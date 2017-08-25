@@ -2,7 +2,6 @@
 // page to configure export options with previews
 // progress bar on wallet generation, export generation
 // a) fix current test failure, b) test wallet creation to reveal no address on decryption bug
-// bug: import private text only update when alphanumerics change (ignore enter key, arrows, etc)
 // change number of wallets, don't destroy rest of history
 // review formats of private keys (hex, base58, etc)
 // peer review encryption schemes
