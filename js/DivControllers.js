@@ -672,6 +672,12 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 		var textarea = $("<textarea>");
 		div.append(textarea);
 		textarea.keyup(function() {
+			
+			// only continue if new characters added
+			let count = countNonWhitespaceCharacters(textarea.val());
+			if (lastCount === count) return;
+			lastCount = count;
+			
 			try {
 				if (textarea.val() === "") {
 					errorDiv.html();
@@ -692,6 +698,8 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 		// done rendering
 		callback(div);
 	}
+	
+	var lastCount = 0;
 }
 inheritsFrom(ImportTextController, DivController);
 

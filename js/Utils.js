@@ -504,6 +504,30 @@ function arrToCsv(arr) {
 }
 
 /**
+ * Indicates if the given character is whitespace.
+ * 
+ * @param char is the character to test
+ * @returns true if the given character is whitespace, false otherwise
+ */
+function isWhitespace(char) {
+	return /\s/.test(char);
+}
+
+/**
+ * Counts the number of non-whitespace characters in the given string.
+ * 
+ * @param str is the string to count the number of non-whitespace characters in
+ * @returns int is the number of non-whitespace characters in the given string
+ */
+function countNonWhitespaceCharacters(str) {
+	let count = 0;
+	for (let i = 0; i < str.length; i++) {
+		if (!isWhitespace(str.charAt(i))) count++;
+	}
+	return count;
+}
+
+/**
  * Enumerates high level goals.
  */
 const Goal = {
