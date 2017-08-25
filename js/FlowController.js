@@ -1,4 +1,6 @@
 // TODO
+// remove isPrivateKeyWif().  only have getPrivateKeyMin(str), isPrivateKey(), and getPrivateKeyWif(privateKey)
+// beef up plugin and wallet tests
 // page to configure export options with previews
 // progress bar on wallet generation, export generation
 // a) fix current test failure, b) test wallet creation to reveal no address on decryption bug
