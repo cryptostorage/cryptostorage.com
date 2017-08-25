@@ -1,11 +1,10 @@
 // TODO
-// add LTC
+// page to configure export options with previews
+// progress bar on wallet generation, export generation
 // bug: on password decrypt page, click decrypt after already decrypting, get error that wallet is not decrypted, saving state somehow
 // support WIF private key import
 // a) fix current test failure, b) test wallet creation to reveal no address on decryption bug
-// page to configure export options with previews
 // bug: import private text only update when alphanumerics change (ignore enter key, arrows, etc)
-// progress bar on wallet generation, export generation
 // change number of wallets, don't destroy rest of history
 // review formats of private keys (hex, base58, etc)
 // peer review encryption schemes
