@@ -734,17 +734,12 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 			executeCallbackFunctionsInSequence(decryptFuncs, function(wallets) {
 				onWalletsDecrypted(wallets);
 			});
-
-//			try {
-//				setErrorMessage("");
-//			} catch(err) {
-//				setErrorMessage(err.message);
-//			}
 			
 			function getDecryptCallbackFunction(wallet, password) {
 				return function(onWalletDecrypted) {
 					wallet.decrypt(password, function(resp) {
 						if (resp.constructor.name === 'Wallet') {
+							btnDecrypt.attr("disabled", "disabled");
 							onWalletDecrypted(resp);
 						} else if (resp.constructor.name === 'Error') {
 							throw resp;

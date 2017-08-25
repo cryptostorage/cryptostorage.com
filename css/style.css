@@ -223,3 +223,12 @@ textarea {
 	width:25px;
 	height:25px;
 }
+
+a[disabled], div[disabled] {
+	pointer-events:none;
+	color:gray;
+}
+
+div[disabled] img {
+	display:none;
+}
