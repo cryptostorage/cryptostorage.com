@@ -18,6 +18,7 @@
 // implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
 // cryptostorage donation addresses
 // make qr codes and style smaller
+// single page swipes with other page static?
 
 const RUN_TESTS = false;
 const DEBUG = true;
