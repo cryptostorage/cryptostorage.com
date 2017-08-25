@@ -10,7 +10,6 @@
 // consult designers
 // namespace utils.js
 // set error messages through class method
-// standardize naming wallet piece vs keys
 // test wallet.setState() combinations
 // implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
 // cryptostorage donation addresses
