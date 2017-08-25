@@ -25,6 +25,8 @@ function getCurrencyPlugin(ticker) {
 
 /**
  * Base currency plugin.
+ * 
+ * The default assumption is the private key formats are the same for min and wif.
  */
 function CurrencyPlugin() { }
 CurrencyPlugin.prototype.newWallet = function(state) { return new Wallet(this, state); }
@@ -33,8 +35,10 @@ CurrencyPlugin.prototype.getTickerSymbol = function() { throw new Error("Subclas
 CurrencyPlugin.prototype.getLogo = function() { throw new Error("Subclass must implement"); }
 CurrencyPlugin.prototype.newPrivateKey = function() { throw new Error("Subclass must implement"); }
 CurrencyPlugin.prototype.isPrivateKey = function(str) { throw new Error("Subclass must implement"); }
+CurrencyPlugin.prototype.isPrivateKeyWif = function(str) { return this.isPrivateKey(str); }						// override if wif is different
+CurrencyPlugin.prototype.getPrivateKey = function(privateKeyWif) { return privateKeyWif; }						// override if wif is different
+CurrencyPlugin.prototype.getPrivateKeyWif = function(unencryptedPrivateKey) { return unencryptedPrivateKey; }	// override if wif is different
 CurrencyPlugin.prototype.getAddress = function(unencryptedPrivateKey) { throw new Error("Subclass must implement"); }
-CurrencyPlugin.prototype.getPrivateKeyWif = function(unencryptedPrivateKey) { return unencryptedPrivateKey; }
 CurrencyPlugin.prototype.getEncryptionSchemes = function() { return [EncryptionScheme.CRYPTOJS]; }
 CurrencyPlugin.prototype.getEncryptionScheme = function(encryptedPrivateKey) { throw new Error("Subclass must implement"); }
 CurrencyPlugin.prototype.isEncrypted = function(privateKey) { return isInitialized(this.getEncryptionScheme(privateKey)); }
@@ -109,11 +113,21 @@ function MoneroPlugin() {
 		if (isHex(str) && str.length <= 65) return true;	// TODO: use library
 		return isInitialized(this.getEncryptionScheme(str));			// TODO: use library
 	}
+	this.isPrivateKeyWif = function(str) {
+		try {
+			return this.isPrivateKey(this.getPrivateKey(str));
+		} catch (err) {
+			return false;
+		}
+	}
 	this.getAddress = function(unencryptedPrivateKey) {
 		assertInitialized(unencryptedPrivateKey);
 		assertFalse(this.isEncrypted(unencryptedPrivateKey));
 		var keys = cnUtil.create_address(unencryptedPrivateKey);
 		return cnUtil.pubkeys_to_string(keys.spend.pub, keys.view.pub);
+	}
+	this.getPrivateKey = function(privateKeyWif) {
+		return mn_decode(privateKeyWif);
 	}
 	this.getPrivateKeyWif = function(unencryptedPrivateKey) {
 		assertInitialized(unencryptedPrivateKey);

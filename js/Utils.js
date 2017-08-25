@@ -644,12 +644,16 @@ function parseWallet(plugin, str) {
 	var lines = str.split('\n');
 	var components = [];
 	for (let line of lines) if (line) components.push(line);
-	if (components.length === 1 && plugin.isPrivateKey(components[0])) return plugin.newWallet({privateKey: str});
-	try {
-		return plugin.newWallet({privateKey: plugin.reconstitute(components) });
-	} catch (err) {
-		console.log(err.message);
-		return null;
+	if (components.length === 0) return null;
+	else if (components.length === 1) {
+		if (plugin.isPrivateKey(components[0])) return plugin.newWallet({privateKey: str});
+		if (plugin.isPrivateKeyWif(components[0])) return plugin.newWallet({privateKeyWif: str});
+	} else {
+		try {
+			return plugin.newWallet({privateKey: plugin.reconstitute(components) });
+		} catch (err) {
+			return null;
+		}
 	}
 }
 

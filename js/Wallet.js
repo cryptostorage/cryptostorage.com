@@ -30,6 +30,9 @@ function Wallet(plugin, state) {
 			assertInitialized(state.privateKeyPieces);
 			assertUninitialized(state.privateKey);
 		}
+		if (state.privateKeyWif) {
+			state.privateKey = this.plugin.getPrivateKey(state.privateKeyWif);
+		}
 		if (state.privateKey) {
 			if (!this.plugin.isPrivateKey(state.privateKey)) throw new Error("Invalid private key: " + state.privateKey);
 			if (state.isSplit) throw new Error("Wallet split conflicts with private key being initialized");
@@ -42,6 +45,7 @@ function Wallet(plugin, state) {
 				if (isInitialized(state.address) && state.address !== address) throw new Error("state.address does not match plugin.getAddress(privateKey)");
 				state.address = address;
 			}
+			state.privateKeyWif = this.plugin.getPrivateKeyWif(state.privateKey);
 		}
 		this.state = state;
 		return this;
@@ -68,7 +72,7 @@ function Wallet(plugin, state) {
 	}
 	
 	this.getPrivateKeyWif = function() {
-		return this.plugin.getPrivateKeyWif(this.getPrivateKey());	// TODO: add to state?
+		return this.state.privateKeyWif;
 	}
 	
 	this.setPrivateKey = function(str) {
