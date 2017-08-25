@@ -1,4 +1,5 @@
 // TODO
+// don't disable next button, just don't decrypt
 // remove isPrivateKeyWif().  only have getPrivateKeyMin(str), isPrivateKey(), and getPrivateKeyWif(privateKey)
 // beef up plugin and wallet tests
 // page to configure export options with previews
