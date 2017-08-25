@@ -1,7 +1,7 @@
 // TODO
+// bug: on password decrypt page, click decrypt after already decrypting, get error that wallet is not decrypted, saving state somehow
 // page to configure export options with previews
 // progress bar on wallet generation, export generation
-// bug: on password decrypt page, click decrypt after already decrypting, get error that wallet is not decrypted, saving state somehow
 // support WIF private key import
 // a) fix current test failure, b) test wallet creation to reveal no address on decryption bug
 // bug: import private text only update when alphanumerics change (ignore enter key, arrows, etc)
