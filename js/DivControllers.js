@@ -314,6 +314,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 	DivController.call(this, div);
 	var passwordInput;	// for later focus on show
 	var schemes = state.currency.getEncryptionSchemes();
+	var errorDiv = $("<div>");
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -336,8 +337,8 @@ function PasswordInputController(div, state, onPasswordInput) {
 		
 		// render advanced
 		var advancedDiv = $("<div>").appendTo(div);
-		advancedDiv.append("Advanced (todo)<br>");
-		advancedDiv.append("Password encryption algorithm:<br><br>");
+		advancedDiv.append("Advanced<br><br>");
+		advancedDiv.append("Password encryption algorithm:<br>");
 		var form = $("<form>");
 		for (let scheme of schemes) {
 			var input = $("<input type='radio' name='schemes' value='" + scheme + "'" + (scheme === schemes[0] ? " checked" : "") + ">");
@@ -383,8 +384,6 @@ function PasswordInputController(div, state, onPasswordInput) {
 		errorDiv.html(str);
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
-	
-	var errorDiv = $("<div>");
 }
 inheritsFrom(PasswordInputController, DivController);
 
@@ -419,6 +418,8 @@ inheritsFrom(SplitSelectionController, DivController);
  */
 function NumPiecesInputController(div, state, onPiecesInput) {
 	DivController.call(this, div);
+	var errorDiv = $("<div>");
+
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 
@@ -440,29 +441,33 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		div.append("<br><br>");
 		
 		// error message
-		var errorDiv = $("<div>");
+		errorDiv.empty();
 		errorDiv.attr("class", "error_msg");
-		errorDiv.hide();
+		setErrorMessage("");
 		div.append(errorDiv);
 		
+		// render next button
 		var btnNext = UiUtils.getNextButton("Next");
 		btnNext.click(function() {
 			var numPieces = parseFloat(numPiecesInput.val());
 			var minPieces = parseFloat(minPiecesInput.val());
 			try {
 				validatePiecesInput(numPieces, minPieces);
-				errorDiv.html();
-				errorDiv.hide();
+				setErrorMessage("");
 				onPiecesInput(numPieces, minPieces);
 			} catch (err) {
-				errorDiv.html(err.message);
-				errorDiv.show();
+				setErrorMessage(err.message);
 			}
 		});
 		div.append(btnNext);
 		
 		// done rendering
 		callback(div);
+	}
+	
+	function setErrorMessage(str) {
+		errorDiv.html(str);
+		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 	
 	function validatePiecesInput(numPieces, minPieces) {
@@ -713,6 +718,9 @@ inheritsFrom(PieceRenderer, DivController);
  */
 function ImportTextController(div, state, onUnsplitWalletsImported) {
 	DivController.call(this, div);
+	var errorDiv = $("<div>");
+	var lastCount = 0;
+	var textarea;
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -721,13 +729,13 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 		div.append(UiUtils.getPageHeader("Enter " + state.currency.getName() + " private key or pieces:", state.currency.getLogo()));
 		
 		// render error div
-		var errorDiv = $("<div>");
+		errorDiv.empty();
 		errorDiv.attr("class", "error_msg");
-		errorDiv.hide();
+		setErrorMessage("");
 		div.append(errorDiv);
 		
 		// render textarea input
-		var textarea = $("<textarea>");
+		textarea = $("<textarea>");
 		div.append(textarea);
 		textarea.keyup(function() {
 			
@@ -738,18 +746,15 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 			
 			try {
 				if (textarea.val() === "") {
-					errorDiv.html();
-					errorDiv.hide();
+					setErrorMessage("");
 				} else {
 					var wallet = parseWallet(state.currency, textarea.val());
-					errorDiv.html();
-					errorDiv.hide();
+					setErrorMessage("");
 					if (wallet) onUnsplitWalletsImported([wallet]);
 				}
 			} catch (err) {
 				console.log(err);
-				errorDiv.html(err.message);
-				errorDiv.show();
+				setErrorMessage(err.message);
 			}
 		});
 		
@@ -757,7 +762,14 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 		callback(div);
 	}
 	
-	var lastCount = 0;
+	this.onShow = function() {
+		textarea.focus();
+	}
+	
+	function setErrorMessage(str) {
+		errorDiv.html(str);
+		str === "" ? errorDiv.hide() : errorDiv.show();
+	}
 }
 inheritsFrom(ImportTextController, DivController);
 
