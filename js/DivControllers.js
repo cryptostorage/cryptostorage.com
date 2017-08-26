@@ -150,24 +150,25 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com"));
+		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com."));
 		
-		div.append(getCheckmarkDiv("Generate ultra secure cold storage for Bitcoin, Bitcoin Cash, Ethereum, Litecoin, and Monero"));
-		div.append(getCheckmarkDiv("Protect your private keys with password encryption"));
-		div.append(getCheckmarkDiv("Optionally split your private keys into separate pieces for maximum security"));
-		div.append(getCheckmarkDiv("Export to printable QR codes, CSV, JSON, and TXT for later recovery"));
+		div.append(getCheckmarkDiv("Generate secure storage for your cryptocurrency."));
+	    div.append(getCheckmarkDiv("Supports Bitcoin, Bitcoin Cash, Ethereum, Litecoin, and Monero."));
+		div.append(getCheckmarkDiv("Protect your private keys with password encryption."));
+		div.append(getCheckmarkDiv("Optionally split your private keys into separate pieces for additional security."));
+		div.append(getCheckmarkDiv("Export to printable QR codes, CSV, JSON, and TXT for long term storage and easy recovery."));
 		div.append(getCheckmarkDiv("100% open source, client-side, and free to use.  No account or trusted third parties."));
 		div.append("<br>");
 		
 		div.append("Select an option to get started.")
 		
 		// render create button
-		var btnCreate = UiUtils.getNextButton("Create new cold storage");
+		var btnCreate = UiUtils.getNextButton("Generate new storage");
 		btnCreate.click(function() { onSelectCreate(); });
 		div.append(btnCreate);
 		
 		// render import button
-		var btnExisting = UiUtils.getNextButton("Import existing cold storage");
+		var btnExisting = UiUtils.getNextButton("Import existing storage");
 		btnExisting.click(function() { onSelectImport(); });
 		div.append(btnExisting);
 		
@@ -201,10 +202,10 @@ function CurrencySelectionController(div, state, onCurrencySelection) {
 		// render title
 		switch (state.goal) {
 		case Goal.CREATE_STORAGE:
-			div.append(UiUtils.getPageHeader("Select a currency to create cold storage for."));
+			div.append(UiUtils.getPageHeader("Select a currency to store."));
 			break;
 		case Goal.RESTORE_STORAGE:
-			div.append(UiUtils.getPageHeader("Select a currency to import from a private key."));
+			div.append(UiUtils.getPageHeader("Select a currency to import."));
 			break;
 		default:
 			throw new Error("Invalid goal for currency selection: " + state.goal);
@@ -232,7 +233,7 @@ function NumPairsController(div, state, onNumPairsInput) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("How many public/private key pairs do you want to create?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("How many public/private keys do you want to create?", state.currency.getLogo()));
 		
 		// num wallets input
 		var numPairsInput = $("<input>");
@@ -365,7 +366,7 @@ function SplitSelectionController(div, state, onSplitSelection) {
 		// render title
 		div.append(UiUtils.getPageHeader("Do you want to split your private keys into separate pieces?", state.currency.getLogo()));
 		
-		div.append("The pieces must be combined to restore the private keys.");
+		div.append("The pieces must be recombined to recover the private keys.");
 		
 		var btnYes = UiUtils.getNextButton("Yes");
 		btnYes.click(function() { onSplitSelection(true); });
@@ -450,7 +451,7 @@ function WalletsSummaryController(div, state, onGenerateWallets) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Ready to generate your " + state.currency.getName() + " cold storage?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Ready to generate your " + state.currency.getName() + " storage?", state.currency.getLogo()));
 		
 		div.append("<b>Summary:</b><br><br>");
 		div.append("Currency: " + state.currency.getName() + " (" + state.currency.getTickerSymbol() + ")").append("<br>");
@@ -812,7 +813,7 @@ function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Import zip or json files generated from cryptostorage.com."));
+		div.append(UiUtils.getPageHeader("Import zip or json files from cryptostorage.com."));
 		
 		// add error div
 		div.append(errorDiv);
@@ -981,12 +982,15 @@ inheritsFrom(ImportFilesController, DivController);
  */
 function DownloadPiecesController(div, state, pieces) {
 	DivController.call(this, div);
+	assertTrue(pieces.length > 0);
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Here are your pieces.", state.currency.getLogo()));
+		let isSplit = pieces[0].isSplit;
+		let encryption = pieces[0].encryption;
+		div.append(UiUtils.getPageHeader("Download your " + state.currency.getName() + " storage.", state.currency.getLogo()));
 		
 		// collect functions to render pieces and divs to be rendered to
 		var pieceDivs = [];
@@ -1021,7 +1025,7 @@ function DownloadPiecesController(div, state, pieces) {
 				downloadIcon.click(function() { saveAs(blob, name); });
 				
 				// render preview
-				div.append("<br>Preview<br>");
+				div.append("<br>Preview:<br>");
 				div.append(pieceDivs[0]);
 				
 				// done rendering
