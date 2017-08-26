@@ -1,4 +1,5 @@
 // TODO
+// enter key on password input
 // mockup custom export page for review
 // single page swipes to reveal static page underneath
 // better terminology
