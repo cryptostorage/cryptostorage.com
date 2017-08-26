@@ -168,7 +168,7 @@ function FlowController(contentController, currencies) {
 			}
 			
 			// convert wallets to pieces for download
-			contentController.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(processedWallets)));
+			contentController.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(processedWallets), onCustomExport));
 		}
 	}
 	
@@ -200,6 +200,12 @@ function FlowController(contentController, currencies) {
 		state.wallets = wallets;
 		state.currency = wallets[0].getCurrencyPlugin();
 		if (wallets[0].isEncrypted()) contentController.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
-		else contentController.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets, true)));
+		else contentController.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets, true), onCustomExport));
+	}
+	
+	function onCustomExport(pieces) {
+		if (DEBUG) console.log("onCustomExport(" + pieces.length + ")");
+		assertTrue(pieces.length > 0);
+		contentController.next(new CustomExportController($("<div>"), state, pieces));
 	}
 }

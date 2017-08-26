@@ -1010,7 +1010,7 @@ inheritsFrom(ImportFilesController, DivController);
  * @param state informs how to render
  * @param pieces are the pieces to download
  */
-function DownloadPiecesController(div, state, pieces) {
+function DownloadPiecesController(div, state, pieces, onCustomExport) {
 	DivController.call(this, div);
 	assertTrue(pieces.length > 0);
 	
@@ -1054,6 +1054,11 @@ function DownloadPiecesController(div, state, pieces) {
 				var downloadIcon = $("<img src='img/download.png' class='download_icon'>").appendTo(downloadIconDiv);
 				downloadIcon.click(function() { saveAs(blob, name); });
 				
+				// render custom export options
+				let customExport = $("<a href=''>").appendTo(downloadZipDiv);
+				customExport.append("Custom export options");
+				customExport.click(function(event) { event.preventDefault(); onCustomExport(pieces); });
+				
 				// render preview
 				div.append("<br>Preview:<br>");
 				div.append(pieceDivs[0]);
@@ -1065,3 +1070,27 @@ function DownloadPiecesController(div, state, pieces) {
 	}
 }
 inheritsFrom(DownloadPiecesController, DivController);
+
+/**
+ * Controls the custom export page.
+ * 
+ * @param div is the div to render to
+ * @param state is the current state of the application
+ * @param pieces are the pieces to custom export
+ */
+function CustomExportController(div, state, pieces) {
+	DivController.call(this, div);
+	assertTrue(pieces.length > 0);
+	
+	this.render = function(callback) {
+		console.log("rendering...");
+		UiUtils.pageSetup(div);
+		
+		// render mock png
+		let mock = $("<img src='img/mock_export.png'>").appendTo(div);
+		mock.attr("width, 75%");
+		
+		callback(div);
+	}
+}
+inheritsFrom(CustomExportController, DivController);
