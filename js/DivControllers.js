@@ -766,7 +766,7 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		var title = "Imported " + wallets.length + " wallets.  Your wallets are password protected with " + wallets[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
+		var title = "Imported " + wallets.length + " key pairs.  Your private keys are password protected with " + wallets[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
 		div.append(UiUtils.getPageHeader(title, state.currency.getLogo()));
 		
 		// render error div

@@ -1,4 +1,6 @@
 // TODO
+// mockup custom export page for review
+// single page swipes to reveal static page underneath
 // better terminology
 // disable ability for duplicate generation or decryption of wallets. page advancement is disabled but it can still start work
 // load dependencies as needed
@@ -20,7 +22,6 @@
 // implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
 // cryptostorage donation addresses
 // make qr codes and style smaller
-// single page swipes with other page static?
 // popup on key generation to reconfirm password
 
 const RUN_TESTS = false;
