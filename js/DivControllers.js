@@ -1088,12 +1088,11 @@ function CustomExportController(div, state, pieces) {
 	assertTrue(pieces.length > 0);
 	
 	this.render = function(callback) {
-		console.log("rendering...");
 		UiUtils.pageSetup(div);
 		
 		// render mock png
 		let mock = $("<img src='img/mock_export.png'>").appendTo(div);
-		mock.attr("width, 75%");
+		mock.css("width", "100%");
 		
 		callback(div);
 	}
