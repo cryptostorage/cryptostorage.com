@@ -1,9 +1,24 @@
 /**
  * UI utilities.
  */
-Utils = {
-	getButton: function(label) {
-		return $("<div class='btn'>" + label + "<div class='btn_arrow_div'><img class='btn_arrow' src='img/arrow.png'></div></div>");
+UiUtils = {
+	getButton: function(label, isNext, icon) {
+		let button = $("<div class='btn'>");
+		if (icon) {
+			var logoDiv = $("<div class='button_icon_div'>").appendTo(button);
+			icon.attr("class", "button_icon");
+			logoDiv.append(icon);
+		}
+		button.append(label);
+		if (isNext) {
+			let nextIcon = $("<div class='btn_arrow_div'>").appendTo(button);
+			nextIcon.append($("<img class='btn_arrow' src='img/arrow.png'>"));
+		}
+		return button;
+	},
+	
+	getNextButton: function(label, icon) {
+		return this.getButton(label, true, icon);
 	},
 
 	pageSetup: function(div) {
@@ -132,25 +147,25 @@ inheritsFrom(ContentController, DivController);
 function HomeController(div, onSelectCreate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(Utils.getPageHeader("Welcome to cryptostorage.com"));
+		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com"));
 		
 		div.append("Please select an option.")
 		
 		// render create button
-		var btnCreate = Utils.getButton("Create new cold storage");
+		var btnCreate = UiUtils.getNextButton("Create new cold storage");
 		btnCreate.click(function() { onSelectCreate(); });
 		div.append(btnCreate);
 		
 		// render import button
-		var btnExisting = Utils.getButton("Import existing cold storage");
+		var btnExisting = UiUtils.getNextButton("Import existing cold storage");
 		btnExisting.click(function() { onSelectImport(); });
 		div.append(btnExisting);
 		
 //		// render create crypto-cash button
-//		var btnCreateCash = Utils.getButton("Create crypto-cash (coming soon)");
+//		var btnCreateCash = UiUtils.getNextButton("Create crypto-cash (coming soon)");
 //		div.append(btnCreateCash);
 		
 		// done rendering
@@ -166,15 +181,15 @@ inheritsFrom(HomeController, DivController);
 function CurrencySelectionController(div, state, onCurrencySelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 		
 		// render title
 		switch (state.goal) {
 		case Goal.CREATE_STORAGE:
-			div.append(Utils.getPageHeader("Select a currency to create cold storage for."));
+			div.append(UiUtils.getPageHeader("Select a currency to create cold storage for."));
 			break;
 		case Goal.RESTORE_STORAGE:
-			div.append(Utils.getPageHeader("Select a currency to import from a private key."));
+			div.append(UiUtils.getPageHeader("Select a currency to import from a private key."));
 			break;
 		default:
 			throw new Error("Invalid goal for currency selection: " + state.goal);
@@ -182,14 +197,8 @@ function CurrencySelectionController(div, state, onCurrencySelection) {
 		
 		// render currency buttons
 		for (let currency of state.currencies) {
-			var btn = $("<div class='btn'>");
-			var logoDiv = $("<div class='currency_icon_div'>").appendTo(btn);
-			var logo = currency.getLogo().appendTo(logoDiv);
-			logo.attr("class", "currency_icon");
-			btn.append(currency.getName() + " (" + currency.getTickerSymbol() + ")");
-			btn.append($("<div class='btn_arrow_div'><img class='btn_arrow' src='img/arrow.png'></div>"));
+			let btn = UiUtils.getNextButton(currency.getName() + " (" + currency.getTickerSymbol() + ")", currency.getLogo()).appendTo(div);
 			btn.click(function() { onCurrencySelection(currency.getTickerSymbol()); });
-			div.append(btn);
 		}
 		
 		// done rendering
@@ -205,10 +214,10 @@ function NumPairsController(div, state, onNumPairsInput) {
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(Utils.getPageHeader("How many public/private key pairs do you want to create?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("How many public/private key pairs do you want to create?", state.currency.getLogo()));
 		
 		// num wallets input
 		var numPairsInput = $("<input>");
@@ -225,7 +234,7 @@ function NumPairsController(div, state, onNumPairsInput) {
 		div.append(errorDiv);
 		
 		// next button
-		var btnNext = Utils.getButton("Next");
+		var btnNext = UiUtils.getNextButton("Next");
 		div.append(btnNext);
 		
 		// validate num wallets when button clicked
@@ -261,15 +270,15 @@ inheritsFrom(NumPairsController, DivController);
 function PasswordSelectionController(div, state, onPasswordSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(Utils.getPageHeader("Do you want to password protect your private keys?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Do you want to password protect your private keys?", state.currency.getLogo()));
 		
-		var btnYes = Utils.getButton("Yes (recommended)");
+		var btnYes = UiUtils.getNextButton("Yes (recommended)");
 		btnYes.click(function() { onPasswordSelection(true); });
 		div.append(btnYes);
-		var btnNo = Utils.getButton("No");
+		var btnNo = UiUtils.getNextButton("No");
 		btnNo.click(function() { onPasswordSelection(false); });
 		div.append(btnNo);
 		
@@ -292,10 +301,10 @@ function PasswordInputController(div, state, onPasswordInput) {
 	var schemes = state.currency.getEncryptionSchemes();
 	
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(Utils.getPageHeader("Enter a password to protect your private keys", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter a password to protect your private keys", state.currency.getLogo()));
 		
 		div.append("Password: ");
 		passwordInput = $("<input type='text'>");
@@ -316,7 +325,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		advancedDiv.append(form);
 		if (schemes.length === 1) advancedDiv.hide();
 		
-		var btnNext = Utils.getButton("Next");
+		var btnNext = UiUtils.getNextButton("Next");
 		btnNext.click(function() {
 			var scheme = $("input[type='radio']:checked", form).val();
 			onPasswordInput(passwordInput.val(), scheme);
@@ -336,17 +345,17 @@ inheritsFrom(PasswordInputController, DivController);
 function SplitSelectionController(div, state, onSplitSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(Utils.getPageHeader("Do you want to split your private keys into separate pieces?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Do you want to split your private keys into separate pieces?", state.currency.getLogo()));
 		
 		div.append("The pieces must be combined to restore the private keys.");
 		
-		var btnYes = Utils.getButton("Yes");
+		var btnYes = UiUtils.getNextButton("Yes");
 		btnYes.click(function() { onSplitSelection(true); });
 		div.append(btnYes);
-		var btnNo = Utils.getButton("No");
+		var btnNo = UiUtils.getNextButton("No");
 		btnNo.click(function() { onSplitSelection(false); });
 		div.append(btnNo);
 		
@@ -362,10 +371,10 @@ inheritsFrom(SplitSelectionController, DivController);
 function NumPiecesInputController(div, state, onPiecesInput) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(Utils.getPageHeader("How many pieces do you want to split your private keys into?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("How many pieces do you want to split your private keys into?", state.currency.getLogo()));
 		
 		div.append("Number of pieces: ");
 		var numPiecesInput = $("<input type='number'>");
@@ -387,7 +396,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		errorDiv.hide();
 		div.append(errorDiv);
 		
-		var btnNext = Utils.getButton("Next");
+		var btnNext = UiUtils.getNextButton("Next");
 		btnNext.click(function() {
 			var numPieces = parseFloat(numPiecesInput.val());
 			var minPieces = parseFloat(minPiecesInput.val());
@@ -423,10 +432,10 @@ inheritsFrom(NumPiecesInputController, DivController);
 function WalletsSummaryController(div, state, onGenerateWallets) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(Utils.getPageHeader("Ready to generate your " + state.currency.getName() + " cold storage?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Ready to generate your " + state.currency.getName() + " cold storage?", state.currency.getLogo()));
 		
 		div.append("<b>Summary:</b><br><br>");
 		div.append("Currency: " + state.currency.getName() + " (" + state.currency.getTickerSymbol() + ")").append("<br>");
@@ -434,7 +443,7 @@ function WalletsSummaryController(div, state, onGenerateWallets) {
 		div.append("Password protection: " + (state.passwordEnabled ? "Yes" : "No") + (state.passwordEnabled ? " (" + state.encryptionScheme + ")" : "")).append("<br>");
 		div.append("Split private keys: " + (state.splitEnabled ? "Yes" : "No") + (state.splitEnabled ? " (" + state.minPieces + " of " + state.numPieces + " pieces necessary to restore)" : "")).append("<br>");
 		
-		var btnGenerate = Utils.getButton("Generate cold storage");
+		var btnGenerate = UiUtils.getNextButton("Generate cold storage");
 		btnGenerate.click(function() { onGenerateWallets(); });
 		div.append(btnGenerate);
 		callback(div);
@@ -657,10 +666,10 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(Utils.getPageHeader("Enter private key or pieces:", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter private key or pieces:", state.currency.getLogo()));
 		
 		// render error div
 		var errorDiv = $("<div>");
@@ -715,11 +724,11 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 	var wallets = state.wallets;
 	
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 		
 		// render title
 		var title = "Imported " + wallets.length + " wallets.  Your wallets are password protected with " + wallets[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
-		div.append(Utils.getPageHeader(title, state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader(title, state.currency.getLogo()));
 		
 		// render error div
 		div.append(errorDiv);
@@ -734,7 +743,7 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 		div.append("<br><br>");
 		
 		// render decrypt button
-		var btnDecrypt = Utils.getButton("Decrypt");
+		var btnDecrypt = UiUtils.getButton("Decrypt");
 		btnDecrypt.click(function() {
 			var password = passwordInput.val();
 			var decryptFuncs = [];
@@ -785,10 +794,10 @@ function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(Utils.getPageHeader("Import zip or json files generated from cryptostorage.com."));
+		div.append(UiUtils.getPageHeader("Import zip or json files generated from cryptostorage.com."));
 		
 		// add error div
 		div.append(errorDiv);
@@ -802,7 +811,7 @@ function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText
 		div.append(fileList);
 		
 		// add button to import from text
-		var btnImportText = Utils.getButton("Import private key from text instead").appendTo(div);
+		var btnImportText = UiUtils.getNextButton("Import private key from text instead").appendTo(div);
 		btnImportText.click(onSelectImportText);
 		
 		// handle on files imported
@@ -959,10 +968,10 @@ function DownloadPiecesController(div, state, pieces) {
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
-		Utils.pageSetup(div);
+		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(Utils.getPageHeader("Here are your pieces.", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Here are your pieces.", state.currency.getLogo()));
 		
 		// collect functions to render pieces and divs to be rendered to
 		var pieceDivs = [];

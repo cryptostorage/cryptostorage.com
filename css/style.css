@@ -188,14 +188,14 @@ textarea {
 	height:400px;
 }
 
-.currency_icon_div {
+.button_icon_div {
 	width:60px;
 	display:flex;
 	align-items:center;
 	justify-content:center;
 }
 
-.currency_icon {
+.button_icon {
 	width:42px;
 	height:42px;
 }
