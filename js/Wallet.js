@@ -122,8 +122,7 @@ function Wallet(plugin, state) {
 		if (this.isSplit()) throw new Error("Wallet is split");
 		if (isUndefined(this.getPrivateKey())) throw new Error("Wallet is not initialized");
 		this.plugin.decrypt(this.getEncryptionScheme(), this.getPrivateKey(), password, function(resp) {
-			if (resp.constructor.name === 'Error') callback(resp)
-			else if (!that.plugin.isPrivateKey(resp)) callback(new Error("Invalid password"));
+			if (resp.constructor.name === 'Error' || !that.plugin.isPrivateKey(resp)) callback(new Error("Invalid password"));
 			else {
 				assertUndefined(that.plugin.getEncryptionScheme(resp));
 				that.state.privateKey = resp;
