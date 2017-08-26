@@ -44,8 +44,8 @@ function Wallet(plugin, state) {
 				var address = this.plugin.getAddress(state.privateKey);
 				if (isInitialized(state.address) && state.address !== address) throw new Error("state.address does not match plugin.getAddress(privateKey)");
 				state.address = address;
+				state.privateKeyWif = this.plugin.getPrivateKeyWif(state.privateKey);
 			}
-			state.privateKeyWif = this.plugin.getPrivateKeyWif(state.privateKey);
 		}
 		this.state = state;
 		return this;

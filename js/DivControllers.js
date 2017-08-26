@@ -685,7 +685,7 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Enter private key or pieces:", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter " + state.currency.getName() + " private key or pieces:", state.currency.getLogo()));
 		
 		// render error div
 		var errorDiv = $("<div>");
@@ -773,9 +773,10 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 					wallet.decrypt(password, function(resp) {
 						if (resp.constructor.name === 'Wallet') {
 							btnDecrypt.attr("disabled", "disabled");
+							setErrorMessage("");
 							onWalletDecrypted(resp);
 						} else if (resp.constructor.name === 'Error') {
-							throw resp;
+							setErrorMessage(resp.message);
 						} else {
 							throw new Error("Unrecognized decryption response: " + (resp.constructor.name));
 						}
@@ -837,6 +838,7 @@ function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText
 				var reader = new FileReader();
 				reader.onload = function(event) {
 					getNamedPiecesFromFile(file, reader.result, function(namedPieces) {
+						console.log("onNamedPieces(" + namedPieces.length + ")");
 						if (namedPieces.length === 0) {
 							if (file.type === "application/json") that.setErrorMessage("File '" + file.name + "' is not a valid JSON piece");
 							else if (file.type === "application/zip") that.setErrorMessage("Zip '" + file.name + "' does not contain any valid JSON pieces");
@@ -850,6 +852,7 @@ function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText
 									setErrorMessage(err.message);
 								}
 							}
+							console.log(importedPieces);
 							var unsplitWallets = getUnsplitWallets(importedPieces);
 							if (unsplitWallets.length > 0) onUnsplitWalletsImported(unsplitWallets);
 						}
@@ -862,6 +865,7 @@ function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText
 		}
 		
 		function getNamedPiecesFromFile(file, data, onNamedPieces) {
+			console.log("getNamedPiecesFromFile()");
 			if (file.type === 'application/json') {
 				let piece = JSON.parse(data);
 				validatePiece(piece);
