@@ -1,6 +1,5 @@
 // TODO
 // enter key on password input
-// mockup custom export page for review
 // single page swipes to reveal static page underneath
 // better terminology
 // disable ability for duplicate generation or decryption of wallets. page advancement is disabled but it can still start work
