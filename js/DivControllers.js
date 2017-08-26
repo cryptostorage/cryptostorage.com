@@ -734,7 +734,7 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 		div.append("<br><br>");
 		
 		// render decrypt button
-		var btnDecrypt = Utils.getButton("Next");
+		var btnDecrypt = Utils.getButton("Decrypt");
 		btnDecrypt.click(function() {
 			var password = passwordInput.val();
 			var decryptFuncs = [];
