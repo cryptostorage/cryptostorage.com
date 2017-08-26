@@ -348,6 +348,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		advancedDiv.append(form);
 		if (schemes.length === 1) advancedDiv.hide();
 		
+		// render next button
 		var btnNext = UiUtils.getNextButton("Next");
 		btnNext.click(function() {
 			let password = passwordInput.val();
@@ -361,6 +362,16 @@ function PasswordInputController(div, state, onPasswordInput) {
 			passwordInput.focus();
 		});
 		div.append(btnNext);
+		
+		// register pasword enter key
+		passwordInput.keyup(function(e) {
+			var code = e.which;
+		    if (code == 13) {
+		    	e.preventDefault();
+		        btnNext.click();
+		    }
+		});
+		
 		callback(div);
 	}
 	
@@ -816,6 +827,15 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 			}
 		});
 		div.append(btnDecrypt);
+		
+		// register pasword enter key
+		passwordInput.keyup(function(e) {
+			var code = e.which;
+		    if (code == 13) {
+		    	e.preventDefault();
+		    	btnDecrypt.click();
+		    }
+		});
 		
 		// done rendering
 		callback();
