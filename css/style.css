@@ -253,3 +253,8 @@ div[disabled] img {
 	width:25px;
 	height:25px;
 }
+
+input[type='file'] {
+	calibri, arial, verdana, sans-serif;
+	font-size: 19px;
+}
