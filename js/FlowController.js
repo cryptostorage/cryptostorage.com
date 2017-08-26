@@ -1,6 +1,5 @@
 // TODO
-// getButton() with or without the arrow, then Decrypt button doesn't have arrow
-// better terminology, add bullets with what this servie provides
+// better terminology
 // disable ability for duplicate generation or decryption of wallets. page advancement is disabled but it can still start work
 // load dependencies as needed
 // don't disable next button, just don't decrypt

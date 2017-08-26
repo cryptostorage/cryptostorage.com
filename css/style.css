@@ -92,7 +92,7 @@ body {
 }
 
 .page_header_div {
-	height:50px;
+	height:40px;
 	display:flex;
 	align-items:center;
 	justify-content:center;
@@ -188,14 +188,14 @@ textarea {
 	height:400px;
 }
 
-.button_icon_div {
+.btn_icon_div {
 	width:60px;
 	display:flex;
 	align-items:center;
 	justify-content:center;
 }
 
-.button_icon {
+.btn_icon {
 	width:42px;
 	height:42px;
 }
@@ -232,4 +232,24 @@ a[disabled], div[disabled] {
 
 div[disabled] img {
 	display:none;
+}
+
+.checkmark_text_div {
+	height:30px;
+	color:black;
+	font-size:18px;
+	display:flex;
+	align-items:center;
+}
+
+.checkmark_text_icon_div {
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	margin: 0px 10px 0px 10px;
+}
+
+.checkmark_text_icon {
+	width:25px;
+	height:25px;
 }

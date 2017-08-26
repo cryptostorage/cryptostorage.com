@@ -5,8 +5,8 @@ UiUtils = {
 	getButton: function(label, isNext, icon) {
 		let button = $("<div class='btn'>");
 		if (icon) {
-			var logoDiv = $("<div class='button_icon_div'>").appendTo(button);
-			icon.attr("class", "button_icon");
+			var logoDiv = $("<div class='btn_icon_div'>").appendTo(button);
+			icon.attr("class", "btn_icon");
 			logoDiv.append(icon);
 		}
 		button.append(label);
@@ -152,7 +152,14 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com"));
 		
-		div.append("Please select an option.")
+		div.append(getCheckmarkDiv("Generate ultra secure cold storage for Bitcoin, Bitcoin Cash, Ethereum, Litecoin, and Monero"));
+		div.append(getCheckmarkDiv("Protect your private keys with password encryption"));
+		div.append(getCheckmarkDiv("Optionally split your private keys into separate pieces for maximum security"));
+		div.append(getCheckmarkDiv("Export to printable QR codes, CSV, JSON, and TXT for later recovery"));
+		div.append(getCheckmarkDiv("100% open source, client-side, and free to use.  No account or trusted third parties."));
+		div.append("<br>");
+		
+		div.append("Select an option to get started.")
 		
 		// render create button
 		var btnCreate = UiUtils.getNextButton("Create new cold storage");
@@ -170,6 +177,14 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		
 		// done rendering
 		callback(div);
+	}
+	
+	function getCheckmarkDiv(str) {
+		let div = $("<div class='checkmark_text_div'>");
+		let checkmarkDiv = $("<div class='checkmark_text_icon_div'>").appendTo(div);
+		let checkmark = $("<img class='checkmark_text_icon' src='img/checkmark.png'>").appendTo(checkmarkDiv);
+		div.append(str);
+		return div;
 	}
 }
 inheritsFrom(HomeController, DivController);
