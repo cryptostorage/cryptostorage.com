@@ -589,7 +589,7 @@ function decrypt(scheme, str, password, callback) {
 			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(str, password, function (btcKeyOrError) {
 				if (btcKeyOrError.message) callback(btcKeyOrError);
 				else callback(new Bitcoin.ECKey(btcKeyOrError).setCompressed(true).getBitcoinWalletImportFormat());
-			});			
+			});
 			break;
 		default:
 			throw new Error(scheme + " decryption not implemented");
