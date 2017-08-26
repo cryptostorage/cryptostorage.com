@@ -92,7 +92,7 @@ body {
 }
 
 .page_header_div {
-	height:40px;
+	height:50px;
 	display:flex;
 	align-items:center;
 	justify-content:center;
@@ -103,6 +103,7 @@ body {
 	font-weight: bold;
 	display:flex;
 	flex: 1 1 auto;
+	width:100%;
 	align-items:center;
 	justify-content:center;
 	position: absolute;
@@ -113,7 +114,7 @@ body {
 .page_header_icon_div {
 	display:flex;
 	margin-right:10px;
-	flex: 1 1 auto;
+	flex: 0 1 auto;
 	align-items:center;
 	justify-content:center;
 }

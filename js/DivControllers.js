@@ -787,6 +787,11 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 		var btnDecrypt = UiUtils.getButton("Decrypt");
 		btnDecrypt.click(function() {
 			var password = passwordInput.val();
+			if (password === "") {
+				setErrorMessage("Password must not be blank");
+				return;
+			} else setErrorMessage("");
+			
 			var decryptFuncs = [];
 			for (let wallet of wallets) decryptFuncs.push(getDecryptCallbackFunction(wallet, password));
 			executeCallbackFunctionsInSequence(decryptFuncs, function(wallets) {
