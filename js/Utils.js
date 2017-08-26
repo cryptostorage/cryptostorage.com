@@ -583,8 +583,12 @@ function decrypt(scheme, str, password, callback) {
 	if (!password) throw new Error("Password must not be empty");
 	switch(scheme) {
 		case EncryptionScheme.CRYPTOJS:
-			callback(CryptoJS.AES.decrypt(str, password).toString(CryptoJS.enc.Utf8));
-			break;
+			try {
+				callback(CryptoJS.AES.decrypt(str, password).toString(CryptoJS.enc.Utf8));
+				break;
+			} catch (err) {
+				callback(new Error("Invalid password"));
+			}
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(str, password, function (btcKeyOrError) {
 				if (btcKeyOrError.message) callback(btcKeyOrError);

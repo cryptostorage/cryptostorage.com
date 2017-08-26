@@ -110,7 +110,7 @@ function MoneroPlugin() {
 		return cnUtil.sc_reduce32(cnUtil.rand_32());
 	};
 	this.isPrivateKey = function(str) {
-		if (isHex(str) && str.length >=63 && str.length <= 65) return true;	// TODO: use library
+		if (isHex(str) && str.length >= 63 && str.length <= 65) return true;	// TODO: use library
 		return isInitialized(this.getEncryptionScheme(str));				// TODO: use library
 	}
 	this.isPrivateKeyWif = function(str) {
@@ -165,7 +165,7 @@ function EthereumPlugin() {
 		return keythereum.create().privateKey.toString("hex");
 	};
 	this.isPrivateKey = function(str) {
-		if (isHex(str) && str.length <= 65) return true;	// TODO: use library
+		if (isHex(str) && str.length >= 63 && str.length <= 65) return true;	// TODO: use library
 		return isInitialized(this.getEncryptionScheme(str));			// TODO: use library
 	}
 	this.getAddress = function(unencryptedPrivateKey) {

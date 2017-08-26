@@ -106,14 +106,13 @@ function Wallet(plugin, state) {
 		if (isUndefined(this.getPrivateKey())) throw new Error("Wallet is not initialized");
 		if (!contains(this.plugin.getEncryptionSchemes(), scheme)) throw new Error("'" + scheme + "' is not a supported encryption scheme among " + this.plugin.getEncryptionSchemes());
 		this.plugin.encrypt(scheme, this.getPrivateKey(), password, function(resp) {
-			if (resp.constructor.name === 'Error') throw resp;
-			if (!that.plugin.isPrivateKey(resp)) {
-				callback(new Error("Encryption produced invalid private key"));
-				return;
+			if (resp.constructor.name === 'Error') callback(resp)
+			else if (!that.plugin.isPrivateKey(resp)) callback(new Error("Encryption produced invalid private key"));
+			else {
+				that.state.privateKey = resp;
+				that.state.encryption = scheme;
+				callback(that);
 			}
-			that.state.privateKey = resp;
-			that.state.encryption = scheme;
-			callback(that);
 		});
 		return this;
 	}
@@ -123,16 +122,15 @@ function Wallet(plugin, state) {
 		if (this.isSplit()) throw new Error("Wallet is split");
 		if (isUndefined(this.getPrivateKey())) throw new Error("Wallet is not initialized");
 		this.plugin.decrypt(this.getEncryptionScheme(), this.getPrivateKey(), password, function(resp) {
-			if (resp.constructor.name === 'Error') throw resp;
-			if (!that.plugin.isPrivateKey(resp)) {
-				callback(new Error("Invalid password"));
-				return;
+			if (resp.constructor.name === 'Error') callback(resp)
+			else if (!that.plugin.isPrivateKey(resp)) callback(new Error("Invalid password"));
+			else {
+				assertUndefined(that.plugin.getEncryptionScheme(resp));
+				that.state.privateKey = resp;
+				that.state.address = that.plugin.getAddress(resp);
+				that.state.encryption = undefined;
+				callback(that);
 			}
-			assertUndefined(that.plugin.getEncryptionScheme(resp));
-			that.state.privateKey = resp;
-			that.state.address = that.plugin.getAddress(resp);
-			that.state.encryption = undefined;
-			callback(that);
 		});
 		return this;
 	}

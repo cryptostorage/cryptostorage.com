@@ -322,14 +322,22 @@ function PasswordInputController(div, state, onPasswordInput) {
 		// render title
 		div.append(UiUtils.getPageHeader("Enter a password to protect your private keys", state.currency.getLogo()));
 		
+		// render error div
+		div.append(errorDiv);
+		errorDiv.attr("class", "error_msg");
+		errorDiv.hide();
+		div.append(errorDiv);
+		
+		// render password input
 		div.append("Password: ");
 		passwordInput = $("<input type='text'>");
 		passwordInput.attr("class", "text_input");
 		div.append(passwordInput);
 		div.append("<br><br>");
 		
+		// render advanced
 		var advancedDiv = $("<div>").appendTo(div);
-		advancedDiv.append("Advanced<br>");
+		advancedDiv.append("Advanced (todo)<br>");
 		advancedDiv.append("Password encryption algorithm:<br><br>");
 		var form = $("<form>");
 		for (let scheme of schemes) {
@@ -343,15 +351,30 @@ function PasswordInputController(div, state, onPasswordInput) {
 		
 		var btnNext = UiUtils.getNextButton("Next");
 		btnNext.click(function() {
-			var scheme = $("input[type='radio']:checked", form).val();
-			onPasswordInput(passwordInput.val(), scheme);
+			let password = passwordInput.val();
+			if (password === "") setErrorMessage("Password cannot be empty")
+			else if (password.length < 6) setErrorMessage("Password must be at least 6 characters");
+			else {
+				setErrorMessage("");
+				var scheme = $("input[type='radio']:checked", form).val();
+				onPasswordInput(passwordInput.val(), scheme);
+			}
+			passwordInput.focus();
 		});
 		div.append(btnNext);
 		callback(div);
 	}
+	
 	this.onShow = function() {
 		passwordInput.focus();
 	}
+	
+	function setErrorMessage(str) {
+		errorDiv.html(str);
+		str === "" ? errorDiv.hide() : errorDiv.show();
+	}
+	
+	var errorDiv = $("<div>");
 }
 inheritsFrom(PasswordInputController, DivController);
 
@@ -738,6 +761,7 @@ inheritsFrom(ImportTextController, DivController);
 function DecryptWalletsController(div, state, onWalletsDecrypted) {
 	DivController.call(this, div);
 	var wallets = state.wallets;
+	var passwordInput;	// for later focus
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -754,7 +778,9 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 		
 		// render password input
 		div.append("Password: ");
-		var passwordInput = $("<input type='text'>");
+		passwordInput = $("<input type='text'>");
+		passwordInput.attr("class", "text_input");
+
 		div.append(passwordInput);
 		div.append("<br><br>");
 		
@@ -777,6 +803,7 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 							onWalletDecrypted(resp);
 						} else if (resp.constructor.name === 'Error') {
 							setErrorMessage(resp.message);
+							passwordInput.focus();
 						} else {
 							throw new Error("Unrecognized decryption response: " + (resp.constructor.name));
 						}
@@ -790,13 +817,16 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 		callback();
 	}
 	
+	this.onShow = function() {
+		passwordInput.focus();
+	}
+	
 	function setErrorMessage(str) {
 		errorDiv.html(str);
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 	
 	var errorDiv = $("<div>");
-	errorDiv.attr("class", "error_msg");	
 }
 inheritsFrom(DecryptWalletsController, DivController);
 
