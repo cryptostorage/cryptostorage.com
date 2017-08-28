@@ -10,8 +10,8 @@ function getCurrencyPlugins() {
 		plugins.push(new BitcoinPlugin());
 		plugins.push(new BitcoinCashPlugin());
 		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
 		plugins.push(new LitecoinPlugin());
+		plugins.push(new MoneroPlugin());
 	}
 	return plugins;
 }

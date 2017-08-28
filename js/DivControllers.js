@@ -152,7 +152,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com."));
 		
-		div.append(getCheckmarkDiv("Generate secure storage for Bitcoin, Bitcoin Cash, Litecoin, Ethereum, and Monero."));
+		div.append(getCheckmarkDiv("Generate secure storage for Bitcoin, Bitcoin Cash, Ethereum, Litecoin, and Monero."));
 		div.append(getCheckmarkDiv("Protect your private keys with password encryption."));
 		div.append(getCheckmarkDiv("Optionally split your private keys into separate pieces for additional security."));
 		div.append(getCheckmarkDiv("Export to printable QR codes, CSV, JSON, and TXT for long term storage and easy recovery."));
