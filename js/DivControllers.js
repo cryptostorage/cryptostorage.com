@@ -155,7 +155,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		div.append(getCheckmarkDiv("Generate secure storage for Bitcoin, Bitcoin Cash, Ethereum, Litecoin, and Monero."));
 		div.append(getCheckmarkDiv("Protect your private keys with password encryption."));
 		div.append(getCheckmarkDiv("Optionally split your private keys into separate pieces for additional security."));
-		div.append(getCheckmarkDiv("Export to printable QR codes, CSV, JSON, and TXT for long term storage and easy recovery."));
+		div.append(getCheckmarkDiv("Export to printable QR codes, csv, json, and txt for long term storage and easy recovery."));
 		div.append(getCheckmarkDiv("100% open source, client-side, and free to use.  No account or trusted third parties."));
 		div.append("<br><br>");
 		
@@ -201,7 +201,7 @@ function CurrencySelectionController(div, state, onCurrencySelection) {
 		// render title
 		switch (state.goal) {
 		case Goal.CREATE_STORAGE:
-			div.append(UiUtils.getPageHeader("Select a currency to store."));
+			div.append(UiUtils.getPageHeader("Select a cryptocurrency to store."));
 			break;
 		case Goal.RESTORE_STORAGE:
 			div.append(UiUtils.getPageHeader("Select a currency to import."));
@@ -320,7 +320,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("Enter a password to protect your " + state.currency.getName() + " private keys", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter a password to protect your " + state.currency.getName() + " private keys.", state.currency.getLogo()));
 		
 		// render error div
 		div.append(errorDiv);
@@ -497,7 +497,7 @@ function WalletsSummaryController(div, state, onGenerateWallets) {
 		div.append("Password protection: " + (state.passwordEnabled ? "Yes" : "No") + (state.passwordEnabled ? " (" + state.encryptionScheme + ")" : "")).append("<br>");
 		div.append("Split private keys: " + (state.splitEnabled ? "Yes" : "No") + (state.splitEnabled ? " (" + state.minPieces + " of " + state.numPieces + " pieces necessary to restore)" : "")).append("<br>");
 		
-		var btnGenerate = UiUtils.getNextButton("Generate storage");
+		var btnGenerate = UiUtils.getNextButton("Generate " + state.currency.getName() + " storage");
 		btnGenerate.click(function() { onGenerateWallets(); });
 		div.append(btnGenerate);
 		callback(div);
@@ -1057,7 +1057,7 @@ function DownloadPiecesController(div, state, pieces, onCustomExport) {
 		// render title
 		let isSplit = pieces[0].isSplit;
 		let encryption = pieces[0].encryption;
-		div.append(UiUtils.getPageHeader("Download your " + state.currency.getName() + " storage.", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Download your " + (encryption ? " encrypted " : " unencrypted ") + state.currency.getName() + " storage.", state.currency.getLogo()));
 		
 		// collect functions to render pieces and divs to be rendered to
 		var pieceDivs = [];
