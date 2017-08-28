@@ -157,7 +157,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		div.append(getCheckmarkDiv("Optionally split your private keys into separate pieces for additional security."));
 		div.append(getCheckmarkDiv("Export to printable QR codes, CSV, JSON, and TXT for long term storage and easy recovery."));
 		div.append(getCheckmarkDiv("100% open source, client-side, and free to use.  No account or trusted third parties."));
-		div.append("<br>");
+		div.append("<br><br>");
 		
 		div.append("Select an option to get started.")
 		
@@ -726,7 +726,7 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Enter " + state.currency.getName() + " private key or pieces:", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter " + state.currency.getName() + " private key or split pieces:", state.currency.getLogo()));
 		
 		// render error div
 		errorDiv.empty();
