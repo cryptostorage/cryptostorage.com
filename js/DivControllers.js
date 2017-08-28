@@ -232,7 +232,7 @@ function NumPairsController(div, state, onNumPairsInput) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("How many public/private keys do you want to create?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("How many " + state.currency.getName() + " public/private keys do you want to create?", state.currency.getLogo()));
 		
 		// num wallets input
 		var numPairsInput = $("<input>");
@@ -288,7 +288,7 @@ function PasswordSelectionController(div, state, onPasswordSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Do you want to password protect your private keys?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Do you want to password protect your " + state.currency.getName() + " private keys?", state.currency.getLogo()));
 		
 		var btnYes = UiUtils.getNextButton("Yes (recommended)");
 		btnYes.click(function() { onPasswordSelection(true); });
@@ -320,7 +320,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("Enter a password to protect your private keys", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter a password to protect your " + state.currency.getName() + " private keys", state.currency.getLogo()));
 		
 		// render error div
 		div.append(errorDiv);
@@ -396,7 +396,7 @@ function SplitSelectionController(div, state, onSplitSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Do you want to split your private keys into separate pieces?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Do you want to split your " + state.currency.getName() + " private keys into separate pieces?", state.currency.getLogo()));
 		
 		div.append("The pieces must be recombined to recover the private keys.");
 		
@@ -424,7 +424,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("How many pieces do you want to split your private keys into?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("How many pieces do you want to split your " + state.currency.getName() + " private keys into?", state.currency.getLogo()));
 		
 		div.append("Number of pieces: ");
 		var numPiecesInput = $("<input type='number'>");
@@ -497,7 +497,7 @@ function WalletsSummaryController(div, state, onGenerateWallets) {
 		div.append("Password protection: " + (state.passwordEnabled ? "Yes" : "No") + (state.passwordEnabled ? " (" + state.encryptionScheme + ")" : "")).append("<br>");
 		div.append("Split private keys: " + (state.splitEnabled ? "Yes" : "No") + (state.splitEnabled ? " (" + state.minPieces + " of " + state.numPieces + " pieces necessary to restore)" : "")).append("<br>");
 		
-		var btnGenerate = UiUtils.getNextButton("Generate cold storage");
+		var btnGenerate = UiUtils.getNextButton("Generate storage");
 		btnGenerate.click(function() { onGenerateWallets(); });
 		div.append(btnGenerate);
 		callback(div);
@@ -789,7 +789,7 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		var title = "Imported " + wallets.length + " key pairs.  Your private keys are password protected with " + wallets[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
+		var title = "Imported " + wallets.length + " " + state.currency.getName() + " key pairs which are password protected with " + wallets[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
 		div.append(UiUtils.getPageHeader(title, state.currency.getLogo()));
 		
 		// render error div
