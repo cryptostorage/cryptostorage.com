@@ -1,11 +1,10 @@
 // TODO
-// enter key on password input
 // single page swipes to reveal static page underneath
-// better terminology
 // disable ability for duplicate generation or decryption of wallets. page advancement is disabled but it can still start work
 // load dependencies as needed
 // don't disable next button, just don't decrypt
 // remove isPrivateKeyWif().  only have getPrivateKeyMin(str), isPrivateKey(), and getPrivateKeyWif(privateKey)
+// import json with monero wif throws exception
 // beef up plugin and wallet tests
 // page to configure export options with previews
 // progress bar on wallet generation, export generation
