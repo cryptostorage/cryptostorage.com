@@ -123,14 +123,14 @@ function ContentController(contentDiv) {
 			
 			// swipe right
 			if (lastIdx < curIdx) {
-				pathTracker.getItems()[lastIdx].getDiv().toggle("slide", {direction: "left"}, 400);
-				pathTracker.getItems()[curIdx].getDiv().toggle("slide", {direction: "right", complete:function() { transitioning = false; renderer.onShow(); }}, 400);
+				pathTracker.getItems()[lastIdx].getDiv().toggle("slide", {direction: "left"}, 250);
+				pathTracker.getItems()[curIdx].getDiv().toggle("slide", {direction: "right", complete:function() { transitioning = false; renderer.onShow(); }}, 250);
 			}
 			
 			// swipe left
 			else {
-				pathTracker.getItems()[lastIdx].getDiv().toggle("slide", {direction: "right"}, 400);
-				pathTracker.getItems()[curIdx].getDiv().toggle("slide", {direction: "left", complete:function() { transitioning = false; renderer.onShow(); }}, 400);
+				pathTracker.getItems()[lastIdx].getDiv().toggle("slide", {direction: "right"}, 250);
+				pathTracker.getItems()[curIdx].getDiv().toggle("slide", {direction: "left", complete:function() { transitioning = false; renderer.onShow(); }}, 250);
 			}
 		}
 		
