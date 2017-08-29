@@ -1,6 +1,7 @@
 // TODO
-// single page swipes to reveal static page underneath
-// disable ability for duplicate generation or decryption of wallets. page advancement is disabled but it can still start work
+// padding issues with headers and last row of currency buttons
+// pages not detached from dom when removed from path
+// fix ability for duplicate generation or decryption of wallets. page advancement is disabled but it can still start work
 // load dependencies as needed
 // don't disable next button, just don't decrypt
 // remove isPrivateKeyWif().  only have getPrivateKeyMin(str), isPrivateKey(), and getPrivateKeyWif(privateKey)
