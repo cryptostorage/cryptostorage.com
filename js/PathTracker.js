@@ -78,6 +78,10 @@ function PathTracker(onUpdate) {
 		return idx;
 	}
 	
+	this.getNexts = function() {
+		return items.slice(idx + 1);
+	}
+	
 	function clearNexts() {
 		items = items.slice(0, idx + 1);
 	}

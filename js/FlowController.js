@@ -1,6 +1,4 @@
 // TODO
-// padding issues with headers and last row of currency buttons
-// pages not detached from dom when removed from path
 // fix ability for duplicate generation or decryption of wallets. page advancement is disabled but it can still start work
 // load dependencies as needed
 // don't disable next button, just don't decrypt
@@ -37,33 +35,33 @@ $(document).ready(function() {
 	if (RUN_TESTS) runTests();
 	
 	// initialize content div and flow controller
-	var contentController = new ContentController($("#content"));
-	contentController.render(function() {
-		new FlowController(contentController, getCurrencyPlugins());
+	var pageManager = new PageManager($("#content"));
+	pageManager.render(function() {
+		new FlowController(pageManager, getCurrencyPlugins());
 	})
 });
 
 /**
  * Manages the application flow.
  * 
- * @param contentDiv is the div to render the application content to
+ * @param pageManager manages page navigation and rendering
  * @param currencies is an array of supported currencies
  */
-function FlowController(contentController, currencies) {
+function FlowController(pageManager, currencies) {
 	
 	// track application state
 	var state = {};
 	state.currencies = currencies;
 	
 	// render home page
-	contentController.next(new HomeController($("<div>"), onCreateWallets, onSelectImport));
+	pageManager.next(new HomeController($("<div>"), onCreateWallets, onSelectImport));
 	
 	// ------------------------------ CREATE NEW --------------------------------
 	
 	function onCreateWallets() {
 		if (DEBUG) console.log("onCreateWallets()");
 		state.goal = Goal.CREATE_STORAGE;
-		contentController.next(new CurrencySelectionController($("<div>"), state, onCurrencySelectionNew));
+		pageManager.next(new CurrencySelectionController($("<div>"), state, onCurrencySelectionNew));
 	}
 	
 	function onCurrencySelectionNew(tickerSymbol) {
@@ -72,35 +70,35 @@ function FlowController(contentController, currencies) {
 			if (currency.getTickerSymbol() === tickerSymbol) state.currency = currency;
 		}
 		if (!state.currency) throw new Error("Currency not found with ticker symbol: " + tickerSymbol);
-		contentController.next(new NumPairsController($("<div>"), state, onNumPairsInput));
+		pageManager.next(new NumPairsController($("<div>"), state, onNumPairsInput));
 	}
 	
 	function onNumPairsInput(numWallets) {
 		if (DEBUG) console.log("onNumPairsInput(" + numWallets + ")");
 		assertInt(numWallets);
 		state.numWallets = numWallets;
-		contentController.next(new PasswordSelectionController($("<div>"), state, onPasswordSelection))
+		pageManager.next(new PasswordSelectionController($("<div>"), state, onPasswordSelection))
 	}
 	
 	function onPasswordSelection(passwordEnabled) {
 		if (DEBUG) console.log("onPasswordSelection(" + passwordEnabled + ")");
 		state.passwordEnabled = passwordEnabled;
-		if (passwordEnabled) contentController.next(new PasswordInputController($("<div>"), state, onPasswordInput));
-		else contentController.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
+		if (passwordEnabled) pageManager.next(new PasswordInputController($("<div>"), state, onPasswordInput));
+		else pageManager.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
 	}
 
 	function onPasswordInput(password, encryptionScheme) {
 		if (DEBUG) console.log("onPasswordInput(" + password + ", " + encryptionScheme + ")");
 		state.password = password;
 		state.encryptionScheme = encryptionScheme;
-		contentController.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
+		pageManager.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
 	}
 	
 	function onSplitSelection(splitEnabled) {
 		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
 		state.splitEnabled = splitEnabled;
-		if (splitEnabled) contentController.next(new NumPiecesInputController($("<div>"), state, onSplitInput));
-		else contentController.next(new WalletsSummaryController($("<div>"), state, onGenerateWallets));
+		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, onSplitInput));
+		else pageManager.next(new WalletsSummaryController($("<div>"), state, onGenerateWallets));
 	}
 	
 	function onSplitInput(numPieces, minPieces) {
@@ -109,7 +107,7 @@ function FlowController(contentController, currencies) {
 		assertInt(minPieces);
 		state.numPieces = numPieces;
 		state.minPieces = minPieces;
-		contentController.next(new WalletsSummaryController($("<div>"), state, onGenerateWallets));
+		pageManager.next(new WalletsSummaryController($("<div>"), state, onGenerateWallets));
 	}
 	
 	function onGenerateWallets() {
@@ -169,7 +167,7 @@ function FlowController(contentController, currencies) {
 			}
 			
 			// convert wallets to pieces for download
-			contentController.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(processedWallets), onCustomExport));
+			pageManager.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(processedWallets), onCustomExport));
 		}
 	}
 	
@@ -177,13 +175,13 @@ function FlowController(contentController, currencies) {
 	
 	function onSelectImport() {
 		if (DEBUG) console.log("onSelectImport()");
-		contentController.next(new ImportFilesController($("<div>"), onUnsplitWalletsImported, onSelectImportText));
+		pageManager.next(new ImportFilesController($("<div>"), onUnsplitWalletsImported, onSelectImportText));
 	}
 	
 	function onSelectImportText() {
 		if (DEBUG) console.log("onSelectImportText()");
 		state.goal = Goal.RESTORE_STORAGE;
-		contentController.next(new CurrencySelectionController($("<div>"), state, onSelectImportCurrency));
+		pageManager.next(new CurrencySelectionController($("<div>"), state, onSelectImportCurrency));
 	}
 	
 	function onSelectImportCurrency(tickerSymbol) {
@@ -192,7 +190,7 @@ function FlowController(contentController, currencies) {
 			if (currency.getTickerSymbol() === tickerSymbol) state.currency = currency;
 		}
 		if (!state.currency) throw new Error("Currency not found with ticker symbol: " + tickerSymbol);
-		contentController.next(new ImportTextController($("<div>"), state, onUnsplitWalletsImported));
+		pageManager.next(new ImportTextController($("<div>"), state, onUnsplitWalletsImported));
 	}
 	
 	function onUnsplitWalletsImported(wallets) {
@@ -200,13 +198,13 @@ function FlowController(contentController, currencies) {
 		assertTrue(wallets.length >= 1);
 		state.wallets = wallets;
 		state.currency = wallets[0].getCurrencyPlugin();
-		if (wallets[0].isEncrypted()) contentController.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
-		else contentController.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets, true), onCustomExport));
+		if (wallets[0].isEncrypted()) pageManager.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
+		else pageManager.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets, true), onCustomExport));
 	}
 	
 	function onCustomExport(pieces) {
 		if (DEBUG) console.log("onCustomExport(" + pieces.length + ")");
 		assertTrue(pieces.length > 0);
-		contentController.next(new CustomExportController($("<div>"), state, pieces));
+		pageManager.next(new CustomExportController($("<div>"), state, pieces));
 	}
 }

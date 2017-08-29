@@ -56,9 +56,9 @@ DivController.prototype.onShow = function() { }
 DivController.prototype.onHide = function() { }
 
 /**
- * Render main page panel.
+ * Manages page navigation and rendering.
  */
-function ContentController(contentDiv) {
+function PageManager(contentDiv) {
 	
 	var pathTracker = new PathTracker(onPageChange);	// track path through decision tree
 	var pageDiv;										// container to render page content
@@ -96,7 +96,9 @@ function ContentController(contentDiv) {
 		if (transitioning) return;	// cannot add page if transitioning
 		transitioning = true;
 		renderer.render(function(div) {
+			let toRemoves = pathTracker.getNexts();
 			pathTracker.next(renderer);
+			for (let toRemove of toRemoves) toRemove.getDiv().remove();
 		});
 	};
 	
@@ -139,7 +141,7 @@ function ContentController(contentDiv) {
 		pathTracker.hasNext() ? rightArrow.show() : rightArrow.hide();
 	}
 }
-inheritsFrom(ContentController, DivController);
+inheritsFrom(PageManager, DivController);
 
 /**
  * Render home page.
