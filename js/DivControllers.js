@@ -201,7 +201,7 @@ function CurrencySelectionController(div, state, onCurrencySelection) {
 		// render title
 		switch (state.goal) {
 		case Goal.CREATE_STORAGE:
-			div.append(UiUtils.getPageHeader("Select a cryptocurrency to store."));
+			div.append(UiUtils.getPageHeader("Select a currency to store."));
 			break;
 		case Goal.RESTORE_STORAGE:
 			div.append(UiUtils.getPageHeader("Select a currency to import."));
@@ -1057,7 +1057,7 @@ function DownloadPiecesController(div, state, pieces, onCustomExport) {
 		// render title
 		let isSplit = pieces[0].isSplit;
 		let encryption = pieces[0].encryption;
-		div.append(UiUtils.getPageHeader("Download your " + (encryption ? " encrypted " : " unencrypted ") + state.currency.getName() + " storage.", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Download your " + state.currency.getName() + " storage.", state.currency.getLogo()));
 		
 		// collect functions to render pieces and divs to be rendered to
 		var pieceDivs = [];
