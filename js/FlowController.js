@@ -1,7 +1,5 @@
 // TODO
-// fix ability for duplicate generation or decryption of wallets. page advancement is disabled but it can still start work
 // load dependencies as needed
-// don't disable next button, just don't decrypt
 // remove isPrivateKeyWif().  only have getPrivateKeyMin(str), isPrivateKey(), and getPrivateKeyWif(privateKey)
 // import json with monero wif throws exception
 // beef up plugin and wallet tests
