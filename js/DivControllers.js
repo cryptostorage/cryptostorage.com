@@ -484,9 +484,13 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 inheritsFrom(NumPiecesInputController, DivController);
 
 /**
- * Render summary of generation configuration.
+ * Controls page to summarize configuration and generate wallets.
+ * 
+ * @param div is the div to render to
+ * @param state is the current state of the application
+ * @param onWalletsGenerated(wallets) is invoked when the wallets are generated
  */
-function WalletsSummaryController(div, state, onGenerateWallets) {
+function GenerateWalletsController(div, state, onWalletsGenerated) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -502,12 +506,80 @@ function WalletsSummaryController(div, state, onGenerateWallets) {
 		div.append("<br><br>");
 		
 		var btnGenerate = UiUtils.getNextButton("Generate " + state.currency.getName() + " storage");
-		btnGenerate.click(function() { onGenerateWallets(); });
+		btnGenerate.click(function() {
+			btnGenerate.attr("disabled", "disabled");
+			generateWallets(function(wallets) {
+				onWalletsGenerated(wallets);
+				btnGenerate.removeAttr("disabled");
+			});
+		});
 		div.append(btnGenerate);
 		callback(div);
 	}
+	
+	function generateWallets(onWalletsGenerated) {
+		
+		// generate wallets
+		var wallets = [];
+		for (var i = 0; i < state.numWallets; i++) {
+			wallets.push(state.currency.newWallet());
+		}
+		
+		// copy wallets for processing so originals are preserved for validation
+		var processedWallets = [];
+		for (let wallet of wallets) {
+			processedWallets.push(wallet.copy());
+		}
+		
+		// password encryption
+		if (state.passwordEnabled) {
+			
+			// collect callback functions to encrypt wallets
+			var encryptFuncs = [];
+			for (let wallet of processedWallets) {
+				encryptFuncs.push(getCallbackFunctionEncrypt(wallet, state.encryptionScheme, state.password));
+			}
+			
+			// execute callback functions in sequence
+			executeCallbackFunctionsInSequence(encryptFuncs, function() {
+				
+				// split wallets
+				if (state.splitEnabled) {
+					for (let wallet of processedWallets) {
+						wallet.split(state.numPieces, state.minPieces);
+					}
+				}
+				
+				// wallets generated
+				onWalletsGenerated(processedWallets);
+			});
+			
+			/**
+			 * Returns a callback function to encrypt a wallet.
+			 */
+			function getCallbackFunctionEncrypt(wallet, encryptionScheme, password) {
+				return function(callback) {
+					wallet.encrypt(encryptionScheme, password, callback);
+				}
+			}
+		}
+		
+		// no password encryption
+		else {
+			
+			// split wallets
+			if (state.splitEnabled) {
+				for (let wallet of processedWallets) {
+					wallet.split(state.numPieces, state.minPieces);
+				}
+			}
+			
+			// wallets generated
+			onWalletsGenerated(processedWallets);
+		}
+	}
 }
-inheritsFrom(WalletsSummaryController, DivController);
+inheritsFrom(GenerateWalletsController, DivController);
 
 /**
  * Renders a piece with one or more public/private components to a div with the given config.

@@ -98,7 +98,7 @@ function FlowController(pageManager, currencies) {
 		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
 		state.splitEnabled = splitEnabled;
 		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, onSplitInput));
-		else pageManager.next(new WalletsSummaryController($("<div>"), state, onGenerateWallets));
+		else pageManager.next(new GenerateWalletsController($("<div>"), state, onWalletsGenerated));
 	}
 	
 	function onSplitInput(numPieces, minPieces) {
@@ -107,68 +107,12 @@ function FlowController(pageManager, currencies) {
 		assertInt(minPieces);
 		state.numPieces = numPieces;
 		state.minPieces = minPieces;
-		pageManager.next(new WalletsSummaryController($("<div>"), state, onGenerateWallets));
+		pageManager.next(new GenerateWalletsController($("<div>"), state, onWalletsGenerated));
 	}
 	
-	function onGenerateWallets() {
-		if (DEBUG) console.log("onGenerateWallets()");
-		
-		// generate wallets
-		var wallets = [];
-		for (var i = 0; i < state.numWallets; i++) {
-			wallets.push(state.currency.newWallet());
-		}
-		
-		// copy wallets for processing so originals are preserved for validation
-		var processedWallets = [];
-		for (let wallet of wallets) {
-			processedWallets.push(wallet.copy());
-		}
-		
-		// password encryption
-		if (state.passwordEnabled) {
-			
-			// collect callback functions to encrypt wallets
-			var encryptFuncs = [];
-			for (let wallet of processedWallets) {
-				encryptFuncs.push(getCallbackFunctionEncrypt(wallet, state.encryptionScheme, state.password));
-			}
-			
-			// execute callback functions in sequence
-			executeCallbackFunctionsInSequence(encryptFuncs, function() {
-				splitAndDownload(state);
-			});
-			
-			/**
-			 * Returns a callback function to encrypt a wallet.
-			 */
-			function getCallbackFunctionEncrypt(wallet, encryptionScheme, password) {
-				return function(callback) {
-					wallet.encrypt(encryptionScheme, password, callback);
-				}
-			}
-		}
-		
-		// no password encryption
-		else {
-			splitAndDownload(state);
-		}
-		
-		/**
-		 * Splits wallets in the given state and continues to download page.
-		 */
-		function splitAndDownload(state) {
-			
-			// split wallets
-			if (state.splitEnabled) {
-				for (let wallet of processedWallets) {
-					wallet.split(state.numPieces, state.minPieces);
-				}
-			}
-			
-			// convert wallets to pieces for download
-			pageManager.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(processedWallets), onCustomExport));
-		}
+	function onWalletsGenerated(wallets) {
+		if (DEBUG) console.log("onGeneratedWallets(" + wallets.length + ")");
+		pageManager.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets), onCustomExport));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------
