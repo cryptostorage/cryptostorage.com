@@ -157,9 +157,10 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		div.append(getCheckmarkDiv("Optionally split your private keys into separate pieces for additional security."));
 		div.append(getCheckmarkDiv("Export to printable QR codes, csv, json, and txt for long term storage and easy recovery."));
 		div.append(getCheckmarkDiv("100% open source, client-side, and free to use.  No account or trusted third parties."));
-		div.append("<br><br>");
+		div.append("<br>");
 		
 		div.append("Select an option to get started.")
+		div.append("<br><br>");
 		
 		// render create button
 		var btnCreate = UiUtils.getNextButton("Create new storage");
@@ -241,6 +242,7 @@ function NumPairsController(div, state, onNumPairsInput) {
 		numPairsInput.attr("min", 1);
 		numPairsInput.attr("value", 10);
 		div.append(numPairsInput);
+		div.append("<br><br>");
 		
 		// error message
 		var errorDiv = $("<div>");
@@ -347,10 +349,11 @@ function PasswordInputController(div, state, onPasswordInput) {
 			form.append("<br>")
 		}
 		advancedDiv.append(form);
+		advancedDiv.append("<br>");
 		if (schemes.length === 1) advancedDiv.hide();
 		
 		// render next button
-		var btnNext = UiUtils.getNextButton("Next");
+		var btnNext = UiUtils.getNextButton("Next").appendTo(div);
 		btnNext.click(function() {
 			let password = passwordInput.val();
 			if (password === "") setErrorMessage("Password cannot be empty")
@@ -362,7 +365,6 @@ function PasswordInputController(div, state, onPasswordInput) {
 			}
 			passwordInput.focus();
 		});
-		div.append(btnNext);
 		
 		// register pasword enter key
 		passwordInput.keyup(function(e) {
@@ -399,13 +401,12 @@ function SplitSelectionController(div, state, onSplitSelection) {
 		div.append(UiUtils.getPageHeader("Do you want to split your " + state.currency.getName() + " private keys into separate pieces?", state.currency.getLogo()));
 		
 		div.append("The pieces must be recombined to recover the private keys.");
+		div.append("<br><br>");
 		
-		var btnYes = UiUtils.getNextButton("Yes");
+		var btnYes = UiUtils.getNextButton("Yes").appendTo(div);
 		btnYes.click(function() { onSplitSelection(true); });
-		div.append(btnYes);
-		var btnNo = UiUtils.getNextButton("No");
+		var btnNo = UiUtils.getNextButton("No").appendTo(div);
 		btnNo.click(function() { onSplitSelection(false); });
-		div.append(btnNo);
 		
 		// done rendering
 		callback(div);
@@ -495,7 +496,8 @@ function WalletsSummaryController(div, state, onGenerateWallets) {
 		div.append("Currency: " + state.currency.getName() + " (" + state.currency.getTickerSymbol() + ")").append("<br>");
 		div.append("Number of key pairs to create: " + state.numWallets).append("<br>");
 		div.append("Password protection: " + (state.passwordEnabled ? "Yes" : "No") + (state.passwordEnabled ? " (" + state.encryptionScheme + ")" : "")).append("<br>");
-		div.append("Split private keys: " + (state.splitEnabled ? "Yes" : "No") + (state.splitEnabled ? " (" + state.minPieces + " of " + state.numPieces + " pieces necessary to restore)" : "")).append("<br>");
+		div.append("Split private keys: " + (state.splitEnabled ? "Yes" : "No") + (state.splitEnabled ? " (" + state.minPieces + " of " + state.numPieces + " pieces necessary to restore)" : ""));
+		div.append("<br><br>");
 		
 		var btnGenerate = UiUtils.getNextButton("Generate " + state.currency.getName() + " storage");
 		btnGenerate.click(function() { onGenerateWallets(); });
@@ -894,6 +896,7 @@ function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText
 		div.append(fileList);
 		
 		// add button to import from text
+		div.append("<br><br>");
 		var btnImportText = UiUtils.getNextButton("Import private key from text instead").appendTo(div);
 		btnImportText.click(onSelectImportText);
 		
