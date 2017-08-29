@@ -728,7 +728,7 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Enter " + state.currency.getName() + " private key or split pieces:", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter " + state.currency.getName() + " private key or pieces:", state.currency.getLogo()));
 		
 		// render error div
 		errorDiv.empty();
