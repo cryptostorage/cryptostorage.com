@@ -162,7 +162,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		div.append("Select an option to get started.")
 		
 		// render create button
-		var btnCreate = UiUtils.getNextButton("Generate new storage");
+		var btnCreate = UiUtils.getNextButton("Create new storage");
 		btnCreate.click(function() { onSelectCreate(); });
 		div.append(btnCreate);
 		
