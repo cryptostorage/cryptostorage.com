@@ -1,9 +1,9 @@
 // TODO
-// load dependencies as needed
 // review private keys (hex, base58, etc)
 // page to configure export options with previews
 // plugin and wallet decryption tests (test wallet creation to reveal no address on decryption bug)
 // progress bar on wallet generation, export generation
+// load dependencies as needed
 // prevent swipe right if number of addresses change so it's updated
 // what happens without random movement for bitaddress.org? need true randomization
 // verify final pieces
