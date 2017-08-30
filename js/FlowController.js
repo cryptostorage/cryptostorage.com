@@ -18,7 +18,7 @@
 // popup on key generation to reconfirm password
 // prevent next if imported files deleted
 
-const RUN_TESTS = false;
+const RUN_TESTS = true;
 const DEBUG = true;
 
 /**

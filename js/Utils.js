@@ -81,6 +81,16 @@ function isString(arg) {
 }
 
 /**
+ * Indicates if the given argument is an object.
+ * 
+ * @param arg is the argument to test as being an object
+ * @returns true if the argument is an object, false otherwise
+ */
+function isObject(arg) {
+	return typeof arg === 'object';
+}
+
+/**
  * Indicates if the given argument is a hexidemal string.
  * 
  * Credit: https://github.com/roryrjb/is-hex/blob/master/is-hex.js.
@@ -193,6 +203,8 @@ function assertUninitialized(arg, msg) {
  * @param msg is the message to throw if the arguments are not equal
  */
 function assertEquals(arg1, arg2, msg) {
+	if (isArray(arg1) && isArray(arg2)) return arraysEqual(arg1, arg2);
+	if (isObject(arg1) && isObject(arg2)) return mapsEqual(arg1, arg2);
 	if (arg1 !== arg2) throw new Error(msg ? msg : "Arguments asserted as equal but are not equal: " + arg1 + " vs " + arg2);
 }
 
@@ -315,21 +327,21 @@ function contains(arr, obj) {
 /**
  * Determines if two arrays are equal.
  * 
- * @param a is an array to compare
- * @param b is an array to compare
+ * @param arr1 is an array to compare
+ * @param arr2 is an array to compare
  * @returns true if the arrays are equal, false otherwise
  */
-function arraysEqual(a, b) {
-	if (a === b) return true;
-	if (a == null && b == null) return true;
-	if (a == null || b == null) return false;
-	if (typeof a === 'undefined' && typeof b === 'undefined') return true;
-	if (typeof a === 'undefined' || typeof b === 'undefined') return false;
-	if (!isArray(a)) throw new Error("First argument is not an array");
-	if (!isArray(b)) throw new Error("Second argument is not an array");
-	if (a.length != b.length) return false;
-	for (let i = 0; i < a.length; ++i) {
-		if (a[i] !== b[i]) return false;
+function arraysEqual(arr1, arr2) {
+	if (arr1 === arr2) return true;
+	if (arr1 == null && arr2 == null) return true;
+	if (arr1 == null || arr2 == null) return false;
+	if (typeof arr1 === 'undefined' && typeof arr2 === 'undefined') return true;
+	if (typeof arr1 === 'undefined' || typeof arr2 === 'undefined') return false;
+	if (!isArray(arr1)) throw new Error("First argument is not an array");
+	if (!isArray(arr2)) throw new Error("Second argument is not an array");
+	if (arr1.length != arr2.length) return false;
+	for (let i = 0; i < arr1.length; ++i) {
+		if (arr1[i] !== arr2[i]) return false;
 	}
 	return true;
 }
