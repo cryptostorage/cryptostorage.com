@@ -128,7 +128,7 @@ function testCurrencyPlugin(plugin) {
 	assertInitialized(plugin.getLogo());
 	for (let i = 0; i < REPEAT_LONG; i++) {
 		
-		// test consistency
+		// test self consistency
 		assertTrue(plugin.getEncryptionSchemes().length >= 1);
 		let privateKey = plugin.newPrivateKey();
 		assertInitialized(privateKey);
