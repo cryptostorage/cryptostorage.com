@@ -717,8 +717,8 @@ function walletsToPieces(wallets, wif) {
 		else if (isSplit !== wallet.isSplit()) throw new Error("Wallets have different split states");
 		if (isUndefined(numPieces)) numPieces = isSplit ? wallet.getPrivateKeyPieces().length : 1;
 		else if (numPieces !== (isSplit ? wallet.getPrivateKeyPieces().length : 1)) throw new Error("Wallets have different number of pieces");
-		if (isUndefined(encryption)) encryption = wallet.isEncryptedPrivateKey() ? wallet.getEncryptionScheme() : undefined;
-		else if (encryption !== (wallet.isEncryptedPrivateKey() ? wallet.getEncryptionScheme() : undefined)) throw new Error("Wallets have different encryption states");
+		if (isUndefined(encryption)) encryption = wallet.isEncrypted() ? wallet.getEncryptionScheme() : undefined;
+		else if (encryption !== (wallet.isEncrypted() ? wallet.getEncryptionScheme() : undefined)) throw new Error("Wallets have different encryption states");
 	}
 	
 	// initialize pieces
@@ -737,7 +737,7 @@ function walletsToPieces(wallets, wif) {
 		for (let i = 0; i < numPieces; i++) {
 			var walletKeys = {};
 			walletKeys.publicKey = wallet.getAddress();
-			walletKeys.privateKey = isSplit ? wallet.getPrivateKeyPieces()[i] : wallet.isEncryptedPrivateKey() ? wallet.getUnencryptedPrivateKey() : wif ? wallet.getCurrencyPlugin().getUnencryptedPrivateKeyWif(wallet.getUnencryptedPrivateKey()) : wallet.getUnencryptedPrivateKey();
+			walletKeys.privateKey = isSplit ? wallet.getPrivateKeyPieces()[i] : wallet.isEncrypted() ? wallet.getPrivateKey() : wif ? wallet.getCurrencyPlugin().getUnencryptedPrivateKeyWif(wallet.getPrivateKey()) : wallet.getPrivateKey();
 			pieces[i].keys.push(walletKeys);
 		}
 	}

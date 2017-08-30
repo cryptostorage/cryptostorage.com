@@ -35,7 +35,6 @@ function Wallet(plugin, state) {
 			if (this.plugin.isUnencryptedPrivateKeyWif(state.privateKey)) state.privateKey = this.plugin.getUnencryptedPrivateKey(state.privateKey);
 			if (state.isSplit) throw new Error("Wallet split conflicts with private key being initialized");
 			state.isSplit = false;
-			//console.log(state.privateKey + ": " + state.encryption + " vs " + this.plugin.getEncryptionScheme(state.privateKey));
 			var encryption = this.plugin.getEncryptionScheme(state.privateKey);
 			if (isDefined(state.encryption) && state.encryption != encryption) throw new Error("state.encryption does not match plugin.getEncryptionScheme(privateKey)")
 			state.encryption = encryption;
@@ -58,8 +57,6 @@ function Wallet(plugin, state) {
 	}
 	
 	this.random = function() {
-		console.log(this.plugin);
-		console.log(this.plugin.newPrivateKey());
 		return this.setPrivateKey(this.plugin.newPrivateKey());
 	}
 	
@@ -67,12 +64,12 @@ function Wallet(plugin, state) {
 		return this.state.address;
 	}
 	
-	this.getUnencryptedPrivateKey = function() {
+	this.getPrivateKey = function() {
 		return this.state.privateKey;
 	}
 	
 	this.getUnencryptedPrivateKeyWif = function() {
-		return plugin.getUnencryptedPrivateKey(this.state.privateKey);
+		return this.plugin.getUnencryptedPrivateKeyWif(this.state.privateKey);
 	}
 	
 	this.setPrivateKey = function(str) {
@@ -91,7 +88,7 @@ function Wallet(plugin, state) {
 		return this.state.isSplit;
 	}
 	
-	this.isEncryptedPrivateKey = function() {
+	this.isEncrypted = function() {
 		if (this.isSplit()) return undefined;
 		return isDefined(this.state.encryption);
 	}
@@ -167,7 +164,7 @@ function Wallet(plugin, state) {
 	}
 	
 	// initialize wallet
-	if (!isInitialized(plugin) || plugin.constructor.name !== 'CurrencyPlugin') throw new Error("Must provide currency plugin");
+	if (!isInitialized(plugin) || typeof plugin !== 'object' || plugin.constructor.name !== 'CurrencyPlugin') throw new Error("Must provide currency plugin");
 	var that = this;
 	this.plugin = plugin;
 	this.state = {};

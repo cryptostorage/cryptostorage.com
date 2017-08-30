@@ -117,12 +117,12 @@ function testPathTracker() {
 
 function testCurrencyPlugins() {
 	for (let plugin of getCurrencyPlugins()) {
-		console.log("Testing " + plugin.getName());
 		testCurrencyPlugin(plugin);
 	}
 }
 
 function testCurrencyPlugin(plugin) {
+	console.log("testCurrencyPlugin(" + plugin.getName() + ")");
 	assertInitialized(plugin.getName());
 	assertInitialized(plugin.getTickerSymbol());
 	assertInitialized(plugin.getLogo());
@@ -209,6 +209,27 @@ function testWallets() {
 }
 
 function testWallet(plugin) {
+	console.log("testWallet(" + plugin.getName() + ")");
+	
+	// basic tests
+	let wallet = plugin.newWallet();
+	assertTrue(plugin === wallet.getCurrencyPlugin());
+	assertInitialized(wallet.getPrivateKey());
+	assertInitialized(wallet.getAddress());
+	assertFalse(wallet.isEncrypted());
+	assertUndefined(wallet.getEncryptionScheme());
+	let copy = wallet.copy();
+	assertTrue(wallet.equals(copy));
+	assertTrue(copy.equals(wallet));
+	let oldPrivateKey = wallet.getPrivateKey();
+	let oldAddress = wallet.getAddress();
+	wallet.random();
+	assertNotEquals(oldPrivateKey, wallet.getPrivateKey());
+	assertNotEquals(oldAddress, wallet.getAddress());
+	assertTrue(plugin.isUnencryptedPrivateKeyWif(wallet.getUnencryptedPrivateKeyWif()));
+	wallet.setPrivateKey(oldPrivateKey);
+	assertEquals(oldPrivateKey, wallet.getPrivateKey());
+	assertEquals(oldAddress, wallet.getAddress());	
 	
 	// test without plugin
 	try {
@@ -268,13 +289,13 @@ function testWalletWithEncryption(plugin, callback) {
 			for (let wallet of originalWallets) {
 				assertInitialized(wallet);
 				assertEquals(plugin, wallet.getCurrencyPlugin());
-				assertInitialized(wallet.getUnencryptedPrivateKey());
+				assertInitialized(wallet.getPrivateKey());
 				assertInitialized(wallet.getAddress());
 				assertFalse(wallet.isSplit());
-				assertFalse(wallet.isEncryptedPrivateKey());
+				assertFalse(wallet.isEncrypted());
 				assertUndefined(wallet.getEncryptionScheme());
 				assertUndefined(wallet.getPrivateKeyPieces());
-				assertEquals(plugin.getAddress(wallet.getUnencryptedPrivateKey()), wallet.getAddress());
+				assertEquals(plugin.getAddress(wallet.getPrivateKey()), wallet.getAddress());
 				testSplitWallet(wallet, NUM_PIECES, MIN_PIECES);
 			}
 			
@@ -326,9 +347,9 @@ function testSplitWallet(wallet, numPieces, minPieces) {
 	wallet.split(numPieces, minPieces);
 	assertTrue(wallet.isSplit());
 	assertEquals(numPieces, wallet.getPrivateKeyPieces().length);
-	assertUndefined(wallet.isEncryptedPrivateKey());
+	assertUndefined(wallet.isEncrypted());
 	assertUndefined(wallet.getEncryptionScheme());
-	assertUndefined(wallet.getUnencryptedPrivateKey());
+	assertUndefined(wallet.getPrivateKey());
 	
 	// test reconstituting each combination
 	var pieceCombinations = getCombinations(wallet.getPrivateKeyPieces(), minPieces);
