@@ -13,14 +13,12 @@
 // verify final pieces
 // consult designers
 // namespace utils.js
-// set error messages through class method
 // test wallet.setState() combinations
 // implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
 // cryptostorage donation addresses
 // make qr codes and style smaller
 // popup on key generation to reconfirm password
 // prevent next if imported files deleted
-// 32x32 favicon
 
 const RUN_TESTS = false;
 const DEBUG = true;
