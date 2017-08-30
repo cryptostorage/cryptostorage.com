@@ -71,6 +71,16 @@ function isArray(arg) {
 }
 
 /**
+ * Indicates if the given argument is a string.
+ * 
+ * @param arg is the argument to test as being a string
+ * @returns true if the argument is a string, false otherwise
+ */
+function isString(arg) {
+	return typeof arg === 'string';
+}
+
+/**
  * Indicates if the given argument is a hexidemal string.
  * 
  * Credit: https://github.com/roryrjb/is-hex/blob/master/is-hex.js.
@@ -82,6 +92,15 @@ const HEX_REG_EXP = /([0-9]|[a-f])/gim
 function isHex(arg) {
 	if (typeof arg !== 'string') return false;
 	return (arg.match(HEX_REG_EXP) || []).length === arg.length;
+}
+
+/**
+ * Throws an exception with the given message.
+ * 
+ * @param msg defines the message to throw the exception with (optional)
+ */
+function fail(msg) {
+	throw new Error(msg ? msg : "Failure (no message)");
 }
 
 /**
@@ -174,7 +193,7 @@ function assertUninitialized(arg, msg) {
  * @param msg is the message to throw if the arguments are not equal
  */
 function assertEquals(arg1, arg2, msg) {
-	if (arg1 !== arg2) throw new Error(msg ? msg : "Arguments asserted as equal but are unequal: " + arg1 + " vs " + arg2);
+	if (arg1 !== arg2) throw new Error(msg ? msg : "Arguments asserted as equal but are not equal: " + arg1 + " vs " + arg2);
 }
 
 /**

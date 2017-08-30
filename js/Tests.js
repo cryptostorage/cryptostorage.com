@@ -1,4 +1,4 @@
-const REPEAT_LONG = 1;
+const REPEAT_LONG = 100;
 const REPEAT_SHORT = 1;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
@@ -8,10 +8,13 @@ function runTests(callback) {
 	console.log("Running tests");
 	testUtils();
 	testPathTracker();
-	testWallets(function() {
-		console.log("All tests passed");
-		if (callback) callback();
-	});
+	testCurrencyPlugins();
+	console.log("All tests passed");
+	if (callback) callback();
+//	testWallets(function() {
+//		console.log("All tests passed");
+//		if (callback) callback();
+//	});
 }
 
 function testUtils() {
@@ -21,6 +24,10 @@ function testUtils() {
 	assertFalse(isHex(true));
 	assertFalse(isHex("hello there"));
 	assertTrue(isHex("fcc256cbc5a180831956fba7b9b7de5f521037c39980921ebe6dbd822f791007"));
+	assertTrue(isString("abctesting123"));
+	assertFalse(isString(null));
+	assertFalse(isString(undefined));
+	assertFalse(isString(123));
 }
 
 function testPathTracker() {
@@ -102,6 +109,92 @@ function testPathTracker() {
 		assertNotNull(lastIdx);
 		assertNotNull(curIdx);
 		assertNotNull(item);
+	}
+}
+
+function testCurrencyPlugins() {
+	for (let plugin of getCurrencyPlugins()) {
+		testCurrencyPlugin(plugin);
+	}
+}
+
+function testCurrencyPlugin(plugin) {
+	assertInitialized(plugin.getName());
+	assertInitialized(plugin.getTickerSymbol());
+	assertInitialized(plugin.getLogo());
+	for (let i = 0; i < REPEAT_LONG; i++) {
+		
+		// test consistency
+		assertTrue(plugin.getEncryptionSchemes().length >= 1);
+		let privateKey = plugin.newPrivateKey();
+		assertInitialized(privateKey);
+		assertTrue(plugin.isPrivateKey(privateKey));
+		let privateKeyWif = plugin.getPrivateKeyWif(privateKey);
+		assertTrue(plugin.isPrivateKeyWif(privateKeyWif));
+		assertEquals(privateKey, plugin.getPrivateKey(privateKeyWif));
+		let address = plugin.getAddress(privateKey);
+		// TODO: assertTrue(plugin.isAddress(address));
+		assertUndefined(plugin.getEncryptionScheme(privateKey));
+		assertUndefined(plugin.getEncryptionScheme(privateKeyWif));
+		assertFalse(plugin.isEncrypted(privateKey));
+		assertFalse(plugin.isEncrypted(privateKeyWif));
+		let pieces = plugin.split(privateKey, NUM_PIECES, MIN_PIECES);
+		assertEquals(NUM_PIECES, pieces.length);
+		assertEquals(privateKey, plugin.reconstitute(pieces));
+		pieces = plugin.split(privateKeyWif, NUM_PIECES, MIN_PIECES);
+		assertEquals(NUM_PIECES, pieces.length);
+		assertEquals(privateKey, plugin.reconstitute(pieces));
+		
+		// test invalid private keys
+		let invalids = [null, undefined, "abctesting123", "abc testing 123", 12345];
+		for (let invalid of invalids) {
+			assertFalse(plugin.isPrivateKey(invalid));
+			assertFalse(plugin.isPrivateKeyWif(invalid));
+			try {
+				plugin.getPrivateKey(invalid);
+				fail("Should not be able to get private key from invalid argument");
+			} catch (err) {
+				// nothing to do
+			}
+			try {
+				plugin.getPrivateKeyWif(invalid);
+				fail("Should not be able to get private key WIF from invalid argument");
+			} catch (err) {
+				// nothing to do
+			}
+			try {
+				plugin.getAddress(invalid);
+				fail("Should not be able to get private key address from invalid argument");
+			} catch (err) {
+				// nothing to do
+			}
+			try {
+				plugin.getEncryptionScheme(invalid);
+				fail("Should not be able to get encryption scheme from invalid argument");
+			} catch (err) {
+				// nothing to do
+			}
+			try {
+				plugin.isEncrypted(invalid);
+				fail("Should not be able to determine encryption scheme from invalid argument");
+			} catch (err) {
+				// nothing to do
+			}
+			try {
+				plugin.split(invalid, NUM_PIECES, MIN_PIECES);
+				fail("Should not be able to split invalid argument");
+			} catch (err) {
+				// nothing to do
+			}
+			try {
+				let pieces = [];
+				for (let i = 0; i < NUM_PIECES; i++) pieces.push(invalid);
+				plugin.reconstitute(invalid, NUM_PIECES, MIN_PIECES);
+				fail("Should not be able to reconstitute invalid pieces");
+			} catch (err) {
+				// nothing to do
+			}
+		}
 	}
 }
 
