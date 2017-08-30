@@ -689,8 +689,7 @@ function parseWallet(plugin, str) {
 	for (let line of lines) if (line) components.push(line);
 	if (components.length === 0) return null;
 	else if (components.length === 1) {
-		if (plugin.isPrivateKey(components[0])) return plugin.newWallet({privateKey: str});
-		if (plugin.isPrivateKeyWif(components[0])) return plugin.newWallet({privateKeyWif: str});
+		if (plugin.isPrivateKey(components[0])) return plugin.newWallet({privateKey: components[0]});
 	} else {
 		try {
 			return plugin.newWallet({privateKey: plugin.reconstitute(components) });
@@ -718,8 +717,8 @@ function walletsToPieces(wallets, wif) {
 		else if (isSplit !== wallet.isSplit()) throw new Error("Wallets have different split states");
 		if (isUndefined(numPieces)) numPieces = isSplit ? wallet.getPrivateKeyPieces().length : 1;
 		else if (numPieces !== (isSplit ? wallet.getPrivateKeyPieces().length : 1)) throw new Error("Wallets have different number of pieces");
-		if (isUndefined(encryption)) encryption = wallet.isEncrypted() ? wallet.getEncryptionScheme() : undefined;
-		else if (encryption !== (wallet.isEncrypted() ? wallet.getEncryptionScheme() : undefined)) throw new Error("Wallets have different encryption states");
+		if (isUndefined(encryption)) encryption = wallet.isEncryptedPrivateKey() ? wallet.getEncryptionScheme() : undefined;
+		else if (encryption !== (wallet.isEncryptedPrivateKey() ? wallet.getEncryptionScheme() : undefined)) throw new Error("Wallets have different encryption states");
 	}
 	
 	// initialize pieces
@@ -738,7 +737,7 @@ function walletsToPieces(wallets, wif) {
 		for (let i = 0; i < numPieces; i++) {
 			var walletKeys = {};
 			walletKeys.publicKey = wallet.getAddress();
-			walletKeys.privateKey = isSplit ? wallet.getPrivateKeyPieces()[i] : wallet.isEncrypted() ? wallet.getPrivateKey() : wif ? wallet.getCurrencyPlugin().getPrivateKeyWif(wallet.getPrivateKey()) : wallet.getPrivateKey();
+			walletKeys.privateKey = isSplit ? wallet.getPrivateKeyPieces()[i] : wallet.isEncryptedPrivateKey() ? wallet.getUnencryptedPrivateKey() : wif ? wallet.getCurrencyPlugin().getUnencryptedPrivateKeyWif(wallet.getUnencryptedPrivateKey()) : wallet.getUnencryptedPrivateKey();
 			pieces[i].keys.push(walletKeys);
 		}
 	}

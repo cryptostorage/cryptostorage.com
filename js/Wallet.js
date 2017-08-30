@@ -30,13 +30,12 @@ function Wallet(plugin, state) {
 			assertInitialized(state.privateKeyPieces);
 			assertUninitialized(state.privateKey);
 		}
-		if (state.privateKeyWif) {
-			state.privateKey = this.plugin.getPrivateKey(state.privateKeyWif);
-		}
 		if (state.privateKey) {
 			if (!this.plugin.isPrivateKey(state.privateKey)) throw new Error("Invalid private key: " + state.privateKey);
+			if (this.plugin.isUnencryptedPrivateKeyWif(state.privateKey)) state.privateKey = this.plugin.getUnencryptedPrivateKey(state.privateKey);
 			if (state.isSplit) throw new Error("Wallet split conflicts with private key being initialized");
 			state.isSplit = false;
+			//console.log(state.privateKey + ": " + state.encryption + " vs " + this.plugin.getEncryptionScheme(state.privateKey));
 			var encryption = this.plugin.getEncryptionScheme(state.privateKey);
 			if (isDefined(state.encryption) && state.encryption != encryption) throw new Error("state.encryption does not match plugin.getEncryptionScheme(privateKey)")
 			state.encryption = encryption;
@@ -44,7 +43,6 @@ function Wallet(plugin, state) {
 				var address = this.plugin.getAddress(state.privateKey);
 				if (isInitialized(state.address) && state.address !== address) throw new Error("state.address does not match plugin.getAddress(privateKey)");
 				state.address = address;
-				state.privateKeyWif = this.plugin.getPrivateKeyWif(state.privateKey);
 			}
 		}
 		this.state = state;
@@ -60,6 +58,8 @@ function Wallet(plugin, state) {
 	}
 	
 	this.random = function() {
+		console.log(this.plugin);
+		console.log(this.plugin.newPrivateKey());
 		return this.setPrivateKey(this.plugin.newPrivateKey());
 	}
 	
@@ -67,12 +67,12 @@ function Wallet(plugin, state) {
 		return this.state.address;
 	}
 	
-	this.getPrivateKey = function() {
+	this.getUnencryptedPrivateKey = function() {
 		return this.state.privateKey;
 	}
 	
-	this.getPrivateKeyWif = function() {
-		return this.state.privateKeyWif;
+	this.getUnencryptedPrivateKeyWif = function() {
+		return plugin.getUnencryptedPrivateKey(this.state.privateKey);
 	}
 	
 	this.setPrivateKey = function(str) {
@@ -91,7 +91,7 @@ function Wallet(plugin, state) {
 		return this.state.isSplit;
 	}
 	
-	this.isEncrypted = function() {
+	this.isEncryptedPrivateKey = function() {
 		if (this.isSplit()) return undefined;
 		return isDefined(this.state.encryption);
 	}
@@ -101,14 +101,14 @@ function Wallet(plugin, state) {
 	}
 	
 	this.encrypt = function(scheme, password, callback) {
-		if (this.isEncrypted()) throw new Error("Wallet is already encrypted");
+		if (this.isEncryptedPrivateKey()) throw new Error("Wallet is already encrypted");
 		if (this.isSplit()) throw new Error("Wallet is split");
-		if (isUndefined(this.getPrivateKey())) throw new Error("Wallet is not initialized");
+		if (isUndefined(this.getUnencryptedPrivateKey())) throw new Error("Wallet is not initialized");
 		if (!contains(this.plugin.getEncryptionSchemes(), scheme)) throw new Error("'" + scheme + "' is not a supported encryption scheme among " + this.plugin.getEncryptionSchemes());
-		this.plugin.encrypt(scheme, this.getPrivateKey(), password, function(resp) {
+		this.plugin.encrypt(scheme, this.getUnencryptedPrivateKey(), password, function(resp) {
 			if (resp.constructor.name === 'Error') callback(resp)
-			else if (!that.plugin.isPrivateKey(resp)) callback(new Error("Encryption produced invalid private key"));
 			else {
+				assertEquals(scheme, that.plugin.getEncryptionScheme(resp));
 				that.state.privateKey = resp;
 				that.state.encryption = scheme;
 				callback(that);
@@ -118,11 +118,11 @@ function Wallet(plugin, state) {
 	}
 	
 	this.decrypt = function(password, callback) {
-		if (!this.isEncrypted()) throw new Error("Wallet is not encrypted");
+		if (!this.isEncryptedPrivateKey()) throw new Error("Wallet is not encrypted");
 		if (this.isSplit()) throw new Error("Wallet is split");
-		if (isUndefined(this.getPrivateKey())) throw new Error("Wallet is not initialized");
-		this.plugin.decrypt(this.getEncryptionScheme(), this.getPrivateKey(), password, function(resp) {
-			if (resp.constructor.name === 'Error' || !that.plugin.isPrivateKey(resp)) callback(new Error("Invalid password"));
+		if (isUndefined(this.getUnencryptedPrivateKey())) throw new Error("Wallet is not initialized");
+		this.plugin.decrypt(this.getEncryptionScheme(), this.getUnencryptedPrivateKey(), password, function(resp) {
+			if (resp.constructor.name === 'Error' || !that.plugin.isUnencryptedPrivateKey(resp)) callback(new Error("Invalid password"));
 			else {
 				assertUndefined(that.plugin.getEncryptionScheme(resp));
 				that.state.privateKey = resp;
@@ -138,8 +138,8 @@ function Wallet(plugin, state) {
 		assertTrue(numPieces >= 2);
 		assertTrue(minPieces >= 2);
 		if (this.isSplit()) throw new Error("Wallet is already split");
-		if (isUndefined(this.getPrivateKey())) throw new Error("Wallet is not initialized");
-		this.state.privateKeyPieces = this.plugin.split(this.getPrivateKey(), numPieces, minPieces);
+		if (isUndefined(this.getUnencryptedPrivateKey())) throw new Error("Wallet is not initialized");
+		this.state.privateKeyPieces = this.plugin.split(this.getUnencryptedPrivateKey(), numPieces, minPieces);
 		this.state.isSplit = true;
 		this.state.privateKey = undefined;
 		this.state.encryption = undefined;
@@ -154,7 +154,7 @@ function Wallet(plugin, state) {
 		this.state.privateKeyPieces = undefined;
 		this.state.isSplit = false;
 		this.state.encryption = this.plugin.getEncryptionScheme(privateKey);
-		if (!this.isEncrypted()) {
+		if (!this.isEncryptedPrivateKey()) {
 			let address = this.plugin.getAddress(privateKey);
 			if (isDefined(this.getAddress()) && this.getAddress() !== address) throw new Error("Derived address does not match original");
 			this.state.address = address;
@@ -167,7 +167,7 @@ function Wallet(plugin, state) {
 	}
 	
 	// initialize wallet
-	if (!isInitialized(plugin)) throw new Error("Currency plugin in not initialized");
+	if (!isInitialized(plugin) || plugin.constructor.name !== 'CurrencyPlugin') throw new Error("Must provide currency plugin");
 	var that = this;
 	this.plugin = plugin;
 	this.state = {};

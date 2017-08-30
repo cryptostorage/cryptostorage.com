@@ -1,6 +1,5 @@
 // TODO
 // load dependencies as needed
-// remove isPrivateKeyWif().  only have getPrivateKeyMin(str), isPrivateKey(), and getPrivateKeyWif(privateKey)
 // import json with monero wif throws exception
 // beef up plugin and wallet tests
 // page to configure export options with previews
@@ -20,7 +19,7 @@
 // popup on key generation to reconfirm password
 // prevent next if imported files deleted
 
-const RUN_TESTS = false;
+const RUN_TESTS = true;
 const DEBUG = true;
 
 /**
@@ -139,7 +138,7 @@ function FlowController(pageManager, currencies) {
 		assertTrue(wallets.length >= 1);
 		state.wallets = wallets;
 		state.currency = wallets[0].getCurrencyPlugin();
-		if (wallets[0].isEncrypted()) pageManager.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
+		if (wallets[0].isEncryptedPrivateKey()) pageManager.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
 		else pageManager.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets, true), onCustomExport));
 	}
 	

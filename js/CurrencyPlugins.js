@@ -35,14 +35,15 @@ CurrencyPlugin.prototype.getName = function() { throw new Error("Subclass must i
 CurrencyPlugin.prototype.getTickerSymbol = function() { throw new Error("Subclass must implement"); }
 CurrencyPlugin.prototype.getLogo = function() { throw new Error("Subclass must implement"); }
 CurrencyPlugin.prototype.newPrivateKey = function() { throw new Error("Subclass must implement"); }
-CurrencyPlugin.prototype.isPrivateKey = function(str) { throw new Error("Subclass must implement"); }
-CurrencyPlugin.prototype.isPrivateKeyWif = function(str) { return this.isPrivateKey(str); }										// override if wif is different
-CurrencyPlugin.prototype.getPrivateKey = function(privateKey) { assertTrue(this.isPrivateKey(privateKey)); return privateKey; }	// override if wif is different
-CurrencyPlugin.prototype.getPrivateKeyWif = function(privateKey) { return this.getPrivateKey(privateKey); }						// override if wif is different
+CurrencyPlugin.prototype.isPrivateKey = function(str) { return this.isUnencryptedPrivateKey(str) || this.isEncryptedPrivateKey(str); }
+CurrencyPlugin.prototype.isUnencryptedPrivateKey = function(str) { throw new Error("Subclass must implement"); }
+CurrencyPlugin.prototype.isUnencryptedPrivateKeyWif = function(str) { return this.isUnencryptedPrivateKey(str); }										// override if wif is different
+CurrencyPlugin.prototype.getUnencryptedPrivateKey = function(privateKey) { assertTrue(this.isUnencryptedPrivateKey(privateKey)); return privateKey; }	// override if wif is different
+CurrencyPlugin.prototype.getUnencryptedPrivateKeyWif = function(privateKey) { return this.getUnencryptedPrivateKey(privateKey); }						// override if wif is different
+CurrencyPlugin.prototype.isEncryptedPrivateKey = function(privateKey) { try { return isInitialized(this.getEncryptionScheme(privateKey)); } catch(err) { return false; } }
 CurrencyPlugin.prototype.getAddress = function(privateKey) { throw new Error("Subclass must implement"); }
 CurrencyPlugin.prototype.getEncryptionSchemes = function() { return [EncryptionScheme.CRYPTOJS]; }
 CurrencyPlugin.prototype.getEncryptionScheme = function(privateKey) { throw new Error("Subclass must implement"); }
-CurrencyPlugin.prototype.isEncrypted = function(privateKey) { return isInitialized(this.getEncryptionScheme(privateKey)); }
 CurrencyPlugin.prototype.encrypt = function(scheme, unencryptedPrivateKey, password, callback) { encrypt(scheme, unencryptedPrivateKey, password, callback); }
 CurrencyPlugin.prototype.decrypt = function(scheme, encryptedPrivateKey, password, callback) { decrypt(scheme, encryptedPrivateKey, password, callback); }
 CurrencyPlugin.prototype.split = function(privateKey, numPieces, minPieces) { throw new Error("Subclass must implement"); }
@@ -61,12 +62,12 @@ function BitcoinPlugin() {
 		key.setCompressed(true);
 		return key.getBitcoinWalletImportFormat();
 	}
-	this.isPrivateKey = function(str) {
+	this.isUnencryptedPrivateKey = function(str) {
 		if (!isString(str)) return false;
 		return ninja.privateKey.isPrivateKey(str);
 	}
 	this.getAddress = function(privateKey) {
-		assertTrue(this.isPrivateKey(privateKey));
+		assertTrue(this.isUnencryptedPrivateKey(privateKey));
 		return new Bitcoin.ECKey(privateKey).getBitcoinAddress();
 	}
 	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38, EncryptionScheme.CRYPTOJS]; }
@@ -74,7 +75,7 @@ function BitcoinPlugin() {
 		if (!isString(privateKey)) throw new Error("Argument must be a string");
 		if (ninja.privateKey.isBIP38Format(privateKey)) return EncryptionScheme.BIP38;	// bitaddress.js:6353
 		if (privateKey[0] === 'U') return EncryptionScheme.CRYPTOJS;					// TODO: better cryptojs validation
-		if (this.isPrivateKey(privateKey)) return undefined;
+		if (this.isUnencryptedPrivateKey(privateKey)) return undefined;
 		throw new Error("Unrecognized encrypted or unencrypted private key: " + privateKey);
 	}
 	this.split = function(privateKey, numPieces, minPieces) {
@@ -110,12 +111,12 @@ function MoneroPlugin() {
 	this.newPrivateKey = function() {
 		return cnUtil.sc_reduce32(cnUtil.rand_32());
 	};
-	this.isPrivateKey = function(str) {
+	this.isUnencryptedPrivateKey = function(str) {
 		if (isHex(str) && str.length >= 63 && str.length <= 65) return true;	// TODO: use library
-		if (this.isPrivateKeyWif(str)) return true;
+		if (this.isUnencryptedPrivateKeyWif(str)) return true;
 		return false;
 	}
-	this.isPrivateKeyWif = function(str) {
+	this.isUnencryptedPrivateKeyWif = function(str) {
 		try {
 			mn_decode(str);
 			return true;
@@ -124,25 +125,24 @@ function MoneroPlugin() {
 		}
 	}
 	this.getAddress = function(privateKey) {
-		var keys = cnUtil.create_address(this.getPrivateKey(privateKey));
+		var keys = cnUtil.create_address(this.getUnencryptedPrivateKey(privateKey));
 		return cnUtil.pubkeys_to_string(keys.spend.pub, keys.view.pub);
 	}
-	this.getPrivateKey = function(privateKey) {
-		assertTrue(this.isPrivateKey(privateKey));
+	this.getUnencryptedPrivateKey = function(privateKey) {
+		assertTrue(this.isUnencryptedPrivateKey(privateKey));
 		if (privateKey.indexOf(' ') !== -1) return mn_decode(privateKey);
 		return privateKey;
 	}
-	this.getPrivateKeyWif = function(privateKey) {
-		return mn_encode(this.getPrivateKey(privateKey), 'english');
+	this.getUnencryptedPrivateKeyWif = function(privateKey) {
+		return mn_encode(this.getUnencryptedPrivateKey(privateKey), 'english');
 	}
 	this.getEncryptionScheme = function(privateKey) {
 		if (!isString(privateKey)) throw new Error("privateKey must be a string");
 		if (privateKey[0] === 'U') return EncryptionScheme.CRYPTOJS;	// TODO: better cryptojs validation
-		if (this.isPrivateKey(privateKey)) return undefined;
+		if (this.isUnencryptedPrivateKey(privateKey)) return undefined;
 		throw new Error("Unrecognized encrypted or unencrypted private key: " + privateKey);
 	}
 	this.split = function(privateKey, numPieces, minPieces) {
-		privateKey = this.getPrivateKey(privateKey);
 		var hex = isHex(privateKey) ? privateKey : secrets.str2hex(privateKey);
 		return secrets.share(hex, numPieces, minPieces);
 	}
@@ -167,18 +167,18 @@ function EthereumPlugin() {
 	this.newPrivateKey = function() {
 		return keythereum.create().privateKey.toString("hex");
 	};
-	this.isPrivateKey = function(str) {
+	this.isUnencryptedPrivateKey = function(str) {
 		if (isHex(str) && str.length >= 63 && str.length <= 65) return true;	// TODO: use library
 		return false;
 	}
 	this.getAddress = function(privateKey) {
-		assertTrue(this.isPrivateKey(privateKey));
+		assertTrue(this.isUnencryptedPrivateKey(privateKey));
 		return keythereum.privateKeyToAddress(privateKey);
 	}
 	this.getEncryptionScheme = function(privateKey) {
 		if (typeof privateKey !== 'string') throw new Error("privateKey must be a string");
 		if (privateKey[0] === 'U') return EncryptionScheme.CRYPTOJS;			// TODO: better cryptojs validation
-		if (this.isPrivateKey(privateKey)) return undefined;
+		if (this.isUnencryptedPrivateKey(privateKey)) return undefined;
 		throw new Error("Unrecognized encrypted or unencrypted private key: " + privateKey);
 	}
 	this.split = function(privateKey, numPieces, minPieces) {
@@ -218,17 +218,17 @@ function LitecoinPlugin() {
 	this.newPrivateKey = function() {
 		return new litecore.PrivateKey().toWIF();
 	};
-	this.isPrivateKey = function(str) {
+	this.isUnencryptedPrivateKey = function(str) {
 		return litecore.PrivateKey.isValid(str);
 	}
 	this.getAddress = function(privateKey) {
-		assertTrue(this.isPrivateKey(privateKey));
+		assertTrue(this.isUnencryptedPrivateKey(privateKey));
 		return new litecore.PrivateKey(privateKey).toAddress().toString();
 	}
 	this.getEncryptionScheme = function(privateKey) {
 		if (!isString(privateKey)) throw new Error("Argument must be a string");
 		if (privateKey[0] === 'U') return EncryptionScheme.CRYPTOJS;	// TODO: better cryptojs validation
-		if (this.isPrivateKey(privateKey)) return undefined;
+		if (this.isUnencryptedPrivateKey(privateKey)) return undefined;
 		throw new Error("Unrecognized encrypted or unencrypted private key: " + privateKey);
 	}
 	this.split = function(privateKey, numPieces, minPieces) {
