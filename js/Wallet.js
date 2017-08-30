@@ -15,7 +15,7 @@ function Wallet(plugin, state) {
 	}
 	
 	this.setState = function(state) {
-		state = Object.assign({}, state);
+		state = Object.assign({}, state);	// copy
 		assertInitialized(state);
 		if (state.encryption) {
 			assertTrue(contains(this.plugin.getEncryptionSchemes(), state.encryption));
