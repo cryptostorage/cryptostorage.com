@@ -9,7 +9,6 @@
 // verify final pieces
 // consult designers
 // namespace utils.js
-// test wallet.setState() combinations
 // implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
 // cryptostorage donation addresses
 // make qr codes and style smaller
