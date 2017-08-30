@@ -335,6 +335,21 @@ function arraysEqual(a, b) {
 }
 
 /**
+ * Determines if two maps are equal.
+ * 
+ * @param map1 is a map to compare
+ * @param map2 is a map to compare
+ * @returns true if the maps have identical keys and values, false otherwise
+ */
+function mapsEqual(map1, map2) {
+	if (map1.size !== map2.size) return false;
+	for (let key of Object.keys(map1)) {
+		if (map1[key] !== map2[key]) return false;
+	}
+	return true;
+}
+
+/**
  * Implements str.replaceAt(idx, replacement).
  */
 String.prototype.replaceAt=function(idx, replacement) {

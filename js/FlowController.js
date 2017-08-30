@@ -137,7 +137,7 @@ function FlowController(pageManager, currencies) {
 		assertTrue(wallets.length >= 1);
 		state.wallets = wallets;
 		state.currency = wallets[0].getCurrencyPlugin();
-		if (wallets[0].isEncryptedPrivateKey()) pageManager.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
+		if (wallets[0].isEncrypted()) pageManager.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
 		else pageManager.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets, true), onCustomExport));
 	}
 	

@@ -213,7 +213,7 @@ function testWallet(plugin) {
 	
 	// basic tests
 	let wallet = plugin.newWallet();
-	assertTrue(plugin === wallet.getCurrencyPlugin());
+	assertEquals(plugin, wallet.getCurrencyPlugin());
 	assertInitialized(wallet.getPrivateKey());
 	assertInitialized(wallet.getAddress());
 	assertFalse(wallet.isEncrypted());
@@ -229,7 +229,24 @@ function testWallet(plugin) {
 	assertTrue(plugin.isUnencryptedPrivateKeyWif(wallet.getUnencryptedPrivateKeyWif()));
 	wallet.setPrivateKey(oldPrivateKey);
 	assertEquals(oldPrivateKey, wallet.getPrivateKey());
-	assertEquals(oldAddress, wallet.getAddress());	
+	assertEquals(oldAddress, wallet.getAddress());
+	
+	// test splitting
+	assertFalse(wallet.isSplit());
+	wallet.split(NUM_PIECES, MIN_PIECES);
+	assertTrue(wallet.isSplit());
+	assertUndefined(wallet.isEncrypted());
+	assertUndefined(wallet.getEncryptionScheme());
+	assertUndefined(wallet.getPrivateKey());
+	assertUndefined(wallet.getUnencryptedPrivateKeyWif());
+	let pieces = wallet.getPrivateKeyPieces();
+	assertEquals(NUM_PIECES, pieces.length);
+	let splitWallet = new Wallet(plugin, {privateKeyPieces: pieces, address: wallet.getAddress()});
+	assertTrue(splitWallet.isSplit());
+	assertTrue(wallet.equals(splitWallet));
+	splitWallet.reconstitute();
+	wallet.reconstitute();
+	assertTrue(wallet.equals(splitWallet));
 	
 	// test without plugin
 	try {
@@ -238,6 +255,8 @@ function testWallet(plugin) {
 	} catch (err) {
 		assertEquals("Must provide currency plugin", err.message);
 	}
+	
+	// test with wif, encrypted, and split private keys
 }
 
 function testWalletsWithEncryption(callback) {
