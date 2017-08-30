@@ -233,6 +233,7 @@ function testWallet(plugin) {
 	
 	// test splitting
 	assertFalse(wallet.isSplit());
+	assertUndefined(wallet.getPrivateKeyPieces());
 	wallet.split(NUM_PIECES, MIN_PIECES);
 	assertTrue(wallet.isSplit());
 	assertUndefined(wallet.isEncrypted());
