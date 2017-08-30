@@ -1,11 +1,10 @@
 // TODO
 // load dependencies as needed
+// review private keys (hex, base58, etc)
 // page to configure export options with previews
 // plugin and wallet decryption tests (test wallet creation to reveal no address on decryption bug)
 // progress bar on wallet generation, export generation
 // prevent swipe right if number of addresses change so it's updated
-// review formats of private keys (hex, base58, etc)
-// peer review encryption schemes
 // what happens without random movement for bitaddress.org? need true randomization
 // verify final pieces
 // consult designers

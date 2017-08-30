@@ -75,8 +75,8 @@ function BitcoinPlugin() {
 		if (!isString(privateKey)) throw new Error("Argument must be a string");
 		if (ninja.privateKey.isBIP38Format(privateKey)) return EncryptionScheme.BIP38;	// bitaddress.js:6353
 		if (privateKey[0] === 'U') return EncryptionScheme.CRYPTOJS;					// TODO: better cryptojs validation
-		if (this.isUnencryptedPrivateKey(privateKey)) return undefined;
-		throw new Error("Unrecognized encrypted or unencrypted private key: " + privateKey);
+		assertTrue(this.isUnencryptedPrivateKey(privateKey));
+		return undefined;
 	}
 	this.split = function(privateKey, numPieces, minPieces) {
 		return secrets.share(secrets.str2hex(privateKey), numPieces, minPieces);
@@ -139,8 +139,8 @@ function MoneroPlugin() {
 	this.getEncryptionScheme = function(privateKey) {
 		if (!isString(privateKey)) throw new Error("privateKey must be a string");
 		if (privateKey[0] === 'U') return EncryptionScheme.CRYPTOJS;	// TODO: better cryptojs validation
-		if (this.isUnencryptedPrivateKey(privateKey)) return undefined;
-		throw new Error("Unrecognized encrypted or unencrypted private key: " + privateKey);
+		assertTrue(this.isUnencryptedPrivateKey(privateKey));
+		return undefined;
 	}
 	this.split = function(privateKey, numPieces, minPieces) {
 		var hex = isHex(privateKey) ? privateKey : secrets.str2hex(privateKey);
@@ -178,8 +178,8 @@ function EthereumPlugin() {
 	this.getEncryptionScheme = function(privateKey) {
 		if (typeof privateKey !== 'string') throw new Error("privateKey must be a string");
 		if (privateKey[0] === 'U') return EncryptionScheme.CRYPTOJS;			// TODO: better cryptojs validation
-		if (this.isUnencryptedPrivateKey(privateKey)) return undefined;
-		throw new Error("Unrecognized encrypted or unencrypted private key: " + privateKey);
+		assertTrue(this.isUnencryptedPrivateKey(privateKey));
+		return undefined;
 	}
 	this.split = function(privateKey, numPieces, minPieces) {
 		assertInitialized(privateKey);
@@ -228,8 +228,8 @@ function LitecoinPlugin() {
 	this.getEncryptionScheme = function(privateKey) {
 		if (!isString(privateKey)) throw new Error("Argument must be a string");
 		if (privateKey[0] === 'U') return EncryptionScheme.CRYPTOJS;	// TODO: better cryptojs validation
-		if (this.isUnencryptedPrivateKey(privateKey)) return undefined;
-		throw new Error("Unrecognized encrypted or unencrypted private key: " + privateKey);
+		assertTrue(this.isUnencryptedPrivateKey(privateKey));
+		return undefined;
 	}
 	this.split = function(privateKey, numPieces, minPieces) {
 		assertInitialized(privateKey);
