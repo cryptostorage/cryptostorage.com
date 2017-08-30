@@ -1,6 +1,5 @@
 // TODO
 // load dependencies as needed
-// import json with monero wif throws exception
 // beef up plugin and wallet tests
 // page to configure export options with previews
 // progress bar on wallet generation, export generation
