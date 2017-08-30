@@ -1,4 +1,4 @@
-const REPEAT_LONG = 100;
+const REPEAT_LONG = 50;
 const REPEAT_SHORT = 1;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
@@ -8,7 +8,7 @@ function runTests(callback) {
 	console.log("Running tests");
 	testUtils();
 	testPathTracker();
-//	testCurrencyPlugins();
+	testCurrencyPlugins();
 	testWallets();
 	console.log("All tests passed");
 	if (callback) callback();
