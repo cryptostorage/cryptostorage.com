@@ -1,5 +1,4 @@
 // TODO
-// add alpha software warning
 // review private keys (hex, base58, etc)
 // page to configure export options with previews
 // plugin and wallet decryption tests (test wallet creation to reveal no address on decryption bug)
