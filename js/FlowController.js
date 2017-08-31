@@ -4,7 +4,6 @@
 // plugin and wallet decryption tests (test wallet creation to reveal no address on decryption bug)
 // progress bar on wallet generation, export generation
 // load dependencies as needed
-// prevent swipe right if number of addresses change so it's updated
 // what happens without random movement for bitaddress.org? need true randomization
 // verify final pieces
 // consult designers
@@ -13,7 +12,7 @@
 // cryptostorage donation addresses
 // make qr codes and style smaller
 // popup on key generation to reconfirm password
-// prevent next if imported files deleted
+// register shortcut keys for page navigation (enter, y, n)
 
 const RUN_TESTS = false;
 const DEBUG = true;
@@ -62,7 +61,7 @@ function FlowController(pageManager, currencies) {
 			if (currency.getTickerSymbol() === tickerSymbol) state.currency = currency;
 		}
 		if (!state.currency) throw new Error("Currency not found with ticker symbol: " + tickerSymbol);
-		pageManager.next(new NumPairsController($("<div>"), state, onNumPairsInput));
+		pageManager.next(new NumPairsController($("<div>"), state, pageManager.getPathTracker(), onNumPairsInput));
 	}
 	
 	function onNumPairsInput(numWallets) {
@@ -75,7 +74,7 @@ function FlowController(pageManager, currencies) {
 	function onPasswordSelection(passwordEnabled) {
 		if (DEBUG) console.log("onPasswordSelection(" + passwordEnabled + ")");
 		state.passwordEnabled = passwordEnabled;
-		if (passwordEnabled) pageManager.next(new PasswordInputController($("<div>"), state, onPasswordInput));
+		if (passwordEnabled) pageManager.next(new PasswordInputController($("<div>"), state, pageManager.getPathTracker(), onPasswordInput));
 		else pageManager.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
 	}
 
@@ -89,7 +88,7 @@ function FlowController(pageManager, currencies) {
 	function onSplitSelection(splitEnabled) {
 		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
 		state.splitEnabled = splitEnabled;
-		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, onSplitInput));
+		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, pageManager.getPathTracker(), onSplitInput));
 		else pageManager.next(new GenerateWalletsController($("<div>"), state, onWalletsGenerated));
 	}
 	

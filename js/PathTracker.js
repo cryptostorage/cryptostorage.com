@@ -7,7 +7,6 @@ function PathTracker(onUpdate) {
 	
 	var items = [];	// tracks items
 	var idx = -1;	// tracks current index
-	var that = this;
 
 	/**
 	 * Moves to the next item.  Sets the next item to the given item if not null.
@@ -16,12 +15,12 @@ function PathTracker(onUpdate) {
 		
 		// set next item
 		if (item) {
-			clearNexts();
+			this.clearNexts();
 			items.push(item);
 		}
 		
 		// move to next item
-		if (!that.hasNext()) throw Error("No next item");
+		if (!this.hasNext()) throw new Error("No next item");
 		idx++;
 		onUpdate(idx - 1, idx, items[idx]);
 		return items[idx];
@@ -31,7 +30,7 @@ function PathTracker(onUpdate) {
 	 * Moves to the previous item.
 	 */
 	this.prev = function() {
-		if (!that.hasPrev()) throw Error("No previous item");
+		if (!this.hasPrev()) throw Error("No previous item");
 		idx--;
 		onUpdate(idx + 1, idx, items[idx]);
 		return items[idx];
@@ -82,7 +81,9 @@ function PathTracker(onUpdate) {
 		return items.slice(idx + 1);
 	}
 	
-	function clearNexts() {
+	this.clearNexts = function() {
+		if (!this.hasNext()) return;
 		items = items.slice(0, idx + 1);
+		onUpdate(idx, idx, items[idx]);
 	}
 }

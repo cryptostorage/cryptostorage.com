@@ -102,6 +102,10 @@ function PageManager(contentDiv) {
 		});
 	};
 	
+	this.getPathTracker = function() {
+		return pathTracker;
+	}
+	
 	/**
 	 * Invoked when the current page is changed.
 	 * 
@@ -118,8 +122,8 @@ function PageManager(contentDiv) {
 			pageDiv.append(renderer.getDiv());
 		}
 		
-		// handle non-first page
-		else {
+		// handle non-first page change
+		else if (lastIdx !== curIdx){
 			renderer.getDiv().css("display", "none");	// so div swipes into view
 			pageDiv.append(renderer.getDiv());
 			
@@ -228,7 +232,7 @@ inheritsFrom(CurrencySelectionController, DivController);
 /**
  * Render number of key pairs.
  */
-function NumPairsController(div, state, onNumPairsInput) {
+function NumPairsController(div, state, pathTracker, onNumPairsInput) {
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
@@ -237,7 +241,7 @@ function NumPairsController(div, state, onNumPairsInput) {
 		// render title
 		div.append(UiUtils.getPageHeader("How many " + state.currency.getName() + " public/private keys do you want to create?", state.currency.getLogo()));
 		
-		// num wallets input
+		// num key pairs input
 		var numPairsInput = $("<input>");
 		numPairsInput.attr("class", "num_input");
 		numPairsInput.attr("type", "number");
@@ -245,6 +249,7 @@ function NumPairsController(div, state, onNumPairsInput) {
 		numPairsInput.attr("value", 10);
 		div.append(numPairsInput);
 		div.append("<br><br>");
+		numPairsInput.keypress(function() { pathTracker.clearNexts(); });
 		
 		// error message
 		var errorDiv = $("<div>");
@@ -314,7 +319,7 @@ inheritsFrom(PasswordSelectionController, DivController);
  * @param state is the current state of the application
  * @param onPasswordInput(password, scheme) is the callback and its parameters
  */
-function PasswordInputController(div, state, onPasswordInput) {
+function PasswordInputController(div, state, pathTracker, onPasswordInput) {
 	DivController.call(this, div);
 	var passwordInput;	// for later focus on show
 	var schemes = state.currency.getEncryptionSchemes();
@@ -338,6 +343,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		passwordInput.attr("class", "text_input");
 		div.append(passwordInput);
 		div.append("<br><br>");
+		passwordInput.keypress(function() { pathTracker.clearNexts(); });
 		
 		// render advanced
 		var advancedDiv = $("<div>").appendTo(div);
@@ -419,7 +425,7 @@ inheritsFrom(SplitSelectionController, DivController);
 /**
  * Number of pieces input page.
  */
-function NumPiecesInputController(div, state, onPiecesInput) {
+function NumPiecesInputController(div, state, pathTracker, onPiecesInput) {
 	DivController.call(this, div);
 	var errorDiv = $("<div>");
 
@@ -435,6 +441,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		numPiecesInput.attr("value", 3);
 		div.append(numPiecesInput);
 		div.append("<br><br>");
+		numPiecesInput.keypress(function() { pathTracker.clearNexts(); });
 		
 		div.append("Number of pieces necessary to restore private keys: ");
 		var minPiecesInput = $("<input type='number'>");
@@ -442,6 +449,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		minPiecesInput.attr("value", 2);
 		div.append(minPiecesInput);
 		div.append("<br><br>");
+		minPiecesInput.keypress(function() { pathTracker.clearNexts(); });
 		
 		// error message
 		errorDiv.empty();
