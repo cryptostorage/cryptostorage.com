@@ -13,6 +13,7 @@
 // make qr codes and style smaller
 // popup on key generation to reconfirm password
 // register shortcut keys for page navigation (enter, y, n)
+// paste private key doesn't work in iphone safari
 
 const RUN_TESTS = false;
 const DEBUG = true;
