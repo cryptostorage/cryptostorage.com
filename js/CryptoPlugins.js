@@ -108,9 +108,8 @@ function BitcoinPlugin {
 		return key.getBitcoinHexFormat();
 	}
 	this.privateKeyHexToWif = function(hex) {
-		var key = new Bitcoin.ECKey(hex);	// bitaddress.js:5367	// TODO: handle randomization
-		key.setCompressed(true);
-		return key.getBitcoinHexFormat();
+		if (this.isEncryptedPrivateKey(hex)) throw new Error("Hex to wif conversion not supported with encrypted private key");
+		throw new Error("Not implemented");
 	}
 }
 inheritsFrom(BitcoinPlugin, CurrencyPlugin);

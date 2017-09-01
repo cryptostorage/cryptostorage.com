@@ -30,7 +30,7 @@ function PrivateKey(plugin, state) {
 	}
 	
 	this.random = function() {
-		this.setPrivateKey(this.plugin.newPrivateKeyHex());
+		this.setPrivateKey(this.plugin.newUnencryptedPrivateKeyHex());
 	}
 	
 	this.setPrivateKey(str) {
