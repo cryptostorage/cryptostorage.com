@@ -1,11 +1,11 @@
 // TODO
+// verify final pieces
 // review private keys (hex, base58, etc)
 // page to configure export options with previews
 // plugin and wallet decryption tests (test wallet creation to reveal no address on decryption bug)
 // progress bar on wallet generation, export generation
 // load dependencies as needed
 // what happens without random movement for bitaddress.org? need true randomization
-// verify final pieces
 // consult designers
 // namespace utils.js
 // implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
