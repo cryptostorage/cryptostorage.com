@@ -26,9 +26,14 @@ function CryptoPlugin {
 	}
 	
 	/**
-	 * Determines the encryption scheme of the given string.  Throws an exception if the string is not recognized.
+	 * Returns the encryption scheme of the given private key string.  Throws an exception if the string is not recognized.
 	 */
 	this.getEncryptionScheme = function(str) { throw new Error("Subclass must implement"); }
+	
+	/**
+	 * Returns the address of the given private key.
+	 */
+	this.getAddress = function(key) { throw new Error("Subclass must implement"); }
 }
 
 function BitcoinPlugin {
