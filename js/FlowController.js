@@ -14,6 +14,7 @@
 // popup on key generation to reconfirm password
 // register shortcut keys for page navigation (enter, y, n)
 // paste private key doesn't work in iphone safari
+// aes.java needs de-minified
 
 const RUN_TESTS = false;
 const DEBUG = true;
