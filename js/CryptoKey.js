@@ -43,7 +43,7 @@ function CryptoKey(plugin, state) {
 	}
 	
 	this.encrypt = function(scheme, password) {
-		this.setCryptoKey(this.plugin.encrypt(scheme, this, password));
+		this.setPrivateKey(this.plugin.encrypt(scheme, this, password));
 	}
 	
 	this.decrypt = function(password) {
