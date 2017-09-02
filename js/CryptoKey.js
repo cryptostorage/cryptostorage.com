@@ -54,6 +54,10 @@ function CryptoKey(plugin, state) {
 		return isInitialized(this.state.encryption);
 	}
 	
+	this.getEncryptionSchemes = function() {
+		return this.plugin.getEncryptionSchemes();
+	}
+	
 	this.getEncryptionScheme = function() {
 		return this.state.encryption;
 	}

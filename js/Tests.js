@@ -8,7 +8,7 @@ function runTests(callback) {
 	console.log("Running tests");
 	testUtils();
 	testPathTracker();
-	testCryptoPlugins();
+	//testCryptoPlugins();
 	testCryptoKeys();
 	console.log("All tests passed");
 	if (callback) callback();
@@ -147,27 +147,19 @@ function testCryptoPlugin(plugin) {
 		try {
 			plugin.privateKeyHexToWif(invalid);
 			fail("Should not be able to get hex from invalid private key");
-		} catch (err) {
-			// nothing to do
-		}
+		} catch (err) { }
 		try {
 			plugin.privateKeyWifToHex(invalid);
 			fail("Should not be able to get wif from invalid private key");
-		} catch (err) {
-			// nothing to do
-		}
+		} catch (err) { }
 		try {
 			plugin.getAddress(invalid);
 			fail("Should not be able to get address from invalid private key");
-		} catch (err) {
-			// nothing to do
-		}
+		} catch (err) { }
 		try {
 			plugin.getEncryptionScheme(invalid);
 			fail("Should not be able to get encryption scheme from invalid argument");
-		} catch (err) {
-			// nothing to do
-		}
+		} catch (err) { }
 	}
 }
 
@@ -183,6 +175,8 @@ function testCryptoKey(plugin) {
 	for (let i = 0; i < REPEAT_LONG; i++) {
 		let key = plugin.newCryptoKey();
 		assertEquals(plugin, key.getPlugin());
+		assertTrue(plugin.isPrivateKey(key.toHex()));
+		assertTrue(plugin.isPrivateKey(key.toWif()));
 		assertTrue(plugin.isPrivateKeyHex(key.toHex()));
 		assertTrue(plugin.isPrivateKeyWif(key.toWif()));
 		assertTrue(plugin.isAddress(key.toAddress()));
@@ -192,7 +186,7 @@ function testCryptoKey(plugin) {
 		assertTrue(key.equals(copy));
 	}
 	
-	// test initialization
+	// test basic initialization
 	let hex = plugin.newUnencryptedPrivateKeyHex();
 	let wif = plugin.privateKeyHexToWif(hex);
 	let key1 = new CryptoKey(plugin, hex);
@@ -202,14 +196,48 @@ function testCryptoKey(plugin) {
 	assertEquals(hex, key2.toHex());
 	assertEquals(wif, key2.toWif());
 	
-	// test invalid initialization
+	// test initialization with an address
+	let address = key1.toAddress();
+	let key = new CryptoKey(plugin, {privateKey: wif, address: address});
+	assertEquals(hex, key.toHex());
+	assertEquals(wif, key.toWif());
+	assertEquals(address, key.toAddress());
+	
+	// test invalid initializations
 	try {
 		new CryptoKey(plugin, "invalid");
 		throw new Error("CryptoKey created with invalid private key");
 	} catch (err) { }
+	try {
+		let temp = new CryptoKey(plugin);
+		new CryptoKey(plugin, {privateKey: wif, address: temp.toAddress()});	// address mismatch from private key
+		throw new Error("CryptoKey created with mismatching address");
+	} catch (err) { }
 	
+	// test encryption
+	assertTrue(plugin.getEncryptionSchemes().length >= 1);
+	for (let scheme of plugin.getEncryptionSchemes()) {
+		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
+		for (let i = 0; i < max; i++) {
+			
+			// encryption
+			let key = plugin.newCryptoKey();
+			key.encrypt(scheme, PASSWORD);
+			assertTrue(key.isEncrypted());
+			assertEquals(scheme, key.getEncryptionScheme());
+			assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
+			assertEquals(scheme, plugin.getEncryptionScheme(key.toWif()));
+			assertTrue(plugin.isPrivateKeyHex(key.toHex()));
+			assertTrue(plugin.isPrivateKeyWif(key.toWif()));
+			assertTrue(plugin.isAddress(key.toAddress()));
+			assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));	// TODO: implement these
+			assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
+			
+			// decryption
+			
+		}
+	}
 
-	
 	
 	
 	

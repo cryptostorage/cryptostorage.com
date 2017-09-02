@@ -592,18 +592,18 @@ const EncryptionScheme = {
 }
 
 /**
- * Encrypts the given private key with the given scheme and password.
+ * Encrypts the given crypto key with the given scheme and password.
  */
-function encrypt(scheme, privateKey, password) {
+function encrypt(scheme, cryptoKey, password) {
 	if (!scheme) throw new Error("Scheme must be initialized");
-	if (!privateKey) throw new Error("Private key to encrypt must be initialized");
+	if (!cryptoKey) throw new Error("Crypto key to encrypt must be initialized");
 	if (!password) throw new Error("Password must be initialized");
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
-			throw new Exception("Not implemented");
+			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
-			throw new Exception("Not implemented");
+			throw new Error("Not implemented");
 			break;
 		default:
 			throw new Error("Encryption scheme '" + scheme + "' not supported");
@@ -611,18 +611,18 @@ function encrypt(scheme, privateKey, password) {
 }
 
 /**
- * Decrypts the given private key with the given scheme and password.
+ * Decrypts the given crypto key with the given scheme and password.
  */
-function decrypt(scheme, privateKey, password) {
+function decrypt(scheme, cryptoKey, password) {
 	if (!scheme) throw new Error("Scheme must be initialized");
-	if (!privateKey) throw new Error("Private key to decrypt must be initialized");
+	if (!cryptoKey) throw new Error("Private key to decrypt must be initialized");
 	if (!password) throw new Error("Password must be initialized");
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
-			throw new Exception("Not implemented");
+			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
-			throw new Exception("Not implemented");
+			throw new Error("Not implemented");
 			break;
 		default:
 			throw new Error("Decryption scheme '" + scheme + "' not supported");
