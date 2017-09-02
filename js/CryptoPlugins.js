@@ -130,7 +130,7 @@ function BitcoinPlugin() {
 	}
 	this.privateKeyWifToHex = function(wif) {
 		assertTrue(this.isPrivateKeyWif(wif), "Given argument must be a wif formatted private key");
-		if (this.isEncryptedPrivateKey(wif)) throw new Error("Wif to hex with encrypted private key not implemetented");
+		if (this.isEncryptedPrivateKey(wif)) throw new Error("Wif to hex with encrypted private key not implemented");
 		return new Bitcoin.ECKey(wif).getBitcoinHexFormat();
 	}
 	this.isPrivateKeyHex = function(str) {

@@ -84,7 +84,7 @@ function CryptoKey(plugin, state) {
 		// set address
 		if (!this.state.encryption) {
 			let address = plugin.getAddress(this);
-			if (state.address && state.address !== address) throw new Error("state.address does not match derived address");
+			if (state.address && state.address !== address) throw new Error("state.address does not match address derived from private key");
 			this.state.address = address;
 		}
 	}
