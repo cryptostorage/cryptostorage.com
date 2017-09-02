@@ -102,14 +102,14 @@ CryptoPlugin.prototype.getEncryptionSchemes = function() { return [EncryptionSch
 CryptoPlugin.prototype.getEncryptionScheme = function(str) { throw new Error("Subclass must implement"); }
 
 /**
- * Returns a private key string encrypted with the given scheme and password.
+ * Returns a promise which is called with an encrypted private key string upon completion.
  */
-CryptoPlugin.prototype.encrypt = function(scheme, cryptoKey, password) { encrypt(scheme, cryptoKey, password); }
+CryptoPlugin.prototype.encrypt = function(scheme, cryptoKey, password) { return encrypt(scheme, cryptoKey, password); }
 
 /**
- * Returns a private key string decrypted with the given scheme and password.
+ * Returns a promise which is called with a decrypted private key string upon completion.
  */
-CryptoPlugin.prototype.decrypt = function(scheme, cryptoKey, password) { decrypt(scheme, cryptoKey, password); }
+CryptoPlugin.prototype.decrypt = function(scheme, cryptoKey, password) { return decrypt(scheme, cryptoKey, password); }
 
 /**
  * Bitcoin plugin.
@@ -125,13 +125,26 @@ function BitcoinPlugin() {
 	}
 	this.privateKeyHexToWif = function(hex) {
 		assertTrue(this.isPrivateKeyHex(hex), "Given argument must be a hex formatted private key");
-		if (this.isEncryptedPrivateKey(hex)) throw new Error("Hex to wif with encrypted private key not implemented");
+		switch(this.getEncryptionScheme(hex)) {
+			case EncryptionScheme.BIP38:
+				return Bitcoin.Base58.encode(Crypto.util.hexToBytes(hex));
+			case EncryptionScheme.CRYPTOJS:
+				throw new Error("CryptoJS wif to hex not implemented");
+			default:
+				return new Bitcoin.ECKey(hex).getBitcoinWalletImportFormat();
+		}
 		return new Bitcoin.ECKey(hex).getBitcoinWalletImportFormat();
 	}
 	this.privateKeyWifToHex = function(wif) {
 		assertTrue(this.isPrivateKeyWif(wif), "Given argument must be a wif formatted private key");
-		if (this.isEncryptedPrivateKey(wif)) throw new Error("Wif to hex with encrypted private key not implemented");
-		return new Bitcoin.ECKey(wif).getBitcoinHexFormat();
+		switch (this.getEncryptionScheme(wif)) {
+			case EncryptionScheme.BIP38:
+				return Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif));
+			case EncryptionScheme.CRYPTOJS:
+				throw new Error("CryptoJS wif to hex not implemented");
+			default:
+				return new Bitcoin.ECKey(wif).getBitcoinHexFormat();
+		}
 	}
 	this.isPrivateKeyHex = function(str) {
 		if (!isHex(str)) return false;
@@ -153,10 +166,11 @@ function BitcoinPlugin() {
 			return false;
 		}
 	}
-	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38, EncryptionScheme.CRYPTOJS]; }
+	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38]; }
 	this.getEncryptionScheme = function(str) {
 		if (!isString(str)) return undefined;
 		if (ninja.privateKey.isBIP38Format(str)) return EncryptionScheme.BIP38;		// bitaddress.js:6353
+		if (isHex(str) && str.length > 80 && str.length < 90) return EncryptionScheme.BIP38;
 		if (isHex(str) && str.length > 100) return EncryptionScheme.CRYPTOJS;		// TODO: better cryptojs validation
 		if (str[0] === 'U') return EncryptionScheme.CRYPTOJS;						// TODO: better cryptojs validation
 		if (ninja.privateKey.isPrivateKey(str)) return null;

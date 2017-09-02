@@ -43,7 +43,12 @@ function CryptoKey(plugin, state) {
 	}
 	
 	this.encrypt = function(scheme, password) {
-		this.setPrivateKey(this.plugin.encrypt(scheme, this, password));
+		return new Promise(function(resolved, rejected) {
+			that.plugin.encrypt(scheme, that, password).then(function(encryptedStr) {
+				that.setState({privateKey: encryptedStr, address: that.toAddress(), encryption: scheme})
+				resolved();
+			}).catch(rejected);
+		});
 	}
 	
 	this.decrypt = function(password) {
@@ -79,7 +84,9 @@ function CryptoKey(plugin, state) {
 		}
 		
 		// set encryption
-		this.state.encryption = plugin.getEncryptionScheme(state.privateKey);
+		let encryption = plugin.getEncryptionScheme(state.privateKey);
+		if (state.encryption && state.encryption !== encryption) throw new Error("state.encryption does not match detected encryption");
+		this.state.encryption = encryption;
 		
 		// set address
 		if (!this.state.encryption) {
@@ -92,6 +99,7 @@ function CryptoKey(plugin, state) {
 	// initialize key
 	if (!plugin || typeof plugin !== 'object' || plugin.constructor.name !== 'CryptoPlugin') throw new Error("Must provide crypto plugin");
 	this.plugin = plugin;
+	var that = this;
 	this.state = {};
 	if (state) {
 		if (isString(state)) this.setPrivateKey(state);

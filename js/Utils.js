@@ -81,13 +81,17 @@ function isString(arg) {
 }
 
 /**
- * Indicates if the given argument is an object.
+ * Indicates if the given argument is an object and optionally if it has the given constructor name.
  * 
- * @param arg is the argument to test as being an object
- * @returns true if the argument is an object, false otherwise
+ * @param arg is the argument to test
+ * @param constructorName is the argument's constructor name (optional)
+ * @returns true if the given argument is an object and optionally has the given constructor name
  */
-function isObject(arg) {
-	return typeof arg === 'object';
+function isObject(arg, constructorName) {
+	if (!arg) return false;
+	if (typeof arg !== 'object') return false;
+	if (constructorName && arg.constructor.name !== constructorName) return false;
+	return true;
 }
 
 /**
@@ -596,21 +600,18 @@ const EncryptionScheme = {
  */
 function encrypt(scheme, cryptoKey, password) {
 	if (!scheme) throw new Error("Scheme must be initialized");
-	if (!cryptoKey) throw new Error("Crypto key to encrypt must be initialized");
+	if (!isObject(cryptoKey, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 	if (!password) throw new Error("Password must be initialized");
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
 			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
-			
-			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(cryptoKey.toHex(), password, true, function(resp) {
-				console.log("BIP38 done");
-				console.log(resp);
-			});	// TODO: confirm callback called with Error or interpret
-
-			throw new Error("Not implemented");
-			break;
+			return new Promise(function(resolve, reject) {
+				ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(cryptoKey.toHex(), password, true, function(resp) {	// TODO: confirm callback called with Error or interpret
+					resolve(resp);
+				});
+			});
 		default:
 			throw new Error("Encryption scheme '" + scheme + "' not supported");
 	}

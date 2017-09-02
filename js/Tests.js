@@ -1,5 +1,5 @@
 const REPEAT_LONG = 50;
-const REPEAT_SHORT = 1;
+const REPEAT_SHORT = 2;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
 const PASSWORD = "MySuperSecretPasswordAbcTesting123";
@@ -217,25 +217,43 @@ function testCryptoKey(plugin) {
 	// test encryption
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
 	for (let scheme of plugin.getEncryptionSchemes()) {
-		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
-		for (let i = 0; i < max; i++) {
-			
-			// encryption
+		let promise = testEncryption(plugin, scheme);
+		promise.then(function(resp) {
+			console.log("Promise resolved!");
+		}).catch(function(resp) {
+			console.log("Promise rejected!");
+		});
+		
+		
+		
+//		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
+//		let resolved = Promise.resolve();
+//		for (let i = 0; i < max; i++) {
+//			resolved = resolved.then(function() {
+//				testEncryption(plugin, scheme);
+//			});
+//		}
+	}
+	
+	function testEncryption(plugin, scheme) {
+		let promise = new Promise(function(resolve, reject) {
 			let key = plugin.newCryptoKey();
-			key.encrypt(scheme, PASSWORD);
-			assertTrue(key.isEncrypted());
-			assertEquals(scheme, key.getEncryptionScheme());
-			assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
-			assertEquals(scheme, plugin.getEncryptionScheme(key.toWif()));
-			assertTrue(plugin.isPrivateKeyHex(key.toHex()));
-			assertTrue(plugin.isPrivateKeyWif(key.toWif()));
-			assertTrue(plugin.isAddress(key.toAddress()));
-			assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));	// TODO: implement these
-			assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
-			
-			// decryption
-			
-		}
+			key.encrypt(scheme, PASSWORD).then(function(resp) {
+				assertTrue(key.isEncrypted());
+				assertEquals(scheme, key.getEncryptionScheme());
+				assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
+				assertEquals(scheme, plugin.getEncryptionScheme(key.toWif()));
+				assertTrue(plugin.isPrivateKeyHex(key.toHex()));
+				assertTrue(plugin.isPrivateKeyWif(key.toWif()));
+				assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
+				assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
+				assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
+				resolve();
+			}).catch(function(resp) {
+				console.log(resp);
+			});
+		});
+		return promise;
 	}
 
 	
