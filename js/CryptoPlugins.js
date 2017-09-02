@@ -4,7 +4,7 @@ function getCryptoPlugins() {
 		plugins = [];
 		plugins.push(new BitcoinPlugin());
 //		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
+//		plugins.push(new MoneroPlugin());
 //		plugins.push(new LitecoinPlugin());
 //		plugins.push(new BitcoinCashPlugin());
 //		plugins.push(new EthereumClassicPlugin());
@@ -87,7 +87,7 @@ CryptoPlugin.prototype.isPrivateKeyWif = function(str) { throw new Error("Subcla
 CryptoPlugin.prototype.isEncryptedPrivateKey = function(str) { try { return isInitialized(this.getEncryptionScheme(str)); } catch {} }
 	
 /**
- * Returns the encryption scheme of the given private key string.  Throws an exception if the string is not recognized.
+ * Returns the encryption scheme of the given string if known, null if known to be unencrypted, and undefined unknown.
  */
 CryptoPlugin.prototype.getEncryptionScheme = function(str) { throw new Error("Subclass must implement"); }
 	
@@ -96,7 +96,19 @@ CryptoPlugin.prototype.getEncryptionScheme = function(str) { throw new Error("Su
  */
 CryptoPlugin.prototype.getAddress = function(privateKey) { throw new Error("Subclass must implement"); }
 
+/**
+ * Returns a private key string encrypted with the given scheme and password.
+ */
+CryptoPlugin.prototype.encrypt = function(scheme, privateKey, password) { encrypt(scheme, privateKey, password); }
 
+/**
+ * Returns a private key string decrypted with the given scheme and password.
+ */
+CryptoPlugin.prototype.decrypt = function(scheme, privateKey, password) { decrypt(scheme, privateKey, password); }
+
+/**
+ * Bitcoin plugin.
+ */
 function BitcoinPlugin {
 	this.getName = function() { return "Bitcoin"; }
 	this.getTickerSymbol = function() { return "BTC" };
@@ -108,12 +120,41 @@ function BitcoinPlugin {
 		return key.getBitcoinHexFormat();
 	}
 	this.privateKeyHexToWif = function(hex) {
-		if (this.isEncryptedPrivateKey(hex)) throw new Error("Hex to wif conversion not supported with encrypted private key");
-		throw new Error("Not implemented");
+		assertTrue(isPrivateKeyHex(hex), "Given argument must be a hex formatted private key");
+		if (this.isEncryptedPrivateKey(hex)) throw new Error("Hex to wif with encrypted private key not implemented");
+		return new Bitcoin.ECKey(hex).getBitcoinWalletImportFormat();
+	}
+	this.privateKeyWifToHex = function(wif) {
+		assertTrue(this.isPrivateKeyWif(wif), "Given argument must be a wif formatted private key");
+		if (this.isEncryptedPrivateKey(wif)) throw new Error("Wif to hex with encrypted private key not implemetented");
+		return new Bitcoin.ECKey(wif).getBitcoinHexFormat();
+	}
+	this.isPrivateKeyHex = function(str) {
+		if (!isHex(str)) return false;
+		return isDefined(this.getEncryptionScheme(str));
+	}
+	this.isPrivateKeyWif = function(str) {
+		if (isHex(str)) return false;
+		return isDefined(this.getEncryptionScheme(str));
+	}
+	this.getEncryptionScheme = function(str) {
+		assertTrue(isString(str), "Argument must be a string");
+		if (ninja.privateKey.isBIP38Format(str)) return EncryptionScheme.BIP38;				// bitaddress.js:6353
+		if (isHex(privateKey) && privateKey.length > 100) return EncryptionScheme.CRYPTOJS;	// TODO: better cryptojs validation
+		if (privateKey[0] === 'U') return EncryptionScheme.CRYPTOJS;						// TODO: better cryptojs validation
+		if (ninja.privateKey.isPrivateKey(str)) return null;
+		return undefined;
+	}
+	this.getAddress = function(privateKey) {
+		assertFalse(privateKey.isEncrypted(), "Private key must not be encrypted");
+		return new Bitcoin.ECKey(privateKey.toHex()).getBitcoinAddress();
 	}
 }
 inheritsFrom(BitcoinPlugin, CurrencyPlugin);
 
+/**
+ * Monero plugin.
+ */
 function MoneroPlugin {
 	
 }

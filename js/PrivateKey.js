@@ -50,11 +50,11 @@ function PrivateKey(plugin, state) {
 	}
 	
 	this.encrypt = function(scheme, password) {
-		throw new Error("Not implemented");
+		this.setPrivateKey(this.plugin.encrypt(scheme, this, password));
 	}
 	
 	this.decrypt = function(password) {
-		throw new Error("Not implemented");
+		this.setPrivateKey(this.plugin.decrypt(this.getEncrpytionScheme(), this, password));
 	}
 	
 	this.isEncrypted = function() {
@@ -66,6 +66,7 @@ function PrivateKey(plugin, state) {
 	}
 	
 	this.setState = function(state) {
+		
 		// copy state
 		this.state = Object.assign({}, state);
 		
