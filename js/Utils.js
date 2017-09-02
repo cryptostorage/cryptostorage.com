@@ -592,55 +592,93 @@ const EncryptionScheme = {
 }
 
 /**
- * Encrypts the given string with the given password.
- * 
- * @param scheme is the encryption scheme to use
- * @param str is the string to encrypt
- * @param password is the password to encrypt the string
- * @param callback is called with the encrypted string or Error
+ * Encrypts the given private key with the given scheme and password.
  */
-function encrypt(scheme, str, password, callback) {
-	if (!str) throw new Error("String to encrypt must not be empty");
-	if (!password) throw new Error("Password must not be empty");
+function encrypt(scheme, privateKey, password) {
+	if (!scheme) throw new Error("Scheme must be initialized");
+	if (!privateKey) throw new Error("Private key to encrypt must be initialized");
+	if (!password) throw new Error("Password must be initialized");
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
-			callback(CryptoJS.AES.encrypt(str, password).toString());
+			throw new Exception("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
-			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(str, password, true, callback);	// TODO: confirm callback called with Error or interpret
+			throw new Exception("Not implemented");
 			break;
 		default:
-			throw new Error(scheme + " encryption not implemented");
+			throw new Error("Encryption scheme '" + scheme + "' not supported");
 	}
 }
 
 /**
- * Decrypts the given string with the given password.
- * 
- * TODO: move this into plugin? probably.
- * 
- * @param scheme is the encryption scheme to use
- * @param str is the string to decrypt
- * @param password is the password to decrypt the string
- * @param callback is called with the decrypted string or Error
+ * Decrypts the given private key with the given scheme and password.
  */
-function decrypt(scheme, str, password, callback) {
-	if (!str) throw new Error("String to decrypt must not be empty");
-	if (!password) throw new Error("Password must not be empty");
-	switch(scheme) {
+function decrypt(scheme, privateKey, password) {
+	if (!scheme) throw new Error("Scheme must be initialized");
+	if (!privateKey) throw new Error("Private key to decrypt must be initialized");
+	if (!password) throw new Error("Password must be initialized");
+	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
-			callback(CryptoJS.AES.decrypt(str, password).toString(CryptoJS.enc.Utf8));
+			throw new Exception("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
-			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(str, password, function (btcKeyOrError) {
-				if (btcKeyOrError.message) callback(btcKeyOrError);
-				else callback(new Bitcoin.ECKey(btcKeyOrError).setCompressed(true).getBitcoinWalletImportFormat());
-			});
+			throw new Exception("Not implemented");
 			break;
 		default:
-			throw new Error(scheme + " decryption not implemented");
+			throw new Error("Decryption scheme '" + scheme + "' not supported");
 	}
 }
+
+///**
+// * Encrypts the given string with the given password.
+// * 
+// * @param scheme is the encryption scheme to use
+// * @param str is the string to encrypt
+// * @param password is the password to encrypt the string
+// * @param callback is called with the encrypted string or Error
+// */
+//function encrypt(scheme, str, password, callback) {
+//	if (!str) throw new Error("String to encrypt must not be empty");
+//	if (!password) throw new Error("Password must not be empty");
+//	switch (scheme) {
+//		case EncryptionScheme.CRYPTOJS:
+//			callback(CryptoJS.AES.encrypt(str, password).toString());
+//			break;
+//		case EncryptionScheme.BIP38:
+//			ninja.privateKey.BIP38CryptoKeyToEncryptedKeyAsync(str, password, true, callback);	// TODO: confirm callback called with Error or interpret
+//			break;
+//		default:
+//			throw new Error(scheme + " encryption not implemented");
+//	}
+//}
+//
+///**
+// * Decrypts the given string with the given password.
+// * 
+// * TODO: move this into plugin? probably.
+// * 
+// * @param scheme is the encryption scheme to use
+// * @param str is the string to decrypt
+// * @param password is the password to decrypt the string
+// * @param callback is called with the decrypted string or Error
+// */
+//function decrypt(scheme, str, password, callback) {
+//	if (!str) throw new Error("String to decrypt must not be empty");
+//	if (!password) throw new Error("Password must not be empty");
+//	switch(scheme) {
+//		case EncryptionScheme.CRYPTOJS:
+//			callback(CryptoJS.AES.decrypt(str, password).toString(CryptoJS.enc.Utf8));
+//			break;
+//		case EncryptionScheme.BIP38:
+//			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(str, password, function (btcKeyOrError) {
+//				if (btcKeyOrError.message) callback(btcKeyOrError);
+//				else callback(new Bitcoin.ECKey(btcKeyOrError).setCompressed(true).getBitcoinWalletImportFormat());
+//			});
+//			break;
+//		default:
+//			throw new Error(scheme + " decryption not implemented");
+//	}
+//}
 
 /**
  * Splits the given string.  First converts the string to hex.
@@ -716,7 +754,7 @@ function parseWallet(plugin, str) {
 	for (let line of lines) if (line) components.push(line);
 	if (components.length === 0) return null;
 	else if (components.length === 1) {
-		if (plugin.isPrivateKey(components[0])) return plugin.newWallet({privateKey: components[0]});
+		if (plugin.isCryptoKey(components[0])) return plugin.newWallet({privateKey: components[0]});
 	} else {
 		try {
 			return plugin.newWallet({privateKey: plugin.reconstitute(components) });
@@ -742,8 +780,8 @@ function walletsToPieces(wallets, wif) {
 		else if (ticker !== wallet.getCurrencyPlugin().getTickerSymbol()) throw new Error("Wallets have different currencies: " + ticker + " vs " + wallet.getCurrencyPlugin().getTicker());
 		if (isUndefined(isSplit)) isSplit = wallet.isSplit();
 		else if (isSplit !== wallet.isSplit()) throw new Error("Wallets have different split states");
-		if (isUndefined(numPieces)) numPieces = isSplit ? wallet.getPrivateKeyPieces().length : 1;
-		else if (numPieces !== (isSplit ? wallet.getPrivateKeyPieces().length : 1)) throw new Error("Wallets have different number of pieces");
+		if (isUndefined(numPieces)) numPieces = isSplit ? wallet.getCryptoKeyPieces().length : 1;
+		else if (numPieces !== (isSplit ? wallet.getCryptoKeyPieces().length : 1)) throw new Error("Wallets have different number of pieces");
 		if (isUndefined(encryption)) encryption = wallet.isEncrypted() ? wallet.getEncryptionScheme() : undefined;
 		else if (encryption !== (wallet.isEncrypted() ? wallet.getEncryptionScheme() : undefined)) throw new Error("Wallets have different encryption states");
 	}
@@ -764,7 +802,7 @@ function walletsToPieces(wallets, wif) {
 		for (let i = 0; i < numPieces; i++) {
 			var walletKeys = {};
 			walletKeys.publicKey = wallet.getAddress();
-			walletKeys.privateKey = isSplit ? wallet.getPrivateKeyPieces()[i] : wallet.isEncrypted() ? wallet.getPrivateKey() : wif ? wallet.getCurrencyPlugin().getUnencryptedPrivateKeyWif(wallet.getPrivateKey()) : wallet.getPrivateKey();
+			walletKeys.privateKey = isSplit ? wallet.getCryptoKeyPieces()[i] : wallet.isEncrypted() ? wallet.getCryptoKey() : wif ? wallet.getCurrencyPlugin().getUnencryptedCryptoKeyWif(wallet.getCryptoKey()) : wallet.getCryptoKey();
 			pieces[i].keys.push(walletKeys);
 		}
 	}

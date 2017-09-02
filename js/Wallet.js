@@ -31,8 +31,8 @@ function Wallet(plugin, state) {
 			assertUninitialized(state.privateKey);
 		}
 		if (state.privateKey) {
-			if (!this.plugin.isPrivateKey(state.privateKey)) throw new Error("Invalid private key: " + state.privateKey);
-			if (this.plugin.isUnencryptedPrivateKeyWif(state.privateKey)) state.privateKey = this.plugin.getUnencryptedPrivateKey(state.privateKey);
+			if (!this.plugin.isCryptoKey(state.privateKey)) throw new Error("Invalid private key: " + state.privateKey);
+			if (this.plugin.isUnencryptedCryptoKeyWif(state.privateKey)) state.privateKey = this.plugin.getUnencryptedCryptoKey(state.privateKey);
 			if (state.isSplit) throw new Error("Wallet split conflicts with private key being initialized");
 			state.isSplit = false;
 			var encryption = this.plugin.getEncryptionScheme(state.privateKey);
@@ -57,31 +57,31 @@ function Wallet(plugin, state) {
 	}
 	
 	this.random = function() {
-		return this.setPrivateKey(this.plugin.newPrivateKey());
+		return this.setCryptoKey(this.plugin.newCryptoKey());
 	}
 	
 	this.getAddress = function() {
 		return this.state.address;
 	}
 	
-	this.getPrivateKey = function() {
+	this.getCryptoKey = function() {
 		return this.state.privateKey;
 	}
 	
-	this.getUnencryptedPrivateKeyWif = function() {
+	this.getUnencryptedCryptoKeyWif = function() {
 		if (this.isSplit() || this.isEncrypted()) return undefined;
-		return this.plugin.getUnencryptedPrivateKeyWif(this.state.privateKey);
+		return this.plugin.getUnencryptedCryptoKeyWif(this.state.privateKey);
 	}
 	
-	this.setPrivateKey = function(str) {
+	this.setCryptoKey = function(str) {
 		return this.setState({privateKey: str});
 	}
 	
-	this.getPrivateKeyPieces = function() {
+	this.getCryptoKeyPieces = function() {
 		return this.state.privateKeyPieces;
 	}
 	
-	this.setPrivateKeyPieces = function(pieces) {
+	this.setCryptoKeyPieces = function(pieces) {
 		return this.setState({privateKeyPieces: pieces});
 	}
 	
@@ -101,9 +101,9 @@ function Wallet(plugin, state) {
 	this.encrypt = function(scheme, password, callback) {
 		if (this.isEncrypted()) throw new Error("Wallet is already encrypted");
 		if (this.isSplit()) throw new Error("Wallet is split");
-		if (isUndefined(this.getPrivateKey())) throw new Error("Wallet is not initialized");
+		if (isUndefined(this.getCryptoKey())) throw new Error("Wallet is not initialized");
 		if (!contains(this.plugin.getEncryptionSchemes(), scheme)) throw new Error("'" + scheme + "' is not a supported encryption scheme among " + this.plugin.getEncryptionSchemes());
-		this.plugin.encrypt(scheme, this.getPrivateKey(), password, function(resp) {
+		this.plugin.encrypt(scheme, this.getCryptoKey(), password, function(resp) {
 			if (resp.constructor.name === 'Error') callback(resp)
 			else {
 				assertEquals(scheme, that.plugin.getEncryptionScheme(resp));
@@ -118,9 +118,9 @@ function Wallet(plugin, state) {
 	this.decrypt = function(password, callback) {
 		if (!this.isEncrypted()) throw new Error("Wallet is not encrypted");
 		if (this.isSplit()) throw new Error("Wallet is split");
-		if (isUndefined(this.getPrivateKey())) throw new Error("Wallet is not initialized");
-		this.plugin.decrypt(this.getEncryptionScheme(), this.getPrivateKey(), password, function(resp) {
-			if (resp.constructor.name === 'Error' || !that.plugin.isUnencryptedPrivateKey(resp)) callback(new Error("Invalid password"));
+		if (isUndefined(this.getCryptoKey())) throw new Error("Wallet is not initialized");
+		this.plugin.decrypt(this.getEncryptionScheme(), this.getCryptoKey(), password, function(resp) {
+			if (resp.constructor.name === 'Error' || !that.plugin.isUnencryptedCryptoKey(resp)) callback(new Error("Invalid password"));
 			else {
 				assertUndefined(that.plugin.getEncryptionScheme(resp));
 				that.state.privateKey = resp;
@@ -136,8 +136,8 @@ function Wallet(plugin, state) {
 		assertTrue(numPieces >= 2);
 		assertTrue(minPieces >= 2);
 		if (this.isSplit()) throw new Error("Wallet is already split");
-		if (isUndefined(this.getPrivateKey())) throw new Error("Wallet is not initialized");
-		this.state.privateKeyPieces = this.plugin.split(this.getPrivateKey(), numPieces, minPieces);
+		if (isUndefined(this.getCryptoKey())) throw new Error("Wallet is not initialized");
+		this.state.privateKeyPieces = this.plugin.split(this.getCryptoKey(), numPieces, minPieces);
 		this.state.isSplit = true;
 		this.state.privateKey = undefined;
 		this.state.encryption = undefined;
@@ -146,8 +146,8 @@ function Wallet(plugin, state) {
 	
 	this.reconstitute = function() {
 		if (!this.isSplit()) throw new Error("Wallet is not split");
-		var privateKey = this.plugin.reconstitute(this.getPrivateKeyPieces());
-		if (!this.plugin.isPrivateKey(privateKey)) throw new Error("Invalid private key reconstituted from pieces");
+		var privateKey = this.plugin.reconstitute(this.getCryptoKeyPieces());
+		if (!this.plugin.isCryptoKey(privateKey)) throw new Error("Invalid private key reconstituted from pieces");
 		this.state.privateKey = privateKey;
 		this.state.privateKeyPieces = undefined;
 		this.state.isSplit = false;

@@ -4,14 +4,7 @@
  * @param plugin is a plugin for a specific cryptocurrency
  * @param state defines the initial state (optional)
  */
-function PrivateKey(plugin, state) {
-	
-	// initialize key
-	if (!isInitialized(plugin) || typeof plugin !== 'object' || plugin.constructor.name !== 'CryptoPlugin') throw new Error("Must provide crypto plugin");
-	this.plugin = plugin;
-	this.state = {};
-	if (state) this.setState(state);
-	else this.random();
+function CryptoKey(plugin, state) {
 	
 	this.copy = function() {
 		return new CryptoKey(this.plugin, this.state);
@@ -33,7 +26,7 @@ function PrivateKey(plugin, state) {
 		this.setPrivateKey(this.plugin.newUnencryptedPrivateKeyHex());
 	}
 	
-	this.setPrivateKey(str) {
+	this.setPrivateKey = function(str) {
 		this.setState({privateKey: str});
 	}
 	
@@ -50,11 +43,11 @@ function PrivateKey(plugin, state) {
 	}
 	
 	this.encrypt = function(scheme, password) {
-		this.setPrivateKey(this.plugin.encrypt(scheme, this, password));
+		this.setCryptoKey(this.plugin.encrypt(scheme, this, password));
 	}
 	
 	this.decrypt = function(password) {
-		this.setPrivateKey(this.plugin.decrypt(this.getEncrpytionScheme(), this, password));
+		this.setCryptoKey(this.plugin.decrypt(this.getEncryptionScheme(), this, password));
 	}
 	
 	this.isEncrypted = function() {
@@ -73,7 +66,7 @@ function PrivateKey(plugin, state) {
 		// set private key
 		if (state.privateKey) {
 			if (plugin.isPrivateKeyHex(state.privateKey)) {
-				this.state.hex = privateKey;
+				this.state.hex = state.privateKey;
 				this.state.wif = plugin.privateKeyHexToWif(state.privateKey);
 			} else if (plugin.isPrivateKeyWif(state.privateKey)) {
 				this.state.hex = plugin.privateKeyWifToHex(state.privateKey);
@@ -85,10 +78,20 @@ function PrivateKey(plugin, state) {
 		this.state.encryption = plugin.getEncryptionScheme(state.privateKey);
 		
 		// set address
-		if (!this.isEncrypted) {
+		if (!this.state.encryption) {
 			let address = plugin.getAddress(this);
 			if (state.address && state.address !== address) throw new Error("state.address does not match derived address");
 			this.state.address = address;
 		}
 	}
+	
+	// initialize key
+	if (!isInitialized(plugin) || typeof plugin !== 'object' || plugin.constructor.name !== 'CryptoPlugin') throw new Error("Must provide crypto plugin");
+	this.plugin = plugin;
+	this.state = {};
+	if (state) {
+		if (isString(state)) this.setPrivateKey(state);
+		else this.setState(state);
+	}
+	else this.random();
 }

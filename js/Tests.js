@@ -8,8 +8,8 @@ function runTests(callback) {
 	console.log("Running tests");
 	testUtils();
 	testPathTracker();
-	testCurrencyPlugins();
-	testWallets();
+	testCryptoPlugins();
+	testCryptoKeys();
 	console.log("All tests passed");
 	if (callback) callback();
 	
@@ -115,91 +115,131 @@ function testPathTracker() {
 	}
 }
 
-function testCurrencyPlugins() {
-	for (let plugin of getCurrencyPlugins()) {
-		testCurrencyPlugin(plugin);
+function testCryptoPlugins() {
+	for (let plugin of getCryptoPlugins()) {
+		testCryptoPlugin(plugin);
 	}
 }
 
-function testCurrencyPlugin(plugin) {
-	console.log("testCurrencyPlugin(" + plugin.getName() + ")");
+function testCryptoPlugin(plugin) {
+	console.log("testCryptoPlugin(" + plugin.getName() + ")");
 	assertInitialized(plugin.getName());
 	assertInitialized(plugin.getTickerSymbol());
 	assertInitialized(plugin.getLogo());
+	
+	// test unencrypted wif and hex consistency
 	for (let i = 0; i < REPEAT_LONG; i++) {
-		
-		// test self consistency
-		assertTrue(plugin.getEncryptionSchemes().length >= 1);
-		let privateKey = plugin.newPrivateKey();
-		assertInitialized(privateKey);
-		assertTrue(plugin.isUnencryptedPrivateKey(privateKey));
-		let privateKeyWif = plugin.getUnencryptedPrivateKeyWif(privateKey);
-		assertTrue(plugin.isUnencryptedPrivateKeyWif(privateKeyWif));
-		assertEquals(privateKey, plugin.getUnencryptedPrivateKey(privateKeyWif));
-		let address = plugin.getAddress(privateKey);
-		// TODO: assertTrue(plugin.isAddress(address));
-		assertUndefined(plugin.getEncryptionScheme(privateKey));
-		assertUndefined(plugin.getEncryptionScheme(privateKeyWif));
-		assertFalse(plugin.isEncryptedPrivateKey(privateKey));
-		assertFalse(plugin.isEncryptedPrivateKey(privateKeyWif));
-		let pieces = plugin.split(privateKey, NUM_PIECES, MIN_PIECES);
-		assertEquals(NUM_PIECES, pieces.length);
-		assertEquals(privateKey, plugin.reconstitute(pieces));
-		pieces = plugin.split(privateKeyWif, NUM_PIECES, MIN_PIECES);
-		assertEquals(NUM_PIECES, pieces.length);
-		assertEquals(privateKeyWif, plugin.reconstitute(pieces));
-		
-		// test invalid private keys
-		let invalids = [null, undefined, "abctesting123", "abc testing 123", 12345];
-		for (let invalid of invalids) {
-			assertFalse(plugin.isUnencryptedPrivateKey(invalid));
-			assertFalse(plugin.isUnencryptedPrivateKeyWif(invalid));
-			try {
-				plugin.getUnencryptedPrivateKey(invalid);
-				fail("Should not be able to get private key from invalid argument");
-			} catch (err) {
-				// nothing to do
-			}
-			try {
-				plugin.getUnencryptedPrivateKeyWif(invalid);
-				fail("Should not be able to get private key WIF from invalid argument");
-			} catch (err) {
-				// nothing to do
-			}
-			try {
-				plugin.getAddress(invalid);
-				fail("Should not be able to get private key address from invalid argument");
-			} catch (err) {
-				// nothing to do
-			}
-			try {
-				plugin.getEncryptionScheme(invalid);
-				fail("Should not be able to get encryption scheme from invalid argument");
-			} catch (err) {
-				// nothing to do
-			}
-			try {
-				plugin.isEncryptedPrivateKey(invalid);
-				fail("Should not be able to determine encryption scheme from invalid argument");
-			} catch (err) {
-				// nothing to do
-			}
-			try {
-				plugin.split(invalid, NUM_PIECES, MIN_PIECES);
-				fail("Should not be able to split invalid argument");
-			} catch (err) {
-				// nothing to do
-			}
-			try {
-				let pieces = [];
-				for (let i = 0; i < NUM_PIECES; i++) pieces.push(invalid);
-				plugin.reconstitute(invalid, NUM_PIECES, MIN_PIECES);
-				fail("Should not be able to reconstitute invalid pieces");
-			} catch (err) {
-				// nothing to do
-			}
+		let pkHex = plugin.newUnencryptedPrivateKeyHex();
+		assertTrue(plugin.isPrivateKey(pkHex));
+		assertTrue(plugin.isPrivateKeyHex(pkHex));
+		let pkWif = plugin.privateKeyHexToWif(pkHex);
+		assertTrue(plugin.isPrivateKey(pkWif));
+		assertTrue(plugin.isPrivateKeyWif(pkWif));
+		assertEquals(pkHex, plugin.privateKeyWifToHex(pkWif));
+	}
+	
+	// test invalid private keys
+	let invalids = [null, undefined, "abctesting123", "abc testing 123", 12345];
+	for (let invalid of invalids) {
+		assertFalse(plugin.isPrivateKey(invalid));
+		assertUndefined(plugin.getEncryptionScheme(invalid));
+		assertFalse(plugin.isEncryptedPrivateKey(invalid));
+		try {
+			plugin.privateKeyHexToWif(invalid);
+			fail("Should not be able to get hex from invalid private key");
+		} catch (err) {
+			// nothing to do
+		}
+		try {
+			plugin.privateKeyWifToHex(invalid);
+			fail("Should not be able to get wif from invalid private key");
+		} catch (err) {
+			// nothing to do
+		}
+		try {
+			plugin.getAddress(invalid);
+			fail("Should not be able to get address from invalid private key");
+		} catch (err) {
+			// nothing to do
+		}
+		try {
+			plugin.getEncryptionScheme(invalid);
+			fail("Should not be able to get encryption scheme from invalid argument");
+		} catch (err) {
+			// nothing to do
 		}
 	}
+}
+
+function testCryptoKeys() {
+	for (let plugin of getCryptoPlugins()) {
+		testCryptoKey(plugin);
+	}
+}
+
+function testCryptoKey(plugin) {
+	
+	// test unencrypted private key consistency
+	for (let i = 0; i < REPEAT_LONG; i++) {
+		let key = plugin.newCryptoKey();
+		assertEquals(plugin, key.getPlugin());
+		assertTrue(plugin.isPrivateKeyHex(key.toHex()));
+		assertTrue(plugin.isPrivateKeyWif(key.toWif()));
+		assertTrue(plugin.isAddress(key.toAddress()));
+		assertFalse(key.isEncrypted());
+		assertNull(key.getEncryptionScheme());
+		let copy = key.copy();
+		assertTrue(key.equals(copy));
+	}
+	
+	// test initialization
+	let hex = plugin.newUnencryptedPrivateKeyHex();
+	let wif = plugin.privateKeyHexToWif(hex);
+	let key1 = new CryptoKey(plugin, hex);
+	let key2 = new CryptoKey(plugin, {privateKey: wif});
+	assertEquals(hex, key1.toHex());
+	assertEquals(wif, key1.toWif());
+	assertEquals(hex, key2.toHex());
+	assertEquals(wif, key2.toWif());
+	
+	// test invalid initialization
+	try {
+		new CryptoKey(plugin, "invalid");
+		throw new Error("CryptoKey created with invalid private key");
+	} catch (err) { }
+	
+
+	
+	
+	
+	
+	
+	// test encryption
+//	assertTrue(plugin.getEncryptionSchemes().length >= 1);
+//	for (let scheme of plugin.getEncryptionSchemes()) {
+//		throw new Error("Not yet implemented.");
+//		// test self consistency
+//		assertTrue(plugin.getEncryptionSchemes().length >= 1);
+//		let pkHex = plugin.newUnencryptedCryptoKeyHex();
+//		assertInitialized(pkHex);
+//		assertTrue(isHex(pkHex));
+//		assertTrue(plugin.isUnencryptedCryptoKey(privateKey));
+//		let privateKeyWif = plugin.getUnencryptedCryptoKeyWif(privateKey);
+//		assertTrue(plugin.isUnencryptedCryptoKeyWif(privateKeyWif));
+//		assertEquals(privateKey, plugin.getUnencryptedCryptoKey(privateKeyWif));
+//		let address = plugin.getAddress(privateKey);
+//		// TODO: assertTrue(plugin.isAddress(address));
+//		assertUndefined(plugin.getEncryptionScheme(privateKey));
+//		assertUndefined(plugin.getEncryptionScheme(privateKeyWif));
+//		assertFalse(plugin.isEncryptedCryptoKey(privateKey));
+//		assertFalse(plugin.isEncryptedCryptoKey(privateKeyWif));
+//		let pieces = plugin.split(privateKey, NUM_PIECES, MIN_PIECES);
+//		assertEquals(NUM_PIECES, pieces.length);
+//		assertEquals(privateKey, plugin.reconstitute(pieces));
+//		pieces = plugin.split(privateKeyWif, NUM_PIECES, MIN_PIECES);
+//		assertEquals(NUM_PIECES, pieces.length);
+//		assertEquals(privateKeyWif, plugin.reconstitute(pieces));
+//	}
 }
 
 function testWallets() {
@@ -214,33 +254,33 @@ function testWallet(plugin) {
 	// basic tests
 	let wallet = plugin.newWallet();
 	assertEquals(plugin, wallet.getCurrencyPlugin());
-	assertInitialized(wallet.getPrivateKey());
+	assertInitialized(wallet.getCryptoKey());
 	assertInitialized(wallet.getAddress());
 	assertFalse(wallet.isEncrypted());
 	assertUndefined(wallet.getEncryptionScheme());
 	let copy = wallet.copy();
 	assertTrue(wallet.equals(copy));
 	assertTrue(copy.equals(wallet));
-	let oldPrivateKey = wallet.getPrivateKey();
+	let oldCryptoKey = wallet.getCryptoKey();
 	let oldAddress = wallet.getAddress();
 	wallet.random();
-	assertNotEquals(oldPrivateKey, wallet.getPrivateKey());
+	assertNotEquals(oldCryptoKey, wallet.getCryptoKey());
 	assertNotEquals(oldAddress, wallet.getAddress());
-	assertTrue(plugin.isUnencryptedPrivateKeyWif(wallet.getUnencryptedPrivateKeyWif()));
-	wallet.setPrivateKey(oldPrivateKey);
-	assertEquals(oldPrivateKey, wallet.getPrivateKey());
+	assertTrue(plugin.isUnencryptedCryptoKeyWif(wallet.getUnencryptedCryptoKeyWif()));
+	wallet.setCryptoKey(oldCryptoKey);
+	assertEquals(oldCryptoKey, wallet.getCryptoKey());
 	assertEquals(oldAddress, wallet.getAddress());
 	
 	// test splitting
 	assertFalse(wallet.isSplit());
-	assertUndefined(wallet.getPrivateKeyPieces());
+	assertUndefined(wallet.getCryptoKeyPieces());
 	wallet.split(NUM_PIECES, MIN_PIECES);
 	assertTrue(wallet.isSplit());
 	assertUndefined(wallet.isEncrypted());
 	assertUndefined(wallet.getEncryptionScheme());
-	assertUndefined(wallet.getPrivateKey());
-	assertUndefined(wallet.getUnencryptedPrivateKeyWif());
-	let pieces = wallet.getPrivateKeyPieces();
+	assertUndefined(wallet.getCryptoKey());
+	assertUndefined(wallet.getUnencryptedCryptoKeyWif());
+	let pieces = wallet.getCryptoKeyPieces();
 	assertEquals(NUM_PIECES, pieces.length);
 	let walletSplit = new Wallet(plugin, {privateKeyPieces: pieces, address: wallet.getAddress()});
 	assertTrue(walletSplit.isSplit());
@@ -250,7 +290,7 @@ function testWallet(plugin) {
 	assertTrue(wallet.equals(walletSplit));
 	
 	// test wif
-	let walletWif = new Wallet(plugin, {privateKey: wallet.getUnencryptedPrivateKeyWif()});
+	let walletWif = new Wallet(plugin, {privateKey: wallet.getUnencryptedCryptoKeyWif()});
 	assertEquals(wallet, walletWif);
 	
 	// test without plugin
@@ -303,7 +343,7 @@ function testWalletWithEncryption(plugin, callback) {
 				originalWallets.push(wallet);
 				funcs.push(getCallbackFunctionEncryptWallet(scheme, wallet.copy(), PASSWORD));
 			}
-			let wallet = plugin.newWallet({privateKey: plugin.newPrivateKey()});
+			let wallet = plugin.newWallet({privateKey: plugin.newCryptoKey()});
 			originalWallets.push(wallet);
 			funcs.push(getCallbackFunctionEncryptWallet(scheme, wallet.copy(), PASSWORD));
 			
@@ -311,13 +351,13 @@ function testWalletWithEncryption(plugin, callback) {
 			for (let wallet of originalWallets) {
 				assertInitialized(wallet);
 				assertEquals(plugin, wallet.getCurrencyPlugin());
-				assertInitialized(wallet.getPrivateKey());
+				assertInitialized(wallet.getCryptoKey());
 				assertInitialized(wallet.getAddress());
 				assertFalse(wallet.isSplit());
 				assertFalse(wallet.isEncrypted());
 				assertUndefined(wallet.getEncryptionScheme());
-				assertUndefined(wallet.getPrivateKeyPieces());
-				assertEquals(plugin.getAddress(wallet.getPrivateKey()), wallet.getAddress());
+				assertUndefined(wallet.getCryptoKeyPieces());
+				assertEquals(plugin.getAddress(wallet.getCryptoKey()), wallet.getAddress());
 				testSplitWallet(wallet, NUM_PIECES, MIN_PIECES);
 			}
 			
@@ -368,13 +408,13 @@ function testSplitWallet(wallet, numPieces, minPieces) {
 	// split and test
 	wallet.split(numPieces, minPieces);
 	assertTrue(wallet.isSplit());
-	assertEquals(numPieces, wallet.getPrivateKeyPieces().length);
+	assertEquals(numPieces, wallet.getCryptoKeyPieces().length);
 	assertUndefined(wallet.isEncrypted());
 	assertUndefined(wallet.getEncryptionScheme());
-	assertUndefined(wallet.getPrivateKey());
+	assertUndefined(wallet.getCryptoKey());
 	
 	// test reconstituting each combination
-	var pieceCombinations = getCombinations(wallet.getPrivateKeyPieces(), minPieces);
+	var pieceCombinations = getCombinations(wallet.getCryptoKeyPieces(), minPieces);
 	for (let pieceCombinationIdx = 0; pieceCombinationIdx < pieceCombinationIdx.length; pieceCombinationIdx++) {
 		var pieceCombination = pieceCombinations[pieceCombinationIdx];
 		var reconstituted = new Wallet(plugin, {privateKeyPieces: pieceCombination}).reconstitute();

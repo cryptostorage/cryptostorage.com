@@ -1,4 +1,5 @@
 // TODO
+// change terminology from wallets to private keys
 // verify final pieces
 // review private keys (hex, base58, etc)
 // page to configure export options with previews
@@ -16,7 +17,7 @@
 // paste private key doesn't work in iphone safari
 // aes.java needs de-minified
 
-const RUN_TESTS = false;
+const RUN_TESTS = true;
 const DEBUG = true;
 
 /**
@@ -30,7 +31,7 @@ $(document).ready(function() {
 	// initialize content div and flow controller
 	var pageManager = new PageManager($("#content"));
 	pageManager.render(function() {
-		new FlowController(pageManager, getCurrencyPlugins());
+		new FlowController(pageManager, getCryptoPlugins());
 	})
 });
 
@@ -38,13 +39,13 @@ $(document).ready(function() {
  * Manages the application flow.
  * 
  * @param pageManager manages page navigation and rendering
- * @param currencies is an array of supported currencies
+ * @param plugins is an array of supported cryptos
  */
-function FlowController(pageManager, currencies) {
+function FlowController(pageManager, plugins) {
 	
 	// track application state
 	var state = {};
-	state.currencies = currencies;
+	state.plugins = plugins;
 	
 	// render home page
 	pageManager.next(new HomeController($("<div>"), onCreateWallets, onSelectImport));
@@ -59,10 +60,10 @@ function FlowController(pageManager, currencies) {
 	
 	function onCurrencySelectionNew(tickerSymbol) {
 		if (DEBUG) console.log("onCurrencySelectionNew(" + tickerSymbol + ")");
-		for (let currency of currencies) {
-			if (currency.getTickerSymbol() === tickerSymbol) state.currency = currency;
+		for (let plugin of plugins) {
+			if (plugin.getTickerSymbol() === tickerSymbol) state.plugin = plugin;
 		}
-		if (!state.currency) throw new Error("Currency not found with ticker symbol: " + tickerSymbol);
+		if (!state.plugin) throw new Error("plugin not found with ticker symbol: " + tickerSymbol);
 		pageManager.next(new NumPairsController($("<div>"), state, pageManager.getPathTracker(), onNumPairsInput));
 	}
 	
@@ -123,10 +124,10 @@ function FlowController(pageManager, currencies) {
 	
 	function onSelectImportCurrency(tickerSymbol) {
 		if (DEBUG) console.log("onSelectImportCurrency(" + tickerSymbol + ")");
-		for (let currency of currencies) {
-			if (currency.getTickerSymbol() === tickerSymbol) state.currency = currency;
+		for (let plugin of plugins) {
+			if (plugin.getTickerSymbol() === tickerSymbol) state.plugin = plugin;
 		}
-		if (!state.currency) throw new Error("Currency not found with ticker symbol: " + tickerSymbol);
+		if (!state.plugin) throw new Error("plugin not found with ticker symbol: " + tickerSymbol);
 		pageManager.next(new ImportTextController($("<div>"), state, onUnsplitWalletsImported));
 	}
 	
@@ -134,7 +135,7 @@ function FlowController(pageManager, currencies) {
 		if (DEBUG) console.log("onUnsplitWalletsImported(" + wallets.length + " wallets)");
 		assertTrue(wallets.length >= 1);
 		state.wallets = wallets;
-		state.currency = wallets[0].getCurrencyPlugin();
+		state.plugin = wallets[0].getCurrencyPlugin();
 		if (wallets[0].isEncrypted()) pageManager.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
 		else pageManager.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets, true), onCustomExport));
 	}
