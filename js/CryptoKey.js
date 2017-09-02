@@ -90,7 +90,7 @@ function CryptoKey(plugin, state) {
 	}
 	
 	// initialize key
-	if (!isInitialized(plugin) || typeof plugin !== 'object' || plugin.constructor.name !== 'CryptoPlugin') throw new Error("Must provide crypto plugin");
+	if (!plugin || typeof plugin !== 'object' || plugin.constructor.name !== 'CryptoPlugin') throw new Error("Must provide crypto plugin");
 	this.plugin = plugin;
 	this.state = {};
 	if (state) {
