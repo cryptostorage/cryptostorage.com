@@ -604,7 +604,10 @@ function encrypt(scheme, cryptoKey, password) {
 			break;
 		case EncryptionScheme.BIP38:
 			
-			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(str, password, true, callback);	// TODO: confirm callback called with Error or interpret
+			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(cryptoKey.toHex(), password, true, function(resp) {
+				console.log("BIP38 done");
+				console.log(resp);
+			});	// TODO: confirm callback called with Error or interpret
 
 			throw new Error("Not implemented");
 			break;
