@@ -1,5 +1,5 @@
 const REPEAT_LONG = 50;
-const REPEAT_SHORT = 2;
+const REPEAT_SHORT = 5;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
 const PASSWORD = "MySuperSecretPasswordAbcTesting123";
@@ -217,25 +217,16 @@ function testCryptoKey(plugin) {
 	// test encryption
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
 	for (let scheme of plugin.getEncryptionSchemes()) {
-		let promise = testEncryption(plugin, scheme);
-		promise.then(function(resp) {
-			console.log("Promise resolved!");
-		}).catch(function(resp) {
-			console.log("Promise rejected!");
-		});
-		
-		
-		
-//		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
-//		let resolved = Promise.resolve();
-//		for (let i = 0; i < max; i++) {
-//			resolved = resolved.then(function() {
-//				testEncryption(plugin, scheme);
-//			});
-//		}
+		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
+		let resolved = Promise.resolve();
+		for (let i = 0; i < max; i++) {
+			resolved = resolved.then(testEncryption(plugin, scheme));
+		}
+		resolved.then(function() { console.log("Now am I done?"); });
 	}
 	
 	function testEncryption(plugin, scheme) {
+		console.log("Calling test encryption");
 		let promise = new Promise(function(resolve, reject) {
 			let key = plugin.newCryptoKey();
 			key.encrypt(scheme, PASSWORD).then(function(resp) {
@@ -248,17 +239,14 @@ function testCryptoKey(plugin) {
 				assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
 				assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
 				assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
+				console.log("Resolved!");
 				resolve();
 			}).catch(function(resp) {
 				console.log(resp);
 			});
 		});
 		return promise;
-	}
-
-	
-	
-	
+	}	
 	
 	// test encryption
 //	assertTrue(plugin.getEncryptionSchemes().length >= 1);

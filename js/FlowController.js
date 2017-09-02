@@ -17,6 +17,10 @@
 // paste private key doesn't work in iphone safari
 // aes.java needs de-minified
 
+// promises execute in sequence
+// what is =>
+// what is reduce
+
 const RUN_TESTS = true;
 const DEBUG = true;
 
