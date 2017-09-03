@@ -162,10 +162,10 @@ function testCryptoPlugin(plugin) {
 	}
 }
 
-function testCryptoKeys(callback) {	// TODO: execute in series
-	for (let plugin of getCryptoPlugins()) {
-		testCryptoKey(plugin, callback);
-	}
+function testCryptoKeys(callback) {
+	let funcs = [];
+	for (let plugin of getCryptoPlugins()) funcs.push(function(callback) { testCryptoKey(plugin, callback); });
+	async.series(funcs, callback);
 }
 
 function testCryptoKey(plugin, callback) {
@@ -225,12 +225,15 @@ function testCryptoKey(plugin, callback) {
 	function testEncryption(plugin, scheme, callback) {
 		let key = plugin.newCryptoKey();
 		key.encrypt(scheme, PASSWORD, function(error) {
-			if (error) callback(error);
+			if (error) {
+				callback(error);
+				return;
+			}
 			assertTrue(key.isEncrypted());
 			assertEquals(scheme, key.getEncryptionScheme());
 			assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
 			assertEquals(scheme, plugin.getEncryptionScheme(key.toWif()));
-			assertFalse(plugin.isPrivateKeyHex(key.toHex()));
+			assertTrue(plugin.isPrivateKeyHex(key.toHex()));
 			assertTrue(plugin.isPrivateKeyWif(key.toWif()));
 			assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
 			assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
