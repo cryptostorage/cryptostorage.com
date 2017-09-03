@@ -329,6 +329,23 @@ function contains(arr, obj) {
 }
 
 /**
+ * Returns the single value contained in an array of equal elements.
+ * 
+ * @param arr whose elements are identical
+ * @returns the value of every element
+ * @throws error if the array is empty or all elements are not equal
+ */
+function getSingleValue(arr) {
+	assertTrue(arr.length > 0, "The given array cannot be empty");
+	let val;
+	for (let i = 0; i < arr.length; i++) {
+		if (i === 0) val = arr[i];
+		else if (val !== arr[i]) throw new Error("Index " + i + " has different value from previous indices");
+	}
+	return val;
+}
+
+/**
  * Determines if two arrays are equal.
  * 
  * @param arr1 is an array to compare

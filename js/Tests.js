@@ -181,9 +181,7 @@ function testCryptoKey(plugin, callback) {
 		assertTrue(plugin.isAddress(key.toAddress()));
 		assertFalse(key.isEncrypted());
 		assertNull(key.getEncryptionScheme());
-		let copy = key.copy();	// TODO: copy broken because CryptoKey doesn't really have 'privateKey' field
-		console.log(key.getState());
-		console.log(copy.getState());
+		let copy = key.copy();
 		assertTrue(key.equals(copy));
 	}
 	
@@ -245,9 +243,8 @@ function testCryptoKey(plugin, callback) {
 			testDecryption(key, function(error) {
 				if (error) callback(error);
 				else {
-					console.log(key.getState());
-					console.log(copy.getState());
 					assertTrue(key.equals(copy));
+					callback();
 				}
 			});
 		});

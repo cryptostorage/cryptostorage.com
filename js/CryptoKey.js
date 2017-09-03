@@ -73,20 +73,36 @@ function CryptoKey(plugin, state) {
 		// copy state
 		this.state = Object.assign({}, state);
 		
-		// set private key
-		this.state.privateKey = undefined;
+		// collect hex and wif values both given and derived
+		let hexArr = [];
+		let wifArr = [];
 		if (state.privateKey) {
 			if (plugin.isPrivateKeyHex(state.privateKey)) {
-				this.state.hex = state.privateKey;
-				this.state.wif = plugin.privateKeyHexToWif(state.privateKey);
+				hexArr.push(state.privateKey);
+				wifArr.push(plugin.privateKeyHexToWif(state.privateKey));
 			} else if (plugin.isPrivateKeyWif(state.privateKey)) {
-				this.state.hex = plugin.privateKeyWifToHex(state.privateKey);
-				this.state.wif = state.privateKey;
+				hexArr.push(plugin.privateKeyWifToHex(state.privateKey));
+				wifArr.push(state.privateKey);
 			} else throw new Error("Unrecognized private key: " + state.privateKey);
 		}
+		if (state.hex) {
+			assertTrue(plugin.isPrivateKeyHex(state.hex));
+			hexArr.push(state.hex);
+			wifArr.push(plugin.privateKeyHexToWif(state.hex));
+		}
+		if (state.wif) {
+			assertTrue(plugin.isPrivateKeyWif(state.wif));
+			hexArr.push(plugin.privateKeyWifToHex(state.wif));
+			wifArr.push(state.wif);
+		}
+		
+		// ensure all values agree to initialize hex and wif
+		this.state.privateKey = undefined;
+		this.state.hex = getSingleValue(hexArr);
+		this.state.wif = getSingleValue(wifArr);
 		
 		// set encryption
-		let encryption = plugin.getEncryptionScheme(state.privateKey);
+		let encryption = plugin.getEncryptionScheme(this.state.hex);
 		if (isDefined(state.encryption) && state.encryption !== encryption) throw new Error("state.encryption does not match detected encryption");
 		this.state.encryption = encryption;
 		
@@ -95,7 +111,7 @@ function CryptoKey(plugin, state) {
 			let address = plugin.getAddress(this);
 			if (state.address && state.address !== address) throw new Error("state.address does not match address derived from private key");
 			this.state.address = address;
-		}
+		} // TODO: this doesn't preserve address if given with encrypted key
 	}
 	
 	// initialize key
