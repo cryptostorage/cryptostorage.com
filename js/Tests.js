@@ -1,5 +1,5 @@
 const REPEAT_LONG = 50;
-const REPEAT_SHORT = 1;
+const REPEAT_SHORT = 2;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
 const PASSWORD = "MySuperSecretPasswordAbcTesting123";
@@ -213,7 +213,7 @@ function testCryptoKey(plugin, callback) {
 		throw new Error("CryptoKey created with mismatching address");
 	} catch (err) { }
 	
-	// test each encryption scheme
+	// test encryption for each scheme
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
 	for (let scheme of plugin.getEncryptionSchemes()) {
 		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
@@ -222,6 +222,7 @@ function testCryptoKey(plugin, callback) {
 		async.parallel(funcs, callback);
 	}
 	
+	// test encryption of one key
 	function testEncryption(plugin, scheme, callback) {
 		let key = plugin.newCryptoKey();
 		let copy = key.copy();
@@ -252,6 +253,7 @@ function testCryptoKey(plugin, callback) {
 		});
 	}
 	
+	// test decryption of one key
 	function testDecryption(key, callback) {
 		key.decrypt(PASSWORD, function(error) {
 			if (error) {
