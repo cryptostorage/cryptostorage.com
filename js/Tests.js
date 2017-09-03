@@ -231,6 +231,7 @@ function testCryptoKey(plugin, callback) {
 				return;
 			}
 			assertFalse(key.equals(copy));
+			assertTrue(key.equals(key.copy()));
 			assertTrue(key.isEncrypted());
 			assertEquals(scheme, key.getEncryptionScheme());
 			assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
@@ -243,6 +244,7 @@ function testCryptoKey(plugin, callback) {
 			testDecryption(key, function(error) {
 				if (error) callback(error);
 				else {
+					assertTrue(key.equals(key.copy()));
 					assertTrue(key.equals(copy));
 					callback();
 				}

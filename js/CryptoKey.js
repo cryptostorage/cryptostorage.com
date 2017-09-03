@@ -71,7 +71,7 @@ function CryptoKey(plugin, state) {
 	this.setState = function(state) {
 		
 		// copy state
-		this.state = Object.assign({}, state);
+		state = Object.assign({}, state);
 		
 		// collect hex and wif values both given and derived
 		let hexArr = [];
@@ -111,7 +111,9 @@ function CryptoKey(plugin, state) {
 			let address = plugin.getAddress(this);
 			if (state.address && state.address !== address) throw new Error("state.address does not match address derived from private key");
 			this.state.address = address;
-		} // TODO: this doesn't preserve address if given with encrypted key
+		} else {
+			this.state.address = state.address;
+		}
 	}
 	
 	// initialize key
