@@ -133,7 +133,6 @@ function BitcoinPlugin() {
 			default:
 				return new Bitcoin.ECKey(hex).setCompressed(true).getBitcoinWalletImportFormat();
 		}
-		return new Bitcoin.ECKey(hex).getBitcoinWalletImportFormat();
 	}
 	this.privateKeyWifToHex = function(wif) {
 		assertTrue(this.isPrivateKeyWif(wif), "Given argument must be a wif formatted private key");
@@ -180,9 +179,86 @@ function BitcoinPlugin() {
 inheritsFrom(BitcoinPlugin, CryptoPlugin);
 
 /**
+ * Bitcoin cash plugin.
+ */
+function BitcoinCashPlugin() {
+	BitcoinPlugin.call(this);
+	this.getName = function() { return "Bitcoin Cash"; }
+	this.getTickerSymbol = function() { return "BCH" };
+	this.getLogo = function() { return $("<img src='img/bitcoin_cash.png'>"); }
+}
+inheritsFrom(BitcoinCashPlugin, BitcoinPlugin);
+
+/**
  * Monero plugin.
  */
 function MoneroPlugin() {
-	
+	this.getName = function() { return "Monero"; }
+	this.getTickerSymbol = function() { return "XMR" };
+	this.getLogo = function() { return $("<img src='img/monero.png'>"); }
+	this.newUnencryptedPrivateKeyHex = function() {
+		return cnUtil.sc_reduce32(cnUtil.rand_32());
+	}
+	this.privateKeyHexToWif = function(hex) {
+		assertTrue(this.isPrivateKeyHex(hex), "Given argument must be a hex formatted private key");
+		switch(this.getEncryptionScheme(hex)) {
+			case EncryptionScheme.CRYPTOJS:
+				throw new Error("CryptoJS wif to hex not implemented");
+			default:
+				throw new Error("Not implemented");
+		}
+	}
+	this.privateKeyWifToHex = function(wif) {
+		assertTrue(this.isPrivateKeyWif(wif), "Given argument must be a wif formatted private key");
+		switch (this.getEncryptionScheme(wif)) {
+			case EncryptionScheme.CRYPTOJS:
+				throw new Error("CryptoJS wif to hex not implemented");
+			default:
+				throw new Error("Not implemented");
+		}
+	}
+	this.isPrivateKeyHex = function(str) {
+		if (isHex(str)) return false;
+		return isDefined(this.getEncryptionScheme(str));
+	}
+	this.isPrivateKeyWif = function(str) {
+		if (isHex(str)) return false;
+		switch (this.getEncryptionScheme(str)) {
+			case EncryptionScheme.CRYPTOJS:
+				throw new Error("CryptoJS wif to hex not implemented");
+			default:
+				try {
+					mn_decode(str);
+					return true;
+				} catch (err) {
+					return false;
+				}
+		}
+	}
+	this.getAddress = function(cryptoKey) {
+		assertFalse(cryptoKey.isEncrypted(), "Private key must not be encrypted");
+		let keys = cnUtil.create_address(cryptoKey.toHex());
+		return cnUtil.pubkeys_to_string(keys.spend.pub, keys.view.pub);
+	}
+	this.isAddress = function(str) {
+		throw new Error("Not implemented");
+	}
+	this.getEncryptionSchemes = function() { return [EncryptionScheme.CRYPTOJS]; }
+	this.getEncryptionScheme = function(str) {
+		if (!isString(str)) return undefined;
+		if (str[0] === 'U') return EncryptionScheme.CRYPTOJS;			// TODO: better cryptojs validation
+		if (isHex(str)) {
+			if (str.length > 100) return EncryptionScheme.CRYPTOJS;		// TODO: better cryptojs validation
+			if (str.length >= 63 && str.length <= 65) return null;
+		}
+		try {
+			mn_decode(str);
+			return true;
+		} catch (err) {
+			return false;
+		}
+		
+		return undefined;
+	}
 }
 inheritsFrom(MoneroPlugin, CryptoPlugin);
