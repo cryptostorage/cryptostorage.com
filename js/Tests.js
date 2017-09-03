@@ -227,29 +227,28 @@ function testCryptoKey(plugin, callback) {
 		let key = plugin.newCryptoKey();
 		let copy = key.copy();
 		key.encrypt(scheme, PASSWORD, function(error) {
-			if (error) {
-				callback(error);
-				return;
+			if (error) callback(error);
+			else {
+				assertFalse(key.equals(copy));
+				assertTrue(key.equals(key.copy()));
+				assertTrue(key.isEncrypted());
+				assertEquals(scheme, key.getEncryptionScheme());
+				assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
+				assertEquals(scheme, plugin.getEncryptionScheme(key.toWif()));
+				assertTrue(plugin.isPrivateKeyHex(key.toHex()));
+				assertTrue(plugin.isPrivateKeyWif(key.toWif()));
+				assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
+				assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
+				assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
+				testDecryption(key, function(error) {
+					if (error) callback(error);
+					else {
+						assertTrue(key.equals(key.copy()));
+						assertTrue(key.equals(copy));
+						callback();
+					}
+				});
 			}
-			assertFalse(key.equals(copy));
-			assertTrue(key.equals(key.copy()));
-			assertTrue(key.isEncrypted());
-			assertEquals(scheme, key.getEncryptionScheme());
-			assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
-			assertEquals(scheme, plugin.getEncryptionScheme(key.toWif()));
-			assertTrue(plugin.isPrivateKeyHex(key.toHex()));
-			assertTrue(plugin.isPrivateKeyWif(key.toWif()));
-			assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
-			assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
-			assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
-			testDecryption(key, function(error) {
-				if (error) callback(error);
-				else {
-					assertTrue(key.equals(key.copy()));
-					assertTrue(key.equals(copy));
-					callback();
-				}
-			});
 		});
 	}
 	
