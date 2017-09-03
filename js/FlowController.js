@@ -17,7 +17,7 @@
 // paste private key doesn't work in iphone safari
 // aes.java needs de-minified
 
-const RUN_TESTS = true;
+const RUN_TESTS = false;
 const DEBUG = true;
 
 /**
@@ -51,29 +51,29 @@ function FlowController(pageManager, plugins) {
 	state.plugins = plugins;
 	
 	// render home page
-	pageManager.next(new HomeController($("<div>"), onCreateWallets, onSelectImport));
+	pageManager.next(new HomeController($("<div>"), onSelectCreate, onSelectImport));
 	
 	// ------------------------------ CREATE NEW --------------------------------
 	
-	function onCreateWallets() {
-		if (DEBUG) console.log("onCreateWallets()");
+	function onSelectCreate() {
+		if (DEBUG) console.log("onSelectCreate()");
 		state.goal = Goal.CREATE_STORAGE;
-		pageManager.next(new CurrencySelectionController($("<div>"), state, onCurrencySelectionNew));
+		pageManager.next(new CryptoSelectionController($("<div>"), state, onCryptoSelectionNew));
 	}
 	
-	function onCurrencySelectionNew(tickerSymbol) {
-		if (DEBUG) console.log("onCurrencySelectionNew(" + tickerSymbol + ")");
+	function onCryptoSelectionNew(tickerSymbol) {
+		if (DEBUG) console.log("onCryptoSelectionNew(" + tickerSymbol + ")");
 		for (let plugin of plugins) {
 			if (plugin.getTickerSymbol() === tickerSymbol) state.plugin = plugin;
 		}
 		if (!state.plugin) throw new Error("plugin not found with ticker symbol: " + tickerSymbol);
-		pageManager.next(new NumPairsController($("<div>"), state, pageManager.getPathTracker(), onNumPairsInput));
+		pageManager.next(new NumKeysController($("<div>"), state, pageManager.getPathTracker(), onNumKeysInput));
 	}
 	
-	function onNumPairsInput(numWallets) {
-		if (DEBUG) console.log("onNumPairsInput(" + numWallets + ")");
-		assertInt(numWallets);
-		state.numWallets = numWallets;
+	function onNumKeysInput(numKeys) {
+		if (DEBUG) console.log("onNumKeysInput(" + numKeys + ")");
+		assertInt(numKeys);
+		state.numKeys = numKeys;
 		pageManager.next(new PasswordSelectionController($("<div>"), state, onPasswordSelection))
 	}
 	
@@ -95,7 +95,7 @@ function FlowController(pageManager, plugins) {
 		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
 		state.splitEnabled = splitEnabled;
 		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, pageManager.getPathTracker(), onSplitInput));
-		else pageManager.next(new GenerateWalletsController($("<div>"), state, onWalletsGenerated));
+		else pageManager.next(new GenerateWalletsController($("<div>"), state, onKeysGenerated));
 	}
 	
 	function onSplitInput(numPieces, minPieces) {
@@ -104,12 +104,12 @@ function FlowController(pageManager, plugins) {
 		assertInt(minPieces);
 		state.numPieces = numPieces;
 		state.minPieces = minPieces;
-		pageManager.next(new GenerateWalletsController($("<div>"), state, onWalletsGenerated));
+		pageManager.next(new GenerateWalletsController($("<div>"), state, onKeysGenerated));
 	}
 	
-	function onWalletsGenerated(wallets) {
-		if (DEBUG) console.log("onGeneratedWallets(" + wallets.length + ")");
-		pageManager.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets), onCustomExport));
+	function onKeysGenerated(keys) {
+		if (DEBUG) console.log("onKeysGenerated(" + keys.length + ")");
+		pageManager.next(new DownloadPiecesController($("<div>"), state, keysToPieces(keys), onCustomExport));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------
@@ -122,7 +122,7 @@ function FlowController(pageManager, plugins) {
 	function onSelectImportText() {
 		if (DEBUG) console.log("onSelectImportText()");
 		state.goal = Goal.RESTORE_STORAGE;
-		pageManager.next(new CurrencySelectionController($("<div>"), state, onSelectImportCurrency));
+		pageManager.next(new CryptoSelectionController($("<div>"), state, onSelectImportCurrency));
 	}
 	
 	function onSelectImportCurrency(tickerSymbol) {
@@ -140,7 +140,7 @@ function FlowController(pageManager, plugins) {
 		state.wallets = wallets;
 		state.plugin = wallets[0].getCurrencyPlugin();
 		if (wallets[0].isEncrypted()) pageManager.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
-		else pageManager.next(new DownloadPiecesController($("<div>"), state, walletsToPieces(wallets, true), onCustomExport));
+		else pageManager.next(new DownloadPiecesController($("<div>"), state, keysToPieces(wallets, true), onCustomExport));
 	}
 	
 	function onCustomExport(pieces) {

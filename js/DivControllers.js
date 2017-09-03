@@ -200,7 +200,7 @@ inheritsFrom(HomeController, DivController);
  * Render currenct selection.
  */
 
-function CurrencySelectionController(div, state, onCurrencySelection) {
+function CryptoSelectionController(div, state, onCryptoSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -217,39 +217,39 @@ function CurrencySelectionController(div, state, onCurrencySelection) {
 			throw new Error("Invalid goal for currency selection: " + state.goal);
 		}
 		
-		// render currency buttons
-		for (let currency of state.currencies) {
-			let btn = UiUtils.getNextButton(currency.getName() + " (" + currency.getTickerSymbol() + ")", currency.getLogo()).appendTo(div);
-			btn.click(function() { onCurrencySelection(currency.getTickerSymbol()); });
+		// render crypto buttons
+		for (let plugin of state.plugins) {
+			let btn = UiUtils.getNextButton(plugin.getName() + " (" + plugin.getTickerSymbol() + ")", plugin.getLogo()).appendTo(div);
+			btn.click(function() { onCryptoSelection(plugin.getTickerSymbol()); });
 		}
 		
 		// done rendering
 		callback(div);
 	}
 }
-inheritsFrom(CurrencySelectionController, DivController);
+inheritsFrom(CryptoSelectionController, DivController);
 
 /**
  * Render number of key pairs.
  */
-function NumPairsController(div, state, pathTracker, onNumPairsInput) {
+function NumKeysController(div, state, pathTracker, onNumKeysInput) {
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("How many " + state.currency.getName() + " public/private keys do you want to create?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("How many " + state.plugin.getName() + " keys do you want to create?", state.plugin.getLogo()));
 		
-		// num key pairs input
-		var numPairsInput = $("<input>");
-		numPairsInput.attr("class", "num_input");
-		numPairsInput.attr("type", "number");
-		numPairsInput.attr("min", 1);
-		numPairsInput.attr("value", 10);
-		div.append(numPairsInput);
+		// num key keys input
+		var numKeysInput = $("<input>");
+		numKeysInput.attr("class", "num_input");
+		numKeysInput.attr("type", "number");
+		numKeysInput.attr("min", 1);
+		numKeysInput.attr("value", 10);
+		div.append(numKeysInput);
 		div.append("<br><br>");
-		numPairsInput.keypress(function() { pathTracker.clearNexts(); });
+		numKeysInput.keypress(function() { pathTracker.clearNexts(); });
 		
 		// error message
 		var errorDiv = $("<div>");
@@ -263,12 +263,12 @@ function NumPairsController(div, state, pathTracker, onNumPairsInput) {
 		
 		// validate num wallets when button clicked
 		btnNext.click(function() {
-			var numPairs = parseFloat(numPairsInput.val());
+			var numKeys = parseFloat(numKeysInput.val());
 			try {
-				validateNumPairs(numPairs);
+				validateNumKeys(numKeys);
 				errorDiv.html();
 				errorDiv.hide();
-				onNumPairsInput(numPairs);
+				onNumKeysInput(numKeys);
 			} catch (err) {
 				errorDiv.html(err.message);
 				errorDiv.show();
@@ -280,13 +280,13 @@ function NumPairsController(div, state, pathTracker, onNumPairsInput) {
 	}
 	
 	// validates number of pairs is integer >= 1
-	function validateNumPairs(numPairs) {
+	function validateNumKeys(numPairs) {
 		if (isInt(numPairs)) {
-			if (numPairs < 1) throw new Error("Number of public/private key pairs must be at least 1");
-		} else throw new Error("Number of public/private key pairs must be an integer greater than 0");
+			if (numPairs < 1) throw new Error("Number of keys must be at least 1");
+		} else throw new Error("Number of keys must be an integer greater than 0");
 	}
 }
-inheritsFrom(NumPairsController, DivController);
+inheritsFrom(NumKeysController, DivController);
 
 /**
  * Render password selection page.
@@ -297,7 +297,7 @@ function PasswordSelectionController(div, state, onPasswordSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Do you want to password protect your " + state.currency.getName() + " private keys?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Do you want to password protect your " + state.plugin.getName() + " private keys?", state.plugin.getLogo()));
 		
 		var btnYes = UiUtils.getNextButton("Yes (recommended)");
 		btnYes.click(function() { onPasswordSelection(true); });
@@ -322,14 +322,14 @@ inheritsFrom(PasswordSelectionController, DivController);
 function PasswordInputController(div, state, pathTracker, onPasswordInput) {
 	DivController.call(this, div);
 	var passwordInput;	// for later focus on show
-	var schemes = state.currency.getEncryptionSchemes();
+	var schemes = state.plugin.getEncryptionSchemes();
 	var errorDiv = $("<div>");
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("Enter a password to protect your " + state.currency.getName() + " private keys.", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter a password to protect your " + state.plugin.getName() + " private keys.", state.plugin.getLogo()));
 		
 		// render error div
 		div.append(errorDiv);
@@ -406,7 +406,7 @@ function SplitSelectionController(div, state, onSplitSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Do you want to split your " + state.currency.getName() + " private keys into separate pieces?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Do you want to split your " + state.plugin.getName() + " private keys into separate pieces?", state.plugin.getLogo()));
 		
 		div.append("The pieces must be recombined to recover the private keys.");
 		div.append("<br><br>");
@@ -433,7 +433,7 @@ function NumPiecesInputController(div, state, pathTracker, onPiecesInput) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("How many pieces do you want to split your " + state.currency.getName() + " private keys into?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("How many pieces do you want to split your " + state.plugin.getName() + " private keys into?", state.plugin.getLogo()));
 		
 		div.append("Number of pieces: ");
 		var numPiecesInput = $("<input type='number'>");
@@ -496,28 +496,28 @@ inheritsFrom(NumPiecesInputController, DivController);
  * 
  * @param div is the div to render to
  * @param state is the current state of the application
- * @param onWalletsGenerated(wallets) is invoked when the wallets are generated
+ * @param onKeysGenerated(wallets) is invoked when the wallets are generated
  */
-function GenerateWalletsController(div, state, onWalletsGenerated) {
+function GenerateWalletsController(div, state, onKeysGenerated) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Ready to generate your " + state.currency.getName() + " storage?", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Ready to generate your " + state.plugin.getName() + " storage?", state.plugin.getLogo()));
 		
 		div.append("<b>Summary:</b><br><br>");
-		div.append("Currency: " + state.currency.getName() + " (" + state.currency.getTickerSymbol() + ")").append("<br>");
-		div.append("Number of key pairs to create: " + state.numWallets).append("<br>");
+		div.append("Currency: " + state.plugin.getName() + " (" + state.plugin.getTickerSymbol() + ")").append("<br>");
+		div.append("Number of key pairs to create: " + state.numKeys).append("<br>");
 		div.append("Password protection: " + (state.passwordEnabled ? "Yes" : "No") + (state.passwordEnabled ? " (" + state.encryptionScheme + ")" : "")).append("<br>");
 		div.append("Split private keys: " + (state.splitEnabled ? "Yes" : "No") + (state.splitEnabled ? " (" + state.minPieces + " of " + state.numPieces + " pieces necessary to restore)" : ""));
 		div.append("<br><br>");
 		
-		var btnGenerate = UiUtils.getNextButton("Generate " + state.currency.getName() + " storage");
+		var btnGenerate = UiUtils.getNextButton("Generate " + state.plugin.getName() + " storage");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
 			generateWallets(function(wallets) {
-				onWalletsGenerated(wallets);
+				onKeysGenerated(wallets);
 				btnGenerate.removeAttr("disabled");
 			});
 		});
@@ -525,12 +525,12 @@ function GenerateWalletsController(div, state, onWalletsGenerated) {
 		callback(div);
 	}
 	
-	function generateWallets(onWalletsGenerated) {
+	function generateWallets(onKeysGenerated) {
 		
 		// generate wallets
 		var wallets = [];
-		for (var i = 0; i < state.numWallets; i++) {
-			wallets.push(state.currency.newWallet());
+		for (var i = 0; i < state.numKeys; i++) {
+			wallets.push(state.plugin.newWallet());
 		}
 		
 		// copy wallets for processing so originals are preserved for validation
@@ -559,7 +559,7 @@ function GenerateWalletsController(div, state, onWalletsGenerated) {
 				}
 				
 				// wallets generated
-				onWalletsGenerated(processedWallets);
+				onKeysGenerated(processedWallets);
 			});
 			
 			/**
@@ -583,7 +583,7 @@ function GenerateWalletsController(div, state, onWalletsGenerated) {
 			}
 			
 			// wallets generated
-			onWalletsGenerated(processedWallets);
+			onKeysGenerated(processedWallets);
 		}
 	}
 }
@@ -810,7 +810,7 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Enter " + state.currency.getName() + " private key or pieces:", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter " + state.plugin.getName() + " private key or pieces:", state.plugin.getLogo()));
 		
 		// render error div
 		errorDiv.empty();
@@ -832,7 +832,7 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 				if (textarea.val() === "") {
 					setErrorMessage("");
 				} else {
-					var wallet = parseWallet(state.currency, textarea.val());
+					var wallet = parseWallet(state.plugin, textarea.val());
 					setErrorMessage("");
 					if (wallet) onUnsplitWalletsImported([wallet]);
 				}
@@ -873,8 +873,8 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		var title = "Imported " + wallets.length + " " + state.currency.getName() + " key pairs which are password protected with " + wallets[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
-		div.append(UiUtils.getPageHeader(title, state.currency.getLogo()));
+		var title = "Imported " + wallets.length + " " + state.plugin.getName() + " key pairs which are password protected with " + wallets[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
+		div.append(UiUtils.getPageHeader(title, state.plugin.getLogo()));
 		
 		// render error div
 		div.append(errorDiv);
@@ -1142,7 +1142,7 @@ function DownloadPiecesController(div, state, pieces, onCustomExport) {
 		// render title
 		let isSplit = pieces[0].isSplit;
 		let encryption = pieces[0].encryption;
-		div.append(UiUtils.getPageHeader("Download your " + state.currency.getName() + " storage.", state.currency.getLogo()));
+		div.append(UiUtils.getPageHeader("Download your " + state.plugin.getName() + " storage.", state.plugin.getLogo()));
 		
 		// collect functions to render pieces and divs to be rendered to
 		var pieceDivs = [];

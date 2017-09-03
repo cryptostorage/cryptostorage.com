@@ -783,7 +783,7 @@ function parseWallet(plugin, str) {
 /**
  * Converts the given wallets to pieces.
  */
-function walletsToPieces(wallets, wif) {
+function keysToPieces(wallets, wif) {
 	assertTrue(wallets.length > 0);
 	
 	// collect piece metadata while ensuring consistency
