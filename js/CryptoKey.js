@@ -1,5 +1,5 @@
 /**
- * Maintains a single private key.
+ * Maintains a single public/private key pair.
  * 
  * @param plugin is a plugin for a specific cryptocurrency
  * @param state defines the initial state (optional)
