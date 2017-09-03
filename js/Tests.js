@@ -1,5 +1,5 @@
 const REPEAT_LONG = 50;
-const REPEAT_SHORT = 5;
+const REPEAT_SHORT = 2;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
 const PASSWORD = "MySuperSecretPasswordAbcTesting123";
@@ -165,7 +165,7 @@ function testCryptoPlugin(plugin) {
 function testCryptoKeys(callback) {
 	let funcs = [];
 	for (let plugin of getCryptoPlugins()) funcs.push(function(callback) { testCryptoKey(plugin, callback); });
-	async.series(funcs, callback);
+	async.parallel(funcs, callback);
 }
 
 function testCryptoKey(plugin, callback) {
@@ -219,17 +219,18 @@ function testCryptoKey(plugin, callback) {
 		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
 		let funcs = [];
 		for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin, scheme, callback); });
-		async.series(funcs, callback);
+		async.parallel(funcs, callback);
 	}
 	
 	function testEncryption(plugin, scheme, callback) {
-		// TODO: remember original for later comparison
 		let key = plugin.newCryptoKey();
+		let copy = key.copy();
 		key.encrypt(scheme, PASSWORD, function(error) {
 			if (error) {
 				callback(error);
 				return;
 			}
+			assertFalse(key.equals(copy));
 			assertTrue(key.isEncrypted());
 			assertEquals(scheme, key.getEncryptionScheme());
 			assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
@@ -239,8 +240,10 @@ function testCryptoKey(plugin, callback) {
 			assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
 			assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
 			assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
-			//callback();
-			testDecryption(key, callback);
+			testDecryption(key, function(error) {
+				if (error) callback(error);
+				//else assertTrue(key.equals(copy));
+			});
 		});
 	}
 	
