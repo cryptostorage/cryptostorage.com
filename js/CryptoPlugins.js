@@ -131,7 +131,7 @@ function BitcoinPlugin() {
 			case EncryptionScheme.CRYPTOJS:
 				throw new Error("CryptoJS wif to hex not implemented");
 			default:
-				return new Bitcoin.ECKey(hex).getBitcoinWalletImportFormat();
+				return new Bitcoin.ECKey(hex).setCompressed(true).getBitcoinWalletImportFormat();
 		}
 		return new Bitcoin.ECKey(hex).getBitcoinWalletImportFormat();
 	}
@@ -143,7 +143,7 @@ function BitcoinPlugin() {
 			case EncryptionScheme.CRYPTOJS:
 				throw new Error("CryptoJS wif to hex not implemented");
 			default:
-				return new Bitcoin.ECKey(wif).getBitcoinHexFormat();
+				return new Bitcoin.ECKey(wif).setCompressed(true).getBitcoinHexFormat();
 		}
 	}
 	this.isPrivateKeyHex = function(str) {
