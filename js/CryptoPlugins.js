@@ -42,7 +42,7 @@ CryptoPlugin.prototype.getLogo = function() { throw new Error("Subclass must imp
 /**
  * Returns a new random key.
  */
-CryptoPlugin.prototype.newCryptoKey = function() { return new CryptoKey(this); }
+CryptoPlugin.prototype.newKey = function() { return new CryptoKey(this); }
 	
 /**
  * Returns a new unencrypted hex private key.

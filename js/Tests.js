@@ -172,7 +172,7 @@ function testCryptoKey(plugin, callback) {
 	
 	// test unencrypted private key consistency
 	for (let i = 0; i < REPEAT_LONG; i++) {
-		let key = plugin.newCryptoKey();
+		let key = plugin.newKey();
 		assertEquals(plugin, key.getPlugin());
 		assertTrue(plugin.isPrivateKey(key.toHex()));
 		assertTrue(plugin.isPrivateKey(key.toWif()));
@@ -224,7 +224,7 @@ function testCryptoKey(plugin, callback) {
 	
 	// test encryption of one key
 	function testEncryption(plugin, scheme, callback) {
-		let key = plugin.newCryptoKey();
+		let key = plugin.newKey();
 		let copy = key.copy();
 		key.encrypt(scheme, PASSWORD, function(error) {
 			if (error) callback(error);
@@ -373,7 +373,7 @@ function testWalletWithEncryption(plugin, callback) {
 				originalWallets.push(wallet);
 				funcs.push(getCallbackFunctionEncryptWallet(scheme, wallet.copy(), PASSWORD));
 			}
-			let wallet = plugin.newWallet({privateKey: plugin.newCryptoKey()});
+			let wallet = plugin.newWallet({privateKey: plugin.newKey()});
 			originalWallets.push(wallet);
 			funcs.push(getCallbackFunctionEncryptWallet(scheme, wallet.copy(), PASSWORD));
 			

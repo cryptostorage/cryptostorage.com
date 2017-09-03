@@ -57,7 +57,7 @@ function Wallet(plugin, state) {
 	}
 	
 	this.random = function() {
-		return this.setCryptoKey(this.plugin.newCryptoKey());
+		return this.setCryptoKey(this.plugin.newKey());
 	}
 	
 	this.getAddress = function() {

@@ -530,7 +530,7 @@ function GenerateWalletsController(div, state, onKeysGenerated) {
 		// generate wallets
 		var wallets = [];
 		for (var i = 0; i < state.numKeys; i++) {
-			wallets.push(state.plugin.newWallet());
+			wallets.push(state.plugin.newKey());
 		}
 		
 		// copy wallets for processing so originals are preserved for validation
