@@ -8,11 +8,10 @@ function runTests(callback) {
 	console.log("Running tests");
 	testUtils();
 	testPathTracker();
-	//testCryptoPlugins();
-	testCryptoKeys();
-	console.log("All tests passed");
-	if (callback) callback();
-	
+	testCryptoPlugins();
+	testCryptoKeys(function(error) {
+		if (callback) callback(error);
+	});
 	
 //	testWalletsWithEncryption(function() {
 //		console.log("All tests passed");
@@ -163,13 +162,13 @@ function testCryptoPlugin(plugin) {
 	}
 }
 
-function testCryptoKeys() {
+function testCryptoKeys(callback) {	// TODO: execute in series
 	for (let plugin of getCryptoPlugins()) {
-		testCryptoKey(plugin);
+		testCryptoKey(plugin, callback);
 	}
 }
 
-function testCryptoKey(plugin) {
+function testCryptoKey(plugin, callback) {
 	
 	// test unencrypted private key consistency
 	for (let i = 0; i < REPEAT_LONG; i++) {
@@ -218,34 +217,26 @@ function testCryptoKey(plugin) {
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
 	for (let scheme of plugin.getEncryptionSchemes()) {
 		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
-		let resolved = Promise.resolve();
-		for (let i = 0; i < max; i++) {
-			resolved = resolved.then(testEncryption(plugin, scheme));
+		for (let i = 0; i < 1; i++) {	// TODO: set back to max and execute in series
+			testEncryption(plugin, scheme, callback);
 		}
-		resolved.then(function() { console.log("Now am I done?"); });
 	}
 	
-	function testEncryption(plugin, scheme) {
-		console.log("Calling test encryption");
-		let promise = new Promise(function(resolve, reject) {
-			let key = plugin.newCryptoKey();
-			key.encrypt(scheme, PASSWORD).then(function(resp) {
-				assertTrue(key.isEncrypted());
-				assertEquals(scheme, key.getEncryptionScheme());
-				assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
-				assertEquals(scheme, plugin.getEncryptionScheme(key.toWif()));
-				assertTrue(plugin.isPrivateKeyHex(key.toHex()));
-				assertTrue(plugin.isPrivateKeyWif(key.toWif()));
-				assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
-				assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
-				assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
-				console.log("Resolved!");
-				resolve();
-			}).catch(function(resp) {
-				console.log(resp);
-			});
+	function testEncryption(plugin, scheme, callback) {
+		let key = plugin.newCryptoKey();
+		key.encrypt(scheme, PASSWORD, function(error) {
+			if (error) callback(error);
+			assertTrue(key.isEncrypted());
+			assertEquals(scheme, key.getEncryptionScheme());
+			assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
+			assertEquals(scheme, plugin.getEncryptionScheme(key.toWif()));
+			assertTrue(plugin.isPrivateKeyHex(key.toHex()));
+			assertTrue(plugin.isPrivateKeyWif(key.toWif()));
+			assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
+			assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
+			assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
+			callback();
 		});
-		return promise;
 	}
 	
 	// test encryption

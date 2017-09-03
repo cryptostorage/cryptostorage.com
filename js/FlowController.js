@@ -30,7 +30,10 @@ const DEBUG = true;
 $(document).ready(function() {
 	
 	// run tests
-	if (RUN_TESTS) runTests();
+	if (RUN_TESTS) runTests(function(error) {
+		if (error) throw error;
+		console.log("All tests pass");
+	});
 	
 	// initialize content div and flow controller
 	var pageManager = new PageManager($("#content"));

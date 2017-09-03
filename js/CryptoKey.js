@@ -42,17 +42,18 @@ function CryptoKey(plugin, state) {
 		return this.state.wif;
 	}
 	
-	this.encrypt = function(scheme, password) {
-		return new Promise(function(resolved, rejected) {
-			that.plugin.encrypt(scheme, that, password).then(function(encryptedStr) {
-				that.setState({privateKey: encryptedStr, address: that.toAddress(), encryption: scheme})
-				resolved();
-			}).catch(rejected);
+	this.encrypt = function(scheme, password, callback) {
+		this.plugin.encrypt(scheme, this, password, function(encrypted, error) {
+			if (encrypted) that.setState({privateKey: encrypted, address: that.toAddress(), encryption: scheme});
+			callback(error);
 		});
 	}
 	
-	this.decrypt = function(password) {
-		this.setCryptoKey(this.plugin.decrypt(this.getEncryptionScheme(), this, password));
+	this.decrypt = function(password, callback) {
+		this.plugin.decrypt(this.getEncryptionScheme(), this, password, function(decrypted, error) {
+			if (decrypted) that.setState({privateKey: decrypted, address: that.toAddress()});
+			callback(error);
+		});
 	}
 	
 	this.isEncrypted = function() {

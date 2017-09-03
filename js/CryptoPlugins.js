@@ -104,12 +104,12 @@ CryptoPlugin.prototype.getEncryptionScheme = function(str) { throw new Error("Su
 /**
  * Returns a promise which is called with an encrypted private key string upon completion.
  */
-CryptoPlugin.prototype.encrypt = function(scheme, cryptoKey, password) { return encrypt(scheme, cryptoKey, password); }
+CryptoPlugin.prototype.encrypt = function(scheme, cryptoKey, password, callback) { encrypt(scheme, cryptoKey, password, callback); }
 
 /**
  * Returns a promise which is called with a decrypted private key string upon completion.
  */
-CryptoPlugin.prototype.decrypt = function(scheme, cryptoKey, password) { return decrypt(scheme, cryptoKey, password); }
+CryptoPlugin.prototype.decrypt = function(scheme, cryptoKey, password, callback) { return decrypt(scheme, cryptoKey, password, callback); }
 
 /**
  * Bitcoin plugin.

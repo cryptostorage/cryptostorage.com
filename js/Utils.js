@@ -597,8 +597,10 @@ const EncryptionScheme = {
 
 /**
  * Encrypts the given crypto key with the given scheme and password.
+ * 
+ * callback(encrypted, error) is called with the encrypted private key or an error
  */
-function encrypt(scheme, cryptoKey, password) {
+function encrypt(scheme, cryptoKey, password, callback) {
 	if (!scheme) throw new Error("Scheme must be initialized");
 	if (!isObject(cryptoKey, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 	if (!password) throw new Error("Password must be initialized");
@@ -607,13 +609,12 @@ function encrypt(scheme, cryptoKey, password) {
 			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
-			return new Promise(function(resolve, reject) {
-				ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(cryptoKey.toHex(), password, true, function(resp) {	// TODO: confirm callback called with Error or interpret
-					resolve(resp);
-				});
+			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(cryptoKey.toHex(), password, true, function(resp) {
+				callback(resp);	// TODO: handle error
 			});
+			break;
 		default:
-			throw new Error("Encryption scheme '" + scheme + "' not supported");
+			callback(undefined, new Error("Encryption scheme '" + scheme + "' not supported"));
 	}
 }
 
