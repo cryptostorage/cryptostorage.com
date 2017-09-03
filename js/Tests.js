@@ -217,9 +217,9 @@ function testCryptoKey(plugin, callback) {
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
 	for (let scheme of plugin.getEncryptionSchemes()) {
 		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
-		for (let i = 0; i < 1; i++) {	// TODO: set back to max and execute in series
-			testEncryption(plugin, scheme, callback);
-		}
+		let funcs = [];
+		for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin, scheme, callback) });
+		async.series(funcs, callback);
 	}
 	
 	function testEncryption(plugin, scheme, callback) {
@@ -230,7 +230,7 @@ function testCryptoKey(plugin, callback) {
 			assertEquals(scheme, key.getEncryptionScheme());
 			assertEquals(scheme, plugin.getEncryptionScheme(key.toHex()));
 			assertEquals(scheme, plugin.getEncryptionScheme(key.toWif()));
-			assertTrue(plugin.isPrivateKeyHex(key.toHex()));
+			assertFalse(plugin.isPrivateKeyHex(key.toHex()));
 			assertTrue(plugin.isPrivateKeyWif(key.toWif()));
 			assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
 			assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
