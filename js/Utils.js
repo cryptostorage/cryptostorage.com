@@ -501,36 +501,21 @@ function ThreadTracker() {
 /**
  * Executes the given functions in sequence.
  * 
- * @param callbackFunctions are functions with a single callback argument to execute in sequence
+ * @param callbackFuncs are functions with a single callback argument to execute in sequence
  * @param callback is called when all functions have been invoked
  */
-function executeCallbackFunctionsInSequence(callbackFunctions, callback) {
-	executeAux(callbackFunctions, 0, [], callback);
-	function executeAux(callbackFunctions, index, callbackArgs, callback) {
+function executeInSeries(callbackFuncs, callback) {
+	executeAux(callbackFuncs, 0, [], callback);
+	function executeAux(callbackFuncs, index, callbackArgs, callback) {
 		//console.log("executeAux(" + index + ")");
-		if (index >= callbackFunctions.length) callback(callbackArgs);
+		if (index >= callbackFuncs.length) callback(callbackArgs);
 		else {
-			try {
-				callbackFunctions[index](function(args) {
-					callbackArgs.push(args);
-					executeAux(callbackFunctions, index + 1, callbackArgs, callback);
-				});
-			} catch (err) {
-				throw err;
-			}
+			callbackFuncs[index](function(args) {
+				callbackArgs.push(args);
+				executeAux(callbackFuncs, index + 1, callbackArgs, callback);
+			});
 		}
 	}
-}
-
-/**
- * Executes callback functions.
- * 
- * @param callbackFunctions are the callback functions to invoke
- * @param numThreads is the number of threads to run at a time
- * @param callback is invoked when all callback functions have been processed
- */
-function executeCallbackFunctions(callbackFunctions, numThreads, callback) {
-	throw new Error("Not yet implemented");
 }
 
 /**
@@ -619,9 +604,30 @@ function encrypt(scheme, cryptoKey, password, callback) {
 }
 
 /**
- * Decrypts the given crypto key with the given scheme and password.
+ * Decrypts the given crypto key with the given scheme and password.s
+ * 
+ * callback(encrypted, error) is called with the encrypted private key or an error
  */
-function decrypt(scheme, cryptoKey, password) {
+function decrypt(scheme, cryptoKey, password, callback) {
+//	if (!scheme) throw new Error("Scheme must be initialized");
+//	if (!isObject(cryptoKey, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+//	if (!password) throw new Error("Password must be initialized");
+//	switch (scheme) {
+//		case EncryptionScheme.CRYPTOJS:
+//			throw new Error("Not implemented");
+//			break;
+//		case EncryptionScheme.BIP38:
+//			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(cryptoKey.toHex(), password, true, function(resp) {
+//				callback(resp);	// TODO: handle error
+//			});
+//			break;
+//		default:
+//			callback(undefined, new Error("Encryption scheme '" + scheme + "' not supported"));
+//	}
+//	
+//	
+//	
+//	
 	if (!scheme) throw new Error("Scheme must be initialized");
 	if (!cryptoKey) throw new Error("Private key to decrypt must be initialized");
 	if (!password) throw new Error("Password must be initialized");
@@ -847,7 +853,7 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 	}
 	
 	// generate zips in sequence
-	executeCallbackFunctionsInSequence(funcs, function(blobs) {
+	executeInSeries(funcs, function(blobs) {
 		var name = "cryptostorage_" + pieces[0].currency.toLowerCase();
 		if (blobs.length === 1) callback(name + ".zip", blobs[0]);
 		else {
@@ -896,7 +902,7 @@ function zipToPieces(blob, onPieces) {
 		});
 		
 		// invoke callback functions to get pieces
-		executeCallbackFunctionsInSequence(callbackFunctions, function(args) {
+		executeInSeries(callbackFunctions, function(args) {
 			var pieces = [];
 			for (let arg of args) {
 				if (isArray(arg)) for (let piece of arg) pieces.push(piece);

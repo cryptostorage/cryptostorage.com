@@ -213,12 +213,12 @@ function testCryptoKey(plugin, callback) {
 		throw new Error("CryptoKey created with mismatching address");
 	} catch (err) { }
 	
-	// test encryption
+	// test each encryption scheme
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
 	for (let scheme of plugin.getEncryptionSchemes()) {
 		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
 		let funcs = [];
-		for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin, scheme, callback) });
+		for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin, scheme, callback); });
 		async.series(funcs, callback);
 	}
 	
@@ -238,6 +238,26 @@ function testCryptoKey(plugin, callback) {
 			assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
 			assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
 			assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
+			callback();
+			//testDecryption(key, callback);	// TODO
+		});
+	}
+	
+	function testDecryption(key, callback) {
+		key.decrypt(PASSWORD, function(error) {
+			if (error) {
+				callback(error);
+				return;
+			}
+			assertFalse(key.isEncrypted());
+			assertUndefined(key.getEncryptionScheme());
+			assertUndefined(key.plugin.getEncryptionScheme(key.toHex()));
+			assertUndefined(key.plugin.getEncryptionScheme(key.toWif()));
+			assertTrue(key.plugin.isPrivateKeyHex(key.toHex()));
+			assertTrue(key.plugin.isPrivateKeyWif(key.toWif()));
+			assertTrue(key.plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
+			assertEquals(key.toHex(), key.plugin.privateKeyWifToHex(key.toWif()));
+			assertEquals(key.toWif(), key.plugin.privateKeyHexToWif(key.toHex()));
 			callback();
 		});
 	}
@@ -339,7 +359,7 @@ function testWalletsWithEncryption(callback) {
 	}
 	
 	// execute callback functions in sequence
-	executeCallbackFunctionsInSequence(funcs, callback);
+	executeInSeries(funcs, callback);
 	
 	function getCallbackFunctionTestWalletWithEncryption(plugin) {
 		return function(callback) { testWalletWithEncryption(plugin, callback); }
@@ -354,7 +374,7 @@ function testWalletWithEncryption(plugin, callback) {
 	for (let scheme of plugin.getEncryptionSchemes()) {
 		funcs.push(getCallbackFunctionTestScheme(plugin, scheme));
 	}
-	executeCallbackFunctionsInSequence(funcs, callback);
+	executeInSeries(funcs, callback);
 	
 	// callback function to test a single scheme
 	function getCallbackFunctionTestScheme(plugin, scheme) {
@@ -390,7 +410,7 @@ function testWalletWithEncryption(plugin, callback) {
 			}
 			
 			// encrypt wallets
-			executeCallbackFunctionsInSequence(funcs, function(encryptedWallets) {
+			executeInSeries(funcs, function(encryptedWallets) {
 				
 				// test encrypted split
 				for (let encryptedWallet of encryptedWallets) {
@@ -405,7 +425,7 @@ function testWalletWithEncryption(plugin, callback) {
 				}
 				
 				// decrypt decrypt wallets
-				executeCallbackFunctionsInSequence(funcs, function(decryptedWallets) {
+				executeInSeries(funcs, function(decryptedWallets) {
 					assertTrue(decryptedWallets.length > 0);
 					assertEquals(originalWallets.length, decryptedWallets.length);
 					for (let i = 0; i < originalWallets.length; i++) {

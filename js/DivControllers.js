@@ -549,7 +549,7 @@ function GenerateWalletsController(div, state, onWalletsGenerated) {
 			}
 			
 			// execute callback functions in sequence
-			executeCallbackFunctionsInSequence(encryptFuncs, function() {
+			executeInSeries(encryptFuncs, function() {
 				
 				// split wallets
 				if (state.splitEnabled) {
@@ -665,7 +665,7 @@ function PieceRenderer(div, piece, config) {
 		}
 		
 		// execute callback functions
-		executeCallbackFunctionsInSequence(callbackFunctions, callback);
+		executeInSeries(callbackFunctions, callback);
 		
 		/**
 		 * Returns a callback function (function with single callback argument) which will render a pair div.
@@ -901,7 +901,7 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 			
 			var decryptFuncs = [];
 			for (let wallet of wallets) decryptFuncs.push(getDecryptCallbackFunction(wallet, password));
-			executeCallbackFunctionsInSequence(decryptFuncs, function(wallets) {
+			executeInSeries(decryptFuncs, function(wallets) {
 				onWalletsDecrypted(wallets);
 			});
 			
@@ -1155,7 +1155,7 @@ function DownloadPiecesController(div, state, pieces, onCustomExport) {
 		}
 		
 		// render each piece in sequence to minimize resource requirements
-		executeCallbackFunctionsInSequence(renderFuncs, function() {
+		executeInSeries(renderFuncs, function() {
 			
 			// wrap piece divs in html containers
 			var pieceHtmls = [];
