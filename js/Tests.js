@@ -246,7 +246,7 @@ function testCryptoKey(plugin) {
 			});
 		});
 		return promise;
-	}	
+	}
 	
 	// test encryption
 //	assertTrue(plugin.getEncryptionSchemes().length >= 1);
