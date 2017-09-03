@@ -595,11 +595,12 @@ function encrypt(scheme, cryptoKey, password, callback) {
 			break;
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(cryptoKey.toHex(), password, true, function(resp) {
-				callback(resp);	// TODO: handle error
+				if (resp.message) callback(resp);	// TODO: confirm error handling, isError()
+				else callback(resp);
 			});
 			break;
 		default:
-			callback(undefined, new Error("Encryption scheme '" + scheme + "' not supported"));
+			callback(new Error("Encryption scheme '" + scheme + "' not supported"));
 	}
 }
 
@@ -609,37 +610,21 @@ function encrypt(scheme, cryptoKey, password, callback) {
  * callback(encrypted, error) is called with the encrypted private key or an error
  */
 function decrypt(scheme, cryptoKey, password, callback) {
-//	if (!scheme) throw new Error("Scheme must be initialized");
-//	if (!isObject(cryptoKey, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-//	if (!password) throw new Error("Password must be initialized");
-//	switch (scheme) {
-//		case EncryptionScheme.CRYPTOJS:
-//			throw new Error("Not implemented");
-//			break;
-//		case EncryptionScheme.BIP38:
-//			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(cryptoKey.toHex(), password, true, function(resp) {
-//				callback(resp);	// TODO: handle error
-//			});
-//			break;
-//		default:
-//			callback(undefined, new Error("Encryption scheme '" + scheme + "' not supported"));
-//	}
-//	
-//	
-//	
-//	
 	if (!scheme) throw new Error("Scheme must be initialized");
-	if (!cryptoKey) throw new Error("Private key to decrypt must be initialized");
+	if (!isObject(cryptoKey, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 	if (!password) throw new Error("Password must be initialized");
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
 			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
-			throw new Error("Not implemented");
+			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(cryptoKey.toWif(), password, function(resp) {
+				if (resp.message) callback(resp);	// TODO: confirm error handling, isError()
+				else callback(new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat());
+			});
 			break;
 		default:
-			throw new Error("Decryption scheme '" + scheme + "' not supported");
+			callback(new Error("Encryption scheme '" + scheme + "' not supported"));
 	}
 }
 

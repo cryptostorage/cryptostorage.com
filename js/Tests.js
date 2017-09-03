@@ -223,6 +223,7 @@ function testCryptoKey(plugin, callback) {
 	}
 	
 	function testEncryption(plugin, scheme, callback) {
+		// TODO: remember original for later comparison
 		let key = plugin.newCryptoKey();
 		key.encrypt(scheme, PASSWORD, function(error) {
 			if (error) {
@@ -238,8 +239,8 @@ function testCryptoKey(plugin, callback) {
 			assertTrue(plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
 			assertEquals(key.toHex(), plugin.privateKeyWifToHex(key.toWif()));
 			assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
-			callback();
-			//testDecryption(key, callback);	// TODO
+			//callback();
+			testDecryption(key, callback);
 		});
 	}
 	
@@ -250,9 +251,9 @@ function testCryptoKey(plugin, callback) {
 				return;
 			}
 			assertFalse(key.isEncrypted());
-			assertUndefined(key.getEncryptionScheme());
-			assertUndefined(key.plugin.getEncryptionScheme(key.toHex()));
-			assertUndefined(key.plugin.getEncryptionScheme(key.toWif()));
+			assertNull(key.getEncryptionScheme());
+			assertNull(key.plugin.getEncryptionScheme(key.toHex()));
+			assertNull(key.plugin.getEncryptionScheme(key.toWif()));
 			assertTrue(key.plugin.isPrivateKeyHex(key.toHex()));
 			assertTrue(key.plugin.isPrivateKeyWif(key.toWif()));
 			assertTrue(key.plugin.isAddress(key.toAddress()), "Not an address: " + key.toAddress());
