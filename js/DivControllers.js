@@ -508,7 +508,7 @@ function GenerateWalletsController(div, state, onKeysGenerated) {
 		
 		div.append("<b>Summary:</b><br><br>");
 		div.append("Currency: " + state.plugin.getName() + " (" + state.plugin.getTickerSymbol() + ")").append("<br>");
-		div.append("Number of key pairs to create: " + state.numKeys).append("<br>");
+		div.append("Number of keys to create: " + state.numKeys).append("<br>");
 		div.append("Password protection: " + (state.passwordEnabled ? "Yes" : "No") + (state.passwordEnabled ? " (" + state.encryptionScheme + ")" : "")).append("<br>");
 		div.append("Split private keys: " + (state.splitEnabled ? "Yes" : "No") + (state.splitEnabled ? " (" + state.minPieces + " of " + state.numPieces + " pieces necessary to restore)" : ""));
 		div.append("<br><br>");
