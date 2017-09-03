@@ -1,5 +1,5 @@
 // TODO
-// change terminology from wallets to private keys
+// change terminology from wallets to keys
 // verify final pieces
 // review private keys (hex, base58, etc)
 // page to configure export options with previews
