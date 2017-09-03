@@ -74,6 +74,7 @@ function CryptoKey(plugin, state) {
 		this.state = Object.assign({}, state);
 		
 		// set private key
+		this.state.privateKey = undefined;
 		if (state.privateKey) {
 			if (plugin.isPrivateKeyHex(state.privateKey)) {
 				this.state.hex = state.privateKey;
@@ -86,7 +87,7 @@ function CryptoKey(plugin, state) {
 		
 		// set encryption
 		let encryption = plugin.getEncryptionScheme(state.privateKey);
-		if (state.encryption && state.encryption !== encryption) throw new Error("state.encryption does not match detected encryption");
+		if (isDefined(state.encryption) && state.encryption !== encryption) throw new Error("state.encryption does not match detected encryption");
 		this.state.encryption = encryption;
 		
 		// set address

@@ -1,5 +1,5 @@
 const REPEAT_LONG = 50;
-const REPEAT_SHORT = 2;
+const REPEAT_SHORT = 1;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
 const PASSWORD = "MySuperSecretPasswordAbcTesting123";
@@ -181,7 +181,9 @@ function testCryptoKey(plugin, callback) {
 		assertTrue(plugin.isAddress(key.toAddress()));
 		assertFalse(key.isEncrypted());
 		assertNull(key.getEncryptionScheme());
-		let copy = key.copy();
+		let copy = key.copy();	// TODO: copy broken because CryptoKey doesn't really have 'privateKey' field
+		console.log(key.getState());
+		console.log(copy.getState());
 		assertTrue(key.equals(copy));
 	}
 	
@@ -242,7 +244,11 @@ function testCryptoKey(plugin, callback) {
 			assertEquals(key.toWif(), plugin.privateKeyHexToWif(key.toHex()));
 			testDecryption(key, function(error) {
 				if (error) callback(error);
-				//else assertTrue(key.equals(copy));
+				else {
+					console.log(key.getState());
+					console.log(copy.getState());
+					assertTrue(key.equals(copy));
+				}
 			});
 		});
 	}
