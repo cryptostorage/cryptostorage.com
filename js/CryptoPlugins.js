@@ -71,7 +71,7 @@ function BitcoinPlugin() {
 	this.getName = function() { return "Bitcoin"; }
 	this.getTickerSymbol = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
-	this.getEncryptionSchemes = function() { return [EncryptionScheme.CRYPTOJS]; }
+	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38, EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function() {
 		let key = new Bitcoin.ECKey();
 		key.setCompressed(true);

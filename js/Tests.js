@@ -1,4 +1,4 @@
-const REPEAT_LONG = 50;
+const REPEAT_LONG = 25;
 const REPEAT_SHORT = 2;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
@@ -167,7 +167,7 @@ function testCryptoKey(plugin, callback) {
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
 	let funcs = [];
 	for (let scheme of plugin.getEncryptionSchemes()) funcs.push(function(callback) { testEncryptionScheme(plugin, scheme, callback); });
-	async.series(funcs, callback);
+	async.parallel(funcs, callback);
 	
 	// test one encryption scheme
 	function testEncryptionScheme(plugin, scheme, callback) {
@@ -175,7 +175,7 @@ function testCryptoKey(plugin, callback) {
 		let funcs = [];
 		for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin, scheme, PASSWORD, PASSWORD, callback); });
 		funcs.push(function(callback) { testEncryption(plugin, scheme, PASSWORD, "invalidPassword123", callback); });	// test wrong password
-		async.series(funcs, callback);
+		async.parallel(funcs, callback);
 	}
 	
 	// test encryption of one key

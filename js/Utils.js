@@ -636,11 +636,10 @@ function decrypt(key, password, callback) {
 	if (!password) throw new Error("Password must be initialized");
 	switch (key.getEncryptionScheme()) {
 		case EncryptionScheme.CRYPTOJS:
-			console.log(key.toWif());
-			console.log(password);
-			console.log(CryptoJS.AES.decrypt(key.toWif(), password));
-			let hex = CryptoJS.AES.decrypt(key.toWif(), password).toString(CryptoJS.enc.Utf8);
-			console.log(hex);
+			let hex;
+			try {
+				hex = CryptoJS.AES.decrypt(key.toWif(), password).toString(CryptoJS.enc.Utf8);
+			} catch (err) { }
 			if (!hex) callback(undefined, new Error("Invalid password"));
 			else {
 				key.setState(key.getPlugin().parse(hex).getState());
