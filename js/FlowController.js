@@ -17,7 +17,7 @@
 // paste private key doesn't work in iphone safari
 // aes.java needs de-minified
 
-const RUN_TESTS = false;
+const RUN_TESTS = true;
 const DEBUG = true;
 
 /**

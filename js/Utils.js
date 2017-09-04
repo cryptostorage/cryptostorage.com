@@ -600,20 +600,23 @@ const EncryptionScheme = {
 /**
  * Encrypts the given crypto key with the given scheme and password.
  * 
- * callback(encrypted, error) is called with the encrypted private key or an error
+ * Invokes callback(encryptedKey, error) when done.
  */
-function encrypt(scheme, cryptoKey, password, callback) {
+function encrypt(scheme, key, password, callback) {
 	if (!scheme) throw new Error("Scheme must be initialized");
-	if (!isObject(cryptoKey, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+	if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 	if (!password) throw new Error("Password must be initialized");
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
 			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
-			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(cryptoKey.toHex(), password, true, function(resp) {
-				if (resp.message) callback(resp);	// TODO: confirm error handling, isError()
-				else callback(resp);
+			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.toHex(), password, true, function(resp) {
+				if (resp.message) callback(undefined, resp);	// TODO: confirm error handling, isError()
+				else {
+					key.setState(Object.assign(key.getPlugin().parse(resp).getState(), {address: key.toAddress()}));
+					callback(key);
+				}
 			});
 			break;
 		default:
@@ -622,22 +625,25 @@ function encrypt(scheme, cryptoKey, password, callback) {
 }
 
 /**
- * Decrypts the given crypto key with the given scheme and password.s
+ * Decrypts the given crypto key with the given password.
  * 
- * callback(encrypted, error) is called with the encrypted private key or an error
+ * Invokes callback(decryptedKey, error) when done.
  */
-function decrypt(scheme, cryptoKey, password, callback) {
-	if (!scheme) throw new Error("Scheme must be initialized");
-	if (!isObject(cryptoKey, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+function decrypt(key, password, callback) {
+	if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 	if (!password) throw new Error("Password must be initialized");
-	switch (scheme) {
+	switch (key.getEncryptionScheme()) {
 		case EncryptionScheme.CRYPTOJS:
 			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
-			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(cryptoKey.toWif(), password, function(resp) {
-				if (resp.message) callback(resp);	// TODO: confirm error handling, isError()
-				else callback(new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat());
+			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.toWif(), password, function(resp) {
+				if (resp.message) callback(undefined, resp);	// TODO: confirm error handling, isError()
+				else {
+					let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
+					key.setState(key.getPlugin().parse(wif).getState());
+					callback(key);
+				}
 			});
 			break;
 		default:

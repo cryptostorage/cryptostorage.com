@@ -47,22 +47,22 @@ CryptoPlugin.prototype.getEncryptionSchemes = function() { return [EncryptionSch
 /**
  * Returns a new random key.
  */
-CryptoPlugin.prototype.newKey = function(str) { return new CryptoKey(this, str); }
+CryptoPlugin.prototype.newKey = function() { throw new Error("Subclass must implement"); }
 
 /**
- * Parses the given string into a crypto key.
+ * Parses the given private key string into a key with all known information.
  */
 CryptoPlugin.prototype.parse = function(str) { throw new Error("Subclass must implement"); }
 
 /**
- * Returns a promise which is called with an encrypted private key string upon completion.
+ * Encrypts the given key with the given scheme and password.  Invokes callback(key, error) when done.
  */
-CryptoPlugin.prototype.encrypt = function(scheme, cryptoKey, password, callback) { encrypt(scheme, cryptoKey, password, callback); }
+CryptoPlugin.prototype.encrypt = function(scheme, key, password, callback) { encrypt(scheme, key, password, callback); }
 
 /**
- * Returns a promise which is called with a decrypted private key string upon completion.
+ * Decrypts the given key with the givne password.  Invokes callback(key, error) when done.
  */
-CryptoPlugin.prototype.decrypt = function(scheme, cryptoKey, password, callback) { return decrypt(scheme, cryptoKey, password, callback); }
+CryptoPlugin.prototype.decrypt = function(key, password, callback) { return decrypt(key, password, callback); }
 
 /**
  * Bitcoin plugin.
@@ -72,18 +72,15 @@ function BitcoinPlugin() {
 	this.getTickerSymbol = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
 	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38]; }
-	this.newKey = function(str) {
-		if (str) return this.parse(str);
-		else {
-			let key = new Bitcoin.ECKey(str);
-			key.setCompressed(true);
-			let state = {}
-			state.hex = key.getBitcoinHexFormat();
-			state.wif = key.getBitcoinWalletImportFormat();
-			state.address = key.getBitcoinAddress();
-			state.encryption = null;
-			return new CryptoKey(this, state);
-		}
+	this.newKey = function() {
+		let key = new Bitcoin.ECKey();
+		key.setCompressed(true);
+		let state = {}
+		state.hex = key.getBitcoinHexFormat();
+		state.wif = key.getBitcoinWalletImportFormat();
+		state.address = key.getBitcoinAddress();
+		state.encryption = null;
+		return new CryptoKey(this, state);
 	}
 	this.parse = function(str) {
 		assertTrue(isString(str), "Argument to parse must be a string");
@@ -92,6 +89,7 @@ function BitcoinPlugin() {
 		// unencrypted private key
 		if (ninja.privateKey.isPrivateKey(str)) {
 			let key = new Bitcoin.ECKey(str);
+			key.setCompressed(true);
 			state.hex = key.getBitcoinHexFormat();
 			state.wif = key.getBitcoinWalletImportFormat();
 			state.address = key.getBitcoinAddress();
@@ -100,7 +98,7 @@ function BitcoinPlugin() {
 		
 		// wif bip38
 		else if (ninja.privateKey.isBIP38Format(str)) {
-			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif));
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.encryption = EncryptionScheme.BIP38;
 		}
@@ -130,21 +128,11 @@ function BitcoinPlugin() {
 			}
 		}
 		
-		// address
-		else if (this.isAddress(str)) {
-			state.address = str;
-		}
+		// otherwise key is not recognized
+		else throw new Error("Unrecognized private key: " + str);
 		
 		// return crypto key
 		return new CryptoKey(this, state);
-	}
-	this.isAddress = function(str) {
-		try {
-			new Bitcoin.Address.decodeString(str);
-			return true;
-		} catch (err) {
-			return false;
-		}
 	}
 }
 inheritsFrom(BitcoinPlugin, CryptoPlugin);

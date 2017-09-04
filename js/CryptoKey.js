@@ -22,12 +22,16 @@ function CryptoKey(plugin, state) {
 		return this.state;
 	}
 	
+	this.setState = function(state) {
+		this.state = Object.assign({}, state);
+	}
+	
 	this.random = function() {
-		this.setPrivateKey(this.plugin.newUnencryptedPrivateKeyHex());
+		this.setState(this.plugin.newKey().getState());
 	}
 	
 	this.setPrivateKey = function(str) {
-		this.setState({privateKey: str});
+		this.setState(this.plugin.parse(str).getState());
 	}
 	
 	this.toAddress = function() {
@@ -43,17 +47,11 @@ function CryptoKey(plugin, state) {
 	}
 	
 	this.encrypt = function(scheme, password, callback) {
-		this.plugin.encrypt(scheme, this, password, function(encrypted, error) {
-			if (encrypted) that.setState({privateKey: encrypted, address: that.toAddress(), encryption: scheme});
-			callback(error);
-		});
+		this.plugin.encrypt(scheme, this, password, callback);
 	}
 	
 	this.decrypt = function(password, callback) {
-		this.plugin.decrypt(this.getEncryptionScheme(), this, password, function(decrypted, error) {
-			if (decrypted) that.setState({privateKey: decrypted, address: that.toAddress()});
-			callback(error);
-		});
+		this.plugin.decrypt(this, password, callback);
 	}
 	
 	this.isEncrypted = function() {
@@ -68,55 +66,7 @@ function CryptoKey(plugin, state) {
 		return this.state.encryption;
 	}
 	
-	this.setState = function(state) {
-		
-		// copy state
-		state = Object.assign({}, state);
-		
-		// collect hex and wif values both given and derived
-		let hexArr = [];
-		let wifArr = [];
-		if (state.privateKey) {
-			if (plugin.isPrivateKeyHex(state.privateKey)) {
-				hexArr.push(state.privateKey);
-				wifArr.push(plugin.privateKeyHexToWif(state.privateKey));
-			} else if (plugin.isPrivateKeyWif(state.privateKey)) {
-				hexArr.push(plugin.privateKeyWifToHex(state.privateKey));
-				wifArr.push(state.privateKey);
-			} else throw new Error("Unrecognized private key: " + state.privateKey);
-		}
-		if (state.hex) {
-			assertTrue(plugin.isPrivateKeyHex(state.hex));
-			hexArr.push(state.hex);
-			wifArr.push(plugin.privateKeyHexToWif(state.hex));
-		}
-		if (state.wif) {
-			assertTrue(plugin.isPrivateKeyWif(state.wif));
-			hexArr.push(plugin.privateKeyWifToHex(state.wif));
-			wifArr.push(state.wif);
-		}
-		
-		// ensure all values agree to initialize hex and wif
-		this.state.privateKey = undefined;
-		this.state.hex = getSingleValue(hexArr);
-		this.state.wif = getSingleValue(wifArr);
-		
-		// set encryption
-		let encryption = plugin.getEncryptionScheme(this.state.hex);
-		if (isDefined(state.encryption) && state.encryption !== encryption) throw new Error("state.encryption does not match detected encryption");
-		this.state.encryption = encryption;
-		
-		// set address
-		if (!this.state.encryption) {
-			let address = plugin.getAddress(this);
-			if (state.address && state.address !== address) throw new Error("state.address does not match address derived from private key");
-			this.state.address = address;
-		} else {
-			this.state.address = state.address;
-		}
-	}
-	
-	// initialize key
+	// initialize
 	if (!isObject(plugin, 'CryptoPlugin')) throw new Error("Must provide crypto plugin");
 	this.plugin = plugin;
 	var that = this;
