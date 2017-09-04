@@ -17,7 +17,7 @@
 // paste private key doesn't work in iphone safari
 // aes.java needs de-minified
 
-const RUN_TESTS = true;
+const RUN_TESTS = false;
 const DEBUG = true;
 
 /**
@@ -61,11 +61,11 @@ function FlowController(pageManager, plugins) {
 	function onSelectCreate() {
 		if (DEBUG) console.log("onSelectCreate()");
 		state.goal = Goal.CREATE_STORAGE;
-		pageManager.next(new CryptoSelectionController($("<div>"), state, onCryptoSelectionNew));
+		pageManager.next(new CryptoSelectionController($("<div>"), state, onCryptoSelectionCreate));
 	}
 	
-	function onCryptoSelectionNew(tickerSymbol) {
-		if (DEBUG) console.log("onCryptoSelectionNew(" + tickerSymbol + ")");
+	function onCryptoSelectionCreate(tickerSymbol) {
+		if (DEBUG) console.log("onCryptoSelectionCreate(" + tickerSymbol + ")");
 		for (let plugin of plugins) {
 			if (plugin.getTickerSymbol() === tickerSymbol) state.plugin = plugin;
 		}
@@ -98,7 +98,7 @@ function FlowController(pageManager, plugins) {
 		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
 		state.splitEnabled = splitEnabled;
 		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, pageManager.getPathTracker(), onSplitInput));
-		else pageManager.next(new GenerateWalletsController($("<div>"), state, onKeysGenerated));
+		else pageManager.next(new GenerateKeysController($("<div>"), state, onKeysGenerated));
 	}
 	
 	function onSplitInput(numPieces, minPieces) {
@@ -107,7 +107,7 @@ function FlowController(pageManager, plugins) {
 		assertInt(minPieces);
 		state.numPieces = numPieces;
 		state.minPieces = minPieces;
-		pageManager.next(new GenerateWalletsController($("<div>"), state, onKeysGenerated));
+		pageManager.next(new GenerateKeysController($("<div>"), state, onKeysGenerated));
 	}
 	
 	function onKeysGenerated(keys) {
