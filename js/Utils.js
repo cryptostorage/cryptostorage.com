@@ -746,25 +746,25 @@ function parseWallet(plugin, str) {
 }
 
 /**
- * Converts the given wallets to pieces.
+ * Converts the given keys to pieces.
  */
-function keysToPieces(wallets, wif) {
-	assertTrue(wallets.length > 0);
+function keysToPieces(keys, wif) {
+	assertTrue(keys.length > 0);
 	
 	// collect piece metadata while ensuring consistency
 	var ticker;
 	var isSplit;
 	var numPieces;
 	var encryption;
-	for (let wallet of wallets) {
-		if (isUndefined(ticker)) ticker = wallet.getCurrencyPlugin().getTickerSymbol();
-		else if (ticker !== wallet.getCurrencyPlugin().getTickerSymbol()) throw new Error("Wallets have different currencies: " + ticker + " vs " + wallet.getCurrencyPlugin().getTicker());
-		if (isUndefined(isSplit)) isSplit = wallet.isSplit();
-		else if (isSplit !== wallet.isSplit()) throw new Error("Wallets have different split states");
-		if (isUndefined(numPieces)) numPieces = isSplit ? wallet.getCryptoKeyPieces().length : 1;
-		else if (numPieces !== (isSplit ? wallet.getCryptoKeyPieces().length : 1)) throw new Error("Wallets have different number of pieces");
-		if (isUndefined(encryption)) encryption = wallet.isEncrypted() ? wallet.getEncryptionScheme() : undefined;
-		else if (encryption !== (wallet.isEncrypted() ? wallet.getEncryptionScheme() : undefined)) throw new Error("Wallets have different encryption states");
+	for (let key of keys) {
+		if (isUndefined(ticker)) ticker = key.getPlugin().getTickerSymbol();
+		else if (ticker !== key.getCurrencyPlugin().getTickerSymbol()) throw new Error("Wallets have different currencies: " + ticker + " vs " + key.getCurrencyPlugin().getTicker());
+		if (isUndefined(isSplit)) isSplit = key.isSplit();
+		else if (isSplit !== key.isSplit()) throw new Error("Wallets have different split states");
+		if (isUndefined(numPieces)) numPieces = isSplit ? key.getCryptoKeyPieces().length : 1;
+		else if (numPieces !== (isSplit ? key.getCryptoKeyPieces().length : 1)) throw new Error("Wallets have different number of pieces");
+		if (isUndefined(encryption)) encryption = key.isEncrypted() ? key.getEncryptionScheme() : undefined;
+		else if (encryption !== (key.isEncrypted() ? key.getEncryptionScheme() : undefined)) throw new Error("Wallets have different encryption states");
 	}
 	
 	// initialize pieces
@@ -778,12 +778,12 @@ function keysToPieces(wallets, wif) {
 		pieces.push(piece);
 	}
 	
-	// add wallet keys to each piece
-	for (let wallet of wallets) {
+	// add key keys to each piece
+	for (let key of keys) {
 		for (let i = 0; i < numPieces; i++) {
-			var walletKeys = {};
-			walletKeys.publicKey = wallet.getAddress();
-			walletKeys.privateKey = isSplit ? wallet.getCryptoKeyPieces()[i] : wallet.isEncrypted() ? wallet.getCryptoKey() : wif ? wallet.getCurrencyPlugin().getUnencryptedCryptoKeyWif(wallet.getCryptoKey()) : wallet.getCryptoKey();
+			var pieceKeys = {};
+			pieceKeys.publicKey = key.getAddress();
+			pieceKeys.privateKey = isSplit ? key.getCryptoKeyPieces()[i] : key.isEncrypted() ? key.getCryptoKey() : wif ? key.getCurrencyPlugin().getUnencryptedCryptoKeyWif(key.getCryptoKey()) : key.getCryptoKey();
 			pieces[i].keys.push(walletKeys);
 		}
 	}
