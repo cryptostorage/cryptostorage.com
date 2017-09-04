@@ -121,6 +121,7 @@ function testCryptoKeys(callback) {
 }
 
 function testCryptoKey(plugin, callback) {
+	console.log("testCryptoKey(" + plugin.getTickerSymbol() + ")");
 	
 	// test plugin
 	assertInitialized(plugin.getName());
