@@ -231,7 +231,7 @@ function testCryptoKey(plugin, callback) {
 					assertInitialized(key.toAddress());
 					assertNull(key.getEncryptionScheme());
 					
-					// test copy
+					// test decryption and copy
 					assertTrue(key.equals(expected));
 					assertTrue(key.equals(key.copy()));
 					
