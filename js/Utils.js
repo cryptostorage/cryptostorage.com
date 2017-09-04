@@ -608,7 +608,27 @@ function encrypt(scheme, key, password, callback) {
 	if (!password) throw new Error("Password must be initialized");
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
-			throw new Error("Not implemented");
+			var b64 = CryptoJS.AES.encrypt(key.toHex(), password).toString();
+		    var e64 = CryptoJS.enc.Base64.parse(b64);
+		    var hex = e64.toString(CryptoJS.enc.Hex);
+			key.setState(Object.assign(key.getPlugin().parse(hex).getState(), {address: key.toAddress()}));
+			callback(key);
+		    
+		    
+		    
+		    
+		    
+		    
+//		    console.log("------");
+//		    console.log(eHex);
+//		    console.log(Crypto.util.hexToBytes(eHex));
+//		    console.log(Bitcoin.Base58.encode(Crypto.util.hexToBytes(eHex)));
+//		    callback(Bitcoin.Base58.encode(Crypto.util.hexToBytes(eHex)));
+//		    //callback(eHex);
+//			
+//			
+//			
+//			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.toHex(), password, true, function(resp) {
@@ -634,6 +654,16 @@ function decrypt(key, password, callback) {
 	if (!password) throw new Error("Password must be initialized");
 	switch (key.getEncryptionScheme()) {
 		case EncryptionScheme.CRYPTOJS:
+			
+			
+			
+			var reb64 = CryptoJS.enc.Hex.parse(str);
+			var bytes = reb64.toString(CryptoJS.enc.Base64);
+			console.log("Decrypt bytes: " + bytes);
+			var decrypt = CryptoJS.AES.decrypt(bytes, password);
+			var plain = decrypt.toString(CryptoJS.enc.Utf8);
+			callback(plain);
+			
 			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:

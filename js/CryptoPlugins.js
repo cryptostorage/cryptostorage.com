@@ -71,7 +71,7 @@ function BitcoinPlugin() {
 	this.getName = function() { return "Bitcoin"; }
 	this.getTickerSymbol = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
-	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38]; }
+	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38, EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function() {
 		let key = new Bitcoin.ECKey();
 		key.setCompressed(true);
@@ -105,6 +105,7 @@ function BitcoinPlugin() {
 		
 		// wif cryptojs
 		else if (str[0] === 'U') {
+			throw new Error("Not implemented");
 			state.hex = undefined;
 			state.wif = str;
 			state.encryption = EncryptionScheme.CRYPTOJS;
@@ -122,6 +123,7 @@ function BitcoinPlugin() {
 			
 			// cryptojs
 			else if (str.length > 100) {
+				throw new Error("Not implemented");
 				state.hex = str;
 				state.wif = undefined;
 				state.encryption = EncryptionScheme.CRYPTOJS;
