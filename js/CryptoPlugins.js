@@ -45,11 +45,6 @@ CryptoPlugin.prototype.getLogo = function() { throw new Error("Subclass must imp
 CryptoPlugin.prototype.getEncryptionSchemes = function() { return [EncryptionScheme.CRYPTOJS]; }
 
 /**
- * Returns a new random key.
- */
-CryptoPlugin.prototype.newKey = function(str) { throw new Error("Subclass must implement"); }
-
-/**
  * Encrypts the given key with the given scheme and password.  Invokes callback(key, error) when done.
  */
 CryptoPlugin.prototype.encrypt = function(scheme, key, password, callback) { encrypt(scheme, key, password, callback); }
@@ -58,6 +53,11 @@ CryptoPlugin.prototype.encrypt = function(scheme, key, password, callback) { enc
  * Decrypts the given key with the givne password.  Invokes callback(key, error) when done.
  */
 CryptoPlugin.prototype.decrypt = function(key, password, callback) { return decrypt(key, password, callback); }
+
+/**
+ * Returns a new random key.
+ */
+CryptoPlugin.prototype.newKey = function(str) { throw new Error("Subclass must implement"); }
 
 /**
  * Bitcoin plugin.
