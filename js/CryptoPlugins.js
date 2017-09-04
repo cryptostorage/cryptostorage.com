@@ -47,12 +47,7 @@ CryptoPlugin.prototype.getEncryptionSchemes = function() { return [EncryptionSch
 /**
  * Returns a new random key.
  */
-CryptoPlugin.prototype.newKey = function() { throw new Error("Subclass must implement"); }
-
-/**
- * Parses the given private key string into a key with all known information.
- */
-CryptoPlugin.prototype.parse = function(str) { throw new Error("Subclass must implement"); }
+CryptoPlugin.prototype.newKey = function(str) { throw new Error("Subclass must implement"); }
 
 /**
  * Encrypts the given key with the given scheme and password.  Invokes callback(key, error) when done.
@@ -72,17 +67,21 @@ function BitcoinPlugin() {
 	this.getTickerSymbol = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
 	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38, EncryptionScheme.CRYPTOJS]; }
-	this.newKey = function() {
-		let key = new Bitcoin.ECKey();
-		key.setCompressed(true);
-		let state = {}
-		state.hex = key.getBitcoinHexFormat();
-		state.wif = key.getBitcoinWalletImportFormat();
-		state.address = key.getBitcoinAddress();
-		state.encryption = null;
-		return new CryptoKey(this, state);
-	}
-	this.parse = function(str) {
+	this.newKey = function(str) {
+		
+		// create new key
+		if (!str) {
+			let key = new Bitcoin.ECKey();
+			key.setCompressed(true);
+			let state = {}
+			state.hex = key.getBitcoinHexFormat();
+			state.wif = key.getBitcoinWalletImportFormat();
+			state.address = key.getBitcoinAddress();
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// parse key
 		assertTrue(isString(str), "Argument to parse must be a string");
 		let state = {};
 		
@@ -131,7 +130,7 @@ function BitcoinPlugin() {
 		// otherwise key is not recognized
 		else throw new Error("Unrecognized private key: " + str);
 		
-		// return crypto key
+		// return key
 		return new CryptoKey(this, state);
 	}
 }

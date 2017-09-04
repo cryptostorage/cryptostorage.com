@@ -609,14 +609,14 @@ function encrypt(scheme, key, password, callback) {
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
 			let b64 = CryptoJS.AES.encrypt(key.toHex(), password).toString();
-			key.setState(Object.assign(key.getPlugin().parse(b64).getState(), {address: key.toAddress()}));
+			key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.toAddress()}));
 			callback(key);
 			break;
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.toHex(), password, true, function(resp) {
 				if (resp.message) callback(undefined, resp);	// TODO: confirm error handling, isError()
 				else {
-					key.setState(Object.assign(key.getPlugin().parse(resp).getState(), {address: key.toAddress()}));
+					key.setState(Object.assign(key.getPlugin().newKey(resp).getState(), {address: key.toAddress()}));
 					callback(key);
 				}
 			});
@@ -642,40 +642,16 @@ function decrypt(key, password, callback) {
 			} catch (err) { }
 			if (!hex) callback(undefined, new Error("Invalid password"));
 			else {
-				key.setState(key.getPlugin().parse(hex).getState());
+				key.setState(key.getPlugin().newKey(hex).getState());
 				callback(key);
 			}
-			
-//			throw new Error("Not implemented fool");
-//			CryptoJS.enc.Hex.parse(key.toHex()).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-//			try {
-//				let decrypted = CryptoJS.AES.decrypt(key.toHex(), password);
-//				console.log(decrypted);
-//				var reb64 = CryptoJS.enc.Hex.parse(str);
-//				console.log(reb64);
-//				var bytes = reb64.toString(CryptoJS.enc.Base64);
-//				console.log(bytes);
-//				var decrypt = CryptoJS.AES.decrypt(bytes, password);
-//				console.log(decrypt);
-//				var plain = decrypt.toString(CryptoJS.enc.Utf8);
-//				console.log(plain);
-//				callback(plain);
-//			} catch (err) {
-//				callback(undefined, err);
-//			}
-
-//			
-//			
-//			CryptoJS.AES.decrypt(str, password).toString(CryptoJS.enc.Utf8)
-//			
-//			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.toWif(), password, function(resp) {
 				if (resp.message) callback(undefined, resp);	// TODO: confirm error handling, isError()
 				else {
 					let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
-					key.setState(key.getPlugin().parse(wif).getState());
+					key.setState(key.getPlugin().newKey(wif).getState());
 					callback(key);
 				}
 			});
@@ -684,57 +660,6 @@ function decrypt(key, password, callback) {
 			callback(undefined, new Error("Encryption scheme '" + scheme + "' not supported"));
 	}
 }
-
-///**
-// * Encrypts the given string with the given password.
-// * 
-// * @param scheme is the encryption scheme to use
-// * @param str is the string to encrypt
-// * @param password is the password to encrypt the string
-// * @param callback is called with the encrypted string or Error
-// */
-//function encrypt(scheme, str, password, callback) {
-//	if (!str) throw new Error("String to encrypt must not be empty");
-//	if (!password) throw new Error("Password must not be empty");
-//	switch (scheme) {
-//		case EncryptionScheme.CRYPTOJS:
-//			callback(CryptoJS.AES.encrypt(str, password).toString());
-//			break;
-//		case EncryptionScheme.BIP38:
-//			ninja.privateKey.BIP38CryptoKeyToEncryptedKeyAsync(str, password, true, callback);	// TODO: confirm callback called with Error or interpret
-//			break;
-//		default:
-//			throw new Error(scheme + " encryption not implemented");
-//	}
-//}
-//
-///**
-// * Decrypts the given string with the given password.
-// * 
-// * TODO: move this into plugin? probably.
-// * 
-// * @param scheme is the encryption scheme to use
-// * @param str is the string to decrypt
-// * @param password is the password to decrypt the string
-// * @param callback is called with the decrypted string or Error
-// */
-//function decrypt(scheme, str, password, callback) {
-//	if (!str) throw new Error("String to decrypt must not be empty");
-//	if (!password) throw new Error("Password must not be empty");
-//	switch(scheme) {
-//		case EncryptionScheme.CRYPTOJS:
-//			callback(CryptoJS.AES.decrypt(str, password).toString(CryptoJS.enc.Utf8));
-//			break;
-//		case EncryptionScheme.BIP38:
-//			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(str, password, function (btcKeyOrError) {
-//				if (btcKeyOrError.message) callback(btcKeyOrError);
-//				else callback(new Bitcoin.ECKey(btcKeyOrError).setCompressed(true).getBitcoinWalletImportFormat());
-//			});
-//			break;
-//		default:
-//			throw new Error(scheme + " decryption not implemented");
-//	}
-//}
 
 /**
  * Splits the given string.  First converts the string to hex.

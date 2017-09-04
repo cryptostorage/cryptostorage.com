@@ -159,7 +159,7 @@ function testCryptoKey(plugin, callback) {
 	
 	// parse undefined
 	try {
-		plugin.parse(undefined);
+		plugin.newKey(undefined);
 		fail("Should have thrown an error");
 	} catch (error) { }
 	

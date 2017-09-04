@@ -32,7 +32,7 @@ function CryptoKey(plugin, state) {
 	}
 	
 	this.setPrivateKey = function(str) {
-		this.setState(this.plugin.parse(str).getState());
+		this.setState(this.plugin.newKey(str).getState());
 	}
 	
 	this.toAddress = function() {
