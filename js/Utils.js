@@ -608,27 +608,9 @@ function encrypt(scheme, key, password, callback) {
 	if (!password) throw new Error("Password must be initialized");
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
-			var b64 = CryptoJS.AES.encrypt(key.toHex(), password).toString();
-		    var e64 = CryptoJS.enc.Base64.parse(b64);
-		    var hex = e64.toString(CryptoJS.enc.Hex);
-			key.setState(Object.assign(key.getPlugin().parse(hex).getState(), {address: key.toAddress()}));
+			let b64 = CryptoJS.AES.encrypt(key.toHex(), password).toString();
+			key.setState(Object.assign(key.getPlugin().parse(b64).getState(), {address: key.toAddress()}));
 			callback(key);
-		    
-		    
-		    
-		    
-		    
-		    
-//		    console.log("------");
-//		    console.log(eHex);
-//		    console.log(Crypto.util.hexToBytes(eHex));
-//		    console.log(Bitcoin.Base58.encode(Crypto.util.hexToBytes(eHex)));
-//		    callback(Bitcoin.Base58.encode(Crypto.util.hexToBytes(eHex)));
-//		    //callback(eHex);
-//			
-//			
-//			
-//			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.toHex(), password, true, function(resp) {
@@ -640,7 +622,7 @@ function encrypt(scheme, key, password, callback) {
 			});
 			break;
 		default:
-			callback(new Error("Encryption scheme '" + scheme + "' not supported"));
+			callback(undefined, new Error("Encryption scheme '" + scheme + "' not supported"));
 	}
 }
 
@@ -654,17 +636,28 @@ function decrypt(key, password, callback) {
 	if (!password) throw new Error("Password must be initialized");
 	switch (key.getEncryptionScheme()) {
 		case EncryptionScheme.CRYPTOJS:
-			
-			
-			
-			var reb64 = CryptoJS.enc.Hex.parse(str);
-			var bytes = reb64.toString(CryptoJS.enc.Base64);
-			console.log("Decrypt bytes: " + bytes);
-			var decrypt = CryptoJS.AES.decrypt(bytes, password);
-			var plain = decrypt.toString(CryptoJS.enc.Utf8);
-			callback(plain);
-			
-			throw new Error("Not implemented");
+			throw new Error("Not implemented fool");
+//			try {
+//				let decrypted = CryptoJS.AES.decrypt(key.toHex(), password);
+//				console.log(decrypted);
+//				var reb64 = CryptoJS.enc.Hex.parse(str);
+//				console.log(reb64);
+//				var bytes = reb64.toString(CryptoJS.enc.Base64);
+//				console.log(bytes);
+//				var decrypt = CryptoJS.AES.decrypt(bytes, password);
+//				console.log(decrypt);
+//				var plain = decrypt.toString(CryptoJS.enc.Utf8);
+//				console.log(plain);
+//				callback(plain);
+//			} catch (err) {
+//				callback(undefined, err);
+//			}
+
+//			
+//			
+//			CryptoJS.AES.decrypt(str, password).toString(CryptoJS.enc.Utf8)
+//			
+//			throw new Error("Not implemented");
 			break;
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.toWif(), password, function(resp) {
@@ -677,7 +670,7 @@ function decrypt(key, password, callback) {
 			});
 			break;
 		default:
-			callback(new Error("Encryption scheme '" + scheme + "' not supported"));
+			callback(undefined, new Error("Encryption scheme '" + scheme + "' not supported"));
 	}
 }
 

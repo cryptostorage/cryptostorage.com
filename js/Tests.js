@@ -3,6 +3,7 @@ const REPEAT_SHORT = 2;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
 const PASSWORD = "MySuperSecretPasswordAbcTesting123";
+var counter = 0;
 
 function runTests(callback) {
 	console.log("Running tests");
@@ -162,22 +163,27 @@ function testCryptoKey(plugin, callback) {
 		fail("Should have thrown an error");
 	} catch (error) { }
 	
-	// test encryption for each scheme
+	// test each encryption scheme
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
-	for (let scheme of plugin.getEncryptionSchemes()) {
+	let funcs = [];
+	for (let scheme of plugin.getEncryptionSchemes()) funcs.push(function(callback) { testEncryptionScheme(plugin, scheme, callback); });
+	async.series(funcs, callback);
+	
+	// test one encryption scheme
+	function testEncryptionScheme(plugin, scheme, callback) {
 		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
 		let funcs = [];
 		for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin, scheme, PASSWORD, PASSWORD, callback); });
-		funcs.push(function(callback) { testEncryption(plugin, scheme, PASSWORD, "invalidPassword123", callback); });	// test wrong passwrod
-		async.parallel(funcs, callback);
+		funcs.push(function(callback) { testEncryption(plugin, scheme, PASSWORD, "invalidPassword123", callback); });	// test wrong password
+		async.series(funcs, callback);
 	}
 	
 	// test encryption of one key
 	function testEncryption(plugin, scheme, encryptionPassword, decryptionPassword, callback) {
 		let key = plugin.newKey();
 		let original = key.copy();
-		key.encrypt(scheme, encryptionPassword, function(encryptedKey, error) {
-			if (error) callback(error);
+		key.encrypt(scheme, encryptionPassword, function(encryptedKey, err) {
+			if (err) callback(err);
 			else {
 				
 				// test basic initialization
@@ -210,12 +216,12 @@ function testCryptoKey(plugin, callback) {
 	
 	// test decryption of one key
 	function testDecryption(key, encryptionPassword, decryptionPassword, expected, callback) {
-		key.decrypt(decryptionPassword, function(decryptedKey, error) {
+		key.decrypt(decryptionPassword, function(decryptedKey, err) {
 			if (encryptionPassword !== decryptionPassword) {
-				if (!error) throw new Error("Decryption with wrong password should throw an error");
-				callback();
+				if (!err) callback(new Error("Decryption with wrong password should throw an error"));
+				else callback();
 			} else {
-				if (error) callback(error);
+				if (err) callback(err);
 				else {
 					
 					// test basic initialization
