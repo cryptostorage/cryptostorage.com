@@ -2,7 +2,7 @@ var plugins;
 function getCryptoPlugins() {
 	if (!plugins) {
 		plugins = [];
-//		plugins.push(new BitcoinPlugin());
+		plugins.push(new BitcoinPlugin());
 //		plugins.push(new EthereumPlugin());
 		plugins.push(new MoneroPlugin());
 //		plugins.push(new LitecoinPlugin());
@@ -170,21 +170,27 @@ function MoneroPlugin() {
 		assertTrue(isString(str), "Argument to parse must be a string");
 		let state = {};
 		
-		// unencrypted private key
-		if (ninja.privateKey.isPrivateKey(str)) {
-			let key = new Bitcoin.ECKey(str);
-			key.setCompressed(true);
-			state.hex = key.getBitcoinHexFormat();
-			state.wif = key.getBitcoinWalletImportFormat();
-			state.address = key.getBitcoinAddress();
-			state.encryption = null;
-		}
-		
-		// wif bip38
-		else if (ninja.privateKey.isBIP38Format(str)) {
-			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
-			state.wif = str;
-			state.encryption = EncryptionScheme.BIP38;
+		// handle hex
+		if (isHex(str)) {
+			
+			// unencrypted
+			if (str.length >= 63 && str.length <= 65) {
+				let address = cnUtil.create_address(str);
+				if (!cnUtil.valid_keys(address.view.pub, address.view.sec, address.spend.pub, address.spend.sec)) {
+					throw new Error("Invalid address keys derived from hex key");
+				}
+				state.hex = str;
+				state.wif = mn_encode(state.hex, 'english');
+				state.address = address.public_addr;
+				state.encryption = null;
+			}
+			
+			// hex cryptojs
+			else if (str.length > 100) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				state.encryption = EncryptionScheme.CRYPTOJS;
+			}
 		}
 		
 		// wif cryptojs
@@ -194,22 +200,12 @@ function MoneroPlugin() {
 			state.encryption = EncryptionScheme.CRYPTOJS;
 		}
 		
-		// encrypted hex
-		else if (isHex(str)) {
-			
-			// bip38
-			if (str.length > 80 && str.length < 90) {
-				state.hex = str;
-				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
-				state.encryption = EncryptionScheme.BIP38;
-			}
-			
-			// cryptojs
-			else if (str.length > 100) {
-				state.hex = str;
-				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				state.encryption = EncryptionScheme.CRYPTOJS;
-			}
+		// wif unencrypted
+		else if (str.indexOf(' ') !== -1) {
+			state.hex = mn_decode(str);
+			state.wif = str;
+			state.address = cnUtil.create_address(state.hex).public_addr;
+			state.encryption = null;
 		}
 		
 		// otherwise key is not recognized

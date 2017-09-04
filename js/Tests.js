@@ -1,4 +1,4 @@
-const REPEAT_LONG = 25;
+const REPEAT_LONG = 50;
 const REPEAT_SHORT = 2;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
