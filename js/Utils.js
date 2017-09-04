@@ -598,7 +598,7 @@ const EncryptionScheme = {
 }
 
 /**
- * Encrypts the given crypto key with the given scheme and password.
+ * Encrypts the given key with the given scheme and password.
  * 
  * Invokes callback(encryptedKey, error) when done.
  */
@@ -627,7 +627,7 @@ function encrypt(scheme, key, password, callback) {
 }
 
 /**
- * Decrypts the given crypto key with the given password.
+ * Decrypts the given key with the given password.
  * 
  * Invokes callback(decryptedKey, error) when done.
  */
