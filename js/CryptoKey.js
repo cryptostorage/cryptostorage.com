@@ -10,8 +10,9 @@ function CryptoKey(plugin, state) {
 		return new CryptoKey(this.plugin, this.state);
 	}
 	
-	this.equals = function(cryptoKey) {
-		return mapsEqual(this.getState(), cryptoKey.getState());
+	this.equals = function(key) {
+		if (!isObject(plugin, 'CryptoPlugin')) throw new Error("Given argument must be a CryptoKey");
+		return mapsEqual(this.getState(), key.getState());
 	}
 	
 	this.getPlugin = function() {
