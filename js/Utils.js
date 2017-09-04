@@ -636,7 +636,13 @@ function decrypt(key, password, callback) {
 	if (!password) throw new Error("Password must be initialized");
 	switch (key.getEncryptionScheme()) {
 		case EncryptionScheme.CRYPTOJS:
-			throw new Error("Not implemented fool");
+			let hex = CryptoJS.AES.decrypt(key.toWif(), password).toString(CryptoJS.enc.Utf8);
+			key.setState(key.getPlugin().parse(hex).getState());
+			callback(key);
+			
+			
+//			throw new Error("Not implemented fool");
+//			CryptoJS.enc.Hex.parse(key.toHex()).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 //			try {
 //				let decrypted = CryptoJS.AES.decrypt(key.toHex(), password);
 //				console.log(decrypted);

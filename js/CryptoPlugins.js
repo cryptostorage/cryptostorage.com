@@ -122,9 +122,8 @@ function BitcoinPlugin() {
 			
 			// cryptojs
 			else if (str.length > 100) {
-				console.log(CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8));
 				state.hex = str;
-				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64);
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 				state.encryption = EncryptionScheme.CRYPTOJS;
 			}
 		}
