@@ -98,7 +98,7 @@ function BitcoinPlugin() {
 		
 		// wif bip38
 		else if (ninja.privateKey.isBIP38Format(str)) {
-			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str)) + "abc";
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.encryption = EncryptionScheme.BIP38;
 		}

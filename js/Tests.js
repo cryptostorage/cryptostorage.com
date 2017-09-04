@@ -219,7 +219,6 @@ function testCryptoKey(plugin, callback) {
 				assertInitialized(key.toWif());
 				assertInitialized(key.toAddress());
 				assertNull(key.getEncryptionScheme());
-				assertUndefined(key.getEncryptionScheme());
 				
 				// test copy
 				assertTrue(key.equals(expected));
@@ -234,6 +233,7 @@ function testCryptoKey(plugin, callback) {
 				assertEquals(key.toHex(), parsed.toHex());
 				assertEquals(key.toWif(), parsed.toWif());
 				assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
+				callback();
 			}
 		});
 	}
