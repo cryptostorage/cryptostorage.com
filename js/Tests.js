@@ -6,17 +6,11 @@ const PASSWORD = "MySuperSecretPasswordAbcTesting123";
 var counter = 0;
 
 function runTests(callback) {
-	console.log("Running tests");
 	testUtils();
 	testPathTracker();
 	testCryptoKeys(function(error) {
 		if (callback) callback(error);
 	});
-	
-//	testWalletsWithEncryption(function() {
-//		console.log("All tests passed");
-//		if (callback) callback();
-//	});
 }
 
 function testUtils() {
@@ -249,162 +243,6 @@ function testCryptoKey(plugin, callback) {
 				}
 			}
 		});
-	}
-}
-
-function testWallets() {
-	for (let plugin of getCurrencyPlugins()) {
-		testWallet(plugin);
-	}
-}
-
-function testWallet(plugin) {
-	console.log("testWallet(" + plugin.getName() + ")");
-	
-	// basic tests
-	let wallet = plugin.newWallet();
-	assertEquals(plugin, wallet.getCurrencyPlugin());
-	assertInitialized(wallet.getCryptoKey());
-	assertInitialized(wallet.getAddress());
-	assertFalse(wallet.isEncrypted());
-	assertUndefined(wallet.getEncryptionScheme());
-	let copy = wallet.copy();
-	assertTrue(wallet.equals(copy));
-	assertTrue(copy.equals(wallet));
-	let oldCryptoKey = wallet.getCryptoKey();
-	let oldAddress = wallet.getAddress();
-	wallet.random();
-	assertNotEquals(oldCryptoKey, wallet.getCryptoKey());
-	assertNotEquals(oldAddress, wallet.getAddress());
-	assertTrue(plugin.isUnencryptedCryptoKeyWif(wallet.getUnencryptedCryptoKeyWif()));
-	wallet.setCryptoKey(oldCryptoKey);
-	assertEquals(oldCryptoKey, wallet.getCryptoKey());
-	assertEquals(oldAddress, wallet.getAddress());
-	
-	// test splitting
-	assertFalse(wallet.isSplit());
-	assertUndefined(wallet.getCryptoKeyPieces());
-	wallet.split(NUM_PIECES, MIN_PIECES);
-	assertTrue(wallet.isSplit());
-	assertUndefined(wallet.isEncrypted());
-	assertUndefined(wallet.getEncryptionScheme());
-	assertUndefined(wallet.getCryptoKey());
-	assertUndefined(wallet.getUnencryptedCryptoKeyWif());
-	let pieces = wallet.getCryptoKeyPieces();
-	assertEquals(NUM_PIECES, pieces.length);
-	let walletSplit = new Wallet(plugin, {privateKeyPieces: pieces, address: wallet.getAddress()});
-	assertTrue(walletSplit.isSplit());
-	assertTrue(wallet.equals(walletSplit));
-	walletSplit.reconstitute();
-	wallet.reconstitute();
-	assertTrue(wallet.equals(walletSplit));
-	
-	// test wif
-	let walletWif = new Wallet(plugin, {privateKey: wallet.getUnencryptedCryptoKeyWif()});
-	assertEquals(wallet, walletWif);
-	
-	// test without plugin
-	try {
-		new Wallet({privateKey: "abc"});
-		fail("Must provide currency plugin");
-	} catch (err) {
-		assertEquals("Must provide currency plugin", err.message);
-	}
-}
-
-function testWalletsWithEncryption(callback) {
-	
-	// collect callback functions
-	let funcs = [];
-	for (let plugin of getCurrencyPlugins()) {
-		funcs.push(getCallbackFunctionTestWalletWithEncryption(plugin));
-	}
-	
-	// execute callback functions in sequence
-	executeInSeries(funcs, callback);
-	
-	function getCallbackFunctionTestWalletWithEncryption(plugin) {
-		return function(callback) { testWalletWithEncryption(plugin, callback); }
-	}
-}
-
-function testWalletWithEncryption(plugin, callback) {
-	console.log("Testing " + plugin.getTickerSymbol());
-
-	// test each scheme in sequence
-	let funcs = [];
-	for (let scheme of plugin.getEncryptionSchemes()) {
-		funcs.push(getCallbackFunctionTestScheme(plugin, scheme));
-	}
-	executeInSeries(funcs, callback);
-	
-	// callback function to test a single scheme
-	function getCallbackFunctionTestScheme(plugin, scheme) {
-		return function(callback) {
-			
-			// determine maximum number of times to encrypt since bip38 is slow
-			let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;
-			
-			// collect wallets and functions for encryption
-			let funcs = [];
-			let originalWallets = [];
-			for (let i = 0; i < max; i++) {
-				let wallet = plugin.newWallet();
-				originalWallets.push(wallet);
-				funcs.push(getCallbackFunctionEncryptWallet(scheme, wallet.copy(), PASSWORD));
-			}
-			let wallet = plugin.newWallet({privateKey: plugin.newKey()});
-			originalWallets.push(wallet);
-			funcs.push(getCallbackFunctionEncryptWallet(scheme, wallet.copy(), PASSWORD));
-			
-			// test each wallet
-			for (let wallet of originalWallets) {
-				assertInitialized(wallet);
-				assertEquals(plugin, wallet.getCurrencyPlugin());
-				assertInitialized(wallet.getCryptoKey());
-				assertInitialized(wallet.getAddress());
-				assertFalse(wallet.isSplit());
-				assertFalse(wallet.isEncrypted());
-				assertUndefined(wallet.getEncryptionScheme());
-				assertUndefined(wallet.getCryptoKeyPieces());
-				assertEquals(plugin.getAddress(wallet.getCryptoKey()), wallet.getAddress());
-				testSplitWallet(wallet, NUM_PIECES, MIN_PIECES);
-			}
-			
-			// encrypt wallets
-			executeInSeries(funcs, function(encryptedWallets) {
-				
-				// test encrypted split
-				for (let encryptedWallet of encryptedWallets) {
-					if (encryptedWallet.constructor.name === 'Error') throw encryptedWallet;
-					testSplitWallet(encryptedWallet, NUM_PIECES, MIN_PIECES);
-				}
-				
-				// collect callback functions to decrypt
-				funcs = [];
-				for (let i = 0; i < encryptedWallets.length; i++) {
-					funcs.push(getCallbackFunctionDecryptWallet(encryptedWallets[i], PASSWORD));
-				}
-				
-				// decrypt decrypt wallets
-				executeInSeries(funcs, function(decryptedWallets) {
-					assertTrue(decryptedWallets.length > 0);
-					assertEquals(originalWallets.length, decryptedWallets.length);
-					for (let i = 0; i < originalWallets.length; i++) {
-						assertTrue(originalWallets[i].equals(decryptedWallets[i]));
-					}
-					callback();
-				});
-			});
-			
-			function getCallbackFunctionEncryptWallet(scheme, wallet, password) {
-				return function(callback) { wallet.encrypt(scheme, password, callback); }
-			}
-			
-			function getCallbackFunctionDecryptWallet(wallet, password) {
-				return function(callback) { wallet.decrypt(password, callback); }
-			}
-		}
 	}
 }
 
