@@ -553,8 +553,8 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 				
 				// split wallets
 				if (state.splitEnabled) {
-					for (let wallet of processedWallets) {
-						wallet.split(state.numPieces, state.minPieces);
+					for (let key of keys) {
+						key.split(state.numPieces, state.minPieces);
 					}
 				}
 				
