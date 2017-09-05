@@ -242,7 +242,6 @@ function assertNumber(arg, msg) {
  */
 function assertObject(arg, name, msg) {
 	if (!isObject(arg, name)) {
-		console.log(arg);
 		throw new Error(msg ? msg : "Argument asserted as object with name '" + name + "' but was not");
 	}
 }
@@ -820,9 +819,13 @@ function piecesToKeys(pieces) {
 	// handle one piece
 	if (pieces.length === 1) {
 		for (let pieceKey of pieces[0]) {
-			let key = getCryptoPlugin(pieceKey.crypto).newKey(pieceKey.privateKey);
-			if (key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);
-			keys.push(key);
+			try {
+				let key = getCryptoPlugin(pieceKey.crypto).newKey(pieceKey.privateKey);
+				if (key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);
+				keys.push(key);
+			} catch (err) {
+				return [];
+			}
 		}
 	}
 	
@@ -858,9 +861,13 @@ function piecesToKeys(pieces) {
 		for (let i = 0; i < pieces[0].length; i++) {
 			let shares = [];
 			for (let piece of pieces) shares.push(piece[i].privateKey);
-			let key = getCryptoPlugin(pieces[0][i].crypto).combine(shares);
-			if (key.isEncrypted() && pieces[0][i].address) key.setAddress(pieces[0][i].address);
-			keys.push(key);
+			try {
+				let key = getCryptoPlugin(pieces[0][i].crypto).combine(shares);
+				if (key.isEncrypted() && pieces[0][i].address) key.setAddress(pieces[0][i].address);
+				keys.push(key);
+			} catch (err) {
+				return [];
+			}
 		}
 	}
 

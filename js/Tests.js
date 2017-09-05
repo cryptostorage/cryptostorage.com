@@ -6,11 +6,25 @@ const PASSWORD = "MySuperSecretPasswordAbcTesting123";
 var counter = 0;
 
 function runTests(callback) {
+	testInvalidMonero();
 	testUtils();
 	testPathTracker();
 	testCryptoKeys(function(error) {
 		if (callback) callback(error);
 	});
+}
+
+function testInvalidMonero() {	
+	let shares = [];
+	shares.push("56RJiZacTZheVgAA2z2qosgnfm9LVdoXqV85JM5VV2RcaCJrDXSrWZWtQqAZihNf8xDG3iEHGy696Cs2r6LtMVkj9mSjBQeFAScYWWmtmuJKSwPkSuLzupuqWTE7ear2Gkoni2y");
+	shares.push("56kU7nRVmxuu36sspUdhLF52rT3MqLhWo9R53ZDpqYHQtxW68rBZcgf6S6sDX49LMZ7AN9F4GSHRig1W9JApEGbeo6XfDTmtcoaPgNUt6RZcHb3NURK8ArJCkGjznmSoderbSMY");
+	try {
+		let key = getCryptoPlugin("XMR").combine(shares);
+		fail("fail");
+	} catch (err) {
+		if (err.message === "fail") throw new Error("Should not be able to create key from too few shares");
+	}
+
 }
 
 function testUtils() {
