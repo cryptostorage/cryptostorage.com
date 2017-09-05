@@ -1,4 +1,5 @@
 // TODO
+// test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
 // change terminology from wallets to keys
 // verify final pieces
 // review private keys (hex, base58, etc)

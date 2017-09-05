@@ -3,10 +3,10 @@ function getCryptoPlugins() {
 	if (!plugins) {
 		plugins = [];
 		plugins.push(new BitcoinPlugin());
-//		plugins.push(new EthereumPlugin());
+		plugins.push(new BitcoinCashPlugin());
+		plugins.push(new EthereumPlugin());
 		plugins.push(new MoneroPlugin());
 //		plugins.push(new LitecoinPlugin());
-//		plugins.push(new BitcoinCashPlugin());
 //		plugins.push(new EthereumClassicPlugin());
 	}
 	return plugins;
@@ -242,3 +242,63 @@ function MoneroPlugin() {
 	}
 }
 inheritsFrom(MoneroPlugin, CryptoPlugin);
+
+/**
+ * Ethereum plugin.
+ */
+function EthereumPlugin() {
+	this.getName = function() { return "Ethereum"; }
+	this.getTickerSymbol = function() { return "ETH" };
+	this.getLogo = function() { return $("<img src='img/ethereum.png'>"); }
+	this.newKey = function(str) {
+		
+		// create new key
+		// TODO: shortcut, just make str = state.hex, then goes to below flow
+		if (!str) {
+			let state = {};
+			state.hex = keythereum.create().privateKey.toString("hex");
+			state.wif = state.hex;	// TODO: different wif?
+			state.address = keythereum.privateKeyToAddress(state.hex)
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// parse key
+		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		let state = {};
+		
+		// handle hex
+		if (isHex(str)) {
+			
+			// unencrypted
+			if (str.length >= 63 && str.length <= 65) {
+				state.hex = str;
+				state.wif = str;	// TODO: different wif?
+				state.address = keythereum.privateKeyToAddress(state.hex);
+				state.encryption = null;
+			}
+			
+			// hex cryptojs
+			else if (str.length > 100) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				state.encryption = EncryptionScheme.CRYPTOJS;
+			}
+		}
+		
+		// wif cryptojs
+		else if (str[0] === 'U') {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = EncryptionScheme.CRYPTOJS;
+		}
+		
+		// otherwise key is not recognized
+		else throw new Error("Unrecognized private key: " + str);
+		
+		// return key
+		return new CryptoKey(this, state);
+	}
+}
+inheritsFrom(EthereumPlugin, CryptoPlugin);
+
