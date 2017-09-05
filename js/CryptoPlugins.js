@@ -66,16 +66,7 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	assertTrue(isObject(key, 'CryptoKey'));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
-	console.log(key.getHex());
-	let pieces = secrets.share(key.getHex(), numPieces, minPieces);
-	for (let piece of pieces) console.log(piece);
-	//console.log(pieces);
-	for (let i = 0; i < pieces.length; i++) {
-		pieces[i] = Bitcoin.Base58.encode(Crypto.util.hexToBytes(pieces[i]));
-	}
-	for (let piece of pieces) console.log(piece);
-	//console.log(pieces);
-	return pieces;
+	return secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
 }
 
 /**
@@ -85,13 +76,7 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
  * @return CryptoKey is the key built from combining the pieces
  */
 CryptoPlugin.prototype.combine = function(pieces) {
-	let hexPieces = [];
-	for (let piece of pieces) {
-		hexPieces.push(Crypto.util.bytesToHex(Bitcoin.Base58.decode(piece)));
-	}
-	for (let piece of hexPieces) console.log(piece);
-	console.log(secrets.combine(hexPieces));
-	return this.newKey(secrets.combine(hexPieces));
+	return this.newKey(secrets.combine(pieces.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
 }
 
 /**
