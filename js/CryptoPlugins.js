@@ -2,12 +2,12 @@ var plugins;
 function getCryptoPlugins() {
 	if (!plugins) {
 		plugins = [];
-		plugins.push(new BitcoinPlugin());
-		plugins.push(new BitcoinCashPlugin());
-		plugins.push(new EthereumPlugin());
-		plugins.push(new EthereumClassicPlugin());
-//		plugins.push(new LitecoinPlugin());
-		plugins.push(new MoneroPlugin());
+//		plugins.push(new BitcoinPlugin());
+//		plugins.push(new BitcoinCashPlugin());
+//		plugins.push(new EthereumPlugin());
+//		plugins.push(new EthereumClassicPlugin());
+		plugins.push(new LitecoinPlugin());
+//		plugins.push(new MoneroPlugin());
 	}
 	return plugins;
 }
@@ -95,19 +95,8 @@ function BitcoinPlugin() {
 	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38, EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function(str) {
 		
-		// create new key
-		if (!str) {
-			let key = new Bitcoin.ECKey();
-			key.setCompressed(true);
-			let state = {}
-			state.hex = key.getBitcoinHexFormat();
-			state.wif = key.getBitcoinWalletImportFormat();
-			state.address = key.getBitcoinAddress();
-			state.encryption = null;
-			return new CryptoKey(this, state);
-		}
-		
-		// parse key
+		// create key if not given
+		if (!str) str = new Bitcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		let state = {};
 		
@@ -174,6 +163,114 @@ function BitcoinCashPlugin() {
 inheritsFrom(BitcoinCashPlugin, BitcoinPlugin);
 
 /**
+ * Ethereum plugin.
+ */
+function EthereumPlugin() {
+	this.getName = function() { return "Ethereum"; }
+	this.getTickerSymbol = function() { return "ETH" };
+	this.getLogo = function() { return $("<img src='img/ethereum.png'>"); }
+	this.newKey = function(str) {
+		
+		// create key if not given
+		if (!str) str = keythereum.create().privateKey.toString("hex");
+		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		let state = {};
+		
+		// handle hex
+		if (isHex(str)) {
+			
+			// unencrypted
+			if (str.length >= 63 && str.length <= 65) {
+				state.hex = str;
+				state.wif = str;	// TODO: different wif?
+				state.address = keythereum.privateKeyToAddress(state.hex);
+				state.encryption = null;
+			}
+			
+			// hex cryptojs
+			else if (str.length > 100) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				state.encryption = EncryptionScheme.CRYPTOJS;
+			}
+		}
+		
+		// wif cryptojs
+		else if (str[0] === 'U') {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = EncryptionScheme.CRYPTOJS;
+		}
+		
+		// otherwise key is not recognized
+		else throw new Error("Unrecognized private key: " + str);
+		
+		// return key
+		return new CryptoKey(this, state);
+	}
+}
+inheritsFrom(EthereumPlugin, CryptoPlugin);
+
+/**
+ * Ethereum classic plugin.
+ */
+function EthereumClassicPlugin() {
+	EthereumPlugin.call(this);
+	this.getName = function() { return "Ethereum Classic"; }
+	this.getTickerSymbol = function() { return "ETC" };
+	this.getLogo = function() { return $("<img src='img/ethereum_classic.png'>"); }
+}
+inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
+
+/**
+ * Litecoin plugin.
+ */
+function LitecoinPlugin() {
+	this.getName = function() { return "Litecoin"; }
+	this.getTickerSymbol = function() { return "LTC" };
+	this.getLogo = function() { return $("<img src='img/litecoin.png'>"); }
+	this.newKey = function(str) {
+		
+		// create key if not given
+		if (!str) str = new litecore.PrivateKey().toString()
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		let state = {};
+		
+		// handle hex
+		if (isHex(str)) {
+			
+			// unencrypted
+			if (litecore.PrivateKey.isValid(str)) {
+				state.hex = str;
+				state.wif = str;	// TODO: wif different?
+				state.address =  new litecore.PrivateKey(str).getAddress().toString();
+				state.encryption = null;
+			}
+			
+			// hex cryptojs
+			else if (str.length > 100) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				state.encryption = EncryptionScheme.CRYPTOJS;
+			}
+		}
+		
+		// wif cryptojs
+		else if (str[0] === 'U') {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = EncryptionScheme.CRYPTOJS;
+		}
+		
+		// otherwise key is not recognized
+		else throw new Error("Unrecognized private key: " + str);
+		
+		// return key
+		return new CryptoKey(this, state);
+	}
+}
+
+/**
  * Monero plugin.
  */
 function MoneroPlugin() {
@@ -182,17 +279,8 @@ function MoneroPlugin() {
 	this.getLogo = function() { return $("<img src='img/monero.png'>"); }
 	this.newKey = function(str) {
 		
-		// create new key
-		if (!str) {
-			let state = {};
-			state.hex = cnUtil.sc_reduce32(cnUtil.rand_32());
-			state.wif = mn_encode(state.hex, 'english');
-			state.address = cnUtil.create_address(state.hex).public_addr;
-			state.encryption = null;
-			return new CryptoKey(this, state);
-		}
-		
-		// parse key
+		// create key if not given
+		if (!str) str = cnUtil.sc_reduce32(cnUtil.rand_32());
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		let state = {};
 		
@@ -242,73 +330,3 @@ function MoneroPlugin() {
 	}
 }
 inheritsFrom(MoneroPlugin, CryptoPlugin);
-
-/**
- * Ethereum plugin.
- */
-function EthereumPlugin() {
-	this.getName = function() { return "Ethereum"; }
-	this.getTickerSymbol = function() { return "ETH" };
-	this.getLogo = function() { return $("<img src='img/ethereum.png'>"); }
-	this.newKey = function(str) {
-		
-		// create new key
-		// TODO: shortcut, just make str = state.hex, then goes to below flow
-		if (!str) {
-			let state = {};
-			state.hex = keythereum.create().privateKey.toString("hex");
-			state.wif = state.hex;	// TODO: different wif?
-			state.address = keythereum.privateKeyToAddress(state.hex)
-			state.encryption = null;
-			return new CryptoKey(this, state);
-		}
-		
-		// parse key
-		assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		let state = {};
-		
-		// handle hex
-		if (isHex(str)) {
-			
-			// unencrypted
-			if (str.length >= 63 && str.length <= 65) {
-				state.hex = str;
-				state.wif = str;	// TODO: different wif?
-				state.address = keythereum.privateKeyToAddress(state.hex);
-				state.encryption = null;
-			}
-			
-			// hex cryptojs
-			else if (str.length > 100) {
-				state.hex = str;
-				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				state.encryption = EncryptionScheme.CRYPTOJS;
-			}
-		}
-		
-		// wif cryptojs
-		else if (str[0] === 'U') {
-			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-			state.wif = str;
-			state.encryption = EncryptionScheme.CRYPTOJS;
-		}
-		
-		// otherwise key is not recognized
-		else throw new Error("Unrecognized private key: " + str);
-		
-		// return key
-		return new CryptoKey(this, state);
-	}
-}
-inheritsFrom(EthereumPlugin, CryptoPlugin);
-
-/**
- * Ethereum classic plugin.
- */
-function EthereumClassicPlugin() {
-	EthereumPlugin.call(this);
-	this.getName = function() { return "Ethereum Classic"; }
-	this.getTickerSymbol = function() { return "ETC" };
-	this.getLogo = function() { return $("<img src='img/ethereum_classic.png'>"); }
-}
-inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
