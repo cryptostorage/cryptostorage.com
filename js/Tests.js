@@ -123,6 +123,7 @@ function testCryptoKey(plugin, callback) {
 	assertInitialized(plugin.getLogo());
 	
 	// test unencrypted keys
+	let keys = [];
 	for (let i = 0; i < REPEAT_LONG; i++) {
 		
 		// create new key
@@ -142,9 +143,16 @@ function testCryptoKey(plugin, callback) {
 		key2 = new CryptoKey(plugin, key.getWif());
 		assertTrue(key.equals(key2));
 		
-		// test splitting
-		testSplit(key, NUM_PIECES, MIN_PIECES);
+		keys.push(key);
+		
+//		// test splitting
+//		testSplit(key, NUM_PIECES, MIN_PIECES);
 	}
+	
+	// test keys to pieces
+	// TODO: test keys to pieces with encryption.  probably modify test to encrypt all keys, then decrypt all keys
+	testKeysToPieces(keys);
+	testKeysToPieces(keys, NUM_PIECES, MIN_PIECES);
 	
 	// test invalid private keys
 	let invalids = [null, "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress()];
@@ -206,8 +214,12 @@ function testEncryption(key, scheme, encryptionPassword, decryptionPassword, cal
 			assertEquals(key.getWif(), parsed.getWif());
 			assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
 			
-			// test splitting
-			testSplit(key, NUM_PIECES, MIN_PIECES);
+			// test keys to pieces
+			testKeysToPieces([key]);
+			testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
+			
+//			// test splitting
+//			testSplit(key, NUM_PIECES, MIN_PIECES);
 			
 			// test decryption
 			testDecryption(key, encryptionPassword, decryptionPassword, original, callback);
@@ -265,5 +277,15 @@ function testSplit(key, numPieces, minPieces) {
 		assertEquals(key.getWif(), combined.getWif());
 		assertEquals(key.getEncryptionScheme(), combined.getEncryptionScheme());
 		if (!key.isEncrypted()) assertEquals(key.getAddress(), combined.getAddress());
+	}
+}
+
+function testKeysToPieces(keys, numPieces, minPieces) {
+	assertTrue(keys.length > 0);
+	let pieces = keysToPieces(keys, numPieces, minPieces);
+	let keysFromPieces = piecesToKeys(pieces);
+	assertEquals(keys.length, keysFromPieces.length);
+	for (let i = 0; i < keys.length; i++) {
+		assertTrue(keys[i].equals(keysFromPieces[i]));
 	}
 }

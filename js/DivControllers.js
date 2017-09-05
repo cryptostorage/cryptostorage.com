@@ -941,10 +941,10 @@ inheritsFrom(DecryptKeysController, DivController);
  * Render import files page.
  * 
  * @param div is the div to render to
- * @param onUnsplitWalletsImported is invoked with unsplit wallets when upload files reconstitute wallets
+ * @param onKeysImported is invoked when keys are extracted from uploaded files
  * @param onSelectImportText is invoked if the user prefers to import a private key from text
  */
-function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText) {
+function ImportFilesController(div, onKeysImported, onSelectImportText) {
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
@@ -989,8 +989,9 @@ function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText
 									setErrorMessage(err.message);
 								}
 							}
-							var unsplitWallets = getUnsplitWallets(importedPieces);
-							if (unsplitWallets.length > 0) onUnsplitWalletsImported(unsplitWallets);
+							console.log(importedPieces);
+							let keys = getUnsplitWallets(importedPieces);
+							if (keys.length > 0) onKeysImported(keys);
 						}
 					});
 				}
@@ -1004,7 +1005,7 @@ function ImportFilesController(div, onUnsplitWalletsImported, onSelectImportText
 			if (file.type === 'application/json') {
 				let piece = JSON.parse(data);
 				validatePiece(piece);
-				var namedPiece = {name: file.name, piece: piece};
+				let namedPiece = {name: file.name, piece: piece};
 				onNamedPieces([namedPiece]);
 			}
 			else if (file.type === 'application/zip') {

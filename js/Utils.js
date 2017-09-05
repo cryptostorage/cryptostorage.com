@@ -808,6 +808,16 @@ function keysToPieces(keys, numPieces, minPieces) {
 }
 
 /**
+ * Converts the given pieces to keys.
+ * 
+ * @param pieces are the pieces to convert to keys
+ * @returns keys built from the pieces
+ */
+function piecesToKeys(pieces) {
+	throw new Error("Not implemented");
+}
+
+/**
  * Zips the given pieces.
  * 
  * @param pieces are the pieces to zip
@@ -871,7 +881,7 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 }
 
 /**
- * Extracts valid pieces from a zip blob.
+ * Extracts pieces from a zip blob.
  * 
  * @param blob is the raw zip data
  * @param onPieces(namedPieces) is called when all pieces have been extracted
@@ -882,7 +892,7 @@ function zipToPieces(blob, onPieces) {
 	JSZip.loadAsync(blob).then(function(zip) {
 		
 		// collect callback functions to get pieces
-		var callbackFunctions = [];
+		let callbackFunctions = [];
 		zip.forEach(function(path, zipObject) {
 			if (path.startsWith("_")) return;
 			if (path.endsWith(".json")) {
@@ -894,7 +904,7 @@ function zipToPieces(blob, onPieces) {
 		
 		// invoke callback functions to get pieces
 		executeInSeries(callbackFunctions, function(args) {
-			var pieces = [];
+			let pieces = [];
 			for (let arg of args) {
 				if (isArray(arg)) for (let piece of arg) pieces.push(piece);
 				else pieces.push(arg);
@@ -906,11 +916,12 @@ function zipToPieces(blob, onPieces) {
 	function getPieceCallbackFunction(zipObject) {
 		return function(onPiece) {
 			zipObject.async("string").then(function(str) {
-				var piece;
+				let piece;
 				try {
 					piece = JSON.parse(str);
 					validatePiece(piece);
 				} catch (err) {
+					//throw err;
 					console.log(err);
 				}
 				onPiece({name: zipObject.name, piece: piece});
@@ -956,8 +967,11 @@ function pieceToStr(piece) {
 }
 
 function validatePiece(piece) {
-	assertDefined(piece.crypto, "piece.crypto is not defined");
-	assertDefined(piece.isSplit, "piece.isSplit is not defined");
-	assertDefined(piece.address, "piece.address is not defined");
-	assertDefined(piece.privateKey, "piece.privateKey is not defined");
+	assertTrue(piece.length > 0);
+	for (let key of piece) {
+		assertDefined(key.crypto, "piece.crypto is not defined");
+		assertDefined(key.isSplit, "piece.isSplit is not defined");
+		assertDefined(key.address, "piece.address is not defined");
+		assertDefined(key.privateKey, "piece.privateKey is not defined");
+	}
 }
