@@ -1018,7 +1018,6 @@ function validatePiece(piece) {
 	for (let key of piece) {
 		assertDefined(key.crypto, "piece.crypto is not defined");
 		assertDefined(key.isSplit, "piece.isSplit is not defined");
-		assertDefined(key.address, "piece.address is not defined");
 		assertDefined(key.privateKey, "piece.privateKey is not defined");
 	}
 }
