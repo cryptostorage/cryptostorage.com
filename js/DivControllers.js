@@ -783,10 +783,10 @@ inheritsFrom(PieceRenderer, DivController);
  * Render page to import private components from text.
  * 
  * @param div is the div to render to
- * @param plugin is the currency plugin for wallet generation
- * @param onImportUnsplitWallets(wallet) is invoked with the imported wallet
+ * @param plugin is the crypto plugin for key generation
+ * @param onKeysImported(key) is invoked with the imported key
  */
-function ImportTextController(div, state, onUnsplitWalletsImported) {
+function ImportTextController(div, state, onKeysImported) {
 	DivController.call(this, div);
 	var errorDiv = $("<div>");
 	var lastCount = 0;
@@ -818,9 +818,9 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 				if (textarea.val() === "") {
 					setErrorMessage("");
 				} else {
-					var wallet = parseWallet(state.plugin, textarea.val());
+					var key = parseKey(state.plugin, textarea.val());
 					setErrorMessage("");
-					if (wallet) onUnsplitWalletsImported([wallet]);
+					if (key) onKeysImported([key]);
 				}
 			} catch (err) {
 				console.log(err);
@@ -844,22 +844,22 @@ function ImportTextController(div, state, onUnsplitWalletsImported) {
 inheritsFrom(ImportTextController, DivController);
 
 /**
- * Render page to password decrypt wallets.
+ * Render page to password decrypt keys.
  * 
  * @param div is the div to render to
- * @param wallets are the wallet to decrypt
- * @param onWalletDecrypt(wallet) is invoked when the wallet is decrypted
+ * @param keys are the keys to decrypt
+ * @param onKeysDecrypt(keys) is invoked when the keys are decrypted
  */
-function DecryptWalletsController(div, state, onWalletsDecrypted) {
+function DecryptKeysController(div, state, onKeysDecrypted) {
 	DivController.call(this, div);
-	var wallets = state.wallets;
+	var keys = state.keys;
 	var passwordInput;	// for later focus
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		var title = "Imported " + wallets.length + " " + state.plugin.getName() + " key pairs which are password protected with " + wallets[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
+		var title = "Imported " + keys.length + " " + state.plugin.getName() + " key pairs which are password protected with " + keys[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
 		div.append(UiUtils.getPageHeader(title, state.plugin.getLogo()));
 		
 		// render error div
@@ -886,18 +886,18 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 			} else setErrorMessage("");
 			
 			var decryptFuncs = [];
-			for (let wallet of wallets) decryptFuncs.push(getDecryptCallbackFunction(wallet, password));
-			executeInSeries(decryptFuncs, function(wallets) {
-				onWalletsDecrypted(wallets);
+			for (let key of keys) decryptFuncs.push(getDecryptCallbackFunction(key, password));
+			executeInSeries(decryptFuncs, function(keys) {
+				onKeysDecrypted(keys);
 			});
 			
-			function getDecryptCallbackFunction(wallet, password) {
-				return function(onWalletDecrypted) {
-					wallet.decrypt(password, function(resp) {
-						if (resp.constructor.name === 'Wallet') {
+			function getDecryptCallbackFunction(key, password) {
+				return function(onKeyDecrypted) {
+					key.decrypt(password, function(resp) {
+						if (isObject(key, 'CryptoKey')) {
 							btnDecrypt.attr("disabled", "disabled");
 							setErrorMessage("");
-							onWalletDecrypted(resp);
+							onKeyDecrypted(resp);
 						} else if (resp.constructor.name === 'Error') {
 							setErrorMessage(resp.message);
 							passwordInput.focus();
@@ -934,7 +934,7 @@ function DecryptWalletsController(div, state, onWalletsDecrypted) {
 	
 	var errorDiv = $("<div>");
 }
-inheritsFrom(DecryptWalletsController, DivController);
+inheritsFrom(DecryptKeysController, DivController);
 
 /**
  * Render import files page.

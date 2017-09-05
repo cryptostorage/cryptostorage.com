@@ -16,6 +16,7 @@
 // register shortcut keys for page navigation (enter, y, n)
 // paste private key doesn't work in iphone safari
 // aes.java needs de-minified
+// still able to decrypt twice, test with bip38
 
 const RUN_TESTS = false;
 const DEBUG = true;
@@ -123,31 +124,31 @@ function FlowController(pageManager, plugins) {
 	
 	function onSelectImport() {
 		if (DEBUG) console.log("onSelectImport()");
-		pageManager.next(new ImportFilesController($("<div>"), onUnsplitWalletsImported, onSelectImportText));
+		pageManager.next(new ImportFilesController($("<div>"), onKeysImported, onSelectImportText));
 	}
 	
 	function onSelectImportText() {
 		if (DEBUG) console.log("onSelectImportText()");
 		state.goal = Goal.RESTORE_STORAGE;
-		pageManager.next(new CryptoSelectionController($("<div>"), state, onSelectImportCurrency));
+		pageManager.next(new CryptoSelectionController($("<div>"), state, onSelectImportCrypto));
 	}
 	
-	function onSelectImportCurrency(tickerSymbol) {
-		if (DEBUG) console.log("onSelectImportCurrency(" + tickerSymbol + ")");
+	function onSelectImportCrypto(tickerSymbol) {
+		if (DEBUG) console.log("onSelectImportCrypto(" + tickerSymbol + ")");
 		for (let plugin of plugins) {
 			if (plugin.getTickerSymbol() === tickerSymbol) state.plugin = plugin;
 		}
 		if (!state.plugin) throw new Error("plugin not found with ticker symbol: " + tickerSymbol);
-		pageManager.next(new ImportTextController($("<div>"), state, onUnsplitWalletsImported));
+		pageManager.next(new ImportTextController($("<div>"), state, onKeysImported));
 	}
 	
-	function onUnsplitWalletsImported(wallets) {
-		if (DEBUG) console.log("onUnsplitWalletsImported(" + wallets.length + " wallets)");
-		assertTrue(wallets.length >= 1);
-		state.wallets = wallets;
-		state.plugin = wallets[0].getCurrencyPlugin();
-		if (wallets[0].isEncrypted()) pageManager.next(new DecryptWalletsController($("<div>"), state, onUnsplitWalletsImported));
-		else pageManager.next(new DownloadPiecesController($("<div>"), state, keysToPieces(wallets, true), onCustomExport));
+	function onKeysImported(keys) {
+		if (DEBUG) console.log("onKeysImported(" + keys.length + " keys)");
+		assertTrue(keys.length >= 1);
+		state.keys = keys;
+		state.plugin = keys[0].getPlugin();	// TODO: may not have same plugin across all keys
+		if (keys[0].isEncrypted()) pageManager.next(new DecryptKeysController($("<div>"), state, onKeysImported));
+		else pageManager.next(new DownloadPiecesController($("<div>"), state, keysToPieces(keys), onCustomExport));
 	}
 	
 	function onCustomExport(pieces) {

@@ -728,30 +728,22 @@ function renderQrCode(text, config, callback) {
 }
 
 /**
- * Attempts to construct a wallet from the given string.  The string is expected to
- * be a single private key (encrypted or unencrypted) or one or more pieces that reconstitute
- * a single private key (encrypted or unencrypted).
+ * Attempts to construct a key from the given string.  The string is expected to be a
+ * single private key (hex or wif, encrypted or unencrypted) or one or more pieces that
+ * reconstitute a single private key (hex or wif, encrypted or unencrypted).
  * 
  * @param plugin in the coin plugin used to parse the string
- * @param str is the string to parse into a wallet
- * @returns a wallet parsed from the given string
- * @throws an exception if a wallet private key cannot be parsed from the string
+ * @param str is the string to parse into a key
+ * @returns a key parsed from the given string
+ * @throws an exception if a private key cannot be parsed from the string
  */
-function parseWallet(plugin, str) {
+function parseKey(plugin, str) {
 	str = str.trim();
 	var lines = str.split('\n');
 	var components = [];
 	for (let line of lines) if (line) components.push(line);
 	if (components.length === 0) return null;
-	else if (components.length === 1) {
-		if (plugin.isCryptoKey(components[0])) return plugin.newWallet({privateKey: components[0]});
-	} else {
-		try {
-			return plugin.newWallet({privateKey: plugin.reconstitute(components) });
-		} catch (err) {
-			return null;
-		}
-	}
+	return plugin.newKey(components.length > 1 ? plugin.combine(components) : components[0]);
 }
 
 /**
