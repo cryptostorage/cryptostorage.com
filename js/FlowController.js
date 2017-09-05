@@ -98,7 +98,11 @@ function FlowController(pageManager, plugins) {
 		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
 		state.splitEnabled = splitEnabled;
 		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, pageManager.getPathTracker(), onSplitInput));
-		else pageManager.next(new GenerateKeysController($("<div>"), state, onKeysGenerated));
+		else {
+			delete state.numPieces;
+			delete state.minPieces;
+			pageManager.next(new GenerateKeysController($("<div>"), state, onKeysGenerated));
+		}
 	}
 	
 	function onSplitInput(numPieces, minPieces) {
