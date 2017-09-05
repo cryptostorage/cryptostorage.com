@@ -2,12 +2,12 @@ var plugins;
 function getCryptoPlugins() {
 	if (!plugins) {
 		plugins = [];
-//		plugins.push(new BitcoinPlugin());
-//		plugins.push(new BitcoinCashPlugin());
-//		plugins.push(new EthereumPlugin());
-//		plugins.push(new EthereumClassicPlugin());
+		plugins.push(new BitcoinPlugin());
+		plugins.push(new BitcoinCashPlugin());
+		plugins.push(new EthereumPlugin());
+		plugins.push(new EthereumClassicPlugin());
 		plugins.push(new LitecoinPlugin());
-//		plugins.push(new MoneroPlugin());
+		plugins.push(new MoneroPlugin());
 	}
 	return plugins;
 }
@@ -155,6 +155,7 @@ inheritsFrom(BitcoinPlugin, CryptoPlugin);
  * Bitcoin cash plugin.
  */
 function BitcoinCashPlugin() {
+	BitcoinPlugin.call(this);
 	this.getName = function() { return "Bitcoin Cash"; }
 	this.getTickerSymbol = function() { return "BCH" };
 	this.getLogo = function() { return $("<img src='img/bitcoin_cash.png'>"); }
@@ -229,33 +230,25 @@ function LitecoinPlugin() {
 	this.getLogo = function() { return $("<img src='img/litecoin.png'>"); }
 	this.newKey = function(str) {
 		
-		let wif = new litecore.PrivateKey().toWIF();
-		console.log(wif);
-		console.log(new litecore.PrivateKey(wif).getAddress().toString());
-		
 		// create key if not given
 		if (!str) str = new litecore.PrivateKey().toString();		
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		let state = {};
 		
-		// handle hex
-		if (isHex(str)) {
-			
-			// unencrypted
-			if (litecore.PrivateKey.isValid(str)) {
-				state.hex = str;
-				state.wif = str;	// TODO: wif different?
-				console.log(str);
-				state.address = "abc testing"; // new litecore.PrivateKey(str).getAddress().toString()
-				state.encryption = null;
-			}
-			
-			// hex cryptojs
-			else if (str.length > 100) {
-				state.hex = str;
-				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				state.encryption = EncryptionScheme.CRYPTOJS;
-			}
+		// unencrypted
+		if (litecore.PrivateKey.isValid(str)) {
+			let key = new litecore.PrivateKey(str);
+			state.hex = key.toString();
+			state.wif = key.toWIF();
+			state.address = key.toAddress().toString();
+			state.encryption = null;
+		}
+		
+		// hex cryptojs
+		else if (isHex(str) && str.length > 100) {
+			state.hex = str;
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			state.encryption = EncryptionScheme.CRYPTOJS;
 		}
 		
 		// wif cryptojs
