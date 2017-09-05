@@ -1141,7 +1141,7 @@ function DownloadPiecesController(div, state, pieces, onCustomExport) {
 		}
 		
 		// render each piece in sequence to minimize resource requirements
-		async.parallel(renderFuncs, function() {
+		executeInSeries(renderFuncs, function() {	// TODO: switch to async.parallel() but sometimes causes last address to only render public QR code
 			
 			// wrap piece divs in html containers
 			var pieceHtmls = [];
