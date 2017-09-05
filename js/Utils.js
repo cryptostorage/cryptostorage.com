@@ -234,6 +234,20 @@ function assertNumber(arg, msg) {
 }
 
 /**
+ * Asserts that the given argument is an object with the given name.
+ * 
+ * @param arg is the argument to test
+ * @param name is the name of the expected object
+ * @param msg is the message to throw if the argument is not the specified object
+ */
+function assertObject(arg, name, msg) {
+	if (!isObject(arg, name)) {
+		console.log(arg);
+		throw new Error(msg ? msg : "Argument asserted as object with name '" + name + "' but was not");
+	}
+}
+
+/**
  * Asserts that the given argument is an integer.
  * 
  * @param arg is the argument to assert as an integer
@@ -647,8 +661,6 @@ function decrypt(key, password, callback) {
 		case EncryptionScheme.CRYPTOJS:
 			let hex;
 			try {
-				console.log(key.getHex());
-				console.log(key.getWif());
 				hex = CryptoJS.AES.decrypt(key.getWif(), password).toString(CryptoJS.enc.Utf8);
 			} catch (err) { }
 			if (!hex) callback(undefined, new Error("Invalid password"));

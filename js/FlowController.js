@@ -18,7 +18,7 @@
 // aes.java needs de-minified
 // still able to decrypt twice, test with bip38
 
-const RUN_TESTS = false;
+const RUN_TESTS = true;
 const DEBUG = true;
 
 /**

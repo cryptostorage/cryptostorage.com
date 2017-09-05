@@ -168,82 +168,80 @@ function testCryptoKey(plugin, callback) {
 	function testEncryptionScheme(plugin, scheme, callback) {
 		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
 		let funcs = [];
-		for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin, scheme, PASSWORD, PASSWORD, callback); });
-		funcs.push(function(callback) { testEncryption(plugin, scheme, PASSWORD, "invalidPassword123", callback); });	// test wrong password
+		for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin.newKey(), scheme, PASSWORD, PASSWORD, callback); });
+		funcs.push(function(callback) { testEncryption(plugin.newKey(), scheme, PASSWORD, "invalidPassword123", callback); });	// test wrong password
 		async.parallel(funcs, callback);
 	}
-	
-	// test encryption of one key
-	function testEncryption(plugin, scheme, encryptionPassword, decryptionPassword, callback) {
-		let key = plugin.newKey();
-		let original = key.copy();
-		key.encrypt(scheme, encryptionPassword, function(encryptedKey, err) {
+}
+
+function testEncryption(key, scheme, encryptionPassword, decryptionPassword, callback) {
+	assertObject(key, 'CryptoKey');
+	let original = key.copy();
+	key.encrypt(scheme, encryptionPassword, function(encryptedKey, err) {
+		if (err) callback(err);
+		else {
+			
+			// test basic initialization
+			assertTrue(key.equals(encryptedKey));
+			assertInitialized(key.getHex());
+			assertInitialized(key.getWif());
+			assertInitialized(key.getAddress());
+			assertEquals(scheme, key.getEncryptionScheme());
+			assertTrue(key.isEncrypted());
+			
+			// test original
+			assertFalse(key.equals(original));
+			assertTrue(key.equals(key.copy()));
+			
+			// test consistency
+			let parsed = new CryptoKey(key.getPlugin(), key.getHex());
+			assertEquals(key.getHex(), parsed.getHex());
+			assertEquals(key.getWif(), parsed.getWif());
+			assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
+			parsed = new CryptoKey(key.getPlugin(), key.getWif());
+			assertEquals(key.getHex(), parsed.getHex());
+			assertEquals(key.getWif(), parsed.getWif());
+			assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
+			
+			// test decryption
+			testDecryption(key, encryptionPassword, decryptionPassword, original, callback);
+		}
+	});
+}
+
+function testDecryption(key, encryptionPassword, decryptionPassword, expected, callback) {
+	key.decrypt(decryptionPassword, function(decryptedKey, err) {
+		if (encryptionPassword !== decryptionPassword) {
+			if (!err) callback(new Error("Decryption with wrong password should throw an error"));
+			else callback();
+		} else {
 			if (err) callback(err);
 			else {
 				
 				// test basic initialization
-				assertTrue(key.equals(encryptedKey));
+				assertTrue(key.equals(decryptedKey));
 				assertInitialized(key.getHex());
 				assertInitialized(key.getWif());
 				assertInitialized(key.getAddress());
-				assertEquals(scheme, key.getEncryptionScheme());
-				assertTrue(key.isEncrypted());
+				assertNull(key.getEncryptionScheme());
 				
-				// test original
-				assertFalse(key.equals(original));
+				// test decryption and copy
+				assertTrue(key.equals(expected));
 				assertTrue(key.equals(key.copy()));
 				
 				// test consistency
-				let parsed = new CryptoKey(plugin, key.getHex());
+				let parsed = new CryptoKey(key.getPlugin(), key.getHex());
 				assertEquals(key.getHex(), parsed.getHex());
 				assertEquals(key.getWif(), parsed.getWif());
 				assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-				parsed = new CryptoKey(plugin, key.getWif());
+				parsed = new CryptoKey(key.getPlugin(), key.getWif());
 				assertEquals(key.getHex(), parsed.getHex());
 				assertEquals(key.getWif(), parsed.getWif());
 				assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-				
-				// test decryption
-				testDecryption(key, encryptionPassword, decryptionPassword, original, callback);
+				callback();
 			}
-		});
-	}
-	
-	// test decryption of one key
-	function testDecryption(key, encryptionPassword, decryptionPassword, expected, callback) {
-		key.decrypt(decryptionPassword, function(decryptedKey, err) {
-			if (encryptionPassword !== decryptionPassword) {
-				if (!err) callback(new Error("Decryption with wrong password should throw an error"));
-				else callback();
-			} else {
-				if (err) callback(err);
-				else {
-					
-					// test basic initialization
-					assertTrue(key.equals(decryptedKey));
-					assertInitialized(key.getHex());
-					assertInitialized(key.getWif());
-					assertInitialized(key.getAddress());
-					assertNull(key.getEncryptionScheme());
-					
-					// test decryption and copy
-					assertTrue(key.equals(expected));
-					assertTrue(key.equals(key.copy()));
-					
-					// test consistency
-					let parsed = new CryptoKey(plugin, key.getHex());
-					assertEquals(key.getHex(), parsed.getHex());
-					assertEquals(key.getWif(), parsed.getWif());
-					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-					parsed = new CryptoKey(plugin, key.getWif());
-					assertEquals(key.getHex(), parsed.getHex());
-					assertEquals(key.getWif(), parsed.getWif());
-					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-					callback();
-				}
-			}
-		});
-	}
+		}
+	});
 }
 
 function testSplitWallet(wallet, numPieces, minPieces) {
