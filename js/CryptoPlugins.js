@@ -66,10 +66,13 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	assertTrue(isObject(key, 'CryptoKey'));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
+	console.log(key.getHex());
 	let pieces = secrets.share(key.getHex(), numPieces, minPieces);
+	console.log(pieces);
 	for (let i = 0; i < pieces.length; i++) {
 		pieces[i] = Bitcoin.Base58.encode(Crypto.util.hexToBytes(pieces[i]));
 	}
+	console.log(pieces);
 	return pieces;
 }
 
@@ -84,6 +87,8 @@ CryptoPlugin.prototype.combine = function(pieces) {
 	for (let piece of pieces) {
 		hexPieces.push(Crypto.util.bytesToHex(Bitcoin.Base58.decode(piece)));
 	}
+	console.log(hexPieces);
+	console.log(secrets.combine(hexPieces));
 	return this.newKey(secrets.combine(hexPieces));
 }
 
