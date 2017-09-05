@@ -18,6 +18,17 @@
 // aes.java needs de-minified
 // still able to decrypt twice, test with bip38
 
+// bitaddress.org todos
+// o vs 3 discrepency running bitaddress.org split from my site vs their site
+// how are their methods namespaced
+// what is their step by step process for creating split shares
+//	split: hex (pads 0s) -> bytes -> b58
+//	combine: b58 -> bytes -> hex -> strip leading zeros
+// can their encoding scheme be used with other hex addresses and/or longer hex strings from crytojs
+// able to decrypt twice with bip38 text import
+// make CryptoKey object oriented? plugin.newKey(str) key.isEncrypted(), etc
+// difference between split.hexToBytes() which pads 0 and Crypto.util.hexToBytes() (theirs produces one less character)
+
 const RUN_TESTS = true;
 const DEBUG = true;
 
