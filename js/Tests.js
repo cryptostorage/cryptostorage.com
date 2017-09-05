@@ -127,24 +127,24 @@ function testCryptoKey(plugin, callback) {
 		
 		// create new key
 		let key = plugin.newKey();
-		assertInitialized(key.toHex());
-		assertInitialized(key.toWif());
-		assertInitialized(key.toAddress());
+		assertInitialized(key.getHex());
+		assertInitialized(key.getWif());
+		assertInitialized(key.getAddress());
 		assertNull(key.getEncryptionScheme());
 		let copy = key.copy();
 		assertTrue(key.equals(copy));
 		
 		// parse unencrypted hex
-		let key2 = new CryptoKey(plugin, key.toHex());
+		let key2 = new CryptoKey(plugin, key.getHex());
 		assertTrue(key.equals(key2));
 		
 		// parse unencrypted wif
-		key2 = new CryptoKey(plugin, key.toWif());
+		key2 = new CryptoKey(plugin, key.getWif());
 		assertTrue(key.equals(key2));
 	}
 	
 	// test invalid private keys
-	let invalids = [null, "abctesting123", "abc testing 123", 12345, plugin.newKey().toAddress()];
+	let invalids = [null, "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress()];
 	for (let invalid of invalids) {
 		try {
 			new CryptoKey(plugin, invalid);
@@ -183,9 +183,9 @@ function testCryptoKey(plugin, callback) {
 				
 				// test basic initialization
 				assertTrue(key.equals(encryptedKey));
-				assertInitialized(key.toHex());
-				assertInitialized(key.toWif());
-				assertInitialized(key.toAddress());
+				assertInitialized(key.getHex());
+				assertInitialized(key.getWif());
+				assertInitialized(key.getAddress());
 				assertEquals(scheme, key.getEncryptionScheme());
 				assertTrue(key.isEncrypted());
 				
@@ -194,13 +194,13 @@ function testCryptoKey(plugin, callback) {
 				assertTrue(key.equals(key.copy()));
 				
 				// test consistency
-				let parsed = new CryptoKey(plugin, key.toHex());
-				assertEquals(key.toHex(), parsed.toHex());
-				assertEquals(key.toWif(), parsed.toWif());
+				let parsed = new CryptoKey(plugin, key.getHex());
+				assertEquals(key.getHex(), parsed.getHex());
+				assertEquals(key.getWif(), parsed.getWif());
 				assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-				parsed = new CryptoKey(plugin, key.toWif());
-				assertEquals(key.toHex(), parsed.toHex());
-				assertEquals(key.toWif(), parsed.toWif());
+				parsed = new CryptoKey(plugin, key.getWif());
+				assertEquals(key.getHex(), parsed.getHex());
+				assertEquals(key.getWif(), parsed.getWif());
 				assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
 				
 				// test decryption
@@ -221,9 +221,9 @@ function testCryptoKey(plugin, callback) {
 					
 					// test basic initialization
 					assertTrue(key.equals(decryptedKey));
-					assertInitialized(key.toHex());
-					assertInitialized(key.toWif());
-					assertInitialized(key.toAddress());
+					assertInitialized(key.getHex());
+					assertInitialized(key.getWif());
+					assertInitialized(key.getAddress());
 					assertNull(key.getEncryptionScheme());
 					
 					// test decryption and copy
@@ -231,13 +231,13 @@ function testCryptoKey(plugin, callback) {
 					assertTrue(key.equals(key.copy()));
 					
 					// test consistency
-					let parsed = new CryptoKey(plugin, key.toHex());
-					assertEquals(key.toHex(), parsed.toHex());
-					assertEquals(key.toWif(), parsed.toWif());
+					let parsed = new CryptoKey(plugin, key.getHex());
+					assertEquals(key.getHex(), parsed.getHex());
+					assertEquals(key.getWif(), parsed.getWif());
 					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-					parsed = new CryptoKey(plugin, key.toWif());
-					assertEquals(key.toHex(), parsed.toHex());
-					assertEquals(key.toWif(), parsed.toWif());
+					parsed = new CryptoKey(plugin, key.getWif());
+					assertEquals(key.getHex(), parsed.getHex());
+					assertEquals(key.getWif(), parsed.getWif());
 					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
 					callback();
 				}

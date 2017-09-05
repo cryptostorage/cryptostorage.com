@@ -608,15 +608,15 @@ function encrypt(scheme, key, password, callback) {
 	if (!password) throw new Error("Password must be initialized");
 	switch (scheme) {
 		case EncryptionScheme.CRYPTOJS:
-			let b64 = CryptoJS.AES.encrypt(key.toHex(), password).toString();
-			key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.toAddress()}));
+			let b64 = CryptoJS.AES.encrypt(key.getHex(), password).toString();
+			key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
 			callback(key);
 			break;
 		case EncryptionScheme.BIP38:
-			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.toHex(), password, true, function(resp) {
+			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.getHex(), password, true, function(resp) {
 				if (resp.message) callback(undefined, resp);	// TODO: confirm error handling, isError()
 				else {
-					key.setState(Object.assign(key.getPlugin().newKey(resp).getState(), {address: key.toAddress()}));
+					key.setState(Object.assign(key.getPlugin().newKey(resp).getState(), {address: key.getAddress()}));
 					callback(key);
 				}
 			});
@@ -638,7 +638,7 @@ function decrypt(key, password, callback) {
 		case EncryptionScheme.CRYPTOJS:
 			let hex;
 			try {
-				hex = CryptoJS.AES.decrypt(key.toWif(), password).toString(CryptoJS.enc.Utf8);
+				hex = CryptoJS.AES.decrypt(key.getWif(), password).toString(CryptoJS.enc.Utf8);
 			} catch (err) { }
 			if (!hex) callback(undefined, new Error("Invalid password"));
 			else {
@@ -647,7 +647,7 @@ function decrypt(key, password, callback) {
 			}
 			break;
 		case EncryptionScheme.BIP38:
-			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.toWif(), password, function(resp) {
+			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), password, function(resp) {
 				if (resp.message) callback(undefined, resp);	// TODO: confirm error handling, isError()
 				else {
 					let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()

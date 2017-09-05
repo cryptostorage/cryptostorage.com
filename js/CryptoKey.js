@@ -35,15 +35,15 @@ function CryptoKey(plugin, state) {
 		this.setState(this.plugin.newKey(str).getState());
 	}
 	
-	this.toAddress = function() {
+	this.getAddress = function() {
 		return this.state.address;
 	}
 	
-	this.toHex = function() {
+	this.getHex = function() {
 		return this.state.hex;
 	}
 
-	this.toWif = function() {
+	this.getWif = function() {
 		return this.state.wif;
 	}
 	

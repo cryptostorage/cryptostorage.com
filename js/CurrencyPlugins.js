@@ -223,7 +223,7 @@ function LitecoinPlugin() {
 	}
 	this.getAddress = function(privateKey) {
 		assertTrue(this.isUnencryptedPrivateKey(privateKey));
-		return new litecore.PrivateKey(privateKey).toAddress().toString();
+		return new litecore.PrivateKey(privateKey).getAddress().toString();
 	}
 	this.getEncryptionScheme = function(privateKey) {
 		if (!isString(privateKey)) throw new Error("Argument must be a string");
