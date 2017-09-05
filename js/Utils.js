@@ -819,7 +819,7 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 		let name = crypto + (pieces.length > 1 ? "_" + (i + 1) : "");
 		let path = "cryptostorage_" + name + "/" + name;
 		let zip = new JSZip();
-		//zip.file(path + ".html", getOuterHtml(pieceHtmls[i]));
+		zip.file(path + ".html", getOuterHtml(pieceHtmls[i]));
 		zip.file(path + ".csv", pieceToCsv(pieces[i]));
 		zip.file(path + ".txt", pieceToStr(pieces[i]));
 		zip.file(path + ".json", pieceToJson(pieces[i]));

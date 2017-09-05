@@ -612,10 +612,10 @@ function PieceRenderer(div, piece, config) {
 		// collect callback functions to render each piece pair
 		var callbackFunctions = [];
 		var rowDiv;
-		for (var i = 0; i < piece.keys.length; i++) {
+		for (var i = 0; i < piece.length; i++) {
 			
 			// get public/private pair
-			var walletPiece = piece.keys[i];
+			var keyPiece = piece[i];
 			
 			// create pair div
 			var pairDiv = $("<div>");
@@ -626,7 +626,7 @@ function PieceRenderer(div, piece, config) {
 			pairDiv.css("page-break-inside", "avoid");
 			
 			// prepare function to render pair
-			callbackFunctions.push(prepareCallbackFunctionRenderPairDiv(pairDiv, "==== " + (i + 1) + " ====", walletPiece.publicKey, walletPiece.privateKey, config));
+			callbackFunctions.push(prepareCallbackFunctionRenderPairDiv(pairDiv, "==== " + (i + 1) + " ====", keyPiece.address, keyPiece.privateKey, config));
 			
 			// append pair div and row div
 			if (i % config.num_columns === 0) {
