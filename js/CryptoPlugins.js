@@ -13,6 +13,7 @@ function getCryptoPlugins() {
 }
 
 function getCryptoPlugin(ticker) {
+	assertInitialized(ticker);
 	for (let plugin of getCryptoPlugins()) {
 		if (plugin.getTickerSymbol() === ticker) return plugin;
 	}

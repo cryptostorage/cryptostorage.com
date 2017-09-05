@@ -814,7 +814,54 @@ function keysToPieces(keys, numPieces, minPieces) {
  * @returns keys built from the pieces
  */
 function piecesToKeys(pieces) {
-	throw new Error("Not implemented");
+	assertTrue(pieces.length > 0);
+	let keys = [];
+	
+	// handle one piece
+	if (pieces.length === 1) {
+		for (let pieceKey of pieces[0]) {
+			let key = getCryptoPlugin(pieceKey.crypto).newKey(pieceKey.privateKey);
+			if (key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);
+			keys.push(key);
+		}
+	}
+	
+	// handle multiple pieces
+	else {
+		
+		// validate pieces contain same number of keys
+		let numKeys;
+		for (let piece of pieces) {
+			if (!numKeys) numKeys = piece.length;
+			else if (numKeys !== piece.length) throw new Error("Piece " + (i + 1) + " contains " + piece[i] + " keys unlike previous pieces which contain " + numKeys + " keys");
+		}
+		
+		// validate consistent keys across pieces
+		for (let i = 0; i < pieces[0].length; i++) {
+			let crypto;
+			let isSplit;
+			let address;
+			for (let piece of pieces) {
+				if (!crypto) crypto = piece.crypto;
+				else if (crypto !== piece.crypto) throw new Error("Pieces are for different cryptocurrencies");
+				if (!isSplit) isSplit = piece.isSplit;
+				else if (isSplit !== piece.isSplit) throw new Error("Pieces have different split states");
+				if (!address) address = piece.address;
+				else if (address !== piece.address) throw new Error("Pieces have different addresses");
+			}
+		}
+		
+		// combine keys across pieces
+		for (let i = 0; i < pieces[0].length; i++) {
+			let shares = [];
+			for (let piece of pieces) shares.push(piece[i].privateKey);
+			let key = getCryptoPlugin(pieces[0][i].crypto).combine(shares);
+			if (key.isEncrypted() && pieces[0][i].address) key.setAddress(pieces[0][i].address);
+			keys.push(key);
+		}
+	}
+
+	return keys;
 }
 
 /**

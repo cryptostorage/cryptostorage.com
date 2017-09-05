@@ -286,6 +286,10 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 	let keysFromPieces = piecesToKeys(pieces);
 	assertEquals(keys.length, keysFromPieces.length);
 	for (let i = 0; i < keys.length; i++) {
+		if (!keys[i].equals(keysFromPieces[i])) {
+			console.log(keys[i].getState());
+			console.log(keysFromPieces[i].getState());
+		}
 		assertTrue(keys[i].equals(keysFromPieces[i]));
 	}
 }

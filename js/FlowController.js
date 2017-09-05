@@ -17,6 +17,7 @@
 // paste private key doesn't work in iphone safari
 // aes.java needs de-minified
 // still able to decrypt twice, test with bip38
+// test key.setAddress()
 
 // bitaddress.org todos
 // o vs 3 discrepency running bitaddress.org split from my site vs their site
