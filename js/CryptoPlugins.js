@@ -215,6 +215,7 @@ inheritsFrom(EthereumPlugin, CryptoPlugin);
  * Ethereum classic plugin.
  */
 function EthereumClassicPlugin() {
+	EthereumPlugin.call(this);
 	this.getName = function() { return "Ethereum Classic"; }
 	this.getTickerSymbol = function() { return "ETC" };
 	this.getLogo = function() { return $("<img src='img/ethereum_classic.png'>"); }
