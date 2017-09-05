@@ -748,8 +748,6 @@ function parseWallet(plugin, str) {
 /**
  * Converts the given keys to pieces.
  * 
- * TODO: change piece.currency to piece.crypto
- * 
  * @param keys are the keys to convert to pieces
  * @param numPieces are the number of pieces to split the keys into (optional)
  * @param minPieces are the minimum pieces to reconstitute the keys (optional)
@@ -776,6 +774,7 @@ function keysToPieces(keys, numPieces, minPieces) {
 		for (let i = 0; i < numPieces; i++) {
 			let piece = {};
 			piece.crypto = key.getPlugin().getTickerSymbol();
+			piece.isSplit = numPieces > 1;
 			piece.address = key.getAddress();
 			piece.privateKey = keyPieces[i];
 			if (numPieces === 1) piece.encryption = key.getEncryptionScheme();
@@ -798,7 +797,7 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 	// prepare zips for each piece
 	var zips = [];
 	for (let i = 0; i < pieces.length; i++) {
-		let name = pieces[i].currency.toLowerCase() + (pieces.length > 1 ? "_" + (i + 1) : "");
+		let name = pieces[i].crypto.toLowerCase() + (pieces.length > 1 ? "_" + (i + 1) : "");
 		let path = "cryptostorage_" + name + "/" + name;
 		let zip = new JSZip();
 		zip.file(path + ".html", getOuterHtml(pieceHtmls[i]));
@@ -816,7 +815,7 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 	
 	// generate zips in sequence
 	executeInSeries(funcs, function(blobs) {
-		var name = "cryptostorage_" + pieces[0].currency.toLowerCase();
+		var name = "cryptostorage_" + pieces[0].crypt.toLowerCase();
 		if (blobs.length === 1) callback(name + ".zip", blobs[0]);
 		else {
 			
@@ -927,8 +926,8 @@ function pieceToStr(piece) {
 }
 
 function validatePiece(piece) {
-	if (isUndefined(piece.currency)) throw new Error("piece.currency is not defined");
-	if (isUndefined(piece.isSplit)) throw new Error("piece.isSplit is not defined");
-	if (isUndefined(piece.keys)) throw new Error("piece.keys is not defined");
-	if (piece.keys.length === 0) throw new Error("Piece contains no keys");
+	assertDefined(piece.crypto, "piece.crypto is not defined");
+	assertDefined(piece.isSplit, "piece.isSplit is not defined");
+	assertDefined(piece.address, "piece.address is not defined");
+	assertDefined(piece.privateKey, "piece.privateKey is not defined");
 }
