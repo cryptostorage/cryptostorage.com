@@ -833,7 +833,7 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 	}
 	
 	// generate zips in sequence
-	executeInSeries(funcs, function(blobs) {
+	executeInSeries(funcs, function(blobs) {	// TODO: switch this to async library, but they pass give callback arg
 		let name = "cryptostorage_" + crypto;
 		if (blobs.length === 1) callback(name + ".zip", blobs[0]);
 		else {
