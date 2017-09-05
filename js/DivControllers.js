@@ -883,7 +883,10 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			if (password === "") {
 				setErrorMessage("Password must not be blank");
 				return;
-			} else setErrorMessage("");
+			} else {
+				setErrorMessage("");
+				btnDecrypt.attr("disabled", "disabled");
+			}
 			
 			var decryptFuncs = [];
 			for (let key of keys) decryptFuncs.push(getDecryptCallbackFunction(key, password));
@@ -893,16 +896,14 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			
 			function getDecryptCallbackFunction(key, password) {
 				return function(onKeyDecrypted) {
-					key.decrypt(password, function(resp) {
-						if (isObject(key, 'CryptoKey')) {
-							btnDecrypt.attr("disabled", "disabled");
-							setErrorMessage("");
-							onKeyDecrypted(resp);
-						} else if (resp.constructor.name === 'Error') {
-							setErrorMessage(resp.message);
+					key.decrypt(password, function(key, err) {
+						if (err) {
+							setErrorMessage(err.message);
 							passwordInput.focus();
+							btnDecrypt.removeAttr("disabled");
 						} else {
-							throw new Error("Unrecognized decryption response: " + (resp.constructor.name));
+							setErrorMessage("");
+							onKeyDecrypted(key);
 						}
 					});
 				}

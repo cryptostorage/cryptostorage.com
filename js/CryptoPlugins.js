@@ -115,7 +115,7 @@ function BitcoinPlugin() {
 		}
 		
 		// parse key
-		assertTrue(isString(str), "Argument to parse must be a string");
+		assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		let state = {};
 		
 		// unencrypted private key
@@ -200,7 +200,7 @@ function MoneroPlugin() {
 		}
 		
 		// parse key
-		assertTrue(isString(str), "Argument to parse must be a string");
+		assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		let state = {};
 		
 		// handle hex

@@ -647,6 +647,8 @@ function decrypt(key, password, callback) {
 		case EncryptionScheme.CRYPTOJS:
 			let hex;
 			try {
+				console.log(key.getHex());
+				console.log(key.getWif());
 				hex = CryptoJS.AES.decrypt(key.getWif(), password).toString(CryptoJS.enc.Utf8);
 			} catch (err) { }
 			if (!hex) callback(undefined, new Error("Invalid password"));
@@ -743,7 +745,12 @@ function parseKey(plugin, str) {
 	var components = [];
 	for (let line of lines) if (line) components.push(line);
 	if (components.length === 0) return null;
-	return plugin.newKey(components.length > 1 ? plugin.combine(components) : components[0]);
+	try {
+		return components.length === 1 ? plugin.newKey(components[0]) : plugin.combine(components);
+	} catch (err) {
+		console.log(err);
+		return null;
+	}
 }
 
 /**
