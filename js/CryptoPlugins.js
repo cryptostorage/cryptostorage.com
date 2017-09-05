@@ -5,9 +5,9 @@ function getCryptoPlugins() {
 		plugins.push(new BitcoinPlugin());
 		plugins.push(new BitcoinCashPlugin());
 		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
+		plugins.push(new EthereumClassicPlugin());
 //		plugins.push(new LitecoinPlugin());
-//		plugins.push(new EthereumClassicPlugin());
+		plugins.push(new MoneroPlugin());
 	}
 	return plugins;
 }
@@ -302,3 +302,13 @@ function EthereumPlugin() {
 }
 inheritsFrom(EthereumPlugin, CryptoPlugin);
 
+/**
+ * Ethereum classic plugin.
+ */
+function EthereumClassicPlugin() {
+	EthereumPlugin.call(this);
+	this.getName = function() { return "Ethereum Classic"; }
+	this.getTickerSymbol = function() { return "ETC" };
+	this.getLogo = function() { return $("<img src='img/ethereum_classic.png'>"); }
+}
+inheritsFrom(EthereumClassicPlugin, EthereumPlugin);

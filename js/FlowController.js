@@ -1,5 +1,4 @@
 // TODO
-// test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
 // change terminology from wallets to keys
 // verify final pieces
 // review private keys (hex, base58, etc)
@@ -19,6 +18,8 @@
 // aes.java needs de-minified
 // still able to decrypt twice, test with bip38
 // test key.setAddress()
+// test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
+// switch to async library
 
 // bitaddress.org todos
 // o vs 3 discrepency running bitaddress.org split from my site vs their site
