@@ -141,6 +141,9 @@ function testCryptoKey(plugin, callback) {
 		// parse unencrypted wif
 		key2 = new CryptoKey(plugin, key.getWif());
 		assertTrue(key.equals(key2));
+		
+		// test splitting
+		testSplit(key, NUM_PIECES, MIN_PIECES);
 	}
 	
 	// test invalid private keys
@@ -203,6 +206,9 @@ function testEncryption(key, scheme, encryptionPassword, decryptionPassword, cal
 			assertEquals(key.getWif(), parsed.getWif());
 			assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
 			
+			// test splitting
+			testSplit(key, NUM_PIECES, MIN_PIECES);
+			
 			// test decryption
 			testDecryption(key, encryptionPassword, decryptionPassword, original, callback);
 		}
@@ -244,30 +250,20 @@ function testDecryption(key, encryptionPassword, decryptionPassword, expected, c
 	});
 }
 
-function testSplitWallet(wallet, numPieces, minPieces) {
+function testSplit(key, numPieces, minPieces) {
 	
-	// ensure wallet is not split
-	assertFalse(wallet.isSplit());
-	var original = wallet.copy();
-	assertTrue(original.equals(wallet));
+	// split private key into shares
+	let shares = key.getPlugin().split(key, numPieces, minPieces);
+	assertEquals(numPieces, shares.length);
 	
-	// split and test
-	wallet.split(numPieces, minPieces);
-	assertTrue(wallet.isSplit());
-	assertEquals(numPieces, wallet.getCryptoKeyPieces().length);
-	assertUndefined(wallet.isEncrypted());
-	assertUndefined(wallet.getEncryptionScheme());
-	assertUndefined(wallet.getCryptoKey());
-	
-	// test reconstituting each combination
-	var pieceCombinations = getCombinations(wallet.getCryptoKeyPieces(), minPieces);
-	for (let pieceCombinationIdx = 0; pieceCombinationIdx < pieceCombinationIdx.length; pieceCombinationIdx++) {
-		var pieceCombination = pieceCombinations[pieceCombinationIdx];
-		var reconstituted = new Wallet(plugin, {privateKeyPieces: pieceCombination}).reconstitute();
-		assertTrue(reconstituted.equals(original));
+	// test each share combination
+	let combinations = getCombinations(shares, minPieces);
+	for (let i = 0; i < combinations.length; i++) {
+		let combination = combinations[i];
+		let combined = key.getPlugin().combine(combination);
+		assertEquals(key.getHex(), combined.getHex());
+		assertEquals(key.getWif(), combined.getWif());
+		assertEquals(key.getEncryptionScheme(), combined.getEncryptionScheme());
+		if (!key.isEncrypted()) assertEquals(key.getAddress(), combined.getAddress());
 	}
-	
-	// reconstitute entire wallet
-	wallet.reconstitute();
-	assertTrue(wallet.equals(original));
 }

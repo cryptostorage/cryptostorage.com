@@ -66,7 +66,7 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	assertTrue(isObject(key, 'CryptoKey'));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
-	let pieces = secrets.share(key.getHex(), 3, 2);
+	let pieces = secrets.share(key.getHex(), numPieces, minPieces);
 	for (let i = 0; i < pieces.length; i++) {
 		pieces[i] = Bitcoin.Base58.encode(Crypto.util.hexToBytes(pieces[i]));
 	}
