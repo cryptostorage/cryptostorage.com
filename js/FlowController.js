@@ -29,7 +29,7 @@
 // make CryptoKey object oriented? plugin.newKey(str) key.isEncrypted(), etc
 // difference between split.hexToBytes() which pads 0 and Crypto.util.hexToBytes() (theirs produces one less character)
 
-const RUN_TESTS = true;
+const RUN_TESTS = false;
 const DEBUG = true;
 
 /**
