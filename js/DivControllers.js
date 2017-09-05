@@ -1121,7 +1121,6 @@ inheritsFrom(ImportFilesController, DivController);
 function DownloadPiecesController(div, state, pieces, onCustomExport) {
 	DivController.call(this, div);
 	assertTrue(pieces.length > 0);
-	console.log(pieces);
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -1142,7 +1141,7 @@ function DownloadPiecesController(div, state, pieces, onCustomExport) {
 		}
 		
 		// render each piece in sequence to minimize resource requirements
-		executeInSeries(renderFuncs, function() {
+		async.parallel(renderFuncs, function() {
 			
 			// wrap piece divs in html containers
 			var pieceHtmls = [];

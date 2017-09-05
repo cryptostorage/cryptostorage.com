@@ -329,6 +329,18 @@ function contains(arr, obj) {
 }
 
 /**
+ * Returns an array of unique elements in the given array.
+ * 
+ * @param arr to return unique values from
+ * @returns an array of unique values in the given array
+ */
+function getUniqueValues(arr) {
+	let uniques = [];
+	for (let elem of arr) if (!contains(uniques, elem)) uniques.push(elem);
+	return uniques;
+}
+
+/**
  * Returns the single value contained in an array of equal elements.
  * 
  * @param arr whose elements are identical
@@ -337,12 +349,9 @@ function contains(arr, obj) {
  */
 function getSingleValue(arr) {
 	assertTrue(arr.length > 0, "The given array cannot be empty");
-	let val;
-	for (let i = 0; i < arr.length; i++) {
-		if (i === 0) val = arr[i];
-		else if (val !== arr[i]) throw new Error("Index " + i + " has different value from previous indices");
-	}
-	return val;
+	let uniques = getUniqueValues(arr);
+	if (uniques.length === 1) return uniques[0];
+	throw new Error("Array contains multiple unique values: " + arr.toString());
 }
 
 /**
@@ -760,6 +769,8 @@ function keysToPieces(keys, numPieces, minPieces) {
 	if (numPieces) {
 		assertTrue(numPieces >= 2);
 		assertTrue(minPieces >= 2);
+	} else {
+		numPieces = 1;
 	}
 	
 	// initialize pieces
@@ -770,7 +781,7 @@ function keysToPieces(keys, numPieces, minPieces) {
 	
 	// add keys to each piece
 	for (let key of keys) {
-		let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getHex()];
+		let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getWif()];
 		for (let i = 0; i < numPieces; i++) {
 			let piece = {};
 			piece.crypto = key.getPlugin().getTickerSymbol();
@@ -793,14 +804,22 @@ function keysToPieces(keys, numPieces, minPieces) {
  * @param callback(name, blob) is invoked when zipping is complete
  */
 function piecesToZip(pieces, pieceHtmls, callback) {
+	assertTrue(pieces.length > 0, "Pieces cannot be empty");
+	
+	// get crypto identifier
+	let cryptos = [];
+	for (let key of pieces[0]) {
+		if (!contains(cryptos, key.crypto)) cryptos.push(key.crypto);
+	}
+	let crypto = cryptos.length === 1 ? cryptos[0].toLowerCase() : "mix";
 	
 	// prepare zips for each piece
-	var zips = [];
+	let zips = [];
 	for (let i = 0; i < pieces.length; i++) {
-		let name = pieces[i].crypto.toLowerCase() + (pieces.length > 1 ? "_" + (i + 1) : "");
+		let name = crypto + (pieces.length > 1 ? "_" + (i + 1) : "");
 		let path = "cryptostorage_" + name + "/" + name;
 		let zip = new JSZip();
-		zip.file(path + ".html", getOuterHtml(pieceHtmls[i]));
+		//zip.file(path + ".html", getOuterHtml(pieceHtmls[i]));
 		zip.file(path + ".csv", pieceToCsv(pieces[i]));
 		zip.file(path + ".txt", pieceToStr(pieces[i]));
 		zip.file(path + ".json", pieceToJson(pieces[i]));
@@ -808,20 +827,20 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 	}
 	
 	// get callback functions to generate zips
-	var funcs = [];
+	let funcs = [];
 	for (let zip of zips) {
 		funcs.push(getCallbackFunctionGenerateZip(zip));
 	}
 	
 	// generate zips in sequence
 	executeInSeries(funcs, function(blobs) {
-		var name = "cryptostorage_" + pieces[0].crypt.toLowerCase();
+		let name = "cryptostorage_" + crypto;
 		if (blobs.length === 1) callback(name + ".zip", blobs[0]);
 		else {
 			
 			// zip the zips
-			var zip = new JSZip();
-			for (var i = 0; i < blobs.length; i++) {
+			let zip = new JSZip();
+			for (let i = 0; i < blobs.length; i++) {
 				zip.file(name + "/" + name + "_" + (i + 1) + ".zip", blobs[i]);
 			}
 			zip.generateAsync({type:"blob"}).then(function(blob) {
@@ -903,8 +922,8 @@ function pieceToCsv(piece) {
 	
 	// convert piece to 2D array
 	var arr = [];
-	for (var i = 0; i < piece.keys.length; i++) {
-		arr.push([piece.keys[i].privateKey, piece.keys[i].privateKey]);
+	for (var i = 0; i < piece.length; i++) {
+		arr.push([piece[i].address, piece[i].privateKey]);
 	}
 	
 	// convert array to csv
@@ -917,10 +936,10 @@ function pieceToJson(piece) {
 
 function pieceToStr(piece) {
 	var str = "";
-	for (var i = 0; i < piece.keys.length; i++) {
+	for (var i = 0; i < piece.length; i++) {
 		str += "==== " + (i + 1) + " ====\n\n";
-		str += "Public:\n" + piece.keys[i].publicKey + "\n\n";
-		str += "Private:\n" + piece.keys[i].privateKey + "\n\n";
+		str += "Public:\n" + piece[i].address + "\n\n";
+		str += "Private:\n" + piece[i].privateKey + "\n\n";
 	}
 	return str.trim();
 }
