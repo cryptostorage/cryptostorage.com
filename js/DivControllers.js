@@ -549,7 +549,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			}
 			
 			// execute callback functions in sequence
-			async.series(encryptFuncs, function() {
+			executeInSeries(encryptFuncs, function() {	// TODO: switch to async.series() but causes only first to be encrypted
 				
 				// keys generated
 				onKeysGenerated(keys);
