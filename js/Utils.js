@@ -841,6 +841,7 @@ function piecesToKeys(pieces) {
 			let crypto;
 			let isSplit;
 			let address;
+			let encryption;
 			for (let piece of pieces) {
 				if (!crypto) crypto = piece.crypto;
 				else if (crypto !== piece.crypto) throw new Error("Pieces are for different cryptocurrencies");
@@ -848,6 +849,8 @@ function piecesToKeys(pieces) {
 				else if (isSplit !== piece.isSplit) throw new Error("Pieces have different split states");
 				if (!address) address = piece.address;
 				else if (address !== piece.address) throw new Error("Pieces have different addresses");
+				if (!encryption) encryption = piece.encryption;
+				else if (encryption !== piece.encryption) throw new Error("Pieces have different encryption states");
 			}
 		}
 		

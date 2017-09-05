@@ -989,8 +989,9 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 									setErrorMessage(err.message);
 								}
 							}
-							console.log(importedPieces);
-							let keys = getUnsplitWallets(importedPieces);
+							let pieces = [];
+							for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
+							let keys = piecesToKeys(pieces);
 							if (keys.length > 0) onKeysImported(keys);
 						}
 					});
@@ -1019,50 +1020,6 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		callback();
 	};
 	
-	function getUnsplitWallets(namedPieces) {
-		
-		// validate consistent currencies, number of keys, and split state
-		var currency;
-		var numKeys;
-		var isSplit;
-		for (let namedPiece of namedPieces) {
-			if (!currency) currency = namedPiece.piece.currency;
-			else if (currency !== namedPiece.piece.currency) throw new Error("File '" + namedPiece.name + "' is for " + namedPiece.piece.currency + " which is different from other " + currency + " pieces");
-			if (!numKeys) numKeys = namedPiece.piece.keys.length;
-			else if (numKeys !== namedPiece.piece.keys.length) throw new Error("File '" + namedPiece.name + "' has " + namedPiece.piece.keys.length + " keys which is different from other pieces with " + numKeys + " keys");
-			if (isUndefined(isSplit)) isSplit = namedPiece.piece.isSplit;
-			else if (isSplit !== namedPiece.piece.isSplit) throw new Error("File '" + namedPiece.name + "' is " + (namedPiece.piece.isSplit ? "" : " not ") + " split unlike other pieces");
-		}
-		
-		var unsplitWallets = [];
-		
-		// must have at least one piece
-		if (namedPieces.length === 0) throw new Error("At least one named piece is necessary");
-		
-		// handle more than one piece
-		else if (namedPieces.length > 1) {			
-			
-			// attempt to reconstitue wallets
-			for (let i = 0; i < numKeys; i++) {
-				let privateKeyPieces = [];
-				for (let pieceIdx = 0; pieceIdx < namedPieces.length; pieceIdx++) {
-					privateKeyPieces.push(namedPieces[pieceIdx].piece.keys[i].privateKey);
-				}
-				unsplitWallets.push(new Wallet(getCurrencyPlugin(currency), {privateKeyPieces: privateKeyPieces}).reconstitute());
-			}
-		}
-		
-		// handle one piece
-		else if (!namedPieces[0].piece.isSplit){
-			for (let i = 0; i < namedPieces[0].piece.keys.length; i++) {
-				unsplitWallets.push(new Wallet(getCurrencyPlugin(currency), {privateKey: namedPieces[0].piece.keys[i].privateKey}));
-			}
-		}
-		
-		// return unsplit wallets
-		return unsplitWallets;
-	}
-	
 	function setErrorMessage(str) {
 		errorDiv.html(str);
 		str === "" ? errorDiv.hide() : errorDiv.show();
@@ -1071,7 +1028,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 	function addPiece(name, piece) {
 		
 		// don't re-add same piece
-		var found = false;
+		let found = false;
 		for (let importedPiece of importedPieces) {
 			if (name === importedPiece.name) found = true;
 		}
