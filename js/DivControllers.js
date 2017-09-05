@@ -551,14 +551,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			// execute callback functions in sequence
 			async.series(encryptFuncs, function() {
 				
-				// split wallets
-				if (state.splitEnabled) {
-					for (let key of keys) {
-						key.split(state.numPieces, state.minPieces);
-					}
-				}
-				
-				// wallets generated
+				// keys generated
 				onKeysGenerated(keys);
 			});
 			
@@ -575,14 +568,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		// no password encryption
 		else {
 			
-			// split wallets
-			if (state.splitEnabled) {
-				for (let key of keys) {
-					key.split(state.numPieces, state.minPieces);
-				}
-			}
-			
-			// wallets generated
+			// keys generated
 			onKeysGenerated(keys);
 		}
 	}
@@ -1135,6 +1121,7 @@ inheritsFrom(ImportFilesController, DivController);
 function DownloadPiecesController(div, state, pieces, onCustomExport) {
 	DivController.call(this, div);
 	assertTrue(pieces.length > 0);
+	console.log(pieces);
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);

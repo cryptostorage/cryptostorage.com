@@ -112,7 +112,7 @@ function FlowController(pageManager, plugins) {
 	
 	function onKeysGenerated(keys) {
 		if (DEBUG) console.log("onKeysGenerated(" + keys.length + ")");
-		pageManager.next(new DownloadPiecesController($("<div>"), state, keysToPieces(keys), onCustomExport));
+		pageManager.next(new DownloadPiecesController($("<div>"), state, keysToPieces(keys, state.numPieces, state.minPieces), onCustomExport));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------

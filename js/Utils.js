@@ -747,44 +747,39 @@ function parseWallet(plugin, str) {
 
 /**
  * Converts the given keys to pieces.
+ * 
+ * TODO: change piece.currency to piece.crypto
+ * 
+ * @param keys are the keys to convert to pieces
+ * @param numPieces are the number of pieces to split the keys into (optional)
+ * @param minPieces are the minimum pieces to reconstitute the keys (optional)
+ * @returns exportable pieces
  */
-function keysToPieces(keys, wif) {
-	assertTrue(keys.length > 0);
+function keysToPieces(keys, numPieces, minPieces) {
 	
-	// collect piece metadata while ensuring consistency
-	var ticker;
-	var isSplit;
-	var numPieces;
-	var encryption;
-	for (let key of keys) {
-		if (isUndefined(ticker)) ticker = key.getPlugin().getTickerSymbol();
-		else if (ticker !== key.getCurrencyPlugin().getTickerSymbol()) throw new Error("Wallets have different currencies: " + ticker + " vs " + key.getCurrencyPlugin().getTicker());
-		if (isUndefined(isSplit)) isSplit = key.isSplit();
-		else if (isSplit !== key.isSplit()) throw new Error("Wallets have different split states");
-		if (isUndefined(numPieces)) numPieces = isSplit ? key.getCryptoKeyPieces().length : 1;
-		else if (numPieces !== (isSplit ? key.getCryptoKeyPieces().length : 1)) throw new Error("Wallets have different number of pieces");
-		if (isUndefined(encryption)) encryption = key.isEncrypted() ? key.getEncryptionScheme() : undefined;
-		else if (encryption !== (key.isEncrypted() ? key.getEncryptionScheme() : undefined)) throw new Error("Wallets have different encryption states");
+	// validate input
+	assertTrue(keys.length > 0);
+	if (numPieces) {
+		assertTrue(numPieces >= 2);
+		assertTrue(minPieces >= 2);
 	}
 	
 	// initialize pieces
-	var pieces = [];
+	let pieces = [];
 	for (let i = 0; i < numPieces; i++) {
-		var piece = {};
-		piece.currency = ticker;
-		piece.isSplit = isSplit;
-		piece.encryption = encryption;
-		piece.keys = [];
-		pieces.push(piece);
+		pieces.push([]);
 	}
 	
-	// add key keys to each piece
+	// add keys to each piece
 	for (let key of keys) {
+		let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getHex()];
 		for (let i = 0; i < numPieces; i++) {
-			var pieceKeys = {};
-			pieceKeys.publicKey = key.getAddress();
-			pieceKeys.privateKey = isSplit ? key.getCryptoKeyPieces()[i] : key.isEncrypted() ? key.getCryptoKey() : wif ? key.getCurrencyPlugin().getUnencryptedCryptoKeyWif(key.getCryptoKey()) : key.getCryptoKey();
-			pieces[i].keys.push(walletKeys);
+			let piece = {};
+			piece.crypto = key.getPlugin().getTickerSymbol();
+			piece.address = key.getAddress();
+			piece.privateKey = keyPieces[i];
+			if (numPieces === 1) piece.encryption = key.getEncryptionScheme();
+			pieces[i].push(piece);
 		}
 	}
 	

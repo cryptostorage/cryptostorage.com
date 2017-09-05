@@ -55,6 +55,39 @@ CryptoPlugin.prototype.encrypt = function(scheme, key, password, callback) { enc
 CryptoPlugin.prototype.decrypt = function(key, password, callback) { return decrypt(key, password, callback); }
 
 /**
+ * Returns the given key's private key split into pieces.
+ * 
+ * @param key is the key to split into pieces
+ * @param numPieces is the number of pieces to split the key into
+ * @param minPieces is the minimum pieces to reconstitute the key
+ * @returns string[] are the split pieces
+ */
+CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
+	assertTrue(isObject(key, 'CryptoKey'));
+	assertTrue(numPieces >= 2);
+	assertTrue(minPieces >= 2);
+	let pieces = secrets.share(key.getHex(), 3, 2);
+	for (let i = 0; i < pieces.length; i++) {
+		pieces[i] = Bitcoin.Base58.encode(Crypto.util.hexToBytes(pieces[i]));
+	}
+	return pieces;
+}
+
+/**
+ * Combines the given pieces to build a key.
+ * 
+ * @param pieces are pieces to combine
+ * @return CryptoKey is the key built from combining the pieces
+ */
+CryptoPlugin.prototype.combine = function(pieces) {
+	let hexPieces = [];
+	for (let piece of pieces) {
+		hexPieces.push(Crypto.util.bytesToHex(Bitcoin.Base58.decode(piece)));
+	}
+	return this.newKey(secrets.combine(hexPieces));
+}
+
+/**
  * Returns a new random key.
  */
 CryptoPlugin.prototype.newKey = function(str) { throw new Error("Subclass must implement"); }
