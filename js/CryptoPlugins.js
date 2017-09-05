@@ -155,7 +155,6 @@ inheritsFrom(BitcoinPlugin, CryptoPlugin);
  * Bitcoin cash plugin.
  */
 function BitcoinCashPlugin() {
-	BitcoinPlugin.call(this);
 	this.getName = function() { return "Bitcoin Cash"; }
 	this.getTickerSymbol = function() { return "BCH" };
 	this.getLogo = function() { return $("<img src='img/bitcoin_cash.png'>"); }
@@ -215,7 +214,6 @@ inheritsFrom(EthereumPlugin, CryptoPlugin);
  * Ethereum classic plugin.
  */
 function EthereumClassicPlugin() {
-	EthereumPlugin.call(this);
 	this.getName = function() { return "Ethereum Classic"; }
 	this.getTickerSymbol = function() { return "ETC" };
 	this.getLogo = function() { return $("<img src='img/ethereum_classic.png'>"); }
@@ -231,8 +229,12 @@ function LitecoinPlugin() {
 	this.getLogo = function() { return $("<img src='img/litecoin.png'>"); }
 	this.newKey = function(str) {
 		
+		let wif = new litecore.PrivateKey().toWIF();
+		console.log(wif);
+		console.log(new litecore.PrivateKey(wif).getAddress().toString());
+		
 		// create key if not given
-		if (!str) str = new litecore.PrivateKey().toString()
+		if (!str) str = new litecore.PrivateKey().toString();		
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		let state = {};
 		
@@ -243,7 +245,8 @@ function LitecoinPlugin() {
 			if (litecore.PrivateKey.isValid(str)) {
 				state.hex = str;
 				state.wif = str;	// TODO: wif different?
-				state.address =  new litecore.PrivateKey(str).getAddress().toString();
+				console.log(str);
+				state.address = "abc testing"; // new litecore.PrivateKey(str).getAddress().toString()
 				state.encryption = null;
 			}
 			
@@ -269,6 +272,7 @@ function LitecoinPlugin() {
 		return new CryptoKey(this, state);
 	}
 }
+inheritsFrom(LitecoinPlugin, CryptoPlugin);
 
 /**
  * Monero plugin.
