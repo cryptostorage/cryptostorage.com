@@ -439,12 +439,14 @@ function NumPiecesInputController(div, state, pathTracker, onPiecesInput) {
 		var numPiecesInput = $("<input type='number'>");
 		numPiecesInput.attr("class", "num_input");
 		numPiecesInput.attr("value", 3);
+		numPiecesInput.attr("min", 2);
 		div.append(numPiecesInput);
 		div.append("<br><br>");
 		numPiecesInput.keypress(function() { pathTracker.clearNexts(); });
 		
 		div.append("Number of pieces necessary to restore private keys: ");
 		var minPiecesInput = $("<input type='number'>");
+		minPiecesInput.attr("min", 2);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
 		div.append(minPiecesInput);

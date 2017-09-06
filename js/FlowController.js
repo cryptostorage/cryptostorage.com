@@ -1,5 +1,4 @@
 // TODO
-// do not allow invalid num pieces input
 // test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
 // test key.setAddress()
 // able to decrypt twice with bip38 text import
