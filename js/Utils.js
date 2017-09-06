@@ -813,6 +813,7 @@ function keysToPieces(keys, numPieces, minPieces) {
  * @returns keys built from the pieces
  */
 function piecesToKeys(pieces) {
+//	console.log(pieces);
 	assertTrue(pieces.length > 0);
 	let keys = [];
 	

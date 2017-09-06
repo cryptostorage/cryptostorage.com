@@ -12,6 +12,15 @@ function getCryptoPlugins() {
 	return plugins;
 }
 
+function getOriginalCryptoPlugins() {
+	let plugins = [];
+//	plugins.push(new BitcoinPlugin());
+//	plugins.push(new EthereumPlugin());
+//	plugins.push(new LitecoinPlugin());
+	plugins.push(new MoneroPlugin());
+	return plugins;
+}
+
 function getCryptoPlugin(ticker) {
 	assertInitialized(ticker);
 	for (let plugin of getCryptoPlugins()) {
@@ -295,37 +304,38 @@ function MoneroPlugin() {
 				state.wif = mn_encode(state.hex, 'english');
 				state.address = address.public_addr;
 				state.encryption = null;
+				return new CryptoKey(this, state);
 			}
 			
 			// hex cryptojs
-			else if (str.length > 100) {
+			if (str.length > 100) {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 				if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
 				state.encryption = EncryptionScheme.CRYPTOJS;
+				return new CryptoKey(this, state);
 			}
 		}
 		
 		// wif cryptojs
-		else if (str[0] === 'U') {
+		if (str[0] === 'U') {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
 		}
 		
 		// wif unencrypted
-		else if (str.indexOf(' ') !== -1) {
+		if (str.indexOf(' ') !== -1) {
 			state.hex = mn_decode(str);
 			state.wif = str;
 			state.address = cnUtil.create_address(state.hex).public_addr;
 			state.encryption = null;
+			return new CryptoKey(this, state);
 		}
 		
 		// otherwise key is not recognized
-		else throw new Error("Unrecognized private key: " + str);
-		
-		// return key
-		return new CryptoKey(this, state);
+		throw new Error("Unrecognized private key: " + str);
 	}
 }
 inheritsFrom(MoneroPlugin, CryptoPlugin);
