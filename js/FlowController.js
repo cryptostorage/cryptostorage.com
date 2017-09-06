@@ -1,7 +1,6 @@
 // TODO
 // investigate discrepency between bitaddress split and your split
 // do not allow invalid num pieces input
-// test keyToPieces() against all encrypted keys
 // test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
 // test key.setAddress()
 // able to decrypt twice with bip38 text import

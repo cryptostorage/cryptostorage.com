@@ -662,7 +662,7 @@ function decrypt(key, password, callback) {
 			try {
 				hex = CryptoJS.AES.decrypt(key.getWif(), password).toString(CryptoJS.enc.Utf8);
 			} catch (err) { }
-			if (!hex) callback(undefined, new Error("Invalid password"));
+			if (!hex) callback(undefined, new Error("Incorrect password"));
 			else {
 				key.setState(key.getPlugin().newKey(hex).getState());
 				callback(key);
@@ -670,7 +670,7 @@ function decrypt(key, password, callback) {
 			break;
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), password, function(resp) {
-				if (resp.message) callback(undefined, resp);	// TODO: confirm error handling, isError()
+				if (resp.message) callback(undefined, new Error("Incorrect password"));
 				else {
 					let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
 					key.setState(key.getPlugin().newKey(wif).getState());

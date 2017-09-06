@@ -1,4 +1,4 @@
-const REPEAT_LONG = 25;
+const REPEAT_LONG = 50;
 const REPEAT_SHORT = 1;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
@@ -143,15 +143,10 @@ function testCryptoKey(plugin, callback) {
 		// parse unencrypted wif
 		key2 = new CryptoKey(plugin, key.getWif());
 		assertTrue(key.equals(key2));
-		
-		// test keys to pieces
-		//testSplit(key, NUM_PIECES, MIN_PIECES);
-		testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
 	}
 	
-	// test keys to pieces
-	// TODO: test keys to pieces with encryption.  probably modify test to encrypt all keys, then decrypt all keys
-	testKeysToPieces(keys);
+	// test splitting unencrypted keys
+	for (let key of keys) testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
 	testKeysToPieces(keys, NUM_PIECES, MIN_PIECES);
 	
 	// test invalid private keys
@@ -167,39 +162,65 @@ function testCryptoKey(plugin, callback) {
 	try {
 		plugin.newKey(undefined);
 		fail("Should have thrown an error");
-	} catch (error) { }
+	} catch (error) { }	
 	
 	// test each encryption scheme
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
 	let funcs = [];
-	for (let scheme of plugin.getEncryptionSchemes()) funcs.push(function(callback) { testEncryptionScheme(plugin, scheme, callback); });
+	for (let scheme of plugin.getEncryptionSchemes()) {
+		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;
+		let keys = [];
+		for (let i = 0; i < max; i++) keys.push(plugin.newKey());
+		funcs.push(function(callback) { testEncryptKeys(keys, scheme, PASSWORD, callback); });
+	}
 	async.parallel(funcs, callback);
 }
 
-function testEncryptionScheme(plugin, scheme, callback) {
-	let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
+function testEncryptKeys(keys, scheme, password, callback) {
+	assertTrue(keys.length > 0);
+	
+	// keep originals for later validation
+	let originals = copyKeys(keys);
+	
+	// test encryption of all keys
 	let funcs = [];
-	for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin.newKey(), scheme, PASSWORD, PASSWORD, callback); });
-	funcs.push(function(callback) { testEncryption(plugin.newKey(), scheme, PASSWORD, "invalidPassword123", callback); });	// test wrong password
-	async.parallel(funcs, callback);
+	for (let key of keys) funcs.push(function(callback) { testEncryptKey(key, scheme, password, callback); });
+	async.parallel(funcs, function() {
+		
+		// test splitting encrypted keys
+		for (let key of keys) testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
+		testKeysToPieces(keys, NUM_PIECES, MIN_PIECES);
+		
+		// test decryption with wrong password
+		testDecryptKeys([keys[0]], "wrongPassword123", function(err) {
+			assertEquals("Incorrect password", err.message);
+			
+			// test decryption
+			testDecryptKeys(keys, password, function() {
+				if (!originals) throw new Error("Originals is not defined fool!!!!");
+				assertEquals(originals.length, keys.length);
+				for (let i = 0; i < originals.length; i++) assertTrue(originals[i].equals(keys[i]));
+				callback();
+			});
+		});
+	});
 }
 
-function testEncryption(key, scheme, encryptionPassword, decryptionPassword, callback) {
+function testEncryptKey(key, scheme, password, callback) {
 	assertObject(key, 'CryptoKey');
 	let original = key.copy();
-	key.encrypt(scheme, encryptionPassword, function(encryptedKey, err) {
+	key.encrypt(scheme, password, function(encrypted, err) {
 		if (err) callback(err);
 		else {
 			
 			// test basic initialization
-			assertTrue(key.equals(encryptedKey));
+			assertTrue(key.equals(encrypted));
 			assertInitialized(key.getHex());
 			assertInitialized(key.getWif());
 			assertInitialized(key.getAddress());
 			assertEquals(scheme, key.getEncryptionScheme());
 			assertTrue(key.isEncrypted());
-			
-			// test original
+			if (!original) throw new Error("Original is not defined fool");
 			assertFalse(key.equals(original));
 			assertTrue(key.equals(key.copy()));
 			
@@ -212,52 +233,44 @@ function testEncryption(key, scheme, encryptionPassword, decryptionPassword, cal
 			assertEquals(key.getHex(), parsed.getHex());
 			assertEquals(key.getWif(), parsed.getWif());
 			assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-			
-			// test keys to pieces
-			testKeysToPieces([key]);
-			testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
-			
-			// test splitting
-			// TODO this is unecessary if encrypted keys collected and testKeysToPieces()
-			testSplit(key, NUM_PIECES, MIN_PIECES);
-			
-			// test decryption
-			testDecryption(key, encryptionPassword, decryptionPassword, original, callback);
+			callback();
 		}
 	});
 }
 
-function testDecryption(key, encryptionPassword, decryptionPassword, expected, callback) {
-	key.decrypt(decryptionPassword, function(decryptedKey, err) {
-		if (encryptionPassword !== decryptionPassword) {
-			if (!err) callback(new Error("Decryption with wrong password should throw an error"));
-			else callback();
-		} else {
-			if (err) callback(err);
-			else {
-				
-				// test basic initialization
-				assertTrue(key.equals(decryptedKey));
-				assertInitialized(key.getHex());
-				assertInitialized(key.getWif());
-				assertInitialized(key.getAddress());
-				assertNull(key.getEncryptionScheme());
-				
-				// test decryption and copy
-				assertTrue(key.equals(expected));
-				assertTrue(key.equals(key.copy()));
-				
-				// test consistency
-				let parsed = new CryptoKey(key.getPlugin(), key.getHex());
-				assertEquals(key.getHex(), parsed.getHex());
-				assertEquals(key.getWif(), parsed.getWif());
-				assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-				parsed = new CryptoKey(key.getPlugin(), key.getWif());
-				assertEquals(key.getHex(), parsed.getHex());
-				assertEquals(key.getWif(), parsed.getWif());
-				assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-				callback();
-			}
+function testDecryptKeys(keys, password, callback) {
+	assertTrue(keys.length > 0);
+	let funcs = [];
+	for (let key of keys) funcs.push(function(callback) { testDecryptKey(key, password, callback); });
+	async.parallel(funcs, callback);
+}
+
+function testDecryptKey(key, password, callback) {
+	assertObject(key, 'CryptoKey');
+	let original = key.copy();
+	key.decrypt(password, function(decrypted, err) {
+		if (err) callback(err);
+		else {
+			
+			// test basic initialization
+			assertTrue(key.equals(decrypted));
+			assertInitialized(key.getHex());
+			assertInitialized(key.getWif());
+			assertInitialized(key.getAddress());
+			assertNull(key.getEncryptionScheme());
+			assertFalse(key.equals(original));
+			assertTrue(key.equals(key.copy()));
+			
+			// test consistency
+			let parsed = new CryptoKey(key.getPlugin(), key.getHex());
+			assertEquals(key.getHex(), parsed.getHex());
+			assertEquals(key.getWif(), parsed.getWif());
+			assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
+			parsed = new CryptoKey(key.getPlugin(), key.getWif());
+			assertEquals(key.getHex(), parsed.getHex());
+			assertEquals(key.getWif(), parsed.getWif());
+			assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
+			callback();
 		}
 	});
 }
@@ -282,7 +295,7 @@ function testSplit(key, numPieces, minPieces) {
 		if (!key.isEncrypted()) assertEquals(key.getAddress(), combined.getAddress());
 	}
 	
-//	// these tests appear to be invalid because shamir's algorithm can return some valid hex key without threshold met
+//	// apparently these tests are invalid because shamir's can return some valid hex key without threshold met
 //	// test one share which does not meet minimum threshold
 //	try {
 //		key.getPlugin().newKey(shares[0]);
@@ -323,7 +336,7 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 		}
 	}
 	
-//	// these tests appear to be invalid because shamir's algorithm can return some valid hex key without threshold met
+//	// apparently these tests are invalid because shamir's can return some valid hex key without threshold met
 //	// test keys from one piece which is too few
 //	if (minPieces >= 2) {
 //		let keysFromPieces = piecesToKeys([pieces[0]]);
@@ -343,4 +356,10 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 //		}
 //		assertEquals(0, keysFromPieces.length);
 //	}
+}
+
+function copyKeys(keys) {
+	let copies = [];
+	for (let key of keys) copies.push(key.copy());
+	return copies;
 }
