@@ -1,13 +1,18 @@
 // TODO
 // investigate discrepency between bitaddress split and your split
 // do not allow invalid num pieces input
+// test keyToPieces() against all encrypted keys
+// test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
+// test key.setAddress()
+// able to decrypt twice with bip38 text import
 // verify final pieces
-// custom export options page
-// progress bar on wallet generation, export generation
 // load dependencies as needed
+// progress bar on wallet generation, export generation
+// switch to async library
+// custom export options page
 // what happens without random movement for bitaddress.org? need true randomization
 // consult designers
-// namespace utils.js
+// namespace utils.js (reference bitaddress.org)
 // implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
 // cryptostorage donation addresses
 // re-style html export
@@ -16,22 +21,8 @@
 // paste private key doesn't work in iphone safari
 // aes.java needs de-minified
 // still able to decrypt twice, test with bip38
-// test key.setAddress()
-// test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
-// switch to async library
 // peer review encodings
 // todos throughout code
-
-// bitaddress.org todos
-// o vs 3 discrepency running bitaddress.org split from my site vs their site
-// how are their methods namespaced
-// what is their step by step process for creating split shares
-//	split: hex (pads 0s) -> bytes -> b58
-//	combine: b58 -> bytes -> hex -> strip leading zeros
-// can their encoding scheme be used with other hex addresses and/or longer hex strings from crytojs
-// able to decrypt twice with bip38 text import
-// make CryptoKey object oriented? plugin.newKey(str) key.isEncrypted(), etc
-// difference between split.hexToBytes() which pads 0 and Crypto.util.hexToBytes() (theirs produces one less character)
 
 const RUN_TESTS = false;
 const DEBUG = true;
