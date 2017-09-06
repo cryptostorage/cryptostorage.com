@@ -20,6 +20,7 @@
 // test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
 // switch to async library
 // peer review encodings
+// todos throughout code
 
 // bitaddress.org todos
 // o vs 3 discrepency running bitaddress.org split from my site vs their site
