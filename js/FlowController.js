@@ -5,20 +5,19 @@
 // placeholders for faq and donations
 // switch to async library
 // custom export options page
-// consult designers
 // namespace utils.js (reference bitaddress.org)
-// implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
 // cryptostorage donation addresses
 // re-style html export
 // popup on key generation to reconfirm password
 // register shortcut keys for page navigation (enter, y, n)
 // paste private key doesn't work in iphone safari
-// aes.java needs de-minified
-// still able to decrypt twice, test with bip38
-// peer review encodings
+// de-minify aes.java
 // todos throughout code
 // run minimum tests when site accessed
 // use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org)
+
+// peer review encodings
+// consult designers
 
 const RUN_TESTS = false;
 const DEBUG = true;
