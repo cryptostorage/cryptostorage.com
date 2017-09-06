@@ -8,6 +8,7 @@
 // verify final pieces
 // load dependencies as needed
 // progress bar on wallet generation, export generation
+// placeholders for faq and donations
 // switch to async library
 // custom export options page
 // what happens without random movement for bitaddress.org? need true randomization
