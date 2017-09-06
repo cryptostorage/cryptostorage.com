@@ -218,6 +218,7 @@ function testEncryption(key, scheme, encryptionPassword, decryptionPassword, cal
 			testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
 			
 			// test splitting
+			// TODO this is unecessary if encrypted keys collected and testKeysToPieces()
 			testSplit(key, NUM_PIECES, MIN_PIECES);
 			
 			// test decryption
