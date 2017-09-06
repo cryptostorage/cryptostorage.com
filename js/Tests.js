@@ -6,13 +6,13 @@ const PASSWORD = "MySuperSecretPasswordAbcTesting123";
 var counter = 0;
 
 function runTests(callback) {
-//	testInvalidMonero();
-//	if (callback) callback();
-	testUtils();
-	testPathTracker();
-	testCryptoKeys(getOriginalCryptoPlugins(), function(error) {
-		if (callback) callback(error);
-	});
+	testInvalidMonero();
+	if (callback) callback();
+//	testUtils();
+//	testPathTracker();
+//	testCryptoKeys(getOriginalCryptoPlugins(), function(error) {
+//		if (callback) callback(error);
+//	});
 }
 
 function testInvalidMonero() {
@@ -160,8 +160,8 @@ function testCryptoKey(plugin, callback) {
 		assertTrue(key.equals(key2));
 		
 		// test keys to pieces
-		//testSplit(key, NUM_PIECES, MIN_PIECES);
-		testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
+		testSplit(key, NUM_PIECES, MIN_PIECES);
+		//testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
 		
 		// key passes
 		keys.push(key);
@@ -312,8 +312,7 @@ function testSplit(key, numPieces, minPieces) {
 	// test two shares
 	try {
 		let combined = key.getPlugin().combine([shares[0], shares[1]]);
-		console.log(shares[0]);
-		console.log(shares[1]);
+		console.log(shares);
 		console.log(key.getState());
 		console.log(combined.getState());
 		fail("fail");

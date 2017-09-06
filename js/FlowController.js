@@ -1,12 +1,8 @@
 // TODO
 // investigate discrepency between bitaddress split and your split
-// error when splitting with 1 of 7 pieces
-// test piecesToKeys() and keysToPieces() with insufficient number of pieces
-// change terminology from wallets to keys
+// do not allow invalid num pieces input
 // verify final pieces
-// review private keys (hex, base58, etc)
-// page to configure export options with previews
-// plugin and wallet decryption tests (test wallet creation to reveal no address on decryption bug)
+// custom export options page
 // progress bar on wallet generation, export generation
 // load dependencies as needed
 // what happens without random movement for bitaddress.org? need true randomization
@@ -14,7 +10,7 @@
 // namespace utils.js
 // implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
 // cryptostorage donation addresses
-// make qr codes and style smaller
+// re-style html export
 // popup on key generation to reconfirm password
 // register shortcut keys for page navigation (enter, y, n)
 // paste private key doesn't work in iphone safari
@@ -23,6 +19,7 @@
 // test key.setAddress()
 // test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
 // switch to async library
+// peer review encodings
 
 // bitaddress.org todos
 // o vs 3 discrepency running bitaddress.org split from my site vs their site
