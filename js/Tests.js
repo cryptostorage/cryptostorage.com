@@ -1,7 +1,7 @@
 const REPEAT_LONG = 50;
 const REPEAT_SHORT = 1;
-const NUM_PIECES = 5;
-const MIN_PIECES = 3;
+const NUM_PIECES = 3;
+const MIN_PIECES = 2;
 const PASSWORD = "MySuperSecretPasswordAbcTesting123";
 var counter = 0;
 
