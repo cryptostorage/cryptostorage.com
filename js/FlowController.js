@@ -1,4 +1,5 @@
 // TODO
+// investigate discrepency between bitaddress split and your split
 // error when splitting with 1 of 7 pieces
 // test piecesToKeys() and keysToPieces() with insufficient number of pieces
 // change terminology from wallets to keys

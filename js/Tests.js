@@ -1,4 +1,4 @@
-const REPEAT_LONG = 50;
+const REPEAT_LONG = 100;
 const REPEAT_SHORT = 1;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
@@ -6,13 +6,13 @@ const PASSWORD = "MySuperSecretPasswordAbcTesting123";
 var counter = 0;
 
 function runTests(callback) {
-	testInvalidMonero();
-	if (callback) callback();
-//	testUtils();
-//	testPathTracker();
-//	testCryptoKeys(getOriginalCryptoPlugins(), function(error) {
-//		if (callback) callback(error);
-//	});
+//	testInvalidMonero();
+//	if (callback) callback();
+	testUtils();
+	testPathTracker();
+	testCryptoKeys(getOriginalCryptoPlugins(), function(error) {
+		if (callback) callback(error);
+	});
 }
 
 function testInvalidMonero() {
@@ -160,7 +160,7 @@ function testCryptoKey(plugin, callback) {
 		assertTrue(key.equals(key2));
 		
 		// test keys to pieces
-		testSplit(key, NUM_PIECES, MIN_PIECES);
+		//testSplit(key, NUM_PIECES, MIN_PIECES);
 		testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
 		
 		// key passes

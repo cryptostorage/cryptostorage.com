@@ -76,7 +76,8 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	assertTrue(isObject(key, 'CryptoKey'));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
-	return secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
+	return secrets.share(key.getHex(), numPieces, minPieces);
+	//return secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
 }
 
 /**
@@ -86,7 +87,8 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
  * @return CryptoKey is the key built by combining the shares
  */
 CryptoPlugin.prototype.combine = function(shares) {
-	return this.newKey(secrets.combine(shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
+	return this.newKey(secrets.combine(shares));
+	//return this.newKey(secrets.combine(shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
 }
 
 /**
@@ -290,7 +292,6 @@ function MoneroPlugin() {
 		if (!str) str = cnUtil.sc_reduce32(cnUtil.rand_32());
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		let state = {};
-		console.log(str);
 		
 		// handle hex
 		if (isHex(str)) {
