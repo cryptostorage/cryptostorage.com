@@ -80,13 +80,13 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 }
 
 /**
- * Combines the given pieces to build a key.
+ * Combines the given shares to build a key.
  * 
- * @param pieces are pieces to combine
- * @return CryptoKey is the key built from combining the pieces
+ * @param shares are shares to combine
+ * @return CryptoKey is the key built by combining the shares
  */
-CryptoPlugin.prototype.combine = function(pieces) {
-	return this.newKey(secrets.combine(pieces.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
+CryptoPlugin.prototype.combine = function(shares) {
+	return this.newKey(secrets.combine(shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
 }
 
 /**
@@ -290,6 +290,7 @@ function MoneroPlugin() {
 		if (!str) str = cnUtil.sc_reduce32(cnUtil.rand_32());
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		let state = {};
+		console.log(str);
 		
 		// handle hex
 		if (isHex(str)) {
