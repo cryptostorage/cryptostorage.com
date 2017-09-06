@@ -1,4 +1,4 @@
-const REPEAT_LONG = 100;
+const REPEAT_LONG = 25;
 const REPEAT_SHORT = 1;
 const NUM_PIECES = 5;
 const MIN_PIECES = 3;
@@ -6,27 +6,11 @@ const PASSWORD = "MySuperSecretPasswordAbcTesting123";
 var counter = 0;
 
 function runTests(callback) {
-	testInvalidMonero();
-	if (callback) callback();
-//	testUtils();
-//	testPathTracker();
-//	testCryptoKeys(getOriginalCryptoPlugins(), function(error) {
-//		if (callback) callback(error);
-//	});
-}
-
-function testInvalidMonero() {
-	try {
-//		let share1 = "oKuMb4iGEp6y6Tzf7DyFDwKSBh5UPtiZv1pWzN9L6nYpeSM";
-//		let share2 = "oMXUZfBm72VZN4w1ufcjEnDPEz8VGtS5NGb8uaZM8RkBJBY";
-		let share1 = "oLVEcKrJR6mhywCNGuvmMv2EEvyYQELmp4vATw2H8STUrvk";
-		let share2 = "oMFCySoZndun71m9gvkf2whc1wcfh5cE8P2zj4W19J3avU1";
-		let key = getCryptoPlugin("XMR").combine([share1, share2]);
-		console.log(key.getState());
-		fail("fail");
-	} catch (err) {
-		if (err.message === "fail") throw new Error("Shares are not sufficient to create a key");
-	}	
+	testUtils();
+	testPathTracker();
+	testCryptoKeys(getTestCryptoPlugins(), function(error) {
+		if (callback) callback(error);
+	});
 }
 
 function testUtils() {
@@ -144,6 +128,7 @@ function testCryptoKey(plugin, callback) {
 		
 		// create new key
 		let key = plugin.newKey();
+		keys.push(key);
 		assertInitialized(key.getHex());
 		assertInitialized(key.getWif());
 		assertInitialized(key.getAddress());
@@ -160,11 +145,8 @@ function testCryptoKey(plugin, callback) {
 		assertTrue(key.equals(key2));
 		
 		// test keys to pieces
-		testSplit(key, NUM_PIECES, MIN_PIECES);
-		//testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
-		
-		// key passes
-		keys.push(key);
+		//testSplit(key, NUM_PIECES, MIN_PIECES);
+		testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
 	}
 	
 	// test keys to pieces
@@ -192,15 +174,14 @@ function testCryptoKey(plugin, callback) {
 	let funcs = [];
 	for (let scheme of plugin.getEncryptionSchemes()) funcs.push(function(callback) { testEncryptionScheme(plugin, scheme, callback); });
 	async.parallel(funcs, callback);
-	
-	// test one encryption scheme
-	function testEncryptionScheme(plugin, scheme, callback) {
-		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
-		let funcs = [];
-		for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin.newKey(), scheme, PASSWORD, PASSWORD, callback); });
-		funcs.push(function(callback) { testEncryption(plugin.newKey(), scheme, PASSWORD, "invalidPassword123", callback); });	// test wrong password
-		async.parallel(funcs, callback);
-	}
+}
+
+function testEncryptionScheme(plugin, scheme, callback) {
+	let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;	// bip38 takes a long time
+	let funcs = [];
+	for (let i = 0; i < max; i++) funcs.push(function(callback) { testEncryption(plugin.newKey(), scheme, PASSWORD, PASSWORD, callback); });
+	funcs.push(function(callback) { testEncryption(plugin.newKey(), scheme, PASSWORD, "invalidPassword123", callback); });	// test wrong password
+	async.parallel(funcs, callback);
 }
 
 function testEncryption(key, scheme, encryptionPassword, decryptionPassword, callback) {
@@ -281,10 +262,9 @@ function testDecryption(key, encryptionPassword, decryptionPassword, expected, c
 }
 
 function testSplit(key, numPieces, minPieces) {
-	
-	// minimum 3 shares so 1 and 2 shares can be tested
-	assertTrue(minPieces >= 3);
-	assertTrue(numPieces >= minPieces);
+	assertInitialized(key);
+	assertTrue(numPieces >= 2);
+	assertTrue(minPieces >= 2);
 	
 	// split private key into shares
 	let shares = key.getPlugin().split(key, numPieces, minPieces);
@@ -301,24 +281,25 @@ function testSplit(key, numPieces, minPieces) {
 		if (!key.isEncrypted()) assertEquals(key.getAddress(), combined.getAddress());
 	}
 	
-	// test one share
-	try {
-		key.getPlugin().newKey(shares[0]);
-		fail("fail");
-	} catch (err) {
-		if (err.message === "fail") throw new Error("Creating key with too few shares should fail");
-	}
-	
-	// test two shares
-	try {
-		let combined = key.getPlugin().combine([shares[0], shares[1]]);
-		console.log(shares);
-		console.log(key.getState());
-		console.log(combined.getState());
-		fail("fail");
-	} catch (err) {
-		if (err.message === "fail") throw new Error("Creating key with too few shares should fail");
-	}
+//	// these tests appear to be invalid because shamir's algorithm can return some valid hex key without threshold met
+//	// test one share which does not meet minimum threshold
+//	try {
+//		key.getPlugin().newKey(shares[0]);
+//		fail("fail");
+//	} catch (err) {
+//		if (err.message === "fail") throw new Error("Creating key with too few shares should fail");
+//	}
+//	
+//	// test two shares which does not meet minimum threshold
+//	try {
+//		let combined = key.getPlugin().combine([shares[0], shares[1]]);
+//		console.log(shares);
+//		console.log(key.getState());
+//		console.log(combined.getState());
+//		fail("fail");
+//	} catch (err) {
+//		if (err.message === "fail") throw new Error("Creating key with too few shares should fail");
+//	}
 }
 
 function testKeysToPieces(keys, numPieces, minPieces) {
@@ -341,28 +322,24 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 		}
 	}
 	
-	// test keys from one piece which is too few
-	if (minPieces >= 2) {
-		let keysFromPieces = piecesToKeys([pieces[0]]);
-		assertEquals(keysFromPieces.length, 0);
-	}
-	
-	// test keys from two pieces which is too few
-	if (minPieces >= 3) {
-		keysFromPieces = piecesToKeys([pieces[0], pieces[1]]);
-		if (keysFromPieces.length !== 0) {
-			console.log(pieces[0]);
-			console.log(pieces[1]);
-			console.log("Originals:");
-			for (let key of keys) {
-				console.log(key.getState());
-			}
-			console.log("Pieces to keys:");
-			for (let key of keysFromPieces) {
-				console.log(key.getState());
-			}
-		}
-		
-		assertEquals(0, keysFromPieces.length);
-	}
+//	// these tests appear to be invalid because shamir's algorithm can return some valid hex key without threshold met
+//	// test keys from one piece which is too few
+//	if (minPieces >= 2) {
+//		let keysFromPieces = piecesToKeys([pieces[0]]);
+//		assertEquals(keysFromPieces.length, 0);
+//	}
+//	
+//	// test keys from two pieces which is too few
+//	if (minPieces >= 3) {
+//		keysFromPieces = piecesToKeys([pieces[0], pieces[1]]);
+//		if (keysFromPieces.length !== 0) {
+//			console.log(pieces[0]);
+//			console.log(pieces[1]);
+//			console.log("Originals:");
+//			for (let key of keys) console.log(key.getState());
+//			console.log("Pieces to keys:");
+//			for (let key of keysFromPieces) console.log(key.getState());
+//		}
+//		assertEquals(0, keysFromPieces.length);
+//	}
 }

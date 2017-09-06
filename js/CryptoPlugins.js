@@ -12,11 +12,11 @@ function getCryptoPlugins() {
 	return plugins;
 }
 
-function getOriginalCryptoPlugins() {
+function getTestCryptoPlugins() {
 	let plugins = [];
-//	plugins.push(new BitcoinPlugin());
-//	plugins.push(new EthereumPlugin());
-//	plugins.push(new LitecoinPlugin());
+	plugins.push(new BitcoinPlugin());
+	plugins.push(new EthereumPlugin());
+	plugins.push(new LitecoinPlugin());
 	plugins.push(new MoneroPlugin());
 	return plugins;
 }
