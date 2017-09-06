@@ -12,7 +12,7 @@ body {
 }
 
 #header {
-	height:125px;
+	height:115px;
 	flex:none;
 	display:flex;
 	align-items:center;
