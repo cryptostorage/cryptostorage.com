@@ -121,6 +121,10 @@ function testCryptoKey(plugin, callback) {
 	assertInitialized(plugin.getName());
 	assertInitialized(plugin.getTickerSymbol());
 	assertInitialized(plugin.getLogo());
+	assertFalse(plugin.isAddress("invalidAddress123"));
+	assertFalse(plugin.isAddress(null));
+	assertFalse(plugin.isAddress(undefined));
+	assertFalse(plugin.isAddress([]));
 	
 	// test unencrypted keys
 	let keys = [];
@@ -131,16 +135,24 @@ function testCryptoKey(plugin, callback) {
 		keys.push(key);
 		assertInitialized(key.getHex());
 		assertInitialized(key.getWif());
-		assertInitialized(key.getAddress());
 		assertNull(key.getEncryptionScheme());
 		let copy = key.copy();
 		assertTrue(key.equals(copy));
 		
-		// parse unencrypted hex
+		// test address
+		assertInitialized(key.getAddress());
+		assertTrue(plugin.isAddress(key.getAddress()));
+		key.setAddress(key.getAddress());
+		try {
+			key.setAddress("invalidAddress123");
+			fail("fail");
+		} catch(err) {
+			if (err.message === "fail") throw new Error("Cannot change address of unencrypted key");
+		}
+		
+		// test new key from unencrypted hex and wif
 		let key2 = new CryptoKey(plugin, key.getHex());
 		assertTrue(key.equals(key2));
-		
-		// parse unencrypted wif
 		key2 = new CryptoKey(plugin, key.getWif());
 		assertTrue(key.equals(key2));
 	}
@@ -214,15 +226,33 @@ function testEncryptKey(key, scheme, password, callback) {
 		else {
 			
 			// test basic initialization
+			assertTrue(key.isEncrypted());
 			assertTrue(key.equals(encrypted));
 			assertInitialized(key.getHex());
 			assertInitialized(key.getWif());
-			assertInitialized(key.getAddress());
 			assertEquals(scheme, key.getEncryptionScheme());
-			assertTrue(key.isEncrypted());
 			if (!original) throw new Error("Original is not defined fool");
 			assertFalse(key.equals(original));
 			assertTrue(key.equals(key.copy()));
+			
+			// test address
+			assertInitialized(key.getAddress());
+			key.setAddress(key.getAddress());
+			try {
+				key.setAddress("invalidAddress123");
+			} catch (err) {
+				if (err.message === "fail") throw new Error("Cannot set encrypted key's address to invalid address");
+			}
+			
+			// test new key from encrypted hex and wif
+			let key2 = new CryptoKey(key.getPlugin(), key.getHex());
+			assertUndefined(key2.getAddress());
+			key2.setAddress(key.getAddress());
+			assertTrue(key.equals(key2));
+			key2 = new CryptoKey(key.getPlugin(), key.getWif());
+			assertUndefined(key2.getAddress());
+			key2.setAddress(key.getAddress());
+			assertTrue(key.equals(key2));
 			
 			// test consistency
 			let parsed = new CryptoKey(key.getPlugin(), key.getHex());

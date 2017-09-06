@@ -40,9 +40,12 @@ function CryptoKey(plugin, state) {
 	}
 	
 	this.setAddress = function(address) {
-		if (!this.isEncrypted()) throw new Error("Cannot override derived address for unencrypted private key");
-		if (this.state.address && this.state.address !== address) throw new Error("Given address conflicts with existing address");
-		this.state.address = address;
+		if (this.isEncrypted()) {
+			if (!this.plugin.isAddress(address)) throw new Error("Address is invalid: " + address);
+			this.state.address = address;
+		} else {
+			if (this.state.address !== address) throw new Error("Cannot change address of unencrypted key");
+		}
 	}
 	
 	this.getHex = function() {

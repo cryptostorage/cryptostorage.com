@@ -1,6 +1,4 @@
 // TODO
-// test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
-// test key.setAddress()
 // verify final pieces
 // load dependencies as needed
 // progress bar on wallet generation, export generation

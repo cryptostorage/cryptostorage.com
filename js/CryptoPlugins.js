@@ -76,7 +76,6 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	assertTrue(isObject(key, 'CryptoKey'));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
-//	return secrets.share(key.getHex(), numPieces, minPieces);
 	return secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
 }
 
@@ -87,7 +86,6 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
  * @return CryptoKey is the key built by combining the shares
  */
 CryptoPlugin.prototype.combine = function(shares) {
-//	return this.newKey(secrets.combine(shares));
 	return this.newKey(secrets.combine(shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
 }
 
@@ -95,6 +93,11 @@ CryptoPlugin.prototype.combine = function(shares) {
  * Returns a new random key.
  */
 CryptoPlugin.prototype.newKey = function(str) { throw new Error("Subclass must implement"); }
+
+/**
+ * Determines if the given string is a valid address.
+ */
+CryptoPlugin.prototype.isAddress = function(str) { throw new Error("Subclass must implement"); }
 
 /**
  * Bitcoin plugin.
@@ -159,6 +162,14 @@ function BitcoinPlugin() {
 		// return key
 		return new CryptoKey(this, state);
 	}
+	this.isAddress = function(str) {
+		try {
+			Bitcoin.Address.decodeString(str);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
 }
 inheritsFrom(BitcoinPlugin, CryptoPlugin);
 
@@ -219,6 +230,35 @@ function EthereumPlugin() {
 		// return key
 		return new CryptoKey(this, state);
 	}
+	this.isAddress = function(str) {
+		return isAddress(str);
+		
+		// Credit: https://ethereum.stackexchange.com/questions/1374/how-can-i-check-if-an-ethereum-address-is-valid
+		function isAddress(address) {
+			if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
+		        // check if it has the basic requirements of an address
+		        return false;
+		    } else if (/^(0x)?[0-9a-f]{40}$/.test(address) || /^(0x)?[0-9A-F]{40}$/.test(address)) {
+		        // If it's all small caps or all all caps, return true
+		        return true;
+		    } else {
+		        // Otherwise check each case
+		        return isChecksumAddress(address);
+		    }
+		}
+		function isChecksumAddress(address) {
+		    // Check each case
+		    address = address.replace('0x','');
+		    var addressHash = sha3(address.toLowerCase());
+		    for (var i = 0; i < 40; i++ ) {
+		        // the nth letter should be uppercase if the nth digit of casemap is 1
+		        if ((parseInt(addressHash[i], 16) > 7 && address[i].toUpperCase() !== address[i]) || (parseInt(addressHash[i], 16) <= 7 && address[i].toLowerCase() !== address[i])) {
+		            return false;
+		        }
+		    }
+		    return true;
+		}
+	}
 }
 inheritsFrom(EthereumPlugin, CryptoPlugin);
 
@@ -275,6 +315,9 @@ function LitecoinPlugin() {
 		
 		// return key
 		return new CryptoKey(this, state);
+	}
+	this.isAddress = function(str) {
+		return litecore.Address.isValid(str);
 	}
 }
 inheritsFrom(LitecoinPlugin, CryptoPlugin);
@@ -338,6 +381,15 @@ function MoneroPlugin() {
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
+	}
+	this.isAddress = function(str) {
+		if (!isString(str)) return false;
+		try {
+			cnUtil.decode_address(str);
+			return true;
+		} catch (err) {
+			return false;
+		}
 	}
 }
 inheritsFrom(MoneroPlugin, CryptoPlugin);
