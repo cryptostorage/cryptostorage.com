@@ -1,5 +1,4 @@
 // TODO
-// investigate discrepency between bitaddress split and your split
 // do not allow invalid num pieces input
 // test every combination of key initialization: new, unencrypted hex, unencrypted wif, encrypted(s) hex, encrypted(s) wif
 // test key.setAddress()
@@ -10,7 +9,6 @@
 // placeholders for faq and donations
 // switch to async library
 // custom export options page
-// what happens without random movement for bitaddress.org? need true randomization
 // consult designers
 // namespace utils.js (reference bitaddress.org)
 // implement executeCallbackFunctions() and switch some things to multithreaded (like reading files)
@@ -23,6 +21,8 @@
 // still able to decrypt twice, test with bip38
 // peer review encodings
 // todos throughout code
+// run minimum tests when site accessed
+// use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org)
 
 const RUN_TESTS = false;
 const DEBUG = true;
