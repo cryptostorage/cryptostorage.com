@@ -230,7 +230,7 @@ function CryptoSelectionController(div, state, onCryptoSelection) {
 inheritsFrom(CryptoSelectionController, DivController);
 
 /**
- * Render number of key pairs.
+ * Render number of keys.
  */
 function NumKeysController(div, state, pathTracker, onNumKeysInput) {
 	DivController.call(this, div);
@@ -859,7 +859,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		var title = "Imported " + keys.length + " " + state.plugin.getName() + " key pairs which are password protected with " + keys[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
+		var title = "Imported " + keys.length + " " + state.plugin.getName() + " keys which are password protected with " + keys[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
 		div.append(UiUtils.getPageHeader(title, state.plugin.getLogo()));
 		
 		// render error div
