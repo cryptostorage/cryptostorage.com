@@ -41,6 +41,9 @@ $(document).ready(function() {
 		});
 	}
 	
+	// hex shares start with 7 so b58 starts with 3
+	secrets.init(7);	
+	
 	// initialize content div and flow controller
 	var pageManager = new PageManager($("#content"));
 	pageManager.render(function() {
