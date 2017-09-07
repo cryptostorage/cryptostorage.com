@@ -64,6 +64,7 @@ function FlowController(pageManager, plugins) {
 	
 	// track application state
 	var state = {};
+	state.pageManager = pageManager;
 	state.plugins = plugins;
 	
 	// render home page
@@ -83,25 +84,15 @@ function FlowController(pageManager, plugins) {
 		if (state.cryptoSelection === "MIX") {
 			throw new Error("Mix crypto selection not supported");
 		} else {
-			state.plugin = getCryptoPlugin(selection);
-			pageManager.next(new NumKeysController($("<div>"), state, pageManager.getPathTracker(), onNumKeysInput));
+			state.mix.push({plugin: getCryptoPlugin(selection)});
+			pageManager.next(new NumKeysController($("<div>"), state, onNumKeysInput));
 		}
 	}
 	
 	function onNumKeysInput(numKeys) {
 		if (DEBUG) console.log("onNumKeysInput(" + numKeys + ")");
-//		state.mix = [
-//			{
-//				crypto: "BTC",
-//				numKeys: 10;
-//				encryption: "BIP38"
-//			},
-//			
-//		]
-//		
-//		
 		assertInt(numKeys);
-		state.numKeys = numKeys;
+		state.mix[0].numKeys = numKeys;
 		pageManager.next(new PasswordSelectionController($("<div>"), state, onPasswordSelection))
 	}
 	

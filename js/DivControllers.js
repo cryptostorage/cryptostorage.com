@@ -231,14 +231,15 @@ inheritsFrom(SelectCryptoController, DivController);
  * 
  * Invokes onNumKeysInput(numKeys) when done.
  */
-function NumKeysController(div, state, pathTracker, onNumKeysInput) {
+function NumKeysController(div, state, onNumKeysInput) {
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("How many " + state.plugin.getName() + " keys do you want to create?", state.plugin.getLogo()));
+		let plugin = state.mix[0].plugin;
+		div.append(UiUtils.getPageHeader("How many keys do you want to create?", plugin.getLogo()));
 		
 		// num key keys input
 		var numKeysInput = $("<input>");
@@ -248,7 +249,7 @@ function NumKeysController(div, state, pathTracker, onNumKeysInput) {
 		numKeysInput.attr("value", 10);
 		div.append(numKeysInput);
 		div.append("<br><br>");
-		numKeysInput.keypress(function() { pathTracker.clearNexts(); });
+		numKeysInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
 		
 		// error message
 		var errorDiv = $("<div>");
@@ -296,7 +297,8 @@ function PasswordSelectionController(div, state, onPasswordSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Do you want to password protect your " + state.plugin.getName() + " private keys?", state.plugin.getLogo()));
+		let logo = state.mix.length > 1 ? undefined : state.mix[0].plugin.getLogo();	// TODO: get mixed logo
+		div.append(UiUtils.getPageHeader("Do you want to password protect your private keys?", logo));
 		
 		var btnYes = UiUtils.getNextButton("Yes (recommended)");
 		btnYes.click(function() { onPasswordSelection(true); });
@@ -318,10 +320,10 @@ inheritsFrom(PasswordSelectionController, DivController);
  * @param state is the current state of the application
  * @param onPasswordInput(password, scheme) is the callback and its parameters
  */
-function PasswordInputController(div, state, pathTracker, onPasswordInput) {
+function PasswordInputController(div, state, onPasswordInput) {
 	DivController.call(this, div);
 	var passwordInput;	// for later focus on show
-	var schemes = state.plugin.getEncryptionSchemes();
+	var schemes = state.plugin.getEncryptionSchemes();	// TODO: not one set with mixed
 	var errorDiv = $("<div>");
 	
 	this.render = function(callback) {
@@ -342,7 +344,7 @@ function PasswordInputController(div, state, pathTracker, onPasswordInput) {
 		passwordInput.attr("class", "text_input");
 		div.append(passwordInput);
 		div.append("<br><br>");
-		passwordInput.keypress(function() { pathTracker.clearNexts(); });
+		passwordInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
 		
 		// render advanced
 		var advancedDiv = $("<div>").appendTo(div);
@@ -424,7 +426,7 @@ inheritsFrom(SplitSelectionController, DivController);
 /**
  * Number of pieces input page.
  */
-function NumPiecesInputController(div, state, pathTracker, onPiecesInput) {
+function NumPiecesInputController(div, state, onPiecesInput) {
 	DivController.call(this, div);
 	var errorDiv = $("<div>");
 
@@ -441,7 +443,7 @@ function NumPiecesInputController(div, state, pathTracker, onPiecesInput) {
 		numPiecesInput.attr("min", 2);
 		div.append(numPiecesInput);
 		div.append("<br><br>");
-		numPiecesInput.keypress(function() { pathTracker.clearNexts(); });
+		numPiecesInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
 		
 		div.append("Number of pieces necessary to restore private keys: ");
 		var minPiecesInput = $("<input type='number'>");
