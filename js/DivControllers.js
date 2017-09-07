@@ -217,6 +217,10 @@ function CryptoSelectionController(div, state, onCryptoSelection) {
 			throw new Error("Invalid goal for currency selection: " + state.goal);
 		}
 		
+		// render mix and match button
+		let btn = UiUtils.getNextButton("Mix and match").appendTo(div);
+		btn.click(function() { onCryptoSelection("MIX"); });
+		
 		// render crypto buttons
 		for (let plugin of state.plugins) {
 			let btn = UiUtils.getNextButton(plugin.getName() + " (" + plugin.getTickerSymbol() + ")", plugin.getLogo()).appendTo(div);
