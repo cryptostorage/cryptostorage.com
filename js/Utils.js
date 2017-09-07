@@ -798,7 +798,7 @@ function keysToPieces(keys, numPieces, minPieces) {
 			piece.isSplit = numPieces > 1;
 			piece.address = key.getAddress();
 			piece.privateKey = keyPieces[i];
-			if (numPieces === 1) piece.encryption = key.getEncryptionScheme();
+			piece.encryption = key.getEncryptionScheme();
 			pieces[i].push(piece);
 		}
 	}

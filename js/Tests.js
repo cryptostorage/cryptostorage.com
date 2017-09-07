@@ -355,8 +355,21 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 	// split keys into pieces
 	let pieces = keysToPieces(keys, numPieces, minPieces);
 	
-	// TODO: test structure of split pieces based on input keys
-	//pieces[0].encryption = "CryptoJS", etc
+	// test each share in each piece
+	for (let piece of pieces) {
+		for (let i = 0; i < keys.length; i++) {
+			assertEquals(keys[i].getPlugin().getTickerSymbol(), piece[i].crypto);
+			assertEquals(keys[i].getAddress(), piece[i].address);
+			assertEquals(keys[i].getEncryptionScheme(), piece[i].encryption);
+			if (numPieces > 1) {
+				assertTrue(piece[i].isSplit);
+				assertFalse(keys[i].getWif() === piece[i].privateKey);
+			} else {
+				assertFalse(piece[i].isSplit);
+				asserTrue(keys[i].getWif() === piece[i].privateKey);
+			}
+		}
+	}
 	
 	// verify secrets is initialized with 7 bits
 	if (numPieces > 1) {
