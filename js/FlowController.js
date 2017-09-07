@@ -31,9 +31,9 @@ $(document).ready(function() {
 
 	// start loading common dependencies
 	loader = new DependencyLoader();
-	const DEPENDENCIES = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js"];
-	const MORE = [];
-	loader.load(allDependencies, function() {
+	const DEPENDENCIES = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/moneroaddress.js", "lib/litecore.js", "lib/keythereum.js"];
+	loader.load(DEPENDENCIES, function() {
+		
 		// run tests
 		if (RUN_TESTS) {
 			console.log("Running tests");
