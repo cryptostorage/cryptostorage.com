@@ -43,12 +43,28 @@ UiUtils = {
 		return headerDiv;
 	},
 
-	getName: function(state) {
-		return state.mix.length > 1 ? "mixed" : state.mix[0].plugin.getName();
+	getCryptoName: function(state) {
+		if (state.mix) return state.mix.length > 1 ? "mixed" : state.mix[0].plugin.getName();
+		else {
+			let name;
+			for (let key of state.keys) {
+				if (!name) name = key.getPlugin().getName();
+				else if (name !== key.getPlugin().getName()) return "mixed";
+			}
+			return name;
+		}
 	},
 	
-	getLogo: function(state) {
-		return state.mix.length > 1 ? undefined : state.mix[0].plugin.getLogo();
+	getCryptoLogo: function(state) {
+		if (state.mix)  return state.mix.length > 1 ? undefined : state.mix[0].plugin.getLogo();
+		else {
+			let ticker;
+			for (let key of state.keys) {
+				if (!ticker) ticker = key.getPlugin().getTickerSymbol();
+				else if (name !== key.getPlugin().getTickerSymbol()) return undefined;	// TODO: return mix logo
+			}
+			return getCryptoPlugin(ticker).getLogo();
+		}
 	}
 }
 
@@ -305,7 +321,7 @@ function PasswordSelectionController(div, state, onPasswordSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Do you want to password protect your private keys?", UiUtils.getLogo(state)));
+		div.append(UiUtils.getPageHeader("Do you want to password protect your private keys?", UiUtils.getCryptoLogo(state)));
 		
 		var btnYes = UiUtils.getNextButton("Yes (recommended)");
 		btnYes.click(function() { onPasswordSelection(true); });
@@ -335,7 +351,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("Enter a password to protect your private keys.", UiUtils.getLogo(state)));
+		div.append(UiUtils.getPageHeader("Enter a password to protect your private keys.", UiUtils.getCryptoLogo(state)));
 		
 		// render error div
 		div.append(errorDiv);
@@ -417,7 +433,7 @@ function SplitSelectionController(div, state, onSplitSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Do you want to split your private keys into separate pieces?", UiUtils.getLogo(state)));
+		div.append(UiUtils.getPageHeader("Do you want to split your private keys into separate pieces?", UiUtils.getCryptoLogo(state)));
 		
 		div.append("The pieces must be recombined to recover the private keys.");
 		div.append("<br><br>");
@@ -444,7 +460,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("How many pieces do you want to split your private keys into?", UiUtils.getLogo(state)));
+		div.append(UiUtils.getPageHeader("How many pieces do you want to split your private keys into?", UiUtils.getCryptoLogo(state)));
 		
 		div.append("Number of pieces: ");
 		var numPiecesInput = $("<input type='number'>");
@@ -517,7 +533,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Ready to generate your " + UiUtils.getName(state) + " storage?", UiUtils.getLogo(state)));
+		div.append(UiUtils.getPageHeader("Ready to generate your " + UiUtils.getCryptoName(state) + " storage?", UiUtils.getCryptoLogo(state)));
 		
 		div.append("<b>Summary:</b><br><br>");
 		for (let elem of state.mix) {
@@ -890,8 +906,8 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		var title = "Imported " + keys.length + " " + state.plugin.getName() + " keys which are password protected with " + keys[0].getEncryptionScheme() + ".  Enter the password to decrypt them.";
-		div.append(UiUtils.getPageHeader(title, state.plugin.getLogo()));
+		var title = "Imported " + keys.length + " " + UiUtils.getCryptoName(state) + " keys which are password protected.  Enter the password to decrypt them.";
+		div.append(UiUtils.getPageHeader(title, UiUtils.getCryptoLogo(state)));
 		
 		// render error div
 		div.append(errorDiv);
@@ -1116,7 +1132,7 @@ function DownloadPiecesController(div, state, onCustomExport) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Download your " + UiUtils.getName(state) + " storage.", UiUtils.getLogo(state)));
+		div.append(UiUtils.getPageHeader("Download your " + UiUtils.getCryptoName(state) + " storage.", UiUtils.getCryptoLogo(state)));
 		
 		// collect functions to render pieces and divs to be rendered to
 		var pieceDivs = [];

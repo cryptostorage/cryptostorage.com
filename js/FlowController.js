@@ -63,9 +63,12 @@ $(document).ready(function() {
 function FlowController(pageManager, plugins) {
 	
 	// track application state
-	var state = {};
-	state.pageManager = pageManager;
-	state.plugins = plugins;
+	var state;
+	function initState() {
+		state = {};
+		state.pageManager = pageManager;
+		state.plugins = plugins;
+	}
 	
 	// render home page
 	pageManager.next(new HomeController($("<div>"), onSelectCreate, onSelectImport));
@@ -74,6 +77,7 @@ function FlowController(pageManager, plugins) {
 	
 	function onSelectCreate() {
 		if (DEBUG) console.log("onSelectCreate()");
+		initState();
 		state.mix = [];	// fill out mix to create as we go
 		pageManager.next(new SelectCryptoController($("<div>"), state, onSelectCryptoCreate));
 	}
@@ -141,12 +145,12 @@ function FlowController(pageManager, plugins) {
 	
 	function onSelectImport() {
 		if (DEBUG) console.log("onSelectImport()");
+		initState();
 		pageManager.next(new ImportFilesController($("<div>"), onKeysImported, onSelectImportText));
 	}
 	
 	function onSelectImportText() {
 		if (DEBUG) console.log("onSelectImportText()");
-		state.goal = Goal.RESTORE_STORAGE;
 		pageManager.next(new SelectCryptoController($("<div>"), state, onSelectCryptoImport));
 	}
 	
@@ -163,9 +167,11 @@ function FlowController(pageManager, plugins) {
 		if (DEBUG) console.log("onKeysImported(" + keys.length + " keys)");
 		assertTrue(keys.length >= 1);
 		state.keys = keys;
-		state.plugin = keys[0].getPlugin();	// TODO: may not have same plugin across all keys
 		if (keys[0].isEncrypted()) pageManager.next(new DecryptKeysController($("<div>"), state, onKeysImported));
-		else pageManager.next(new DownloadPiecesController($("<div>"), state, keysToPieces(keys), onCustomExport));
+		else {
+			state.pieces = keysToPieces(keys);
+			pageManager.next(new DownloadPiecesController($("<div>"), state, onCustomExport));
+		}
 	}
 	
 	function onCustomExport(pieces) {

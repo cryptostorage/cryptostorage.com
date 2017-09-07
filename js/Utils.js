@@ -602,15 +602,6 @@ function countNonWhitespaceCharacters(str) {
 }
 
 /**
- * Enumerates high level goals.
- */
-const Goal = {
-	CREATE_STORAGE: "create_storage",
-	RESTORE_STORAGE: "restore_storage",
-	CREATE_CRYPTOCASH: "create_cryptocash"
-}
-
-/**
  * Enumerates password encryption/decryption schemes.
  */
 const EncryptionScheme = {
