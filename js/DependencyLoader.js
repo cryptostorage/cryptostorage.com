@@ -22,7 +22,7 @@ const Dependencies = {
 //<script src="lib/FileSaver.js"></script>
 
 /**
- * Loads dependencies and tracks the state of what's loaded.
+ * Loads dependencies.
  * 
  * Uses loadjs under the covers: https://github.com/muicss/loadjs
  */
@@ -39,12 +39,14 @@ function DependencyLoader() {
 		// listify paths
 		paths = isArray(paths) ? paths : [paths];
 		
+		// only load paths that aren't previously defined
 		for (let path of paths) {
 			if (!loadjs.isDefined(path)) {
 				loadjs(path, path);
 			}
 		}
 		
+		// invokes callback when ready
 		loadjs.ready(paths, {
 			success: callback,
 			error: callback
