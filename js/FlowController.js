@@ -74,7 +74,7 @@ function FlowController(pageManager, plugins) {
 	function onSelectCreate() {
 		if (DEBUG) console.log("onSelectCreate()");
 		state.goal = Goal.CREATE_STORAGE;
-		pageManager.next(new CryptoSelectionController($("<div>"), state, onSelectCryptoCreate));
+		pageManager.next(new SelectCryptoController($("<div>"), state, onSelectCryptoCreate));
 	}
 	
 	function onSelectCryptoCreate(selection) {
@@ -90,6 +90,16 @@ function FlowController(pageManager, plugins) {
 	
 	function onNumKeysInput(numKeys) {
 		if (DEBUG) console.log("onNumKeysInput(" + numKeys + ")");
+//		state.mix = [
+//			{
+//				crypto: "BTC",
+//				numKeys: 10;
+//				encryption: "BIP38"
+//			},
+//			
+//		]
+//		
+//		
 		assertInt(numKeys);
 		state.numKeys = numKeys;
 		pageManager.next(new PasswordSelectionController($("<div>"), state, onPasswordSelection))
@@ -144,7 +154,7 @@ function FlowController(pageManager, plugins) {
 	function onSelectImportText() {
 		if (DEBUG) console.log("onSelectImportText()");
 		state.goal = Goal.RESTORE_STORAGE;
-		pageManager.next(new CryptoSelectionController($("<div>"), state, onSelectCryptoImport));
+		pageManager.next(new SelectCryptoController($("<div>"), state, onSelectCryptoImport));
 	}
 	
 	function onSelectCryptoImport(tickerSymbol) {

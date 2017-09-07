@@ -197,10 +197,9 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 inheritsFrom(HomeController, DivController);
 
 /**
- * Render currenct selection.
+ * Render crypto selection.
  */
-
-function CryptoSelectionController(div, state, onCryptoSelection) {
+function SelectCryptoController(div, state, onCryptoSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -231,10 +230,12 @@ function CryptoSelectionController(div, state, onCryptoSelection) {
 		callback(div);
 	}
 }
-inheritsFrom(CryptoSelectionController, DivController);
+inheritsFrom(SelectCryptoController, DivController);
 
 /**
  * Render number of keys.
+ * 
+ * Invokes onNumKeysInput(numKeys) when done.
  */
 function NumKeysController(div, state, pathTracker, onNumKeysInput) {
 	DivController.call(this, div);
