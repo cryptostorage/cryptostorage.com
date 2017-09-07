@@ -19,7 +19,7 @@
 // peer review encodings
 // consult designers
 
-const RUN_TESTS = true;
+const RUN_TESTS = false;
 const DEBUG = true;
 var loader;
 
