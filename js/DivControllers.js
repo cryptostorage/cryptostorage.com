@@ -56,15 +56,19 @@ UiUtils = {
 	},
 	
 	getCryptoLogo: function(state) {
-		if (state.mix)  return state.mix.length > 1 ? undefined : state.mix[0].plugin.getLogo();
+		if (state.mix) return state.mix.length > 1 ? $("<img src='img/mix.png'>") : state.mix[0].plugin.getLogo();
 		else {
 			let ticker;
 			for (let key of state.keys) {
 				if (!ticker) ticker = key.getPlugin().getTicker();
-				else if (name !== key.getPlugin().getTicker()) return undefined;	// TODO: return mix logo
+				else if (name !== key.getPlugin().getTicker()) return getMixLogo();
 			}
 			return getCryptoPlugin(ticker).getLogo();
 		}
+	},
+	
+	getMixLogo: function() {
+		return $("<img src='img/mix.png'>");
 	}
 }
 
@@ -234,7 +238,7 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		
 		// render mix and match button if creating new storage
 		if (state.mix) {
-			let btn = UiUtils.getNextButton("Mix and match").appendTo(div);
+			let btn = UiUtils.getNextButton("Select multiple", UiUtils.getMixLogo()).appendTo(div);
 			btn.click(function() { onCryptoSelection("MIX"); });
 		}
 		
