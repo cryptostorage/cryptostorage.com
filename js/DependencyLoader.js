@@ -1,27 +1,4 @@
 /**
- * Enumerates dependencies for each currency.
- */
-const Dependencies = {
-	ANY: ["lib/jquery-csv.js", "lib/aes.js", "lib/secrets.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js"],
-	BTC: ["lib/bitaddress.js"],
-	ETH: ["lib/bitaddress.js"],
-	LTC: ["lib/bitaddress.js"],
-	XMR: ["lib/bitaddress.js"]
-}
-
-
-//<script src="lib/jquery-csv.js"></script>
-//<script src="lib/bitaddress.js"></script>
-//<script src="lib/moneroaddress.js"></script>
-//<script src="lib/litecore.js"></script>
-//<script src="lib/keythereum.js"></script>
-//<script src="lib/aes.js"></script>
-//<script src="lib/secrets.js"></script>
-//<script src="lib/qrcode.js"></script>
-//<script src="lib/jszip.js"></script>
-//<script src="lib/FileSaver.js"></script>
-
-/**
  * Loads dependencies.
  * 
  * Uses loadjs under the covers: https://github.com/muicss/loadjs

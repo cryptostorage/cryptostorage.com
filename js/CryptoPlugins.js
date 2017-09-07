@@ -50,6 +50,11 @@ CryptoPlugin.prototype.getTickerSymbol = function() { throw new Error("Subclass 
 CryptoPlugin.prototype.getLogo = function() { throw new Error("Subclass must implement"); }
 
 /**
+ * Returns an array of dependency paths for the plugin.
+ */
+CryptoPlugin.prototype.getDependencies = function() { throw new Error("Subclass must implement"); }
+
+/**
  * Returns the supported encryption schemes.  All support CryptoJS by default.
  */
 CryptoPlugin.prototype.getEncryptionSchemes = function() { return [EncryptionScheme.CRYPTOJS]; }
@@ -106,6 +111,7 @@ function BitcoinPlugin() {
 	this.getName = function() { return "Bitcoin"; }
 	this.getTickerSymbol = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
+	this.getDependencies = function() { return ["lib/bitaddress.js"]; }
 	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38, EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function(str) {
 		
@@ -191,6 +197,7 @@ function EthereumPlugin() {
 	this.getName = function() { return "Ethereum"; }
 	this.getTickerSymbol = function() { return "ETH" };
 	this.getLogo = function() { return $("<img src='img/ethereum.png'>"); }
+	this.getDependencies = function() { return ["lib/keythereum.js"]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -280,6 +287,7 @@ function LitecoinPlugin() {
 	this.getName = function() { return "Litecoin"; }
 	this.getTickerSymbol = function() { return "LTC" };
 	this.getLogo = function() { return $("<img src='img/litecoin.png'>"); }
+	this.getDependencies = function() { return ["lib/litecore.js"]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -329,6 +337,7 @@ function MoneroPlugin() {
 	this.getName = function() { return "Monero"; }
 	this.getTickerSymbol = function() { return "XMR" };
 	this.getLogo = function() { return $("<img src='img/monero.png'>"); }
+	this.getDependencies = function() { return ["lib/moneroaddress.js"]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
