@@ -1,6 +1,7 @@
 // TODO
-// verify final pieces
+// support mix & match
 // load dependencies as needed
+// verify final pieces
 // progress bar on wallet generation, export generation
 // placeholders for faq and donations
 // switch to async library
@@ -72,16 +73,18 @@ function FlowController(pageManager, plugins) {
 	function onSelectCreate() {
 		if (DEBUG) console.log("onSelectCreate()");
 		state.goal = Goal.CREATE_STORAGE;
-		pageManager.next(new CryptoSelectionController($("<div>"), state, onCryptoSelectionCreate));
+		pageManager.next(new CryptoSelectionController($("<div>"), state, onSelectCryptoCreate));
 	}
 	
-	function onCryptoSelectionCreate(tickerSymbol) {
-		if (DEBUG) console.log("onCryptoSelectionCreate(" + tickerSymbol + ")");
-		for (let plugin of plugins) {
-			if (plugin.getTickerSymbol() === tickerSymbol) state.plugin = plugin;
+	function onSelectCryptoCreate(selection) {
+		if (DEBUG) console.log("onSelectCrypto(" + selection + ")");
+		state.cryptoSelection = selection;
+		if (state.cryptoSelection === "MIX") {
+			throw new Error("Mix crypto selection not supported");
+		} else {
+			state.plugin = getCryptoPlugin(selection);
+			pageManager.next(new NumKeysController($("<div>"), state, pageManager.getPathTracker(), onNumKeysInput));
 		}
-		if (!state.plugin) throw new Error("plugin not found with ticker symbol: " + tickerSymbol);
-		pageManager.next(new NumKeysController($("<div>"), state, pageManager.getPathTracker(), onNumKeysInput));
 	}
 	
 	function onNumKeysInput(numKeys) {
@@ -140,11 +143,11 @@ function FlowController(pageManager, plugins) {
 	function onSelectImportText() {
 		if (DEBUG) console.log("onSelectImportText()");
 		state.goal = Goal.RESTORE_STORAGE;
-		pageManager.next(new CryptoSelectionController($("<div>"), state, onSelectImportCrypto));
+		pageManager.next(new CryptoSelectionController($("<div>"), state, onSelectCryptoImport));
 	}
 	
-	function onSelectImportCrypto(tickerSymbol) {
-		if (DEBUG) console.log("onSelectImportCrypto(" + tickerSymbol + ")");
+	function onSelectCryptoImport(tickerSymbol) {
+		if (DEBUG) console.log("onSelectCryptoImport(" + tickerSymbol + ")");
 		for (let plugin of plugins) {
 			if (plugin.getTickerSymbol() === tickerSymbol) state.plugin = plugin;
 		}

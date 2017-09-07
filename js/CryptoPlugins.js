@@ -26,7 +26,7 @@ function getCryptoPlugin(ticker) {
 	for (let plugin of getCryptoPlugins()) {
 		if (plugin.getTickerSymbol() === ticker) return plugin;
 	}
-	return null;
+	throw new Error("No plugin found for crypto '" + ticker + "'");
 }
 
 /**
