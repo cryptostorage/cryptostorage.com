@@ -24,7 +24,7 @@ function getTestCryptoPlugins() {
 function getCryptoPlugin(ticker) {
 	assertInitialized(ticker);
 	for (let plugin of getCryptoPlugins()) {
-		if (plugin.getTickerSymbol() === ticker) return plugin;
+		if (plugin.getTicker() === ticker) return plugin;
 	}
 	throw new Error("No plugin found for crypto '" + ticker + "'");
 }
@@ -42,7 +42,7 @@ CryptoPlugin.prototype.getName = function() { throw new Error("Subclass must imp
 /**
  * Returns the ticker symbol.
  */
-CryptoPlugin.prototype.getTickerSymbol = function() { throw new Error("Subclass must implement"); }
+CryptoPlugin.prototype.getTicker = function() { throw new Error("Subclass must implement"); }
 
 /**
  * Returns the logo.
@@ -109,7 +109,7 @@ CryptoPlugin.prototype.isAddress = function(str) { throw new Error("Subclass mus
  */
 function BitcoinPlugin() {
 	this.getName = function() { return "Bitcoin"; }
-	this.getTickerSymbol = function() { return "BTC" };
+	this.getTicker = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
 	this.getDependencies = function() { return ["lib/aes.js", "lib/bitaddress.js"]; }
 	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38, EncryptionScheme.CRYPTOJS]; }
@@ -185,7 +185,7 @@ inheritsFrom(BitcoinPlugin, CryptoPlugin);
 function BitcoinCashPlugin() {
 	BitcoinPlugin.call(this);
 	this.getName = function() { return "Bitcoin Cash"; }
-	this.getTickerSymbol = function() { return "BCH" };
+	this.getTicker = function() { return "BCH" };
 	this.getLogo = function() { return $("<img src='img/bitcoin_cash.png'>"); }
 }
 inheritsFrom(BitcoinCashPlugin, BitcoinPlugin);
@@ -195,7 +195,7 @@ inheritsFrom(BitcoinCashPlugin, BitcoinPlugin);
  */
 function EthereumPlugin() {
 	this.getName = function() { return "Ethereum"; }
-	this.getTickerSymbol = function() { return "ETH" };
+	this.getTicker = function() { return "ETH" };
 	this.getLogo = function() { return $("<img src='img/ethereum.png'>"); }
 	this.getDependencies = function() { return ["lib/aes.js", "lib/bitaddress.js", "lib/keythereum.js"]; }
 	this.newKey = function(str) {
@@ -275,7 +275,7 @@ inheritsFrom(EthereumPlugin, CryptoPlugin);
 function EthereumClassicPlugin() {
 	EthereumPlugin.call(this);
 	this.getName = function() { return "Ethereum Classic"; }
-	this.getTickerSymbol = function() { return "ETC" };
+	this.getTicker = function() { return "ETC" };
 	this.getLogo = function() { return $("<img src='img/ethereum_classic.png'>"); }
 }
 inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
@@ -285,7 +285,7 @@ inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
  */
 function LitecoinPlugin() {
 	this.getName = function() { return "Litecoin"; }
-	this.getTickerSymbol = function() { return "LTC" };
+	this.getTicker = function() { return "LTC" };
 	this.getLogo = function() { return $("<img src='img/litecoin.png'>"); }
 	this.getDependencies = function() { return ["lib/aes.js", "lib/bitaddress.js", "lib/litecore.js"]; }
 	this.newKey = function(str) {
@@ -335,7 +335,7 @@ inheritsFrom(LitecoinPlugin, CryptoPlugin);
  */
 function MoneroPlugin() {
 	this.getName = function() { return "Monero"; }
-	this.getTickerSymbol = function() { return "XMR" };
+	this.getTicker = function() { return "XMR" };
 	this.getLogo = function() { return $("<img src='img/monero.png'>"); }
 	this.getDependencies = function() { return ["lib/aes.js", "lib/bitaddress.js", "lib/moneroaddress.js"]; }
 	this.newKey = function(str) {

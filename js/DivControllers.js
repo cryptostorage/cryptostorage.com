@@ -60,8 +60,8 @@ UiUtils = {
 		else {
 			let ticker;
 			for (let key of state.keys) {
-				if (!ticker) ticker = key.getPlugin().getTickerSymbol();
-				else if (name !== key.getPlugin().getTickerSymbol()) return undefined;	// TODO: return mix logo
+				if (!ticker) ticker = key.getPlugin().getTicker();
+				else if (name !== key.getPlugin().getTicker()) return undefined;	// TODO: return mix logo
 			}
 			return getCryptoPlugin(ticker).getLogo();
 		}
@@ -240,8 +240,8 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		
 		// render crypto buttons
 		for (let plugin of state.plugins) {
-			let btn = UiUtils.getNextButton(plugin.getName() + " (" + plugin.getTickerSymbol() + ")", plugin.getLogo()).appendTo(div);
-			btn.click(function() { onCryptoSelection(plugin.getTickerSymbol()); });
+			let btn = UiUtils.getNextButton(plugin.getName() + " (" + plugin.getTicker() + ")", plugin.getLogo()).appendTo(div);
+			btn.click(function() { onCryptoSelection(plugin.getTicker()); });
 		}
 		
 		// done rendering

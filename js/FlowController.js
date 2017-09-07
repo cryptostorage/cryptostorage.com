@@ -157,7 +157,7 @@ function FlowController(pageManager, plugins) {
 	function onSelectCryptoImport(tickerSymbol) {
 		if (DEBUG) console.log("onSelectCryptoImport(" + tickerSymbol + ")");
 		for (let plugin of plugins) {
-			if (plugin.getTickerSymbol() === tickerSymbol) state.plugin = plugin;
+			if (plugin.getTicker() === tickerSymbol) state.plugin = plugin;
 		}
 		if (!state.plugin) throw new Error("plugin not found with ticker symbol: " + tickerSymbol);
 		pageManager.next(new ImportTextController($("<div>"), state, onKeysImported));

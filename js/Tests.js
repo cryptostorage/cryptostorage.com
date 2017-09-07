@@ -115,11 +115,11 @@ function testCryptoKeys(plugins, callback) {
 }
 
 function testCryptoKey(plugin, callback) {
-	console.log("testCryptoKey(" + plugin.getTickerSymbol() + ")");
+	console.log("testCryptoKey(" + plugin.getTicker() + ")");
 	
 	// test plugin
 	assertInitialized(plugin.getName());
-	assertInitialized(plugin.getTickerSymbol());
+	assertInitialized(plugin.getTicker());
 	assertInitialized(plugin.getLogo());
 	assertFalse(plugin.isAddress("invalidAddress123"));
 	assertFalse(plugin.isAddress(null));
@@ -358,7 +358,7 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 	// test each share in each piece
 	for (let piece of pieces) {
 		for (let i = 0; i < keys.length; i++) {
-			assertEquals(keys[i].getPlugin().getTickerSymbol(), piece[i].crypto);
+			assertEquals(keys[i].getPlugin().getTicker(), piece[i].crypto);
 			assertEquals(keys[i].getAddress(), piece[i].address);
 			assertEquals(keys[i].getEncryptionScheme(), piece[i].encryption);
 			if (numPieces > 1) {

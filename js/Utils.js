@@ -785,7 +785,7 @@ function keysToPieces(keys, numPieces, minPieces) {
 		let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getWif()];
 		for (let i = 0; i < numPieces; i++) {
 			let piece = {};
-			piece.crypto = key.getPlugin().getTickerSymbol();
+			piece.crypto = key.getPlugin().getTicker();
 			piece.isSplit = numPieces > 1;
 			piece.address = key.getAddress();
 			piece.privateKey = keyPieces[i];
