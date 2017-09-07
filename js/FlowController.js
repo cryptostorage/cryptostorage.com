@@ -32,16 +32,16 @@ $(document).ready(function() {
 	// start loading common dependencies
 	loader = new DependencyLoader();
 	let allDependencies = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js"];
-	loader.load(allDependencies, function() {} );
-	
-	// run tests
-	if (RUN_TESTS) {
-		console.log("Running tests");
-		runTests(function(error) {
-			if (error) throw error;
-			console.log("All tests pass");
-		});
-	}
+	loader.load(allDependencies, function() {
+		// run tests
+		if (RUN_TESTS) {
+			console.log("Running tests");
+			runTests(function(error) {
+				if (error) throw error;
+				console.log("All tests pass");
+			});
+		}
+	});
 	
 	// initialize content div and flow controller
 	var pageManager = new PageManager($("#content"));

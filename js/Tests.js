@@ -355,11 +355,15 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 	// split keys into pieces
 	let pieces = keysToPieces(keys, numPieces, minPieces);
 	
-	// verify secrets is initialized with 8 bits
+	// TODO: test structure of split pieces based on input keys
+	//pieces[0].encryption = "CryptoJS", etc
+	
+	// verify secrets is initialized with 7 bits
 	if (numPieces > 1) {
 		for (let share of pieces[0]) {
-			console.log(share.privateKey);
-			if (share.crypto === 'BTC') assertTrue(share.privateKey.startsWith("3X"));
+			if (!share.encryption && share.crypto === 'BTC') {
+				assertTrue(share.privateKey.startsWith("3X"));
+			}
 		}
 	}
 	
