@@ -73,7 +73,7 @@ function FlowController(pageManager, plugins) {
 	
 	function onSelectCreate() {
 		if (DEBUG) console.log("onSelectCreate()");
-		state.goal = Goal.CREATE_STORAGE;
+		state.mix = [];	// fill out mix to create as we go
 		pageManager.next(new SelectCryptoController($("<div>"), state, onSelectCryptoCreate));
 	}
 	

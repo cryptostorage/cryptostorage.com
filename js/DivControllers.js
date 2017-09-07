@@ -205,20 +205,14 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		switch (state.goal) {
-		case Goal.CREATE_STORAGE:
-			div.append(UiUtils.getPageHeader("Select a currency to store."));
-			break;
-		case Goal.RESTORE_STORAGE:
-			div.append(UiUtils.getPageHeader("Select a currency to import."));
-			break;
-		default:
-			throw new Error("Invalid goal for currency selection: " + state.goal);
-		}
+		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to store."));
+		else div.append(UiUtils.getPageHeader("Select a currency to import."));
 		
-		// render mix and match button
-		let btn = UiUtils.getNextButton("Mix and match").appendTo(div);
-		btn.click(function() { onCryptoSelection("MIX"); });
+		// render mix and match button if creating new storage
+		if (state.mix) {
+			let btn = UiUtils.getNextButton("Mix and match").appendTo(div);
+			btn.click(function() { onCryptoSelection("MIX"); });
+		}
 		
 		// render crypto buttons
 		for (let plugin of state.plugins) {
