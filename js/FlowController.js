@@ -39,14 +39,14 @@ $(document).ready(function() {
 	
 	// load dependencies async
 	loader = new DependencyLoader();
-//	let allDependencies = ["lib/jquery-csv.js", "lib/aes.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js"];
+	let allDependencies = ["lib/jquery-csv.js", "lib/aes.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/secrets.js", "lib/bitaddress.js"];
 //	let splitDependencies = ["lib/secrets.js", "lib/bitaddress.js"];
-//	loader.load(allDependencies, function() {
-//		console.log("All done");
-//		
-//		// hex shares start with 7 so b58 starts with 3
-//		//secrets.init(7);
-//	});
+	loader.load(allDependencies, function() {
+		console.log("All done");
+		
+		// hex shares start with 7 so b58 starts with 3
+		secrets.init(7);
+	});
 	
 	// initialize content div and flow controller
 	var pageManager = new PageManager($("#content"));
