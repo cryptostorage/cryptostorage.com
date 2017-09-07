@@ -28,7 +28,6 @@ var loader;
  * Invoked when document initialized.
  */
 $(document).ready(function() {
-	
 
 	// start loading dependencies
 	loader = new DependencyLoader();
