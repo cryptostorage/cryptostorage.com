@@ -19,7 +19,7 @@
 // peer review encodings
 // consult designers
 
-const RUN_TESTS = false;
+const RUN_TESTS = true;
 const DEBUG = true;
 var loader;
 
@@ -27,6 +27,12 @@ var loader;
  * Invoked when document initialized.
  */
 $(document).ready(function() {
+	
+
+	// start loading common dependencies
+	loader = new DependencyLoader();
+	let allDependencies = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js"];
+	loader.load(allDependencies, function() {} );
 	
 	// run tests
 	if (RUN_TESTS) {
@@ -36,17 +42,6 @@ $(document).ready(function() {
 			console.log("All tests pass");
 		});
 	}
-	
-	// load dependencies async
-	loader = new DependencyLoader();
-	let allDependencies = ["lib/jquery-csv.js", "lib/aes.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/secrets.js", "lib/bitaddress.js"];
-//	let splitDependencies = ["lib/secrets.js", "lib/bitaddress.js"];
-	loader.load(allDependencies, function() {
-		console.log("All done");
-		
-		// hex shares start with 7 so b58 starts with 3
-		secrets.init(7);
-	});
 	
 	// initialize content div and flow controller
 	var pageManager = new PageManager($("#content"));
