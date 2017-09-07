@@ -142,7 +142,7 @@ function PageManager(contentDiv) {
 	 * @param renderer the page renderer for the page
 	 */
 	function onPageChange(lastIdx, curIdx, renderer) {
-		if (DEBUG) console.log("onPageMove(" + lastIdx + ", " + curIdx + ", " + JSON.stringify(renderer) + ")");
+		if (DEBUG) console.log("onPageMove(" + lastIdx + ", " + curIdx + ")");
 		
 		// handle first page
 		if (lastIdx === -1) {
@@ -236,16 +236,16 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to store."));
 		else div.append(UiUtils.getPageHeader("Select a currency to import."));
 		
-		// render mix and match button if creating new storage
-		if (state.mix) {
-			let btn = UiUtils.getNextButton("Select multiple", UiUtils.getMixLogo()).appendTo(div);
-			btn.click(function() { onCryptoSelection("MIX"); });
-		}
-		
 		// render crypto buttons
 		for (let plugin of state.plugins) {
 			let btn = UiUtils.getNextButton(plugin.getName() + " (" + plugin.getTicker() + ")", plugin.getLogo()).appendTo(div);
 			btn.click(function() { onCryptoSelection(plugin.getTicker()); });
+		}
+		
+		// render mix and match button if creating new storage
+		if (state.mix) {
+			let btn = UiUtils.getNextButton("Select multiple", UiUtils.getMixLogo()).appendTo(div);
+			btn.click(function() { onCryptoSelection("MIX"); });
 		}
 		
 		// done rendering
