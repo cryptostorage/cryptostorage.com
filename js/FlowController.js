@@ -84,7 +84,7 @@ function FlowController(pageManager, plugins) {
 		if (state.cryptoSelection === "MIX") {
 			throw new Error("Mix crypto selection not supported");
 		} else {
-			state.mix.push({plugin: getCryptoPlugin(selection)});
+			state.mix = [{plugin: getCryptoPlugin(selection)}];
 			pageManager.next(new NumKeysController($("<div>"), state, onNumKeysInput));
 		}
 	}
@@ -99,21 +99,22 @@ function FlowController(pageManager, plugins) {
 	function onPasswordSelection(passwordEnabled) {
 		if (DEBUG) console.log("onPasswordSelection(" + passwordEnabled + ")");
 		state.passwordEnabled = passwordEnabled;
-		if (passwordEnabled) pageManager.next(new PasswordInputController($("<div>"), state, pageManager.getPathTracker(), onPasswordInput));
-		else pageManager.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
+		if (passwordEnabled) pageManager.next(new PasswordInputController($("<div>"), state, onPasswordInput));
+		else {
+			for (let elem of state.mix) elem.encryption = null;
+			pageManager.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
+		}
 	}
 
-	function onPasswordInput(password, encryptionScheme) {
-		if (DEBUG) console.log("onPasswordInput(" + password + ", " + encryptionScheme + ")");
-		state.password = password;
-		state.encryptionScheme = encryptionScheme;
+	function onPasswordInput() {
+		if (DEBUG) console.log("onPasswordInput()");
 		pageManager.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
 	}
 	
 	function onSplitSelection(splitEnabled) {
 		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
 		state.splitEnabled = splitEnabled;
-		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, pageManager.getPathTracker(), onSplitInput));
+		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, onSplitInput));
 		else {
 			delete state.numPieces;
 			delete state.minPieces;
@@ -132,7 +133,8 @@ function FlowController(pageManager, plugins) {
 	
 	function onKeysGenerated(keys) {
 		if (DEBUG) console.log("onKeysGenerated(" + keys.length + ")");
-		pageManager.next(new DownloadPiecesController($("<div>"), state, keysToPieces(keys, state.numPieces, state.minPieces), onCustomExport));
+		state.pieces = keysToPieces(keys, state.numPieces, state.minPieces);
+		pageManager.next(new DownloadPiecesController($("<div>"), state, onCustomExport));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------

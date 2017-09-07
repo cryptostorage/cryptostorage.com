@@ -41,6 +41,14 @@ UiUtils = {
 		contentDiv.append(title);
 		
 		return headerDiv;
+	},
+
+	getName: function(state) {
+		return state.mix.length > 1 ? "mixed" : state.mix[0].plugin.getName();
+	},
+	
+	getLogo: function(state) {
+		return state.mix.length > 1 ? undefined : state.mix[0].plugin.getLogo();
 	}
 }
 
@@ -297,8 +305,7 @@ function PasswordSelectionController(div, state, onPasswordSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		let logo = state.mix.length > 1 ? undefined : state.mix[0].plugin.getLogo();	// TODO: get mixed logo
-		div.append(UiUtils.getPageHeader("Do you want to password protect your private keys?", logo));
+		div.append(UiUtils.getPageHeader("Do you want to password protect your private keys?", UiUtils.getLogo(state)));
 		
 		var btnYes = UiUtils.getNextButton("Yes (recommended)");
 		btnYes.click(function() { onPasswordSelection(true); });
@@ -317,20 +324,18 @@ inheritsFrom(PasswordSelectionController, DivController);
  * Render password input page.
  * 
  * @param div is the div to render to
- * @param state is the current state of the application
- * @param onPasswordInput(password, scheme) is the callback and its parameters
+ * @param state is updated with the new password configuration
  */
 function PasswordInputController(div, state, onPasswordInput) {
 	DivController.call(this, div);
 	var passwordInput;	// for later focus on show
-	var schemes = state.plugin.getEncryptionSchemes();	// TODO: not one set with mixed
 	var errorDiv = $("<div>");
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("Enter a password to protect your " + state.plugin.getName() + " private keys.", state.plugin.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter a password to protect your private keys.", UiUtils.getLogo(state)));
 		
 		// render error div
 		div.append(errorDiv);
@@ -346,7 +351,11 @@ function PasswordInputController(div, state, onPasswordInput) {
 		div.append("<br><br>");
 		passwordInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
 		
+		// TODO: mix and match support
+		if (state.mix.length > 1) throw new Error("Mix and match password input not supported");
+		
 		// render advanced
+		let schemes = state.mix[0].plugin.getEncryptionSchemes();
 		var advancedDiv = $("<div>").appendTo(div);
 		advancedDiv.append("Advanced<br><br>");
 		advancedDiv.append("Password encryption algorithm:<br>");
@@ -369,8 +378,9 @@ function PasswordInputController(div, state, onPasswordInput) {
 			else if (password.length < 6) setErrorMessage("Password must be at least 6 characters");
 			else {
 				setErrorMessage("");
-				var scheme = $("input[type='radio']:checked", form).val();
-				onPasswordInput(passwordInput.val(), scheme);
+				state.mix[0].password = passwordInput.val();
+				state.mix[0].encryption = $("input[type='radio']:checked", form).val();
+				onPasswordInput();
 			}
 			passwordInput.focus();
 		});
@@ -407,7 +417,7 @@ function SplitSelectionController(div, state, onSplitSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Do you want to split your " + state.plugin.getName() + " private keys into separate pieces?", state.plugin.getLogo()));
+		div.append(UiUtils.getPageHeader("Do you want to split your private keys into separate pieces?", UiUtils.getLogo(state)));
 		
 		div.append("The pieces must be recombined to recover the private keys.");
 		div.append("<br><br>");
@@ -434,7 +444,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		UiUtils.pageSetup(div);
 
 		// render title
-		div.append(UiUtils.getPageHeader("How many pieces do you want to split your " + state.plugin.getName() + " private keys into?", state.plugin.getLogo()));
+		div.append(UiUtils.getPageHeader("How many pieces do you want to split your private keys into?", UiUtils.getLogo(state)));
 		
 		div.append("Number of pieces: ");
 		var numPiecesInput = $("<input type='number'>");
@@ -495,11 +505,11 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 inheritsFrom(NumPiecesInputController, DivController);
 
 /**
- * Controls page to summarize configuration and generate keys.
+ * Summarize configuration and generate keys.
  * 
  * @param div is the div to render to
  * @param state is the current state of the application
- * @param onKeysGenerated(wallets) is invoked when the keys are generated
+ * @param onKeysGenerated(keys) is invoked when the keys are created
  */
 function GenerateKeysController(div, state, onKeysGenerated) {
 	DivController.call(this, div);
@@ -507,16 +517,20 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Ready to generate your " + state.plugin.getName() + " storage?", state.plugin.getLogo()));
+		div.append(UiUtils.getPageHeader("Ready to generate your " + UiUtils.getName(state) + " storage?", UiUtils.getLogo(state)));
 		
 		div.append("<b>Summary:</b><br><br>");
-		div.append("Currency: " + state.plugin.getName() + " (" + state.plugin.getTickerSymbol() + ")").append("<br>");
-		div.append("Number of keys to create: " + state.numKeys).append("<br>");
-		div.append("Password protection: " + (state.passwordEnabled ? "Yes" : "No") + (state.passwordEnabled ? " (" + state.encryptionScheme + ")" : "")).append("<br>");
-		div.append("Split private keys: " + (state.splitEnabled ? "Yes" : "No") + (state.splitEnabled ? " (" + state.minPieces + " of " + state.numPieces + " pieces necessary to restore)" : ""));
+		for (let elem of state.mix) {
+			div.append(elem.numKeys + " " + elem.plugin.getName() + " keys" + (elem.encryption ? " encrypted with " + elem.encryption : " unencrypted") + "<br>");
+		}
+		if (state.splitEnabled) {
+			div.append("Split private keys into " + state.numPieces + " pieces with a minimum of " + state.minPieces + " to restore")
+		} else {
+			div.append("Private keys will not be split")
+		}
 		div.append("<br><br>");
 		
-		var btnGenerate = UiUtils.getNextButton("Generate " + state.plugin.getName() + " storage");
+		var btnGenerate = UiUtils.getNextButton("Generate storage");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
 			generateKeys(function(keys) {
@@ -530,50 +544,64 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 	
 	function generateKeys(onKeysGenerated) {
 		
-		// generate keys
-		var keys = [];
-		for (var i = 0; i < state.numKeys; i++) {
-			keys.push(state.plugin.newKey());
-		}
-		
-		// copy originals for later validation
-		var originalKeys = [];
-		for (let key of keys) {
-			originalKeys.push(key.copy());
-		}
-		
-		// password encryption
-		if (state.passwordEnabled) {
-			
-			// collect callback functions to encrypt wallets
-			var encryptFuncs = [];
-			for (let key of keys) {
-				encryptFuncs.push(getCallbackFunctionEncrypt(key, state.encryptionScheme, state.password));
-			}
-			
-			// execute callback functions in sequence
-			executeInSeries(encryptFuncs, function() {	// TODO: switch to async.series() but causes only first to be encrypted
-				
-				// keys generated
-				onKeysGenerated(keys);
-			});
-			
-			/**
-			 * Returns a callback function to encrypt a key.
-			 */
-			function getCallbackFunctionEncrypt(key, encryptionScheme, password) {
-				return function(callback) {
-					key.encrypt(encryptionScheme, password, callback);
+		// create keys and callback functions to encrypt
+		let originals = [];	// save originals for later validation
+		let processeds = [];
+		let funcs = [];
+		for (let elem of state.mix) {
+			for (let i = 0; i < elem.numKeys; i++) {
+				let original = elem.plugin.newKey();
+				let processed = original.copy();
+				originals.push(original);
+				processeds.push(processed);
+				if (elem.encryption) {
+					funcs.push(function(callback) { processed.encrypt(elem.encryption, elem.password, callback); })
 				}
 			}
 		}
 		
-		// no password encryption
-		else {
-			
-			// keys generated
-			onKeysGenerated(keys);
-		}
+		// encrypt keys
+		executeInSeries(funcs, function() {
+			onKeysGenerated(processeds);
+		})
+		
+		
+//		// copy originals for later validation
+//		var originalKeys = [];
+//		for (let key of keys) {
+//			originalKeys.push(key.copy());
+//		}
+//		
+//		// collect callback functions to encrypt keys
+//		
+//		
+//		// password encryption
+//		if (state.passwordEnabled) {
+//			
+//			
+//			// execute callback functions in sequence
+//			executeInSeries(encryptFuncs, function() {	// TODO: switch to async.series() but causes only first to be encrypted
+//				
+//				// keys generated
+//				onKeysGenerated(keys);
+//			});
+//			
+//			/**
+//			 * Returns a callback function to encrypt a key.
+//			 */
+//			function getCallbackFunctionEncrypt(key, encryptionScheme, password) {
+//				return function(callback) {
+//					key.encrypt(encryptionScheme, password, callback);
+//				}
+//			}
+//		}
+//		
+//		// no password encryption
+//		else {
+//			
+//			// keys generated
+//			onKeysGenerated(keys);
+//		}
 	}
 }
 inheritsFrom(GenerateKeysController, DivController);
@@ -1078,19 +1106,17 @@ inheritsFrom(ImportFilesController, DivController);
  * 
  * @param div is the div to render to
  * @param state informs how to render
- * @param pieces are the pieces to download
  */
-function DownloadPiecesController(div, state, pieces, onCustomExport) {
+function DownloadPiecesController(div, state, onCustomExport) {
 	DivController.call(this, div);
+	var pieces = state.pieces;
 	assertTrue(pieces.length > 0);
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		let isSplit = pieces[0].isSplit;
-		let encryption = pieces[0].encryption;
-		div.append(UiUtils.getPageHeader("Download your " + state.plugin.getName() + " storage.", state.plugin.getLogo()));
+		div.append(UiUtils.getPageHeader("Download your " + UiUtils.getName(state) + " storage.", UiUtils.getLogo(state)));
 		
 		// collect functions to render pieces and divs to be rendered to
 		var pieceDivs = [];
