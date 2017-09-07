@@ -31,7 +31,8 @@ $(document).ready(function() {
 
 	// start loading common dependencies
 	loader = new DependencyLoader();
-	let allDependencies = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js"];
+	const DEPENDENCIES = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js"];
+	const MORE = [];
 	loader.load(allDependencies, function() {
 		// run tests
 		if (RUN_TESTS) {
