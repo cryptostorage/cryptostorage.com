@@ -1,10 +1,10 @@
 // TODO
+// switch to async library
+// progress bar on wallet generation
 // verify final pieces
 // support mix & match
 // can buttons automatically grey out with progress wheel until next screen rendered?
-// progress bar on wallet generation, export generation
 // placeholders for faq and donations
-// switch to async library
 // custom export options page
 // namespace utils.js (reference bitaddress.org)
 // cryptostorage donation addresses
