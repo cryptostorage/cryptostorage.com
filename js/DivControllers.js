@@ -489,7 +489,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		minPiecesInput.attr("value", 2);
 		div.append(minPiecesInput);
 		div.append("<br><br>");
-		minPiecesInput.keypress(function() { pathTracker.clearNexts(); });
+		minPiecesInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
 		
 		// error message
 		errorDiv.empty();

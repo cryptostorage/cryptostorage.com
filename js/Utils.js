@@ -512,26 +512,6 @@ function ThreadTracker() {
 }
 
 /**
- * Executes the given functions in sequence.
- * 
- * @param callbackFuncs are functions with a single callback argument to execute in sequence
- * @param callback is called when all functions have been invoked
- */
-function executeInSeries(callbackFuncs, callback) {
-	executeAux(callbackFuncs, 0, [], callback);
-	function executeAux(callbackFuncs, index, callbackArgs, callback) {
-		//console.log("executeAux(" + index + ")");
-		if (index >= callbackFuncs.length) callback(callbackArgs);
-		else {
-			callbackFuncs[index](function(args) {
-				callbackArgs.push(args);
-				executeAux(callbackFuncs, index + 1, callbackArgs, callback);
-			});
-		}
-	}
-}
-
-/**
  * Converts a CSV string to a 2-dimensional array of strings.
  * 
  * @param csv is the CSV string to convert
@@ -873,11 +853,14 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 	// get callback functions to generate zips
 	let funcs = [];
 	for (let zip of zips) {
-		funcs.push(getCallbackFunctionGenerateZip(zip));
+		(function(zip) {
+			funcs.push(function(callback) { zip.generateAsync({type:"blob"}).then(function(blob) { callback(null, blob) }); });
+		})(zip);
 	}
 	
-	// generate zips in sequence
-	executeInSeries(funcs, function(blobs) {	// TODO: switch this to async library, but they give different callback arg
+	// zip in parallel
+	async.parallel(funcs, function(err, blobs) {
+		if (err) throw err;
 		let name = "cryptostorage_" + crypto;
 		if (blobs.length === 1) callback(name + ".zip", blobs[0]);
 		else {
@@ -892,15 +875,6 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 			});
 		}
 	});
-	
-	/**
-	 * Returns a callback function to generate a zip.
-	 */
-	function getCallbackFunctionGenerateZip(zip) {
-		return function(callback) {
-			zip.generateAsync({type:"blob"}).then(callback);
-		}
-	}
 }
 
 /**
@@ -915,18 +889,19 @@ function zipToPieces(blob, onPieces) {
 	JSZip.loadAsync(blob).then(function(zip) {
 		
 		// collect callback functions to get pieces
-		let callbackFunctions = [];
+		let funcs = [];
 		zip.forEach(function(path, zipObject) {
 			if (path.startsWith("_")) return;
 			if (path.endsWith(".json")) {
-				callbackFunctions.push(getPieceCallbackFunction(zipObject));
+				funcs.push(getPieceCallbackFunction(zipObject));
 			} else if (path.endsWith(".zip")) {
-				callbackFunctions.push(getZipCallbackFunction(zipObject));
+				funcs.push(getZipCallbackFunction(zipObject));
 			}
 		});
 		
 		// invoke callback functions to get pieces
-		executeInSeries(callbackFunctions, function(args) {
+		async.parallel(funcs, function(err, args) {
+			if (err) throw err;
 			let pieces = [];
 			for (let arg of args) {
 				if (isArray(arg)) for (let piece of arg) pieces.push(piece);
@@ -947,7 +922,7 @@ function zipToPieces(blob, onPieces) {
 					//throw err;
 					console.log(err);
 				}
-				onPiece({name: zipObject.name, piece: piece});
+				onPiece(null, {name: zipObject.name, piece: piece});
 			});
 		}
 	}
@@ -956,7 +931,7 @@ function zipToPieces(blob, onPieces) {
 		return function(callback) {
 			zipObject.async("blob").then(function(blob) {
 				zipToPieces(blob, function(pieces) {
-					callback(pieces);
+					callback(null, pieces);
 				});
 			});
 		}
