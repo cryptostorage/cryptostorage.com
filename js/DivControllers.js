@@ -924,26 +924,24 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 				btnDecrypt.attr("disabled", "disabled");
 			}
 			
-			var decryptFuncs = [];
-			for (let key of keys) decryptFuncs.push(getDecryptCallbackFunction(key, password));
-			executeInSeries(decryptFuncs, function(keys) {
-				onKeysDecrypted(keys);
-			});
-			
-			function getDecryptCallbackFunction(key, password) {
-				return function(onKeyDecrypted) {
-					key.decrypt(password, function(key, err) {
-						if (err) {
-							setErrorMessage(err.message);
-							passwordInput.focus();
-							btnDecrypt.removeAttr("disabled");
-						} else {
-							setErrorMessage("");
-							onKeyDecrypted(key);
-						}
-					});
-				}
+			// collect functions to decrypt
+			let funcs = [];
+			for (let key of keys) {
+				(function(key) {
+					funcs.push(function(callback) { key.decrypt(password, callback); });
+				})(key);
 			}
+			
+			// decrypt keys
+			async.series(funcs, function(err, result) {
+				if (err) {
+					setErrorMessage(err.message);
+					passwordInput.focus();
+					btnDecrypt.removeAttr("disabled");
+				} else {
+					onKeysDecrypted(keys);
+				}
+			});
 		});
 		div.append(btnDecrypt);
 		
@@ -1144,14 +1142,16 @@ function DownloadPiecesController(div, state, onCustomExport) {
 		var pieceDivs = [];
 		var renderFuncs = [];
 		for (let piece of pieces) {
-			var pieceDiv = $("<div>");
-			pieceDivs.push(pieceDiv);
-			var renderer = new PieceRenderer(pieceDiv, piece);
-			renderFuncs.push(renderer.render);
+			(function(piece) {
+				var pieceDiv = $("<div>");
+				pieceDivs.push(pieceDiv);
+				var renderer = new PieceRenderer(pieceDiv, piece);
+				renderFuncs.push(function(callback) { renderer.render(function() { callback(); }) });
+			})(piece);
 		}
 		
-		// render each piece in sequence to minimize resource requirements
-		executeInSeries(renderFuncs, function() {	// TODO: switch to async.parallel() but sometimes causes last address to only render public QR code
+		// render each piece
+		async.parallelLimit(renderFuncs, 3, function(err, result) {
 			
 			// wrap piece divs in html containers
 			var pieceHtmls = [];

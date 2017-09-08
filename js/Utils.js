@@ -621,6 +621,7 @@ function encrypt(scheme, key, password, callback) {
 function decrypt(key, password, callback) {
 	if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 	if (!password) throw new Error("Password must be initialized");
+	assertTrue(key.isEncrypted());
 	switch (key.getEncryptionScheme()) {
 		case EncryptionScheme.CRYPTOJS:
 			let hex;
@@ -629,7 +630,7 @@ function decrypt(key, password, callback) {
 			} catch (err) { }
 			if (!hex) callback(new Error("Incorrect password"));
 			else {
-				key.setState(key.getPlugin().newKey(hex).getState());
+				key.setPrivateKey(hex);
 				callback(null, key);
 			}
 			break;
@@ -638,13 +639,13 @@ function decrypt(key, password, callback) {
 				if (resp.message) callback(new Error("Incorrect password"));
 				else {
 					let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
-					key.setState(key.getPlugin().newKey(wif).getState());
+					key.setPrivateKey(wif);
 					callback(null, key);
 				}
 			});
 			break;
 		default:
-			callback(new Error("Encryption scheme '" + scheme + "' not supported"));
+			callback(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
 	}
 }
 
