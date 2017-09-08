@@ -16,6 +16,7 @@
 // run minimum tests when site accessed
 // use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org)
 // create new storage from csv import
+// common dependencies need to be loaded at critical parts
 
 // peer review encodings
 // consult designers
