@@ -1,7 +1,7 @@
 // TODO
-// support mix & match
 // load dependencies as needed
 // verify final pieces
+// support mix & match
 // can buttons automatically grey out / progress bar until next screen rendered?
 // progress bar on wallet generation, export generation
 // placeholders for faq and donations

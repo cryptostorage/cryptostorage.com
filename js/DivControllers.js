@@ -61,7 +61,7 @@ UiUtils = {
 			let ticker;
 			for (let key of state.keys) {
 				if (!ticker) ticker = key.getPlugin().getTicker();
-				else if (name !== key.getPlugin().getTicker()) return getMixLogo();
+				else if (ticker !== key.getPlugin().getTicker()) return this.getMixLogo();
 			}
 			return getCryptoPlugin(ticker).getLogo();
 		}
@@ -1042,8 +1042,25 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 							}
 							let pieces = [];
 							for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
-							let keys = piecesToKeys(pieces);
-							if (keys.length > 0) onKeysImported(keys);
+							
+							// collect cryptos being imported
+							let cryptos = new Set();
+							for (let elem of pieces[0]) cryptos.add(elem.crypto);
+							
+							// collect dependencies
+							let dependencies = new Set();
+							for (let crypto of cryptos) {
+								let plugin = getCryptoPlugin(crypto);
+								for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
+							}
+							
+							// load dependencies
+							loader.load(Array.from(dependencies), function() {
+								
+								// create keys
+								let keys = piecesToKeys(pieces);
+								if (keys.length > 0) onKeysImported(keys);
+							})
 						}
 					});
 				}

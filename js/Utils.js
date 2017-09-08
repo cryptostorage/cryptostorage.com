@@ -342,32 +342,6 @@ function contains(arr, obj) {
 }
 
 /**
- * Returns an array of unique elements in the given array.
- * 
- * @param arr to return unique values from
- * @returns an array of unique values in the given array
- */
-function getUniqueValues(arr) {
-	let uniques = [];
-	for (let elem of arr) if (!contains(uniques, elem)) uniques.push(elem);
-	return uniques;
-}
-
-/**
- * Returns the single value contained in an array of equal elements.
- * 
- * @param arr whose elements are identical
- * @returns the value of every element
- * @throws error if the array is empty or all elements are not equal
- */
-function getSingleValue(arr) {
-	assertTrue(arr.length > 0, "The given array cannot be empty");
-	let uniques = getUniqueValues(arr);
-	if (uniques.length === 1) return uniques[0];
-	throw new Error("Array contains multiple unique values: " + arr.toString());
-}
-
-/**
  * Determines if two arrays are equal.
  * 
  * @param arr1 is an array to compare
