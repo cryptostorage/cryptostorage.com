@@ -1,5 +1,4 @@
 // TODO
-// switch to async library
 // progress bar on wallet generation
 // verify final pieces
 // support mix & match
