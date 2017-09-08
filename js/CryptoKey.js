@@ -2,7 +2,7 @@
  * Maintains a single public/private key pair.
  * 
  * @param plugin is a plugin for a specific cryptocurrency
- * @param state defines the initial state (optional)
+ * @param state specifies the initial private key or state (optional)
  */
 function CryptoKey(plugin, state) {
 	
@@ -82,8 +82,8 @@ function CryptoKey(plugin, state) {
 	var that = this;
 	this.state = {};
 	if (state) {
-		if (isString(state)) this.setPrivateKey(state);
-		else this.setState(state);
+		if (isObject(state)) this.setState(state);
+		else this.setPrivateKey(state);
 	}
 	else this.random();
 }

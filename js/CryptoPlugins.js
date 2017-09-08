@@ -128,6 +128,7 @@ function BitcoinPlugin() {
 			state.wif = key.getBitcoinWalletImportFormat();
 			state.address = key.getBitcoinAddress();
 			state.encryption = null;
+			return new CryptoKey(this, state);
 		}
 		
 		// wif bip38
@@ -135,6 +136,7 @@ function BitcoinPlugin() {
 			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.encryption = EncryptionScheme.BIP38;
+			return new CryptoKey(this, state);
 		}
 		
 		// wif cryptojs
@@ -142,6 +144,7 @@ function BitcoinPlugin() {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
 		}
 		
 		// encrypted hex
@@ -152,6 +155,7 @@ function BitcoinPlugin() {
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
 				state.encryption = EncryptionScheme.BIP38;
+				return new CryptoKey(this, state);
 			}
 			
 			// cryptojs
@@ -159,14 +163,12 @@ function BitcoinPlugin() {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 				state.encryption = EncryptionScheme.CRYPTOJS;
+				return new CryptoKey(this, state);
 			}
 		}
 		
 		// otherwise key is not recognized
-		else throw new Error("Unrecognized private key: " + str);
-		
-		// return key
-		return new CryptoKey(this, state);
+		throw new Error("Unrecognized private key: " + str);		
 	}
 	this.isAddress = function(str) {
 		try {
@@ -214,6 +216,7 @@ function EthereumPlugin() {
 				state.wif = str;	// TODO: different wif?
 				state.address = keythereum.privateKeyToAddress(state.hex);
 				state.encryption = null;
+				return new CryptoKey(this, state);
 			}
 			
 			// hex cryptojs
@@ -221,6 +224,7 @@ function EthereumPlugin() {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 				state.encryption = EncryptionScheme.CRYPTOJS;
+				return new CryptoKey(this, state);
 			}
 		}
 		
@@ -229,13 +233,11 @@ function EthereumPlugin() {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
 		}
 		
 		// otherwise key is not recognized
-		else throw new Error("Unrecognized private key: " + str);
-		
-		// return key
-		return new CryptoKey(this, state);
+		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
 		return isAddress(str);
@@ -296,12 +298,13 @@ function LitecoinPlugin() {
 		let state = {};
 		
 		// unencrypted
-		if (litecore.PrivateKey.isValid(str)) {
+		if (str.length >= 52 && litecore.PrivateKey.isValid(str)) {	// TODO: litecore says 'ab' is valid ... ?
 			let key = new litecore.PrivateKey(str);
 			state.hex = key.toString();
 			state.wif = key.toWIF();
 			state.address = key.toAddress().toString();
 			state.encryption = null;
+			return new CryptoKey(this, state);
 		}
 		
 		// hex cryptojs
@@ -309,6 +312,7 @@ function LitecoinPlugin() {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 			state.encryption = EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
 		}
 		
 		// wif cryptojs
@@ -316,13 +320,11 @@ function LitecoinPlugin() {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
 		}
 		
 		// otherwise key is not recognized
-		else throw new Error("Unrecognized private key: " + str);
-		
-		// return key
-		return new CryptoKey(this, state);
+		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
 		return litecore.Address.isValid(str);

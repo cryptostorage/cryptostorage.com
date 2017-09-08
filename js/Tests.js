@@ -6,11 +6,26 @@ const PASSWORD = "MySuperSecretPasswordAbcTesting123";
 var counter = 0;
 
 function runTests(callback) {
-	testUtils();
-	testPathTracker();
-	testCryptoKeys(getTestCryptoPlugins(), function(error) {
-		if (callback) callback(error);
-	});
+	
+	// get test plugins
+	let plugins = getTestCryptoPlugins();
+	
+	// collect dependencies
+	let dependencies = new Set();
+	for (let plugin of plugins) {
+		for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
+	}
+	
+	// load dependencies
+	loader.load(Array.from(dependencies), function() {
+		
+		// run tests
+		testUtils();
+		testPathTracker();
+		testCryptoKeys(getTestCryptoPlugins(), function(error) {
+			if (callback) callback(error);
+		});
+	})
 }
 
 function testUtils() {
@@ -162,12 +177,14 @@ function testCryptoKey(plugin, callback) {
 	testKeysToPieces(keys, NUM_PIECES, MIN_PIECES);
 	
 	// test invalid private keys
-	let invalids = [null, "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress()];
+	let invalids = ["ab", "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress()];
 	for (let invalid of invalids) {
 		try {
-			new CryptoKey(plugin, invalid);
-			fail("Should have thrown an error");
-		} catch (error) { }
+			let key = new CryptoKey(plugin, invalid);
+			fail("fail");
+		} catch (err) {
+			if (err.message === "fail") throw new Error("Should not create key from invalid input: " + plugin.getTicker() + "(" + invalid + ")");
+		}
 	}
 	
 	// parse undefined
