@@ -853,9 +853,7 @@ function piecesToZip(pieces, pieceHtmls, callback) {
 	// get callback functions to generate zips
 	let funcs = [];
 	for (let zip of zips) {
-		(function(zip) {
-			funcs.push(function(callback) { zip.generateAsync({type:"blob"}).then(function(blob) { callback(null, blob) }); });
-		})(zip);
+		funcs.push(function(callback) { zip.generateAsync({type:"blob"}).then(function(blob) { callback(null, blob) }); });
 	}
 	
 	// zip in parallel

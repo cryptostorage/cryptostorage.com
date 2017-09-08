@@ -927,9 +927,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			// collect functions to decrypt
 			let funcs = [];
 			for (let key of keys) {
-				(function(key) {
-					funcs.push(function(callback) { key.decrypt(password, callback); });
-				})(key);
+				funcs.push(function(callback) { key.decrypt(password, callback); });
 			}
 			
 			// decrypt keys
@@ -1139,22 +1137,20 @@ function DownloadPiecesController(div, state, onCustomExport) {
 		div.append(UiUtils.getPageHeader("Download your " + UiUtils.getCryptoName(state) + " storage.", UiUtils.getCryptoLogo(state)));
 		
 		// collect functions to render pieces and divs to be rendered to
-		var pieceDivs = [];
-		var renderFuncs = [];
+		let pieceDivs = [];
+		let renderFuncs = [];
 		for (let piece of pieces) {
-			(function(piece) {
-				var pieceDiv = $("<div>");
-				pieceDivs.push(pieceDiv);
-				var renderer = new PieceRenderer(pieceDiv, piece);
-				renderFuncs.push(function(callback) { renderer.render(function() { callback(); }) });
-			})(piece);
+			let pieceDiv = $("<div>");
+			pieceDivs.push(pieceDiv);
+			let renderer = new PieceRenderer(pieceDiv, piece);
+			renderFuncs.push(function(callback) { renderer.render(function() { callback(); }) });
 		}
 		
 		// render each piece
 		async.parallelLimit(renderFuncs, 3, function(err, result) {
 			
 			// wrap piece divs in html containers
-			var pieceHtmls = [];
+			let pieceHtmls = [];
 			for (let pieceDiv of pieceDivs) {
 				pieceHtmls.push($("<html>").append($("<body>").append(pieceDiv)));
 			}
@@ -1164,12 +1160,12 @@ function DownloadPiecesController(div, state, onCustomExport) {
 				
 				// render zip download
 				div.append("<br>");
-				var downloadZipsDiv = $("<div>").appendTo(div);
+				let downloadZipsDiv = $("<div>").appendTo(div);
 				downloadZipsDiv.attr("class", "download_zips_div");
-				var downloadZipDiv = $("<div>").appendTo(downloadZipsDiv);
+				let downloadZipDiv = $("<div>").appendTo(downloadZipsDiv);
 				downloadZipDiv.attr("class", "download_zip_div");
-				var downloadIconDiv = $("<div style='text-align:center'>").appendTo(downloadZipDiv);
-				var downloadIcon = $("<img src='img/download.png' class='download_icon'>").appendTo(downloadIconDiv);
+				let downloadIconDiv = $("<div style='text-align:center'>").appendTo(downloadZipDiv);
+				let downloadIcon = $("<img src='img/download.png' class='download_icon'>").appendTo(downloadIconDiv);
 				downloadIcon.click(function() { saveAs(blob, name); });
 				
 				// render custom export options
