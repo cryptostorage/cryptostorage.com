@@ -658,7 +658,7 @@ function PieceRenderer(div, piece, config) {
 			pairDiv.css("page-break-inside", "avoid");
 			
 			// prepare function to render pair
-			callbackFunctions.push(prepareCallbackFunctionRenderPairDiv(pairDiv, "==== " + (i + 1) + " ====", keyPiece.address, keyPiece.privateKey, config));
+			callbackFunctions.push(callbackFunctionRenderPairDiv(pairDiv, "==== " + (i + 1) + " ====", keyPiece.address, keyPiece.privateKey, config));
 			
 			// append pair div and row div
 			if (i % config.num_columns === 0) {
@@ -683,12 +683,12 @@ function PieceRenderer(div, piece, config) {
 		}
 		
 		// execute callback functions
-		executeInSeries(callbackFunctions, callback);
+		async.series(callbackFunctions, callback);
 		
 		/**
 		 * Returns a callback function (function with single callback argument) which will render a pair div.
 		 */
-		function prepareCallbackFunctionRenderPairDiv(pairDiv, name, publicKey, privateKey, config) {
+		function callbackFunctionRenderPairDiv(pairDiv, name, publicKey, privateKey, config) {
 			
 			// callback function wraps rendering
 			return function(callback) {
