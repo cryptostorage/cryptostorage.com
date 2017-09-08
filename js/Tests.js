@@ -22,7 +22,7 @@ function runTests(callback) {
 		// run tests
 		testUtils();
 		testPathTracker();
-		testCryptoKeys(getTestCryptoPlugins(), function(error) {
+		testCryptoKeys(plugins, function(error) {
 			if (callback) callback(error);
 		});
 	})
