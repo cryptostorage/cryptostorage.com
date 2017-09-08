@@ -60,12 +60,12 @@ CryptoPlugin.prototype.getDependencies = function() { throw new Error("Subclass 
 CryptoPlugin.prototype.getEncryptionSchemes = function() { return [EncryptionScheme.CRYPTOJS]; }
 
 /**
- * Encrypts the given key with the given scheme and password.  Invokes callback(key, error) when done.
+ * Encrypts the given key with the given scheme and password.  Invokes callback(err, key) when done.
  */
 CryptoPlugin.prototype.encrypt = function(scheme, key, password, callback) { encrypt(scheme, key, password, callback); }
 
 /**
- * Decrypts the given key with the givne password.  Invokes callback(key, error) when done.
+ * Decrypts the given key with the given password.  Invokes callback(err, key) when done.
  */
 CryptoPlugin.prototype.decrypt = function(key, password, callback) { return decrypt(key, password, callback); }
 

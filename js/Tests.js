@@ -214,7 +214,8 @@ function testEncryptKeys(keys, scheme, password, callback) {
 	// test encryption of all keys
 	let funcs = [];
 	for (let key of keys) funcs.push(function(callback) { testEncryptKey(key, scheme, password, callback); });
-	async.parallel(funcs, function() {
+	async.parallel(funcs, function(err, result) {
+		if (err) throw err;
 		
 		// test splitting encrypted keys
 		for (let key of keys) testKeysToPieces([key], NUM_PIECES, MIN_PIECES);
@@ -225,8 +226,8 @@ function testEncryptKeys(keys, scheme, password, callback) {
 			assertEquals("Incorrect password", err.message);
 			
 			// test decryption
-			testDecryptKeys(keys, password, function() {
-				if (!originals) throw new Error("Originals is not defined fool!!!!");
+			testDecryptKeys(keys, password, function(err, result) {
+				if (err) throw err;
 				assertEquals(originals.length, keys.length);
 				for (let i = 0; i < originals.length; i++) assertTrue(originals[i].equals(keys[i]));
 				callback();
@@ -238,7 +239,7 @@ function testEncryptKeys(keys, scheme, password, callback) {
 function testEncryptKey(key, scheme, password, callback) {
 	assertObject(key, 'CryptoKey');
 	let original = key.copy();
-	key.encrypt(scheme, password, function(encrypted, err) {
+	key.encrypt(scheme, password, function(err, encrypted) {
 		if (err) callback(err);
 		else {
 			
@@ -248,7 +249,6 @@ function testEncryptKey(key, scheme, password, callback) {
 			assertInitialized(key.getHex());
 			assertInitialized(key.getWif());
 			assertEquals(scheme, key.getEncryptionScheme());
-			if (!original) throw new Error("Original is not defined fool");
 			assertFalse(key.equals(original));
 			assertTrue(key.equals(key.copy()));
 			
@@ -295,7 +295,7 @@ function testDecryptKeys(keys, password, callback) {
 function testDecryptKey(key, password, callback) {
 	assertObject(key, 'CryptoKey');
 	let original = key.copy();
-	key.decrypt(password, function(decrypted, err) {
+	key.decrypt(password, function(err, decrypted) {
 		if (err) callback(err);
 		else {
 			

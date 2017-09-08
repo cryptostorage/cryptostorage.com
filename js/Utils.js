@@ -587,7 +587,7 @@ const EncryptionScheme = {
 /**
  * Encrypts the given key with the given scheme and password.
  * 
- * Invokes callback(encryptedKey, error) when done.
+ * Invokes callback(err, encryptedKey) when done.
  */
 function encrypt(scheme, key, password, callback) {
 	if (!scheme) throw new Error("Scheme must be initialized");
@@ -597,26 +597,26 @@ function encrypt(scheme, key, password, callback) {
 		case EncryptionScheme.CRYPTOJS:
 			let b64 = CryptoJS.AES.encrypt(key.getHex(), password).toString();
 			key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
-			callback(key);
+			callback(null, key);
 			break;
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.getHex(), password, true, function(resp) {
-				if (resp.message) callback(undefined, resp);	// TODO: confirm error handling, isError()
+				if (resp.message) callback(resp);	// TODO: confirm error handling, isError()
 				else {
 					key.setState(Object.assign(key.getPlugin().newKey(resp).getState(), {address: key.getAddress()}));
-					callback(key);
+					callback(null, key);
 				}
 			});
 			break;
 		default:
-			callback(undefined, new Error("Encryption scheme '" + scheme + "' not supported"));
+			callback(new Error("Encryption scheme '" + scheme + "' not supported"));
 	}
 }
 
 /**
  * Decrypts the given key with the given password.
  * 
- * Invokes callback(decryptedKey, error) when done.
+ * Invokes callback(err, decryptedKey) when done.
  */
 function decrypt(key, password, callback) {
 	if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
@@ -627,24 +627,24 @@ function decrypt(key, password, callback) {
 			try {
 				hex = CryptoJS.AES.decrypt(key.getWif(), password).toString(CryptoJS.enc.Utf8);
 			} catch (err) { }
-			if (!hex) callback(undefined, new Error("Incorrect password"));
+			if (!hex) callback(new Error("Incorrect password"));
 			else {
 				key.setState(key.getPlugin().newKey(hex).getState());
-				callback(key);
+				callback(null, key);
 			}
 			break;
 		case EncryptionScheme.BIP38:
 			ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), password, function(resp) {
-				if (resp.message) callback(undefined, new Error("Incorrect password"));
+				if (resp.message) callback(new Error("Incorrect password"));
 				else {
 					let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
 					key.setState(key.getPlugin().newKey(wif).getState());
-					callback(key);
+					callback(null, key);
 				}
 			});
 			break;
 		default:
-			callback(undefined, new Error("Encryption scheme '" + scheme + "' not supported"));
+			callback(new Error("Encryption scheme '" + scheme + "' not supported"));
 	}
 }
 

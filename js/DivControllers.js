@@ -599,9 +599,9 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			}
 			
 			// encrypt keys
-			executeInSeries(funcs, function() {
+			async.series(funcs, function(err, result) {
 				onKeysGenerated(processeds);
-			})
+			});
 		});
 	}
 }
