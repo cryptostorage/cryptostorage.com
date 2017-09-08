@@ -834,23 +834,27 @@ function ImportTextController(div, state, onKeysImported) {
 		div.append(textarea);
 		textarea.keyup(function() {
 			
-			// only continue if new characters added
-			let count = countNonWhitespaceCharacters(textarea.val());
-			if (lastCount === count) return;
-			lastCount = count;
-			
-			try {
-				if (textarea.val() === "") {
-					setErrorMessage("");
-				} else {
-					var key = parseKey(state.plugin, textarea.val());
-					setErrorMessage("");
-					if (key) onKeysImported([key]);
+			// load dependencies
+			loader.load(state.plugin.getDependencies(), function() {
+				
+				// only continue if new characters added
+				let count = countNonWhitespaceCharacters(textarea.val());
+				if (lastCount === count) return;
+				lastCount = count;
+				
+				try {
+					if (textarea.val() === "") {
+						setErrorMessage("");
+					} else {
+						var key = parseKey(state.plugin, textarea.val());
+						setErrorMessage("");
+						if (key) onKeysImported([key]);
+					}
+				} catch (err) {
+					console.log(err);
+					setErrorMessage(err.message);
 				}
-			} catch (err) {
-				console.log(err);
-				setErrorMessage(err.message);
-			}
+			})
 		});
 		
 		// done rendering
