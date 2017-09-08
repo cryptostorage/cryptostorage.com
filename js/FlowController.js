@@ -1,5 +1,4 @@
 // TODO
-// load dependencies asap
 // verify final pieces
 // support mix & match
 // can buttons automatically grey out with progress wheel until next screen rendered?
