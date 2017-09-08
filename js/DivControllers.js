@@ -539,6 +539,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		// render title
 		div.append(UiUtils.getPageHeader("Ready to generate your " + UiUtils.getCryptoName(state) + " storage?", UiUtils.getCryptoLogo(state)));
 		
+		// render summary
 		div.append("<b>Summary:</b><br><br>");
 		for (let elem of state.mix) {
 			div.append(elem.numKeys + " " + elem.plugin.getName() + " keys" + (elem.encryption ? " encrypted with " + elem.encryption : " unencrypted") + "<br>");
@@ -550,6 +551,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		}
 		div.append("<br><br>");
 		
+		// render generate button
 		var btnGenerate = UiUtils.getNextButton("Generate storage");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
@@ -564,64 +566,36 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 	
 	function generateKeys(onKeysGenerated) {
 		
-		// create keys and callback functions to encrypt
-		let originals = [];	// save originals for later validation
-		let processeds = [];
-		let funcs = [];
+		// collect dependencies
+		let dependencies = new Set();
 		for (let elem of state.mix) {
-			for (let i = 0; i < elem.numKeys; i++) {
-				let original = elem.plugin.newKey();
-				let processed = original.copy();
-				originals.push(original);
-				processeds.push(processed);
-				if (elem.encryption) {
-					funcs.push(function(callback) { processed.encrypt(elem.encryption, elem.password, callback); })
-				}
-			}
+			for (let dependency of elem.plugin.getDependencies()) dependencies.add(dependency);
 		}
 		
-		// encrypt keys
-		executeInSeries(funcs, function() {
-			onKeysGenerated(processeds);
-		})
-		
-		
-//		// copy originals for later validation
-//		var originalKeys = [];
-//		for (let key of keys) {
-//			originalKeys.push(key.copy());
-//		}
-//		
-//		// collect callback functions to encrypt keys
-//		
-//		
-//		// password encryption
-//		if (state.passwordEnabled) {
-//			
-//			
-//			// execute callback functions in sequence
-//			executeInSeries(encryptFuncs, function() {	// TODO: switch to async.series() but causes only first to be encrypted
-//				
-//				// keys generated
-//				onKeysGenerated(keys);
-//			});
-//			
-//			/**
-//			 * Returns a callback function to encrypt a key.
-//			 */
-//			function getCallbackFunctionEncrypt(key, encryptionScheme, password) {
-//				return function(callback) {
-//					key.encrypt(encryptionScheme, password, callback);
-//				}
-//			}
-//		}
-//		
-//		// no password encryption
-//		else {
-//			
-//			// keys generated
-//			onKeysGenerated(keys);
-//		}
+		// load dependencies
+		loader.load(Array.from(dependencies), function() {
+			
+			// create keys and callback functions to encrypt
+			let originals = [];	// save originals for later validation
+			let processeds = [];
+			let funcs = [];
+			for (let elem of state.mix) {
+				for (let i = 0; i < elem.numKeys; i++) {
+					let original = elem.plugin.newKey();
+					let processed = original.copy();
+					originals.push(original);
+					processeds.push(processed);
+					if (elem.encryption) {
+						funcs.push(function(callback) { processed.encrypt(elem.encryption, elem.password, callback); })
+					}
+				}
+			}
+			
+			// encrypt keys
+			executeInSeries(funcs, function() {
+				onKeysGenerated(processeds);
+			})
+		});
 	}
 }
 inheritsFrom(GenerateKeysController, DivController);
