@@ -586,6 +586,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			let originals = [];	// save originals for later validation
 			let processeds = [];
 			let funcs = [];
+			let encryptionDone = 0;
 			for (let elem of state.mix) {
 				for (let i = 0; i < elem.numKeys; i++) {
 					let original = elem.plugin.newKey();
@@ -593,16 +594,35 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 					originals.push(original);
 					processeds.push(processed);
 					if (elem.encryption) {
-						funcs.push(function(callback) { processed.encrypt(elem.encryption, elem.password, callback); })
+						funcs.push(function(callback) {
+							
+							// encrypt key
+							processed.encrypt(elem.encryption, elem.password, function(err, key) {
+								
+								// update progress
+								setEncryptionProgress(++encryptionDone, elem.numKeys);
+								
+								// release thread to update UI
+								setTimeout(function() { callback(err, key); }, 0);
+							});
+						})
 					}
 				}
 			}
 			
 			// encrypt keys
-			async.series(funcs, function(err, result) {
-				onKeysGenerated(processeds);
+			async.series(funcs, function(err, encryptedKeys) {
+				onKeysGenerated(encryptedKeys);
 			});
 		});
+	}
+	
+	function setEncryptionProgress(done, total) {
+		console.log("setEncryptionProgress(" + done + "/" + total + "(" + (done / total) + "%))");
+	}
+	
+	function setDecryptionProgress(done, total) {
+		console.log("setDecryptionProgress(" + done + "/" + total + "(" + (done / total) + "%))");
 	}
 }
 inheritsFrom(GenerateKeysController, DivController);
