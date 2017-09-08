@@ -16,6 +16,7 @@
 // todos throughout code
 // run minimum tests when site accessed
 // use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org)
+// create new storage from csv import
 
 // peer review encodings
 // consult designers
