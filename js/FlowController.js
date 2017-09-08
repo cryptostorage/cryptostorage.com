@@ -34,7 +34,7 @@ $(document).ready(function() {
 	// start loading dependencies
 	loader = new DependencyLoader();
 	
-	// run tests when dependencies loaded
+	// run tests when dependencies load
 	loader.load(DEPENDENCIES, function() {
 		
 		// run tests
