@@ -18,6 +18,7 @@
 // create new storage from csv import
 // common dependencies need to be loaded at critical parts
 // better mix logo
+// password input with multiple currencies
 
 // peer review encodings
 // consult designers
