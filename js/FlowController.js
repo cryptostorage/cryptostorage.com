@@ -1,7 +1,7 @@
 // TODO
+// password input with multiple currencies
 // progress bar on wallet generation
 // verify final pieces
-// support mix & match
 // can buttons automatically grey out with progress wheel until next screen rendered?
 // placeholders for faq and donations
 // custom export options page
@@ -18,7 +18,6 @@
 // create new storage from csv import
 // common dependencies need to be loaded at critical parts
 // better mix logo
-// password input with multiple currencies
 
 // peer review encodings
 // consult designers
