@@ -318,6 +318,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 				} catch (err) {
 					setErrorMessage(err.message);
 					error = true;
+					break;
 				}
 			}
 			
