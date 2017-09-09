@@ -329,6 +329,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 								
 				// build state.mix
 				else {
+					setErrorMessage("");
 					state.mix = [];
 					for (let i = 0; i < plugins.length; i++) {
 						if (!numKeysInts[i]) continue;
