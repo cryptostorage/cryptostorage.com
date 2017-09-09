@@ -187,14 +187,14 @@ textarea {
 	height:400px;
 }
 
-.btn_icon_div {
+.crypto_icon_div {
 	width:60px;
 	display:flex;
 	align-items:center;
 	justify-content:center;
 }
 
-.btn_icon {
+.crypto_icon {
 	width:42px;
 	height:42px;
 }
@@ -255,4 +255,25 @@ div[disabled] img {
 
 input[type='file'] {
 	font-size: 19px;
+}
+
+.crypto_num_keys_div {
+	min-height:65px;
+	font-size:20px;
+ 	padding:0px 0px 0px 20px;
+	margin-bottom: 30px;
+	display:flex;
+	align-items:center;
+}
+
+.crypto_num_keys_div:hover {
+	background-color:#F0F0F0;
+	color:black;
+}
+
+.crypto_num_keys_input {
+	width:100px;
+	height:50px;
+	font-size:20px;
+	margin-left:auto;
 }

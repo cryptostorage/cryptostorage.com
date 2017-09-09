@@ -96,8 +96,7 @@ function FlowController(pageManager, plugins) {
 	
 	function onMixNumKeysInput() {
 		if (DEBUG) console.log("onMixNumKeysInput");
-		console.log(state);
-		throw new Error("Not implemented");
+		pageManager.next(new PasswordSelectionController($("<div>"), state, onPasswordSelection))
 	}
 	
 	function onNumKeysInput(numKeys) {

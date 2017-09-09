@@ -5,8 +5,8 @@ UiUtils = {
 	getButton: function(label, isNext, icon) {
 		let button = $("<div class='btn'>");
 		if (icon) {
-			var logoDiv = $("<div class='btn_icon_div'>").appendTo(button);
-			icon.attr("class", "btn_icon");
+			var logoDiv = $("<div class='crypto_icon_div'>").appendTo(button);
+			icon.attr("class", "crypto_icon");
 			logoDiv.append(icon);
 		}
 		button.append(label);
@@ -276,15 +276,76 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 		// render title
 		div.append(UiUtils.getPageHeader("Enter the number of keys to create for each currency.", UiUtils.getMixLogo()));
 		
+		// render num key inputs
+		let numKeysInputs = [];
+		for (let plugin of state.plugins) {
+			console.log(plugin.getTicker());
+			let numKeysDiv = $("<div class='crypto_num_keys_div'>").appendTo(div);
+			let numKeysLogoDiv = $("<div class='crypto_icon_div'>").appendTo(numKeysDiv);
+			let logo = plugin.getLogo().appendTo(numKeysLogoDiv);
+			logo.attr("class", "crypto_icon");
+			numKeysDiv.append(plugin.getName());
+			let numKeysInput = $("<input>").appendTo(numKeysDiv);
+			numKeysInput.attr("class", "crypto_num_keys_input");
+			numKeysInput.attr("type", "number");
+			numKeysInput.attr("min", 0);
+			numKeysInput.attr("value", 0);
+			numKeysInputs.push(numKeysInput);
+		}
+		
+		// add error div
+		errorDiv.attr("class", "error_msg");
+		setErrorMessage("");
+		div.append(errorDiv);
+		
+		// next button
+		let btnNext = UiUtils.getNextButton("Next").appendTo(div);
+		
+		// validate num keys when button clicked
+		btnNext.click(function() {
+			
+			// validate number of keys for each plugin
+			let sum = 0;
+			let error = false;
+			let numKeysInts = [];
+			for (let i = 0; i < state.plugins.length; i++) {
+				console.log(state.plugins[i].getName());
+				try {
+					let numKeys = parseFloat(numKeysInputs[i].val());
+					validateNumKeys(state.plugins[i].getName(), numKeys);
+					sum += numKeys;
+					numKeysInts.push(numKeys);
+				} catch (err) {
+					setErrorMessage(err.message);
+					error = true;
+				}
+			}
+			
+			// continue if no error
+			if (!error) {
+				
+				// validate at least one key
+				if (sum === 0) setErrorMessage("Must create at least one key");
+								
+				// build state.mix
+				else {
+					state.mix = [];
+					for (let i = 0; i < plugins.length; i++) {
+						if (!numKeysInts[i]) continue;
+						state.mix.push({plugin: plugins[i], numKeys: numKeysInts[i]});
+					}
+					onMixNumKeysInput();
+				}
+			}
+		});
+		
 		// done rendering
 		callback(div);
 	}
 	
-	// validates number of pairs is integer >= 1
-	function validateNumKeys(numPairs) {
-		if (isInt(numPairs)) {
-			if (numPairs < 1) throw new Error("Number of keys must be at least 1");
-		} else throw new Error("Number of keys must be an integer greater than 0");
+	function validateNumKeys(name, numKeys) {
+		if (!isInt(numKeys)) throw new Error("Number of " + name + " keys must be an integer");
+		else if (numKeys < 0) throw new Error("Number of " + name + " keys cannot be negative");
 	}
 	
 	function setErrorMessage(str) {
@@ -311,7 +372,7 @@ function NumKeysController(div, state, onNumKeysInput) {
 		div.append(UiUtils.getPageHeader("How many keys do you want to create?", plugin.getLogo()));
 		
 		// num key keys input
-		var numKeysInput = $("<input>");
+		let numKeysInput = $("<input>");
 		numKeysInput.attr("class", "num_input");
 		numKeysInput.attr("type", "number");
 		numKeysInput.attr("min", 1);
@@ -321,16 +382,14 @@ function NumKeysController(div, state, onNumKeysInput) {
 		numKeysInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
 		
 		// error message
-		var errorDiv = $("<div>");
 		errorDiv.attr("class", "error_msg");
 		setErrorMessage("");
 		div.append(errorDiv);
 		
 		// next button
-		var btnNext = UiUtils.getNextButton("Next");
-		div.append(btnNext);
+		let btnNext = UiUtils.getNextButton("Next").appendTo(div);
 		
-		// validate num wallets when button clicked
+		// validate num keys when button clicked
 		btnNext.click(function() {
 			var numKeys = parseFloat(numKeysInput.val());
 			try {
@@ -648,9 +707,12 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			}
 			
 			// encrypt keys
-			async.series(funcs, function(err, encryptedKeys) {
-				onKeysGenerated(encryptedKeys);
-			});
+			if (funcs.length) {
+				async.series(funcs, function(err, encryptedKeys) {
+					onKeysGenerated(encryptedKeys);
+				});
+			}
+			else onKeysGenerated(processeds);
 		});
 	}
 	
