@@ -17,6 +17,7 @@
 // use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org)
 // create new storage from csv import
 // common dependencies need to be loaded at critical parts
+// better mix logo
 
 // peer review encodings
 // consult designers
@@ -86,11 +87,17 @@ function FlowController(pageManager, plugins) {
 		if (DEBUG) console.log("onSelectCrypto(" + selection + ")");
 		state.cryptoSelection = selection;
 		if (state.cryptoSelection === "MIX") {
-			throw new Error("Mix crypto selection not supported");
+			pageManager.next(new MixNumKeysController($("<div>"), state, onMixNumKeysInput))
 		} else {
 			state.mix = [{plugin: getCryptoPlugin(selection)}];
 			pageManager.next(new NumKeysController($("<div>"), state, onNumKeysInput));
 		}
+	}
+	
+	function onMixNumKeysInput() {
+		if (DEBUG) console.log("onMixNumKeysInput");
+		console.log(state);
+		throw new Error("Not implemented");
 	}
 	
 	function onNumKeysInput(numKeys) {

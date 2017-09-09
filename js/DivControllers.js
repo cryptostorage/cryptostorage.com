@@ -56,7 +56,7 @@ UiUtils = {
 	},
 	
 	getCryptoLogo: function(state) {
-		if (state.mix) return state.mix.length > 1 ? $("<img src='img/mix.png'>") : state.mix[0].plugin.getLogo();
+		if (state.mix) return state.mix.length > 1 ? this.getMixLogo() : state.mix[0].plugin.getLogo();
 		else {
 			let ticker;
 			for (let key of state.keys) {
@@ -262,12 +262,46 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 inheritsFrom(SelectCryptoController, DivController);
 
 /**
+ * Render mixed num keys input.
+ * 
+ * Modifies state.mix and invokes onMixNumKeysInput() on input.
+ */
+function MixNumKeysController(div, state, onMixNumKeysInput) {
+	DivController.call(this, div);
+	var errorDiv = $("<div>");
+	
+	this.render = function(callback) {
+		UiUtils.pageSetup(div);
+		
+		// render title
+		div.append(UiUtils.getPageHeader("Enter the number of keys to create for each currency.", UiUtils.getMixLogo()));
+		
+		// done rendering
+		callback(div);
+	}
+	
+	// validates number of pairs is integer >= 1
+	function validateNumKeys(numPairs) {
+		if (isInt(numPairs)) {
+			if (numPairs < 1) throw new Error("Number of keys must be at least 1");
+		} else throw new Error("Number of keys must be an integer greater than 0");
+	}
+	
+	function setErrorMessage(str) {
+		errorDiv.html(str);
+		str === "" ? errorDiv.hide() : errorDiv.show();
+	}
+}
+inheritsFrom(MixNumKeysController, DivController);
+
+/**
  * Render number of keys.
  * 
  * Invokes onNumKeysInput(numKeys) when done.
  */
 function NumKeysController(div, state, onNumKeysInput) {
 	DivController.call(this, div);
+	var errorDiv = $("<div>");
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -289,7 +323,7 @@ function NumKeysController(div, state, onNumKeysInput) {
 		// error message
 		var errorDiv = $("<div>");
 		errorDiv.attr("class", "error_msg");
-		errorDiv.hide();
+		setErrorMessage("");
 		div.append(errorDiv);
 		
 		// next button
@@ -301,12 +335,10 @@ function NumKeysController(div, state, onNumKeysInput) {
 			var numKeys = parseFloat(numKeysInput.val());
 			try {
 				validateNumKeys(numKeys);
-				errorDiv.html();
-				errorDiv.hide();
+				setErrorMessage("");
 				onNumKeysInput(numKeys);
 			} catch (err) {
-				errorDiv.html(err.message);
-				errorDiv.show();
+				setErrorMessage(err.message);
 			}
 		});
 		
@@ -319,6 +351,11 @@ function NumKeysController(div, state, onNumKeysInput) {
 		if (isInt(numPairs)) {
 			if (numPairs < 1) throw new Error("Number of keys must be at least 1");
 		} else throw new Error("Number of keys must be an integer greater than 0");
+	}
+	
+	function setErrorMessage(str) {
+		errorDiv.html(str);
+		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
 inheritsFrom(NumKeysController, DivController);
