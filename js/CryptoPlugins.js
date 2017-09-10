@@ -3,11 +3,11 @@ function getCryptoPlugins() {
 	if (!plugins) {
 		plugins = [];
 		plugins.push(new BitcoinPlugin());
-		plugins.push(new BitcoinCashPlugin());
 		plugins.push(new EthereumPlugin());
-		plugins.push(new EthereumClassicPlugin());
 		plugins.push(new LitecoinPlugin());
 		plugins.push(new MoneroPlugin());
+		plugins.push(new BitcoinCashPlugin());
+		plugins.push(new EthereumClassicPlugin());
 	}
 	return plugins;
 }
