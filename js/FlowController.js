@@ -17,6 +17,7 @@
 // create new storage from csv import
 // common dependencies need to be loaded at critical parts
 // better mix logo
+// disable navigation during piece generation
 
 // peer review encodings
 // consult designers

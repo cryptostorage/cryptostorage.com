@@ -739,10 +739,13 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		// load dependencies
 		loader.load(Array.from(dependencies), function() {
 			
+			// weight BIP38 for more accurate status
+			let bip38Weight = 100;
+			
 			// get total number of keys
-			let numKeys = 0;
+			let numKeysWeighted = 0;
 			for (let elem of state.mix) {
-				numKeys += elem.numKeys;
+				numKeysWeighted += (elem.encryption === EncryptionScheme.BIP38 ? bip38Weight : 1) * elem.numKeys;
 			}
 			
 			// create keys and callback functions to encrypt
@@ -766,14 +769,14 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				// convert keys to pieces
 				let pieces = keysToPieces(originals, state.numPieces, state.minPieces);
 				
-				// validate that pieces can recreate originals
+				// validate pieces can recreate originals
 				let keysFromPieces = piecesToKeys(pieces);
 				assertEquals(originals.length, keysFromPieces.length);
 				for (let i = 0; i < originals.length; i++) {
 					assertTrue(originals[i].equals(keysFromPieces[i]));
 				}
 				
-				// done
+				// pieces created and validated
 				onPiecesGenerated(pieces);
 				return;
 			}
@@ -784,7 +787,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				// convert keys to pieces
 				let pieces = keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
 				
-				// validate that pieces can recreate originals
+				// validate pieces can recreate originals
 				let keysFromPieces = piecesToKeys(pieces);
 				
 				// collect decryption functions
@@ -809,7 +812,8 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			function encryptFunc(key, scheme, password) {
 				return function(callback) {
 					key.encrypt(scheme, password, function(err, key) {
-						setEncryptionStatus(++numEncrypted, numKeys);
+						numEncrypted += (scheme === EncryptionScheme.BIP38 ? bip38Weight : 1);
+						setEncryptionStatus(numEncrypted, numKeysWeighted);
 						setTimeout(function() { callback(err, key); }, 0);
 					});
 				}
@@ -817,8 +821,10 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			
 			function decryptFunc(key, password) {
 				return function(callback) {
+					let toAdd = key.getEncryptionScheme() === EncryptionScheme.BIP38 ? bip38Weight : 1;
 					key.decrypt(password, function(err, key) {
-						setDecryptionStatus(++numDecrypted, numKeys);
+						numDecrypted += toAdd;
+						setDecryptionStatus(numDecrypted, numKeysWeighted);
 						setTimeout(function() { callback(err, key); });
 					});
 				}
