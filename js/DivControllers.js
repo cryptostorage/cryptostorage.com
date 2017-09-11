@@ -486,7 +486,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		
 		// render each encryption selection div
 		let advancedDiv = $("<div>").appendTo(div);
-		advancedDiv.css("margin-left", "15px");
+		advancedDiv.css("margin-left", "18px");
 		advancedDiv.append("<br>Encryption options:");
 		let options = false;
 		let encryptionSelectors = [];

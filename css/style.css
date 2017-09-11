@@ -281,7 +281,7 @@ input[type='file'] {
 .encryption_selection_div {
 	min-height:65px;
 	font-size:20px;
- 	padding:0px 0px 0px 20px;
+ 	padding:0px 10px 0px 10px;
 	margin-top: 10px;
 	display:flex;
 	align-items:center;
@@ -306,4 +306,5 @@ input[type='file'] {
 .mock_link {
 	text-decoration:none;
 	color:blue;
+	cursor: pointer;
 }
