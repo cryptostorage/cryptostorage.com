@@ -821,9 +821,9 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			
 			function decryptFunc(key, password) {
 				return function(callback) {
-					let toAdd = key.getEncryptionScheme() === EncryptionScheme.BIP38 ? bip38Weight : 1;
+					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
-						numDecrypted += toAdd;
+						numDecrypted += (scheme === EncryptionScheme.BIP38 ? bip38Weight : 1);
 						setDecryptionStatus(numDecrypted, numKeysWeighted);
 						setTimeout(function() { callback(err, key); });
 					});
