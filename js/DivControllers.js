@@ -697,6 +697,11 @@ inheritsFrom(NumPiecesInputController, DivController);
  */
 function GeneratePiecesController(div, state, onPiecesGenerated) {
 	DivController.call(this, div);
+	
+	// progress bars
+	var progressEncrypt;
+	var progressDecrypt;
+	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
 		
@@ -725,6 +730,13 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			});
 		});
 		div.append(btnGenerate);
+		
+		progressEncrypt = $("<div>").appendTo(div);
+		progressEncrypt.progressbar();
+		progressDecrypt = $("<div>").appendTo(div);
+		progressDecrypt.progressbar();
+		
+		// done rendering
 		callback(div);
 	}
 	
@@ -834,10 +846,12 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	
 	function setEncryptionStatus(done, total) {
 		console.log("setEncryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
+		progressEncrypt.progressbar("value", done / total * 100);
 	}
 	
 	function setDecryptionStatus(done, total) {
 		console.log("setDecryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
+		progressDecrypt.progressbar("value", done / total * 100);
 	}
 }
 inheritsFrom(GeneratePiecesController, DivController);
