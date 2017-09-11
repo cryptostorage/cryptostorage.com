@@ -93,7 +93,7 @@ function FlowController(pageManager, plugins) {
 	}
 	
 	function onMixNumKeysInput() {
-		if (DEBUG) console.log("onMixNumKeysInput");
+		if (DEBUG) console.log("onMixNumKeysInput()");
 		pageManager.next(new PasswordSelectionController($("<div>"), state, onPasswordSelection))
 	}
 	
