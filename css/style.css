@@ -292,9 +292,13 @@ input[type='file'] {
 	color:black;
 }
 
-.scheme_div {
+.schemes_div {
 	margin-left:auto;
 	display:flex;
 	align-items:center;
 	justify-content:center;
+}
+
+.scheme_div {
+	width:100px;
 }

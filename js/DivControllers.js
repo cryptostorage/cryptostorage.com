@@ -511,13 +511,17 @@ function PasswordInputController(div, state, onPasswordInput) {
 				div.append(plugin.getName());
 								
 				// append encryption selections
-				form = $("<form>");
+				let schemesDiv = $("<div>").appendTo(div);
+				schemesDiv.attr("class", "schemes_div");
 				let schemes = plugin.getEncryptionSchemes();
+				form = $("<form>");
 				for (let scheme of schemes) {
 					let input = $("<input type='radio' name='schemes' value='" + scheme + "'" + (scheme === schemes[0] ? " checked" : "") + ">");
-					let schemeDiv = $("<div class='scheme_div'>").appendTo(div);					
+					form.append(input);
+					let schemeDiv = $("<div class='scheme_div'>");				
 					schemeDiv.append(input);
 					schemeDiv.append(scheme);
+					schemesDiv.append(schemeDiv);
 				}
 			}
 			
