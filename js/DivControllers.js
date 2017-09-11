@@ -747,57 +747,74 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			
 			// create keys and callback functions to encrypt
 			let originals = [];	// save originals for later validation
-			let processeds = [];
 			let funcs = [];
 			let numEncrypted = 0;
+			let numDecrypted = 0;
+			let passwords = [];
 			for (let elem of state.mix) {
 				for (let i = 0; i < elem.numKeys; i++) {
 					let original = elem.plugin.newKey();
-					let processed = original.copy();
 					originals.push(original);
-					processeds.push(processed);
-					if (elem.encryption) {
-						funcs.push(function(callback) {
-							
-							// encrypt key
-							processed.encrypt(elem.encryption, elem.password, function(err, key) {
-								
-								// update progress
-								setEncryptionProgress(++numEncrypted, elem.numKeys);
-								
-								// release thread to update UI
-								setTimeout(function() { callback(err, key); }, 0);
-							});
-						})
-					}
+					passwords.push(elem.password);
+					if (elem.encryption) funcs.push(encryptFunc(original.copy(), elem.encryption, elem.password));
 				}
 			}
+			
+			// done if no encryption
+			if (!funcs.length) {
+				onKeysGenerated(originals);
+				return;
+			}
+			
+			// encrypt keys
+			async.series(funcs, function(err, encryptedKeys) {
+				assertEquals(originals.length, encryptedKeys.length);
+				
+				// verify decryption
+				funcs = [];
+				for (let i = 0; i < encryptedKeys.length; i++) {
+					funcs.push(decryptFunc(encryptedKeys[i].copy(), passwords[i]));
+				}
+				async.series(funcs, function(err, decryptedKeys) {
+					assertEquals(originals.length, decryptedKeys.length);
+					
+					// verify equivalence
+					for (let i = 0; i < originals.length; i++) {
+						assertTrue(originals[i].equals(decryptedKeys[i]));
+					}
+					
+					// keys generated
+					onKeysGenerated(encryptedKeys);
+				});
+				
+			});
 			
 			function encryptFunc(key, scheme, password) {
 				return function(callback) {
 					key.encrypt(scheme, password, function(err, key) {
-						setEncryptionStatus(numEncrypted, numKeys);
+						setEncryptionStatus(++numEncrypted, numKeys);
 						setTimeout(function() { callback(err, key); }, 0);
 					});
 				}
 			}
 			
-			// encrypt keys
-			if (funcs.length) {
-				async.series(funcs, function(err, encryptedKeys) {
-					onKeysGenerated(encryptedKeys);
-				});
+			function decryptFunc(key, password) {
+				return function(callback) {
+					key.decrypt(password, function(err, key) {
+						setDecryptionStatus(++numDecrypted, numKeys);
+						setTimeout(function() { callback(err, key); });
+					});
+				}
 			}
-			else onKeysGenerated(processeds);
 		});
 	}
 	
-	function setEncryptionProgress(done, total) {
-		console.log("setEncryptionProgress(" + done + "/" + total + "(" + (done / total) + "%))");
+	function setEncryptionStatus(done, total) {
+		console.log("setEncryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
 	}
 	
-	function setDecryptionProgress(done, total) {
-		console.log("setDecryptionProgress(" + done + "/" + total + "(" + (done / total) + "%))");
+	function setDecryptionStatus(done, total) {
+		console.log("setDecryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
 	}
 }
 inheritsFrom(GenerateKeysController, DivController);
