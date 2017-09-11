@@ -23,7 +23,7 @@ function DependencyLoader() {
 			}
 		}
 		
-		// invokes callback when ready
+		// invokes callback when all paths loaded
 		loadjs.ready(paths, {
 			success: callback,
 			error: callback
