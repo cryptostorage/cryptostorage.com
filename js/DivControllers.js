@@ -739,11 +739,17 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		// load dependencies
 		loader.load(Array.from(dependencies), function() {
 			
+			// get total number of keys
+			let numKeys = 0;
+			for (let elem of state.mix) {
+				numKeys += elem.numKeys;
+			}
+			
 			// create keys and callback functions to encrypt
 			let originals = [];	// save originals for later validation
 			let processeds = [];
 			let funcs = [];
-			let encryptionDone = 0;
+			let numEncrypted = 0;
 			for (let elem of state.mix) {
 				for (let i = 0; i < elem.numKeys; i++) {
 					let original = elem.plugin.newKey();
@@ -757,13 +763,22 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 							processed.encrypt(elem.encryption, elem.password, function(err, key) {
 								
 								// update progress
-								setEncryptionProgress(++encryptionDone, elem.numKeys);
+								setEncryptionProgress(++numEncrypted, elem.numKeys);
 								
 								// release thread to update UI
 								setTimeout(function() { callback(err, key); }, 0);
 							});
 						})
 					}
+				}
+			}
+			
+			function encryptFunc(key, scheme, password) {
+				return function(callback) {
+					key.encrypt(scheme, password, function(err, key) {
+						setEncryptionStatus(numEncrypted, numKeys);
+						setTimeout(function() { callback(err, key); }, 0);
+					});
 				}
 			}
 			
