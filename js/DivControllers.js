@@ -279,7 +279,6 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 		// render num key inputs
 		let numKeysInputs = [];
 		for (let plugin of state.plugins) {
-			console.log(plugin.getTicker());
 			let numKeysDiv = $("<div class='crypto_num_keys_div'>").appendTo(div);
 			let numKeysLogoDiv = $("<div class='crypto_icon_div'>").appendTo(numKeysDiv);
 			let logo = plugin.getLogo().appendTo(numKeysLogoDiv);
@@ -309,7 +308,6 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 			let error = false;
 			let numKeysInts = [];
 			for (let i = 0; i < state.plugins.length; i++) {
-				console.log(state.plugins[i].getName());
 				try {
 					let numKeys = parseFloat(numKeysInputs[i].val());
 					validateNumKeys(state.plugins[i].getName(), numKeys);
@@ -455,6 +453,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 	DivController.call(this, div);
 	var passwordInput;	// for later focus on show
 	var errorDiv = $("<div>");
+	let advancedOpen;
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -476,11 +475,19 @@ function PasswordInputController(div, state, onPasswordInput) {
 		div.append("<br><br>");
 		passwordInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
 		
-		// render advanced div
-		let advancedDiv = $("<div>").appendTo(div);
-		advancedDiv.append("Select encryption schemes");
+		// render advanced link
+		let advancedLink = $("<div class='mock_link'>").appendTo(div);
+		advancedLink.click(function() { toggleAdvanced(); });
+		function toggleAdvanced() {
+			advancedOpen = !advancedOpen;
+			advancedLink.text(advancedOpen ? "\u25be Advanced" : "\u25b8 Advanced");
+			advancedOpen ? advancedDiv.show() : advancedDiv.hide();
+		}
 		
-		// render each encryption selection controllers
+		// render each encryption selection div
+		let advancedDiv = $("<div>").appendTo(div);
+		advancedDiv.css("margin-left", "15px");
+		advancedDiv.append("<br>Encryption options:");
 		let options = false;
 		let encryptionSelectors = [];
 		for (let elem of state.mix) {
@@ -494,10 +501,15 @@ function PasswordInputController(div, state, onPasswordInput) {
 			}
 		}
 		
+		// toggle advanced closed by default
+		advancedOpen = true;
+		toggleAdvanced();
+		
 		// only render advanced div if options exist
-		if (!options) advancedDiv.hide();
+		if (!options) advancedLink.hide();
 		
 		// render next button
+		div.append("<br>");
 		var btnNext = UiUtils.getNextButton("Next").appendTo(div);
 		btnNext.click(function() {
 			let password = passwordInput.val();

@@ -282,7 +282,7 @@ input[type='file'] {
 	min-height:65px;
 	font-size:20px;
  	padding:0px 0px 0px 20px;
-	margin-bottom: 10px;
+	margin-top: 10px;
 	display:flex;
 	align-items:center;
 }
@@ -301,4 +301,9 @@ input[type='file'] {
 
 .scheme_div {
 	width:100px;
+}
+
+.mock_link {
+	text-decoration:none;
+	color:blue;
 }
