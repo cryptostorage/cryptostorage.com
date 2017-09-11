@@ -1,6 +1,5 @@
 // TODO
 // progress bar on wallet generation
-// verify final pieces
 // can buttons automatically grey out with progress wheel until next screen rendered?
 // placeholders for faq and donations
 // custom export options page
