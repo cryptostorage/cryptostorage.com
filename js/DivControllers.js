@@ -735,17 +735,32 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		
 		// add progress bars
 		encryptProgressDiv = $("<div>").appendTo(div);
-		encryptProgressBar = new ProgressBar.Line(encryptProgressDiv.get(0), {
-			strokeWidth: 2,
-			color: '#33cc33',
-			svgStyle: {width: '100%', height: '100%'}
-		});
+		encryptProgressBar = getProgressPar(encryptProgressDiv.get(0));
 		decryptProgressDiv = $("<div>").appendTo(div);
-		decryptProgressBar = new ProgressBar.Line(decryptProgressDiv.get(0), {
-			strokeWidth: 2,
-			color: '#33cc33',
-			svgStyle: {width: '100%', height: '100%'}
-		});
+		decryptProgressBar = getProgressPar(decryptProgressDiv.get(0));
+		function getProgressPar(div) {
+			return new ProgressBar.Line(div, {
+				strokeWidth: 3,
+				color: '#33cc33',
+				duration: 0,
+				svgStyle: {width: '100%', height: '100%'},
+				text: {
+					className: 'progresbar-text',
+					style: {
+						color: 'black',
+			            position: 'absolute',
+			            left: '50%',
+			            top: '50%',
+			            padding: 0,
+			            margin: 0,
+			            transform: {
+			                prefix: true,
+			                value: 'translate(-50%, -50%)'
+			            }
+					}
+				}
+			});
+		}
 		
 		// done rendering
 		callback(div);
@@ -856,15 +871,15 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	}
 	
 	function setEncryptionStatus(done, total) {
-		console.log("setEncryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
-		let rounded = Math.round(done / total);
-		encryptProgressBar.animate(rounded);
+		console.log("setEncryptionProgress(" + done + "/" + total + " (" + done / total + "%))");
+		encryptProgressBar.set(done / total);
+		encryptProgressBar.setText(Math.round(done / total * 100) + "%");
 	}
 	
 	function setDecryptionStatus(done, total) {
-		console.log("setDecryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
-		let rounded = Math.round(done / total);
-		decryptProgressBar.animate(rounded);
+		console.log("setDecryptionProgress(" + done + "/" + total + " (" + done / total + "%))");
+		decryptProgressBar.set(done / total);
+		decryptProgressBar.setText(Math.round(done / total * 100) + "%");
 	}
 }
 inheritsFrom(GeneratePiecesController, DivController);
