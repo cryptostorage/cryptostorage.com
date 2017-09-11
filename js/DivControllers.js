@@ -519,7 +519,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 				setErrorMessage("");
 				for (let i = 0; i < state.mix.length; i++) {
 					state.mix[i].password = passwordInput.val();
-					state.mix[i].encryption = encryptionSelectors[i] ? encryptionSelectors[i].getSelection() : state.plugins[i].getEncryptionSchemes()[0];
+					state.mix[i].encryption = encryptionSelectors[i] ? encryptionSelectors[i].getSelection() : state.mix[i].plugin.getEncryptionSchemes()[0];
 				}
 				onPasswordInput();
 			}
