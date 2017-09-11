@@ -236,6 +236,12 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to store."));
 		else div.append(UiUtils.getPageHeader("Select a currency to import."));
 		
+		// render mix and match button if creating new storage
+		if (state.mix) {
+			let btn = UiUtils.getNextButton("Select multiple", UiUtils.getMixLogo()).appendTo(div);
+			btn.click(function() { onCryptoSelection("MIX"); });
+		}
+		
 		// render crypto buttons
 		for (let plugin of state.plugins) {
 			let btn = UiUtils.getNextButton(plugin.getName() + " (" + plugin.getTicker() + ")", plugin.getLogo()).appendTo(div);
@@ -247,12 +253,6 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 				// invoke callback
 				onCryptoSelection(plugin.getTicker());
 			});
-		}
-		
-		// render mix and match button if creating new storage
-		if (state.mix) {
-			let btn = UiUtils.getNextButton("Select multiple", UiUtils.getMixLogo()).appendTo(div);
-			btn.click(function() { onCryptoSelection("MIX"); });
 		}
 		
 		// done rendering
@@ -480,23 +480,26 @@ function PasswordInputController(div, state, onPasswordInput) {
 		let advancedDiv = $("<div>").appendTo(div);
 		advancedDiv.append("Select encryption schemes");
 		
-		// render each encryption selection controller
+		// render each encryption selection controllers
 		let options = false;
+		let encryptionSelectors = [];
 		for (let elem of state.mix) {
 			if (elem.plugin.getEncryptionSchemes().length > 1) {
 				options = true;
-				advancedDiv.append(new EncryptionSelector(elem.plugin, $("<div>")).getDiv());
+				let encryptionSelector = new EncryptionSelector(elem.plugin, $("<div>"));
+				encryptionSelectors.push(encryptionSelector);
+				advancedDiv.append(encryptionSelector.getDiv());
+			} else {
+				encryptionSelectors.push(null);
 			}
 		}
-		
-		console.log(options);
 		
 		// only render advanced div if options exist
 		if (!options) advancedDiv.hide();
 		
-		// render an encryption selector for a plugin
+		// render encryption selector for a plugin
 		function EncryptionSelector(plugin, div) {
-			let form;
+			let inputs = [];
 			render();
 			function render() {
 				div.attr("class", "encryption_selection_div");
@@ -513,11 +516,10 @@ function PasswordInputController(div, state, onPasswordInput) {
 				// append encryption selections
 				let schemesDiv = $("<div>").appendTo(div);
 				schemesDiv.attr("class", "schemes_div");
-				form = $("<form>");
 				let schemes = plugin.getEncryptionSchemes();
 				for (let scheme of schemes) {
-					let input = $("<input type='radio' name='schemes' value='" + scheme + "'" + (scheme === schemes[0] ? " checked" : "") + ">");
-					form.append(input);
+					let input = $("<input type='radio' name='" + plugin.getName() + "' value='" + scheme + "'" + (scheme === schemes[0] ? " checked" : "") + ">");
+					inputs.push(input);
 					let schemeDiv = $("<div class='scheme_div'>");
 					schemeDiv.append(input);
 					schemeDiv.append(scheme);
@@ -530,28 +532,12 @@ function PasswordInputController(div, state, onPasswordInput) {
 			}
 			
 			this.getSelection = function() {
-				throw new Error("Not implemented");
+				for (let input of inputs) {
+					if (input.prop("checked")) return input.attr("value");
+				}
+				throw new Error("No encryption radio button selected");
 			}
 		}
-		
-		// TODO: mix and match support
-//		if (state.mix.length > 1) throw new Error("Mix and match password input not supported");
-		
-//		// render advanced
-//		let schemes = state.mix[0].plugin.getEncryptionSchemes();
-//		var advancedDiv = $("<div>").appendTo(div);
-//		advancedDiv.append("Advanced<br><br>");
-//		advancedDiv.append("Password encryption algorithm:<br>");
-//		var form = $("<form>");
-//		for (let scheme of schemes) {
-//			var input = $("<input type='radio' name='schemes' value='" + scheme + "'" + (scheme === schemes[0] ? " checked" : "") + ">");
-//			form.append(input);
-//			form.append(scheme);
-//			form.append("<br>")
-//		}
-//		advancedDiv.append(form);
-//		advancedDiv.append("<br>");
-//		if (schemes.length === 1) advancedDiv.hide();
 		
 		// render next button
 		var btnNext = UiUtils.getNextButton("Next").appendTo(div);
@@ -561,8 +547,10 @@ function PasswordInputController(div, state, onPasswordInput) {
 			else if (password.length < 6) setErrorMessage("Password must be at least 6 characters");
 			else {
 				setErrorMessage("");
-				state.mix[0].password = passwordInput.val();
-				state.mix[0].encryption = $("input[type='radio']:checked", form).val();
+				for (let i = 0; i < state.mix.length; i++) {
+					state.mix[i].password = passwordInput.val();
+					state.mix[i].encryption = encryptionSelectors[i] ? encryptionSelectors[i].getSelection() : state.plugins[i].getEncryptionSchemes()[0];
+				}
 				onPasswordInput();
 			}
 			passwordInput.focus();
@@ -588,25 +576,6 @@ function PasswordInputController(div, state, onPasswordInput) {
 		errorDiv.html(str);
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
-	
-	/**
-	 * Renders a password selector and provides access to state.
-	 */
-	function EncryptionSelectionController(div, plugin) {
-		
-		this.render = function(callback) {
-			throw new Error("not implemented");
-		}
-	
-		this.getPlugin = function() {
-			return this.plugin;
-		}
-		
-		this.getSelectedScheme = function() {
-			
-		}
-	}
-	inheritsFrom(EncryptionSelectionController, DivController);
 }
 inheritsFrom(PasswordInputController, DivController);
 
