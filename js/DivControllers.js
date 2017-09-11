@@ -851,16 +851,13 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	function setEncryptionStatus(done, total) {
 		console.log("setEncryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
 		let rounded = Math.round(done / total * 100);
-		//progressEncrypt.html(rounded + "%");
-		progressEncrypt.progressbar("value", rounded);
-		//progressEncrypt.append(rounded + "%");
+		progressEncrypt.progressbar({value: rounded}).children('.ui-progressbar-value').html(rounded + '%').css("display", "block");
 	}
 	
 	function setDecryptionStatus(done, total) {
 		console.log("setDecryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
 		let rounded = Math.round(done / total * 100);
-		progressDecrypt.progressbar("value", rounded);
-		//progressDecrypt.html(rounded + "%");
+		progressDecrypt.progressbar({value: rounded}).children('.ui-progressbar-value').html(rounded + '%').css("display", "block");
 	}
 }
 inheritsFrom(GeneratePiecesController, DivController);

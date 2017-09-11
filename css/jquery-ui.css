@@ -109,20 +109,14 @@
 }
 
 .ui-progressbar {
-  height: 20px;
+  height: 30px;
   text-align: left;
   overflow: hidden;
 }
 .ui-progressbar .ui-progressbar-value {
   margin: -1px;
   height: 100%;
-  background-color: green;
+  background-color:#33cc33;
+  text-align:center;
+  vertical-align:middle;
 }
-
-.progress-label {
-    position: absolute;
-    left: 50%;
-    top: 4px;
-    font-weight: bold;
-    text-shadow: 1px 1px 0 #fff;
-  }
