@@ -277,3 +277,24 @@ input[type='file'] {
 	font-size:20px;
 	margin-left:auto;
 }
+
+.encryption_selection_div {
+	min-height:65px;
+	font-size:20px;
+ 	padding:0px 0px 0px 20px;
+	margin-bottom: 10px;
+	display:flex;
+	align-items:center;
+}
+
+.encryption_selection_div:hover {
+	background-color:#F0F0F0;
+	color:black;
+}
+
+.scheme_div {
+	margin-left:auto;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}

@@ -85,8 +85,7 @@ function FlowController(pageManager, plugins) {
 	
 	function onSelectCryptoCreate(selection) {
 		if (DEBUG) console.log("onSelectCrypto(" + selection + ")");
-		state.cryptoSelection = selection;
-		if (state.cryptoSelection === "MIX") {
+		if (selection === "MIX") {
 			pageManager.next(new MixNumKeysController($("<div>"), state, onMixNumKeysInput))
 		} else {
 			state.mix = [{plugin: getCryptoPlugin(selection)}];
