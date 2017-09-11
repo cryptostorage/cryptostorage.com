@@ -700,7 +700,9 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	
 	// progress bars
 	var progressEncrypt;
+	var progressEncryptLabel;
 	var progressDecrypt;
+	var progressDecryptLabel;
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -733,8 +735,10 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		
 		progressEncrypt = $("<div>").appendTo(div);
 		progressEncrypt.progressbar();
+		progressEncryptLabel = $("<div class='progress-label'>").appendTo(progressEncrypt);
 		progressDecrypt = $("<div>").appendTo(div);
 		progressDecrypt.progressbar();
+		progressDecryptLabel = $("<div class='progress-label'>").appendTo(progressDecrypt);
 		
 		// done rendering
 		callback(div);
@@ -846,12 +850,16 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	
 	function setEncryptionStatus(done, total) {
 		console.log("setEncryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
-		progressEncrypt.progressbar("value", done / total * 100);
+		let rounded = Math.round(done / total * 100);
+		progressEncrypt.progressbar("value", rounded);
+		progressEncryptLabel.text(rounded + "%");
 	}
 	
 	function setDecryptionStatus(done, total) {
 		console.log("setDecryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
-		progressDecrypt.progressbar("value", done / total * 100);
+		let rounded = Math.round(done / total * 100);
+		progressDecrypt.progressbar("value", rounded);
+		progressDecryptLabel.text(rounded + "%");
 	}
 }
 inheritsFrom(GeneratePiecesController, DivController);
