@@ -1,5 +1,4 @@
 // TODO
-// password input with multiple currencies
 // progress bar on wallet generation
 // verify final pieces
 // can buttons automatically grey out with progress wheel until next screen rendered?
