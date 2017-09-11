@@ -780,7 +780,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			}
 			
 			// handle no encryption
-			if (!funcs) {
+			if (!funcs.length) {
 				
 				// convert keys to pieces
 				let pieces = keysToPieces(originals, state.numPieces, state.minPieces);
@@ -851,15 +851,16 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	function setEncryptionStatus(done, total) {
 		console.log("setEncryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
 		let rounded = Math.round(done / total * 100);
+		//progressEncrypt.html(rounded + "%");
 		progressEncrypt.progressbar("value", rounded);
-		progressEncryptLabel.text(rounded + "%");
+		//progressEncrypt.append(rounded + "%");
 	}
 	
 	function setDecryptionStatus(done, total) {
 		console.log("setDecryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
 		let rounded = Math.round(done / total * 100);
 		progressDecrypt.progressbar("value", rounded);
-		progressDecryptLabel.text(rounded + "%");
+		//progressDecrypt.html(rounded + "%");
 	}
 }
 inheritsFrom(GeneratePiecesController, DivController);
