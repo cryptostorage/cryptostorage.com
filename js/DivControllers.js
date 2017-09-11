@@ -497,7 +497,36 @@ function PasswordInputController(div, state, onPasswordInput) {
 		// only render advanced div if options exist
 		if (!options) advancedDiv.hide();
 		
-		// render encryption selector for a plugin
+		// render next button
+		var btnNext = UiUtils.getNextButton("Next").appendTo(div);
+		btnNext.click(function() {
+			let password = passwordInput.val();
+			if (password === "") setErrorMessage("Password cannot be empty")
+			else if (password.length < 6) setErrorMessage("Password must be at least 6 characters");
+			else {
+				setErrorMessage("");
+				for (let i = 0; i < state.mix.length; i++) {
+					state.mix[i].password = passwordInput.val();
+					state.mix[i].encryption = encryptionSelectors[i] ? encryptionSelectors[i].getSelection() : state.plugins[i].getEncryptionSchemes()[0];
+				}
+				onPasswordInput();
+			}
+			passwordInput.focus();
+		});
+		
+		// register pasword enter key
+		passwordInput.keyup(function(e) {
+			var code = e.which;
+		    if (code == 13) {
+		    	e.preventDefault();
+		        btnNext.click();
+		    }
+		});
+		
+		// done rendering
+		callback(div);
+		
+		// private renderer to select encryption scheme
 		function EncryptionSelector(plugin, div) {
 			let inputs = [];
 			render();
@@ -538,34 +567,6 @@ function PasswordInputController(div, state, onPasswordInput) {
 				throw new Error("No encryption radio button selected");
 			}
 		}
-		
-		// render next button
-		var btnNext = UiUtils.getNextButton("Next").appendTo(div);
-		btnNext.click(function() {
-			let password = passwordInput.val();
-			if (password === "") setErrorMessage("Password cannot be empty")
-			else if (password.length < 6) setErrorMessage("Password must be at least 6 characters");
-			else {
-				setErrorMessage("");
-				for (let i = 0; i < state.mix.length; i++) {
-					state.mix[i].password = passwordInput.val();
-					state.mix[i].encryption = encryptionSelectors[i] ? encryptionSelectors[i].getSelection() : state.plugins[i].getEncryptionSchemes()[0];
-				}
-				onPasswordInput();
-			}
-			passwordInput.focus();
-		});
-		
-		// register pasword enter key
-		passwordInput.keyup(function(e) {
-			var code = e.which;
-		    if (code == 13) {
-		    	e.preventDefault();
-		        btnNext.click();
-		    }
-		});
-		
-		callback(div);
 	}
 	
 	this.onShow = function() {
