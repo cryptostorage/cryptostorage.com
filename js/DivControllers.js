@@ -737,15 +737,15 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		encryptProgressDiv = $("<div>").appendTo(div);
 		encryptProgressBar = new ProgressBar.Line(encryptProgressDiv.get(0), {
 			strokeWidth: 2,
-			color: '##33cc33',
+			color: '#33cc33',
 			svgStyle: {width: '100%', height: '100%'}
 		});
-//		decryptProgressDiv = $("<div>").appendTo(div);
-//		decryptProgressBar = new ProgressBar.Line(decryptProgressDiv.get(0), {
-//			strokeWidth: 2,
-//			color: '#33cc33',
-//			svgStyle: {width: '100%', height: '100%'}
-//		});
+		decryptProgressDiv = $("<div>").appendTo(div);
+		decryptProgressBar = new ProgressBar.Line(decryptProgressDiv.get(0), {
+			strokeWidth: 2,
+			color: '#33cc33',
+			svgStyle: {width: '100%', height: '100%'}
+		});
 		
 		// done rendering
 		callback(div);
@@ -864,7 +864,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	function setDecryptionStatus(done, total) {
 		console.log("setDecryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
 		let rounded = Math.round(done / total);
-//		decryptProgressBar.animate(rounded);
+		decryptProgressBar.animate(rounded);
 	}
 }
 inheritsFrom(GeneratePiecesController, DivController);
