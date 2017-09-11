@@ -126,7 +126,7 @@ function FlowController(pageManager, plugins) {
 		else {
 			delete state.numPieces;
 			delete state.minPieces;
-			pageManager.next(new GenerateKeysController($("<div>"), state, onKeysGenerated));
+			pageManager.next(new GeneratePiecesController($("<div>"), state, onPiecesGenerated));
 		}
 	}
 	
@@ -136,12 +136,12 @@ function FlowController(pageManager, plugins) {
 		assertInt(minPieces);
 		state.numPieces = numPieces;
 		state.minPieces = minPieces;
-		pageManager.next(new GenerateKeysController($("<div>"), state, onKeysGenerated));
+		pageManager.next(new GeneratePiecesController($("<div>"), state, onPiecesGenerated));
 	}
 	
-	function onKeysGenerated(keys) {
-		if (DEBUG) console.log("onKeysGenerated(" + keys.length + ")");
-		state.pieces = keysToPieces(keys, state.numPieces, state.minPieces);
+	function onPiecesGenerated(pieces) {
+		if (DEBUG) console.log("onPiecesGenerated(" + pieces.length + ")");
+		state.pieces = pieces;
 		pageManager.next(new DownloadPiecesController($("<div>"), state, onCustomExport));
 	}
 	

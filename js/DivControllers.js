@@ -689,13 +689,13 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 inheritsFrom(NumPiecesInputController, DivController);
 
 /**
- * Summarize configuration and generate keys.
+ * Summarize configuration and generate pieces.
  * 
  * @param div is the div to render to
  * @param state is the current state of the application
- * @param onKeysGenerated(keys) is invoked when the keys are created
+ * @param onPiecesGenerated(pieces) is invoked when the pieces are created
  */
-function GenerateKeysController(div, state, onKeysGenerated) {
+function GeneratePiecesController(div, state, onPiecesGenerated) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -719,8 +719,8 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		var btnGenerate = UiUtils.getNextButton("Generate storage");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
-			generateKeys(function(keys) {
-				onKeysGenerated(keys);
+			generatePieces(function(pieces) {
+				onPiecesGenerated(pieces);
 				btnGenerate.removeAttr("disabled");
 			});
 		});
@@ -728,7 +728,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		callback(div);
 	}
 	
-	function generateKeys(onKeysGenerated) {
+	function generatePieces(onPiecesGenerated) {
 		
 		// collect dependencies
 		let dependencies = new Set();
@@ -748,9 +748,9 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			// create keys and callback functions to encrypt
 			let originals = [];	// save originals for later validation
 			let funcs = [];
+			let passwords = [];
 			let numEncrypted = 0;
 			let numDecrypted = 0;
-			let passwords = [];
 			for (let elem of state.mix) {
 				for (let i = 0; i < elem.numKeys; i++) {
 					let original = elem.plugin.newKey();
@@ -760,33 +760,50 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 				}
 			}
 			
-			// done if no encryption
-			if (!funcs.length) {
-				onKeysGenerated(originals);
+			// handle no encryption
+			if (!funcs) {
+				
+				// convert keys to pieces
+				let pieces = keysToPieces(originals, state.numPieces, state.minPieces);
+				
+				// validate that pieces can recreate originals
+				let keysFromPieces = piecesToKeys(pieces);
+				assertEquals(originals.length, keysFromPieces.length);
+				for (let i = 0; i < originals.length; i++) {
+					assertTrue(originals[i].equals(keysFromPieces[i]));
+				}
+				
+				// done
+				onPiecesGenerated(pieces);
 				return;
 			}
 			
 			// encrypt keys
 			async.series(funcs, function(err, encryptedKeys) {
-				assertEquals(originals.length, encryptedKeys.length);
 				
-				// verify decryption
+				// convert keys to pieces
+				let pieces = keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
+				
+				// validate that pieces can recreate originals
+				let keysFromPieces = piecesToKeys(pieces);
+				
+				// collect decryption functions
 				funcs = [];
 				for (let i = 0; i < encryptedKeys.length; i++) {
-					funcs.push(decryptFunc(encryptedKeys[i].copy(), passwords[i]));
+					funcs.push(decryptFunc(encryptedKeys[i], passwords[i]));
 				}
+				
+				// decrypt keys
 				async.series(funcs, function(err, decryptedKeys) {
-					assertEquals(originals.length, decryptedKeys.length);
 					
 					// verify equivalence
 					for (let i = 0; i < originals.length; i++) {
 						assertTrue(originals[i].equals(decryptedKeys[i]));
 					}
 					
-					// keys generated
-					onKeysGenerated(encryptedKeys);
+					// pieces created and validated
+					onPiecesGenerated(pieces);
 				});
-				
 			});
 			
 			function encryptFunc(key, scheme, password) {
@@ -817,7 +834,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		console.log("setDecryptionProgress(" + done + "/" + total + " (" + (done / total) + "%))");
 	}
 }
-inheritsFrom(GenerateKeysController, DivController);
+inheritsFrom(GeneratePiecesController, DivController);
 
 /**
  * Renders a piece with one or more public/private components to a div with the given config.
