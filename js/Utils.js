@@ -1059,7 +1059,9 @@ function renderPieces(pieces, config, onProgress, onDone) {
 		}
 		
 		// execute callback functions
-		async.series(funcs, onDone(null, div));
+		async.series(funcs, function(err) {
+			onDone(err, div);
+		});
 		
 		/**
 		 * Returns a callback function (function with single callback argument) which will render a pair div.
