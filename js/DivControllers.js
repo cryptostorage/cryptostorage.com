@@ -699,10 +699,8 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	DivController.call(this, div);
 	
 	// progress bars
-	let encryptProgressDiv;
-	let encryptProgressBar;
-	let verifyProgressDiv;
-	let verifyProgressBar;
+	let progressDiv;
+	let progressBar;
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -733,19 +731,14 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		});
 		div.append(btnGenerate);
 		
-		// add progress bars
-		encryptProgressDiv = $("<div>").appendTo(div);
-		encryptProgressDiv.hide();
-		encryptProgressBar = getProgressPar(encryptProgressDiv.get(0));
-		verifyProgressDiv = $("<div>").appendTo(div);
-		verifyProgressDiv.hide();
-		verifyProgressBar = getProgressPar(verifyProgressDiv.get(0));
+		// add progress bar
+		progressDiv = $("<div>").appendTo(div);
+		progressDiv.hide();
+		progressBar = getProgressPar(progressDiv.get(0));
 		function getProgressPar(div) {
 			return new ProgressBar.Line(div, {
 				strokeWidth: 2.5,
 				color: 'rgb(96, 178, 198)',	// cryptostorage teal
-//				color: '#33cc33',
-//				color: '#00ff00',
 				duration: 0,
 				svgStyle: {width: '100%', height: '100%'},
 				text: {
@@ -768,6 +761,14 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		
 		// done rendering
 		callback(div);
+	}
+	
+	function setProgress(label, done, total) {
+		console.log("setProgress(" + done + "/" + total + " (" + done / total + "%))");
+		progressDiv.show();
+		progressBar.set(done / total);
+		let rounded = Math.round(done / total * 100);
+		progressBar.setText(label);
 	}
 	
 	function generatePieces(onPiecesGenerated) {
@@ -873,22 +874,6 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				}
 			}
 		});
-	}
-	
-	function setEncryptionStatus(done, total) {
-		console.log("setEncryptionProgress(" + done + "/" + total + " (" + done / total + "%))");
-		encryptProgressDiv.show();
-		encryptProgressBar.set(done / total);
-		let rounded = Math.round(done / total * 100);
-		encryptProgressBar.setText("Key encryption " + (rounded !== 100 ? rounded + "% ": "") + "complete");
-	}
-	
-	function setVerifyStatus(done, total) {
-		console.log("setVerifyStatus(" + done + "/" + total + " (" + done / total + "%))");
-		verifyProgressDiv.show();
-		verifyProgressBar.set(done / total);
-		let rounded = Math.round(done / total * 100);
-		verifyProgressBar.setText("Key verification " + (rounded !== 100 ? rounded + "% ": "") + "complete");
 	}
 }
 inheritsFrom(GeneratePiecesController, DivController);
