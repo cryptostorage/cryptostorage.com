@@ -1263,6 +1263,10 @@ function DownloadPiecesController(div, state, onCustomExport) {
 				pieceHtmls.push($("<html>").append($("<body>").append(pieceDiv)));
 			}
 			
+			for (let pieceHtml of pieceHtmls) {
+				console.log(pieceHtml.html());
+			}
+			
 			// zip pieces
 			piecesToZip(pieces, pieceHtmls, function(name, blob) {
 				
