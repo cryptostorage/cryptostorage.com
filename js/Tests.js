@@ -41,14 +41,13 @@ function getKeyWeights() {
 		}
 	}
 	let end = new Date().getTime();
-	console.log(keys.length + " keys");
-	console.log(end - start);
+	console.log(keys.length + " keys created in " + (end - start) + " milliseconds");
 }
 
 function getBip38Weights(callback) {
 	let bitcoin = getCryptoPlugin("BTC");
 	let keys = [];
-	for (let i = 0; i < 20; i++) {
+	for (let i = 0; i < 25; i++) {
 		keys.push(bitcoin.newKey());
 	}
 	
