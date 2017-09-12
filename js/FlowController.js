@@ -1,7 +1,6 @@
 // TODO
-// progress bar on wallet generation
-// can buttons automatically grey out with progress wheel until next screen rendered?
 // placeholders for faq and donations
+// can buttons automatically grey out with progress wheel until next screen rendered?
 // custom export options page
 // namespace utils.js (reference bitaddress.org)
 // cryptostorage donation addresses
@@ -13,11 +12,11 @@
 // todos throughout code
 // run minimum tests when site accessed
 // use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org)
-// create new storage from csv import
 // common dependencies need to be loaded at critical parts
 // better mix logo
 // disable navigation during piece generation
-// render htmls with progress bar on piece generation
+// key generation and html rendering progress bars with brief pause at end
+// create new storage from csv import
 
 // peer review encodings
 // consult designers
