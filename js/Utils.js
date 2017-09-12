@@ -714,7 +714,7 @@ function parseKey(plugin, str) {
  * Converts the given keys to pieces.
  * 
  * @param keys are the keys to convert to pieces
- * @param numPieces are the number of pieces to split the keys into (optional)
+ * @param numPieces are the number of pieces to split the keys into (must be >= 1)
  * @param minPieces are the minimum pieces to reconstitute the keys (optional)
  * @returns exportable pieces
  */
@@ -722,11 +722,12 @@ function keysToPieces(keys, numPieces, minPieces) {
 	
 	// validate input
 	assertTrue(keys.length > 0);
-	if (numPieces) {
+	assertTrue(numPieces >= 1);
+	if (minPieces) {
 		assertTrue(numPieces >= 2);
 		assertTrue(minPieces >= 2);
 	} else {
-		numPieces = 1;
+		assertTrue(numPieces >= 1);
 	}
 	
 	// initialize pieces

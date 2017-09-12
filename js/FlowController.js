@@ -127,7 +127,7 @@ function FlowController(pageManager, plugins) {
 		state.splitEnabled = splitEnabled;
 		if (splitEnabled) pageManager.next(new NumPiecesInputController($("<div>"), state, onSplitInput));
 		else {
-			delete state.numPieces;
+			state.numPieces = 1;
 			delete state.minPieces;
 			pageManager.next(new GeneratePiecesController($("<div>"), state, onPiecesGenerated));
 		}
@@ -142,10 +142,12 @@ function FlowController(pageManager, plugins) {
 		pageManager.next(new GeneratePiecesController($("<div>"), state, onPiecesGenerated));
 	}
 	
-	function onPiecesGenerated(pieces, htmls) {
+	function onPiecesGenerated(pieces, pieceDivs) {
 		if (DEBUG) console.log("onPiecesGenerated(" + pieces.length + ")");
+		assertTrue(pieces.length > 0);
+		assertEquals(pieces.length, pieceDivs.length);
 		state.pieces = pieces;
-		state.html = html;
+		state.pieceDivs = pieceDivs;
 		pageManager.next(new RenderPiecesController($("<div>"), state, onCustomExport));
 	}
 	

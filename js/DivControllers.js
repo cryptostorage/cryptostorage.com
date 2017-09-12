@@ -98,7 +98,7 @@ let Weights = {
 		}
 	},
 	getQrWeight: function() {
-		return 400;
+		return 100;
 	}
 }
 
@@ -753,8 +753,8 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		var btnGenerate = UiUtils.getNextButton("Generate storage");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
-			generatePieces(function(pieces) {
-				onPiecesGenerated(pieces);
+			generatePieces(function(pieces, pieceDivs) {
+				onPiecesGenerated(pieces, pieceDivs);
 				btnGenerate.removeAttr("disabled");
 			});
 		});
@@ -803,11 +803,14 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			
 			// compute total weight
 			let totalWeight = 0;
+			let numKeys = 0;
 			for (let elem of state.mix) {
+				numKeys += elem.numKeys;
 				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
 				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + Weights.getDecryptWeight(elem.encryption));
 			}
-			piecesRender.getWeight();
+			let piecesRendererWeight = IndustrialPiecesRenderer.getWeight(numKeys, state.numPieces, null);
+			totalWeight += piecesRendererWeight;
 			
 			// collect key creation functions
 			let funcs = [];
@@ -852,7 +855,9 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					
 					// render pieces to htmls
 					renderPieceHtmls(pieces, function(err, htmls) {
-						setProgress("Complete", progressWeight, totalWeight);
+						if (err) throw err;
+						assertEquals(pieces.length, htmls.length);
+						setProgress("Complete", 1, 1);
 						onPiecesGenerated(pieces, htmls);
 					})
 				}
@@ -888,7 +893,9 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 							
 							// render pieces to htmls
 							renderPieceHtmls(pieces, function(err, htmls) {
-								setProgress("Complete", progressWeight, totalWeight);
+								if (err) throw err;
+								assertEquals(pieces.length, htmls.length);
+								setProgress("Complete", 1, 1);
 								onPiecesGenerated(pieces, htmls);
 							})
 						});
@@ -929,17 +936,15 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
 						progressWeight += Weights.getDecryptWeight(scheme);
-						setProgress("Decrypting keys", progressWeight, totalWeight);
+						setProgress("Verifying encryption", progressWeight, totalWeight);
 						setTimeout(function() { callback(err, key); });	// let UI breath
 					});
 				}
 			}
 			
 			function renderPieceHtmls(pieces, onDone) {
-				let renderer = new IndustrialPiecesRenderer(pieces, null);
-				renderer.render(function(percent) {
-					progressWeight += percent * renderer.getWeight();
-					setProgress("Rendering pieces", progressWeight, totalWeight);
+				IndustrialPiecesRenderer.render(pieces, null, function(percent) {
+					setProgress("Rendering pieces", progressWeight + (percent * piecesRendererWeight), totalWeight);
 				}, onDone);
 			}
 		});
@@ -1271,8 +1276,14 @@ function RenderPiecesController(div, state, onCustomExport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Download your " + UiUtils.getCryptoName(state) + " storage.", UiUtils.getCryptoLogo(state)));
 		
+		// wrap piece divs with htmls for export
+		let htmls = [];
+		for (let pieceDiv of state.pieceDivs) {
+			htmls.push($("<html>").append($("<body>").append(div)));
+		}
+		
 		// zip pieces
-		piecesToZip(state.pieces, state.pieceHtmls, function(name, blob) {
+		piecesToZip(state.pieces, htmls, function(name, blob) {
 			
 			// render zip download
 			div.append("<br>");
@@ -1291,7 +1302,7 @@ function RenderPiecesController(div, state, onCustomExport) {
 			
 			// render preview
 			div.append("<br>Preview:<br>");
-			div.append(pieceDivs[0]);
+			div.append(state.pieceDivs[0]);
 			
 			// done rendering
 			callback(div);
@@ -1324,44 +1335,41 @@ function CustomExportController(div, state, pieces) {
 inheritsFrom(CustomExportController, DivController);
 
 /**
- * Renders the given pieces to divs.
- * 
- * @param pieces are the peices to render
- * @param config is the render configuration
-
+ * Utility functions for the "industrial" pieces renderer.
  */
-function IndustrialPiecesRenderer(pieces, config) {
-	
+IndustrialPiecesRenderer = {
+		
+	// initialize default configuration
+	defaultConfig: {
+		public_qr: true,
+		private_qr: true,
+		public_text: true,
+		private_text: true,
+		num_columns: 2,
+		qr_size: 200,
+		qr_version: null,
+		qr_error_correction_level: 'H',
+		qr_scale: 4,
+		qr_padding: 5,		// spacing in pixels
+		col_spacing: 12,	// spacing in pixels
+		add_table_width: 15	// spacing in pixels
+	},
+
 	/**
 	 * Invokes rendering.
 	 * 
+	 * @param pieces are the peices to render
+	 * @param config is the render configuration
 	 * @param onProgress(percent) is called as progress is made
 	 * @param onDone(err, divs) is called when complete
 	 */
-	this.render = function(onProgress, onDone) {
-		
-		// initialize default configuration
-		let DEFAULT_CONFIG = {
-			public_qr: true,
-			private_qr: true,
-			public_text: true,
-			private_text: true,
-			num_columns: 2,
-			qr_size: 200,
-			qr_version: null,
-			qr_error_correction_level: 'H',
-			qr_scale: 4,
-			qr_padding: 5,		// spacing in pixels
-			col_spacing: 12,	// spacing in pixels
-			add_table_width: 15	// spacing in pixels
-		};
+	render: function(pieces, config, onProgress, onDone) {
 		
 		// merge configs
-		config = Object.assign({}, DEFAULT_CONFIG, config);
+		config = Object.assign({}, IndustrialPiecesRenderer.defaultConfig, config);
 		
 		// compute total number of qr codes to render
-		
-		let totalQrs = getNumQrs();
+		let totalQrs = IndustrialPiecesRenderer.getNumQrs(pieces[0].length, pieces.length, config);
 		let doneQrs = 0;
 		function qrCodeRendered() {
 			onProgress(++doneQrs / totalQrs);
@@ -1552,13 +1560,16 @@ function IndustrialPiecesRenderer(pieces, config) {
 				}
 			}
 		}
-	}
+	},
 	
-	this.getWeight = function() {
-		return getNumQrs() * Weights.getQrWeight();
-	}
+	getNumQrs: function(numKeys, numPieces, config) {
+		config = Object.assign({}, IndustrialPiecesRenderer.defaultConfig, config);
+		return numKeys * numPieces * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
+	},
 	
-	function getNumQrs() {
-		return pieces.length * pieces[0].length * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
+	getWeight: function(numKeys, numPieces, config) {
+		console.log("IndustrialPiecesRenderer.getWeight(" + numKeys + ", " + numPieces + ", " + config + ")");;
+		config = Object.assign({}, IndustrialPiecesRenderer.defaultConfig, config);
+		return IndustrialPiecesRenderer.getNumQrs(numKeys, numPieces, config) * Weights.getQrWeight();
 	}
 }
