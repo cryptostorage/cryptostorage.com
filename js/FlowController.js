@@ -16,6 +16,7 @@
 // better mix logo
 // disable navigation during piece generation
 // key generation and html rendering progress bars with brief pause at end
+// decryption progress bar
 // create new storage from csv import
 
 // peer review encodings
