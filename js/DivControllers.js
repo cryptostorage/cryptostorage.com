@@ -73,6 +73,33 @@ UiUtils = {
 }
 
 /**
+ * Relative weights of key creation and encryption/decryption operations.
+ * 
+ * Derived from experimentation and used for accurate progress bar.
+ */
+const WEIGHTS = {
+	getCreateKeyWeight: function() { return 1; },
+	getEncryptWeight: function(scheme) {
+		switch (scheme) {
+			case EncryptionScheme.BIP38:
+				return 100;
+			case EncryptionScheme.CRYPTOJS:
+				return 5;
+			default: throw new Error("Unrecognized encryption scheme: " + scheme);
+		}
+	},
+	getDecryptWeight: function(scheme) {
+		switch (scheme) {
+			case EncryptionScheme.BIP38:
+				return 100;
+			case EncryptionScheme.CRYPTOJS:
+				return 20;
+			default: throw new Error("Unrecognized encryption scheme: " + scheme);
+		}
+	}
+}
+
+/**
  * Base class to render and control a div.
  */
 function DivController(div) {
@@ -764,10 +791,9 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	}
 	
 	function setProgress(label, done, total) {
-		console.log("setProgress(" + done + "/" + total + " (" + done / total + "%))");
+		console.log("setProgress(" + label + ", " + done + ", " + total + " (" + Math.round(done / total * 100) + "%)");
 		progressDiv.show();
 		progressBar.set(done / total);
-		let rounded = Math.round(done / total * 100);
 		progressBar.setText(label);
 	}
 	
@@ -782,24 +808,23 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		// load dependencies
 		loader.load(Array.from(dependencies), function() {
 			
-			// weight BIP38 for more accurate status
-			let bip38Weight = 100;
-			
-			// get total number of keys
-			let numKeysWeighted = 0;
+			// compute total weight
+			let totalWeight = 0;
 			for (let elem of state.mix) {
-				numKeysWeighted += (elem.encryption === EncryptionScheme.BIP38 ? bip38Weight : 1) * elem.numKeys;
+				totalWeight += elem.numKeys * WEIGHTS.getCreateKeyWeight();
+				if (elem.encryption) totalWeight += elem.numKeys * (WEIGHTS.getEncryptWeight(elem.encryption) + WEIGHTS.getDecryptWeight(elem.encryption));
 			}
 			
 			// create keys and callback functions to encrypt
 			let originals = [];	// save originals for later validation
 			let funcs = [];
 			let passwords = [];
-			let numEncrypted = 0;
-			let numDecrypted = 0;
+			let progressWeight = 0;
 			for (let elem of state.mix) {
 				for (let i = 0; i < elem.numKeys; i++) {
 					let original = elem.plugin.newKey();
+					progressWeight += WEIGHTS.getCreateKeyWeight();
+					setProgress("Creating keys", progressWeight, totalWeight);
 					originals.push(original);
 					passwords.push(elem.password);
 					if (elem.encryption) funcs.push(encryptFunc(original.copy(), elem.encryption, elem.password));
@@ -818,7 +843,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				for (let i = 0; i < originals.length; i++) {
 					assertTrue(originals[i].equals(keysFromPieces[i]));
 				}
-				setVerifyStatus(1, 1);
+				setProgress("Storage generation complete", 1, 1);
 				
 				// pieces created and validated
 				onPiecesGenerated(pieces);
@@ -856,9 +881,9 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			function encryptFunc(key, scheme, password) {
 				return function(callback) {
 					key.encrypt(scheme, password, function(err, key) {
-						numEncrypted += (scheme === EncryptionScheme.BIP38 ? bip38Weight : 1);
-						setEncryptionStatus(numEncrypted, numKeysWeighted);
-						setTimeout(function() { callback(err, key); }, 0);
+						progressWeight += WEIGHTS.getEncryptWeight(scheme);
+						setProgress("Encrypting keys", progressWeight, totalWeight);
+						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
 				}
 			}
@@ -867,9 +892,9 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				return function(callback) {
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
-						numDecrypted += (scheme === EncryptionScheme.BIP38 ? bip38Weight : 1);
-						setVerifyStatus(numDecrypted, numKeysWeighted);
-						setTimeout(function() { callback(err, key); });
+						progressWeight += WEIGHTS.getDecryptWeight(scheme);
+						setProgress("Decrypting keys", progressWeight, totalWeight);
+						setTimeout(function() { callback(err, key); });	// let UI breath
 					});
 				}
 			}
