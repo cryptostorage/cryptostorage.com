@@ -142,10 +142,11 @@ function FlowController(pageManager, plugins) {
 		pageManager.next(new GeneratePiecesController($("<div>"), state, onPiecesGenerated));
 	}
 	
-	function onPiecesGenerated(pieces) {
+	function onPiecesGenerated(pieces, htmls) {
 		if (DEBUG) console.log("onPiecesGenerated(" + pieces.length + ")");
 		state.pieces = pieces;
-		pageManager.next(new DownloadPiecesController($("<div>"), state, onCustomExport));
+		state.html = html;
+		pageManager.next(new RenderPiecesController($("<div>"), state, onCustomExport));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------
@@ -177,7 +178,7 @@ function FlowController(pageManager, plugins) {
 		if (keys[0].isEncrypted()) pageManager.next(new DecryptKeysController($("<div>"), state, onKeysImported));
 		else {
 			state.pieces = keysToPieces(keys);
-			pageManager.next(new DownloadPiecesController($("<div>"), state, onCustomExport));
+			pageManager.next(new RenderPiecesController($("<div>"), state, onCustomExport));
 		}
 	}
 	

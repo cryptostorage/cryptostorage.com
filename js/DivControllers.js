@@ -77,7 +77,7 @@ UiUtils = {
  * 
  * Derived from experimentation and used for representative progress bar.
  */
-const WEIGHTS = {
+let Weights = {
 	getCreateKeyWeight: function() { return 63; },
 	getEncryptWeight: function(scheme) {
 		switch (scheme) {
@@ -96,6 +96,9 @@ const WEIGHTS = {
 				return 343;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
+	},
+	getQrWeight: function() {
+		return 400;
 	}
 }
 
@@ -720,12 +723,11 @@ inheritsFrom(NumPiecesInputController, DivController);
  * 
  * @param div is the div to render to
  * @param state is the current state of the application
- * @param onPiecesGenerated(pieces) is invoked when the pieces are created
+ * @param onPiecesGenerated(pieces, piecesHtml) is invoked when the pieces are created
  */
 function GeneratePiecesController(div, state, onPiecesGenerated) {
 	DivController.call(this, div);
 	
-	// progress bars
 	let progressDiv;
 	let progressBar;
 	
@@ -790,13 +792,6 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		callback(div);
 	}
 	
-	function setProgress(label, done, total) {
-		//console.log("setProgress(" + label + ", " + done + ", " + total + " (" + Math.round(done / total * 100) + "%)");
-		progressDiv.show();
-		progressBar.set(done / total);
-		progressBar.setText(label);
-	}
-	
 	function generatePieces(onPiecesGenerated) {
 		
 		// load dependencies
@@ -809,9 +804,10 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			// compute total weight
 			let totalWeight = 0;
 			for (let elem of state.mix) {
-				totalWeight += elem.numKeys * WEIGHTS.getCreateKeyWeight();
-				if (elem.encryption) totalWeight += elem.numKeys * (WEIGHTS.getEncryptWeight(elem.encryption) + WEIGHTS.getDecryptWeight(elem.encryption));
+				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
+				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + Weights.getDecryptWeight(elem.encryption));
 			}
+			piecesRender.getWeight();
 			
 			// collect key creation functions
 			let funcs = [];
@@ -853,51 +849,65 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					for (let i = 0; i < originals.length; i++) {
 						assertTrue(originals[i].equals(keysFromPieces[i]));
 					}
-					setProgress("Complete", 1, 1);
 					
-					// pieces created and validated
-					onPiecesGenerated(pieces);
-					return;
+					// render pieces to htmls
+					renderPieceHtmls(pieces, function(err, htmls) {
+						setProgress("Complete", progressWeight, totalWeight);
+						onPiecesGenerated(pieces, htmls);
+					})
 				}
 				
-				// encrypt keys
-				async.series(funcs, function(err, encryptedKeys) {
-					if (err) throw err;
+				// handle encryption
+				else {
 					
-					// convert keys to pieces
-					let pieces = keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
-					
-					// validate pieces can recreate originals
-					let keysFromPieces = piecesToKeys(pieces);
-					
-					// collect decryption functions
-					funcs = [];
-					for (let i = 0; i < encryptedKeys.length; i++) {
-						funcs.push(decryptFunc(encryptedKeys[i], passwords[i]));
-					}
-					
-					// decrypt keys
-					async.series(funcs, function(err, decryptedKeys) {
+					// encrypt keys
+					async.series(funcs, function(err, encryptedKeys) {
 						if (err) throw err;
 						
-						// verify equivalence
-						assertEquals(originals.length, decryptedKeys.length);
-						for (let i = 0; i < originals.length; i++) {
-							assertTrue(originals[i].equals(decryptedKeys[i]));
+						// convert keys to pieces
+						let pieces = keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
+						
+						// validate pieces can recreate originals
+						let keysFromPieces = piecesToKeys(pieces);
+						
+						// collect decryption functions
+						funcs = [];
+						for (let i = 0; i < encryptedKeys.length; i++) {
+							funcs.push(decryptFunc(encryptedKeys[i], passwords[i]));
 						}
 						
-						// pieces created and validated
-						setProgress("Complete", progressWeight, totalWeight);
-						onPiecesGenerated(pieces);
+						// decrypt keys
+						async.series(funcs, function(err, decryptedKeys) {
+							if (err) throw err;
+							
+							// verify equivalence
+							assertEquals(originals.length, decryptedKeys.length);
+							for (let i = 0; i < originals.length; i++) {
+								assertTrue(originals[i].equals(decryptedKeys[i]));
+							}
+							
+							// render pieces to htmls
+							renderPieceHtmls(pieces, function(err, htmls) {
+								setProgress("Complete", progressWeight, totalWeight);
+								onPiecesGenerated(pieces, htmls);
+							})
+						});
 					});
-				});
+				}
 			});
+			
+			function setProgress(label, done, total) {
+				console.log("setProgress(" + label + ", " + done + ", " + total + " (" + Math.round(done / total * 100) + "%)");
+				progressDiv.show();
+				progressBar.set(done / total);
+				progressBar.setText(label);
+			}
 			
 			function newKeyFunc(plugin, callback) {
 				return function(callback) {
 					setTimeout(function() {
 						let key = plugin.newKey();
-						progressWeight += WEIGHTS.getCreateKeyWeight();
+						progressWeight += Weights.getCreateKeyWeight();
 						setProgress("Creating keys", progressWeight, totalWeight);
 						callback(null, key);
 					}, 0);	// let UI breath
@@ -907,7 +917,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			function encryptFunc(key, scheme, password) {
 				return function(callback) {
 					key.encrypt(scheme, password, function(err, key) {
-						progressWeight += WEIGHTS.getEncryptWeight(scheme);
+						progressWeight += Weights.getEncryptWeight(scheme);
 						setProgress("Encrypting keys", progressWeight, totalWeight);
 						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
@@ -918,11 +928,19 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				return function(callback) {
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
-						progressWeight += WEIGHTS.getDecryptWeight(scheme);
+						progressWeight += Weights.getDecryptWeight(scheme);
 						setProgress("Decrypting keys", progressWeight, totalWeight);
 						setTimeout(function() { callback(err, key); });	// let UI breath
 					});
 				}
+			}
+			
+			function renderPieceHtmls(pieces, onDone) {
+				let renderer = new IndustrialPiecesRenderer(pieces, null);
+				renderer.render(function(percent) {
+					progressWeight += percent * renderer.getWeight();
+					setProgress("Rendering pieces", progressWeight, totalWeight);
+				}, onDone);
 			}
 		});
 	}
@@ -1238,15 +1256,14 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 inheritsFrom(ImportFilesController, DivController);
 
 /**
- * Renders page to download pieces.
+ * Renders pieces for customization and export.
  * 
  * @param div is the div to render to
- * @param state informs how to render
+ * @param state has pieces to render
  */
-function DownloadPiecesController(div, state, onCustomExport) {
+function RenderPiecesController(div, state, onCustomExport) {
 	DivController.call(this, div);
-	let pieces = state.pieces;
-	assertTrue(pieces.length > 0);
+	assertTrue(state.pieces.length > 0);
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -1254,48 +1271,34 @@ function DownloadPiecesController(div, state, onCustomExport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Download your " + UiUtils.getCryptoName(state) + " storage.", UiUtils.getCryptoLogo(state)));
 		
-		// render pieces
-		renderPieces(pieces, null, onProgress, function(pieceDivs) {
+		// zip pieces
+		piecesToZip(state.pieces, state.pieceHtmls, function(name, blob) {
 			
-			// wrap in html
-			let pieceHtmls = [];
-			for (let pieceDiv of pieceDivs) {
-				pieceHtmls.push($("<html>").append($("<body>").append(pieceDiv)));
-			}
+			// render zip download
+			div.append("<br>");
+			let downloadZipsDiv = $("<div>").appendTo(div);
+			downloadZipsDiv.attr("class", "download_zips_div");
+			let downloadZipDiv = $("<div>").appendTo(downloadZipsDiv);
+			downloadZipDiv.attr("class", "download_zip_div");
+			let downloadIconDiv = $("<div style='text-align:center'>").appendTo(downloadZipDiv);
+			let downloadIcon = $("<img src='img/download.png' class='download_icon'>").appendTo(downloadIconDiv);
+			downloadIcon.click(function() { saveAs(blob, name); });
 			
-			// zip pieces
-			piecesToZip(pieces, pieceHtmls, function(name, blob) {
-				
-				// render zip download
-				div.append("<br>");
-				let downloadZipsDiv = $("<div>").appendTo(div);
-				downloadZipsDiv.attr("class", "download_zips_div");
-				let downloadZipDiv = $("<div>").appendTo(downloadZipsDiv);
-				downloadZipDiv.attr("class", "download_zip_div");
-				let downloadIconDiv = $("<div style='text-align:center'>").appendTo(downloadZipDiv);
-				let downloadIcon = $("<img src='img/download.png' class='download_icon'>").appendTo(downloadIconDiv);
-				downloadIcon.click(function() { saveAs(blob, name); });
-				
-				// render custom export options
-				let customExport = $("<a href=''>").appendTo(downloadZipDiv);
-				customExport.append("Custom export options");
-				customExport.click(function(event) { event.preventDefault(); onCustomExport(pieces); });
-				
-				// render preview
-				div.append("<br>Preview:<br>");
-				div.append(pieceDivs[0]);
-				
-				// done rendering
-				callback(div);
-			});
+			// render custom export options
+			let customExport = $("<a href=''>").appendTo(downloadZipDiv);
+			customExport.append("Custom export options");
+			customExport.click(function(event) { event.preventDefault(); onCustomExport(state.pieces); });
+			
+			// render preview
+			div.append("<br>Preview:<br>");
+			div.append(pieceDivs[0]);
+			
+			// done rendering
+			callback(div);
 		});
 	}
-	
-	function onProgress(percent) {
-		console.log("DownloadPiecesController.onProgress(" + percent + ")");
-	}
 }
-inheritsFrom(DownloadPiecesController, DivController);
+inheritsFrom(RenderPiecesController, DivController);
 
 /**
  * Controls the custom export page.
@@ -1319,3 +1322,243 @@ function CustomExportController(div, state, pieces) {
 	}
 }
 inheritsFrom(CustomExportController, DivController);
+
+/**
+ * Renders the given pieces to divs.
+ * 
+ * @param pieces are the peices to render
+ * @param config is the render configuration
+
+ */
+function IndustrialPiecesRenderer(pieces, config) {
+	
+	/**
+	 * Invokes rendering.
+	 * 
+	 * @param onProgress(percent) is called as progress is made
+	 * @param onDone(err, divs) is called when complete
+	 */
+	this.render = function(onProgress, onDone) {
+		
+		// initialize default configuration
+		let DEFAULT_CONFIG = {
+			public_qr: true,
+			private_qr: true,
+			public_text: true,
+			private_text: true,
+			num_columns: 2,
+			qr_size: 200,
+			qr_version: null,
+			qr_error_correction_level: 'H',
+			qr_scale: 4,
+			qr_padding: 5,		// spacing in pixels
+			col_spacing: 12,	// spacing in pixels
+			add_table_width: 15	// spacing in pixels
+		};
+		
+		// merge configs
+		config = Object.assign({}, DEFAULT_CONFIG, config);
+		
+		// compute total number of qr codes to render
+		
+		let totalQrs = getNumQrs();
+		let doneQrs = 0;
+		function qrCodeRendered() {
+			onProgress(++doneQrs / totalQrs);
+		}
+		
+		// render pieces in series
+		let renderPieceFuncs = [];
+		for (let piece of pieces) {
+			renderPieceFuncs.push(function(callback) { renderPiece(piece, config, callback); });
+		}
+		async.series(renderPieceFuncs, function(err, divs) {
+			onDone(null, divs);
+		});
+		
+		// renders a piece
+		function renderPiece(piece, config, onDone) {
+			let div = $("<div>");
+			
+			// collect callback functions to render each piece pair
+			let funcs = [];
+			let rowDiv;
+			for (let i = 0; i < piece.length; i++) {
+				
+				// get public/private pair
+				let keyPiece = piece[i];
+				
+				// create pair div
+				let pairDiv = $("<div>");
+				pairDiv.css("margin", 0);
+				pairDiv.css("padding", 0);
+				pairDiv.css("border", 0);
+				pairDiv.css("flex", 1);
+				pairDiv.css("page-break-inside", "avoid");
+				
+				// prepare function to render pair
+				funcs.push(renderPairDivFunc(pairDiv, "==== " + (i + 1) + " ====", keyPiece.address, keyPiece.privateKey, config));
+				
+				// append pair div and row div
+				if (i % config.num_columns === 0) {
+					rowDiv = $("<div>");
+					rowDiv.css("display", "flex");
+					rowDiv.css("page-break-inside", "avoid");
+					rowDiv.css("margin", 0);
+					rowDiv.css("padding", 0);
+					rowDiv.css("border", 0);
+					div.append(rowDiv);
+					//if (i < piece.length - 1) div.append("<br>");
+				}
+				rowDiv.append(pairDiv);
+				if ((i + 1) % config.num_columns !== 0) {
+					let spaceDiv = $("<div>");
+					spaceDiv.css("min-width", config.col_spacing + "px");
+					spaceDiv.css("margin", 0);
+					spaceDiv.css("padding", 0);
+					spaceDiv.css("border", 0);
+					rowDiv.append(spaceDiv);
+				}
+			}
+			
+			// execute callback functions
+			async.series(funcs, function(err) {
+				onDone(err, div);
+			});
+			
+			/**
+			 * Returns a callback function (function with single callback argument) which will render a pair div.
+			 */
+			function renderPairDivFunc(pairDiv, name, publicKey, privateKey, config) {
+				
+				// callback function wraps rendering
+				return function(callback) {
+					renderPair(pairDiv, name, publicKey, privateKey, config, callback);
+				}
+				
+				/**
+				 * Renders a single public/private pair to a div.
+				 * 
+				 * @param div is the div to render to
+				 * @param name is the name of the key pair
+				 * @param publicKey is the public component of the wallet
+				 * @param privateKey is the private component of the wallet
+				 * @param config specifies the render configuration
+				 * @param callback is called when the rendering is complete
+				 */
+				function renderPair(div, name, publicKey, privateKey, config, callback) {
+					
+					// track number of threads to know when rendering is complete
+					let numThreads = (config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0) + (config.public_text || config.private_text ? 1 : 0);	// one for each qr and one for text
+					let tracker2 = new ThreadTracker();
+					tracker2.onIdle(function() {
+						if (tracker2.getNumStopped() === numThreads) callback();
+					});
+					
+					// global text style
+					let monoStyle = "font-size:11px; font-family:monospace;";
+							
+					// configure div
+					div.css("margin", 0);
+					div.css("padding", 0);
+					div.css("border", "none");
+					div.css("align-items", "stretch");
+					let numQrs = (config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0);
+					div.css("min-width", config.add_table_width + numQrs * (config.qr_size + (config.qr_padding * 2)) + "px");
+					div.css("page-break-inside", "avoid");
+
+					// create pair header
+					div.append($("<div style='" + monoStyle + " text-align:center; border:1'>").append(name));
+					div.append("<br>");
+					
+					// add qr codes
+					if (config.public_qr || config.private_qr) {
+						
+						// div to hold qr table
+						let qrTableDiv = $("<div>");
+						qrTableDiv.css("page-break-inside", "avoid");
+						qrTableDiv.css("width", "100%");
+						
+						// qr table
+						let qrTable = $("<table border='1' width='100%' style='table-layout:fixed'>");
+						qrTableDiv.append(qrTable);
+						let qrTr1 = $("<tr>");
+						qrTable.append(qrTr1);
+						let qrTr2 = $("<tr>");
+						qrTable.append(qrTr2);
+						
+						// render public QR
+						if (config.public_qr) {
+							tracker2.threadStarted();
+							renderQrCode(publicKey, getQrConfig(config), function(img) {
+								qrCodeRendered();
+								qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Public"));
+								qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
+								tracker2.threadStopped();
+								
+								// render private QR
+								if (config.private_qr) {
+									tracker2.threadStarted();
+									renderQrCode(privateKey, getQrConfig(config), function(img) {
+										qrCodeRendered();
+										qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Private"));
+										qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
+										tracker2.threadStopped();
+									});
+								}
+							});
+						}
+						
+						// render only private QR
+						else if (config.private_qr) {
+							tracker2.threadStarted();
+							renderQrCode(privateKey, getQrConfig(config), function(img) {
+								qrCodeRendered();
+								qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Private"));
+								qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
+								tracker2.threadStopped();
+							});
+						}
+						
+						qrTableDiv.append("<br>");
+						div.append(qrTableDiv);
+					}
+					
+					// add public/private text
+					if (config.public_text || config.private_text) {
+						tracker2.threadStarted();	// start writing text
+						
+						// add public text
+						if (config.public_text) {
+							div.append("<div style='" + monoStyle + " word-wrap:break-word;'>Public: " + publicKey + "<br><br></div>");
+						}
+						
+						// add private text
+						if (config.private_text) {
+							div.append("<div style='" + monoStyle + " word-wrap:break-word;'>Private: " + privateKey + "<br><br></div>");
+						}
+						
+						tracker2.threadStopped();
+					}
+					
+					function getQrConfig(config) {
+						let qr_config = {};
+						if ("undefined" !== config.qr_size) qr_config.size = config.qr_size;
+						if ("undefined" !== config.qr_version) qr_config.version = config.qr_version;
+						if ("undefined" !== config.qr_error_correction_level) qr_config.errorCorrectionLevel = config.qr_error_correction_level;
+						if ("undefined" !== config.qr_scale) qr_config.scale = config.qr_scale;
+						return qr_config;
+					}
+				}
+			}
+		}
+	}
+	
+	this.getWeight = function() {
+		return getNumQrs() * Weights.getQrWeight();
+	}
+	
+	function getNumQrs() {
+		return pieces.length * pieces[0].length * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
+	}
+}
