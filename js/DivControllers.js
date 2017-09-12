@@ -744,7 +744,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			return new ProgressBar.Line(div, {
 				strokeWidth: 2.5,
 				color: '#33cc33',
-//				color: 'rgb(39, 147, 174)',	// 39, 147, 174
+//				color: 'rgb(39, 147, 174)',	// cryptostorage teal
 //				color: '#00ff00',
 				duration: 0,
 				svgStyle: {width: '100%', height: '100%'},
