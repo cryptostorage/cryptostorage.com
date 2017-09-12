@@ -17,6 +17,7 @@
 // common dependencies need to be loaded at critical parts
 // better mix logo
 // disable navigation during piece generation
+// render htmls with progress bar on piece generation
 
 // peer review encodings
 // consult designers
