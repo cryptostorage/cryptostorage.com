@@ -1568,7 +1568,6 @@ IndustrialPiecesRenderer = {
 	},
 	
 	getWeight: function(numKeys, numPieces, config) {
-		console.log("IndustrialPiecesRenderer.getWeight(" + numKeys + ", " + numPieces + ", " + config + ")");;
 		config = Object.assign({}, IndustrialPiecesRenderer.defaultConfig, config);
 		return IndustrialPiecesRenderer.getNumQrs(numKeys, numPieces, config) * Weights.getQrWeight();
 	}
