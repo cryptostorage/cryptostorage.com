@@ -98,7 +98,7 @@ let Weights = {
 		}
 	},
 	getQrWeight: function() {
-		return 20;
+		return 25;
 	}
 }
 
