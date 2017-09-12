@@ -2,10 +2,10 @@
 // placeholders for faq and donations
 // redesign pieces download page
 // decryption progress bar
+// redesign html export
 // can buttons automatically grey out with progress wheel until next screen rendered?
 // namespace utils.js (reference bitaddress.org)
 // cryptostorage donation addresses
-// redesign html export
 // popup on key generation to reconfirm password
 // register shortcut keys for page navigation (enter, y, n)
 // paste private key doesn't work in iphone safari
