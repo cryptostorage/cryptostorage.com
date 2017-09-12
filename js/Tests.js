@@ -20,12 +20,89 @@ function runTests(callback) {
 	loader.load(Array.from(dependencies), function() {
 		
 		// run tests
-		testUtils();
-		testPathTracker();
-		testCryptoKeys(plugins, function(error) {
-			if (callback) callback(error);
+		getKeyWeights();
+		getBip38Weights(function() {
+			getCryptoJsWeights(callback);
 		});
+//		testUtils();
+//		testPathTracker();
+//		testCryptoKeys(plugins, function(error) {
+//			if (callback) callback(error);
+//		});
 	})
+}
+
+function getKeyWeights() {
+	let keys = [];
+	let start = new Date().getTime();
+	for (let plugin of getCryptoPlugins()) {
+		for (let i = 0; i < 200; i++) {
+			keys.push(plugin.newKey());
+		}
+	}
+	let end = new Date().getTime();
+	console.log(keys.length + " keys");
+	console.log(end - start);
+}
+
+function getBip38Weights(callback) {
+	let bitcoin = getCryptoPlugin("BTC");
+	let keys = [];
+	for (let i = 0; i < 20; i++) {
+		keys.push(bitcoin.newKey());
+	}
+	
+	let funcs = [];
+	for (let key of keys) {
+		funcs.push(function(callback) { key.encrypt(EncryptionScheme.BIP38, PASSWORD, callback); })
+	}
+	
+	let start = new Date().getTime();
+	async.series(funcs, function(err, keys) {
+		let end = new Date().getTime();
+		console.log(keys.length + " BIP38 keys encrypted in " + (end - start) + " milliseconds");
+		
+		funcs = [];
+		for (let key of keys) {
+			funcs.push(function(callback) { key.decrypt(PASSWORD, callback); });
+		}
+		start = new Date().getTime();
+		async.series(funcs, function(err, keys) {
+			end = new Date().getTime();
+			console.log(keys.length + " BIP38 keys decrypted in " + (end - start) + " milliseconds");
+			callback();
+		});
+	});
+}
+
+function getCryptoJsWeights(callback) {
+	let bitcoin = getCryptoPlugin("BTC");
+	let keys = [];
+	for (let i = 0; i < 200; i++) {
+		keys.push(bitcoin.newKey());
+	}
+	
+	let funcs = [];
+	for (let key of keys) {
+		funcs.push(function(callback) { key.encrypt(EncryptionScheme.CRYPTOJS, PASSWORD, callback); })
+	}
+	
+	let start = new Date().getTime();
+	async.series(funcs, function(err, keys) {
+		let end = new Date().getTime();
+		console.log(keys.length + " CryptoJS keys encrypted in " + (end - start) + " milliseconds");
+		
+		funcs = [];
+		for (let key of keys) {
+			funcs.push(function(callback) { key.decrypt(PASSWORD, callback); });
+		}
+		start = new Date().getTime();
+		async.series(funcs, function(err, keys) {
+			end = new Date().getTime();
+			console.log(keys.length + " CryptoJS keys decrypted in " + (end - start) + " milliseconds");
+			callback();
+		});
+	});
 }
 
 function testUtils() {
