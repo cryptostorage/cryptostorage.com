@@ -799,13 +799,11 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	
 	function generatePieces(onPiecesGenerated) {
 		
-		// collect dependencies
+		// load dependencies
 		let dependencies = new Set();
 		for (let elem of state.mix) {
 			for (let dependency of elem.plugin.getDependencies()) dependencies.add(dependency);
 		}
-		
-		// load dependencies
 		loader.load(Array.from(dependencies), function() {
 			
 			// compute total weight
@@ -815,69 +813,99 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				if (elem.encryption) totalWeight += elem.numKeys * (WEIGHTS.getEncryptWeight(elem.encryption) + WEIGHTS.getDecryptWeight(elem.encryption));
 			}
 			
-			// create keys and callback functions to encrypt
-			let originals = [];	// save originals for later validation
+			// collect key creation functions
 			let funcs = [];
-			let passwords = [];
-			let progressWeight = 0;
 			for (let elem of state.mix) {
 				for (let i = 0; i < elem.numKeys; i++) {
-					let original = elem.plugin.newKey();
-					progressWeight += WEIGHTS.getCreateKeyWeight();
-					setProgress("Creating keys", progressWeight, totalWeight);
-					originals.push(original);
-					passwords.push(elem.password);
-					if (elem.encryption) funcs.push(encryptFunc(original.copy(), elem.encryption, elem.password));
+					funcs.push(newKeyFunc(elem.plugin));
 				}
 			}
 			
-			// handle no encryption
-			if (!funcs.length) {
-				
-				// convert keys to pieces
-				let pieces = keysToPieces(originals, state.numPieces, state.minPieces);
-				
-				// validate pieces can recreate originals
-				let keysFromPieces = piecesToKeys(pieces);
-				assertEquals(originals.length, keysFromPieces.length);
-				for (let i = 0; i < originals.length; i++) {
-					assertTrue(originals[i].equals(keysFromPieces[i]));
+			// generate keys
+			let progressWeight = 0;
+			async.series(funcs, function(err, keys) {
+				if (err) throw err;
+				let originals = keys;
+				for (let original of originals) {
+					console.log(original.getState());
 				}
-				setProgress("Complete", 1, 1);
 				
-				// pieces created and validated
-				onPiecesGenerated(pieces);
-				return;
-			}
-			
-			// encrypt keys
-			async.series(funcs, function(err, encryptedKeys) {
-				
-				// convert keys to pieces
-				let pieces = keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
-				
-				// validate pieces can recreate originals
-				let keysFromPieces = piecesToKeys(pieces);
-				
-				// collect decryption functions
+				// collect encryption functions
 				funcs = [];
-				for (let i = 0; i < encryptedKeys.length; i++) {
-					funcs.push(decryptFunc(encryptedKeys[i], passwords[i]));
+				let idx = 0;
+				let passwords = [];
+				for (let elem of state.mix) {
+					for (let i = 0; i < elem.numKeys; i++) {
+						if (elem.encryption) funcs.push(encryptFunc(originals[i].copy(), elem.encryption, elem.password));
+						passwords.push(elem.password);
+						idx++;
+					}
 				}
 				
-				// decrypt keys
-				async.series(funcs, function(err, decryptedKeys) {
+				// no encryption
+				if (!funcs.length) {
 					
-					// verify equivalence
+					// convert keys to pieces
+					let pieces = keysToPieces(originals, state.numPieces, state.minPieces);
+					
+					// validate pieces can recreate originals
+					let keysFromPieces = piecesToKeys(pieces);
+					assertEquals(originals.length, keysFromPieces.length);
 					for (let i = 0; i < originals.length; i++) {
-						assertTrue(originals[i].equals(decryptedKeys[i]));
+						assertTrue(originals[i].equals(keysFromPieces[i]));
 					}
+					setProgress("Complete", 1, 1);
 					
 					// pieces created and validated
-					setProgress("Complete", progressWeight, totalWeight);
 					onPiecesGenerated(pieces);
+					return;
+				}
+				
+				// encrypt keys
+				async.series(funcs, function(err, encryptedKeys) {
+					if (err) throw err;
+					
+					// convert keys to pieces
+					let pieces = keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
+					
+					// validate pieces can recreate originals
+					let keysFromPieces = piecesToKeys(pieces);
+					
+					// collect decryption functions
+					funcs = [];
+					for (let i = 0; i < encryptedKeys.length; i++) {
+						funcs.push(decryptFunc(encryptedKeys[i], passwords[i]));
+					}
+					
+					// decrypt keys
+					async.series(funcs, function(err, decryptedKeys) {
+						if (err) throw err;
+						
+						// verify equivalence
+						assertEquals(originals.length, decryptedKeys.length);
+						for (let i = 0; i < originals.length; i++) {
+							console.log(originals[i].getState());
+							console.log(decryptedKeys[i].getState());
+							assertTrue(originals[i].equals(decryptedKeys[i]));
+						}
+						
+						// pieces created and validated
+						setProgress("Complete", progressWeight, totalWeight);
+						onPiecesGenerated(pieces);
+					});
 				});
 			});
+			
+			function newKeyFunc(plugin, callback) {
+				return function(callback) {
+					setTimeout(function() {
+						let key = plugin.newKey();
+						progressWeight += WEIGHTS.getCreateKeyWeight();
+						setProgress("Creating keys", progressWeight, totalWeight);
+						callback(null, key);
+					}, 0);	// let UI breath
+				}
+			}
 			
 			function encryptFunc(key, scheme, password) {
 				return function(callback) {

@@ -19,6 +19,7 @@
 // decryption progress bar
 // create new storage from csv import
 // key generation locks UI so no progress bar
+// test alert if key creation fails for any reason
 
 // peer review encodings
 // consult designers
