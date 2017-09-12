@@ -18,6 +18,7 @@
 // key generation and html rendering progress bars with brief pause at end
 // decryption progress bar
 // create new storage from csv import
+// key generation locks UI so no progress bar
 
 // peer review encodings
 // consult designers

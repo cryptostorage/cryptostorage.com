@@ -843,7 +843,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				for (let i = 0; i < originals.length; i++) {
 					assertTrue(originals[i].equals(keysFromPieces[i]));
 				}
-				setProgress("Storage generation complete", 1, 1);
+				setProgress("Complete", 1, 1);
 				
 				// pieces created and validated
 				onPiecesGenerated(pieces);
@@ -874,6 +874,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					}
 					
 					// pieces created and validated
+					setProgress("Complete", progressWeight, totalWeight);
 					onPiecesGenerated(pieces);
 				});
 			});
