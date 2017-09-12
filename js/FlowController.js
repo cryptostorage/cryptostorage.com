@@ -1,4 +1,5 @@
 // TODO
+// key generation and html rendering progress bar with brief pause at end
 // placeholders for faq and donations
 // can buttons automatically grey out with progress wheel until next screen rendered?
 // custom export options page
@@ -11,15 +12,14 @@
 // de-minify aes.java
 // todos throughout code
 // run minimum tests when site accessed
-// use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org)
+// use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org) (?)
 // common dependencies need to be loaded at critical parts
 // better mix logo
 // disable navigation during piece generation
-// key generation and html rendering progress bars with brief pause at end
 // decryption progress bar
 // create new storage from csv import
-// key generation locks UI so no progress bar
 // test alert if key creation fails for any reason
+// verify no name collisions
 
 // peer review encodings
 // consult designers
