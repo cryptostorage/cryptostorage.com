@@ -1,4 +1,5 @@
 // TODO
+// file and text importer needs to render pieceDivs
 // placeholders for faq and donations
 // redesign pieces download page
 // decryption progress bar
@@ -179,7 +180,7 @@ function FlowController(pageManager, plugins) {
 		state.keys = keys;
 		if (keys[0].isEncrypted()) pageManager.next(new DecryptKeysController($("<div>"), state, onKeysImported));
 		else {
-			state.pieces = keysToPieces(keys);
+			state.pieces = keysToPieces(keys, 1);
 			pageManager.next(new RenderPiecesController($("<div>"), state, onCustomExport));
 		}
 	}
