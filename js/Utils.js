@@ -1000,21 +1000,24 @@ function renderPieces(pieces, config, onProgress, onDone) {
 	// merge configs
 	config = Object.assign({}, DEFAULT_CONFIG, config);
 	
+	// compute total number of qr codes to render
+	let totalQrs = pieces.length * pieces[0].length * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
+	let doneQrs = 0;
+	function qrCodeRendered() {
+		onProgress(++doneQrs / totalQrs);
+	}
+	
 	// render pieces in series
 	let renderPieceFuncs = [];
 	for (let piece of pieces) {
-		renderPieceFuncs.push(function(callback) { renderPiece(piece, config, onPieceProgress, callback); });
+		renderPieceFuncs.push(function(callback) { renderPiece(piece, config, callback); });
 	}
 	async.series(renderPieceFuncs, function(err, divs) {
 		onDone(divs);
 	});
 	
-	function onPieceProgress(percent) {
-		console.log("onPieceProgress(" + percent + ")");
-	}
-	
 	// renders a piece
-	function renderPiece(piece, config, onProgress, onDone) {
+	function renderPiece(piece, config, onDone) {
 		let div = $("<div>");
 		
 		// collect callback functions to render each piece pair
@@ -1128,6 +1131,7 @@ function renderPieces(pieces, config, onProgress, onDone) {
 					if (config.public_qr) {
 						tracker2.threadStarted();
 						renderQrCode(publicKey, getQrConfig(config), function(img) {
+							qrCodeRendered();
 							qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Public"));
 							qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
 							tracker2.threadStopped();
@@ -1136,6 +1140,7 @@ function renderPieces(pieces, config, onProgress, onDone) {
 							if (config.private_qr) {
 								tracker2.threadStarted();
 								renderQrCode(privateKey, getQrConfig(config), function(img) {
+									qrCodeRendered();
 									qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Private"));
 									qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
 									tracker2.threadStopped();
@@ -1148,6 +1153,7 @@ function renderPieces(pieces, config, onProgress, onDone) {
 					else if (config.private_qr) {
 						tracker2.threadStarted();
 						renderQrCode(privateKey, getQrConfig(config), function(img) {
+							qrCodeRendered();
 							qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Private"));
 							qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
 							tracker2.threadStopped();
