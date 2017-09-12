@@ -879,14 +879,16 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		console.log("setEncryptionProgress(" + done + "/" + total + " (" + done / total + "%))");
 		encryptProgressDiv.show();
 		encryptProgressBar.set(done / total);
-		encryptProgressBar.setText("Key encryption " + Math.round(done / total * 100) + "% complete");
+		let rounded = Math.round(done / total * 100);
+		encryptProgressBar.setText("Key encryption " + (rounded !== 100 ? rounded + "% ": "") + "complete");
 	}
 	
 	function setVerifyStatus(done, total) {
 		console.log("setVerifyStatus(" + done + "/" + total + " (" + done / total + "%))");
 		verifyProgressDiv.show();
 		verifyProgressBar.set(done / total);
-		verifyProgressBar.setText("Key verification " + Math.round(done / total * 100) + "% complete");
+		let rounded = Math.round(done / total * 100);
+		verifyProgressBar.setText("Key verification " + (rounded !== 100 ? rounded + "% ": "") + "complete");
 	}
 }
 inheritsFrom(GeneratePiecesController, DivController);
