@@ -791,7 +791,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	}
 	
 	function setProgress(label, done, total) {
-		console.log("setProgress(" + label + ", " + done + ", " + total + " (" + Math.round(done / total * 100) + "%)");
+		//console.log("setProgress(" + label + ", " + done + ", " + total + " (" + Math.round(done / total * 100) + "%)");
 		progressDiv.show();
 		progressBar.set(done / total);
 		progressBar.setText(label);
