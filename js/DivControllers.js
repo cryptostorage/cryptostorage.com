@@ -1372,7 +1372,8 @@ IndustrialPiecesRenderer = {
 		let totalQrs = IndustrialPiecesRenderer.getNumQrs(pieces[0].length, pieces.length, config);
 		let doneQrs = 0;
 		function qrCodeRendered() {
-			onProgress(++doneQrs / totalQrs);
+			doneQrs++;
+			if (doneQrs % 5 === 0 || doneQrs === totalQrs) onProgress(doneQrs / totalQrs);
 		}
 		
 		// render pieces in series
