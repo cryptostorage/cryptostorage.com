@@ -78,22 +78,22 @@ UiUtils = {
  * Derived from experimentation and used for accurate progress bar.
  */
 const WEIGHTS = {
-	getCreateKeyWeight: function() { return 1; },
+	getCreateKeyWeight: function() { return 63; },
 	getEncryptWeight: function(scheme) {
 		switch (scheme) {
 			case EncryptionScheme.BIP38:
-				return 100;
+				return 4187;
 			case EncryptionScheme.CRYPTOJS:
-				return 5;
+				return 1;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
 	getDecryptWeight: function(scheme) {
 		switch (scheme) {
 			case EncryptionScheme.BIP38:
-				return 100;
+				return 4581;
 			case EncryptionScheme.CRYPTOJS:
-				return 20;
+				return 343;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	}

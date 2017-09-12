@@ -22,7 +22,9 @@ function runTests(callback) {
 		// run tests
 		getKeyWeights();
 		getBip38Weights(function() {
-			getCryptoJsWeights(callback);
+			setTimeout(function() {
+				getCryptoJsWeights(callback)
+			}, 0);
 		});
 //		testUtils();
 //		testPathTracker();
@@ -77,7 +79,7 @@ function getBip38Weights(callback) {
 function getCryptoJsWeights(callback) {
 	let bitcoin = getCryptoPlugin("BTC");
 	let keys = [];
-	for (let i = 0; i < 200; i++) {
+	for (let i = 0; i < 500; i++) {
 		keys.push(bitcoin.newKey());
 	}
 	
