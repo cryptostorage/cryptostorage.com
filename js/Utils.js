@@ -1005,9 +1005,9 @@ function renderPieces(pieces, config, onProgress, onDone) {
 	for (let piece of pieces) {
 		renderPieceFuncs.push(function(callback) { renderPiece(piece, config, onPieceProgress, callback); });
 	}
-	async.series(renderPieceFuncs, function(err, divs)) {
+	async.series(renderPieceFuncs, function(err, divs) {
 		onDone(divs);
-	}
+	});
 	
 	function onPieceProgress(percent) {
 		console.log("onPieceProgress(" + percent + ")");
@@ -1015,6 +1015,7 @@ function renderPieces(pieces, config, onProgress, onDone) {
 	
 	// renders a piece
 	function renderPiece(piece, config, onProgress, onDone) {
+		let div = $("<div>");
 		
 		// collect callback functions to render each piece pair
 		let funcs = [];
@@ -1058,7 +1059,7 @@ function renderPieces(pieces, config, onProgress, onDone) {
 		}
 		
 		// execute callback functions
-		async.series(funcs, onDone);
+		async.series(funcs, onDone(null, div));
 		
 		/**
 		 * Returns a callback function (function with single callback argument) which will render a pair div.

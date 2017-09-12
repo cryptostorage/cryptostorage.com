@@ -930,24 +930,6 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 inheritsFrom(GeneratePiecesController, DivController);
 
 /**
- * Renders a piece with one or more public/private components to a div with the given config.
- * 
- * @param div is the div to render to
- * @param piece is the piece with one or more public/private components to render
- * @param config specifies the render configuration (optional)
- */
-function PieceRenderer(div, piece, config) {
-	DivController.call(this, div);
-	
-	this.render = function(callback) {
-		
-		// empty existing div
-		div.empty();
-	}
-}
-inheritsFrom(PieceRenderer, DivController);
-
-/**
  * Render page to import private components from text.
  * 
  * @param div is the div to render to
@@ -1263,7 +1245,7 @@ inheritsFrom(ImportFilesController, DivController);
  */
 function DownloadPiecesController(div, state, onCustomExport) {
 	DivController.call(this, div);
-	var pieces = state.pieces;
+	let pieces = state.pieces;
 	assertTrue(pieces.length > 0);
 	
 	this.render = function(callback) {
@@ -1272,20 +1254,10 @@ function DownloadPiecesController(div, state, onCustomExport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Download your " + UiUtils.getCryptoName(state) + " storage.", UiUtils.getCryptoLogo(state)));
 		
-		// collect functions to render pieces and divs to be rendered to
-		let pieceDivs = [];
-		let renderFuncs = [];
-		for (let piece of pieces) {
-			let pieceDiv = $("<div>");
-			pieceDivs.push(pieceDiv);
-			let renderer = new PieceRenderer(pieceDiv, piece);
-			renderFuncs.push(function(callback) { renderer.render(function() { callback(); }) });
-		}
-		
-		// render each piece
-		async.parallelLimit(renderFuncs, 3, function(err, result) {
+		// render pieces
+		renderPieces(pieces, null, onProgress, function(pieceDivs) {
 			
-			// wrap piece divs in html containers
+			// wrap in html
 			let pieceHtmls = [];
 			for (let pieceDiv of pieceDivs) {
 				pieceHtmls.push($("<html>").append($("<body>").append(pieceDiv)));
@@ -1317,6 +1289,10 @@ function DownloadPiecesController(div, state, onCustomExport) {
 				callback(div);
 			});
 		});
+	}
+	
+	function onProgress(percent) {
+		console.log("DownloadPiecesController.onProgress(" + percent + ")");
 	}
 }
 inheritsFrom(DownloadPiecesController, DivController);
