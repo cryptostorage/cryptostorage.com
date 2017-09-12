@@ -75,7 +75,7 @@ UiUtils = {
 /**
  * Relative weights of key creation and encryption/decryption operations.
  * 
- * Derived from experimentation and used for accurate progress bar.
+ * Derived from experimentation and used for representative progress bar.
  */
 const WEIGHTS = {
 	getCreateKeyWeight: function() { return 63; },
@@ -84,7 +84,7 @@ const WEIGHTS = {
 			case EncryptionScheme.BIP38:
 				return 4187;
 			case EncryptionScheme.CRYPTOJS:
-				return 1;
+				return 10;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
@@ -826,19 +826,18 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			async.series(funcs, function(err, keys) {
 				if (err) throw err;
 				let originals = keys;
-				for (let original of originals) {
-					console.log(original.getState());
-				}
 				
 				// collect encryption functions
 				funcs = [];
-				let idx = 0;
+				let keyIdx = 0;
 				let passwords = [];
 				for (let elem of state.mix) {
 					for (let i = 0; i < elem.numKeys; i++) {
-						if (elem.encryption) funcs.push(encryptFunc(originals[i].copy(), elem.encryption, elem.password));
-						passwords.push(elem.password);
-						idx++;
+						if (elem.encryption) {
+							funcs.push(encryptFunc(originals[keyIdx].copy(), elem.encryption, elem.password));
+							passwords.push(elem.password);
+						}
+						keyIdx++;
 					}
 				}
 				
@@ -884,8 +883,6 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 						// verify equivalence
 						assertEquals(originals.length, decryptedKeys.length);
 						for (let i = 0; i < originals.length; i++) {
-							console.log(originals[i].getState());
-							console.log(decryptedKeys[i].getState());
 							assertTrue(originals[i].equals(decryptedKeys[i]));
 						}
 						
