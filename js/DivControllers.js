@@ -93,12 +93,12 @@ let Weights = {
 			case EncryptionScheme.BIP38:
 				return 4581;
 			case EncryptionScheme.CRYPTOJS:
-				return 343;
+				return 200;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
 	getQrWeight: function() {
-		return 100;
+		return 20;
 	}
 }
 
