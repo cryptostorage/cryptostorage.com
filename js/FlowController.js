@@ -1,11 +1,11 @@
 // TODO
-// key generation and html rendering progress bar with brief pause at end
 // placeholders for faq and donations
+// redesign pieces download page
+// decryption progress bar
 // can buttons automatically grey out with progress wheel until next screen rendered?
-// custom export options page
 // namespace utils.js (reference bitaddress.org)
 // cryptostorage donation addresses
-// re-style html export
+// redesign html export
 // popup on key generation to reconfirm password
 // register shortcut keys for page navigation (enter, y, n)
 // paste private key doesn't work in iphone safari
@@ -16,7 +16,6 @@
 // common dependencies need to be loaded at critical parts
 // better mix logo
 // disable navigation during piece generation
-// decryption progress bar
 // create new storage from csv import
 // test alert if key creation fails for any reason
 // verify no name collisions
