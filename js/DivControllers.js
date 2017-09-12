@@ -743,7 +743,9 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		function getProgressPar(div) {
 			return new ProgressBar.Line(div, {
 				strokeWidth: 2.5,
-				color: '#33cc33',
+//				color: '#33cc33',
+//				color: 'rgb(39, 147, 174)',	// 39, 147, 174
+				color: '#00ff00',
 				duration: 0,
 				svgStyle: {width: '100%', height: '100%'},
 				text: {
@@ -875,18 +877,16 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	
 	function setEncryptionStatus(done, total) {
 		console.log("setEncryptionProgress(" + done + "/" + total + " (" + done / total + "%))");
-		let rounded = Math.round(done / total * 100);
 		encryptProgressDiv.show();
 		encryptProgressBar.set(done / total);
-		encryptProgressBar.setText("Key encryption " + (rounded === 100 ? "complete" : rounded + "%"));
+		encryptProgressBar.setText("Key encryption " + Math.round(done / total * 100) + "% complete");
 	}
 	
 	function setVerifyStatus(done, total) {
 		console.log("setVerifyStatus(" + done + "/" + total + " (" + done / total + "%))");
-		let rounded = Math.round(done / total * 100);
 		verifyProgressDiv.show();
 		verifyProgressBar.set(done / total);
-		verifyProgressBar.setText("Key verification " + (rounded === 100 ? "complete" : rounded + "%"));
+		verifyProgressBar.setText("Key verification " + Math.round(done / total * 100) + "% complete");
 	}
 }
 inheritsFrom(GeneratePiecesController, DivController);
