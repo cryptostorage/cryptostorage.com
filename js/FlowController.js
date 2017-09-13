@@ -1,6 +1,5 @@
 // TODO
 // namespace utils.js (reference bitaddress.org)
-// common dependencies need to be loaded at critical parts
 // navigation issues while generating, importing, etc
 // num addresses page common code
 // placeholders for faq and donations
