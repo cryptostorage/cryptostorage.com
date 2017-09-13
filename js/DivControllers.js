@@ -995,7 +995,7 @@ function ImportTextController(div, state, onKeysImported) {
 			// load dependencies
 			let dependencies = new Set(COMMON_DEPENDENCIES);
 			for (let dependency of state.plugin.getDependencies()) dependencies.add(dependency);
-			loader.load(dependencies, function() {
+			loader.load(Array.from(dependencies), function() {
 				
 				// only continue if new characters added
 				let count = countNonWhitespaceCharacters(textarea.val());
@@ -1006,7 +1006,7 @@ function ImportTextController(div, state, onKeysImported) {
 					if (textarea.val() === "") {
 						setErrorMessage("");
 					} else {
-						var key = parseKey(state.plugin, textarea.val());
+						var key = CryptoUtils.parseKey(state.plugin, textarea.val());
 						setErrorMessage("");
 						if (key) onKeysImported([key]);
 					}

@@ -14,7 +14,10 @@ function DependencyLoader() {
 	this.load = function(paths, callback) {
 		
 		// listify paths
-		paths = isArray(paths) ? paths : [paths];
+		if (!isArray(paths)) {
+			assertTrue(isString(paths));
+			paths = [paths];
+		}
 		
 		// only load paths that aren't previously defined
 		for (let path of paths) {
