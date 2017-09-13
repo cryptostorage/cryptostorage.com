@@ -1076,11 +1076,13 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
 		
 		function onDecrypt() {
+			btnDecrypt.attr("disabled", "disabled");
 			
 			// get passwords
 			var password = passwordInput.val();
 			if (password === "") {
 				setErrorMessage("Password must not be blank");
+				btnDecrypt.removeAttr("disabled");
 				return;
 			}
 			
@@ -1102,7 +1104,9 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 					setErrorMessage(err.message);
 					passwordInput.focus();
 					btnDecrypt.removeAttr("disabled");
+					progressDiv.hide();
 				} else {
+					setErrorMessage("");
 					
 					// convert keys to a decrypted piece
 					let pieces = keysToPieces(keys, 1);
@@ -1130,9 +1134,12 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 				return function(callback) {
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
-						progressWeight += Weights.getDecryptWeight(scheme);
-						setProgress(progressWeight, totalWeight);
-						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
+						if (err) callback(err);
+						else {
+							progressWeight += Weights.getDecryptWeight(scheme);
+							setProgress(progressWeight, totalWeight);
+							setTimeout(function() { callback(err, key); }, 0);	// let UI breath
+						}
 					});
 				}
 			}

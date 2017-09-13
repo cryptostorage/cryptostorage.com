@@ -1,5 +1,5 @@
 // TODO
-// why any progress decrypting with invalid password?
+// bug: delete file on file import page does not update import
 // namespace utils.js (reference bitaddress.org)
 // common dependencies need to be loaded at critical parts
 // navigation issues while generating, importing, etc
@@ -31,7 +31,7 @@
 
 const RUN_TESTS = false;
 const DEBUG = true;
-const DELETE_WINDOW_CRYPTO = true;
+const DELETE_WINDOW_CRYPTO = false;
 const DEPENDENCIES = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/progressbar.js"];
 var loader;
 
