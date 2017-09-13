@@ -228,7 +228,7 @@ function PageManager(contentDiv) {
 		pathTracker.hasNext() ? rightArrow.show() : rightArrow.hide();
 	}
 }
-inheritsFrom(PageManager, DivController);
+GenUtils.inheritsFrom(PageManager, DivController);
 
 /**
  * Render home page.
@@ -280,7 +280,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		return div;
 	}
 }
-inheritsFrom(HomeController, DivController);
+GenUtils.inheritsFrom(HomeController, DivController);
 
 /**
  * Render crypto selection.
@@ -317,7 +317,7 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		callback(div);
 	}
 }
-inheritsFrom(SelectCryptoController, DivController);
+GenUtils.inheritsFrom(SelectCryptoController, DivController);
 
 /**
  * Render mixed num keys input.
@@ -411,7 +411,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-inheritsFrom(MixNumKeysController, DivController);
+GenUtils.inheritsFrom(MixNumKeysController, DivController);
 
 /**
  * Render number of keys.
@@ -475,7 +475,7 @@ function NumKeysController(div, state, onNumKeysInput) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-inheritsFrom(NumKeysController, DivController);
+GenUtils.inheritsFrom(NumKeysController, DivController);
 
 /**
  * Render password selection page.
@@ -499,7 +499,7 @@ function PasswordSelectionController(div, state, onPasswordSelection) {
 		callback(div);
 	}
 }
-inheritsFrom(PasswordSelectionController, DivController);
+GenUtils.inheritsFrom(PasswordSelectionController, DivController);
 
 /**
  * Render password input page.
@@ -648,7 +648,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-inheritsFrom(PasswordInputController, DivController);
+GenUtils.inheritsFrom(PasswordInputController, DivController);
 
 /**
  * Render split selection page.
@@ -673,7 +673,7 @@ function SplitSelectionController(div, state, onSplitSelection) {
 		callback(div);
 	}
 }
-inheritsFrom(SplitSelectionController, DivController);
+GenUtils.inheritsFrom(SplitSelectionController, DivController);
 
 /**
  * Number of pieces input page.
@@ -744,7 +744,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		else if (minPieces > numPieces) throw new Error("Minimum pieces cannot be more than the number of pieces");
 	}
 }
-inheritsFrom(NumPiecesInputController, DivController);
+GenUtils.inheritsFrom(NumPiecesInputController, DivController);
 
 /**
  * Summarize configuration and generate pieces.
@@ -960,7 +960,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		});
 	}
 }
-inheritsFrom(GeneratePiecesController, DivController);
+GenUtils.inheritsFrom(GeneratePiecesController, DivController);
 
 /**
  * Render page to import private components from text.
@@ -1030,7 +1030,7 @@ function ImportTextController(div, state, onKeysImported) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-inheritsFrom(ImportTextController, DivController);
+GenUtils.inheritsFrom(ImportTextController, DivController);
 
 /**
  * Render page to decrypt keys.
@@ -1175,7 +1175,7 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 	
 	var errorDiv = $("<div>");
 }
-inheritsFrom(DecryptKeysController, DivController);
+GenUtils.inheritsFrom(DecryptKeysController, DivController);
 
 /**
  * Render import files page.
@@ -1345,7 +1345,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 	let lastKeys;				// tracks last imported keys so page only advances if keys change
 	setErrorMessage("");
 }
-inheritsFrom(ImportFilesController, DivController);
+GenUtils.inheritsFrom(ImportFilesController, DivController);
 
 /**
  * Renders pieces for customization and export.
@@ -1408,7 +1408,7 @@ function RenderPiecesController(div, state, onCustomExport) {
 		});
 	}
 }
-inheritsFrom(RenderPiecesController, DivController);
+GenUtils.inheritsFrom(RenderPiecesController, DivController);
 
 /**
  * Controls the custom export page.
@@ -1431,7 +1431,7 @@ function CustomExportController(div, state, pieces) {
 		callback(div);
 	}
 }
-inheritsFrom(CustomExportController, DivController);
+GenUtils.inheritsFrom(CustomExportController, DivController);
 
 /**
  * Utility functions for the "industrial" pieces renderer.
