@@ -705,8 +705,7 @@ function parseKey(plugin, str) {
 	try {
 		return components.length === 1 ? plugin.newKey(components[0]) : plugin.combine(components);
 	} catch (err) {
-		console.log(err);
-		return null;
+		return null;	// error means key could not be parsed
 	}
 }
 

@@ -1331,6 +1331,20 @@ function RenderPiecesController(div, state, onCustomExport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Download your " + UiUtils.getCryptoName(state) + " storage.", UiUtils.getCryptoLogo(state)));
 		
+		// render page if pieceDivs provided
+		if (state.pieceDivs) renderPage(function() { callback(div); });
+		
+		// otherwise render pieceDivs then page
+		else {
+			IndustrialPiecesRenderer.render(state.pieces, null, null, function(err, pieceDivs) {
+				state.pieceDivs = pieceDivs;
+				renderPage(function() { callback(div); });
+			});
+		}
+	}
+	
+	function renderPage(onDone) {
+		
 		// wrap piece divs with htmls for export
 		let htmls = [];
 		for (let pieceDiv of state.pieceDivs) {
@@ -1358,9 +1372,7 @@ function RenderPiecesController(div, state, onCustomExport) {
 			// render preview
 			div.append("<br>Preview:<br>");
 			div.append(state.pieceDivs[0]);
-			
-			// done rendering
-			callback(div);
+			onDone();
 		});
 	}
 }
@@ -1428,7 +1440,7 @@ IndustrialPiecesRenderer = {
 		let doneQrs = 0;
 		function qrCodeRendered() {
 			doneQrs++;
-			if (doneQrs % 5 === 0 || doneQrs === totalQrs) onProgress(doneQrs / totalQrs);
+			if (onProgress && (doneQrs % 5 === 0 || doneQrs === totalQrs)) onProgress(doneQrs / totalQrs);
 		}
 		
 		// render pieces in series
