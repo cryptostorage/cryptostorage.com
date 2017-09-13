@@ -1,6 +1,5 @@
 // TODO
 // why any progress decrypting with invalid password?
-// assert existence of window.crypto at start
 // namespace utils.js (reference bitaddress.org)
 // common dependencies need to be loaded at critical parts
 // navigation issues while generating, importing, etc

@@ -2,6 +2,7 @@
  * UI utilities.
  */
 let UiUtils = {
+	
 	getButton: function(label, isNext, icon) {
 		let button = $("<div class='btn'>");
 		if (icon) {
@@ -251,13 +252,16 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		div.append("<br><br>");
 		
 		// render create button
-		var btnCreate = UiUtils.getNextButton("Create new storage");
-		btnCreate.click(function() { onSelectCreate(); });
-		if (!window.crypto) btnCreate.attr("disabled", "disabled");
-		div.append(btnCreate);
+		if (window.crypto) {
+			let btnCreate = UiUtils.getNextButton("Create new storage").appendTo(div);
+			btnCreate.click(function() { onSelectCreate(); });
+		} else {
+			let btnCreate = UiUtils.getNextButton("Create new storage (your browser does not support window.crypto)").appendTo(div);
+			btnCreate.attr("disabled", "disabled");
+		}
 		
 		// render import button
-		var btnExisting = UiUtils.getNextButton("Import existing storage");
+		let btnExisting = UiUtils.getNextButton("Import existing storage");
 		btnExisting.click(function() { onSelectImport(); });
 		div.append(btnExisting);
 		
