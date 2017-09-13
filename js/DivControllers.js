@@ -1289,8 +1289,8 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 				if (confirm("Are you sure you want to remove " + name + "?")) {
 					importedPieces.splice(i, 1);
 					renderImportedPieces(importedPieces);
-					return;
 				}
+				return;
 			}
 		}
 		throw new Error("No piece with name '" + name + "' imported");
