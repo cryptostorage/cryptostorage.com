@@ -1,5 +1,5 @@
 // TODO
-// file and text importer needs to render pieceDivs
+// file and text importer need to render pieceDivs
 // placeholders for faq and donations
 // redesign pieces download page
 // decryption progress bar
