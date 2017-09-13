@@ -1308,7 +1308,8 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 			try {
 				let keys = piecesToKeys(pieces);
 				setErrorMessage("");
-				if (keys.length) onKeysImported(keys);
+				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
+				lastKeys = keys;
 			} catch (err) {
 				setErrorMessage(err.message);
 			}
@@ -1325,11 +1326,22 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		}
 	}
 	
+	function keysDifferent(keys1, keys2) {
+		if (!keys1 && keys2) return true;
+		if (keys1 && !keys2) return true;
+		if (keys1.length !== keys2.length) return true;
+		for (let i = 0; i < keys1.length; i++) {
+			if (!keys1[i].equals(keys2[i])) return true;
+		}
+		return false;
+	}
+	
 	let that = this;
 	let errorDiv = $("<div>");
 	errorDiv.attr("class", "error_msg");
 	let fileList = $("<div>");
 	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
+	let lastKeys;				// tracks last imported keys so page only advances if keys change
 	setErrorMessage("");
 }
 inheritsFrom(ImportFilesController, DivController);
