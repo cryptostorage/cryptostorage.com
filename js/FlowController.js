@@ -23,6 +23,7 @@
 // title bar should not scroll
 // focus on first text element if applicable
 // live site warning to stop and download from github
+// condense javascript to single file for production
 
 // peer review encodings
 // consult designers
@@ -183,7 +184,7 @@ function FlowController(pageManager, plugins) {
 		state.keys = keys;
 		if (keys[0].isEncrypted()) pageManager.next(new DecryptKeysController($("<div>"), state, onPiecesGenerated));
 		else {
-			state.pieces = keysToPieces(keys);
+			state.pieces = CryptoUtils.keysToPieces(keys);
 			pageManager.next(new RenderPiecesController($("<div>"), state, onCustomExport));
 		}
 	}

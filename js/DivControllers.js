@@ -228,7 +228,7 @@ function PageManager(contentDiv) {
 		pathTracker.hasNext() ? rightArrow.show() : rightArrow.hide();
 	}
 }
-GenUtils.inheritsFrom(PageManager, DivController);
+inheritsFrom(PageManager, DivController);
 
 /**
  * Render home page.
@@ -280,7 +280,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		return div;
 	}
 }
-GenUtils.inheritsFrom(HomeController, DivController);
+inheritsFrom(HomeController, DivController);
 
 /**
  * Render crypto selection.
@@ -317,7 +317,7 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		callback(div);
 	}
 }
-GenUtils.inheritsFrom(SelectCryptoController, DivController);
+inheritsFrom(SelectCryptoController, DivController);
 
 /**
  * Render mixed num keys input.
@@ -411,7 +411,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-GenUtils.inheritsFrom(MixNumKeysController, DivController);
+inheritsFrom(MixNumKeysController, DivController);
 
 /**
  * Render number of keys.
@@ -475,7 +475,7 @@ function NumKeysController(div, state, onNumKeysInput) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-GenUtils.inheritsFrom(NumKeysController, DivController);
+inheritsFrom(NumKeysController, DivController);
 
 /**
  * Render password selection page.
@@ -499,7 +499,7 @@ function PasswordSelectionController(div, state, onPasswordSelection) {
 		callback(div);
 	}
 }
-GenUtils.inheritsFrom(PasswordSelectionController, DivController);
+inheritsFrom(PasswordSelectionController, DivController);
 
 /**
  * Render password input page.
@@ -648,7 +648,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-GenUtils.inheritsFrom(PasswordInputController, DivController);
+inheritsFrom(PasswordInputController, DivController);
 
 /**
  * Render split selection page.
@@ -673,7 +673,7 @@ function SplitSelectionController(div, state, onSplitSelection) {
 		callback(div);
 	}
 }
-GenUtils.inheritsFrom(SplitSelectionController, DivController);
+inheritsFrom(SplitSelectionController, DivController);
 
 /**
  * Number of pieces input page.
@@ -744,7 +744,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		else if (minPieces > numPieces) throw new Error("Minimum pieces cannot be more than the number of pieces");
 	}
 }
-GenUtils.inheritsFrom(NumPiecesInputController, DivController);
+inheritsFrom(NumPiecesInputController, DivController);
 
 /**
  * Summarize configuration and generate pieces.
@@ -850,7 +850,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				if (!funcs.length) {
 					
 					// convert keys to pieces
-					let pieces = keysToPieces(originals, state.numPieces, state.minPieces);
+					let pieces = CryptoUtils.keysToPieces(originals, state.numPieces, state.minPieces);
 					
 					// validate pieces can recreate originals
 					let keysFromPieces = piecesToKeys(pieces);
@@ -878,7 +878,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 						if (err) throw err;
 						
 						// convert keys to pieces
-						let pieces = keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
+						let pieces = CryptoUtils.keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
 						
 						// validate pieces can recreate originals
 						let keysFromPieces = piecesToKeys(pieces);
@@ -960,7 +960,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		});
 	}
 }
-GenUtils.inheritsFrom(GeneratePiecesController, DivController);
+inheritsFrom(GeneratePiecesController, DivController);
 
 /**
  * Render page to import private components from text.
@@ -1030,7 +1030,7 @@ function ImportTextController(div, state, onKeysImported) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-GenUtils.inheritsFrom(ImportTextController, DivController);
+inheritsFrom(ImportTextController, DivController);
 
 /**
  * Render page to decrypt keys.
@@ -1109,7 +1109,7 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 					progressDiv.hide();
 				} else {
 					// convert keys to a decrypted piece
-					let pieces = keysToPieces(keys);
+					let pieces = CryptoUtils.keysToPieces(keys);
 					assertEquals(1, pieces.length);
 					
 					// render piece
@@ -1175,7 +1175,7 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 	
 	var errorDiv = $("<div>");
 }
-GenUtils.inheritsFrom(DecryptKeysController, DivController);
+inheritsFrom(DecryptKeysController, DivController);
 
 /**
  * Render import files page.
@@ -1345,7 +1345,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 	let lastKeys;				// tracks last imported keys so page only advances if keys change
 	setErrorMessage("");
 }
-GenUtils.inheritsFrom(ImportFilesController, DivController);
+inheritsFrom(ImportFilesController, DivController);
 
 /**
  * Renders pieces for customization and export.
@@ -1408,7 +1408,7 @@ function RenderPiecesController(div, state, onCustomExport) {
 		});
 	}
 }
-GenUtils.inheritsFrom(RenderPiecesController, DivController);
+inheritsFrom(RenderPiecesController, DivController);
 
 /**
  * Controls the custom export page.
@@ -1431,7 +1431,7 @@ function CustomExportController(div, state, pieces) {
 		callback(div);
 	}
 }
-GenUtils.inheritsFrom(CustomExportController, DivController);
+inheritsFrom(CustomExportController, DivController);
 
 /**
  * Utility functions for the "industrial" pieces renderer.

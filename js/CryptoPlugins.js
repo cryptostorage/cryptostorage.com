@@ -180,7 +180,7 @@ function BitcoinPlugin() {
 		}
 	}
 }
-GenUtils.inheritsFrom(BitcoinPlugin, CryptoPlugin);
+inheritsFrom(BitcoinPlugin, CryptoPlugin);
 
 /**
  * Bitcoin cash plugin.
@@ -191,7 +191,7 @@ function BitcoinCashPlugin() {
 	this.getTicker = function() { return "BCH" };
 	this.getLogo = function() { return $("<img src='img/bitcoin_cash.png'>"); }
 }
-GenUtils.inheritsFrom(BitcoinCashPlugin, BitcoinPlugin);
+inheritsFrom(BitcoinCashPlugin, BitcoinPlugin);
 
 /**
  * Ethereum plugin.
@@ -271,7 +271,7 @@ function EthereumPlugin() {
 		}
 	}
 }
-GenUtils.inheritsFrom(EthereumPlugin, CryptoPlugin);
+inheritsFrom(EthereumPlugin, CryptoPlugin);
 
 /**
  * Ethereum classic plugin.
@@ -282,7 +282,7 @@ function EthereumClassicPlugin() {
 	this.getTicker = function() { return "ETC" };
 	this.getLogo = function() { return $("<img src='img/ethereum_classic.png'>"); }
 }
-GenUtils.inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
+inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
 
 /**
  * Litecoin plugin.
@@ -333,7 +333,7 @@ function LitecoinPlugin() {
 		return litecore.Address.isValid(str);
 	}
 }
-GenUtils.inheritsFrom(LitecoinPlugin, CryptoPlugin);
+inheritsFrom(LitecoinPlugin, CryptoPlugin);
 
 /**
  * Monero plugin.
@@ -406,4 +406,4 @@ function MoneroPlugin() {
 		}
 	}
 }
-GenUtils.inheritsFrom(MoneroPlugin, CryptoPlugin);
+inheritsFrom(MoneroPlugin, CryptoPlugin);

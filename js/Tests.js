@@ -372,7 +372,7 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 	minPieces = minPieces ? minPieces : 1;
 	
 	// split keys into pieces
-	let pieces = keysToPieces(keys, numPieces, minPieces);
+	let pieces = CryptoUtils.keysToPieces(keys, numPieces, minPieces);
 	
 	// test each share in each piece
 	for (let piece of pieces) {
@@ -443,8 +443,8 @@ function testInvalidPiecesToKeys() {
 	}
 	
 	// convert to pieces
-	let ethPieces = keysToPieces(ethKeys);
-	let xmrPieces = keysToPieces(xmrKeys);
+	let ethPieces = CryptoUtils.keysToPieces(ethKeys);
+	let xmrPieces = CryptoUtils.keysToPieces(xmrKeys);
 	
 	// try to combine pieces
 	try {
