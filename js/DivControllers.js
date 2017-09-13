@@ -857,11 +857,11 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					
 					// render pieces to htmls
 					setProgress(progressWeight, totalWeight, "Rendering");
-					renderPieceHtmls(pieces, function(err, htmls) {
+					renderPieceHtmls(pieces, function(err, pieceDivs) {
 						if (err) throw err;
-						assertEquals(pieces.length, htmls.length);
+						assertEquals(pieces.length, pieceDivs.length);
 						setProgress(1, 1, "Complete");
-						onPiecesGenerated(pieces, htmls);
+						onPiecesGenerated(pieces, pieceDivs);
 					});
 				}
 				
@@ -898,11 +898,11 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 							
 							// render pieces to htmls
 							setProgress(progressWeight, totalWeight, "Rendering");
-							renderPieceHtmls(pieces, function(err, htmls) {
+							renderPieceHtmls(pieces, function(err, pieceDivs) {
 								if (err) throw err;
-								assertEquals(pieces.length, htmls.length);
+								assertEquals(pieces.length, pieceDivs.length);
 								setProgress(1, 1, "Complete");
-								onPiecesGenerated(pieces, htmls);
+								onPiecesGenerated(pieces, pieceDivs);
 							})
 						});
 					});
@@ -1334,7 +1334,7 @@ function RenderPiecesController(div, state, onCustomExport) {
 		// wrap piece divs with htmls for export
 		let htmls = [];
 		for (let pieceDiv of state.pieceDivs) {
-			htmls.push($("<html>").append($("<body>").append(div)));
+			htmls.push($("<html>").append($("<body>").append(pieceDiv)));
 		}
 		
 		// zip pieces
