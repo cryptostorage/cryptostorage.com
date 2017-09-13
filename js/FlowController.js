@@ -1,7 +1,6 @@
 // TODO
 // placeholders for faq and donations
 // redesign pieces download page
-// decryption progress bar
 // redesign html export
 // num addresses page common code
 // can buttons automatically grey out with progress wheel until next screen rendered?
