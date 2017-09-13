@@ -241,11 +241,10 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com."));
 		
-		div.append(getCheckmarkDiv("Generate secure storage for multiple cryptocurrencies."));
-		div.append(getCheckmarkDiv("Protect your private keys with password encryption."));
-		div.append(getCheckmarkDiv("Optionally split your private keys into separate pieces which must be combined."));
-		div.append(getCheckmarkDiv("100% open source, client-side, and free to use.  No registration or trusted third parties."));
-		div.append(getCheckmarkDiv("Export to printable QR codes, csv, json, and txt for long term storage and easy recovery."));
+		div.append(getCheckmarkDiv("Generate, store, and recover keys for multiple cryptocurrencies."));
+		div.append(getCheckmarkDiv("Export to printable QR codes, csv, json, and txt for long term storage."));
+		div.append(getCheckmarkDiv("Protect your private keys with password encryption and the ability to split them into pieces."));
+		div.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
 		div.append("<br>");
 		
 		div.append("Select an option to get started.")
