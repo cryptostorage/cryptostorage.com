@@ -199,7 +199,7 @@ function testCryptoKey(plugin, callback) {
 	assertTrue(plugin.getEncryptionSchemes().length >= 1);
 	let funcs = [];
 	for (let scheme of plugin.getEncryptionSchemes()) {
-		let max = scheme === EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;
+		let max = scheme === CryptoUtils.EncryptionScheme.BIP38 ? REPEAT_SHORT : REPEAT_LONG;
 		let keys = [];
 		for (let i = 0; i < max; i++) keys.push(plugin.newKey());
 		funcs.push(function(callback) { testEncryptKeys(keys, scheme, PASSWORD, callback); });
@@ -403,7 +403,7 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 	let combinations = getCombinations(pieces, minPieces);
 	for (let i = 0; i < combinations.length; i++) {
 		let combination = combinations[i];
-		let keysFromPieces = piecesToKeys(pieces);
+		let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
 		assertEquals(keys.length, keysFromPieces.length);
 		for (let i = 0; i < keys.length; i++) {
 			assertTrue(keys[i].equals(keysFromPieces[i]));
@@ -413,13 +413,13 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 //	// apparently these tests are invalid because shamir's can return some valid hex key without threshold met
 //	// test keys from one piece which is too few
 //	if (minPieces >= 2) {
-//		let keysFromPieces = piecesToKeys([pieces[0]]);
+//		let keysFromPieces = CryptoUtils.piecesToKeys([pieces[0]]);
 //		assertEquals(keysFromPieces.length, 0);
 //	}
 //	
 //	// test keys from two pieces which is too few
 //	if (minPieces >= 3) {
-//		keysFromPieces = piecesToKeys([pieces[0], pieces[1]]);
+//		keysFromPieces = CryptoUtils.piecesToKeys([pieces[0], pieces[1]]);
 //		if (keysFromPieces.length !== 0) {
 //			console.log(pieces[0]);
 //			console.log(pieces[1]);
@@ -448,7 +448,7 @@ function testInvalidPiecesToKeys() {
 	
 	// try to combine pieces
 	try {
-		piecesToKeys([ethPieces[0], xmrPieces[0]]);
+		CryptoUtils.piecesToKeys([ethPieces[0], xmrPieces[0]]);
 		fail("fail");
 	} catch(err) {
 		if (err.message === "fail") throw new Error("Cannot get keys from incompatible pieces");

@@ -57,17 +57,17 @@ CryptoPlugin.prototype.getDependencies = function() { throw new Error("Subclass 
 /**
  * Returns the supported encryption schemes.  All support CryptoJS by default.
  */
-CryptoPlugin.prototype.getEncryptionSchemes = function() { return [EncryptionScheme.CRYPTOJS]; }
+CryptoPlugin.prototype.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS]; }
 
 /**
  * Encrypts the given key with the given scheme and password.  Invokes callback(err, key) when done.
  */
-CryptoPlugin.prototype.encrypt = function(scheme, key, password, callback) { encrypt(scheme, key, password, callback); }
+CryptoPlugin.prototype.encrypt = function(scheme, key, password, callback) { CryptoUtils.encrypt(scheme, key, password, callback); }
 
 /**
  * Decrypts the given key with the given password.  Invokes callback(err, key) when done.
  */
-CryptoPlugin.prototype.decrypt = function(key, password, callback) { return decrypt(key, password, callback); }
+CryptoPlugin.prototype.decrypt = function(key, password, callback) { return CryptoUtils.decrypt(key, password, callback); }
 
 /**
  * Returns the given key's private key split into pieces.
@@ -112,7 +112,7 @@ function BitcoinPlugin() {
 	this.getTicker = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
 	this.getDependencies = function() { return ["lib/aes.js", "lib/bitaddress.js"]; }
-	this.getEncryptionSchemes = function() { return [EncryptionScheme.BIP38, EncryptionScheme.CRYPTOJS]; }
+	this.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.BIP38, CryptoUtils.EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -135,7 +135,7 @@ function BitcoinPlugin() {
 		else if (ninja.privateKey.isBIP38Format(str)) {
 			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
-			state.encryption = EncryptionScheme.BIP38;
+			state.encryption = CryptoUtils.EncryptionScheme.BIP38;
 			return new CryptoKey(this, state);
 		}
 		
@@ -143,7 +143,7 @@ function BitcoinPlugin() {
 		else if (str[0] === 'U') {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
-			state.encryption = EncryptionScheme.CRYPTOJS;
+			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
 		
@@ -154,7 +154,7 @@ function BitcoinPlugin() {
 			if (str.length > 80 && str.length < 90) {
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
-				state.encryption = EncryptionScheme.BIP38;
+				state.encryption = CryptoUtils.EncryptionScheme.BIP38;
 				return new CryptoKey(this, state);
 			}
 			
@@ -163,7 +163,7 @@ function BitcoinPlugin() {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 				if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
-				state.encryption = EncryptionScheme.CRYPTOJS;
+				state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
 				return new CryptoKey(this, state);
 			}
 		}
@@ -225,7 +225,7 @@ function EthereumPlugin() {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 				if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
-				state.encryption = EncryptionScheme.CRYPTOJS;
+				state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
 				return new CryptoKey(this, state);
 			}
 		}
@@ -234,7 +234,7 @@ function EthereumPlugin() {
 		else if (str[0] === 'U') {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
-			state.encryption = EncryptionScheme.CRYPTOJS;
+			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
 		
@@ -314,7 +314,7 @@ function LitecoinPlugin() {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
-			state.encryption = EncryptionScheme.CRYPTOJS;
+			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
 		
@@ -322,7 +322,7 @@ function LitecoinPlugin() {
 		else if (str[0] === 'U') {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
-			state.encryption = EncryptionScheme.CRYPTOJS;
+			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
 		
@@ -371,7 +371,7 @@ function MoneroPlugin() {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 				if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
-				state.encryption = EncryptionScheme.CRYPTOJS;
+				state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
 				return new CryptoKey(this, state);
 			}
 		}
@@ -380,7 +380,7 @@ function MoneroPlugin() {
 		if (str[0] === 'U') {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
-			state.encryption = EncryptionScheme.CRYPTOJS;
+			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
 		

@@ -22,12 +22,12 @@ let CryptoUtils = {
 		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 		if (!password) throw new Error("Password must be initialized");
 		switch (scheme) {
-			case EncryptionScheme.CRYPTOJS:
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
 				let b64 = CryptoJS.AES.encrypt(key.getHex(), password).toString();
 				key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
 				callback(null, key);
 				break;
-			case EncryptionScheme.BIP38:
+			case CryptoUtils.EncryptionScheme.BIP38:
 				ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.getHex(), password, true, function(resp) {
 					if (resp.message) callback(resp);	// TODO: confirm error handling, isError()
 					else {
@@ -51,7 +51,7 @@ let CryptoUtils = {
 		if (!password) throw new Error("Password must be initialized");
 		assertTrue(key.isEncrypted());
 		switch (key.getEncryptionScheme()) {
-			case EncryptionScheme.CRYPTOJS:
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
 				let hex;
 				try {
 					hex = CryptoJS.AES.decrypt(key.getWif(), password).toString(CryptoJS.enc.Utf8);
@@ -62,7 +62,7 @@ let CryptoUtils = {
 					callback(null, key);
 				}
 				break;
-			case EncryptionScheme.BIP38:
+			case CryptoUtils.EncryptionScheme.BIP38:
 				ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), password, function(resp) {
 					if (resp.message) callback(new Error("Incorrect password"));
 					else {
@@ -118,7 +118,7 @@ let CryptoUtils = {
 	renderQrCode: function(text, config, callback) {
 		
 		// merge configs
-		config = Object.assign({}, DefaultQrConfig, config);
+		config = Object.assign({}, CryptoUtils.DefaultQrConfig, config);
 
 		// generate QR code
 		var segments = [{data: text, mode: 'byte'}];	// manually specify mode
@@ -294,9 +294,9 @@ let CryptoUtils = {
 			let path = "cryptostorage_" + name + "/" + name;
 			let zip = new JSZip();
 			zip.file(path + ".html", getOuterHtml(pieceHtmls[i]));
-			zip.file(path + ".csv", pieceToCsv(pieces[i]));
-			zip.file(path + ".txt", pieceToStr(pieces[i]));
-			zip.file(path + ".json", pieceToJson(pieces[i]));
+			zip.file(path + ".csv", CryptoUtils.pieceToCsv(pieces[i]));
+			zip.file(path + ".txt", CryptoUtils.pieceToStr(pieces[i]));
+			zip.file(path + ".json", CryptoUtils.pieceToJson(pieces[i]));
 			zips.push(zip);
 		}
 		
@@ -352,7 +352,7 @@ let CryptoUtils = {
 				if (err) throw err;
 				let pieces = [];
 				for (let arg of args) {
-					if (GenUtils.isArray(arg)) for (let piece of arg) pieces.push(piece);
+					if (isArray(arg)) for (let piece of arg) pieces.push(piece);
 					else pieces.push(arg);
 				}
 				onPieces(pieces);
@@ -365,7 +365,7 @@ let CryptoUtils = {
 					let piece;
 					try {
 						piece = JSON.parse(str);
-						validatePiece(piece);
+						CryptoUtils.validatePiece(piece);
 					} catch (err) {
 						//throw err;
 						console.log(err);
@@ -378,7 +378,7 @@ let CryptoUtils = {
 		function getZipCallbackFunction(zipObject) {
 			return function(callback) {
 				zipObject.async("blob").then(function(blob) {
-					zipToPieces(blob, function(pieces) {
+					CryptoUtils.zipToPieces(blob, function(pieces) {
 						callback(null, pieces);
 					});
 				});

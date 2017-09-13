@@ -106,18 +106,18 @@ let Weights = {
 	getCreateKeyWeight: function() { return 63; },
 	getEncryptWeight: function(scheme) {
 		switch (scheme) {
-			case EncryptionScheme.BIP38:
+			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4187;
-			case EncryptionScheme.CRYPTOJS:
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
 				return 10;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
 	getDecryptWeight: function(scheme) {
 		switch (scheme) {
-			case EncryptionScheme.BIP38:
+			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4581;
-			case EncryptionScheme.CRYPTOJS:
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
 				return 100;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
@@ -853,7 +853,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					let pieces = CryptoUtils.keysToPieces(originals, state.numPieces, state.minPieces);
 					
 					// validate pieces can recreate originals
-					let keysFromPieces = piecesToKeys(pieces);
+					let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
 					assertEquals(originals.length, keysFromPieces.length);
 					for (let i = 0; i < originals.length; i++) {
 						assertTrue(originals[i].equals(keysFromPieces[i]));
@@ -881,7 +881,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 						let pieces = CryptoUtils.keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
 						
 						// validate pieces can recreate originals
-						let keysFromPieces = piecesToKeys(pieces);
+						let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
 						
 						// collect decryption functions
 						funcs = [];
@@ -1243,12 +1243,12 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 	function getNamedPiecesFromFile(file, data, onNamedPieces) {
 		if (file.type === 'application/json') {
 			let piece = JSON.parse(data);
-			validatePiece(piece);
+			CryptoUtils.validatePiece(piece);
 			let namedPiece = {name: file.name, piece: piece};
 			onNamedPieces([namedPiece]);
 		}
 		else if (file.type === 'application/zip') {
-			zipToPieces(data, function(namedPieces) {
+			CryptoUtils.zipToPieces(data, function(namedPieces) {
 				onNamedPieces(namedPieces);
 			});
 		}
@@ -1307,7 +1307,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 			
 			// create keys
 			try {
-				let keys = piecesToKeys(pieces);
+				let keys = CryptoUtils.piecesToKeys(pieces);
 				setErrorMessage("");
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
 				lastKeys = keys;
@@ -1384,7 +1384,7 @@ function RenderPiecesController(div, state, onCustomExport) {
 		}
 		
 		// zip pieces
-		piecesToZip(state.pieces, htmls, function(name, blob) {
+		CryptoUtils.piecesToZip(state.pieces, htmls, function(name, blob) {
 			
 			// render zip download
 			div.append("<br>");
@@ -1598,7 +1598,7 @@ let IndustrialPiecesRenderer = {
 						// render public QR
 						if (config.public_qr) {
 							tracker2.threadStarted();
-							renderQrCode(publicKey, getQrConfig(config), function(img) {
+							CryptoUtils.renderQrCode(publicKey, getQrConfig(config), function(img) {
 								qrCodeRendered();
 								qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Public"));
 								qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
@@ -1607,7 +1607,7 @@ let IndustrialPiecesRenderer = {
 								// render private QR
 								if (config.private_qr) {
 									tracker2.threadStarted();
-									renderQrCode(privateKey, getQrConfig(config), function(img) {
+									CryptoUtils.renderQrCode(privateKey, getQrConfig(config), function(img) {
 										qrCodeRendered();
 										qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Private"));
 										qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
@@ -1620,7 +1620,7 @@ let IndustrialPiecesRenderer = {
 						// render only private QR
 						else if (config.private_qr) {
 							tracker2.threadStarted();
-							renderQrCode(privateKey, getQrConfig(config), function(img) {
+							CryptoUtils.renderQrCode(privateKey, getQrConfig(config), function(img) {
 								qrCodeRendered();
 								qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Private"));
 								qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
