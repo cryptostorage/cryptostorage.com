@@ -801,7 +801,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 	function generatePieces(onPiecesGenerated) {
 		
 		// load dependencies
-		let dependencies = new Set();
+		let dependencies = new Set(COMMON_DEPENDENCIES);
 		for (let elem of state.mix) {
 			for (let dependency of elem.plugin.getDependencies()) dependencies.add(dependency);
 		}
@@ -994,7 +994,9 @@ function ImportTextController(div, state, onKeysImported) {
 		textarea.keyup(function() {
 			
 			// load dependencies
-			loader.load(state.plugin.getDependencies(), function() {
+			let dependencies = new Set(COMMON_DEPENDENCIES);
+			for (let dependency of state.plugin.getDependencies()) dependencies.add(dependency);
+			loader.load(dependencies, function() {
 				
 				// only continue if new characters added
 				let count = countNonWhitespaceCharacters(textarea.val());
@@ -1295,7 +1297,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		for (let elem of pieces[0]) cryptos.add(elem.crypto);
 		
 		// collect dependencies
-		let dependencies = new Set();
+		let dependencies = new Set(COMMON_DEPENDENCIES);
 		for (let crypto of cryptos) {
 			let plugin = getCryptoPlugin(crypto);
 			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);

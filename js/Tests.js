@@ -7,16 +7,17 @@ var counter = 0;
 
 function runTests(callback) {
 	
+	// window.crypto required for tests
+	if (!window.crypto) throw new Error("Cannot run tests without window.crypto");
+	
 	// get test plugins
 	let plugins = getTestCryptoPlugins();
 	
-	// collect dependencies
-	let dependencies = new Set();
+	// load dependencies
+	let dependencies = new Set(COMMON_DEPENDENCIES);
 	for (let plugin of plugins) {
 		for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
 	}
-	
-	// load dependencies
 	loader.load(Array.from(dependencies), function() {
 		
 		// run tests

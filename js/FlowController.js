@@ -31,7 +31,7 @@
 const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
-const DEPENDENCIES = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/progressbar.js"];
+const COMMON_DEPENDENCIES = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/progressbar.js"];
 var loader;
 
 /**
@@ -42,22 +42,18 @@ $(document).ready(function() {
 	// delete window.crypto for testing
 	if (DELETE_WINDOW_CRYPTO) delete window.crypto;
 
-	// start loading dependencies
+	// start loading common dependencies
 	loader = new DependencyLoader();
+	loader.load(COMMON_DEPENDENCIES);
 	
-	// run tests when dependencies load
-	loader.load(DEPENDENCIES, function() {
-		
-		// run tests
-		if (RUN_TESTS) {
-			if (!window.crypto) throw new Error("Cannot run tests without window.crypto");
-			console.log("Running tests");
-			runTests(function(error) {
-				if (error) throw error;
-				console.log("All tests pass");
-			});
-		}
-	});
+	// run tests
+	if (RUN_TESTS) {
+		console.log("Running tests");
+		runTests(function(error) {
+			if (error) throw error;
+			console.log("All tests pass");
+		});
+	}
 	
 	// initialize content div and flow controller
 	var pageManager = new PageManager($("#content"));
