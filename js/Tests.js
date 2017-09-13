@@ -8,7 +8,7 @@ let Tests = {
 	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
-	PASSWORD: "MySuperSecretTests.Tests.PASSWORDAbcTesting123",
+	PASSWORD: "MySuperSecretPasswordAbcTesting123",
 	
 	runTests: function(callback) {
 		
