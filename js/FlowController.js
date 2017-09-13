@@ -1,5 +1,4 @@
 // TODO
-// bug: delete file on file import page does not update import
 // namespace utils.js (reference bitaddress.org)
 // common dependencies need to be loaded at critical parts
 // navigation issues while generating, importing, etc
