@@ -21,6 +21,9 @@
 // create new storage from csv import
 // test alert if key creation fails for any reason
 // verify no name collisions
+// bip38 not working on old hardware
+// assert existence of window.crypto at start
+// test on IE
 
 // peer review encodings
 // consult designers
@@ -178,7 +181,7 @@ function FlowController(pageManager, plugins) {
 		if (DEBUG) console.log("onKeysImported(" + keys.length + " keys)");
 		assertTrue(keys.length >= 1);
 		state.keys = keys;
-		if (keys[0].isEncrypted()) pageManager.next(new DecryptKeysController($("<div>"), state, onKeysImported));
+		if (keys[0].isEncrypted()) pageManager.next(new DecryptKeysController($("<div>"), state, onPiecesGenerated));
 		else {
 			state.pieces = keysToPieces(keys, 1);
 			pageManager.next(new RenderPiecesController($("<div>"), state, onCustomExport));

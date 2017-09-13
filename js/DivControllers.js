@@ -69,6 +69,30 @@ UiUtils = {
 	
 	getMixLogo: function() {
 		return $("<img src='img/mix.png'>");
+	},
+	
+	getProgressBar: function(div) {
+		return new ProgressBar.Line(div, {
+			strokeWidth: 2.5,
+			color: 'rgb(96, 178, 198)',	// cryptostorage teal
+			duration: 0,
+			svgStyle: {width: '100%', height: '100%'},
+			text: {
+				className: 'progresbar-text',
+				style: {
+					color: 'black',
+		            position: 'absolute',
+		            left: '50%',
+		            top: '50%',
+		            padding: 0,
+		            margin: 0,
+		            transform: {
+		                prefix: true,
+		                value: 'translate(-50%, -50%)'
+		            }
+				}
+			}
+		});
 	}
 }
 
@@ -763,30 +787,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		// add progress bar
 		progressDiv = $("<div>").appendTo(div);
 		progressDiv.hide();
-		progressBar = getProgressPar(progressDiv.get(0));
-		function getProgressPar(div) {
-			return new ProgressBar.Line(div, {
-				strokeWidth: 2.5,
-				color: 'rgb(96, 178, 198)',	// cryptostorage teal
-				duration: 0,
-				svgStyle: {width: '100%', height: '100%'},
-				text: {
-					className: 'progresbar-text',
-					style: {
-						color: 'black',
-			            position: 'absolute',
-			            left: '50%',
-			            top: '50%',
-			            padding: 0,
-			            margin: 0,
-			            transform: {
-			                prefix: true,
-			                value: 'translate(-50%, -50%)'
-			            }
-					}
-				}
-			});
-		}
+		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
 		
 		// done rendering
 		callback(div);
@@ -861,7 +862,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 						assertEquals(pieces.length, htmls.length);
 						setProgress(1, 1, "Complete");
 						onPiecesGenerated(pieces, htmls);
-					})
+					});
 				}
 				
 				// handle encryption
@@ -1026,16 +1027,18 @@ function ImportTextController(div, state, onKeysImported) {
 inheritsFrom(ImportTextController, DivController);
 
 /**
- * Render page to password decrypt keys.
+ * Render page to decrypt keys.
  * 
  * @param div is the div to render to
- * @param keys are the keys to decrypt
- * @param onKeysDecrypt(keys) is invoked when the keys are decrypted
+ * @param state.keys are the keys to decrypt
+ * @param onPiecesGenerated(pieces, pieceDivs) when done
  */
-function DecryptKeysController(div, state, onKeysDecrypted) {
+function DecryptKeysController(div, state, onPiecesGenerated) {
 	DivController.call(this, div);
-	var keys = state.keys;
-	var passwordInput;	// for later focus
+	let keys = state.keys;
+	let passwordInput;
+	let progressDiv
+	let progressBar;
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -1044,13 +1047,13 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 		var title = "Imported " + keys.length + " " + UiUtils.getCryptoName(state) + " keys which are password protected.  Enter the password to decrypt them.";
 		div.append(UiUtils.getPageHeader(title, UiUtils.getCryptoLogo(state)));
 		
-		// render error div
+		// add error div
 		div.append(errorDiv);
 		errorDiv.attr("class", "error_msg");
 		errorDiv.hide();
 		div.append(errorDiv);
 		
-		// render password input
+		// add password input
 		div.append("Password: ");
 		passwordInput = $("<input type='text'>");
 		passwordInput.attr("class", "text_input");
@@ -1058,36 +1061,83 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 		div.append(passwordInput);
 		div.append("<br><br>");
 		
-		// render decrypt button
-		var btnDecrypt = UiUtils.getButton("Decrypt");
-		btnDecrypt.click(function() {
+		// add decrypt button
+		let btnDecrypt = UiUtils.getButton("Decrypt").appendTo(div);
+		btnDecrypt.click(onDecrypt);
+		
+		// add progress bar
+		progressDiv = $("<div>").appendTo(div);
+		progressDiv.hide();
+		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
+		
+		function onDecrypt() {
+			
+			// get passwords
 			var password = passwordInput.val();
 			if (password === "") {
 				setErrorMessage("Password must not be blank");
 				return;
-			} else {
-				setErrorMessage("");
-				btnDecrypt.attr("disabled", "disabled");
 			}
 			
-			// collect functions to decrypt
-			let funcs = [];
+			// compute total weight for progress bar
+			let totalWeight = 0;
 			for (let key of keys) {
-				funcs.push(function(callback) { key.decrypt(password, callback); });
+				totalWeight += Weights.getDecryptWeight(key.getEncryptionScheme());
 			}
+			let piecesRendererWeight = IndustrialPiecesRenderer.getWeight(keys.length, 1, null);
+			totalWeight += piecesRendererWeight;
 			
 			// decrypt keys
+			let funcs = [];
+			for (let key of keys) funcs.push(decryptFunc(key, password));
+			let progressWeight = 0;
+			setProgress(progressWeight, totalWeight, "Decrypting");
 			async.series(funcs, function(err, result) {
 				if (err) {
 					setErrorMessage(err.message);
 					passwordInput.focus();
 					btnDecrypt.removeAttr("disabled");
 				} else {
-					onKeysDecrypted(keys);
+					
+					// convert keys to a decrypted piece
+					let pieces = keysToPieces(keys, 1);
+					assertEquals(1, pieces.length);
+					
+					// render piece
+					setProgress(progressWeight, totalWeight, "Rendering");
+					renderPieceHtmls(pieces, function(err, htmls) {
+						if (err) throw err;
+						assertEquals(pieces.length, htmls.length);
+						setProgress(1, 1, "Complete");
+						onPiecesGenerated(pieces, htmls);
+					});
 				}
 			});
-		});
-		div.append(btnDecrypt);
+			
+			function setProgress(done, total, label) {
+				//console.log("setProgress(" + label + ", " + done + ", " + total + " (" + Math.round(done / total * 100) + "%)");
+				progressDiv.show();
+				progressBar.set(done / total);
+				if (label) progressBar.setText(label);
+			}
+			
+			function decryptFunc(key, password) {
+				return function(callback) {
+					let scheme = key.getEncryptionScheme();
+					key.decrypt(password, function(err, key) {
+						progressWeight += Weights.getDecryptWeight(scheme);
+						setProgress(progressWeight, totalWeight);
+						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
+					});
+				}
+			}
+			
+			function renderPieceHtmls(pieces, onDone) {
+				IndustrialPiecesRenderer.render(pieces, null, function(percent) {
+					setProgress(progressWeight + (percent * piecesRendererWeight), totalWeight);
+				}, onDone);
+			}
+		}
 		
 		// register pasword enter key
 		passwordInput.keyup(function(e) {
