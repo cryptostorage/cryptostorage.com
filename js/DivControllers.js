@@ -801,7 +801,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		}
 		loader.load(Array.from(dependencies), function() {
 			
-			// compute total weight
+			// compute total weight for progress bar
 			let totalWeight = 0;
 			let numKeys = 0;
 			for (let elem of state.mix) {
@@ -937,7 +937,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					key.decrypt(password, function(err, key) {
 						progressWeight += Weights.getDecryptWeight(scheme);
 						setProgress("Verifying encryption", progressWeight, totalWeight);
-						setTimeout(function() { callback(err, key); });	// let UI breath
+						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
 				}
 			}
