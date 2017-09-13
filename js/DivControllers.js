@@ -117,7 +117,7 @@ let Weights = {
 			case EncryptionScheme.BIP38:
 				return 4581;
 			case EncryptionScheme.CRYPTOJS:
-				return 200;
+				return 100;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
