@@ -822,6 +822,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			
 			// generate keys
 			let progressWeight = 0;
+			setProgress(progressWeight, totalWeight, "Creating keys");
 			async.series(funcs, function(err, keys) {
 				if (err) throw err;
 				let originals = keys;
@@ -854,10 +855,11 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					}
 					
 					// render pieces to htmls
+					setProgress(progressWeight, totalWeight, "Rendering");
 					renderPieceHtmls(pieces, function(err, htmls) {
 						if (err) throw err;
 						assertEquals(pieces.length, htmls.length);
-						setProgress("Complete", 1, 1);
+						setProgress(1, 1, "Complete");
 						onPiecesGenerated(pieces, htmls);
 					})
 				}
@@ -866,6 +868,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				else {
 					
 					// encrypt keys
+					setProgress(progressWeight, totalWeight, "Encrypting keys");
 					async.series(funcs, function(err, encryptedKeys) {
 						if (err) throw err;
 						
@@ -882,6 +885,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 						}
 						
 						// decrypt keys
+						setProgress(progressWeight, totalWeight, "Verifying encryption");
 						async.series(funcs, function(err, decryptedKeys) {
 							if (err) throw err;
 							
@@ -892,10 +896,11 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 							}
 							
 							// render pieces to htmls
+							setProgress(progressWeight, totalWeight, "Rendering");
 							renderPieceHtmls(pieces, function(err, htmls) {
 								if (err) throw err;
 								assertEquals(pieces.length, htmls.length);
-								setProgress("Complete", 1, 1);
+								setProgress(1, 1, "Complete");
 								onPiecesGenerated(pieces, htmls);
 							})
 						});
@@ -903,11 +908,11 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				}
 			});
 			
-			function setProgress(label, done, total) {
+			function setProgress(done, total, label) {
 				//console.log("setProgress(" + label + ", " + done + ", " + total + " (" + Math.round(done / total * 100) + "%)");
 				progressDiv.show();
 				progressBar.set(done / total);
-				progressBar.setText(label);
+				if (label) progressBar.setText(label);
 			}
 			
 			function newKeyFunc(plugin, callback) {
@@ -915,7 +920,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					setTimeout(function() {
 						let key = plugin.newKey();
 						progressWeight += Weights.getCreateKeyWeight();
-						setProgress("Creating keys", progressWeight, totalWeight);
+						setProgress(progressWeight, totalWeight);
 						callback(null, key);
 					}, 0);	// let UI breath
 				}
@@ -925,7 +930,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				return function(callback) {
 					key.encrypt(scheme, password, function(err, key) {
 						progressWeight += Weights.getEncryptWeight(scheme);
-						setProgress("Encrypting keys", progressWeight, totalWeight);
+						setProgress(progressWeight, totalWeight);
 						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
 				}
@@ -936,7 +941,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
 						progressWeight += Weights.getDecryptWeight(scheme);
-						setProgress("Verifying encryption", progressWeight, totalWeight);
+						setProgress(progressWeight, totalWeight);
 						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
 				}
@@ -944,7 +949,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 			
 			function renderPieceHtmls(pieces, onDone) {
 				IndustrialPiecesRenderer.render(pieces, null, function(percent) {
-					setProgress("Rendering pieces", progressWeight + (percent * piecesRendererWeight), totalWeight);
+					setProgress(progressWeight + (percent * piecesRendererWeight), totalWeight);
 				}, onDone);
 			}
 		});

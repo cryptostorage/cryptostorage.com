@@ -21,7 +21,6 @@
 // create new storage from csv import
 // test alert if key creation fails for any reason
 // verify no name collisions
-// progress bar label starts one tick earlier (e.g. decryption starts earlier than it says it does)
 
 // peer review encodings
 // consult designers
