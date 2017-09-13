@@ -1,7 +1,7 @@
 /**
  * UI utilities.
  */
-UiUtils = {
+let UiUtils = {
 	getButton: function(label, isNext, icon) {
 		let button = $("<div class='btn'>");
 		if (icon) {
@@ -253,6 +253,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		// render create button
 		var btnCreate = UiUtils.getNextButton("Create new storage");
 		btnCreate.click(function() { onSelectCreate(); });
+		if (!window.crypto) btnCreate.attr("disabled", "disabled");
 		div.append(btnCreate);
 		
 		// render import button
@@ -1404,7 +1405,7 @@ inheritsFrom(CustomExportController, DivController);
 /**
  * Utility functions for the "industrial" pieces renderer.
  */
-IndustrialPiecesRenderer = {
+let IndustrialPiecesRenderer = {
 		
 	// initialize default configuration
 	defaultConfig: {

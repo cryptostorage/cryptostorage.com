@@ -1,4 +1,5 @@
 // TODO
+// why any progress decrypting with invalid password?
 // assert existence of window.crypto at start
 // namespace utils.js (reference bitaddress.org)
 // common dependencies need to be loaded at critical parts
@@ -21,12 +22,16 @@
 // bip38 not working on old hardware
 // test on IE
 // create storage from csv import
+// "Successfully compiled asm.js code (loaded from cache in 6ms)" messages in moneroaddress and keythereum
+// title bar should not scroll
+// focus on first text element if applicable
 
 // peer review encodings
 // consult designers
 
 const RUN_TESTS = false;
 const DEBUG = true;
+const DELETE_WINDOW_CRYPTO = false;
 const DEPENDENCIES = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/progressbar.js"];
 var loader;
 
@@ -34,6 +39,9 @@ var loader;
  * Invoked when document initialized.
  */
 $(document).ready(function() {
+	
+	// delete window.crypto for testing
+	if (DELETE_WINDOW_CRYPTO) delete window.crypto;
 
 	// start loading dependencies
 	loader = new DependencyLoader();
@@ -43,6 +51,7 @@ $(document).ready(function() {
 		
 		// run tests
 		if (RUN_TESTS) {
+			if (!window.crypto) throw new Error("Cannot run tests without window.crypto");
 			console.log("Running tests");
 			runTests(function(error) {
 				if (error) throw error;
