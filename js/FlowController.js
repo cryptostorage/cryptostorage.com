@@ -1,27 +1,26 @@
 // TODO
+// assert existence of window.crypto at start
+// namespace utils.js (reference bitaddress.org)
+// common dependencies need to be loaded at critical parts
+// navigation issues while generating, importing, etc
+// num addresses page common code
 // placeholders for faq and donations
 // redesign pieces download page
 // redesign html export
-// num addresses page common code
-// can buttons automatically grey out with progress wheel until next screen rendered?
-// namespace utils.js (reference bitaddress.org)
 // cryptostorage donation addresses
-// popup on key generation to reconfirm password
+// password confirmation - re-enter or show
 // register shortcut keys for page navigation (enter, y, n)
 // paste private key doesn't work in iphone safari
 // de-minify aes.java
 // todos throughout code
 // run minimum tests when site accessed
 // use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org) (?)
-// common dependencies need to be loaded at critical parts
 // better mix logo
-// disable navigation during piece generation
-// create new storage from csv import
 // test alert if key creation fails for any reason
 // verify no name collisions
 // bip38 not working on old hardware
-// assert existence of window.crypto at start
 // test on IE
+// create storage from csv import
 
 // peer review encodings
 // consult designers
