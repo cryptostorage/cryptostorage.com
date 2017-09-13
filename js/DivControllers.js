@@ -1076,6 +1076,7 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
 		
 		function onDecrypt() {
+			setErrorMessage("");
 			btnDecrypt.attr("disabled", "disabled");
 			
 			// get passwords
@@ -1106,8 +1107,6 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 					btnDecrypt.removeAttr("disabled");
 					progressDiv.hide();
 				} else {
-					setErrorMessage("");
-					
 					// convert keys to a decrypted piece
 					let pieces = keysToPieces(keys, 1);
 					assertEquals(1, pieces.length);
