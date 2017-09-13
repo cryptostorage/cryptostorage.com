@@ -1,5 +1,5 @@
 // TODO
-// file and text importer need to render pieceDivs
+// file and text importers need to render pieceDivs
 // placeholders for faq and donations
 // redesign pieces download page
 // decryption progress bar
@@ -21,6 +21,7 @@
 // create new storage from csv import
 // test alert if key creation fails for any reason
 // verify no name collisions
+// progress bar label starts one tick earlier (e.g. decryption starts earlier than it says it does)
 
 // peer review encodings
 // consult designers
