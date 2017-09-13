@@ -58,7 +58,7 @@ $(document).ready(function() {
 	// initialize content div and flow controller
 	var pageManager = new PageManager($("#content"));
 	pageManager.render(function() {
-		new FlowController(pageManager, getCryptoPlugins());
+		new FlowController(pageManager, CryptoUtils.getCryptoPlugins());
 	})
 });
 
@@ -95,7 +95,7 @@ function FlowController(pageManager, plugins) {
 		if (selection === "MIX") {
 			pageManager.next(new MixNumKeysController($("<div>"), state, onMixNumKeysInput))
 		} else {
-			state.mix = [{plugin: getCryptoPlugin(selection)}];
+			state.mix = [{plugin: CryptoUtils.getCryptoPlugin(selection)}];
 			pageManager.next(new NumKeysController($("<div>"), state, onNumKeysInput));
 		}
 	}

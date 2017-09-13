@@ -64,7 +64,7 @@ let UiUtils = {
 				if (!ticker) ticker = key.getPlugin().getTicker();
 				else if (ticker !== key.getPlugin().getTicker()) return this.getMixLogo();
 			}
-			return getCryptoPlugin(ticker).getLogo();
+			return CryptoUtils.getCryptoPlugin(ticker).getLogo();
 		}
 	},
 	
@@ -388,6 +388,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 				else {
 					setErrorMessage("");
 					state.mix = [];
+					let plugins = CryptoUtils.getCryptoPlugins();
 					for (let i = 0; i < plugins.length; i++) {
 						if (!numKeysInts[i]) continue;
 						state.mix.push({plugin: plugins[i], numKeys: numKeysInts[i]});
@@ -1298,7 +1299,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		// collect dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
 		for (let crypto of cryptos) {
-			let plugin = getCryptoPlugin(crypto);
+			let plugin = CryptoUtils.getCryptoPlugin(crypto);
 			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
 		}
 		

@@ -4,6 +4,46 @@
 let CryptoUtils = {
 	
 	/**
+	 * Returns all crypto plugins.
+	 */
+	plugins: null,	// cache plugins
+	getCryptoPlugins: function() {
+		if (!CryptoUtils.plugins) {
+			CryptoUtils.plugins = [];
+			CryptoUtils.plugins.push(new BitcoinPlugin());
+			CryptoUtils.plugins.push(new EthereumPlugin());
+			CryptoUtils.plugins.push(new LitecoinPlugin());
+			CryptoUtils.plugins.push(new MoneroPlugin());
+			CryptoUtils.plugins.push(new BitcoinCashPlugin());
+			CryptoUtils.plugins.push(new EthereumClassicPlugin());
+		}
+		return CryptoUtils.plugins;
+	},
+
+	/**
+	 * Returns test crypto plugins.
+	 */
+	getTestCryptoPlugins: function() {
+		let plugins = [];
+		plugins.push(new BitcoinPlugin());
+		plugins.push(new EthereumPlugin());
+		plugins.push(new LitecoinPlugin());
+		plugins.push(new MoneroPlugin());
+		return plugins;
+	},
+	
+	/**
+	 * Returns the crypto plugin with the given ticker symbol.
+	 */
+	getCryptoPlugin: function(ticker) {
+		assertInitialized(ticker);
+		for (let plugin of CryptoUtils.getCryptoPlugins()) {
+			if (plugin.getTicker() === ticker) return plugin;
+		}
+		throw new Error("No plugin found for crypto '" + ticker + "'");
+	},
+		
+	/**
 	 * Enumerates password encryption/decryption schemes.
 	 */
 	EncryptionScheme: {
@@ -215,7 +255,7 @@ let CryptoUtils = {
 		if (pieces.length === 1) {
 			for (let pieceKey of pieces[0]) {
 				try {
-					let key = getCryptoPlugin(pieceKey.crypto).newKey(pieceKey.privateKey);
+					let key = CryptoUtils.getCryptoPlugin(pieceKey.crypto).newKey(pieceKey.privateKey);
 					if (key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);
 					keys.push(key);
 				} catch (err) {
@@ -258,7 +298,7 @@ let CryptoUtils = {
 				let shares = [];
 				for (let piece of pieces) shares.push(piece[i].privateKey);
 				try {
-					let key = getCryptoPlugin(pieces[0][i].crypto).combine(shares);
+					let key = CryptoUtils.getCryptoPlugin(pieces[0][i].crypto).combine(shares);
 					if (key.isEncrypted() && pieces[0][i].address) key.setAddress(pieces[0][i].address);
 					keys.push(key);
 				} catch (err) {

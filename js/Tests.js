@@ -11,7 +11,7 @@ function runTests(callback) {
 	if (!window.crypto) throw new Error("Cannot run tests without window.crypto");
 	
 	// get test plugins
-	let plugins = getTestCryptoPlugins();
+	let plugins = CryptoUtils.getTestCryptoPlugins();
 	
 	// load dependencies
 	let dependencies = new Set(COMMON_DEPENDENCIES);
@@ -438,8 +438,8 @@ function testInvalidPiecesToKeys() {
 	let ethKeys = [];
 	let xmrKeys = [];
 	for (let i = 0; i < 10; i++) {
-		ethKeys.push(getCryptoPlugin("ETH").newKey());
-		xmrKeys.push(getCryptoPlugin("XMR").newKey());
+		ethKeys.push(CryptoUtils.getCryptoPlugin("ETH").newKey());
+		xmrKeys.push(CryptoUtils.getCryptoPlugin("XMR").newKey());
 	}
 	
 	// convert to pieces

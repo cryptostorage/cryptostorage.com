@@ -1,34 +1,3 @@
-var plugins;
-function getCryptoPlugins() {
-	if (!plugins) {
-		plugins = [];
-		plugins.push(new BitcoinPlugin());
-		plugins.push(new EthereumPlugin());
-		plugins.push(new LitecoinPlugin());
-		plugins.push(new MoneroPlugin());
-		plugins.push(new BitcoinCashPlugin());
-		plugins.push(new EthereumClassicPlugin());
-	}
-	return plugins;
-}
-
-function getTestCryptoPlugins() {
-	let plugins = [];
-	plugins.push(new BitcoinPlugin());
-	plugins.push(new EthereumPlugin());
-	plugins.push(new LitecoinPlugin());
-	plugins.push(new MoneroPlugin());
-	return plugins;
-}
-
-function getCryptoPlugin(ticker) {
-	assertInitialized(ticker);
-	for (let plugin of getCryptoPlugins()) {
-		if (plugin.getTicker() === ticker) return plugin;
-	}
-	throw new Error("No plugin found for crypto '" + ticker + "'");
-}
-
 /**
  * Base plugin that specific cryptocurrencies must implement.
  */
