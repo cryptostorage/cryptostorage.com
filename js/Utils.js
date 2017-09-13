@@ -502,6 +502,9 @@ let GenUtils = {
 	}
 };
 
+/**
+ * Collection of utilities for cryptostorage.com.
+ */
 let CryptoUtils = {
 	
 	/**
