@@ -25,13 +25,14 @@
 // "Successfully compiled asm.js code (loaded from cache in 6ms)" messages in moneroaddress and keythereum
 // title bar should not scroll
 // focus on first text element if applicable
+// live site warning to stop and download from github
 
 // peer review encodings
 // consult designers
 
 const RUN_TESTS = false;
 const DEBUG = true;
-const DELETE_WINDOW_CRYPTO = false;
+const DELETE_WINDOW_CRYPTO = true;
 const DEPENDENCIES = ["lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/progressbar.js"];
 var loader;
 
