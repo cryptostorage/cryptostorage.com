@@ -189,7 +189,7 @@ function FlowController(pageManager, plugins) {
 		state.keys = keys;
 		if (keys[0].isEncrypted()) pageManager.next(new DecryptKeysController($("<div>"), state, onPiecesGenerated));
 		else {
-			state.pieces = keysToPieces(keys, 1);
+			state.pieces = keysToPieces(keys);
 			pageManager.next(new RenderPiecesController($("<div>"), state, onCustomExport));
 		}
 	}

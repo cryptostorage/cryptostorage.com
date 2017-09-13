@@ -1108,7 +1108,7 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 					progressDiv.hide();
 				} else {
 					// convert keys to a decrypted piece
-					let pieces = keysToPieces(keys, 1);
+					let pieces = keysToPieces(keys);
 					assertEquals(1, pieces.length);
 					
 					// render piece
@@ -1220,55 +1220,13 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 							else if (file.type === "application/zip") that.setErrorMessage("Zip '" + file.name + "' does not contain any valid JSON pieces");
 							else throw new Error("Unrecognized file type: " + file.type);
 						} else {
-							for (let namedPiece of namedPieces) {
-								try {
-									addPiece(namedPiece.name, namedPiece.piece);
-									setErrorMessage("");
-								} catch (err) {
-									setErrorMessage(err.message);
-								}
-							}
-							let pieces = [];
-							for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
-							
-							// collect cryptos being imported
-							let cryptos = new Set();
-							for (let elem of pieces[0]) cryptos.add(elem.crypto);
-							
-							// collect dependencies
-							let dependencies = new Set();
-							for (let crypto of cryptos) {
-								let plugin = getCryptoPlugin(crypto);
-								for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
-							}
-							
-							// load dependencies
-							loader.load(Array.from(dependencies), function() {
-								
-								// create keys
-								let keys = piecesToKeys(pieces);
-								if (keys.length > 0) onKeysImported(keys);
-							})
+							addPieces(namedPieces);
 						}
 					});
 				}
 				if (file.type === 'application/json') reader.readAsText(file);
 				else if (file.type === 'application/zip') reader.readAsArrayBuffer(file);
 				else setErrorMessage("'" + file.name + "' is not a zip or json file.");
-			}
-		}
-		
-		function getNamedPiecesFromFile(file, data, onNamedPieces) {
-			if (file.type === 'application/json') {
-				let piece = JSON.parse(data);
-				validatePiece(piece);
-				let namedPiece = {name: file.name, piece: piece};
-				onNamedPieces([namedPiece]);
-			}
-			else if (file.type === 'application/zip') {
-				zipToPieces(data, function(namedPieces) {
-					onNamedPieces(namedPieces);
-				});
 			}
 		}
 		
@@ -1281,17 +1239,25 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 	
-	function addPiece(name, piece) {
-		
-		// don't re-add same piece
-		let found = false;
-		for (let importedPiece of importedPieces) {
-			if (name === importedPiece.name) found = true;
+	function getNamedPiecesFromFile(file, data, onNamedPieces) {
+		if (file.type === 'application/json') {
+			let piece = JSON.parse(data);
+			validatePiece(piece);
+			let namedPiece = {name: file.name, piece: piece};
+			onNamedPieces([namedPiece]);
 		}
-		if (!found) importedPieces.push({name: name, piece: piece});
-		
-		// update imported pieces
-		renderImportedPieces(importedPieces);
+		else if (file.type === 'application/zip') {
+			zipToPieces(data, function(namedPieces) {
+				onNamedPieces(namedPieces);
+			});
+		}
+	}
+	
+	function addPieces(namedPieces) {
+		for (let namedPiece of namedPieces) {
+			if (!isPieceImported(namedPiece.name)) importedPieces.push(namedPiece);
+		}
+		updatePieces();
 	}
 	
 	function removePiece(name) {
@@ -1299,12 +1265,54 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 			if (importedPieces[i].name === name) {
 				if (confirm("Are you sure you want to remove " + name + "?")) {
 					importedPieces.splice(i, 1);
-					renderImportedPieces(importedPieces);
+					updatePieces();
 				}
 				return;
 			}
 		}
 		throw new Error("No piece with name '" + name + "' imported");
+	}
+	
+	function isPieceImported(name) {
+		for (let importedPiece of importedPieces) {
+			if (importedPiece.name === name) return true;
+		}
+		return false;
+	}
+	
+	function updatePieces() {
+		
+		// update UI
+		renderImportedPieces(importedPieces);
+		
+		// collect all pieces
+		let pieces = [];
+		for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
+		if (!pieces.length) return;
+		
+		// collect cryptos being imported
+		let cryptos = new Set();
+		for (let elem of pieces[0]) cryptos.add(elem.crypto);
+		
+		// collect dependencies
+		let dependencies = new Set();
+		for (let crypto of cryptos) {
+			let plugin = getCryptoPlugin(crypto);
+			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
+		}
+		
+		// load dependencies
+		loader.load(Array.from(dependencies), function() {
+			
+			// create keys
+			try {
+				let keys = piecesToKeys(pieces);
+				setErrorMessage("");
+				if (keys.length) onKeysImported(keys);
+			} catch (err) {
+				setErrorMessage(err.message);
+			}
+		})
 	}
 	
 	function renderImportedPieces(importedPieces) {
@@ -1317,11 +1325,11 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		}
 	}
 	
-	var that = this;
-	var errorDiv = $("<div>");
+	let that = this;
+	let errorDiv = $("<div>");
 	errorDiv.attr("class", "error_msg");
-	var fileList = $("<div>");
-	var importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
+	let fileList = $("<div>");
+	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
 	setErrorMessage("");
 }
 inheritsFrom(ImportFilesController, DivController);

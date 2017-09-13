@@ -721,6 +721,7 @@ function keysToPieces(keys, numPieces, minPieces) {
 	
 	// validate input
 	assertTrue(keys.length > 0);
+	if (!isDefined(numPieces)) numPieces = 1;
 	assertTrue(numPieces >= 1);
 	if (minPieces) {
 		assertTrue(numPieces >= 2);
@@ -780,9 +781,10 @@ function piecesToKeys(pieces) {
 		
 		// validate pieces contain same number of keys
 		let numKeys;
-		for (let piece of pieces) {
+		for (let i = 0; i < pieces.length; i++) {
+			let piece = pieces[i];
 			if (!numKeys) numKeys = piece.length;
-			else if (numKeys !== piece.length) throw new Error("Piece " + (i + 1) + " contains " + piece[i] + " keys unlike previous pieces which contain " + numKeys + " keys");
+			else if (numKeys !== piece.length) throw new Error("Pieces contain different number of keys");
 		}
 		
 		// validate consistent keys across pieces
@@ -792,14 +794,14 @@ function piecesToKeys(pieces) {
 			let address;
 			let encryption;
 			for (let piece of pieces) {
-				if (!crypto) crypto = piece.crypto;
-				else if (crypto !== piece.crypto) throw new Error("Pieces are for different cryptocurrencies");
-				if (!isSplit) isSplit = piece.isSplit;
-				else if (isSplit !== piece.isSplit) throw new Error("Pieces have different split states");
-				if (!address) address = piece.address;
-				else if (address !== piece.address) throw new Error("Pieces have different addresses");
-				if (!encryption) encryption = piece.encryption;
-				else if (encryption !== piece.encryption) throw new Error("Pieces have different encryption states");
+				if (!crypto) crypto = piece[i].crypto;
+				else if (crypto !== piece[i].crypto) throw new Error("Pieces are for different cryptocurrencies");
+				if (!isSplit) isSplit = piece[i].isSplit;
+				else if (isSplit !== piece[i].isSplit) throw new Error("Pieces have different split states");
+				if (!address) address = piece[i].address;
+				else if (address !== piece[i].address) throw new Error("Pieces have different addresses");
+				if (!encryption) encryption = piece[i].encryption;
+				else if (encryption !== piece[i].encryption) throw new Error("Pieces have different encryption states");
 			}
 		}
 		

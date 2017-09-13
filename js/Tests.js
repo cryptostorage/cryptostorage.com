@@ -22,6 +22,7 @@ function runTests(callback) {
 		// run tests
 		testUtils();
 		testPathTracker();
+		testInvalidPiecesToKeys();
 		testCryptoKeys(plugins, function(error) {
 			if (callback) callback(error);
 		});
@@ -177,7 +178,7 @@ function testCryptoKey(plugin, callback) {
 	testKeysToPieces(keys, NUM_PIECES, MIN_PIECES);
 	
 	// test invalid private keys
-	let invalids = ["ab", "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress()];
+	let invalids = ["ab", "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress(), "1ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a"];
 	for (let invalid of invalids) {
 		try {
 			let key = new CryptoKey(plugin, invalid);
@@ -428,6 +429,29 @@ function testKeysToPieces(keys, numPieces, minPieces) {
 //		}
 //		assertEquals(0, keysFromPieces.length);
 //	}
+}
+
+function testInvalidPiecesToKeys() {
+	
+	// collect keys for different currencies
+	let ethKeys = [];
+	let xmrKeys = [];
+	for (let i = 0; i < 10; i++) {
+		ethKeys.push(getCryptoPlugin("ETH").newKey());
+		xmrKeys.push(getCryptoPlugin("XMR").newKey());
+	}
+	
+	// convert to pieces
+	let ethPieces = keysToPieces(ethKeys);
+	let xmrPieces = keysToPieces(xmrKeys);
+	
+	// try to combine pieces
+	try {
+		piecesToKeys([ethPieces[0], xmrPieces[0]]);
+		fail("fail");
+	} catch(err) {
+		if (err.message === "fail") throw new Error("Cannot get keys from incompatible pieces");
+	}
 }
 
 function copyKeys(keys) {
