@@ -1708,3 +1708,27 @@ let IndustrialPiecesRenderer = {
 		return IndustrialPiecesRenderer.getNumQrs(numKeys, numPieces, config) * Weights.getQrWeight();
 	}
 }
+
+/**
+* FAQ page
+*/
+function FaqController(div) {
+	DivController.call(this, div);
+	this.render = function(callback) {
+		UiUtils.pageSetup(div);
+		
+		// render title
+		div.append(UiUtils.getPageHeader("FAQ"));
+		
+		$("<div class='question'>").html("What is the meaning of life?").appendTo(div);
+		$("<div class='answer'>").html("42").appendTo(div);
+		$("<div class='question'>").html("What is the meaning of life?").appendTo(div);
+		$("<div class='answer'>").html("42").appendTo(div);
+		$("<div class='question'>").html("What is the meaning of life?").appendTo(div);
+		$("<div class='answer'>").html("42").appendTo(div);
+		
+		// done rendering
+		callback(div);
+	}
+}
+inheritsFrom(FaqController, DivController);

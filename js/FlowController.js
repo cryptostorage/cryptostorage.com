@@ -76,7 +76,8 @@ function FlowController(pageManager, plugins) {
 	}
 	
 	// render home page
-	pageManager.next(new HomeController($("<div>"), onSelectCreate, onSelectImport));
+	pageManager.next(new FaqController($("<div>")));
+	//pageManager.next(new HomeController($("<div>"), onSelectCreate, onSelectImport));
 	
 	// ------------------------------ CREATE NEW --------------------------------
 	
