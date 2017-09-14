@@ -143,33 +143,39 @@ DivController.prototype.onHide = function() { }
  */
 function PageManager(contentDiv) {
 	
-	var pathTracker = new PathTracker(onPageChange);	// track path through decision tree
-	var pageDiv;										// container to render page content
-	var leftArrow;										// reference to left navigation arrow
-	var rightArrow;										// reference to right navigation arrow
-	var transitioning = false;							// indicates if transition in progress to prevent duplicates
+	let pathTracker = new PathTracker(onPageChange);	// track path through decision tree
+	let pageDiv;										// container to render page content
+	let transitioning = false;							// indicates if transition in progress to prevent duplicates
+	let leftArrowDiv;									// container for left arrow
+	let leftArrow;										// left navigation arrow
+	let leftArrowDisabled;								// left navigation arrow when navigation disabled
+	let rightArrowDiv;									// container for right arrow
+	let rightArrow;										// right navigation arrow
+	let rightArrowDisabled;								// right navigation arrow when navigation disabled
 	
 	this.render = function(callback) {
 		
 		// swipe div
-		var scrollDiv = $("<div class='swipe_div'>").appendTo(contentDiv);
+		let scrollDiv = $("<div class='swipe_div'>").appendTo(contentDiv);
 		
 		// left arrow
-		var leftArrowDiv = $("<div class='arrow_div'>").appendTo(scrollDiv);
-		leftArrow = $("<img id='left_arrow' class='nav_arrow' src='img/closed_arrow.png'>");
+		let leftDiv = $("<div class='side_div'>").appendTo(scrollDiv);
+		leftArrowDiv = $("<div>").appendTo(leftDiv);
+		leftArrowDiv.hide();
+		leftArrow = $("<img class='nav_arrow left_arrow' src='img/closed_arrow.png'>").appendTo(leftArrowDiv);
 		leftArrow.click(function() { pathTracker.prev(); });
-		leftArrow.hide();
-		leftArrow.appendTo(leftArrowDiv);
+		leftArrowDisabled = $("<img class='nav_arrow_disabled left_arrow' src='img/closed_arrow_grey.png'>");
 		
 		// page div
 		pageDiv = $("<div class='page_div'>").appendTo(scrollDiv);
 		
 		// right arrow
-		var rightArrowDiv = $("<div class='arrow_div'>").appendTo(scrollDiv);
-		rightArrow = $("<img id='right_arrow' class='nav_arrow' src='img/closed_arrow.png'>");
+		let rightDiv = $("<div class='side_div'>").appendTo(scrollDiv);
+		rightArrowDiv = $("<div>").appendTo(rightDiv);
+		rightArrowDiv.hide();
+		rightArrow = $("<img class='nav_arrow right_arrow' src='img/closed_arrow.png'>").appendTo(rightArrowDiv);
 		rightArrow.click(function() { pathTracker.next(); });
-		rightArrow.hide();
-		rightArrowDiv.append(rightArrow);
+		rightArrowDisabled = $("<img class='nav_arrow_disabled right_arrow' src='img/closed_arrow_grey.png'>");
 		
 		// done rendering
 		callback();
@@ -187,6 +193,15 @@ function PageManager(contentDiv) {
 	
 	this.getPathTracker = function() {
 		return pathTracker;
+	}
+	
+	this.setNavigable = function(enabled) {
+		leftArrow.detach();
+		leftArrowDisabled.detach();
+		rightArrow.detach();
+		rightArrowDisabled.detach();
+		leftArrowDiv.append(enabled ? leftArrow : leftArrowDisabled);
+		rightArrowDiv.append(enabled ? rightArrow : rightArrowDisabled);
 	}
 	
 	/**
@@ -224,8 +239,8 @@ function PageManager(contentDiv) {
 		}
 		
 		// update arrows	
-		pathTracker.hasPrev() ? leftArrow.show() : leftArrow.hide();
-		pathTracker.hasNext() ? rightArrow.show() : rightArrow.hide();
+		pathTracker.hasPrev() ? leftArrowDiv.show() : leftArrowDiv.hide();
+		pathTracker.hasNext() ? rightArrowDiv.show() : rightArrowDiv.hide();
 	}
 }
 inheritsFrom(PageManager, DivController);
@@ -782,9 +797,11 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		var btnGenerate = UiUtils.getNextButton("Generate storage");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
+			state.pageManager.setNavigable(false);
 			generatePieces(function(pieces, pieceDivs) {
 				onPiecesGenerated(pieces, pieceDivs);
 				btnGenerate.removeAttr("disabled");
+				state.pageManager.setNavigable(true);
 			});
 		});
 		div.append(btnGenerate);
@@ -1070,22 +1087,34 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 		
 		// add decrypt button
 		let btnDecrypt = UiUtils.getButton("Decrypt").appendTo(div);
-		btnDecrypt.click(onDecrypt);
+		btnDecrypt.click(function() {
+			setErrorMessage("");
+			btnDecrypt.attr("disabled", "disabled");
+			state.pageManager.setNavigable(false);
+			onDecrypt(function(err, pieces, htmls) {
+				state.pageManager.setNavigable(true);
+				if (err) {
+					setErrorMessage(err.message);
+					passwordInput.focus();
+					btnDecrypt.removeAttr("disabled");
+					progressDiv.hide();
+				} else {
+					onPiecesGenerated(pieces, htmls);
+				}
+			});
+		});
 		
 		// add progress bar
 		progressDiv = $("<div>").appendTo(div);
 		progressDiv.hide();
 		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
 		
-		function onDecrypt() {
-			setErrorMessage("");
-			btnDecrypt.attr("disabled", "disabled");
+		function onDecrypt(onDone) {
 			
 			// get passwords
 			var password = passwordInput.val();
 			if (password === "") {
-				setErrorMessage("Password must not be blank");
-				btnDecrypt.removeAttr("disabled");
+				onDone(new Error("Password must not be blank"));
 				return;
 			}
 			
@@ -1103,12 +1132,9 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 			let progressWeight = 0;
 			setProgress(progressWeight, totalWeight, "Decrypting");
 			async.series(funcs, function(err, result) {
-				if (err) {
-					setErrorMessage(err.message);
-					passwordInput.focus();
-					btnDecrypt.removeAttr("disabled");
-					progressDiv.hide();
-				} else {
+				state.pageManager.setNavigable(true);
+				if (err) onDone(err);
+				else {
 					// convert keys to a decrypted piece
 					let pieces = CryptoUtils.keysToPieces(keys);
 					assertEquals(1, pieces.length);
@@ -1116,19 +1142,19 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 					// render piece
 					setProgress(progressWeight, totalWeight, "Rendering");
 					renderPieceHtmls(pieces, function(err, htmls) {
-						if (err) throw err;
+						if (err) onDone(err);
 						assertEquals(pieces.length, htmls.length);
 						setProgress(1, 1, "Complete");
-						onPiecesGenerated(pieces, htmls);
+						onDone(null, pieces, htmls);
 					});
 				}
 			});
 			
 			function setProgress(done, total, label) {
 				//console.log("setProgress(" + label + ", " + done + ", " + total + " (" + Math.round(done / total * 100) + "%)");
-				progressDiv.show();
 				progressBar.set(done / total);
 				if (label) progressBar.setText(label);
+				progressDiv.show();
 			}
 			
 			function decryptFunc(key, password) {
@@ -1208,7 +1234,10 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		// add button to import from text
 		div.append("<br><br>");
 		var btnImportText = UiUtils.getNextButton("Import private key from text instead").appendTo(div);
-		btnImportText.click(onSelectImportText);
+		btnImportText.click(function() {
+			removePieces();
+			onSelectImportText();
+		});
 		
 		// handle on files imported
 		function onFilesImported(files) {
@@ -1259,6 +1288,12 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		for (let namedPiece of namedPieces) {
 			if (!isPieceImported(namedPiece.name)) importedPieces.push(namedPiece);
 		}
+		updatePieces();
+	}
+	
+	function removePieces() {
+		importedPieces = [];
+		lastKeys = undefined;
 		updatePieces();
 	}
 	

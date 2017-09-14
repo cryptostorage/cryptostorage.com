@@ -1,5 +1,4 @@
 // TODO
-// navigation issues while generating, importing, etc
 // placeholders for faq and donations
 // redesign pieces download page
 // redesign html export

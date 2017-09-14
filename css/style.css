@@ -42,7 +42,7 @@ body {
 	overflow:hidden;
 }
 
-.nav_arrow {
+.nav_arrow, .nav_arrow_disabled {
 	width:50px;
 	height:50px;
 }
@@ -51,19 +51,19 @@ body {
 	cursor: pointer;
 }
 
-#left_arrow {
+.left_arrow {
 	-ms-transform: rotate(180deg); /* IE 9 */
     -webkit-transform: rotate(180deg); /* Chrome, Safari, Opera */
     transform: rotate(180deg);
 }
 
-#right_arrow {
+.right_arrow {
 	-ms-transform: rotate(0deg); /* IE 9 */
     -webkit-transform: rotate(0deg); /* Chrome, Safari, Opera */
     transform: rotate(0deg);
 }
 
-.arrow_div {
+.side_div {
 	display:flex;
     width:80px;
     align-items:center;
