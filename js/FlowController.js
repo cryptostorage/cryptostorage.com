@@ -9,7 +9,6 @@
 // de-minify aes.java
 // todos throughout code
 // run minimum tests when site accessed
-// use SecureRandom() with seeded time, mouse movement, etc (bitaddress.org) (?)
 // better mix logo
 // test alert if key creation fails for any reason
 // verify no name collisions
