@@ -164,6 +164,7 @@ function FlowController(pageManager, plugins) {
 	
 	function onSelectImportText() {
 		if (DEBUG) console.log("onSelectImportText()");
+		delete state.pieceDivs;
 		pageManager.next(new SelectCryptoController($("<div>"), state, onSelectCryptoImport));
 	}
 	
