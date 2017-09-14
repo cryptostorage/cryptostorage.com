@@ -1,6 +1,5 @@
 // TODO
 // navigation issues while generating, importing, etc
-// num addresses page common code
 // placeholders for faq and donations
 // redesign pieces download page
 // redesign html export
