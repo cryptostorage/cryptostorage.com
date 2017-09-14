@@ -1732,3 +1732,54 @@ function FaqController(div) {
 	}
 }
 inheritsFrom(FaqController, DivController);
+
+/**
+* Controls entire application.
+* 
+* @param div is the div to render to
+*/
+function ApplicationController(div) {
+	DivController.call(this, div);
+	
+	let contentDiv;
+	let contentManager;
+	
+	this.render = function(onDone) {
+		
+		// render header
+		let header = $("<div>").appendTo(div);
+		
+		// render content
+		content = $("<div>").appendTo(div);
+		
+		// render footer
+		let footer = $("<div>").appendTo(div);
+		
+		// done rendering
+		callback(div);
+	}
+	
+	function renderHome(onDone) {
+		
+	}
+	
+	function renderFaq(onDone) {
+		pageManager.
+	}
+	
+	function renderDonate(onDone) {
+		
+	}
+}
+inheritsFrom(ApplicationController, DivController);
+
+/**
+ * Controls key generation and recovery.
+ */
+function CryptoController(div) {
+	
+	this.render = function(onDone) {
+		
+	}
+}
+inheritsFrom(CryptoController, DivController);
