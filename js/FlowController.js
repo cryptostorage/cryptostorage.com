@@ -21,6 +21,7 @@
 // focus on first text element if applicable
 // live site warning to stop and download from github
 // condense javascript to single file for production
+// sanity check key formats
 
 // peer review encodings
 // consult designers
