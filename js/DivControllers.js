@@ -1432,6 +1432,35 @@ function ExportPiecesController(div, state) {
 		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(configDiv);
 		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(configDiv);
 		splitCheckboxLabel.html("Split private keys into pieces");
+		splitCheckbox.change(function() {
+			if (this.checked) {
+				numPiecesDiv.removeAttr("disabled");
+				numPiecesInput.removeAttr("disabled");
+				minPiecesDiv.removeAttr("disabled");
+				minPiecesInput.removeAttr("disabled");
+			} else {
+				numPiecesDiv.attr("disabled", "disabled");
+				numPiecesInput.attr("disabled", "disabled");
+				minPiecesDiv.attr("disabled", "disabled");
+				minPiecesInput.attr("disabled", "disabled");
+			}
+		})
+		
+		// number of pieces input
+		let numPiecesDiv = $("<div>").appendTo(configDiv);
+		numPiecesDiv.append("Number of pieces:");
+		let numPiecesInput = $("<input type='number'>").appendTo(numPiecesDiv);
+		numPiecesInput.attr("class", "num_input");
+		numPiecesInput.attr("value", 3);
+		numPiecesInput.attr("min", 2);
+		
+		// minimum pieces input
+		let minPiecesDiv = $("<div>").appendTo(configDiv);
+		minPiecesDiv.append("Minimum number of pieces to restore:");
+		let minPiecesInput = $("<input type='number'>").appendTo(minPiecesDiv);
+		minPiecesInput.attr("class", "num_input");
+		minPiecesInput.attr("value", 2);
+		minPiecesInput.attr("min", 2);
 		
 		// done rendering
 		onDone(div);
