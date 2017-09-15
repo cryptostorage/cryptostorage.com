@@ -45,7 +45,7 @@ $(document).ready(function() {
 		});
 	}
 	
-	// start the application
+	// render application to html body
 	new ApplicationController($("body")).render();
 });
 
@@ -72,19 +72,14 @@ function ApplicationController(div) {
 		
 		// footer		
 		let footerDiv = $("<div id='footer'>").appendTo(div);
-		
 		let homeLink = getLink("Home");
 		homeLink.click(function() { that.showHome(); });
-		
 		let faqLink = getLink("FAQ");
 		faqLink.click(function() { that.showFaq(); });
-		
 		let gitHubLink = $("<a href='https://github.com/cryptostorage/cryptostorage.com'>");
 		gitHubLink.html("GitHub");
-		
 		let donateLink = getLink("Donate");
 		donateLink.click(function() { that.showDonate(); });
-		
 		footerDiv.append(homeLink);
 		footerDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		footerDiv.append(faqLink);
@@ -93,7 +88,7 @@ function ApplicationController(div) {
 		footerDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		footerDiv.append(donateLink);
 		
-		// start on home
+		// render body and start on home
 		pageController = new PageController(bodyDiv);
 		pageController.render(function() {
 			that.showHome();
