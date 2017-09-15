@@ -400,7 +400,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 						let numKeysInt = parseFloat(numKeys);
 						validateNumKeys(state.plugins[i].getName(), numKeysInt);
 						sum += numKeys;
-						numKeysInts.push(numKeys);
+						numKeysInts.push(numKeysInt);
 					} else {
 						numKeysInts.push(0);
 					}
