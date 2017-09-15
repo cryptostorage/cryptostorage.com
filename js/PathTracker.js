@@ -5,8 +5,8 @@
  */
 function PathTracker(onUpdate) {
 	
-	var items = [];	// tracks items
-	var idx = -1;	// tracks current index
+	let items = [];	// tracks items
+	let idx = -1;	// tracks current index
 
 	/**
 	 * Moves to the next item.  Sets the next item to the given item if not null.
@@ -61,6 +61,13 @@ function PathTracker(onUpdate) {
 		return items[idx];
 	}
 	
+//	this.set = function(item) {
+//		items = [];
+//		idx = -1;
+//		this.next(item);
+//		onUpdate()
+//	}
+	
 	this.hasNext = function() {
 		return idx < items.length - 1;
 	}
@@ -85,5 +92,10 @@ function PathTracker(onUpdate) {
 		if (!this.hasNext()) return;
 		items = items.slice(0, idx + 1);
 		onUpdate(idx, idx, items[idx]);
+	}
+	
+	this.clear = function() {
+		items = [];
+		idx = -1;
 	}
 }

@@ -139,9 +139,11 @@ DivController.prototype.onShow = function() { }
 DivController.prototype.onHide = function() { }
 
 /**
- * Manages page navigation and rendering.
+ * Controls page navigation and rendering.
+ * 
+ * @param div is the div to render navigable pages to
  */
-function PageManager(contentDiv) {
+function PageController(div) {
 	
 	let pathTracker = new PathTracker(onPageChange);	// track path through decision tree
 	let pageDiv;										// container to render page content
@@ -156,7 +158,7 @@ function PageManager(contentDiv) {
 	this.render = function(callback) {
 		
 		// swipe div
-		let scrollDiv = $("<div class='swipe_div'>").appendTo(contentDiv);
+		let scrollDiv = $("<div class='swipe_div'>").appendTo(div);
 		
 		// left arrow
 		let leftDiv = $("<div class='side_div'>").appendTo(scrollDiv);
@@ -179,6 +181,16 @@ function PageManager(contentDiv) {
 		
 		// done rendering
 		callback();
+	}
+	
+	this.set = function(renderer) {
+		transitioning = false;
+		renderer.render(function(div) {
+			pathTracker.clear();
+			pathTracker.next(renderer);
+		});
+		leftArrowDiv.hide();
+		rightArrowDiv.hide();
 	}
 	
 	this.next = function(renderer) {
@@ -243,7 +255,7 @@ function PageManager(contentDiv) {
 		pathTracker.hasNext() ? rightArrowDiv.show() : rightArrowDiv.hide();
 	}
 }
-inheritsFrom(PageManager, DivController);
+inheritsFrom(PageController, DivController);
 
 /**
  * Render home page.
@@ -453,7 +465,7 @@ function NumKeysController(div, state, onNumKeysInput) {
 		numKeysInput.attr("value", 10);
 		div.append(numKeysInput);
 		div.append("<br><br>");
-		numKeysInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
+		numKeysInput.keypress(function() { state.pageController.getPathTracker().clearNexts(); });
 		
 		// error message
 		errorDiv.attr("class", "error_msg");
@@ -547,7 +559,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		passwordInput.attr("class", "text_input");
 		div.append(passwordInput);
 		div.append("<br><br>");
-		passwordInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
+		passwordInput.keypress(function() { state.pageController.getPathTracker().clearNexts(); });
 		
 		// render advanced link
 		let advancedLink = $("<div class='mock_link'>").appendTo(div);
@@ -711,7 +723,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		numPiecesInput.attr("min", 2);
 		div.append(numPiecesInput);
 		div.append("<br><br>");
-		numPiecesInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
+		numPiecesInput.keypress(function() { state.pageController.getPathTracker().clearNexts(); });
 		
 		div.append("Number of pieces necessary to restore private keys: ");
 		var minPiecesInput = $("<input type='number'>");
@@ -720,7 +732,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		minPiecesInput.attr("value", 2);
 		div.append(minPiecesInput);
 		div.append("<br><br>");
-		minPiecesInput.keypress(function() { state.pageManager.getPathTracker().clearNexts(); });
+		minPiecesInput.keypress(function() { state.pageController.getPathTracker().clearNexts(); });
 		
 		// error message
 		errorDiv.empty();
@@ -797,11 +809,11 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		var btnGenerate = UiUtils.getNextButton("Generate storage");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
-			state.pageManager.setNavigable(false);
+			state.pageController.setNavigable(false);
 			generatePieces(function(pieces, pieceDivs) {
 				onPiecesGenerated(pieces, pieceDivs);
 				btnGenerate.removeAttr("disabled");
-				state.pageManager.setNavigable(true);
+				state.pageController.setNavigable(true);
 			});
 		});
 		div.append(btnGenerate);
@@ -1090,9 +1102,9 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 		btnDecrypt.click(function() {
 			setErrorMessage("");
 			btnDecrypt.attr("disabled", "disabled");
-			state.pageManager.setNavigable(false);
+			state.pageController.setNavigable(false);
 			onDecrypt(function(err, pieces, htmls) {
-				state.pageManager.setNavigable(true);
+				state.pageController.setNavigable(true);
 				if (err) {
 					setErrorMessage(err.message);
 					passwordInput.focus();
@@ -1132,7 +1144,7 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 			let progressWeight = 0;
 			setProgress(progressWeight, totalWeight, "Decrypting");
 			async.series(funcs, function(err, result) {
-				state.pageManager.setNavigable(true);
+				state.pageController.setNavigable(true);
 				if (err) onDone(err);
 				else {
 					// convert keys to a decrypted piece
@@ -1732,54 +1744,3 @@ function FaqController(div) {
 	}
 }
 inheritsFrom(FaqController, DivController);
-
-/**
-* Controls entire application.
-* 
-* @param div is the div to render to
-*/
-function ApplicationController(div) {
-	DivController.call(this, div);
-	
-	let contentDiv;
-	let contentManager;
-	
-	this.render = function(onDone) {
-		
-		// render header
-		let header = $("<div>").appendTo(div);
-		
-		// render content
-		content = $("<div>").appendTo(div);
-		
-		// render footer
-		let footer = $("<div>").appendTo(div);
-		
-		// done rendering
-		callback(div);
-	}
-	
-	function renderHome(onDone) {
-		
-	}
-	
-	function renderFaq(onDone) {
-		pageManager.
-	}
-	
-	function renderDonate(onDone) {
-		
-	}
-}
-inheritsFrom(ApplicationController, DivController);
-
-/**
- * Controls key generation and recovery.
- */
-function CryptoController(div) {
-	
-	this.render = function(onDone) {
-		
-	}
-}
-inheritsFrom(CryptoController, DivController);
