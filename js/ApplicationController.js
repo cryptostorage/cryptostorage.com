@@ -23,6 +23,7 @@
 // consult designers
 // faq page
 // donation page
+// condense files to single files as much as possible
 
 const RUN_TESTS = false;
 const DEBUG = true;
