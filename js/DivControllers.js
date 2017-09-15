@@ -395,10 +395,16 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 			let numKeysInts = [];
 			for (let i = 0; i < state.plugins.length; i++) {
 				try {
-					let numKeys = parseFloat(numKeysInputs[i].val());
-					validateNumKeys(state.plugins[i].getName(), numKeys);
-					sum += numKeys;
-					numKeysInts.push(numKeys);
+					let numKeys = numKeysInputs[i].val();
+					if (numKeys) {
+						let numKeysInt = parseFloat(numKeys);
+						validateNumKeys(state.plugins[i].getName(), numKeysInt);
+						sum += numKeys;
+						numKeysInts.push(numKeys);
+					} else {
+						numKeysInts.push(0);
+					}
+
 				} catch (err) {
 					setErrorMessage(err.message);
 					error = true;

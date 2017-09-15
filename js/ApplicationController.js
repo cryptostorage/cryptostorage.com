@@ -24,6 +24,7 @@
 // faq page
 // donation page
 // condense files to single files as much as possible
+// disable next if mix num keys change
 
 const RUN_TESTS = false;
 const DEBUG = true;
