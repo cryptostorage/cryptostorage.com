@@ -63,15 +63,15 @@ function ApplicationController(div) {
 	this.render = function() {
 		
 		// header
-		let headerDiv = $("<div id='header'>").appendTo(div);
+		let headerDiv = $("<div class='header'>").appendTo(div);
 		let logoLink = $("<a href='index.html'>").appendTo(headerDiv);
 		$("<img width=500px height=500px src='img/cryptostorage.png'>").appendTo(logoLink);
 		
 		// body
-		let bodyDiv = $("<div id='content'>").appendTo(div);
+		let bodyDiv = $("<div class='content'>").appendTo(div);
 		
 		// footer		
-		let footerDiv = $("<div id='footer'>").appendTo(div);
+		let footerDiv = $("<div class='footer'>").appendTo(div);
 		let homeLink = getLink("Home");
 		homeLink.click(function() { that.showHome(); });
 		let faqLink = getLink("FAQ");

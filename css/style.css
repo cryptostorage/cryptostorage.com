@@ -11,7 +11,7 @@ body {
 	overflow:hidden;
 }
 
-#header {
+.header {
 	height:115px;
 	flex:none;
 	display:flex;
@@ -19,13 +19,13 @@ body {
 	justify-content:center;
 }
 
-#content {
+.content {
 	flex:1;
 	display:flex;
 	overflow:hidden;
 }
 
-#footer {
+.footer {
 	height:75px;
 	flex:none;
 	margin-top:auto;
