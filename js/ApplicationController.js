@@ -78,13 +78,13 @@ function ApplicationController(div) {
 		
 		// footer		
 		let footerDiv = $("<div class='footer'>").appendTo(div);
-		let homeLink = getLink("Home");
+		let homeLink = getLink("#", "Home");
 		homeLink.click(function() { that.showHome(); });
-		let faqLink = getLink("FAQ");
+		let faqLink = getLink("#faq", "FAQ");
 		faqLink.click(function() { that.showFaq(); });
 		let gitHubLink = $("<a href='https://github.com/cryptostorage/cryptostorage.com'>");
 		gitHubLink.html("GitHub");
-		let donateLink = getLink("Donate");
+		let donateLink = getLink("#donate", "Donate");
 		donateLink.click(function() { that.showDonate(); });
 		footerDiv.append(homeLink);
 		footerDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
@@ -97,11 +97,22 @@ function ApplicationController(div) {
 		// render body and start on home
 		pageController = new PageController(bodyDiv);
 		pageController.render(function() {
-			that.showHome();
+			
+			// get identifier
+			let href = window.location.href;
+			let lastIdx = href.lastIndexOf("#");
+			let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+			console.log(identifier);
+			
+			// show page based on identifier
+			if (identifier === "faq") that.showFaq();
+			else if (identifier === "donate") that.showDonate();
+			else that.showHome();
 		});
 		
-		function getLink(label) {
-			let link = $("<a href='#'>");
+		function getLink(href, label) {
+			if (!href) href = '';
+			let link = $("<a href='" + href + "'>");
 			link.html(label);
 			return link;
 		}
