@@ -191,14 +191,14 @@ function ApplicationController(div) {
 		pageController.next(new GenerateKeysController($("<div>"), state, onKeysGenerated));
 	}
 	
-	function onKeysGenerated(keys, piece, pieceDiv) {
+	function onKeysGenerated(keys, pieces, pieceDivs) {
 		if (DEBUG) console.log("onKeysGenerated(" + keys.length + ")");
 		assertTrue(keys.length > 0);
-		assertInitialized(piece);
-		assertInitialized(pieceDiv);
+		assertEquals(1, pieces.length);
+		assertEquals(1, pieceDivs.length);
 		state.keys = keys;
-		state.pieces = [piece];
-		state.pieceDivs = [pieceDiv];
+		state.pieces = pieces;
+		state.pieceDivs = pieceDivs;
 		pageController.next(new ExportPiecesController($("<div>"), state, onCustomExport));
 	}
 	

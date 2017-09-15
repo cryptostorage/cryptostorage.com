@@ -790,7 +790,7 @@ inheritsFrom(NumPiecesInputController, DivController);
  * 
  * @param div is the div to render to
  * @param state contains the configuration to generate
- * @param onKeysGenerated(keys, piece, pieceDiv) is invoked after generation
+ * @param onKeysGenerated(keys, pieces, pieceDivs) is invoked after generation
  */
 function GenerateKeysController(div, state, onKeysGenerated) {
 	DivController.call(this, div);
@@ -816,10 +816,10 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
 			state.pageController.setNavigable(false);
-			generateKeys(function(keys, piece, pieceDiv) {
+			generateKeys(function(keys, pieces, pieceDivs) {
 				btnGenerate.removeAttr("disabled");
 				state.pageController.setNavigable(true);
-				onKeysGenerated(keys, piece, pieceDiv);
+				onKeysGenerated(keys, pieces, pieceDivs);
 			});
 		});
 		div.append(btnGenerate);
@@ -901,7 +901,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 						if (err) throw err;
 						assertEquals(pieces.length, pieceDivs.length);
 						setProgress(1, 1, "Complete");
-						onKeysGenerated(keys, pieces[0], pieceDivs[0]);
+						onKeysGenerated(keys, pieces, pieceDivs);
 					});
 				}
 				
@@ -946,7 +946,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 								if (err) throw err;
 								assertEquals(pieces.length, pieceDivs.length);
 								setProgress(1, 1, "Complete");
-								onKeysGenerated(pieces, pieceDivs);
+								onKeysGenerated(encryptedKeys, pieces, pieceDivs);
 							})
 						});
 					});
@@ -1418,8 +1418,6 @@ function ExportPiecesController(div, state) {
 	
 	// export options
 	let splitCheckbox;
-	let numPiecesInput;
-	let minPiecesInput;
 	
 	this.render = function(onDone) {
 		UiUtils.pageSetup(div);
@@ -1432,7 +1430,7 @@ function ExportPiecesController(div, state) {
 		
 		// render split checkbox
 		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(configDiv);
-		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitCheckbox);
+		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(configDiv);
 		splitCheckboxLabel.html("Split private keys into pieces");
 		
 		// done rendering
