@@ -225,7 +225,6 @@ function PageController(div) {
 	 * @param renderer the page renderer for the page
 	 */
 	function onPageChange(lastIdx, curIdx, renderer) {
-		if (DEBUG) console.log("onPageMove(" + lastIdx + ", " + curIdx + ")");
 		
 		// handle first page
 		if (lastIdx === -1) {
