@@ -786,13 +786,13 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 inheritsFrom(NumPiecesInputController, DivController);
 
 /**
- * Summarize configuration and generate pieces.
+ * Summarize and generate keys, piece, and piece HTML.
  * 
  * @param div is the div to render to
- * @param state is the current state of the application
- * @param onPiecesGenerated(pieces, piecesHtml) is invoked when the pieces are created
+ * @param state contains the configuration to generate
+ * @param onKeysGenerated(keys, piece, pieceDiv) is invoked after generation
  */
-function GeneratePiecesController(div, state, onPiecesGenerated) {
+function GenerateKeysController(div, state, onKeysGenerated) {
 	DivController.call(this, div);
 	
 	let progressDiv;
@@ -809,11 +809,6 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		for (let elem of state.mix) {
 			div.append(elem.numKeys + " " + elem.plugin.getName() + " keys" + (elem.encryption ? " encrypted with " + elem.encryption : " unencrypted") + "<br>");
 		}
-		if (state.splitEnabled) {
-			div.append("Split private keys into " + state.numPieces + " pieces with a minimum of " + state.minPieces + " to restore")
-		} else {
-			div.append("Private keys will not be split")
-		}
 		div.append("<br><br>");
 		
 		// render generate button
@@ -821,10 +816,10 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
 			state.pageController.setNavigable(false);
-			generatePieces(function(pieces, pieceDivs) {
-				onPiecesGenerated(pieces, pieceDivs);
+			generateKeys(function(keys, piece, pieceDiv) {
 				btnGenerate.removeAttr("disabled");
 				state.pageController.setNavigable(true);
+				onKeysGenerated(keys, piece, pieceDiv);
 			});
 		});
 		div.append(btnGenerate);
@@ -838,7 +833,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		callback(div);
 	}
 	
-	function generatePieces(onPiecesGenerated) {
+	function generateKeys(onKeysGenerated) {
 		
 		// load dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
@@ -855,7 +850,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
 				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + Weights.getDecryptWeight(elem.encryption));
 			}
-			let piecesRendererWeight = IndustrialPiecesRenderer.getWeight(numKeys, state.numPieces, null);
+			let piecesRendererWeight = IndustrialPiecesRenderer.getWeight(numKeys, 1, null);
 			totalWeight += piecesRendererWeight;
 			
 			// collect key creation functions
@@ -891,7 +886,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 				if (!funcs.length) {
 					
 					// convert keys to pieces
-					let pieces = CryptoUtils.keysToPieces(originals, state.numPieces, state.minPieces);
+					let pieces = CryptoUtils.keysToPieces(originals);
 					
 					// validate pieces can recreate originals
 					let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
@@ -906,7 +901,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 						if (err) throw err;
 						assertEquals(pieces.length, pieceDivs.length);
 						setProgress(1, 1, "Complete");
-						onPiecesGenerated(pieces, pieceDivs);
+						onKeysGenerated(keys, pieces[0], pieceDivs[0]);
 					});
 				}
 				
@@ -919,10 +914,14 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 						if (err) throw err;
 						
 						// convert keys to pieces
-						let pieces = CryptoUtils.keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
+						let pieces = CryptoUtils.keysToPieces(encryptedKeys);
 						
 						// validate pieces can recreate originals
 						let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
+						assertEquals(encryptedKeys.length, keysFromPieces.length);
+						for (let i = 0; i < encryptedKeys.length; i++) {
+							assertTrue(encryptedKeys[i].equals(keysFromPieces[i]));
+						}
 						
 						// collect decryption functions
 						funcs = [];
@@ -947,7 +946,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 								if (err) throw err;
 								assertEquals(pieces.length, pieceDivs.length);
 								setProgress(1, 1, "Complete");
-								onPiecesGenerated(pieces, pieceDivs);
+								onKeysGenerated(pieces, pieceDivs);
 							})
 						});
 					});
@@ -1001,7 +1000,7 @@ function GeneratePiecesController(div, state, onPiecesGenerated) {
 		});
 	}
 }
-inheritsFrom(GeneratePiecesController, DivController);
+inheritsFrom(GenerateKeysController, DivController);
 
 /**
  * Render page to import private components from text.
@@ -1405,6 +1404,42 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 	setErrorMessage("");
 }
 inheritsFrom(ImportFilesController, DivController);
+
+/**
+ * Page to view and export pieces.
+ * 
+ * @param div is the div to render to
+ * @param state is the current application state to render
+ */
+function ExportPiecesController(div, state) {
+	DivController.call(this, div);
+	assertTrue(state.keys.length > 0);
+	assertTrue(state.pieces.length > 0);
+	
+	// export options
+	let splitCheckbox;
+	let numPiecesInput;
+	let minPiecesInput;
+	
+	this.render = function(onDone) {
+		UiUtils.pageSetup(div);
+		
+		// render title
+		div.append(UiUtils.getPageHeader("Your storage is ready to save.", UiUtils.getCryptoLogo(state)));
+		
+		// render export options
+		let configDiv = $("<div>").appendTo(div);
+		
+		// render split checkbox
+		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(configDiv);
+		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitCheckbox);
+		splitCheckboxLabel.html("Split private keys into pieces");
+		
+		// done rendering
+		onDone(div);
+	}
+}
+inheritsFrom(ExportPiecesController, DivController);
 
 /**
  * Renders pieces for customization and export.

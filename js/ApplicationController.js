@@ -182,42 +182,24 @@ function ApplicationController(div) {
 		if (passwordEnabled) pageController.next(new PasswordInputController($("<div>"), state, onPasswordInput));
 		else {
 			for (let elem of state.mix) elem.encryption = null;
-			pageController.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
+			pageController.next(new GenerateKeysController($("<div>"), state, onKeysGenerated));
 		}
 	}
 
 	function onPasswordInput() {
 		if (DEBUG) console.log("onPasswordInput()");
-		pageController.next(new SplitSelectionController($("<div>"), state, onSplitSelection));
+		pageController.next(new GenerateKeysController($("<div>"), state, onKeysGenerated));
 	}
 	
-	function onSplitSelection(splitEnabled) {
-		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
-		state.splitEnabled = splitEnabled;
-		if (splitEnabled) pageController.next(new NumPiecesInputController($("<div>"), state, onSplitInput));
-		else {
-			state.numPieces = 1;
-			delete state.minPieces;
-			pageController.next(new GeneratePiecesController($("<div>"), state, onPiecesGenerated));
-		}
-	}
-	
-	function onSplitInput(numPieces, minPieces) {
-		if (DEBUG) console.log("onSplitInput(" + numPieces + ", " + minPieces + ")");
-		assertInt(numPieces);
-		assertInt(minPieces);
-		state.numPieces = numPieces;
-		state.minPieces = minPieces;
-		pageController.next(new GeneratePiecesController($("<div>"), state, onPiecesGenerated));
-	}
-	
-	function onPiecesGenerated(pieces, pieceDivs) {
-		if (DEBUG) console.log("onPiecesGenerated(" + pieces.length + ")");
-		assertTrue(pieces.length > 0);
-		assertEquals(pieces.length, pieceDivs.length);
-		state.pieces = pieces;
-		state.pieceDivs = pieceDivs;
-		pageController.next(new RenderPiecesController($("<div>"), state, onCustomExport));
+	function onKeysGenerated(keys, piece, pieceDiv) {
+		if (DEBUG) console.log("onKeysGenerated(" + keys.length + ")");
+		assertTrue(keys.length > 0);
+		assertInitialized(piece);
+		assertInitialized(pieceDiv);
+		state.keys = keys;
+		state.pieces = [piece];
+		state.pieceDivs = [pieceDiv];
+		pageController.next(new ExportPiecesController($("<div>"), state, onCustomExport));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------
@@ -257,6 +239,6 @@ function ApplicationController(div) {
 	function onCustomExport(pieces) {
 		if (DEBUG) console.log("onCustomExport(" + pieces.length + ")");
 		assertTrue(pieces.length > 0);
-		pageController.next(new CustomExportController($("<div>"), state, pieces));
+		pageController.next(new ExportPiecesController($("<div>"), state));
 	}
 }
