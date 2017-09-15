@@ -61,13 +61,6 @@ function PathTracker(onUpdate) {
 		return items[idx];
 	}
 	
-//	this.set = function(item) {
-//		items = [];
-//		idx = -1;
-//		this.next(item);
-//		onUpdate()
-//	}
-	
 	this.hasNext = function() {
 		return idx < items.length - 1;
 	}

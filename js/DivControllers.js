@@ -186,6 +186,7 @@ function PageController(div) {
 	this.set = function(renderer) {
 		transitioning = false;
 		renderer.render(function(div) {
+			for (let renderer of pathTracker.getItems()) renderer.getDiv().remove();
 			pathTracker.clear();
 			pathTracker.next(renderer);
 		});
@@ -1722,8 +1723,8 @@ let IndustrialPiecesRenderer = {
 }
 
 /**
-* FAQ page
-*/
+ * FAQ page.
+ */
 function FaqController(div) {
 	DivController.call(this, div);
 	this.render = function(callback) {
@@ -1744,3 +1745,22 @@ function FaqController(div) {
 	}
 }
 inheritsFrom(FaqController, DivController);
+
+/**
+ * Donate page.
+ */
+function DonateController(div) {
+	DivController.call(this, div);
+	this.render = function(callback) {
+		UiUtils.pageSetup(div);
+		
+		// render title
+		div.append(UiUtils.getPageHeader("Donate"));
+		
+		$("<div class='question'>").html("*heart*");
+		
+		// done rendering
+		callback(div);
+	}
+}
+inheritsFrom(DonateController, DivController);
