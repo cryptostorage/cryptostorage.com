@@ -233,7 +233,7 @@ function ApplicationController(div) {
 	
 	function onSelectCryptoImport(tickerSymbol) {
 		if (DEBUG) console.log("onSelectCryptoImport(" + tickerSymbol + ")");
-		for (let plugin of plugins) {
+		for (let plugin of state.plugins) {
 			if (plugin.getTicker() === tickerSymbol) state.plugin = plugin;
 		}
 		if (!state.plugin) throw new Error("plugin not found with ticker symbol: " + tickerSymbol);
