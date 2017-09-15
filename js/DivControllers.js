@@ -269,8 +269,8 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com."));
 		
 		div.append(getCheckmarkDiv("Create storage for multiple cryptocurrencies."));
-		div.append(getCheckmarkDiv("Export to printable QR codes, csv, json, and txt for easy recovery."));
-		div.append(getCheckmarkDiv("Private keys can be password protected and split into separate pieces."));
+		div.append(getCheckmarkDiv("Private keys can be password protected and split into pieces."));
+		div.append(getCheckmarkDiv("Export to physical and digital formats for long term storage and easy recovery."));
 		div.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
 		div.append("<br>");
 		
@@ -353,7 +353,8 @@ inheritsFrom(SelectCryptoController, DivController);
  */
 function MixNumKeysController(div, state, onMixNumKeysInput) {
 	DivController.call(this, div);
-	var errorDiv = $("<div>");
+	let errorDiv = $("<div>");
+	let numKeysInputs;
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -362,7 +363,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 		div.append(UiUtils.getPageHeader("Enter the number of keys to create for each currency.", UiUtils.getMixLogo()));
 		
 		// render num key inputs
-		let numKeysInputs = [];
+		numKeysInputs = [];
 		for (let plugin of state.plugins) {
 			let numKeysDiv = $("<div class='crypto_num_keys_div'>").appendTo(div);
 			let numKeysLogoDiv = $("<div class='crypto_icon_div'>").appendTo(numKeysDiv);
@@ -373,7 +374,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 			numKeysInput.attr("class", "crypto_num_keys_input");
 			numKeysInput.attr("type", "number");
 			numKeysInput.attr("min", 0);
-			numKeysInput.attr("value", 0);
+			numKeysInput.attr("placeholder", 0);
 			numKeysInputs.push(numKeysInput);
 		}
 		
@@ -427,6 +428,10 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 		
 		// done rendering
 		callback(div);
+	}
+	
+	this.onShow = function() {
+		numKeysInputs[0].focus();
 	}
 	
 	function validateNumKeys(name, numKeys) {
