@@ -71,10 +71,11 @@ function ApplicationController(div) {
 		// header
 		let headerDiv = $("<div class='header'>").appendTo(div);
 		let logoLink = $("<a href='index.html'>").appendTo(headerDiv);
-		$("<img width=500px height=500px src='img/cryptostorage.png'>").appendTo(logoLink);
+		$("<img width='500px' height='500px' src='img/cryptostorage.png'>").appendTo(logoLink);
 		
 		// body
 		let bodyDiv = $("<div class='content'>").appendTo(div);
+		pageController = new PageController(bodyDiv);
 		
 		// footer		
 		let footerDiv = $("<div class='footer'>").appendTo(div);
@@ -94,21 +95,23 @@ function ApplicationController(div) {
 		footerDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		footerDiv.append(donateLink);
 		
-		// render body and start on home
-		pageController = new PageController(bodyDiv);
-		pageController.render(function() {
+		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
+		setTimeout(function() {
 			
-			// get identifier
-			let href = window.location.href;
-			let lastIdx = href.lastIndexOf("#");
-			let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
-			console.log(identifier);
-			
-			// show page based on identifier
-			if (identifier === "faq") that.showFaq();
-			else if (identifier === "donate") that.showDonate();
-			else that.showHome();
-		});
+			// render body and start on home
+			pageController.render(function() {
+				
+				// get identifier
+				let href = window.location.href;
+				let lastIdx = href.lastIndexOf("#");
+				let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+				
+				// show page based on identifier
+				if (identifier === "faq") that.showFaq();
+				else if (identifier === "donate") that.showDonate();
+				else that.showHome();
+			});
+		}, 0);
 		
 		function getLink(href, label) {
 			if (!href) href = '';
