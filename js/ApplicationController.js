@@ -1,3 +1,8 @@
+// TODO
+// redesign pieces download page
+// redesign html export
+// password confirmation - re-enter or show
+// register shortcut keys for page navigation (enter, y, n)
 // paste private key doesn't work in iphone safari
 // de-minify aes.java
 // todos throughout code
@@ -14,9 +19,10 @@
 // live site warning to stop and download from github
 // condense javascript to single file for production
 // sanity check key formats
-
 // peer review encodings
 // consult designers
+// faq page
+// donation page
 
 const RUN_TESTS = false;
 const DEBUG = true;
