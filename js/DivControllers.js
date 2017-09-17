@@ -1263,7 +1263,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		
 		// handle on files imported
 		function onFilesImported(files) {
-			for (let file of files) readFile(file);
+			for (let i = 0; i < files.length; i++) readFile(files[0]);
 			function readFile(file) {
 				var reader = new FileReader();
 				reader.onload = function(event) {
