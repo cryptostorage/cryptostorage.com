@@ -17,7 +17,6 @@
 // title bar should not scroll
 // focus on first text element if applicable
 // live site warning to stop and download from github
-// condense javascript to single file for production
 // sanity check key formats
 // peer review encodings
 // consult designers
@@ -26,6 +25,8 @@
 // condense files to single files as much as possible
 // disable next if mix num keys change
 // prevent rendered page from showing after home, FAQ or donate clicked
+// bug on safari on file import
+// flag to verify encryption
 
 const RUN_TESTS = false;
 const DEBUG = true;
