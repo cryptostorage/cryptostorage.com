@@ -1241,7 +1241,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Import zip or json files from cryptostorage.com."));
+		div.append(UiUtils.getPageHeader("Import zip or json files created from this site."));
 		
 		// add error div
 		div.append(errorDiv);
@@ -1420,7 +1420,7 @@ function RenderPiecesController(div, state, onCustomExport) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Download your " + UiUtils.getCryptoName(state) + " storage.", UiUtils.getCryptoLogo(state)));
+		div.append(UiUtils.getPageHeader("Your " + UiUtils.getCryptoName(state) + " storage is ready to save.", UiUtils.getCryptoLogo(state)));
 		
 		// render page if pieceDivs provided
 		if (state.pieceDivs) renderPage(function() { callback(div); });
