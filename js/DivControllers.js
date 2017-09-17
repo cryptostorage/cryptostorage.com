@@ -1783,6 +1783,30 @@ let IndustrialPiecesRenderer = {
 		}
 	},
 	
+	/**
+	 * Renders pieces.
+	 * 
+	 * @param pieces are the pieces to render
+	 * @param config is the configuration to render
+	 * @param onProgress(percent) is invoked as progress is made
+	 * @param onDone(pieceDivs) is invoked with the rendered divs on done
+	 */
+	renderPieces: function(pieces, config, onProgress, onDone) {
+		throw new Error("not implemented");
+	}
+	
+	/**
+	 * Renders a piece.
+	 * 
+	 * @param piece is the piece to render
+	 * @param config is the configuration to render
+	 * @param onProgress(percent) is invoked as progress is made
+	 * @param onDone(pieceDiv) is invoked with the rendered div on done
+	 */
+	renderPiece: function(piece, config, onProgress, onDone) {
+		throw new Error("not implemented");
+	}
+	
 	getNumQrs: function(numKeys, numPieces, config) {
 		config = Object.assign({}, IndustrialPiecesRenderer.defaultConfig, config);
 		return numKeys * numPieces * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
