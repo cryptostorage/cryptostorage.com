@@ -329,7 +329,7 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		
 		// render crypto buttons
 		for (let plugin of state.plugins) {
-			let btn = UiUtils.getNextButton(plugin.getName() + " (" + plugin.getTicker() + ")", plugin.getLogo()).appendTo(div);
+			let btn = UiUtils.getNextButton(plugin.getName(), plugin.getLogo()).appendTo(div);
 			btn.click(function() {
 				
 				// start loading dependencies but don't wait
