@@ -25,7 +25,7 @@
 // condense files to single files as much as possible
 // disable next if mix num keys change
 // prevent rendered page from showing after home, FAQ or donate clicked
-// bug on safari on file import
+// file import zip with invalid json shouldn't prevent others from importing
 // flag to verify encryption
 
 const RUN_TESTS = false;
