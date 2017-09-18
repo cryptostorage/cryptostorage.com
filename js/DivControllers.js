@@ -1508,7 +1508,7 @@ function ExportPiecesController(div, state) {
 		splitConfigDiv.css("margin-left", "20px");
 		
 		// number of pieces input
-		splitConfigDiv.append("Number of pieces:");
+		splitConfigDiv.append("Number of pieces to create:");
 		let numPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
 		numPiecesInput.attr("class", "num_input");
 		numPiecesInput.attr("value", 3);
@@ -1516,7 +1516,7 @@ function ExportPiecesController(div, state) {
 		
 		// minimum pieces input
 		splitConfigDiv.append("<br>");
-		splitConfigDiv.append("Minimum number of pieces to recover storage:");
+		splitConfigDiv.append("Minimum number of pieces needed to recover storage:");
 		let minPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
