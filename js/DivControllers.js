@@ -275,9 +275,9 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com."));
 		
-		div.append(getCheckmarkDiv("Create storage for multiple cryptocurrencies."));
-		div.append(getCheckmarkDiv("Private keys can be password protected and split into pieces."));
-		div.append(getCheckmarkDiv("Export to physical and digital formats for long term storage and easy recovery."));
+		div.append(getCheckmarkDiv("Create long-term storage for multiple cryptocurrencies."));
+		div.append(getCheckmarkDiv("Storage can be password protected and split into pieces."));
+		div.append(getCheckmarkDiv("Export to digital and physical formats which can be recovered at any time."));
 		div.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
 		div.append("<br>");
 		
@@ -325,7 +325,7 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to store."));
+		if (state.mix) div.append(UiUtils.getPageHeader("Select one or more currencies to store."));
 		else div.append(UiUtils.getPageHeader("Select a currency to import."));
 		
 		// render mix and match button if creating new storage
