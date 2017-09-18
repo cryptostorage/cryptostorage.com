@@ -1444,7 +1444,7 @@ function ExportPiecesController(div, state) {
 		configLink.click(function() { toggleConfig(); });
 		function toggleConfig() {
 			configOpen = !configOpen;
-			configLink.text(configOpen ? "\u25be Configure export" : "\u25b8 Configure export");
+			configLink.text(configOpen ? "\u25be Configure export options" : "\u25b8 Configure export options");
 			configOpen ? configDiv.show() : configDiv.hide();
 		}
 		
