@@ -196,7 +196,6 @@ function ApplicationController(div) {
 		assertTrue(keys.length > 0);
 		assertEquals(1, pieces.length);
 		state.keys = keys;
-		console.log(state.keys);
 		state.pieces = pieces;
 		state.pieceDivs = pieceDivs;
 		pageController.next(new SaveController($("<div>"), state, onCustomExport));
