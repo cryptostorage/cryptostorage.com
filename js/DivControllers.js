@@ -1423,7 +1423,7 @@ function ExportPiecesController(div, state) {
 	assertTrue(state.pieceDivs.length > 0);
 	
 	// config elements
-	var includePublicCheckbox;
+	var excludePublicCheckbox;
 	var splitCheckbox;
 	var numPiecesInput;
 	var minPiecesInput;
@@ -1453,7 +1453,7 @@ function ExportPiecesController(div, state) {
 		configLink.click(function() { toggleConfig(); });
 		function toggleConfig() {
 			configOpen = !configOpen;
-			configLink.text(configOpen ? "\u25be Configure export options" : "\u25b8 Configure export options");
+			configLink.text(configOpen ? "\u25be Save options" : "\u25b8 Save options");
 			configOpen ? configDiv.show() : configDiv.hide();
 		}
 		
@@ -1475,8 +1475,8 @@ function ExportPiecesController(div, state) {
 		});
 	}
 	
-	function getIncludePublicAddresses() {
-		return includePublicCheckbox.prop('checked');
+	function getExcludePublicAddresses() {
+		return excludePublicCheckbox.prop('checked');
 	}
 	
 	function getIsSplit() {
@@ -1492,16 +1492,16 @@ function ExportPiecesController(div, state) {
 	}
 	
 	function renderPreview(onProgress, onDone) {
-		previewDiv.empty();
+		console.log("renderPreview()");
 		
 		// read state
-		console.log("Config");
-		console.log(getIncludePublicAddresses());
+		console.log(getExcludePublicAddresses());
 		console.log(getIsSplit());
 		console.log(getNumPieces());
 		console.log(getMinPieces());
 		
 		// add piece selection
+		previewDiv.empty();
 		previewDiv.append("<br>");
 		let pieceSelection = $("<div style='text-align:center;'>").appendTo(previewDiv);
 		for (let i = 0; i < state.pieceDivs.length; i++) {
@@ -1523,40 +1523,46 @@ function ExportPiecesController(div, state) {
 		// placement
 		div.css("margin-left", "18px");
 		
-		// render include public addresses checkbox
-		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(div);
-		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(div);
-		includePublicCheckboxLabel.html(" Include public addresses");
-		includePublicCheckbox.click(function() {
+		let configSpacing = 5;	// space in pixels for each config line
+		
+		// render exclude public addresses checkbox
+		excludePublicDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(div);
+		excludePublicCheckbox = $("<input type='checkbox' id='excludePublicCheckbox'>").appendTo(excludePublicDiv);
+		let excludePublicCheckboxLabel = $("<label for='excludePublicCheckbox'>").appendTo(excludePublicDiv);
+		excludePublicCheckboxLabel.html(" Exclude public addresses");
+		excludePublicCheckbox.click(function() {
 			renderPreview();
 		});
-		includePublicCheckbox.prop('checked', true);
-		
+		excludePublicCheckbox.prop('checked', false);
+				
 		// render split div
-		let splitDiv = $("<div>").appendTo(div);
+		let splitDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(div);
 		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(splitDiv);
 		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.html(" Split storage into separate pieces");
 		splitDiv.append("&nbsp;&nbsp;");
 		
-		// div to hold split config	// TODO each should become its own div
-		let splitConfigDiv = $("<div>").appendTo(splitDiv);
+		// div to hold split config
+		let splitConfigDiv = $("<div>").appendTo(div);
 		splitConfigDiv.css("margin-left", "20px");
 		
 		// number of pieces input
-		splitConfigDiv.append("Number of pieces to create:");
-		numPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
+		let numPiecesDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(splitConfigDiv);
+		numPiecesDiv.append("Number of pieces:");
+		numPiecesInput = $("<input type='number'>").appendTo(numPiecesDiv);
 		numPiecesInput.attr("class", "num_input");
 		numPiecesInput.attr("value", 3);
 		numPiecesInput.attr("min", 2);
+		numPiecesInput.change(function() { renderPreview(); });
 		
 		// minimum pieces input
-		splitConfigDiv.append("<br>");
-		splitConfigDiv.append("Minimum number of pieces needed to recover storage:");
-		minPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
+		let minPiecesDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(splitConfigDiv);
+		minPiecesDiv.append("Minimum number of pieces needed to recover storage:");
+		minPiecesInput = $("<input type='number'>").appendTo(minPiecesDiv);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
 		minPiecesInput.attr("min", 2);
+		minPiecesInput.change(function() { renderPreview(); });
 		
 		// set initial state of split div
 		splitCheckbox.click(function() {

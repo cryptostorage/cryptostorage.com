@@ -312,6 +312,7 @@ input[type='file'] {
 .export_header {
 	display:flex;
 	justify-content:center;
+	padding: 5px;
 }
 
 .export_header_left {
