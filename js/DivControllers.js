@@ -1481,14 +1481,22 @@ function ExportPiecesController(div, state) {
 	function renderConfig(div) {
 		
 		// placement
-		div.append("<br>");
 		div.css("margin-left", "18px");
+		
+		// render include public addresses checkbox
+		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(div);
+		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(div);
+		includePublicCheckboxLabel.html(" Include public addresses");
+		includePublicCheckbox.click(function() {
+			// TODO
+		});
+		includePublicCheckbox.prop('checked', true);
 		
 		// render split div
 		let splitDiv = $("<div>").appendTo(div);
 		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(splitDiv);
 		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitDiv);
-		splitCheckboxLabel.html(" Split private keys into pieces");
+		splitCheckboxLabel.html(" Split storage into separate pieces");
 		splitDiv.append("&nbsp;&nbsp;");
 		let splitConfigDiv = $("<div>").appendTo(splitDiv);
 		splitConfigDiv.css("margin-left", "20px");
@@ -1502,7 +1510,7 @@ function ExportPiecesController(div, state) {
 		
 		// minimum pieces input
 		splitConfigDiv.append("<br>");
-		splitConfigDiv.append("Minimum pieces to recover private keys:");
+		splitConfigDiv.append("Minimum number of pieces to recover storage:");
 		let minPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
@@ -1513,11 +1521,6 @@ function ExportPiecesController(div, state) {
 			this.checked ? splitConfigDiv.show() : splitConfigDiv.hide();
 		});
 		splitCheckbox.trigger('click');
-		
-		// render include public addresses checkbox
-		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(div);
-		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(div);
-		includePublicCheckboxLabel.html(" Include public addresses");
 	}
 }
 inheritsFrom(ExportPiecesController, DivController);
