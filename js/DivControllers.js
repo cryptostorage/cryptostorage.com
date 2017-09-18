@@ -931,7 +931,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 						// collect decryption functions
 						funcs = [];
 						for (let i = 0; i < encryptedKeys.length; i++) {
-							funcs.push(decryptFunc(encryptedKeys[i], passwords[i]));
+							funcs.push(decryptFunc(encryptedKeys[i].copy(), passwords[i]));
 						}
 						
 						// decrypt keys
@@ -1082,9 +1082,9 @@ inheritsFrom(ImportTextController, DivController);
  * 
  * @param div is the div to render to
  * @param state.keys are the keys to decrypt
- * @param onPiecesGenerated(pieces, pieceDivs) when done
+ * @param onKeysDecrypted(keys, pieces, pieceDivs) when done
  */
-function DecryptKeysController(div, state, onPiecesGenerated) {
+function DecryptKeysController(div, state, onKeysDecrypted) {
 	DivController.call(this, div);
 	let keys = state.keys;
 	let passwordInput;
@@ -1126,7 +1126,7 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 					btnDecrypt.removeAttr("disabled");
 					progressDiv.hide();
 				} else {
-					onPiecesGenerated(pieces, pieceDivs);
+					onKeysDecrypted(keys, pieces, pieceDivs);
 				}
 			});
 		});
@@ -1199,7 +1199,7 @@ function DecryptKeysController(div, state, onPiecesGenerated) {
 			}
 			
 			function renderPieceDivs(pieces, onDone) {
-				IndustrialPieceRenderer.render(pieces, null, function(percent) {
+				IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
 					setProgress(progressWeight + (percent * piecesRendererWeight), totalWeight);
 				}, onDone);
 			}
@@ -1420,7 +1420,6 @@ function SaveController(div, state) {
 	DivController.call(this, div);
 	assertTrue(state.keys.length > 0);
 	assertTrue(state.pieces.length > 0);
-	assertTrue(state.pieceDivs.length > 0);
 	
 	// config elements
 	var includePublicCheckbox;
@@ -1471,7 +1470,7 @@ function SaveController(div, state) {
 		// render preview div
 		div.append("<br>");
 		previewDiv = $("<div>").appendTo(div);
-		renderPreview(null, null, function(err) {
+		renderPreview(state.pieceDivs, null, function(err) {
 			if (err) throw err;
 			else onDone(previewDiv);
 		});
