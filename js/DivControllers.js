@@ -1440,7 +1440,7 @@ function SaveController(div, state) {
 		// add title
 		div.append(UiUtils.getPageHeader("Your storage is ready to save.", UiUtils.getCryptoLogo(state)));
 		
-		// add export header
+		// add save header
 		let exportHeader = $("<div class='export_header'>").appendTo(div);
 		let exportHeaderLeft = $("<div class='export_header_left'>").appendTo(exportHeader);
 		let exportHeaderRight = $("<div class='export_header_right'>").appendTo(exportHeader);
@@ -1519,21 +1519,25 @@ function SaveController(div, state) {
 		function setPieceDivs(pieceDivs) {
 			
 			// add header div
-			let previewHeaderDiv = $("<div class='preview_header_div'>").appendTo(previewDiv);
+			let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
+			let previewHeaderLeft = $("<div class='preview_header_left'>").appendTo(previewHeader);
+			let previewHeaderCenter = $("<div class='preview_header_center'>").appendTo(previewHeader);
+			previewHeaderCenter.append("Preview");
+			let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
 			if (pieceDivs.length > 1) {
 				for (let i = 0; i < pieceDivs.length; i++) {
-					if (i !== 0) previewHeaderDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+					if (i !== 0) previewHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 					let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
 					pieceLink.click(function() {
 						currentPieceDiv.empty();
 						currentPieceDiv.append(pieceDivs[i]);
 					});
-					previewHeaderDiv.append(pieceLink);
+					previewHeaderRight.append(pieceLink);
 				}
 			}
 			
 			// set currently showing piece
-			let currentPieceDiv = $("<div>").appendTo(previewDiv);
+			let currentPieceDiv = $("<div style='border-style:solid; padding:20px;'>").appendTo(previewDiv);
 			currentPieceDiv.append(pieceDivs[0]);
 		}
 		

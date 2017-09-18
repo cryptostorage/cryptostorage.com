@@ -311,7 +311,7 @@ input[type='file'] {
 
 .export_header {
 	display:flex;
-	justify-content:center;
+	align-items:center;
 	padding: 5px;
 }
 
@@ -323,6 +323,27 @@ input[type='file'] {
 	margin-left:auto;
 }
 
-.preview_header_div {
+.preview_header {
+	display:flex;
+	min-height:50px;
+	background-color:#d3d3d3;
 	text-align:center;
+	padding:10px;
+	border-style:solid;
+	border-bottom:none;
+}
+
+.preview_header_left {
+	width:300px;
+}
+
+.preview_header_center {
+	flex:1;
+	font-size:24px;
+	align-text:center;
+}
+
+.preview_header_right {
+	width:300px;
+	font-size:18px;
 }
