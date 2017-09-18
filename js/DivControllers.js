@@ -1446,40 +1446,7 @@ function ExportPiecesController(div, state) {
 		optionsDiv.css("margin-left", "18px");
 		optionsOpen = true;
 		toggleOptions();
-		
-		// render split checkbox
-		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(optionsDiv);
-		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(optionsDiv);
-		splitCheckboxLabel.html("Split private keys into pieces");
-		splitCheckbox.change(function() {
-			if (this.checked) {
-				numPiecesDiv.removeAttr("disabled");
-				numPiecesInput.removeAttr("disabled");
-				minPiecesDiv.removeAttr("disabled");
-				minPiecesInput.removeAttr("disabled");
-			} else {
-				numPiecesDiv.attr("disabled", "disabled");
-				numPiecesInput.attr("disabled", "disabled");
-				minPiecesDiv.attr("disabled", "disabled");
-				minPiecesInput.attr("disabled", "disabled");
-			}
-		})
-		
-		// number of pieces input
-		let numPiecesDiv = $("<div>").appendTo(optionsDiv);
-		numPiecesDiv.append("Number of pieces:");
-		let numPiecesInput = $("<input type='number'>").appendTo(numPiecesDiv);
-		numPiecesInput.attr("class", "num_input");
-		numPiecesInput.attr("value", 3);
-		numPiecesInput.attr("min", 2);
-		
-		// minimum pieces input
-		let minPiecesDiv = $("<div>").appendTo(optionsDiv);
-		minPiecesDiv.append("Minimum pieces to recover private keys:");
-		let minPiecesInput = $("<input type='number'>").appendTo(minPiecesDiv);
-		minPiecesInput.attr("class", "num_input");
-		minPiecesInput.attr("value", 2);
-		minPiecesInput.attr("min", 2);	
+		renderOptions(optionsDiv);
 		
 		// render div on top of preview
 		let topDiv = $("<div class='preview_header'>").appendTo(div);
@@ -1499,6 +1466,43 @@ function ExportPiecesController(div, state) {
 		
 		// done rendering
 		onDone(div);
+	}
+	
+	function renderOptions(div) {
+		
+		// render split checkbox
+		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(div);
+		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(div);
+		splitCheckboxLabel.html("Split private keys into pieces");
+		splitCheckbox.change(function() {
+			if (this.checked) {
+				numPiecesDiv.removeAttr("disabled");
+				numPiecesInput.removeAttr("disabled");
+				minPiecesDiv.removeAttr("disabled");
+				minPiecesInput.removeAttr("disabled");
+			} else {
+				numPiecesDiv.attr("disabled", "disabled");
+				numPiecesInput.attr("disabled", "disabled");
+				minPiecesDiv.attr("disabled", "disabled");
+				minPiecesInput.attr("disabled", "disabled");
+			}
+		})
+		
+		// number of pieces input
+		let numPiecesDiv = $("<div>").appendTo(div);
+		numPiecesDiv.append("Number of pieces:");
+		let numPiecesInput = $("<input type='number'>").appendTo(numPiecesDiv);
+		numPiecesInput.attr("class", "num_input");
+		numPiecesInput.attr("value", 3);
+		numPiecesInput.attr("min", 2);
+		
+		// minimum pieces input
+		let minPiecesDiv = $("<div>").appendTo(div);
+		minPiecesDiv.append("Minimum pieces to recover private keys:");
+		let minPiecesInput = $("<input type='number'>").appendTo(minPiecesDiv);
+		minPiecesInput.attr("class", "num_input");
+		minPiecesInput.attr("value", 2);
+		minPiecesInput.attr("min", 2);	
 	}
 }
 inheritsFrom(ExportPiecesController, DivController);
