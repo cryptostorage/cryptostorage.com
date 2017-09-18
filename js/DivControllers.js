@@ -1422,6 +1422,7 @@ function ExportPiecesController(div, state) {
 	DivController.call(this, div);
 	assertTrue(state.keys.length > 0);
 	assertTrue(state.pieces.length > 0);
+	assertTrue(state.pieceDivs.length > 0);
 	
 	// export options
 	let splitCheckbox;
@@ -1464,6 +1465,10 @@ function ExportPiecesController(div, state) {
 		rightTopOptions.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		let downloadLink = UiUtils.getLink("#", "Download").appendTo(rightTopOptions);
 		downloadLink.click(function() { alert("download link clicked"); });
+		
+		// render current piece div
+		let currentPieceDiv = $("<div>").appendTo(div);
+		currentPieceDiv.append(state.pieceDivs[0]);
 		
 		// done rendering
 		onDone(div);
