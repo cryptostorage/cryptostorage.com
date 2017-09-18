@@ -1484,39 +1484,34 @@ function ExportPiecesController(div, state) {
 		div.append("<br>");
 		div.css("margin-left", "18px");
 		
-		// render split checkbox
-		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(div);
-		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(div);
-		splitCheckboxLabel.html("Split private keys into pieces");
-		splitCheckbox.change(function() {
-			if (this.checked) {
-				numPiecesDiv.removeAttr("disabled");
-				numPiecesInput.removeAttr("disabled");
-				minPiecesDiv.removeAttr("disabled");
-				minPiecesInput.removeAttr("disabled");
-			} else {
-				numPiecesDiv.attr("disabled", "disabled");
-				numPiecesInput.attr("disabled", "disabled");
-				minPiecesDiv.attr("disabled", "disabled");
-				minPiecesInput.attr("disabled", "disabled");
-			}
-		})
+		// render split div
+		let splitDiv = $("<div>").appendTo(div);
+		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(splitDiv);
+		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitDiv);
+		splitCheckboxLabel.html(" Split private keys into pieces");
+		splitDiv.append("&nbsp;&nbsp;");
+		let splitConfigSpan = $("<span>").appendTo(splitDiv);
 		
 		// number of pieces input
-		let numPiecesDiv = $("<div>").appendTo(div);
-		numPiecesDiv.append("Number of pieces:");
-		let numPiecesInput = $("<input type='number'>").appendTo(numPiecesDiv);
+		splitConfigSpan.append("Number of pieces:");
+		let numPiecesInput = $("<input type='number'>").appendTo(splitConfigSpan);
 		numPiecesInput.attr("class", "num_input");
 		numPiecesInput.attr("value", 3);
 		numPiecesInput.attr("min", 2);
 		
 		// minimum pieces input
-		let minPiecesDiv = $("<div>").appendTo(div);
-		minPiecesDiv.append("Minimum pieces to recover private keys:");
-		let minPiecesInput = $("<input type='number'>").appendTo(minPiecesDiv);
+		splitConfigSpan.append("&nbsp;&nbsp;");
+		splitConfigSpan.append("Minimum pieces to recover private keys:");
+		let minPiecesInput = $("<input type='number'>").appendTo(splitConfigSpan);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
-		minPiecesInput.attr("min", 2);	
+		minPiecesInput.attr("min", 2);
+		
+		// set initial state of split div
+		splitCheckbox.click(function() {
+			this.checked ? splitConfigSpan.show() : splitConfigSpan.hide();
+		});
+		splitCheckbox.trigger('click');
 	}
 }
 inheritsFrom(ExportPiecesController, DivController);
