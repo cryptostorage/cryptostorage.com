@@ -309,15 +309,15 @@ input[type='file'] {
 	cursor: pointer;
 }
 
-.preview_header {
+.export_header {
 	display:flex;
 	justify-content:center;
 }
 
-.preview_header_left {
+.export_header_left {
 	
 }
 
-.preview_header_right {
+.export_header_right {
 	margin-left:auto;
 }

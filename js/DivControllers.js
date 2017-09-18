@@ -1422,7 +1422,6 @@ function ExportPiecesController(div, state) {
 	assertTrue(state.pieces.length > 0);
 	assertTrue(state.pieceDivs.length > 0);
 	
-	// export options
 	let splitCheckbox;
 	
 	this.render = function(onDone) {
@@ -1431,38 +1430,42 @@ function ExportPiecesController(div, state) {
 		// render title
 		div.append(UiUtils.getPageHeader("Your storage is ready to save.", UiUtils.getCryptoLogo(state)));
 		
-		// render options link
-		let optionsLink = $("<div class='mock_link'>").appendTo(div);
-		optionsLink.click(function() { toggleOptions(); });
-		function toggleOptions() {
-			optionsOpen = !optionsOpen;
-			optionsLink.text(optionsOpen ? "\u25be Export options" : "\u25b8 Export options");
-			optionsOpen ? optionsDiv.show() : optionsDiv.hide();
+		// render export header
+		let exportHeader = $("<div class='export_header'>").appendTo(div);
+		let exportHeaderLeft = $("<div class='export_header_left'>").appendTo(exportHeader);
+		let exportHeaderRight = $("<div class='export_header_right'>").appendTo(exportHeader);
+		
+		// render config link (closed by default)
+		let configLink = $("<div class='mock_link'>").appendTo(exportHeaderLeft);
+		let configDiv = $("<div>").appendTo(div);
+		let configOpen = true;
+		toggleConfig();
+		configLink.click(function() { toggleConfig(); });
+		function toggleConfig() {
+			configOpen = !configOpen;
+			configLink.text(configOpen ? "\u25be Export options" : "\u25b8 Export options");
+			configOpen ? configDiv.show() : configDiv.hide();
 		}
 		
-		// render options div (closed by default)
-		let optionsDiv = $("<div>").appendTo(div);
-		optionsDiv.css("margin-left", "18px");
-		optionsOpen = true;
-		toggleOptions();
-		renderOptions(optionsDiv);
+		// render print and download links
+		let printLink = UiUtils.getLink("#", "Print").appendTo(exportHeaderRight);
+		printLink.click(function() { alert("print link clicked"); });
+		exportHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		let downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderRight);
+		downloadLink.click(function() { alert("download link clicked"); });
+
+		// render config div
+		renderConfig(configDiv);
 		
-		// render div on top of preview
+		// render preview header
 		div.append("<br>");
-		let topDiv = $("<div class='preview_header'>").appendTo(div);
-		let leftTopOptions = $("<div class='preview_header_left'>").appendTo(topDiv);
-		let rightTopOptions = $("<div class='preview_header_right'>").appendTo(topDiv);
+		let previewHeader = $("<div class='preview_header'>").appendTo(div);
+		let previewHeaderLeft = $("<div class='preview_header_left'>").appendTo(previewHeader);
+		let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
 		
 		// render piece selection
-		let pieceSelection = $("<div>").appendTo(leftTopOptions);
+		let pieceSelection = $("<div>").appendTo(previewHeaderLeft);
 		pieceSelection.html("Piece 1");
-		
-		// render print and download links
-		let printLink = UiUtils.getLink("#", "Print All").appendTo(rightTopOptions);
-		printLink.click(function() { alert("print link clicked"); });
-		rightTopOptions.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-		let downloadLink = UiUtils.getLink("#", "Download All").appendTo(rightTopOptions);
-		downloadLink.click(function() { alert("download link clicked"); });
 		
 		// render current piece div
 		div.append("<br>");
@@ -1475,9 +1478,11 @@ function ExportPiecesController(div, state) {
 		onDone(div);
 	}
 	
-	function renderOptions(div) {
+	function renderConfig(div) {
 		
+		// placement
 		div.append("<br>");
+		div.css("margin-left", "18px");
 		
 		// render split checkbox
 		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(div);
