@@ -1422,21 +1422,30 @@ function ExportPiecesController(div, state) {
 	assertTrue(state.pieces.length > 0);
 	assertTrue(state.pieceDivs.length > 0);
 	
-	let splitCheckbox;
-	let currentPieceDiv;
+	// config elements
+	var includePublicCheckbox;
+	var splitCheckbox;
+	var numPiecesInput;
+	var minPiecesInput;
 	
+	// storage preview
+	var previewDiv;
+	
+	/**
+	 * Main render function.
+	 */
 	this.render = function(onDone) {
 		UiUtils.pageSetup(div);
 		
-		// render title
+		// add title
 		div.append(UiUtils.getPageHeader("Your storage is ready to save.", UiUtils.getCryptoLogo(state)));
 		
-		// render export header
+		// add export header
 		let exportHeader = $("<div class='export_header'>").appendTo(div);
 		let exportHeaderLeft = $("<div class='export_header_left'>").appendTo(exportHeader);
 		let exportHeaderRight = $("<div class='export_header_right'>").appendTo(exportHeader);
 		
-		// render config link (closed by default)
+		// add config link (closed by default)
 		let configLink = $("<div class='mock_link'>").appendTo(exportHeaderLeft);
 		let configDiv = $("<div>").appendTo(div);
 		let configOpen = true;
@@ -1448,21 +1457,53 @@ function ExportPiecesController(div, state) {
 			configOpen ? configDiv.show() : configDiv.hide();
 		}
 		
-		// render print and download links
+		// add print and download links
 		let printLink = UiUtils.getLink("#", "Print").appendTo(exportHeaderRight);
 		printLink.click(function() { alert("print link clicked"); });
 		exportHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		let downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderRight);
 		downloadLink.click(function() { alert("download link clicked"); });
 
-		// render config div
+		// add config div
 		renderConfig(configDiv);
 		
-		// render preview header
+		// render preview div
+		previewDiv = $("<div>").appendTo(div);
+		renderPreview(null, function(err) {
+			if (err) throw err;
+			else onDone(previewDiv);
+		});
+	}
+	
+	function getIncludePublicAddresses() {
+		return includePublicCheckbox.prop('checked');
+	}
+	
+	function getIsSplit() {
+		return splitCheckbox.prop('checked');
+	}
+	
+	function getNumPieces() {
+		return parseFloat(numPiecesInput.val());
+	}
+	
+	function getMinPieces() {
+		return parseFloat(minPiecesInput.val());
+	}
+	
+	function renderPreview(onProgress, onDone) {
+		previewDiv.empty();
 		
-		// render piece selection
-		div.append("<br>");
-		let pieceSelection = $("<div style='text-align:center;'>").appendTo(div);
+		// read state
+		console.log("Config");
+		console.log(getIncludePublicAddresses());
+		console.log(getIsSplit());
+		console.log(getNumPieces());
+		console.log(getMinPieces());
+		
+		// add piece selection
+		previewDiv.append("<br>");
+		let pieceSelection = $("<div style='text-align:center;'>").appendTo(previewDiv);
 		for (let i = 0; i < state.pieceDivs.length; i++) {
 			if (i !== 0) pieceSelection.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 			let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
@@ -1473,15 +1514,8 @@ function ExportPiecesController(div, state) {
 			pieceSelection.append(pieceLink);
 		}
 		
-		// render current piece div
-		div.append("<br>");
-		currentPieceDiv = $("<div>").appendTo(div);
-//		currentPieceDiv.css("padding", "25px");
-		//currentPieceDiv.css("border-style", "solid");
-		currentPieceDiv.append(state.pieceDivs[0]);
-		
 		// done rendering
-		onDone(div);
+		if (onDone) onDone(null, previewDiv);
 	}
 	
 	function renderConfig(div) {
@@ -1494,7 +1528,7 @@ function ExportPiecesController(div, state) {
 		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(div);
 		includePublicCheckboxLabel.html(" Include public addresses");
 		includePublicCheckbox.click(function() {
-			// TODO
+			renderPreview();
 		});
 		includePublicCheckbox.prop('checked', true);
 		
@@ -1504,12 +1538,14 @@ function ExportPiecesController(div, state) {
 		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.html(" Split storage into separate pieces");
 		splitDiv.append("&nbsp;&nbsp;");
+		
+		// div to hold split config	// TODO each should become its own div
 		let splitConfigDiv = $("<div>").appendTo(splitDiv);
 		splitConfigDiv.css("margin-left", "20px");
 		
 		// number of pieces input
 		splitConfigDiv.append("Number of pieces to create:");
-		let numPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
+		numPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
 		numPiecesInput.attr("class", "num_input");
 		numPiecesInput.attr("value", 3);
 		numPiecesInput.attr("min", 2);
@@ -1517,7 +1553,7 @@ function ExportPiecesController(div, state) {
 		// minimum pieces input
 		splitConfigDiv.append("<br>");
 		splitConfigDiv.append("Minimum number of pieces needed to recover storage:");
-		let minPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
+		minPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
 		minPiecesInput.attr("min", 2);
@@ -1525,8 +1561,10 @@ function ExportPiecesController(div, state) {
 		// set initial state of split div
 		splitCheckbox.click(function() {
 			this.checked ? splitConfigDiv.show() : splitConfigDiv.hide();
+			renderPreview();
 		});
-		splitCheckbox.trigger('click');
+		splitConfigDiv.hide();
+		splitCheckbox.prop("checked", false);
 	}
 }
 inheritsFrom(ExportPiecesController, DivController);
