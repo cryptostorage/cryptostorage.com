@@ -1449,6 +1449,7 @@ function ExportPiecesController(div, state) {
 		renderOptions(optionsDiv);
 		
 		// render div on top of preview
+		div.append("<br>");
 		let topDiv = $("<div class='preview_header'>").appendTo(div);
 		let leftTopOptions = $("<div class='preview_header_left'>").appendTo(topDiv);
 		let rightTopOptions = $("<div class='preview_header_right'>").appendTo(topDiv);
@@ -1469,6 +1470,8 @@ function ExportPiecesController(div, state) {
 	}
 	
 	function renderOptions(div) {
+		
+		div.append("<br>");
 		
 		// render split checkbox
 		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(div);
