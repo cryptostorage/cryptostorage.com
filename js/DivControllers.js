@@ -1730,8 +1730,8 @@ let IndustrialPieceRenderer = {
 		// collect progress
 		let prevProgress = 0;
 		function onPieceProgress(percent) {
-			onProgress(prevProgress + pieces.length * percent);
-			if (percent === 1) prevProgress += 1;
+			onProgress(prevProgress + percent / pieces.length);
+			if (percent === 1) prevProgress += 1 / pieces.length;
 		}
 	},
 	
