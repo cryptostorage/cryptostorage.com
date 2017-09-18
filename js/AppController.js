@@ -32,6 +32,7 @@
 // enter the number of addresses for each currency || enter the number of Bitcoin addresses to create)
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
 // summary page has table with logos
+// all div controllers directly modify state
 
 const RUN_TESTS = false;
 const DEBUG = true;
