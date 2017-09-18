@@ -1432,12 +1432,24 @@ function ExportPiecesController(div, state) {
 		// render title
 		div.append(UiUtils.getPageHeader("Your storage is ready to save.", UiUtils.getCryptoLogo(state)));
 		
-		// render export options
-		let configDiv = $("<div>").appendTo(div);
+		// render options link
+		let optionsLink = $("<div class='mock_link'>").appendTo(div);
+		optionsLink.click(function() { toggleOptions(); });
+		function toggleOptions() {
+			optionsOpen = !optionsOpen;
+			optionsLink.text(optionsOpen ? "\u25be Export options" : "\u25b8 Export options");
+			optionsOpen ? optionsDiv.show() : optionsDiv.hide();
+		}
+		
+		// render options div (closed by default)
+		let optionsDiv = $("<div>").appendTo(div);
+		optionsDiv.css("margin-left", "18px");
+		optionsOpen = true;
+		toggleOptions();
 		
 		// render split checkbox
-		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(configDiv);
-		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(configDiv);
+		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(optionsDiv);
+		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(optionsDiv);
 		splitCheckboxLabel.html("Split private keys into pieces");
 		splitCheckbox.change(function() {
 			if (this.checked) {
@@ -1454,7 +1466,7 @@ function ExportPiecesController(div, state) {
 		})
 		
 		// number of pieces input
-		let numPiecesDiv = $("<div>").appendTo(configDiv);
+		let numPiecesDiv = $("<div>").appendTo(optionsDiv);
 		numPiecesDiv.append("Number of pieces:");
 		let numPiecesInput = $("<input type='number'>").appendTo(numPiecesDiv);
 		numPiecesInput.attr("class", "num_input");
@@ -1462,12 +1474,12 @@ function ExportPiecesController(div, state) {
 		numPiecesInput.attr("min", 2);
 		
 		// minimum pieces input
-		let minPiecesDiv = $("<div>").appendTo(configDiv);
+		let minPiecesDiv = $("<div>").appendTo(optionsDiv);
 		minPiecesDiv.append("Minimum pieces to recover private keys:");
 		let minPiecesInput = $("<input type='number'>").appendTo(minPiecesDiv);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
-		minPiecesInput.attr("min", 2);
+		minPiecesInput.attr("min", 2);	
 		
 		// render div on top of preview
 		let topDiv = $("<div class='preview_header'>").appendTo(div);
