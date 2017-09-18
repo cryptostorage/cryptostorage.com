@@ -1411,12 +1411,12 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 inheritsFrom(ImportFilesController, DivController);
 
 /**
- * Page to view and export pieces.
+ * Page to view and save pieces.
  * 
  * @param div is the div to render to
  * @param state is the current application state to render
  */
-function ExportPiecesController(div, state) {
+function SaveController(div, state) {
 	DivController.call(this, div);
 	assertTrue(state.keys.length > 0);
 	assertTrue(state.pieces.length > 0);
@@ -1573,7 +1573,7 @@ function ExportPiecesController(div, state) {
 		splitCheckbox.prop("checked", false);
 	}
 }
-inheritsFrom(ExportPiecesController, DivController);
+inheritsFrom(SaveController, DivController);
 
 /**
  * Renders pieces for customization and export.

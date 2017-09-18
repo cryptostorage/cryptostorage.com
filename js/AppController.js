@@ -199,7 +199,7 @@ function ApplicationController(div) {
 		state.keys = keys;
 		state.pieces = pieces;
 		state.pieceDivs = pieceDivs;
-		pageController.next(new ExportPiecesController($("<div>"), state, onCustomExport));
+		pageController.next(new SaveController($("<div>"), state, onCustomExport));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------
@@ -239,6 +239,6 @@ function ApplicationController(div) {
 	function onCustomExport(pieces) {
 		if (DEBUG) console.log("onCustomExport(" + pieces.length + ")");
 		assertTrue(pieces.length > 0);
-		pageController.next(new ExportPiecesController($("<div>"), state));
+		pageController.next(new SaveController($("<div>"), state));
 	}
 }
