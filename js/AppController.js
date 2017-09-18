@@ -31,7 +31,7 @@
 // select one or more currencies to store (consistent look with number of addresses input)
 // enter the number of addresses for each currency || enter the number of Bitcoin addresses to create)
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
-// 
+// summary page has table with logos
 
 const RUN_TESTS = false;
 const DEBUG = true;
