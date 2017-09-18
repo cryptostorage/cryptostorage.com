@@ -1423,7 +1423,7 @@ function SaveController(div, state) {
 	assertTrue(state.pieceDivs.length > 0);
 	
 	// config elements
-	var excludePublicCheckbox;
+	var includePublicCheckbox;
 	var splitCheckbox;
 	var numPiecesInput;
 	var minPiecesInput;
@@ -1475,8 +1475,8 @@ function SaveController(div, state) {
 		});
 	}
 	
-	function getExcludePublicAddresses() {
-		return excludePublicCheckbox.prop('checked');
+	function getIncludePublicAddresses() {
+		return includePublicCheckbox.prop('checked');
 	}
 	
 	function getIsSplit() {
@@ -1495,7 +1495,7 @@ function SaveController(div, state) {
 		console.log("renderPreview()");
 		
 		// read state
-		console.log(getExcludePublicAddresses());
+		console.log(getIncludePublicAddresses());
 		console.log(getIsSplit());
 		console.log(getNumPieces());
 		console.log(getMinPieces());
@@ -1525,15 +1525,15 @@ function SaveController(div, state) {
 		
 		let configSpacing = 5;	// space in pixels for each config line
 		
-		// render exclude public addresses checkbox
-		excludePublicDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(div);
-		excludePublicCheckbox = $("<input type='checkbox' id='excludePublicCheckbox'>").appendTo(excludePublicDiv);
-		let excludePublicCheckboxLabel = $("<label for='excludePublicCheckbox'>").appendTo(excludePublicDiv);
-		excludePublicCheckboxLabel.html(" Exclude public addresses");
-		excludePublicCheckbox.click(function() {
+		// render include public addresses checkbox
+		includePublicDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(div);
+		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(includePublicDiv);
+		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(includePublicDiv);
+		includePublicCheckboxLabel.html(" Include public addresses");
+		includePublicCheckbox.click(function() {
 			renderPreview();
 		});
-		excludePublicCheckbox.prop('checked', false);
+		includePublicCheckbox.prop('checked', true);
 				
 		// render split div
 		let splitDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(div);
@@ -1544,7 +1544,7 @@ function SaveController(div, state) {
 		
 		// div to hold split config
 		let splitConfigDiv = $("<div>").appendTo(div);
-		splitConfigDiv.css("margin-left", "20px");
+		splitConfigDiv.css("margin-left", "25px");
 		
 		// number of pieces input
 		let numPiecesDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(splitConfigDiv);
