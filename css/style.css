@@ -322,3 +322,7 @@ input[type='file'] {
 .export_header_right {
 	margin-left:auto;
 }
+
+.preview_header_div {
+	text-align:center;
+}

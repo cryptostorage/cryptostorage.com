@@ -1469,6 +1469,7 @@ function SaveController(div, state) {
 		renderConfig(configDiv);
 		
 		// render preview div
+		div.append("<br>");
 		previewDiv = $("<div>").appendTo(div);
 		renderPreview(null, null, function(err) {
 			if (err) throw err;
@@ -1507,6 +1508,7 @@ function SaveController(div, state) {
 			let numPieces = getIsSplit() ? getNumPieces() : 1;
 			let minPieces = getIsSplit() ? getMinPieces() : null;
 			let pieces = CryptoUtils.keysToPieces(state.keys, numPieces, minPieces);
+			previewDiv.empty();
 			IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
 				console.log("renderer.onProgress(" + percent + ")");
 			}, function(err, pieceDivs) {
@@ -1517,18 +1519,18 @@ function SaveController(div, state) {
 		
 		function setPieceDivs(pieceDivs) {
 			
-			// add piece selection
-			previewDiv.empty();
-			previewDiv.append("<br>");
-			let pieceSelectionDiv = $("<div style='text-align:center;'>").appendTo(previewDiv);
-			for (let i = 0; i < pieceDivs.length; i++) {
-				if (i !== 0) pieceSelectionDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-				let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
-				pieceLink.click(function() {
-					currentPieceDiv.empty();
-					currentPieceDiv.append(pieceDivs[i]);
-				});
-				pieceSelectionDiv.append(pieceLink);
+			// add header div
+			let previewHeaderDiv = $("<div class='preview_header_div'>").appendTo(previewDiv);
+			if (pieceDivs.length > 1) {
+				for (let i = 0; i < pieceDivs.length; i++) {
+					if (i !== 0) previewHeaderDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+					let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
+					pieceLink.click(function() {
+						currentPieceDiv.empty();
+						currentPieceDiv.append(pieceDivs[i]);
+					});
+					previewHeaderDiv.append(pieceLink);
+				}
 			}
 			
 			// set currently showing piece
