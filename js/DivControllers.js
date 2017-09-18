@@ -1513,6 +1513,11 @@ function ExportPiecesController(div, state) {
 			this.checked ? splitConfigDiv.show() : splitConfigDiv.hide();
 		});
 		splitCheckbox.trigger('click');
+		
+		// render include public addresses checkbox
+		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(div);
+		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(div);
+		includePublicCheckboxLabel.html(" Include public addresses");
 	}
 }
 inheritsFrom(ExportPiecesController, DivController);
