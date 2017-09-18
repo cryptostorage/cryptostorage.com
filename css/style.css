@@ -308,3 +308,16 @@ input[type='file'] {
 	color:blue;
 	cursor: pointer;
 }
+
+.preview_header {
+	display:flex;
+	justify-content:center;
+}
+
+.preview_header_left {
+	
+}
+
+.preview_header_right {
+	margin-left:auto;
+}

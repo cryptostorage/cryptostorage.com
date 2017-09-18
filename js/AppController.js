@@ -83,13 +83,13 @@ function ApplicationController(div) {
 		
 		// footer		
 		let footerDiv = $("<div class='footer'>").appendTo(div);
-		let homeLink = getLink("#", "Home");
+		let homeLink = UiUtils.getLink("#", "Home");
 		homeLink.click(function() { that.showHome(); });
-		let faqLink = getLink("#faq", "FAQ");
+		let faqLink = UiUtils.getLink("#faq", "FAQ");
 		faqLink.click(function() { that.showFaq(); });
 		let gitHubLink = $("<a href='https://github.com/cryptostorage/cryptostorage.com'>");
 		gitHubLink.html("GitHub");
-		let donateLink = getLink("#donate", "Donate");
+		let donateLink = UiUtils.getLink("#donate", "Donate");
 		donateLink.click(function() { that.showDonate(); });
 		footerDiv.append(homeLink);
 		footerDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
@@ -116,13 +116,6 @@ function ApplicationController(div) {
 				else that.showHome();
 			});
 		}, 0);
-		
-		function getLink(href, label) {
-			if (!href) href = '';
-			let link = $("<a href='" + href + "'>");
-			link.html(label);
-			return link;
-		}
 	}
 	
 	this.showHome = function() {

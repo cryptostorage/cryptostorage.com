@@ -72,6 +72,13 @@ let UiUtils = {
 		return $("<img src='img/mix.png'>");
 	},
 	
+	getLink: function(href, label) {
+		if (!href) href = '';
+		let link = $("<a href='" + href + "'>");
+		link.html(label);
+		return link;
+	},
+	
 	getProgressBar: function(div) {
 		return new ProgressBar.Line(div, {
 			strokeWidth: 2.5,
@@ -1456,11 +1463,27 @@ function ExportPiecesController(div, state) {
 		
 		// minimum pieces input
 		let minPiecesDiv = $("<div>").appendTo(configDiv);
-		minPiecesDiv.append("Minimum number of pieces to restore:");
+		minPiecesDiv.append("Minimum pieces to recover private keys:");
 		let minPiecesInput = $("<input type='number'>").appendTo(minPiecesDiv);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
 		minPiecesInput.attr("min", 2);
+		
+		// render div on top of preview
+		let topDiv = $("<div class='preview_header'>").appendTo(div);
+		let leftTopOptions = $("<div class='preview_header_left'>").appendTo(topDiv);
+		let rightTopOptions = $("<div class='preview_header_right'>").appendTo(topDiv);
+		
+		// render piece selection
+		let pieceSelection = $("<div>").appendTo(leftTopOptions);
+		pieceSelection.html("Piece selection");
+		
+		// render print and download links
+		let printLink = UiUtils.getLink("#", "Print").appendTo(rightTopOptions);
+		printLink.click(function() { alert("print link clicked"); });
+		rightTopOptions.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		let downloadLink = UiUtils.getLink("#", "Download").appendTo(rightTopOptions);
+		downloadLink.click(function() { alert("download link clicked"); });
 		
 		// done rendering
 		onDone(div);
