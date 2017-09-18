@@ -584,14 +584,12 @@ function PasswordInputController(div, state, onPasswordInput) {
 		advancedLink.click(function() { toggleAdvanced(); });
 		function toggleAdvanced() {
 			advancedOpen = !advancedOpen;
-			advancedLink.text(advancedOpen ? "\u25be Advanced" : "\u25b8 Advanced");
+			advancedLink.text(advancedOpen ? "\u25be Encryption options" : "\u25b8 Encryption options");
 			advancedOpen ? advancedDiv.show() : advancedDiv.hide();
 		}
 		
 		// render each encryption selection div
 		let advancedDiv = $("<div>").appendTo(div);
-		advancedDiv.css("margin-left", "18px");
-		advancedDiv.append("<br>Encryption options:");
 		let options = false;
 		let encryptionSelectors = [];
 		for (let elem of state.mix) {
@@ -1460,16 +1458,16 @@ function ExportPiecesController(div, state) {
 		pieceSelection.html("Piece 1");
 		
 		// render print and download links
-		let printLink = UiUtils.getLink("#", "Print").appendTo(rightTopOptions);
+		let printLink = UiUtils.getLink("#", "Print All").appendTo(rightTopOptions);
 		printLink.click(function() { alert("print link clicked"); });
 		rightTopOptions.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-		let downloadLink = UiUtils.getLink("#", "Download").appendTo(rightTopOptions);
+		let downloadLink = UiUtils.getLink("#", "Download All").appendTo(rightTopOptions);
 		downloadLink.click(function() { alert("download link clicked"); });
 		
 		// render current piece div
 		div.append("<br>");
 		let currentPieceDiv = $("<div>").appendTo(div);
-		currentPieceDiv.css("padding", "25px");
+//		currentPieceDiv.css("padding", "25px");
 		//currentPieceDiv.css("border-style", "solid");
 		currentPieceDiv.append(state.pieceDivs[0]);
 		
