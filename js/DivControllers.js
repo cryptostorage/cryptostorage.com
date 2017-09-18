@@ -1423,6 +1423,7 @@ function ExportPiecesController(div, state) {
 	assertTrue(state.pieceDivs.length > 0);
 	
 	let splitCheckbox;
+	let currentPieceDiv;
 	
 	this.render = function(onDone) {
 		UiUtils.pageSetup(div);
@@ -1458,18 +1459,23 @@ function ExportPiecesController(div, state) {
 		renderConfig(configDiv);
 		
 		// render preview header
-		div.append("<br>");
-		let previewHeader = $("<div class='preview_header'>").appendTo(div);
-		let previewHeaderLeft = $("<div class='preview_header_left'>").appendTo(previewHeader);
-		let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
 		
 		// render piece selection
-		let pieceSelection = $("<div>").appendTo(previewHeaderLeft);
-		pieceSelection.html("Piece 1");
+		div.append("<br>");
+		let pieceSelection = $("<div style='text-align:center;'>").appendTo(div);
+		for (let i = 0; i < state.pieceDivs.length; i++) {
+			if (i !== 0) pieceSelection.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+			let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
+			pieceLink.click(function() {
+				currentPieceDiv.empty();
+				currentPieceDiv.append(state.pieceDivs[i]);
+			});
+			pieceSelection.append(pieceLink);
+		}
 		
 		// render current piece div
 		div.append("<br>");
-		let currentPieceDiv = $("<div>").appendTo(div);
+		currentPieceDiv = $("<div>").appendTo(div);
 //		currentPieceDiv.css("padding", "25px");
 		//currentPieceDiv.css("border-style", "solid");
 		currentPieceDiv.append(state.pieceDivs[0]);
