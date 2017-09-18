@@ -1457,7 +1457,7 @@ function ExportPiecesController(div, state) {
 		
 		// render piece selection
 		let pieceSelection = $("<div>").appendTo(leftTopOptions);
-		pieceSelection.html("Piece selection");
+		pieceSelection.html("Piece 1");
 		
 		// render print and download links
 		let printLink = UiUtils.getLink("#", "Print").appendTo(rightTopOptions);
@@ -1467,7 +1467,10 @@ function ExportPiecesController(div, state) {
 		downloadLink.click(function() { alert("download link clicked"); });
 		
 		// render current piece div
+		div.append("<br>");
 		let currentPieceDiv = $("<div>").appendTo(div);
+		currentPieceDiv.css("padding", "25px");
+		//currentPieceDiv.css("border-style", "solid");
 		currentPieceDiv.append(state.pieceDivs[0]);
 		
 		// done rendering
