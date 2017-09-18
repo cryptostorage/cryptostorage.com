@@ -1430,6 +1430,7 @@ function SaveController(div, state) {
 	
 	// storage preview
 	var previewDiv;
+	let currentPieceDiv;
 	
 	/**
 	 * Main render function.
@@ -1469,7 +1470,7 @@ function SaveController(div, state) {
 		
 		// render preview div
 		previewDiv = $("<div>").appendTo(div);
-		renderPreview(null, function(err) {
+		renderPreview(null, null, function(err) {
 			if (err) throw err;
 			else onDone(previewDiv);
 		});
@@ -1491,27 +1492,48 @@ function SaveController(div, state) {
 		return parseFloat(minPiecesInput.val());
 	}
 	
-	function renderPreview(onProgress, onDone) {
+	function renderPreview(pieceDivs, onProgress, onDone) {
 		console.log("renderPreview()");
 		
-		// read state
-		console.log(getIncludePublicAddresses());
-		console.log(getIsSplit());
-		console.log(getNumPieces());
-		console.log(getMinPieces());
+		// add given piece divs
+		if (pieceDivs) {
+			setPieceDivs(pieceDivs);
+			if (onDone) onDone();
+			return;
+		}
 		
-		// add piece selection
-		previewDiv.empty();
-		previewDiv.append("<br>");
-		let pieceSelection = $("<div style='text-align:center;'>").appendTo(previewDiv);
-		for (let i = 0; i < state.pieceDivs.length; i++) {
-			if (i !== 0) pieceSelection.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-			let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
-			pieceLink.click(function() {
-				currentPieceDiv.empty();
-				currentPieceDiv.append(state.pieceDivs[i]);
+		// render piece divs
+		else {
+			let numPieces = getIsSplit() ? getNumPieces() : 1;
+			let minPieces = getIsSplit() ? getMinPieces() : null;
+			let pieces = CryptoUtils.keysToPieces(state.keys, numPieces, minPieces);
+			IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
+				console.log("renderer.onProgress(" + percent + ")");
+			}, function(err, pieceDivs) {
+				console.log("renderer.onDone()");
+				setPieceDivs(pieceDivs);
 			});
-			pieceSelection.append(pieceLink);
+		}
+		
+		function setPieceDivs(pieceDivs) {
+			
+			// add piece selection
+			previewDiv.empty();
+			previewDiv.append("<br>");
+			let pieceSelectionDiv = $("<div style='text-align:center;'>").appendTo(previewDiv);
+			for (let i = 0; i < pieceDivs.length; i++) {
+				if (i !== 0) pieceSelectionDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+				let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
+				pieceLink.click(function() {
+					currentPieceDiv.empty();
+					currentPieceDiv.append(pieceDivs[i]);
+				});
+				pieceSelectionDiv.append(pieceLink);
+			}
+			
+			// set currently showing piece
+			let currentPieceDiv = $("<div>").appendTo(previewDiv);
+			currentPieceDiv.append(pieceDivs[0]);
 		}
 		
 		// done rendering
@@ -1705,7 +1727,7 @@ let IndustrialPieceRenderer = {
 		});
 		
 		// collect progress
-		var prevProgress = 0;
+		let prevProgress = 0;
 		function onPieceProgress(percent) {
 			onProgress(prevProgress + pieces.length * percent);
 			if (percent === 1) prevProgress += 1;
