@@ -1524,15 +1524,27 @@ function SaveController(div, state) {
 			let previewHeaderCenter = $("<div class='preview_header_center'>").appendTo(previewHeader);
 			previewHeaderCenter.append("Preview");
 			let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
+			
+			// add piece pull-down selector
+			
 			if (pieceDivs.length > 1) {
+				let selector = $("<select class='piece_selector'>").appendTo(previewHeaderRight);
+				selector.change(function() {
+					currentPieceDiv.empty();
+					console.log(parseFloat(selector.find(":selected").val()));
+					currentPieceDiv.append(pieceDivs[parseFloat(selector.find(":selected").val())]);
+				});
 				for (let i = 0; i < pieceDivs.length; i++) {
-					if (i !== 0) previewHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-					let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
-					pieceLink.click(function() {
-						currentPieceDiv.empty();
-						currentPieceDiv.append(pieceDivs[i]);
-					});
-					previewHeaderRight.append(pieceLink);
+					let option = $("<option value='" + i + "'>").appendTo(selector);
+					option.html("Piece " + (i + 1));
+					
+//					if (i !== 0) previewHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+//					let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
+//					pieceLink.click(function() {
+//						currentPieceDiv.empty();
+//						currentPieceDiv.append(pieceDivs[i]);
+//					});
+//					previewHeaderRight.append(pieceLink);
 				}
 			}
 			

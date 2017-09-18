@@ -326,7 +326,7 @@ input[type='file'] {
 .preview_header {
 	display:flex;
 	min-height:50px;
-	background-color:#d3d3d3;
+	background-color:#E0E0E0;
 	text-align:center;
 	padding:10px;
 	border-style:solid;
@@ -334,7 +334,7 @@ input[type='file'] {
 }
 
 .preview_header_left {
-	width:300px;
+	width:150px;
 }
 
 .preview_header_center {
@@ -344,6 +344,12 @@ input[type='file'] {
 }
 
 .preview_header_right {
-	width:300px;
+	width:150px;
 	font-size:18px;
+}
+
+.piece_selector {
+	padding:5px;
+	font-size:18px;
+	width:150px;
 }
