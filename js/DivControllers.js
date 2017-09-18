@@ -1490,26 +1490,27 @@ function ExportPiecesController(div, state) {
 		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.html(" Split private keys into pieces");
 		splitDiv.append("&nbsp;&nbsp;");
-		let splitConfigSpan = $("<span>").appendTo(splitDiv);
+		let splitConfigDiv = $("<div>").appendTo(splitDiv);
+		splitConfigDiv.css("margin-left", "20px");
 		
 		// number of pieces input
-		splitConfigSpan.append("Number of pieces:");
-		let numPiecesInput = $("<input type='number'>").appendTo(splitConfigSpan);
+		splitConfigDiv.append("Number of pieces:");
+		let numPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
 		numPiecesInput.attr("class", "num_input");
 		numPiecesInput.attr("value", 3);
 		numPiecesInput.attr("min", 2);
 		
 		// minimum pieces input
-		splitConfigSpan.append("&nbsp;&nbsp;");
-		splitConfigSpan.append("Minimum pieces to recover private keys:");
-		let minPiecesInput = $("<input type='number'>").appendTo(splitConfigSpan);
+		splitConfigDiv.append("<br>");
+		splitConfigDiv.append("Minimum pieces to recover private keys:");
+		let minPiecesInput = $("<input type='number'>").appendTo(splitConfigDiv);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
 		minPiecesInput.attr("min", 2);
 		
 		// set initial state of split div
 		splitCheckbox.click(function() {
-			this.checked ? splitConfigSpan.show() : splitConfigSpan.hide();
+			this.checked ? splitConfigDiv.show() : splitConfigDiv.hide();
 		});
 		splitCheckbox.trigger('click');
 	}
