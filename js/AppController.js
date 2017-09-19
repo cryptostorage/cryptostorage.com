@@ -1,4 +1,5 @@
 // TODO
+// flag to verify encryption
 // prevent multiple preview rendering
 // minimum cannot be larger than num pieces
 // redesign pieces download page
@@ -28,7 +29,7 @@
 // disable next if mix num keys change
 // prevent rendered page from showing after home, FAQ or donate clicked
 // file import zip with invalid json shouldn't prevent others from importing
-// flag to verify encryption
+// keyboard popping up in ios on key creation flow
 
 // select one or more currencies to store (consistent look with number of addresses input)
 // enter the number of addresses for each currency || enter the number of Bitcoin addresses to create)
