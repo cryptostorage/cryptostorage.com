@@ -277,7 +277,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		
 		div.append(getCheckmarkDiv("Create long-term storage for multiple cryptocurrencies."));
 		div.append(getCheckmarkDiv("Storage can be password protected and split into pieces."));
-		div.append(getCheckmarkDiv("Export to digital and printable formats which can be recovered at any time."));
+		div.append(getCheckmarkDiv("Export to digital and printable formats which can be recovered any time."));
 		div.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
 		div.append("<br>");
 		
