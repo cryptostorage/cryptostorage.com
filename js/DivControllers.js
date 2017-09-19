@@ -325,7 +325,7 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		if (state.mix) div.append(UiUtils.getPageHeader("Select the currencies to store."));
+		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to store."));
 		else div.append(UiUtils.getPageHeader("Select a currency to import."));
 		
 		// render mix and match button if creating new storage
