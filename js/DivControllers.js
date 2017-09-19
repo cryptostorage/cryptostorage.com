@@ -1419,13 +1419,16 @@ inheritsFrom(ImportFilesController, DivController);
 function SaveController(div, state) {
 	DivController.call(this, div);
 	assertTrue(state.keys.length > 0);
-	assertTrue(state.pieces.length > 0);
 	
 	// config elements
-	var includePublicCheckbox;
-	var splitCheckbox;
-	var numPiecesInput;
-	var minPiecesInput;
+	let includePublicCheckbox;
+	let splitCheckbox;
+	let numPiecesInput;
+	let minPiecesInput;
+	
+	// save links
+	let printLink;
+	let downloadLink;
 	
 	// storage preview
 	let progressDiv;
@@ -1460,12 +1463,9 @@ function SaveController(div, state) {
 		}
 		
 		// add print and download links
-		let printLink = UiUtils.getLink("#", "Print").appendTo(exportHeaderRight);
-		printLink.click(function() { alert("print link clicked"); });
+		printLink = UiUtils.getLink("#", "Print").appendTo(exportHeaderRight);
 		exportHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-		let downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderRight);
-		downloadLink.click(function() { alert("download link clicked"); });
-
+		downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderRight);
 
 		// add config div
 		renderConfig(configDiv);
@@ -1473,9 +1473,9 @@ function SaveController(div, state) {
 		// add preview div
 		div.append("<br>");
 		previewDiv = $("<div>").appendTo(div);
-		renderPreview(state.pieceDivs, null, function(err) {
+		updatePieces(state.pieces, state.pieceDivs, null, function(err) {
 			if (err) throw err;
-			else onDone(previewDiv);
+			if (onDone) onDone(div);
 		});
 	}
 	
@@ -1495,48 +1495,61 @@ function SaveController(div, state) {
 		return parseFloat(minPiecesInput.val());
 	}
 	
-	function renderPreview(pieceDivs, onProgress, onDone) {
-		console.log("renderPreview()");
+	/**
+	 * Updates pieces for the entire save page.
+	 * 
+	 * @param pieces are pre-existing pieces to set (optional)
+	 * @param pieceDivs are pre-existing piece divs to set (optional)
+	 * @param onProgress(percent) is invoked as progress is made
+	 * @param onDone(err, pieces, pieceDivs) is invoked when done
+	 */
+	function updatePieces(pieces, pieceDivs, onProgress, onDone) {
 		
-		// add given piece divs
-		if (pieceDivs) {
-			setPieceDivs(pieceDivs);
-			if (onDone) onDone();
+		// disable print and download links
+		printLink.attr("disabled", "disabled");
+		downloadLink.attr("disabled", "disabled");
+		
+		// handle pieces already set
+		if (pieces && pieceDivs) {
+			setPieces(pieces, pieceDivs);
+			if (onProgress) onProgress(1);
+			if (onDone) onDone(null, pieces, pieceDivs);
 			return;
 		}
 		
-		// render piece divs from scratch
-		else {
-			
-			// empty current content
-			previewDiv.empty();
-			
-			// add progress bar
-			progressDiv = $("<div>").appendTo(previewDiv);
-			progressDiv.hide();
-			progressBar = UiUtils.getProgressBar(progressDiv.get(0));
-			
-			// read configuration
-			let numPieces = getIsSplit() ? getNumPieces() : 1;
-			let minPieces = getIsSplit() ? getMinPieces() : null;
-			let pieces = CryptoUtils.keysToPieces(state.keys, numPieces, minPieces);
-			
-			// render
-			IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
-				setProgress(percent);
-			}, function(err, pieceDivs) {
-				console.log("renderer.onDone()");
-				setPieceDivs(pieceDivs);
-			});
-		}
+		// empty preview
+		previewDiv.empty();
 		
+		// add progress bar
+		progressDiv = $("<div>").appendTo(previewDiv);
+		progressDiv.hide();
+		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
+		
+		// read configuration
+		let numPieces = getIsSplit() ? getNumPieces() : 1;
+		let minPieces = getIsSplit() ? getMinPieces() : null;
+		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, numPieces, minPieces);
+		
+		// render
+		IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
+			setProgress(percent);
+			if (onProgress) onProgress(percent);
+		}, function(err, pieceDivs) {
+			setPieces(pieces, pieceDivs);
+			if (onDone) onDone(pieces, pieceDivs);
+		});
+	
 		function setProgress(percent, label) {
 			progressDiv.show();
 			progressBar.set(percent);
 			if (label) progressBar.setText(label);
 		}
 		
-		function setPieceDivs(pieceDivs) {
+		function setPieces(pieces, pieceDivs) {
+			assertTrue(pieces.length > 0);
+			assertTrue(pieceDivs.length > 0);
+			
+			// empty existing preview
 			previewDiv.empty();
 			
 			// add header div
@@ -1547,7 +1560,6 @@ function SaveController(div, state) {
 			let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
 			
 			// add piece pull-down selector
-			
 			if (pieceDivs.length > 1) {
 				let selector = $("<select class='piece_selector'>").appendTo(previewHeaderRight);
 				selector.change(function() {
@@ -1561,13 +1573,28 @@ function SaveController(div, state) {
 				}
 			}
 			
-			// set currently showing piece
-			let currentPieceDiv = $("<div class='preview_piece_div'>").appendTo(previewDiv);
-			currentPieceDiv.append(pieceDivs[0]);
+			// build htmls from piece divs for zip export
+			let htmls = [];
+			for (let pieceDiv of pieceDivs) {
+				htmls.push($("<html>").append($("<body>").append(pieceDiv)));
+			}
+			
+			// zip pieces
+			CryptoUtils.piecesToZip(pieces, htmls, function(name, blob) {
+				
+				// register save click
+				downloadLink.click(function() { saveAs(blob, name); });
+				printLink.click(function() { alert("print link clicked"); });
+				
+				// set currently showing piece
+				currentPieceDiv = $("<div class='preview_piece_div'>").appendTo(previewDiv);
+				currentPieceDiv.append(pieceDivs[0]);
+				
+				// enable print and download links
+				printLink.removeAttr("disabled");
+				downloadLink.removeAttr("disabled");
+			});
 		}
-		
-		// done rendering
-		if (onDone) onDone(null, previewDiv);
 	}
 	
 	function renderConfig(div) {
@@ -1580,9 +1607,7 @@ function SaveController(div, state) {
 		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(includePublicDiv);
 		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(includePublicDiv);
 		includePublicCheckboxLabel.html(" Include public addresses");
-		includePublicCheckbox.click(function() {
-			renderPreview();
-		});
+		includePublicCheckbox.click(function() { updatePieces(); });
 		includePublicCheckbox.prop('checked', true);
 				
 		// render split div
@@ -1599,11 +1624,11 @@ function SaveController(div, state) {
 		numPiecesInput.attr("class", "num_input");
 		numPiecesInput.attr("value", 3);
 		numPiecesInput.attr("min", 2);
-		numPiecesInput.change(function() { renderPreview(); });
+		numPiecesInput.change(function() { updatePieces(); });
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
 		minPiecesInput.attr("min", 2);
-		minPiecesInput.change(function() { renderPreview(); });
+		minPiecesInput.change(function() { updatePiece(); });
 		
 		// collect elements of split div for enabling/disabling
 		let splitElems = [];
@@ -1616,7 +1641,7 @@ function SaveController(div, state) {
 			for (let elem of splitElems) {
 				this.checked ? elem.removeAttr("disabled") : elem.attr("disabled", "disabled");
 			}
-			renderPreview();
+			updatePieces();
 		});
 		numPiecesInput.attr("disabled", "disabled");
 		minPiecesInput.attr("disabled", "disabled");
