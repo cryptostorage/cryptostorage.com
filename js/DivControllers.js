@@ -1576,19 +1576,14 @@ function SaveController(div, state) {
 				}
 			}
 			
-//			$.get("css/piece.css", function(response) {
-//                console.log(response);
-//            });
-			
-//			$.ajax({
-//				url: "css/piece.css",
-//				success: function(resp) { console.log(resp); },
-//				dataType: "text"
-//			});
-			
-//			$.get("index.html", function( data ) {
-//				  console.log(data);
-//			});
+			loader.load("css/piece.css", function() {
+				console.log(document.styleSheets);
+				for (let styleSheet of document.styleSheets) {
+					for (let cssRule of styleSheet.cssRules) {
+						console.log(cssRule.cssText);
+					}
+				}
+			});
 			
 			// build htmls from piece divs for zip export
 			let htmls = [];
@@ -1611,6 +1606,35 @@ function SaveController(div, state) {
 				printLink.removeAttr("disabled");
 				downloadLink.removeAttr("disabled");
 			});
+			
+//			$.ajax({
+//			    url: "css/piece.css",
+//			    dataType: "text",
+//			    success: function(cssText) {
+//			       console.log(cssText);
+//			    },
+//			    mimeType: 'text/plain; charset=x-user-defined'
+//			});
+			
+//			$.get("css/piece.css", function(response) {
+//                console.log(response);
+//            });
+			
+//			let myDiv = $("<div>");
+//			myDiv.load("css/piece.css", function() {
+//				console.log("load done");
+//				console.log(getOuterHtml(myDiv));
+//			});
+			
+//			$.ajax({
+//				url: "css/piece.css",
+//				dataType: "text",
+//				success: function(resp) { console.log(resp); }
+//			});
+			
+//			$.get("index.html", function( data ) {
+//				  console.log(data);
+//			});
 		}
 	}
 	
