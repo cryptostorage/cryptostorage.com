@@ -1,4 +1,5 @@
 // TODO
+// try Download | Print | > Download options together
 // flag to verify encryption
 // prevent multiple preview rendering
 // minimum cannot be larger than num pieces
