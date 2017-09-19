@@ -201,7 +201,7 @@ function ApplicationController(div) {
 		state.keys = keys;
 		state.pieces = pieces;
 		state.pieceDivs = pieceDivs;
-		pageController.next(new SaveController($("<div>"), state, onCustomExport));
+		pageController.next(new SaveController($("<div>"), state));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------
@@ -231,16 +231,9 @@ function ApplicationController(div) {
 		if (DEBUG) console.log("onKeysImported(" + keys.length + " keys)");
 		assertTrue(keys.length >= 1);
 		state.keys = keys;
-		if (keys[0].isEncrypted()) pageController.next(new DecryptKeysController($("<div>"), state, onKeysGenerated));
+		if (keys[0].isEncrypted()) pageController.next(new DecryptKeysController($("<div>"), state, onKeysImported));
 		else {
-			state.pieces = CryptoUtils.keysToPieces(keys);
-			pageController.next(new RenderPiecesController($("<div>"), state, onCustomExport));
+			pageController.next(new SaveController($("<div>"), state));
 		}
-	}
-	
-	function onCustomExport(pieces) {
-		if (DEBUG) console.log("onCustomExport(" + pieces.length + ")");
-		assertTrue(pieces.length > 0);
-		pageController.next(new SaveController($("<div>"), state));
 	}
 }

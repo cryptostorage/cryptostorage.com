@@ -1473,7 +1473,7 @@ function SaveController(div, state) {
 		// add preview div
 		div.append("<br>");
 		previewDiv = $("<div>").appendTo(div);
-		updatePieces(state.pieces, state.pieceDivs, null, function(err) {
+		updatePieces(state.pieces, state.pieceDivs, function(err) {
 			if (err) throw err;
 			if (onDone) onDone(div);
 		});
@@ -1500,10 +1500,9 @@ function SaveController(div, state) {
 	 * 
 	 * @param pieces are pre-existing pieces to set (optional)
 	 * @param pieceDivs are pre-existing piece divs to set (optional)
-	 * @param onProgress(percent) is invoked as progress is made
 	 * @param onDone(err, pieces, pieceDivs) is invoked when done
 	 */
-	function updatePieces(pieces, pieceDivs, onProgress, onDone) {
+	function updatePieces(pieces, pieceDivs, onDone) {
 		
 		// disable print and download links
 		printLink.off('click');
@@ -1514,7 +1513,6 @@ function SaveController(div, state) {
 		// handle pieces already set
 		if (pieces && pieceDivs) {
 			setPieces(pieces, pieceDivs);
-			if (onProgress) onProgress(1);
 			if (onDone) onDone(null, pieces, pieceDivs);
 			return;
 		}
@@ -1535,10 +1533,13 @@ function SaveController(div, state) {
 		// render
 		IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
 			setProgress(percent);
-			if (onProgress) onProgress(percent);
 		}, function(err, pieceDivs) {
-			setPieces(pieces, pieceDivs);
-			if (onDone) onDone(pieces, pieceDivs);
+			if (err) {
+				if (onDone) onDone(err);
+			} else {
+				setPieces(pieces, pieceDivs);
+				if (onDone) onDone(null, pieces, pieceDivs);
+			}
 		});
 	
 		function setProgress(percent, label) {
@@ -1651,69 +1652,6 @@ function SaveController(div, state) {
 	}
 }
 inheritsFrom(SaveController, DivController);
-
-/**
- * Renders pieces for customization and export.
- * 
- * @param div is the div to render to
- * @param state has pieces to render
- */
-function RenderPiecesController(div, state, onCustomExport) {
-	DivController.call(this, div);
-	assertTrue(state.pieces.length > 0);
-	
-	this.render = function(callback) {
-		UiUtils.pageSetup(div);
-		
-		// render title
-		div.append(UiUtils.getPageHeader("Your " + UiUtils.getCryptoName(state) + " storage is ready to save.", UiUtils.getCryptoLogo(state)));
-		
-		// render page if pieceDivs provided
-		if (state.pieceDivs) renderPage(function() { callback(div); });
-		
-		// otherwise render pieceDivs then page
-		else {
-			IndustrialPieceRenderer.render(state.pieces, null, null, function(err, pieceDivs) {
-				state.pieceDivs = pieceDivs;
-				renderPage(function() { callback(div); });
-			});
-		}
-	}
-	
-	function renderPage(onDone) {
-		
-		// wrap piece divs with htmls for export
-		let htmls = [];
-		for (let pieceDiv of state.pieceDivs) {
-			htmls.push($("<html>").append($("<body>").append(pieceDiv)));
-		}
-		
-		// zip pieces
-		CryptoUtils.piecesToZip(state.pieces, htmls, function(name, blob) {
-			
-			// render zip download
-			div.append("<br>");
-			let downloadZipsDiv = $("<div>").appendTo(div);
-			downloadZipsDiv.attr("class", "download_zips_div");
-			let downloadZipDiv = $("<div>").appendTo(downloadZipsDiv);
-			downloadZipDiv.attr("class", "download_zip_div");
-			let downloadIconDiv = $("<div style='text-align:center'>").appendTo(downloadZipDiv);
-			let downloadIcon = $("<img src='img/download.png' class='download_icon'>").appendTo(downloadIconDiv);
-			downloadIcon.click(function() { saveAs(blob, name); });
-			
-			// render custom export options
-			let customExport = $("<a href=''>").appendTo(downloadZipDiv);
-			customExport.append("Custom export options");
-			customExport.click(function(event) { event.preventDefault(); onCustomExport(state.pieces); });
-			
-			// render preview
-			div.append("<br>Preview:<br>");
-			div.append(state.pieceDivs[0]);
-			onDone();
-		});
-	}
-}
-inheritsFrom(RenderPiecesController, DivController);
 
 /**
  * Controls the custom export page.
