@@ -1701,7 +1701,7 @@ let BitaddressPieceRenderer = {
 		private_qr: true,
 		public_text: true,
 		private_text: true,
-		qr_size: 200,
+		qr_size: 66,
 		qr_version: null,
 		qr_error_correction_level: 'H',
 		qr_scale: 4,
@@ -1759,8 +1759,14 @@ let BitaddressPieceRenderer = {
 	 * @param onDone(err, pieceDiv) is invoked when done
 	 */
 	renderPiece: function(piece, config, onProgress, onDone) {
-		let div = $("<div>");	
 		
+		// merge configs
+		config = Object.assign({}, BitaddressPieceRenderer.defaultConfig, config);
+		
+		// div to render piece to
+		let div = $("<div>");
+		
+		// collect functions to render each pair
 		let funcs = [];
 		for (let elem of piece) {
 			let title1 = elem.crypto;
@@ -1771,11 +1777,15 @@ let BitaddressPieceRenderer = {
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, title1, value1, title2, value2, onDone); });
 		}
 		
-		async.series(funcs, function() {
+		// render pairs in parallel
+		async.parallel(funcs, function() {
 			onDone(null, div);
 		});
 		
+		// render single pair
 		function renderKeyPair(keyDiv, title1, value1, title2, value2, onDone) {
+			
+			// render left side
 			let keyDivLeft = $("<div class='key_div_left'>").appendTo(keyDiv);
 			let keyDivLeftQr = $("<div class='key_div_left_qr'>").appendTo(keyDivLeft);
 			let keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivLeft);
@@ -1784,6 +1794,7 @@ let BitaddressPieceRenderer = {
 			let keyDivLeftLabelKey = $("<div class='key_div_left_label_key'>").appendTo(keyDivLeftLabel);
 			keyDivLeftLabelKey.append(value1);
 			
+			// render right side
 			let keyDivRight = $("<div class='key_div_right'>").appendTo(keyDiv);
 			let keyDivRightQr = $("<div class='key_div_right_qr'>").appendTo(keyDivRight);
 			let keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivRight);
@@ -1792,7 +1803,23 @@ let BitaddressPieceRenderer = {
 			let keyDivRightLabelKey = $("<div class='key_div_right_label_key'>").appendTo(keyDivRightLabel);
 			keyDivRightLabelKey.append(value2);
 			
-			onDone();
+			// render qr codes
+			CryptoUtils.renderQrCode(value1, getQrConfig(config), function(img) {
+				keyDivLeftQr.append(img);
+				CryptoUtils.renderQrCode(value2, getQrConfig(config), function(img) {
+					keyDivRightQr.append(img);
+					onDone();
+				});
+			});
+			
+			function getQrConfig(config) {
+				let qr_config = {};
+				if ("undefined" !== config.qr_size) qr_config.size = config.qr_size;
+				if ("undefined" !== config.qr_version) qr_config.version = config.qr_version;
+				if ("undefined" !== config.qr_error_correction_level) qr_config.errorCorrectionLevel = config.qr_error_correction_level;
+				if ("undefined" !== config.qr_scale) qr_config.scale = config.qr_scale;
+				return qr_config;
+			}
 		}
 	}
 }
