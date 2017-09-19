@@ -1537,19 +1537,11 @@ function SaveController(div, state) {
 				for (let i = 0; i < pieceDivs.length; i++) {
 					let option = $("<option value='" + i + "'>").appendTo(selector);
 					option.html("Piece " + (i + 1));
-					
-//					if (i !== 0) previewHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-//					let pieceLink = UiUtils.getLink("#", "Piece " + (i + 1));
-//					pieceLink.click(function() {
-//						currentPieceDiv.empty();
-//						currentPieceDiv.append(pieceDivs[i]);
-//					});
-//					previewHeaderRight.append(pieceLink);
 				}
 			}
 			
 			// set currently showing piece
-			let currentPieceDiv = $("<div style='border-style:solid; padding:20px;'>").appendTo(previewDiv);
+			let currentPieceDiv = $("<div class='preview_piece_div'>").appendTo(previewDiv);
 			currentPieceDiv.append(pieceDivs[0]);
 		}
 		
