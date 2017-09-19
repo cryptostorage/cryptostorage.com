@@ -1575,14 +1575,13 @@ function SaveController(div, state) {
 				}
 			}
 			
-			// get piece css rules
-			let pieceCss = "";
+			// get internal css rules
+			let internalCss = "";
 			for (let i = 0; i < document.styleSheets.length; i++) {
 				let styleSheet = document.styleSheets[i];
-				console.log(styleSheet);
-				if (!styleSheet.href.endsWith("piece.css")) continue;
+				if (!styleSheet.cssRules) continue;
 				for (let j = 0; j < styleSheet.cssRules.length; j++) {
-					pieceCss += styleSheet.cssRules[j].cssText + "\n";
+					internalCss += styleSheet.cssRules[j].cssText + "\n";
 				}
 			}
 			
@@ -1592,7 +1591,7 @@ function SaveController(div, state) {
 				let html = $("<html>");
 				let head = $("<head>").appendTo(html);
 				let style = $("<style>");
-				style.html(pieceCss);
+				style.html(internalCss);
 				head.append(style);
 				html.append($("<body>").append(pieceDiv));
 				htmls.push(html);
