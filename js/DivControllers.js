@@ -1447,24 +1447,25 @@ function SaveController(div, state) {
 		let exportHeaderLeft = $("<div class='export_header_left'>").appendTo(exportHeader);
 		let exportHeaderRight = $("<div class='export_header_right'>").appendTo(exportHeader);
 		
+		// add print and download links
+		let downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderLeft);
+		exportHeaderLeft.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		downloadLink.click(function() { alert("download link clicked"); });	
+		let printLink = UiUtils.getLink("#", "Print").appendTo(exportHeaderLeft);
+		exportHeaderLeft.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		printLink.click(function() { alert("print link clicked"); });
+		
 		// add config link (closed by default)
-		let configLink = $("<div class='mock_link'>").appendTo(exportHeaderLeft);
+		let configLink = $("<span class='mock_link'>").appendTo(exportHeaderLeft);
+		configLink.click(function() { toggleConfig(); });
 		let configDiv = $("<div>").appendTo(div);
 		let configOpen = true;
 		toggleConfig();
-		configLink.click(function() { toggleConfig(); });
 		function toggleConfig() {
 			configOpen = !configOpen;
-			configLink.text(configOpen ? "\u25be Save options" : "\u25b8 Save options");
+			configLink.text(configOpen ? "\u25be Download options" : "\u25b8 Download options");
 			configOpen ? configDiv.show() : configDiv.hide();
 		}
-		
-		// add print and download links
-		let printLink = UiUtils.getLink("#", "Print").appendTo(exportHeaderRight);
-		printLink.click(function() { alert("print link clicked"); });
-		exportHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-		let downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderRight);
-		downloadLink.click(function() { alert("download link clicked"); });
 
 		// add config div
 		renderConfig(configDiv);

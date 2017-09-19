@@ -1,5 +1,6 @@
 // TODO
-// try Download | Print | > Download options together
+// "Split storage into X pieces where Y pieces are necessary to recover funds."
+// use tabs for pieces?
 // flag to verify encryption
 // prevent multiple preview rendering
 // minimum cannot be larger than num pieces
