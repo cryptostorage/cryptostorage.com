@@ -1,5 +1,5 @@
 // TODO
-// preview multiple preview rendering
+// prevent multiple preview rendering
 // minimum cannot be larger than num pieces
 // redesign pieces download page
 // redesign html export
