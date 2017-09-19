@@ -1440,32 +1440,32 @@ function SaveController(div, state) {
 		UiUtils.pageSetup(div);
 		
 		// add title
-		div.append(UiUtils.getPageHeader("Your storage is ready to save.", UiUtils.getCryptoLogo(state)));
+		div.append(UiUtils.getPageHeader("Your storage is ready to download.", UiUtils.getCryptoLogo(state)));
 		
 		// add save header
 		let exportHeader = $("<div class='export_header'>").appendTo(div);
 		let exportHeaderLeft = $("<div class='export_header_left'>").appendTo(exportHeader);
 		let exportHeaderRight = $("<div class='export_header_right'>").appendTo(exportHeader);
 		
-		// add print and download links
-		let downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderLeft);
-		exportHeaderLeft.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-		downloadLink.click(function() { alert("download link clicked"); });	
-		let printLink = UiUtils.getLink("#", "Print").appendTo(exportHeaderLeft);
-		exportHeaderLeft.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-		printLink.click(function() { alert("print link clicked"); });
-		
 		// add config link (closed by default)
-		let configLink = $("<span class='mock_link'>").appendTo(exportHeaderLeft);
-		configLink.click(function() { toggleConfig(); });
+		let configLink = $("<div class='mock_link'>").appendTo(exportHeaderLeft);
 		let configDiv = $("<div>").appendTo(div);
 		let configOpen = true;
 		toggleConfig();
+		configLink.click(function() { toggleConfig(); });
 		function toggleConfig() {
 			configOpen = !configOpen;
 			configLink.text(configOpen ? "\u25be Download options" : "\u25b8 Download options");
 			configOpen ? configDiv.show() : configDiv.hide();
 		}
+		
+		// add print and download links
+		let printLink = UiUtils.getLink("#", "Print").appendTo(exportHeaderRight);
+		printLink.click(function() { alert("print link clicked"); });
+		exportHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		let downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderRight);
+		downloadLink.click(function() { alert("download link clicked"); });
+
 
 		// add config div
 		renderConfig(configDiv);
@@ -1575,10 +1575,8 @@ function SaveController(div, state) {
 		// placement
 		div.css("margin-left", "18px");
 		
-		let configSpacing = 5;	// space in pixels for each config line
-		
 		// render include public addresses checkbox
-		includePublicDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(div);
+		includePublicDiv = $("<div class='config_option'>").appendTo(div);
 		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(includePublicDiv);
 		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(includePublicDiv);
 		includePublicCheckboxLabel.html(" Include public addresses");
@@ -1588,40 +1586,40 @@ function SaveController(div, state) {
 		includePublicCheckbox.prop('checked', true);
 				
 		// render split div
-		let splitDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(div);
+		let splitDiv = $("<div class='config_option'>").appendTo(div);
 		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(splitDiv);
 		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitDiv);
-		splitCheckboxLabel.html(" Split storage into separate pieces");
-		splitDiv.append("&nbsp;&nbsp;");
+		splitCheckboxLabel.append(" Split storage into ");
+		numPiecesInput = $("<input type='number'>").appendTo(splitDiv);
+		splitDiv.append(" pieces where ");
+		minPiecesInput = $("<input type='number'>").appendTo(splitDiv);
+		splitDiv.append(" pieces are necessary to recover funds");
 		
-		// div to hold split config
-		let splitConfigDiv = $("<div>").appendTo(div);
-		splitConfigDiv.css("margin-left", "25px");
-		
-		// number of pieces input
-		let numPiecesDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(splitConfigDiv);
-		numPiecesDiv.append("Number of pieces:");
-		numPiecesInput = $("<input type='number'>").appendTo(numPiecesDiv);
+		// set up split config
 		numPiecesInput.attr("class", "num_input");
 		numPiecesInput.attr("value", 3);
 		numPiecesInput.attr("min", 2);
 		numPiecesInput.change(function() { renderPreview(); });
-		
-		// minimum pieces input
-		let minPiecesDiv = $("<div style='padding:" + configSpacing + "px;'>").appendTo(splitConfigDiv);
-		minPiecesDiv.append("Minimum number of pieces needed to recover storage:");
-		minPiecesInput = $("<input type='number'>").appendTo(minPiecesDiv);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
 		minPiecesInput.attr("min", 2);
 		minPiecesInput.change(function() { renderPreview(); });
 		
+		// collect elements of split div for enabling/disabling
+		let splitElems = [];
+		splitElems.push(splitCheckboxLabel);
+		splitElems.push(numPiecesInput);
+		splitElems.push(minPiecesInput);
+		
 		// set initial state of split div
 		splitCheckbox.click(function() {
-			this.checked ? splitConfigDiv.show() : splitConfigDiv.hide();
+			for (let elem of splitElems) {
+				this.checked ? elem.removeAttr("disabled") : elem.attr("disabled", "disabled");
+			}
 			renderPreview();
 		});
-		splitConfigDiv.hide();
+		numPiecesInput.attr("disabled", "disabled");
+		minPiecesInput.attr("disabled", "disabled");
 		splitCheckbox.prop("checked", false);
 	}
 }

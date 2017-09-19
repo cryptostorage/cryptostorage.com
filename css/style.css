@@ -171,7 +171,7 @@ body {
 }
 
 .num_input {
-	width:75px;
+	width:55px;
 	font-size: 19px;
 	font-family: "Trebuchet MS", Helvetica, sans-serif;
 	text-align:center;
@@ -322,6 +322,10 @@ input[type='file'] {
 
 .export_header_right {
 	margin-left:auto;
+}
+
+.config_option {
+	padding:5px;
 }
 
 .preview_header {

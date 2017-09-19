@@ -1,5 +1,4 @@
 // TODO
-// "Split storage into X pieces where Y pieces are necessary to recover funds."
 // use tabs for pieces?
 // flag to verify encryption
 // prevent multiple preview rendering
