@@ -1759,8 +1759,26 @@ let BitaddressPieceRenderer = {
 	 * @param onDone(err, pieceDiv) is invoked when done
 	 */
 	renderPiece: function(piece, config, onProgress, onDone) {
-		let div = $("<div class='my_piece'>");
-		div.append("Testing 123");
+		let div = $("<div>");	
+		
+		for (let elem of piece) {
+			let keyDiv = $("<div class='key_div'>").appendTo(div);
+			
+			let keyDivLeft = $("<div class='key_div_left'>").appendTo(keyDiv);
+			let keyDivLeftQr = $("<div class='key_div_left_qr'>").appendTo(keyDivLeft);
+			let keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivLeft);
+			let keyDivLeftLabelTitle = $("<div class='key_div_label_title'>").appendTo(keyDivLeftLabel);
+			keyDivLeftLabelTitle.append("Bitcoin Address")
+			let keyDivLeftLabelKey = $("<div class='key_div_left_label_key'>").appendTo(keyDivLeftLabel);
+			
+			let keyDivRight = $("<div class='key_div_right'>").appendTo(keyDiv);
+			let keyDivRightQr = $("<div class='key_div_right_qr'>").appendTo(keyDivRight);
+			let keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivRight);
+			let keyDivRightLabelTitle = $("<div class='key_div_label_title'>").appendTo(keyDivRightLabel);
+			keyDivRightLabelTitle.append("Private key");
+			let keyDivRightLabelKey = $("<div class='key_div_right_label_key'>").appendTo(keyDivRightLabel);
+		}
+		
 		onDone(null, div);
 	}
 }
