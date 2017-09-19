@@ -3,7 +3,6 @@
 // flag to verify encryption
 // prevent multiple preview rendering
 // minimum cannot be larger than num pieces
-// redesign pieces download page
 // redesign html export
 // password confirmation - re-enter or show
 // register shortcut keys for page navigation (enter, y, n)
