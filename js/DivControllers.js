@@ -791,7 +791,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 inheritsFrom(NumPiecesInputController, DivController);
 
 /**
- * Summarize and generate keys, piece, and piece HTML.
+ * Summarize and generate keys, piece, and piece divs.
  * 
  * @param div is the div to render to
  * @param state contains the configuration to generate
@@ -855,7 +855,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
 				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + Weights.getDecryptWeight(elem.encryption));
 			}
-			let piecesRendererWeight = IndustrialPieceRenderer.getWeight(numKeys, 1, null);
+			let piecesRendererWeight = BitaddressPieceRenderer.getWeight(numKeys, 1, null);
 			totalWeight += piecesRendererWeight;
 			
 			// collect key creation functions
@@ -998,7 +998,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			}
 			
 			function renderPieceDivs(pieces, onDone) {
-				IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
+				BitaddressPieceRenderer.renderPieces(pieces, null, function(percent) {
 					setProgress(progressWeight + (percent * piecesRendererWeight), totalWeight);
 				}, onDone);
 			}
@@ -1150,7 +1150,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			for (let key of keys) {
 				totalWeight += Weights.getDecryptWeight(key.getEncryptionScheme());
 			}
-			let piecesRendererWeight = IndustrialPieceRenderer.getWeight(keys.length, 1, null);
+			let piecesRendererWeight = BitaddressPieceRenderer.getWeight(keys.length, 1, null);
 			totalWeight += piecesRendererWeight;
 			
 			// decrypt keys
@@ -1199,7 +1199,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			}
 			
 			function renderPieceDivs(pieces, onDone) {
-				IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
+				BitaddressPieceRenderer.renderPieces(pieces, null, function(percent) {
 					setProgress(progressWeight + (percent * piecesRendererWeight), totalWeight);
 				}, onDone);
 			}
@@ -1531,7 +1531,7 @@ function SaveController(div, state) {
 		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, numPieces, minPieces);
 		
 		// render
-		IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
+		BitaddressPieceRenderer.renderPieces(pieces, null, function(percent) {
 			setProgress(percent);
 		}, function(err, pieceDivs) {
 			if (err) {
@@ -1575,6 +1575,20 @@ function SaveController(div, state) {
 					option.html("Piece " + (i + 1));
 				}
 			}
+			
+//			$.get("css/piece.css", function(response) {
+//                console.log(response);
+//            });
+			
+//			$.ajax({
+//				url: "css/piece.css",
+//				success: function(resp) { console.log(resp); },
+//				dataType: "text"
+//			});
+			
+//			$.get("index.html", function( data ) {
+//				  console.log(data);
+//			});
 			
 			// build htmls from piece divs for zip export
 			let htmls = [];
@@ -1675,6 +1689,80 @@ function CustomExportController(div, state, pieces) {
 	}
 }
 inheritsFrom(CustomExportController, DivController);
+
+/**
+ * Renders a piece to a div for HTML export.
+ */
+let BitaddressPieceRenderer = {
+
+	defaultConfig: {
+		public_qr: true,
+		private_qr: true,
+		public_text: true,
+		private_text: true,
+		qr_size: 200,
+		qr_version: null,
+		qr_error_correction_level: 'H',
+		qr_scale: 4,
+		qr_padding: 5,		// spacing in pixels
+		col_spacing: 12,	// spacing in pixels
+		add_table_width: 15	// spacing in pixels
+	},
+	
+	getNumQrs: function(numKeys, numPieces, config) {
+		config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
+		return numKeys * numPieces * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
+	},
+	
+	getWeight: function(numKeys, numPieces, config) {
+		config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
+		return IndustrialPieceRenderer.getNumQrs(numKeys, numPieces, config) * Weights.getQrWeight();
+	},
+	
+	/**
+	 * Renders pieces.
+	 * 
+	 * @param pieces are the pieces to render
+	 * @param config is the configuration to render
+	 * @param onProgress(percent) is invoked as progress is made
+	 * @param onDone(err, pieceDivs) is invoked when done
+	 */
+	renderPieces: function(pieces, config, onProgress, onDone) {
+		
+		// collect functions to render
+		let funcs = [];
+		for (let piece of pieces) {
+			funcs.push(function(onDone) { BitaddressPieceRenderer.renderPiece(piece, config, onPieceProgress, onDone); });
+		}
+		
+		// render async
+		async.series(funcs, function(err, pieceDivs) {
+			if (err) throw err;
+			else onDone(null, pieceDivs);
+		});
+		
+		// collect progress
+		let prevProgress = 0;
+		function onPieceProgress(percent) {
+			onProgress(prevProgress + percent / pieces.length);
+			if (percent === 1) prevProgress += 1 / pieces.length;
+		}
+	},
+		
+	/**
+	 * Renders the given piece to a new div.
+	 * 
+	 * @param piece is the piece to render
+	 * @param config is the configuration to render
+	 * @param onProgress(percent) is invoked as progress is made
+	 * @param onDone(err, pieceDiv) is invoked when done
+	 */
+	renderPiece: function(piece, config, onProgress, onDone) {
+		let div = $("<div class='my_piece'>");
+		div.append("Testing 123");
+		onDone(null, div);
+	}
+}
 
 /**
  * Utility functions for the "industrial" pieces renderer.
