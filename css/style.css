@@ -337,6 +337,7 @@ input[type='file'] {
 .preview_piece_div {
 	border:thin solid;
 	padding:25px;
+	overflow:auto;
 }
 
 .preview_header_left {
