@@ -1506,7 +1506,9 @@ function SaveController(div, state) {
 	function updatePieces(pieces, pieceDivs, onProgress, onDone) {
 		
 		// disable print and download links
+		printLink.off('click');
 		printLink.attr("disabled", "disabled");
+		downloadLink.off('click');
 		downloadLink.attr("disabled", "disabled");
 		
 		// handle pieces already set
