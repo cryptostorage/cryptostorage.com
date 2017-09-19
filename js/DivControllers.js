@@ -1567,7 +1567,6 @@ function SaveController(div, state) {
 				let selector = $("<select class='piece_selector'>").appendTo(previewHeaderRight);
 				selector.change(function() {
 					currentPieceDiv.empty();
-					console.log(parseFloat(selector.find(":selected").val()));
 					currentPieceDiv.append(pieceDivs[parseFloat(selector.find(":selected").val())]);
 				});
 				for (let i = 0; i < pieceDivs.length; i++) {
@@ -1576,19 +1575,25 @@ function SaveController(div, state) {
 				}
 			}
 			
-			loader.load("css/piece.css", function() {
-				console.log(document.styleSheets);
-				for (let styleSheet of document.styleSheets) {
-					for (let cssRule of styleSheet.cssRules) {
-						console.log(cssRule.cssText);
-					}
+			// get piece css rules
+			let pieceCss = "";
+			for (let styleSheet of document.styleSheets) {
+				if (!styleSheet.href.endsWith("piece.css")) continue;
+				for (let cssRule of styleSheet.cssRules) {
+					pieceCss += cssRule.cssText + "\n";
 				}
-			});
+			}
 			
 			// build htmls from piece divs for zip export
 			let htmls = [];
 			for (let pieceDiv of pieceDivs) {
-				htmls.push($("<html>").append($("<body>").append(pieceDiv)));
+				let html = $("<html>");
+				let head = $("<head>").appendTo(html);
+				let style = $("<style>");
+				style.html(pieceCss);
+				head.append(style);
+				html.append($("<body>").append(pieceDiv));
+				htmls.push(html);
 			}
 			
 			// zip pieces
@@ -1606,35 +1611,6 @@ function SaveController(div, state) {
 				printLink.removeAttr("disabled");
 				downloadLink.removeAttr("disabled");
 			});
-			
-//			$.ajax({
-//			    url: "css/piece.css",
-//			    dataType: "text",
-//			    success: function(cssText) {
-//			       console.log(cssText);
-//			    },
-//			    mimeType: 'text/plain; charset=x-user-defined'
-//			});
-			
-//			$.get("css/piece.css", function(response) {
-//                console.log(response);
-//            });
-			
-//			let myDiv = $("<div>");
-//			myDiv.load("css/piece.css", function() {
-//				console.log("load done");
-//				console.log(getOuterHtml(myDiv));
-//			});
-			
-//			$.ajax({
-//				url: "css/piece.css",
-//				dataType: "text",
-//				success: function(resp) { console.log(resp); }
-//			});
-			
-//			$.get("index.html", function( data ) {
-//				  console.log(data);
-//			});
 		}
 	}
 	
