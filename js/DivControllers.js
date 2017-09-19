@@ -1577,10 +1577,12 @@ function SaveController(div, state) {
 			
 			// get piece css rules
 			let pieceCss = "";
-			for (let styleSheet of document.styleSheets) {
+			for (let i = 0; i < document.styleSheets.length; i++) {
+				let styleSheet = document.styleSheets[i];
+				console.log(styleSheet);
 				if (!styleSheet.href.endsWith("piece.css")) continue;
-				for (let cssRule of styleSheet.cssRules) {
-					pieceCss += cssRule.cssText + "\n";
+				for (let j = 0; j < styleSheet.cssRules.length; j++) {
+					pieceCss += styleSheet.cssRules[j].cssText + "\n";
 				}
 			}
 			
