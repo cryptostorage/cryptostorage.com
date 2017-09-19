@@ -339,7 +339,7 @@ input[type='file'] {
 }
 
 .preview_header_left {
-	width:150px;
+	width:125px;
 }
 
 .preview_header_center {
@@ -349,12 +349,12 @@ input[type='file'] {
 }
 
 .preview_header_right {
-	width:150px;
+	width:125px;
 	font-size:18px;
 }
 
 .piece_selector {
 	padding:5px;
 	font-size:18px;
-	width:150px;
+	width:125px;
 }

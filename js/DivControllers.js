@@ -1428,7 +1428,9 @@ function SaveController(div, state) {
 	var minPiecesInput;
 	
 	// storage preview
-	var previewDiv;
+	let progressDiv;
+	let progressBar;
+	let previewDiv;
 	let currentPieceDiv;
 	
 	/**
@@ -1467,7 +1469,7 @@ function SaveController(div, state) {
 		// add config div
 		renderConfig(configDiv);
 		
-		// render preview div
+		// add preview div
 		div.append("<br>");
 		previewDiv = $("<div>").appendTo(div);
 		renderPreview(state.pieceDivs, null, function(err) {
@@ -1502,21 +1504,39 @@ function SaveController(div, state) {
 			return;
 		}
 		
-		// render piece divs
+		// render piece divs from scratch
 		else {
+			
+			// empty current content
+			previewDiv.empty();
+			
+			// add progress bar
+			progressDiv = $("<div>").appendTo(previewDiv);
+			progressDiv.hide();
+			progressBar = UiUtils.getProgressBar(progressDiv.get(0));
+			
+			// read configuration
 			let numPieces = getIsSplit() ? getNumPieces() : 1;
 			let minPieces = getIsSplit() ? getMinPieces() : null;
 			let pieces = CryptoUtils.keysToPieces(state.keys, numPieces, minPieces);
-			previewDiv.empty();
+			
+			// render
 			IndustrialPieceRenderer.renderPieces(pieces, null, function(percent) {
-				console.log("renderer.onProgress(" + percent + ")");
+				setProgress(percent);
 			}, function(err, pieceDivs) {
 				console.log("renderer.onDone()");
 				setPieceDivs(pieceDivs);
 			});
 		}
 		
+		function setProgress(percent, label) {
+			progressDiv.show();
+			progressBar.set(percent);
+			if (label) progressBar.setText(label);
+		}
+		
 		function setPieceDivs(pieceDivs) {
+			previewDiv.empty();
 			
 			// add header div
 			let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
