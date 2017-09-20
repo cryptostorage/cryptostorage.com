@@ -1780,10 +1780,8 @@ let CustomPieceRenderer = {
 			let rightValue = piece[i].privateKey;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue,
 				function() {
-					setTimeout(function() {
-						onKeyPairDone();
-						onDone();
-					}, 2);	// let UI breath
+					onKeyPairDone();
+					onDone();
 				}
 			)});
 		}
