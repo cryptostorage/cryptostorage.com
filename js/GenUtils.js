@@ -473,6 +473,16 @@ function arrToCsv(arr) {
 }
 
 /**
+ * Indicates if the given string contains whitespace.
+ * 
+ * @param str is the string to test
+ * @returns true if the string contains whitespace, false otherwise
+ */
+function hasWhitespace(str) {
+	return /\s/g.test(str);
+}
+
+/**
  * Indicates if the given character is whitespace.
  * 
  * @param char is the character to test

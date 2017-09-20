@@ -1702,7 +1702,7 @@ let CustomPieceRenderer = {
 		private_qr: true,
 		public_text: true,
 		private_text: true,
-		qr_size: 82,
+		qr_size: 150,
 		qr_version: null,
 		qr_error_correction_level: 'H',
 		qr_scale: 4,
@@ -1796,6 +1796,7 @@ let CustomPieceRenderer = {
 			let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
 			keyDivCenterLeftLabel.html(leftLabel);
 			let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
+			if (!hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
 			keyDivCenterLeftValue.html(leftValue);
 			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
 			if (logo) {
@@ -1805,6 +1806,7 @@ let CustomPieceRenderer = {
 			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
 			keyDivCenterRightLabel.html(rightLabel);
 			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
+			if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
 			keyDivCenterRightValue.html(rightValue);
 			
 			// right
