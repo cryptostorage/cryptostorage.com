@@ -1765,12 +1765,12 @@ let CustomPieceRenderer = {
 		config = Object.assign({}, CustomPieceRenderer.defaultConfig, config);
 		
 		// div to render piece to
-		let div = $("<div>");
+		let pieceDiv = $("<div class='piece_div'>");
 		
 		// collect functions to render each pair
 		let funcs = [];
 		for (let i = 0; i < piece.length; i++) {
-			let keyDiv = $("<div class='key_div'>").appendTo(div);
+			let keyDiv = $("<div class='key_div'>").appendTo(pieceDiv);
 			if (i === 0) keyDiv.css("border-top", "2px solid green");
 			let plugin = CryptoUtils.getCryptoPlugin(piece[i].crypto);
 			let leftLabel = plugin.getName() + " Address";
@@ -1790,7 +1790,7 @@ let CustomPieceRenderer = {
 		
 		// render pairs in parallel
 		async.series(funcs, function() {
-			onDone(null, div);
+			onDone(null, pieceDiv);
 		});
 		
 		let keyPairsDone = 0;
