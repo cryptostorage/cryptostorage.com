@@ -1770,12 +1770,14 @@ let CustomPieceRenderer = {
 		// collect functions to render each pair
 		let funcs = [];
 		for (let elem of piece) {
-			let title1 = elem.crypto;
-			let value1 = elem.address;
-			let title2 = "Private key";
-			let value2 = elem.privateKey;
 			let keyDiv = $("<div class='key_div'>").appendTo(div);
-			funcs.push(function(onDone) { renderKeyPair(keyDiv, title1, value1, title2, value2, onDone); });
+			let plugin = CryptoUtils.getCryptoPlugin(elem.crypto);
+			let leftLabel = plugin.getName() + " Address";
+			let leftValue = elem.address;
+			let logo = plugin.getLogo();
+			let rightLabel = "Private key";
+			let rightValue = elem.privateKey;
+			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue, onDone); });
 		}
 		
 		// render pairs in parallel
@@ -1784,39 +1786,42 @@ let CustomPieceRenderer = {
 		});
 		
 		// render single pair
-		function renderKeyPair(keyDiv, title1, value1, title2, value2, onDone) {
+		function renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue, onDone) {
 			
-			// render left side
+			// left
 			let keyDivLeft = $("<div class='key_div_left'>").appendTo(keyDiv);
-			let keyDivLeftQr = $("<div class='key_div_left_qr'>").appendTo(keyDivLeft);
-			let keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivLeft);
-			let keyDivLeftLabelTitle = $("<span class='key_div_label_title'>").appendTo(keyDivLeftLabel);
-			keyDivLeftLabelTitle.append(title1)
-			let keyDivLeftLabelKey = $("<span class='key_div_label_key'>").appendTo(keyDivLeftLabel);
-			keyDivLeftLabelKey.append(value1);
 			
-			// render right side
+			// center
+			let keyDivCenter = $("<div class='key_div_center'>").appendTo(keyDiv);
+			let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
+			keyDivCenterLeftLabel.html(leftLabel);
+			let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
+			keyDivCenterLeftValue.html(leftValue);
+			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
+			if (logo) {
+				logo.attr("class", "key_div_logo");
+				logo.appendTo(keyDivCenterLogo);
+			}
+			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
+			keyDivCenterRightLabel.html(rightLabel);
+			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
+			keyDivCenterRightValue.html(rightValue);
+			
+			// right
 			let keyDivRight = $("<div class='key_div_right'>").appendTo(keyDiv);
-			let keyDivRightQr = $("<div class='key_div_right_qr'>").appendTo(keyDivRight);
-			let keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivRight);
-			let keyDivRightLabelTitle = $("<span class='key_div_label_title'>").appendTo(keyDivRightLabel);
-			keyDivRightLabelTitle.append(title2);
-			let keyDivRightLabelKey = $("<span class='key_div_label_key'>").appendTo(keyDivRightLabel);
-			keyDivRightLabelKey.append(value2);
 			
-			// render qr codes
-			CryptoUtils.renderQrCode(value1, getQrConfig(config), function(img) {
-				let canvas1 = $("<canvas width='660' height='660' style='width: 66px; height: 66px;'>");
-				keyDivLeftQr.append(canvas1);
-				//keyDivLeftQr.append(img);
-				CryptoUtils.renderQrCode(value2, getQrConfig(config), function(img) {
-					let canvas2 = $("<canvas width='820' height='820' style='width: 82px; height: 82px;'>");
-					keyDivRightQr.append(canvas2);
-					//keyDivRightQr.append(img);
+			// add QR codes to left and right
+			CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
+				img.attr("class", "key_div_qr");
+				keyDivLeft.append(img);
+				CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
+					img.attr("class", "key_div_qr");
+					keyDivRight.append(img);
 					onDone();
 				});
 			});
 			
+			// translates from renderer config to QR config
 			function getQrConfig(config) {
 				let qr_config = {};
 				if ("undefined" !== config.qr_size) qr_config.size = config.qr_size;
