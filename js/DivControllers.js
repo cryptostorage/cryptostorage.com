@@ -1779,13 +1779,25 @@ let CustomPieceRenderer = {
 			let logo = plugin.getLogo();
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : "");
 			let rightValue = piece[i].privateKey;
-			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue, onDone); });
+			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue,
+				function() {
+					keyPairDone();
+					onDone();
+				}
+			)});
 		}
 		
 		// render pairs in parallel
 		async.parallel(funcs, function() {
 			onDone(null, div);
 		});
+		
+		let keyPairsDone = 0;
+		function keyPairDone() {
+			keyPairsDone++;
+			onProgress(keyPairsDone / piece.length);
+			//if (keyPairsDone % Math.round(piece.length / 50) === 0) onProgress(keyPairsDone / piece.length);
+		}
 		
 		// render single pair
 		function renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue, onDone) {

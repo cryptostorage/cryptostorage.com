@@ -40,9 +40,10 @@
 // all div controllers directly modify state
 
 // top border
-// get rid of double border
 // logos in download
 // progress bar
+// smaller width
+// printable
 
 const RUN_TESTS = false;
 const DEBUG = true;
