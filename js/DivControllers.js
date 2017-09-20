@@ -1577,9 +1577,10 @@ function SaveController(div, state) {
 			
 			// get internal css rules
 			let internalCss = "";
+			console.log(document.styleSheets);
 			for (let i = 0; i < document.styleSheets.length; i++) {
 				let styleSheet = document.styleSheets[i];
-				if (!styleSheet.cssRules) continue;
+				if (!styleSheet.cssRules || styleSheet.href) continue;	// target inline css which has rules and null href
 				for (let j = 0; j < styleSheet.cssRules.length; j++) {
 					internalCss += styleSheet.cssRules[j].cssText + "\n";
 				}
