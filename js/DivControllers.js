@@ -1609,8 +1609,6 @@ function SaveController(div, state) {
 				
 				// set currently showing piece
 				previewDiv.append(pieceDivs[0]);
-				currentPieceDiv = $("<div class='preview_piece_div'>").appendTo(previewDiv);
-				currentPieceDiv.append(pieceDivs[0]);
 				
 				// enable print and download links
 				printLink.removeAttr("disabled");

@@ -337,15 +337,12 @@ input[type='file'] {
 	padding:10px;
 	border:thin solid;
 	border-bottom:none;
+	margin-top:20px;
 }
 
 .preview_div {
 	width:800px;
 	margin-bottom:20px;
-}
-
-.preview_piece_div {
-	
 }
 
 .preview_header_left {
