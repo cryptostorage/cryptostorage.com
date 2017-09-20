@@ -241,7 +241,7 @@ function PageController(div) {
 		
 		// handle non-first page change
 		else if (lastIdx !== curIdx){
-			renderer.getDiv().css("display", "none");	// so div swipes into view
+			renderer.getDiv().hide();
 			pageDiv.append(renderer.getDiv());
 			
 			// swipe right
@@ -1441,6 +1441,9 @@ function SaveController(div, state) {
 	 */
 	this.render = function(onDone) {
 		UiUtils.pageSetup(div);
+		
+		// center page contents
+		div.attr("style", "display:flex; flex-direction:column; align-items:center;");
 		
 		// add title
 		div.append(UiUtils.getPageHeader("Your storage is ready to download.", UiUtils.getCryptoLogo(state)));
