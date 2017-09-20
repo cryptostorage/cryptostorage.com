@@ -1608,7 +1608,8 @@ function SaveController(div, state) {
 				printLink.click(function() { alert("print link clicked"); });
 				
 				// set currently showing piece
-				previewDiv.append(pieceDivs[0]);
+				currentPieceDiv = $("<div>").appendTo(previewDiv);
+				currentPieceDiv.append(pieceDivs[0]);
 				
 				// enable print and download links
 				printLink.removeAttr("disabled");
