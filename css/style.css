@@ -338,9 +338,12 @@ input[type='file'] {
 	border-bottom:none;
 }
 
+.preview_div {
+	margin-bottom:20px;
+}
+
 .preview_piece_div {
-	border:thin solid;
-	padding:25px;
+
 }
 
 .preview_header_left {

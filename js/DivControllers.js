@@ -1472,7 +1472,7 @@ function SaveController(div, state) {
 		
 		// add preview div
 		div.append("<br>");
-		previewDiv = $("<div>").appendTo(div);
+		previewDiv = $("<div class='preview_div'>").appendTo(div);
 		updatePieces(state.pieces, state.pieceDivs, function(err) {
 			if (err) throw err;
 			if (onDone) onDone(div);
@@ -1606,6 +1606,7 @@ function SaveController(div, state) {
 				printLink.click(function() { alert("print link clicked"); });
 				
 				// set currently showing piece
+				previewDiv.append(pieceDivs[0]);
 				currentPieceDiv = $("<div class='preview_piece_div'>").appendTo(previewDiv);
 				currentPieceDiv.append(pieceDivs[0]);
 				
@@ -1776,7 +1777,7 @@ let CustomPieceRenderer = {
 			let leftLabel = plugin.getName() + " Address";
 			let leftValue = piece[i].address;
 			let logo = plugin.getLogo();
-			let rightLabel = "Private key";
+			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : "");
 			let rightValue = piece[i].privateKey;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue, onDone); });
 		}
