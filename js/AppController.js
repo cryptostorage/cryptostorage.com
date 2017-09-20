@@ -1,4 +1,6 @@
 // TODO
+// bitaddress renderer overlapping qr code
+// all css getting injected into html exports
 // use tabs for pieces?
 // flag to verify encryption
 // prevent multiple preview rendering
