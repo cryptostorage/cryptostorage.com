@@ -1805,9 +1805,13 @@ let BitaddressPieceRenderer = {
 			
 			// render qr codes
 			CryptoUtils.renderQrCode(value1, getQrConfig(config), function(img) {
-				keyDivLeftQr.append(img);
+				let canvas1 = $("<canvas width='660' height='660' style='width: 66px; height: 66px;'>");
+				keyDivLeftQr.append(canvas1);
+				//keyDivLeftQr.append(img);
 				CryptoUtils.renderQrCode(value2, getQrConfig(config), function(img) {
-					keyDivRightQr.append(img);
+					let canvas2 = $("<canvas width='820' height='820' style='width: 82px; height: 82px;'>");
+					keyDivRightQr.append(canvas2);
+					//keyDivRightQr.append(img);
 					onDone();
 				});
 			});
