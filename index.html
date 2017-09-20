@@ -20,19 +20,19 @@
 		<script src="js/DependencyLoader.js"></script>
 		<script src="js/Tests.js"></script>
 		
-		<!-- CSS for dynamic html pieces -->
+		<!-- Inline CSS for dynamic HTML generation -->
 		<style>			
-			.key_div { display: block; height: 140px; text-align: left; position: relative; padding: 5px; border: 2px solid; border-top: 0; }
-			.key_div_label_title { font-weight: bold; }
-			.key_div_label_key { display: block; font-family: monospace; font-size: 1.25em; }
-			
-			.key_div_left { float: left; }
-			.key_div_left_qr { display: inline-block; float: left; }
-			.key_div_left_label { display: inline-block; height: 40px; padding: 0 0 0 10px; float: left; }
-			
-			.key_div_right { }
-			.key_div_right_qr { display: inline-block; position: relative; top: 28px; float: right; }
-			.key_div_right_label { margin: 0; float: right; text-align: right; padding: 0 20px 0 0; position: relative; }
+			.key_div { padding: 10px; display: flex; border: 2px solid; border-color:green; }
+			.key_div_qr { width:150px; height:150px; }
+			.key_div_logo { width: 40px; height: 40px; }
+			.key_div_left { width:150px; display:flex; align-items: center; justify-content:center; }
+			.key_div_center { margin: 0 10px 0 10px; flex:1; display:flex; flex-direction:column;}
+			.key_div_center_left_label { font-weight: bold; }
+			.key_div_center_left_value { font-size: 12px; font-family: monospace; word-break: break-all; }
+			.key_div_center_middle { flex: 1; display:flex; align-items:center; justify-content:center; }
+			.key_div_center_right_label { text-align:right; font-weight: bold; margin-top: -20px}
+			.key_div_center_right_value { font-size: 12px; text-align: right; font-family: monospace; }
+			.key_div_right { width:150px; display:flex; align-items: center; justify-content:center; }
 		</style>
 	</head>
 	<body>

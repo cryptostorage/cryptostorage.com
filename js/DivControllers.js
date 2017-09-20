@@ -855,7 +855,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
 				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + Weights.getDecryptWeight(elem.encryption));
 			}
-			let piecesRendererWeight = BitaddressPieceRenderer.getWeight(numKeys, 1, null);
+			let piecesRendererWeight = CustomPieceRenderer.getWeight(numKeys, 1, null);
 			totalWeight += piecesRendererWeight;
 			
 			// collect key creation functions
@@ -998,7 +998,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			}
 			
 			function renderPieceDivs(pieces, onDone) {
-				BitaddressPieceRenderer.renderPieces(pieces, null, function(percent) {
+				CustomPieceRenderer.renderPieces(pieces, null, function(percent) {
 					setProgress(progressWeight + (percent * piecesRendererWeight), totalWeight);
 				}, onDone);
 			}
@@ -1150,7 +1150,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			for (let key of keys) {
 				totalWeight += Weights.getDecryptWeight(key.getEncryptionScheme());
 			}
-			let piecesRendererWeight = BitaddressPieceRenderer.getWeight(keys.length, 1, null);
+			let piecesRendererWeight = CustomPieceRenderer.getWeight(keys.length, 1, null);
 			totalWeight += piecesRendererWeight;
 			
 			// decrypt keys
@@ -1199,7 +1199,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			}
 			
 			function renderPieceDivs(pieces, onDone) {
-				BitaddressPieceRenderer.renderPieces(pieces, null, function(percent) {
+				CustomPieceRenderer.renderPieces(pieces, null, function(percent) {
 					setProgress(progressWeight + (percent * piecesRendererWeight), totalWeight);
 				}, onDone);
 			}
@@ -1531,7 +1531,7 @@ function SaveController(div, state) {
 		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, numPieces, minPieces);
 		
 		// render
-		BitaddressPieceRenderer.renderPieces(pieces, null, function(percent) {
+		CustomPieceRenderer.renderPieces(pieces, null, function(percent) {
 			setProgress(percent);
 		}, function(err, pieceDivs) {
 			if (err) {
@@ -1695,7 +1695,7 @@ inheritsFrom(CustomExportController, DivController);
 /**
  * Renders a piece to a div for HTML export.
  */
-let BitaddressPieceRenderer = {
+let CustomPieceRenderer = {
 
 	defaultConfig: {
 		public_qr: true,
@@ -1734,7 +1734,7 @@ let BitaddressPieceRenderer = {
 		// collect functions to render
 		let funcs = [];
 		for (let piece of pieces) {
-			funcs.push(function(onDone) { BitaddressPieceRenderer.renderPiece(piece, config, onPieceProgress, onDone); });
+			funcs.push(function(onDone) { CustomPieceRenderer.renderPiece(piece, config, onPieceProgress, onDone); });
 		}
 		
 		// render async
@@ -1762,7 +1762,7 @@ let BitaddressPieceRenderer = {
 	renderPiece: function(piece, config, onProgress, onDone) {
 		
 		// merge configs
-		config = Object.assign({}, BitaddressPieceRenderer.defaultConfig, config);
+		config = Object.assign({}, CustomPieceRenderer.defaultConfig, config);
 		
 		// div to render piece to
 		let div = $("<div>");
