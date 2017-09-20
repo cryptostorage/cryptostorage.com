@@ -1769,14 +1769,15 @@ let CustomPieceRenderer = {
 		
 		// collect functions to render each pair
 		let funcs = [];
-		for (let elem of piece) {
+		for (let i = 0; i < piece.length; i++) {
 			let keyDiv = $("<div class='key_div'>").appendTo(div);
-			let plugin = CryptoUtils.getCryptoPlugin(elem.crypto);
+			if (i === 0) keyDiv.css("border-top", "2px solid green");
+			let plugin = CryptoUtils.getCryptoPlugin(piece[i].crypto);
 			let leftLabel = plugin.getName() + " Address";
-			let leftValue = elem.address;
+			let leftValue = piece[i].address;
 			let logo = plugin.getLogo();
 			let rightLabel = "Private key";
-			let rightValue = elem.privateKey;
+			let rightValue = piece[i].privateKey;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue, onDone); });
 		}
 		

@@ -39,6 +39,11 @@
 // summary page has table with logos
 // all div controllers directly modify state
 
+// top border
+// get rid of double border
+// logos in download
+// progress bar
+
 const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
