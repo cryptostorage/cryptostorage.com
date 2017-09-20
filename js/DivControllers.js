@@ -1789,18 +1789,18 @@ let BitaddressPieceRenderer = {
 			let keyDivLeft = $("<div class='key_div_left'>").appendTo(keyDiv);
 			let keyDivLeftQr = $("<div class='key_div_left_qr'>").appendTo(keyDivLeft);
 			let keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivLeft);
-			let keyDivLeftLabelTitle = $("<div class='key_div_label_title'>").appendTo(keyDivLeftLabel);
+			let keyDivLeftLabelTitle = $("<span class='key_div_label_title'>").appendTo(keyDivLeftLabel);
 			keyDivLeftLabelTitle.append(title1)
-			let keyDivLeftLabelKey = $("<div class='key_div_left_label_key'>").appendTo(keyDivLeftLabel);
+			let keyDivLeftLabelKey = $("<span class='key_div_label_key'>").appendTo(keyDivLeftLabel);
 			keyDivLeftLabelKey.append(value1);
 			
 			// render right side
 			let keyDivRight = $("<div class='key_div_right'>").appendTo(keyDiv);
 			let keyDivRightQr = $("<div class='key_div_right_qr'>").appendTo(keyDivRight);
 			let keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivRight);
-			let keyDivRightLabelTitle = $("<div class='key_div_label_title'>").appendTo(keyDivRightLabel);
+			let keyDivRightLabelTitle = $("<span class='key_div_label_title'>").appendTo(keyDivRightLabel);
 			keyDivRightLabelTitle.append(title2);
-			let keyDivRightLabelKey = $("<div class='key_div_right_label_key'>").appendTo(keyDivRightLabel);
+			let keyDivRightLabelKey = $("<span class='key_div_label_key'>").appendTo(keyDivRightLabel);
 			keyDivRightLabelKey.append(value2);
 			
 			// render qr codes
