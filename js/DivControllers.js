@@ -1577,7 +1577,6 @@ function SaveController(div, state) {
 			
 			// get internal css rules
 			let internalCss = "";
-			console.log(document.styleSheets);
 			for (let i = 0; i < document.styleSheets.length; i++) {
 				let styleSheet = document.styleSheets[i];
 				if (!styleSheet.cssRules || styleSheet.href) continue;	// target inline css which has rules and null href
@@ -1740,7 +1739,7 @@ let CustomPieceRenderer = {
 		
 		// render async
 		async.series(funcs, function(err, pieceDivs) {
-			if (err) throw err;
+			if (err) onDone(err);
 			else onDone(null, pieceDivs);
 		});
 		
@@ -1781,22 +1780,29 @@ let CustomPieceRenderer = {
 			let rightValue = piece[i].privateKey;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue,
 				function() {
-					keyPairDone();
-					onDone();
+					setTimeout(function() {
+						onKeyPairDone();
+						onDone();
+					}, 2);	// let UI breath
 				}
 			)});
 		}
 		
 		// render pairs in parallel
-		async.parallel(funcs, function() {
+		async.series(funcs, function() {
 			onDone(null, div);
 		});
 		
 		let keyPairsDone = 0;
-		function keyPairDone() {
+		let lastProgress = 0;
+		let notifyFrequency = .01;	// notifies every 1% progress
+		function onKeyPairDone() {
 			keyPairsDone++;
-			onProgress(keyPairsDone / piece.length);
-			//if (keyPairsDone % Math.round(piece.length / 50) === 0) onProgress(keyPairsDone / piece.length);
+			let progress = keyPairsDone / piece.length;
+			if (progress === 1 || progress - lastProgress >= notifyFrequency) {
+				lastProgress = progress;
+				onProgress(progress);
+			}
 		}
 		
 		// render single pair
