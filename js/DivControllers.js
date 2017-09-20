@@ -1775,7 +1775,7 @@ let CustomPieceRenderer = {
 			let keyDiv = $("<div class='key_div'>").appendTo(pieceDiv);
 			if (i === 0) keyDiv.css("border-top", "2px solid green");
 			let plugin = CryptoUtils.getCryptoPlugin(piece[i].crypto);
-			let leftLabel = "\u25C4 #" + (i + 1) + ": " + 	plugin.getName() + " Address";
+			let leftLabel = "\u25C4 #" + (i + 1) + ": " + 	plugin.getName() + " Public Address";
 			let leftValue = piece[i].address;
 			let logo = plugin.getLogo();
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : "") + " \u25ba";
