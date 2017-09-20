@@ -1701,7 +1701,7 @@ let BitaddressPieceRenderer = {
 		private_qr: true,
 		public_text: true,
 		private_text: true,
-		qr_size: 66,
+		qr_size: 82,
 		qr_version: null,
 		qr_error_correction_level: 'H',
 		qr_scale: 4,
