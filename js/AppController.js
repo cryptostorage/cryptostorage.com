@@ -41,7 +41,6 @@
 
 // top border
 // logos in download
-// progress bar
 // smaller width
 // printable
 
