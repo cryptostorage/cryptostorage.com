@@ -1649,10 +1649,10 @@ function SaveController(div, state) {
 	function renderConfig(div) {
 		
 		// placement
-		div.css("margin-left", "18px");
+		div.attr("class", "download_config_div");
 		
 		// render include public addresses checkbox
-		includePublicDiv = $("<div class='config_option'>").appendTo(div);
+		includePublicDiv = $("<div class='download_config_option'>").appendTo(div);
 		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(includePublicDiv);
 		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(includePublicDiv);
 		includePublicCheckboxLabel.html(" Include public addresses");
@@ -1660,14 +1660,14 @@ function SaveController(div, state) {
 		includePublicCheckbox.prop('checked', true);
 				
 		// render split div
-		let splitDiv = $("<div class='config_option'>").appendTo(div);
+		let splitDiv = $("<div class='download_config_option'>").appendTo(div);
 		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(splitDiv);
 		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.append(" Split storage into ");
 		numPiecesInput = $("<input type='number'>").appendTo(splitDiv);
 		splitDiv.append(" pieces where ");
 		minPiecesInput = $("<input type='number'>").appendTo(splitDiv);
-		splitDiv.append(" pieces are necessary to recover funds");
+		splitDiv.append("");
 		
 		// set up split config
 		numPiecesInput.attr("class", "num_input");

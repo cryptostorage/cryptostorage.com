@@ -325,7 +325,12 @@ input[type='file'] {
 	margin-left:auto;
 }
 
-.config_option {
+.download_config_div {
+	width:800px;
+	margin-left:40px;
+}
+
+.download_config_option {
 	padding:5px;
 }
 
