@@ -505,29 +505,3 @@ function countNonWhitespaceCharacters(str) {
 	}
 	return count;
 }
-
-/**
- * Converts a jquery image to a new image with src set to a base64 data url.
- * 
- * @param img is the jquery image to convert
- * @param format is the output format (image/png, image/jpeg, image/webp)
- * @returns a new jquery image with src set to a base64 data url
- */
-function getInlineImage(img, format) {
-	img = img.get(0);	// convert jquery object to native element
-	let canvas = document.createElement('canvas');
-    canvas.height = img.naturalHeight;
-    canvas.width = img.naturalWidth;
-    let context = canvas.getContext('2d');
-    context.drawImage(img, 0, 0);
-    return $("<img>", { src: canvas.toDataURL(format) });
-}
-
-function imgToDataUrl(img, format) {
-	let canvas = document.createElement('canvas');
-    canvas.height = img.naturalHeight;
-    canvas.width = img.naturalWidth;
-    let context = canvas.getContext('2d');
-    context.drawImage(img, 0, 0);
-    return canvas.toDataURL(format);
-}

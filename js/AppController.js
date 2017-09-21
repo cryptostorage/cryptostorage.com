@@ -32,6 +32,7 @@
 // prevent rendered page from showing after home, FAQ or donate clicked
 // file import zip with invalid json shouldn't prevent others from importing
 // keyboard popping up in ios on key creation flow
+// load optimization: load script with embedded base64 logo data and insert into css rules dynamically to prevent upfront load
 
 // select one or more currencies to store (consistent look with number of addresses input)
 // enter the number of addresses for each currency || enter the number of Bitcoin addresses to create)
