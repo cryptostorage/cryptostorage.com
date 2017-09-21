@@ -1621,9 +1621,9 @@ function SaveController(div, state) {
 			for (let pieceDiv of pieceDivs) {
 				let html = $("<html>");
 				let head = $("<head>").appendTo(html);
-				let style = $("<style>");
+				$("<meta http-equiv='content-type' content='text/html;charset=utf-8'>").appendTo(head);
+				let style = $("<style>").appendTo(head);
 				style.html(internalCss);
-				head.append(style);
 				html.append($("<body>").append(pieceDiv));
 				htmls.push(html);
 			}
