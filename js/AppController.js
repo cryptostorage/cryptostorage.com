@@ -1,5 +1,4 @@
 // TODO
-// save as split, import, then save as split, zips not the same size
 // bitaddress renderer overlapping qr code
 // all css getting injected into html exports
 // use tabs for pieces?
