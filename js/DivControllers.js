@@ -1578,14 +1578,42 @@ function SaveController(div, state) {
 				}
 			}
 			
-			// collect css rules to embed in html exports
-			let internalCss = "";
-			for (let i = 0; i < document.styleSheets.length; i++) {
-				let styleSheet = document.styleSheets[i];
-				if (!styleSheet.cssRules || styleSheet.href) continue;	// target inline css which has rules and null href
-				for (let j = 0; j < styleSheet.cssRules.length; j++) {
-					internalCss += styleSheet.cssRules[j].cssText + "\n";
+			// collect logo css rules to embed for dynamic HTML export
+			let tickers = new Set();
+			for (let elem of pieces[0]) tickers.add(elem.crypto);
+			let logoCssRules = [];
+			tickers.forEach(function(ticker) {
+				logoCssRules.push({selectorText: ".key_div_logo_" + ticker.toLowerCase(), cssText: "{ background:url(" + getLogoData(ticker) + "); background-size: 100% 100% }"});
+			});
+			
+			// inject logo css rules that don't exist
+			let internalStyleSheet = getInternalStyleSheet();
+			assertInitialized(internalStyleSheet);
+			for (let logoCssRule of logoCssRules) {
+				if (!selectorExists(logoCssRule.selectorText, internalStyleSheet)) {
+					internalStyleSheet.insertRule(logoCssRule.selectorText + " " + logoCssRule.cssText);
 				}
+			}
+			
+			// collect all internal css
+			let internalCss = "";
+			for (let i = 0; i < internalStyleSheet.cssRules.length; i++) {
+				internalCss += internalStyleSheet.cssRules[i].cssText + "\n";
+			}
+			
+			function getInternalStyleSheet() {
+				for (let i = 0; i < document.styleSheets.length; i++) {
+					let styleSheet = document.styleSheets[i];
+					if (styleSheet.cssRules && !styleSheet.href) return styleSheet;
+				}
+				return null;
+			}
+			
+			function selectorExists(selectorText, styleSheet) {
+				for (let cssRule of styleSheet.cssRules) {
+					if (cssRule.selectorText === selectorText) return true;
+				}
+				return false;
 			}
 			
 			// build htmls from piece divs for zip export

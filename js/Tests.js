@@ -25,6 +25,11 @@ let Tests = {
 		}
 		loader.load(Array.from(dependencies), function() {
 			
+			// verify each plugin has logo data
+			for (let plugin of CryptoUtils.getCryptoPlugins()) {
+				getLogoData(plugin.getTicker());	// throws exception if not found
+			}
+			
 			// run tests
 			testUtils();
 			testPathTracker();
