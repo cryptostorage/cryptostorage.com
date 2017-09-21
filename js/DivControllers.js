@@ -1579,6 +1579,8 @@ function SaveController(div, state) {
 			}
 			
 			// build embedded logo css rules
+			//getInlineImage(CryptoUtils.getCryptoPlugin("BTC").getLogo());
+			
 			let cryptos = new Set();
 			for (let elem of pieces[0]) cryptos.add(elem.crypto);
 			let logoCssRules = [];
@@ -1597,7 +1599,7 @@ function SaveController(div, state) {
 			for (let i = 0; i < document.styleSheets.length; i++) {
 				let styleSheet = document.styleSheets[i];
 				if (!styleSheet.cssRules || styleSheet.href) continue;	// target inline css which has rules and null href
-				console.log(styleSheet);
+				for (let logoCssRule of logoCssRules) console.log(logoCssRule);
 				for (let logoCssRule of logoCssRules) styleSheet.insertRule(logoCssRule);
 				for (let j = 0; j < styleSheet.cssRules.length; j++) {
 					internalCss += styleSheet.cssRules[j].cssText + "\n";
