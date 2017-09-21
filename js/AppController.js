@@ -1,11 +1,8 @@
 // TODO
-// bitaddress renderer overlapping qr code
-// all css getting injected into html exports
 // use tabs for pieces?
 // flag to verify encryption
 // prevent multiple preview rendering
 // minimum cannot be larger than num pieces
-// redesign html export
 // password confirmation - re-enter or show
 // register shortcut keys for page navigation (enter, y, n)
 // paste private key doesn't work in iphone safari
@@ -32,7 +29,6 @@
 // prevent rendered page from showing after home, FAQ or donate clicked
 // file import zip with invalid json shouldn't prevent others from importing
 // keyboard popping up in ios on key creation flow
-// load optimization: load script with embedded base64 logo data and insert into css rules dynamically to prevent upfront load
 
 // select one or more currencies to store (consistent look with number of addresses input)
 // enter the number of addresses for each currency || enter the number of Bitcoin addresses to create)
@@ -41,9 +37,10 @@
 // all div controllers directly modify state
 
 // top border
-// logos in download
-// smaller width
-// printable
+// logos not appearing in print
+// arrows not appearing in html export
+// preview flickers even on first load
+// height sizing issues in chrome
 
 const RUN_TESTS = false;
 const DEBUG = true;
