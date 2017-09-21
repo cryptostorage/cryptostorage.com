@@ -36,8 +36,9 @@
 // summary page has table with logos
 // all div controllers directly modify state
 
-// top border
 // logos not appearing in print
+// no need to do background hack since data is directly embeddable?
+// top border
 // arrows not appearing in html export
 // preview flickers even on first load
 // height sizing issues in chrome
