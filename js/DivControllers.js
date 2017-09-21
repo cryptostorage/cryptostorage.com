@@ -1821,7 +1821,7 @@ let CustomPieceRenderer = {
 			
 			// center logo
 			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
-			let logoSpan = $("<span>");
+			let logoSpan = $("<div>");
 			logoSpan.attr("class", "key_div_logo " + logoClass);
 			logoSpan.appendTo(keyDivCenterLogo);
 			
