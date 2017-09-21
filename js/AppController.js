@@ -36,6 +36,7 @@
 // summary page has table with logos
 // all div controllers directly modify state
 
+// height issue on safari
 // logos not appearing in print
 // no need to do background hack since data is directly embeddable?
 // top border

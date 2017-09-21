@@ -1610,8 +1610,8 @@ function SaveController(div, state) {
 			}
 			
 			function selectorExists(selectorText, styleSheet) {
-				for (let cssRule of styleSheet.cssRules) {
-					if (cssRule.selectorText === selectorText) return true;
+				for (let i = 0; i < styleSheet.cssRules.length; i++) {
+					if (styleSheet.cssRules[i].selectorText === selectorText) return true;
 				}
 				return false;
 			}
