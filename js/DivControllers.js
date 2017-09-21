@@ -1777,10 +1777,10 @@ let CustomPieceRenderer = {
 			let plugin = CryptoUtils.getCryptoPlugin(piece[i].crypto);
 			let leftLabel = "\u25C4 #" + (i + 1) + ": " + 	plugin.getName() + " Public Address";
 			let leftValue = piece[i].address;
-			let logo = getInlineImage(plugin.getLogo());
+			let logoClass = plugin.getTicker().toLowerCase() + "_logo";
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : "") + " \u25ba";
 			let rightValue = piece[i].privateKey;
-			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue,
+			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logoClass, rightLabel, rightValue,
 				function() {
 					onKeyPairDone();
 					onDone();
@@ -1806,30 +1806,33 @@ let CustomPieceRenderer = {
 		}
 		
 		// render single pair
-		function renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue, onDone) {
+		function renderKeyPair(keyDiv, leftLabel, leftValue, logoClass, rightLabel, rightValue, onDone) {
 			
-			// left
+			// left qr code
 			let keyDivLeft = $("<div class='key_div_left'>").appendTo(keyDiv);
 			
-			// center
+			// center left
 			let keyDivCenter = $("<div class='key_div_center'>").appendTo(keyDiv);
 			let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
 			keyDivCenterLeftLabel.html(leftLabel);
 			let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
 			if (!hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
 			keyDivCenterLeftValue.html(leftValue);
+			
+			// center logo
 			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
-			if (logo) {
-				logo.attr("class", "key_div_logo");
-				logo.appendTo(keyDivCenterLogo);
-			}
+			let logoSpan = $("<span>");
+			logoSpan.attr("class", "key_div_logo " + logoClass);
+			logoSpan.appendTo(keyDivCenterLogo);
+			
+			// center right
 			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
 			keyDivCenterRightLabel.html(rightLabel);
 			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
 			if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
 			keyDivCenterRightValue.html(rightValue);
 			
-			// right
+			// right qr code
 			let keyDivRight = $("<div class='key_div_right'>").appendTo(keyDiv);
 			
 			// add QR codes to left and right

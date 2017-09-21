@@ -522,3 +522,12 @@ function getInlineImage(img, format) {
     context.drawImage(img, 0, 0);
     return $("<img>", { src: canvas.toDataURL(format) });
 }
+
+function imgToDataUrl(img, format) {
+	let canvas = document.createElement('canvas');
+    canvas.height = img.naturalHeight;
+    canvas.width = img.naturalWidth;
+    let context = canvas.getContext('2d');
+    context.drawImage(img, 0, 0);
+    return canvas.toDataURL(format);
+}
