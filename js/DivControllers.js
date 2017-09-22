@@ -275,9 +275,9 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com."));
 		
-		div.append(getCheckmarkDiv("Create long-term storage for multiple cryptocurrencies."));
-		div.append(getCheckmarkDiv("Storage can be password protected and split into pieces."));
-		div.append(getCheckmarkDiv("Export to digital and printable formats which can be recovered any time."));
+		div.append(getCheckmarkDiv("Generate public/private key pairs for multiple cryptocurrencies."));
+		div.append(getCheckmarkDiv("Private keys can be password protected and split into separate pieces."));
+		div.append(getCheckmarkDiv("Export to digital and printable formats which can be easily recovered."));
 		div.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
 		div.append("<br>");
 		
@@ -286,15 +286,15 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		
 		// render create button
 		if (window.crypto) {
-			let btnCreate = UiUtils.getNextButton("Create new storage").appendTo(div);
+			let btnCreate = UiUtils.getNextButton("Create new keys").appendTo(div);
 			btnCreate.click(function() { onSelectCreate(); });
 		} else {
-			let btnCreate = UiUtils.getNextButton("Create new storage (your browser does not support window.crypto)").appendTo(div);
+			let btnCreate = UiUtils.getNextButton("Create new keys (your browser does not support window.crypto)").appendTo(div);
 			btnCreate.attr("disabled", "disabled");
 		}
 		
 		// render import button
-		let btnExisting = UiUtils.getNextButton("Import existing storage");
+		let btnExisting = UiUtils.getNextButton("Import existing keys");
 		btnExisting.click(function() { onSelectImport(); });
 		div.append(btnExisting);
 		
@@ -325,12 +325,12 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to store."));
+		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to create keys for."));
 		else div.append(UiUtils.getPageHeader("Select a currency to import."));
 		
 		// render mix and match button if creating new storage
 		if (state.mix) {
-			let btn = UiUtils.getNextButton("Select multiple", UiUtils.getMixLogo()).appendTo(div);
+			let btn = UiUtils.getNextButton("Select multiple currencies", UiUtils.getMixLogo()).appendTo(div);
 			btn.click(function() { onCryptoSelection("MIX"); });
 		}
 		
@@ -807,7 +807,9 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Ready to generate your " + UiUtils.getCryptoName(state) + " storage?", UiUtils.getCryptoLogo(state)));
+		let name = UiUtils.getCryptoName(state);
+		let header = name === "mixed" ? "Ready to generate keys for multiple currencies?" : "Ready to generate " + name + " keys?";		
+		div.append(UiUtils.getPageHeader(header, UiUtils.getCryptoLogo(state)));
 		
 		// render summary
 		div.append("<b>Summary:</b><br><br>");
@@ -1095,7 +1097,9 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		var title = "Imported " + keys.length + " " + UiUtils.getCryptoName(state) + " keys which are password protected.  Enter the password to decrypt them.";
+		let name = UiUtils.getCryptoName(state);
+		name = name === "mixed" ? " " : " " + name + " ";
+		var title = "Imported " + keys.length + name + " keys which are password protected.  Enter the password to decrypt them.";
 		div.append(UiUtils.getPageHeader(title, UiUtils.getCryptoLogo(state)));
 		
 		// add error div
@@ -1446,7 +1450,10 @@ function SaveController(div, state) {
 		div.attr("style", "display:flex; flex-direction:column; align-items:center;");
 		
 		// add title
-		div.append(UiUtils.getPageHeader("Your storage is ready to download.", UiUtils.getCryptoLogo(state)));
+		let name = UiUtils.getCryptoName(state);
+		name = name === "mixed" ? "" : name;
+		let header = state.mix ? "Your " + (name ? name : "") + "keys are ready to download." : "Your " + (name ? name : "") + "keys have been imported.";
+		div.append(UiUtils.getPageHeader(header, UiUtils.getCryptoLogo(state)));
 		
 		// add save header
 		let exportHeader = $("<div class='export_header'>").appendTo(div);
