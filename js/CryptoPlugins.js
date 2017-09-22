@@ -254,6 +254,17 @@ function EthereumClassicPlugin() {
 inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
 
 /**
+ * OmiseGo plugin.
+ */
+function OmiseGoPlugin() {
+	EthereumPlugin.call(this);
+	this.getName = function() { return "OmiseGo"; }
+	this.getTicker = function() { return "OMG" };
+	this.getLogo = function() { return $("<img src='img/omisego.png'>"); }
+}
+inheritsFrom(OmiseGoPlugin, EthereumPlugin);
+
+/**
  * Litecoin plugin.
  */
 function LitecoinPlugin() {

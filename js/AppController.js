@@ -60,10 +60,23 @@ $(document).ready(function() {
 	
 	// delete window.crypto for testing
 	if (DELETE_WINDOW_CRYPTO) delete window.crypto;
-
+	
 	// start loading common dependencies
 	loader = new DependencyLoader();
-	loader.load(COMMON_DEPENDENCIES);
+	loader.load(COMMON_DEPENDENCIES, function() {
+		
+//		// get data url of logo
+//		let plugin = CryptoUtils.getCryptoPlugin("OMG");
+//		console.log(imgToDataUrl(plugin.getLogo().get(0)));
+//		function imgToDataUrl(img, format) {
+//			let canvas = document.createElement('canvas');
+//		    canvas.height = img.naturalHeight;
+//		    canvas.width = img.naturalWidth;
+//		    let context = canvas.getContext('2d');
+//		    context.drawImage(img, 0, 0);
+//		    return canvas.toDataURL(format);
+//		}
+	});
 	
 	// run tests
 	if (RUN_TESTS) {
