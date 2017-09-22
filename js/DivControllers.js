@@ -1452,7 +1452,7 @@ function SaveController(div, state) {
 		// add title
 		let name = UiUtils.getCryptoName(state);
 		name = name === "mixed" ? "" : name;
-		let header = state.mix ? "Your " + (name ? name : "") + "keys have been generated and are ready to download." : "Your " + (name ? name : "") + "keys have been imported.";
+		let header = state.mix ? "Your " + (name ? name : "") + " keys have been generated and are ready to download." : "Your " + (name ? name : "") + " keys have been imported.";
 		div.append(UiUtils.getPageHeader(header, UiUtils.getCryptoLogo(state)));
 		
 		// add save header
