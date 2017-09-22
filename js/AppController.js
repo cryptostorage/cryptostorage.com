@@ -43,6 +43,12 @@
 // preview flickers even on first load
 // height sizing issues in chrome
 
+// wording on front page
+// potentially collapse selection and address input
+// note that password must be 6 characters
+// make it clearer what to do next on save page
+// add padding to push right key right, left key left
+
 const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
