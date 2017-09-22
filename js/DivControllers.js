@@ -286,10 +286,10 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		
 		// render create button
 		if (window.crypto) {
-			let btnCreate = UiUtils.getNextButton("Create new keys").appendTo(div);
+			let btnCreate = UiUtils.getNextButton("Generate new keys").appendTo(div);
 			btnCreate.click(function() { onSelectCreate(); });
 		} else {
-			let btnCreate = UiUtils.getNextButton("Create new keys (your browser does not support window.crypto)").appendTo(div);
+			let btnCreate = UiUtils.getNextButton("Generate new keys (your browser does not support window.crypto)").appendTo(div);
 			btnCreate.attr("disabled", "disabled");
 		}
 		
@@ -325,7 +325,7 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to create keys for."));
+		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to generate keys for."));
 		else div.append(UiUtils.getPageHeader("Select a currency to import."));
 		
 		// render mix and match button if creating new storage
@@ -367,7 +367,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		div.append(UiUtils.getPageHeader("Enter the number of keys to create for each currency.", UiUtils.getMixLogo()));
+		div.append(UiUtils.getPageHeader("Enter the number of keys to generate for each currency.", UiUtils.getMixLogo()));
 		
 		// render num key inputs
 		numKeysInputs = [];
@@ -1452,7 +1452,7 @@ function SaveController(div, state) {
 		// add title
 		let name = UiUtils.getCryptoName(state);
 		name = name === "mixed" ? "" : name;
-		let header = state.mix ? "Your " + (name ? name : "") + "keys are ready to download." : "Your " + (name ? name : "") + "keys have been imported.";
+		let header = state.mix ? "Your " + (name ? name : "") + "keys have been generated and are ready to download." : "Your " + (name ? name : "") + "keys have been imported.";
 		div.append(UiUtils.getPageHeader(header, UiUtils.getCryptoLogo(state)));
 		
 		// add save header
