@@ -1806,7 +1806,7 @@ let CustomPieceRenderer = {
 			let leftLabel = "\u25C4 " + plugin.getName() + " Address";
 			let leftValue = piece[i].address;
 			let logoClass = "key_div_logo_" + plugin.getTicker().toLowerCase();
-			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : "") + " \u25ba";
+			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = piece[i].privateKey;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logoClass, rightLabel, rightValue,
 				function() {
