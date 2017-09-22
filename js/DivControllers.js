@@ -1626,9 +1626,9 @@ function SaveController(div, state) {
 		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.append(" Split storage into ");
 		numPiecesInput = $("<input type='number'>").appendTo(splitDiv);
-		splitDiv.append(" pieces where ");
+		splitDiv.append(" pieces where any ");
 		minPiecesInput = $("<input type='number'>").appendTo(splitDiv);
-		splitDiv.append("");
+		splitDiv.append(" pieces can restore the keys");
 		
 		// set up split config
 		numPiecesInput.attr("class", "num_input");
