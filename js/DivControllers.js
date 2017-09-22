@@ -1482,22 +1482,6 @@ function SaveController(div, state) {
 		});
 	}
 	
-	function getIncludePublicAddresses() {
-		return includePublicCheckbox.prop('checked');
-	}
-	
-	function getIsSplit() {
-		return splitCheckbox.prop('checked');
-	}
-	
-	function getNumPieces() {
-		return parseFloat(numPiecesInput.val());
-	}
-	
-	function getMinPieces() {
-		return parseFloat(minPiecesInput.val());
-	}
-	
 	/**
 	 * Updates pieces for the entire save page.
 	 * 
@@ -1578,25 +1562,9 @@ function SaveController(div, state) {
 				}
 			}
 			
-			// collect logo css rules to embed for dynamic HTML export
-			let tickers = new Set();
-			for (let elem of pieces[0]) tickers.add(elem.crypto);
-			let logoCssRules = [];
-			tickers.forEach(function(ticker) {
-				logoCssRules.push({selectorText: ".key_div_logo_" + ticker.toLowerCase(), cssText: "{ background:url(" + getLogoData(ticker) + "); background-size: 100% 100% }"});
-			});
-			
-			// inject logo css rules that don't exist
-			let internalStyleSheet = getInternalStyleSheet();
-			assertInitialized(internalStyleSheet);
-			for (let logoCssRule of logoCssRules) {
-				if (!selectorExists(logoCssRule.selectorText, internalStyleSheet)) {
-					internalStyleSheet.insertRule(logoCssRule.selectorText + " " + logoCssRule.cssText);
-				}
-			}
-			
 			// collect all internal css
 			let internalCss = "";
+			let internalStyleSheet = getInternalStyleSheet();
 			for (let i = 0; i < internalStyleSheet.cssRules.length; i++) {
 				internalCss += internalStyleSheet.cssRules[i].cssText + "\n";
 			}
@@ -1607,13 +1575,6 @@ function SaveController(div, state) {
 					if (styleSheet.cssRules && !styleSheet.href) return styleSheet;
 				}
 				return null;
-			}
-			
-			function selectorExists(selectorText, styleSheet) {
-				for (let i = 0; i < styleSheet.cssRules.length; i++) {
-					if (styleSheet.cssRules[i].selectorText === selectorText) return true;
-				}
-				return false;
 			}
 			
 			// build htmls from piece divs for zip export
@@ -1695,6 +1656,22 @@ function SaveController(div, state) {
 		numPiecesInput.attr("disabled", "disabled");
 		minPiecesInput.attr("disabled", "disabled");
 		splitCheckbox.prop("checked", false);
+	}
+	
+	function getIncludePublicAddresses() {
+		return includePublicCheckbox.prop('checked');
+	}
+	
+	function getIsSplit() {
+		return splitCheckbox.prop('checked');
+	}
+	
+	function getNumPieces() {
+		return parseFloat(numPiecesInput.val());
+	}
+	
+	function getMinPieces() {
+		return parseFloat(minPiecesInput.val());
 	}
 }
 inheritsFrom(SaveController, DivController);
@@ -1805,10 +1782,10 @@ let CustomPieceRenderer = {
 			let plugin = CryptoUtils.getCryptoPlugin(piece[i].crypto);
 			let leftLabel = "\u25C4 " + plugin.getName() + " Address";
 			let leftValue = piece[i].address;
-			let logoClass = "key_div_logo_" + plugin.getTicker().toLowerCase();
+			let logo = $("<img width=100% height=100% src='" + getLogoData(piece[i].crypto) + "'>");
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = piece[i].privateKey;
-			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logoClass, rightLabel, rightValue,
+			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue,
 				function() {
 					onKeyPairDone();
 					onDone();
@@ -1834,7 +1811,7 @@ let CustomPieceRenderer = {
 		}
 		
 		// render single pair
-		function renderKeyPair(keyDiv, leftLabel, leftValue, logoClass, rightLabel, rightValue, onDone) {
+		function renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue, onDone) {
 			
 			// left qr code
 			let keyDivLeft = $("<div class='key_div_left'>").appendTo(keyDiv);
@@ -1849,9 +1826,8 @@ let CustomPieceRenderer = {
 			
 			// center logo
 			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
-			let logoSpan = $("<div>");
-			logoSpan.attr("class", "key_div_logo " + logoClass);
-			logoSpan.appendTo(keyDivCenterLogo);
+			let logoDiv = $("<div class='key_div_logo'>").appendTo(keyDivCenterLogo);
+			logoDiv.append(logo);
 			
 			// center right
 			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
