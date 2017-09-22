@@ -37,8 +37,6 @@
 // all div controllers directly modify state
 
 // height issue on safari
-// logos not appearing in print
-// no need to do background hack since data is directly embeddable?
 // top border
 // preview flickers even on first load
 // height sizing issues in chrome
