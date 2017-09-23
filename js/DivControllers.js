@@ -276,7 +276,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com."));
 		
 		div.append(getCheckmarkDiv("Generate public/private key pairs for multiple cryptocurrencies."));
-		div.append(getCheckmarkDiv("Private keys can be password protected and split into separate pieces."));
+		div.append(getCheckmarkDiv("Private keys can be password protected and split into pieces."));
 		div.append(getCheckmarkDiv("Export to digital and printable formats which can be easily recovered."));
 		div.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
 		div.append("<br>");
@@ -1645,7 +1645,7 @@ function SaveController(div, state) {
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
 		minPiecesInput.attr("min", 2);
-		minPiecesInput.change(function() { updatePiece(); });
+		minPiecesInput.change(function() { updatePieces(); });
 		
 		// collect elements of split div for enabling/disabling
 		let splitElems = [];
