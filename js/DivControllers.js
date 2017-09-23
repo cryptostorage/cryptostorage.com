@@ -584,7 +584,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		advancedLink.click(function() { toggleAdvanced(); });
 		function toggleAdvanced() {
 			advancedOpen = !advancedOpen;
-			advancedLink.text(advancedOpen ? "\u25be Encryption options" : "\u25b8 Encryption options");
+			advancedLink.text(advancedOpen ? "\u25be Options" : "\u25b8 Options");
 			advancedOpen ? advancedDiv.show() : advancedDiv.hide();
 		}
 		
