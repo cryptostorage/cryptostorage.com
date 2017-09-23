@@ -1,6 +1,6 @@
 // TODO
 // print link
-// key export: public key pushed left, private key pushed right, logo
+// key export: logo
 // preview top border
 // preview flickers even on first load
 // height issues on chrome and safari
