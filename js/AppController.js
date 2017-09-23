@@ -1,5 +1,5 @@
 // TODO
-// key export title and "Public" address
+// key export: "Public Address", #, Logo + Name, printable
 // preview top border
 // preview flickers even on first load
 // height issues on chrome and safari
