@@ -1,6 +1,6 @@
 // TODO
 // print link
-// key export: logo
+// key export: make qr codes smaller but anchored to top/bottom corner
 // preview top border
 // preview flickers even on first load
 // height issues on chrome and safari
