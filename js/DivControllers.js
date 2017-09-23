@@ -1743,8 +1743,9 @@ let CustomPieceRenderer = {
 			
 			// render new page
 			if (i % PAIRS_PER_PAGE === 0) {
-				pageDiv = $("<div class='piece_page'>").appendTo(pieceDiv);
-				//pageDiv.append("Hello there?");
+				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
+				let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
+				logoDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage.png'>"));
 			}
 			
 			// collect function to render key pair
