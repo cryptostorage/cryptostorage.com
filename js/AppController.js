@@ -1,10 +1,14 @@
 // TODO
-// use tabs for pieces?
+// preview top border
+// preview flickers even on first load
+// height issues on chrome and safari
+// add padding to push right key right, left key left
 // flag to verify encryption
-// prevent multiple preview rendering
+// prevent rendered page from showing after home, FAQ or donate clicked
 // minimum cannot be larger than num pieces
-// password confirmation - re-enter or show
 // register shortcut keys for page navigation (enter, y, n)
+// faq page
+// donation page
 // paste private key doesn't work in iphone safari
 // de-minify aes.java
 // todos throughout code
@@ -14,38 +18,32 @@
 // verify no name collisions
 // bip38 not working on old hardware
 // test on IE
-// create storage from csv import
-// "Successfully compiled asm.js code (loaded from cache in 6ms)" messages in moneroaddress and keythereum
-// title bar should not scroll
-// focus on first text element if applicable
-// live site warning to stop and download from github
-// sanity check key formats
-// peer review encodings
-// consult designers
-// faq page
-// donation page
-// condense files to single files as much as possible
-// disable next if mix num keys change
-// prevent rendered page from showing after home, FAQ or donate clicked
-// file import zip with invalid json shouldn't prevent others from importing
 // keyboard popping up in ios on key creation flow
+// file import zip with invalid json shouldn't prevent others from importing
+// disable next if mix num keys change
+// "Successfully compiled asm.js code (loaded from cache in 6ms)" messages in moneroaddress and keythereum
+// live site warning to stop and download from github
+// focus on first text element if applicable
+// wording on front page
+// note that password must be 6 characters
+// condense files to single files as much as possible
 
+// peer review key formats
+
+// consult designers
+// use tabs for pieces?
+// password confirmation - re-enter or show
+// title bar should not scroll
 // select one or more currencies to store (consistent look with number of addresses input)
 // enter the number of addresses for each currency || enter the number of Bitcoin addresses to create)
-// keys -> addresses (an "address" is a public/private key pair in this terminology).
 // summary page has table with logos
-// all div controllers directly modify state
-
-// height issue on safari
-// top border
-// preview flickers even on first load
-// height sizing issues in chrome
-
-// wording on front page
 // potentially collapse selection and address input
-// note that password must be 6 characters
 // make it clearer what to do next on save page
-// add padding to push right key right, left key left
+
+// low priority
+// create storage from csv import
+// keys -> addresses (an "address" is a public/private key pair in this terminology).
+// all div controllers directly modify state
 
 const RUN_TESTS = false;
 const DEBUG = true;
