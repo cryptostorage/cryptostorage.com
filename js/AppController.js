@@ -1,5 +1,6 @@
 // TODO
-// key export: "Public Address", #, Logo + Name, printable
+// print link
+// key export: public key pushed left, private key pushed right, logo
 // preview top border
 // preview flickers even on first load
 // height issues on chrome and safari
@@ -29,6 +30,7 @@
 // note that password must be 6 characters
 // condense files to single files as much as possible
 // warning if live and/or online
+// switch to jquery-qrcode?
 
 // peer review key formats
 

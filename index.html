@@ -23,14 +23,16 @@
 		<!-- Inline CSS for dynamic HTML generation -->
 		<style>
 			.piece_div { width:820px; }
-			.key_div { padding: 15px 10px 15px 10px; display: flex; border: 2px solid; border-color:green; border-top:none; }
+			.key_div { padding: 15px 10px 15px 10px; display: flex; border: 2px solid; border-color:green; border-top:none; page-break-inside:avoid; }
 			.key_div_logo { width: 40px; height: 40px; }
+			.key_div_logo_label { font-weight:bold; font-size:16px }
 			.key_div_left { display:flex; align-items: center; justify-content:center; }
-			.key_div_center { margin: 0 10px 0 10px; flex:1; display:flex; flex-direction:column;}
-			.key_div_center_left_label { font-weight: bold; font-size: 15px; }
-			.key_div_center_left_value { font-size: 12px; font-family: monospace; word-break: break-all; }
+			.key_div_center { margin: 0 10px 0 10px; flex:1; display:flex; flex-direction:column; position:relative; }
+			.key_div_center_title { font-size:13px; position:absolute; left:0; right:0; text-align:center; }
+			.key_div_center_left_label { font-weight:bold; font-size:14px; }
+			.key_div_center_left_value { font-size:12px; font-family:monospace; word-break:break-all; }
 			.key_div_center_logo { flex: 1; display:flex; align-items:center; justify-content:center; }
-			.key_div_center_right_label { font-weight: bold; font-size: 15px; text-align:right; margin-top: -20px}
+			.key_div_center_right_label { font-weight: bold; font-size: 14px; text-align:right; margin-top:-20px; }
 			.key_div_center_right_value { font-size: 12px; text-align: right; font-family: monospace; }
 			.key_div_right { display:flex; align-items: center; justify-content:center; }
 		</style>

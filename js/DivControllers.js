@@ -1470,7 +1470,7 @@ function SaveController(div, state) {
 		configLink.click(function() { toggleConfig(); });
 		function toggleConfig() {
 			configOpen = !configOpen;
-			configLink.text(configOpen ? "\u25be Download options" : "\u25b8 Download options");
+			configLink.text(configOpen ? "\u25be Options" : "\u25b8 Options");
 			configOpen ? configDiv.show() : configDiv.hide();
 		}
 		
@@ -1667,7 +1667,7 @@ let CustomPieceRenderer = {
 		private_qr: true,
 		public_text: true,
 		private_text: true,
-		qr_size: 150,
+		qr_size: 125,
 		qr_version: null,
 		qr_error_correction_level: 'H',
 		qr_scale: 4,
@@ -1738,12 +1738,14 @@ let CustomPieceRenderer = {
 			let keyDiv = $("<div class='key_div'>").appendTo(pieceDiv);
 			if (i === 0) keyDiv.css("border-top", "2px solid green");
 			let plugin = CryptoUtils.getCryptoPlugin(piece[i].crypto);
+			let title = "#" + (i + 1);
 			let leftLabel = "\u25C4 Public Address";
 			let leftValue = piece[i].address;
 			let logo = $("<img width=100% height=100% src='" + getLogoData(piece[i].crypto) + "'>");
+			let logoLabel = plugin.getName();
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = piece[i].privateKey;
-			funcs.push(function(onDone) { renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue,
+			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue,
 				function() {
 					onKeyPairDone();
 					onDone();
@@ -1769,13 +1771,17 @@ let CustomPieceRenderer = {
 		}
 		
 		// render single pair
-		function renderKeyPair(keyDiv, leftLabel, leftValue, logo, rightLabel, rightValue, onDone) {
+		function renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, onDone) {
 			
 			// left qr code
 			let keyDivLeft = $("<div class='key_div_left'>").appendTo(keyDiv);
 			
-			// center left
+			// center title
 			let keyDivCenter = $("<div class='key_div_center'>").appendTo(keyDiv);
+			let titleDiv = $("<div class='key_div_center_title'>").appendTo(keyDivCenter);
+			titleDiv.html(title);
+			
+			// center left
 			let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
 			keyDivCenterLeftLabel.html(leftLabel);
 			let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
@@ -1786,9 +1792,12 @@ let CustomPieceRenderer = {
 			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
 			let logoDiv = $("<div class='key_div_logo'>").appendTo(keyDivCenterLogo);
 			logoDiv.append(logo);
+			let logoLabelDiv = $("<div class='key_div_logo_label'>").appendTo(keyDivCenterLogo);
+			logoLabelDiv.html("&nbsp;" + logoLabel);
 			
 			// center right
 			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
+			if (rightValue.length > 150) keyDivCenterRightLabel.css("margin-top", "0");	// extra space for long right labels
 			keyDivCenterRightLabel.html(rightLabel);
 			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
 			if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
