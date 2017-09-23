@@ -55,7 +55,7 @@
 const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
-const COMMON_DEPENDENCIES = ["lib/crypto_logos.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/progressbar.js"];
+const COMMON_DEPENDENCIES = ["lib/logos.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/progressbar.js"];
 var loader;
 
 /**
@@ -72,7 +72,7 @@ $(document).ready(function() {
 		
 //		// get data url of logo
 //		let plugin = CryptoUtils.getCryptoPlugin("OMG");
-//		console.log(imgToDataUrl(plugin.getLogo().get(0)));
+//		console.log(imgToDataUrl($("<img src='img/cryptostorage.png'>").get(0)));
 //		function imgToDataUrl(img, format) {
 //			let canvas = document.createElement('canvas');
 //		    canvas.height = img.naturalHeight;

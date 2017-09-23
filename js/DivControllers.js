@@ -1734,7 +1734,7 @@ let CustomPieceRenderer = {
 		let pieceDiv = $("<div class='piece_div'>");
 		
 		// create div per page
-		const PAIRS_PER_PAGE = 7;	// TODO: move to configuration
+		const PAIRS_PER_PAGE = 6;	// TODO: move to configuration
 
 		// setup pages with functions to render key pairs
 		let pageDiv;
@@ -1745,7 +1745,7 @@ let CustomPieceRenderer = {
 			if (i % PAIRS_PER_PAGE === 0) {
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
 				let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
-				logoDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage.png'>"));
+				logoDiv.append($("<img class='piece_page_header_logo' src='" + getLogoData("cryptostorage") + "'>"));
 			}
 			
 			// collect function to render key pair
