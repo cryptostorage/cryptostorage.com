@@ -1555,6 +1555,7 @@ function SaveController(div, state) {
 			let previewHeaderCenter = $("<div class='preview_header_center'>").appendTo(previewHeader);
 			previewHeaderCenter.append("Preview");
 			let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
+			previewDiv.append("<br><br>");
 			
 			// add piece pull-down selector
 			if (pieceDivs.length > 1) {
@@ -1729,14 +1730,26 @@ let CustomPieceRenderer = {
 		// merge configs
 		config = Object.assign({}, CustomPieceRenderer.defaultConfig, config);
 		
-		// div to render piece to
+		// div to render entire piece to
 		let pieceDiv = $("<div class='piece_div'>");
 		
-		// collect functions to render each pair
+		// create div per page
+		const PAIRS_PER_PAGE = 7;	// TODO: move to configuration
+
+		// setup pages with functions to render key pairs
+		let pageDiv;
 		let funcs = [];
 		for (let i = 0; i < piece.length; i++) {
-			let keyDiv = $("<div class='key_div'>").appendTo(pieceDiv);
-			if (i === 0) keyDiv.css("border-top", "2px solid green");
+			
+			// render new page
+			if (i % PAIRS_PER_PAGE === 0) {
+				pageDiv = $("<div class='piece_page'>").appendTo(pieceDiv);
+				//pageDiv.append("Hello there?");
+			}
+			
+			// collect function to render key pair
+			let keyDiv = $("<div class='key_div'>").appendTo(pageDiv);
+			if (i % PAIRS_PER_PAGE === 0) keyDiv.css("border-top", "2px solid green");
 			let plugin = CryptoUtils.getCryptoPlugin(piece[i].crypto);
 			let title = "#" + (i + 1);
 			let leftLabel = "\u25C4 Public Address";
@@ -1753,7 +1766,7 @@ let CustomPieceRenderer = {
 			)});
 		}
 		
-		// render pairs in parallel
+		// render pairs
 		async.series(funcs, function() {
 			onDone(null, pieceDiv);
 		});

@@ -4,7 +4,6 @@
 // preview top border
 // preview flickers even on first load
 // height issues on chrome and safari
-// add padding to push right key right, left key left
 // flag to verify encryption
 // prevent rendered page from showing after home, FAQ or donate clicked
 // minimum cannot be larger than num pieces
