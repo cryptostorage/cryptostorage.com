@@ -31,6 +31,7 @@
 // condense files to single files as much as possible
 // warning if live and/or online
 // switch to jquery-qrcode?
+// csv import to support "bring your own keys"
 
 // peer review key formats
 
@@ -49,7 +50,6 @@
 // warnings to test before using.
 
 // low priority
-// create storage from csv import
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
 // all div controllers directly modify state
 
