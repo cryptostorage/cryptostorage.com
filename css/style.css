@@ -334,20 +334,16 @@ input[type='file'] {
 	padding:5px;
 }
 
-.preview_header {
-	display:flex;
-	min-height:50px;
-	background-color:#E0E0E0;
-	text-align:center;
-	padding:10px;
-	border:thin solid;
-	border-bottom:none;
-	margin-top:20px;
-}
-
 .preview_div {
 	width:820px;
 	margin-bottom:20px;
+	position:relative;
+	margin-top:10px;
+}
+
+.preview_header {
+	position:absolute;
+	margin-top:20px;
 }
 
 .preview_header_left {

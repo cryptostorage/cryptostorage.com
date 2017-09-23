@@ -1551,15 +1551,15 @@ function SaveController(div, state) {
 			
 			// add header div
 			let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
-			let previewHeaderLeft = $("<div class='preview_header_left'>").appendTo(previewHeader);
-			let previewHeaderCenter = $("<div class='preview_header_center'>").appendTo(previewHeader);
-			previewHeaderCenter.append("Preview");
-			let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
-			previewDiv.append("<br><br>");
+//			let previewHeaderLeft = $("<div class='preview_header_left'>").appendTo(previewHeader);
+//			let previewHeaderCenter = $("<div class='preview_header_center'>").appendTo(previewHeader);
+//			previewHeaderCenter.append("Preview");
+//			let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
+//			previewDiv.append("<br><br>");
 			
 			// add piece pull-down selector
 			if (pieceDivs.length > 1) {
-				let selector = $("<select class='piece_selector'>").appendTo(previewHeaderRight);
+				let selector = $("<select class='piece_selector'>").appendTo(previewHeader);
 				selector.change(function() {
 					currentPieceDiv.empty();
 					currentPieceDiv.append(pieceDivs[parseFloat(selector.find(":selected").val())]);
