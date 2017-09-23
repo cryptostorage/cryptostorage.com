@@ -1,4 +1,5 @@
 // TODO
+// key export title and "Public" address
 // preview top border
 // preview flickers even on first load
 // height issues on chrome and safari
@@ -24,13 +25,15 @@
 // "Successfully compiled asm.js code (loaded from cache in 6ms)" messages in moneroaddress and keythereum
 // live site warning to stop and download from github
 // focus on first text element if applicable
-// wording on front page
+// wording on front page / be consistent
 // note that password must be 6 characters
 // condense files to single files as much as possible
+// warning if live and/or online
 
 // peer review key formats
 
 // consult designers
+// icons of supported currencies on home page
 // use tabs for pieces?
 // password confirmation - re-enter or show
 // title bar should not scroll
@@ -39,6 +42,9 @@
 // summary page has table with logos
 // potentially collapse selection and address input
 // make it clearer what to do next on save page
+// less wasted space
+// navigation bar showing overall place in flow
+// warnings to test before using.
 
 // low priority
 // create storage from csv import
