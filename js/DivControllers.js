@@ -816,6 +816,11 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		for (let elem of state.mix) {
 			div.append(elem.numKeys + " " + elem.plugin.getName() + " keys" + (elem.encryption ? " encrypted with " + elem.encryption : " unencrypted") + "<br>");
 		}
+		if (state.numPieces > 1) {
+			div.append("Split private keys into " + state.numPieces + " pieces with a minimum of " + state.minPieces + " to restore")
+		} else {
+			div.append("Private keys will not be split")
+		}
 		div.append("<br><br>");
 		
 		// render generate button
@@ -893,7 +898,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 				if (!funcs.length) {
 					
 					// convert keys to pieces
-					let pieces = CryptoUtils.keysToPieces(originals);
+					let pieces = CryptoUtils.keysToPieces(originals, state.numPieces, state.minPieces);
 					
 					// validate pieces can recreate originals
 					let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
@@ -921,7 +926,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 						if (err) throw err;
 						
 						// convert keys to pieces
-						let pieces = CryptoUtils.keysToPieces(encryptedKeys);
+						let pieces = CryptoUtils.keysToPieces(encryptedKeys, state.numPieces, state.minPieces);
 						
 						// validate pieces can recreate originals
 						let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
