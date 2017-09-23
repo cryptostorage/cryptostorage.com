@@ -1602,7 +1602,7 @@ function SaveController(div, state) {
 				
 				// register save click
 				downloadLink.click(function() { saveAs(blob, name); });
-				printLink.click(function() { alert("print link clicked"); });
+				printLink.click(function() { window.print(); });
 				
 				// set currently showing piece
 				currentPieceDiv = $("<div>").appendTo(previewDiv);
