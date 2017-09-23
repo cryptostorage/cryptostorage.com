@@ -1431,9 +1431,6 @@ function SaveController(div, state) {
 	
 	// config elements
 	let includePublicCheckbox;
-	let splitCheckbox;
-	let numPiecesInput;
-	let minPiecesInput;
 	
 	// save links
 	let printLink;
@@ -1524,10 +1521,8 @@ function SaveController(div, state) {
 		progressDiv.hide();
 		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
 		
-		// read configuration
-		let numPieces = getIsSplit() ? getNumPieces() : 1;
-		let minPieces = getIsSplit() ? getMinPieces() : null;
-		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, numPieces, minPieces);
+		// get pieces
+		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, state.numPieces, state.minPieces);
 		
 		// render
 		CustomPieceRenderer.renderPieces(pieces, null, function(percent) {
@@ -1631,59 +1626,10 @@ function SaveController(div, state) {
 		includePublicCheckboxLabel.html(" Include public addresses");
 		includePublicCheckbox.click(function() { updatePieces(); });
 		includePublicCheckbox.prop('checked', true);
-				
-		// render split div
-		let splitDiv = $("<div class='download_config_option'>").appendTo(div);
-		splitCheckbox = $("<input type='checkbox' id='splitCheckbox'>").appendTo(splitDiv);
-		let splitCheckboxLabel = $("<label for='splitCheckbox'>").appendTo(splitDiv);
-		splitCheckboxLabel.append(" Split storage into ");
-		numPiecesInput = $("<input type='number'>").appendTo(splitDiv);
-		splitDiv.append(" pieces where any ");
-		minPiecesInput = $("<input type='number'>").appendTo(splitDiv);
-		splitDiv.append(" pieces can restore the keys");
-		
-		// set up split config
-		numPiecesInput.attr("class", "num_input");
-		numPiecesInput.attr("value", 3);
-		numPiecesInput.attr("min", 2);
-		numPiecesInput.change(function() { updatePieces(); });
-		minPiecesInput.attr("class", "num_input");
-		minPiecesInput.attr("value", 2);
-		minPiecesInput.attr("min", 2);
-		minPiecesInput.change(function() { updatePieces(); });
-		
-		// collect elements of split div for enabling/disabling
-		let splitElems = [];
-		splitElems.push(splitCheckboxLabel);
-		splitElems.push(numPiecesInput);
-		splitElems.push(minPiecesInput);
-		
-		// set initial state of split div
-		splitCheckbox.click(function() {
-			for (let elem of splitElems) {
-				this.checked ? elem.removeAttr("disabled") : elem.attr("disabled", "disabled");
-			}
-			updatePieces();
-		});
-		numPiecesInput.attr("disabled", "disabled");
-		minPiecesInput.attr("disabled", "disabled");
-		splitCheckbox.prop("checked", false);
 	}
 	
 	function getIncludePublicAddresses() {
 		return includePublicCheckbox.prop('checked');
-	}
-	
-	function getIsSplit() {
-		return splitCheckbox.prop('checked');
-	}
-	
-	function getNumPieces() {
-		return parseFloat(numPiecesInput.val());
-	}
-	
-	function getMinPieces() {
-		return parseFloat(minPiecesInput.val());
 	}
 }
 inheritsFrom(SaveController, DivController);
