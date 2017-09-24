@@ -50,6 +50,7 @@
 // low priority
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
 // all div controllers directly modify state
+// html export is horizontally centered with @media print for actual print
 
 const RUN_TESTS = false;
 const DEBUG = true;
