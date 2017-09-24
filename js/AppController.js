@@ -1,8 +1,8 @@
 // TODO
-// key export: make qr codes smaller but anchored to top/bottom corner
-// all pieces in preview / printed
-// preview flickers even on first load
+// all pieces in preview for print
 // height issues on chrome and safari
+// smaller qr codes but anchored to top/bottom corner
+// preview flickers even on first load
 // flag to verify encryption
 // prevent rendered page from showing after home, FAQ or donate clicked
 // minimum cannot be larger than num pieces
