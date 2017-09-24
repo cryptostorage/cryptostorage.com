@@ -6,7 +6,6 @@
 // flag to verify encryption
 // prevent rendered page from showing after home, FAQ or donate clicked
 // minimum cannot be larger than num pieces
-// register shortcut keys for page navigation (enter, y, n)
 // faq page
 // donation page
 // paste private key doesn't work in iphone safari
@@ -46,6 +45,7 @@
 // less wasted space
 // navigation bar showing overall place in flow
 // warnings to test before using.
+// register shortcut keys for page navigation (enter, y, n)
 
 // low priority
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
