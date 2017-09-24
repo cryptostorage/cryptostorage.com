@@ -275,7 +275,7 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		// render title
 		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com."));
 		
-		div.append(getCheckmarkDiv("Generate public/private key pairs for multiple cryptocurrencies."));
+		div.append(getCheckmarkDiv("Generate public/private keys for multiple cryptocurrencies."));
 		div.append(getCheckmarkDiv("Private keys can be password protected and split into pieces."));
 		div.append(getCheckmarkDiv("Export to digital and printable formats which can be easily recovered."));
 		div.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
