@@ -505,3 +505,10 @@ function countNonWhitespaceCharacters(str) {
 	}
 	return count;
 }
+
+function printDiv(div) {
+    let body = document.body.innerHTML;
+    document.body.innerHTML = div.innerHTML;
+    window.print();
+    document.body.innerHTML = body;
+}

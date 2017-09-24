@@ -365,3 +365,17 @@ input[type='file'] {
 	font-size:18px;
 	width:125px;
 }
+
+@media print {
+	body * {
+		visibility: hidden;
+	}
+	.preview_div, .preview_div * {
+		visibility: visible;
+	}
+	.preview_div {
+		position:fixed;
+		left: 0 !important;
+		top: 0 !important;
+	}
+}
