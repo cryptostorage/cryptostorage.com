@@ -29,6 +29,7 @@
 // warning if live and/or online
 // switch to jquery-qrcode?
 // csv import to support "bring your own keys"
+// copy/paste from pdf inserts space, when space removed window does not auto advance
 
 // peer review key formats
 
