@@ -1577,14 +1577,6 @@ function SaveController(div, state) {
 				internalCss += internalStyleSheet.cssRules[i].cssText + "\n";
 			}
 			
-			function getInternalStyleSheet() {
-				for (let i = 0; i < document.styleSheets.length; i++) {
-					let styleSheet = document.styleSheets[i];
-					if (styleSheet.cssRules && !styleSheet.href) return styleSheet;
-				}
-				return null;
-			}
-			
 			// build htmls from piece divs for zip export
 			let htmls = [];
 			for (let pieceDiv of pieceDivs) {
@@ -1602,25 +1594,7 @@ function SaveController(div, state) {
 				
 				// register save click
 				downloadLink.click(function() { saveAs(blob, name); });
-				printLink.click(function() {
-					
-					printDiv(previewDiv.get(0));
-					
-//					let styleSheet = getInternalStyleSheet();
-//					styleSheet.insertRule("body * { visibility: hidden; }");
-//					styleSheet.insertRule(".preview_div, .preview_div * { visibility: visible; }");
-//					styleSheet.insertRule(".preview_div { position:fixed; left: 0; top: 0; }");
-//					
-//					function getInternalStyleSheet() {
-//						for (let i = 0; i < document.styleSheets.length; i++) {
-//							let styleSheet = document.styleSheets[i];
-//							if (styleSheet.cssRules && !styleSheet.href) return styleSheet;
-//						}
-//						return null;
-//					}
-//					
-//					window.print();
-				});
+				printLink.click(function() { printDiv(previewDiv, internalCss, "cryptostorage.com"); });
 				
 				// set currently showing piece
 				currentPieceDiv = $("<div>").appendTo(previewDiv);

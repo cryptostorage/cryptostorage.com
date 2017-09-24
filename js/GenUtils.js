@@ -506,9 +506,31 @@ function countNonWhitespaceCharacters(str) {
 	return count;
 }
 
-function printDiv(div) {
-    let body = document.body.innerHTML;
-    document.body.innerHTML = div.innerHTML;
-    window.print();
-    document.body.innerHTML = body;
+/**
+ * Returns the document's first stylesheet which has no href.
+ * 
+ * @returns StyleSheet is the internal stylesheet
+ */
+function getInternalStyleSheet() {
+	for (let i = 0; i < document.styleSheets.length; i++) {
+		let styleSheet = document.styleSheets[i];
+		if (!styleSheet.href) return styleSheet;
+	}
+	return null;
+}
+
+/**
+ * Prints the given div in a new window.
+ * 
+ * @param div is the jquery div to print
+ * @param css are css rules to add (optional)
+ * @param title is the title of the new window (optional)
+ */
+function printDiv(div, css, title) {
+	let w = window.open();
+	w.document.write("<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (css ? "<style>" + css + "</style>" : "") + "</head><body>");
+	w.document.write(div.html());
+	w.document.write("</body></html>");
+	w.print();
+	w.close();
 }
