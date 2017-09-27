@@ -362,3 +362,19 @@ input[type='file'] {
 	font-size:18px;
 	width:125px;
 }
+
+.question {
+	font-weight: bold;
+	font-size: 22px;
+	margin-bottom:5px;
+}
+
+.answer {
+	font-size:18px;
+	line-height:30px;
+	margin-bottom:30px;
+}
+
+ol {
+	padding-left:25px;
+}

@@ -2110,12 +2110,12 @@ function FaqController(div) {
 		// render title
 		div.append(UiUtils.getPageHeader("FAQ"));
 		
-		$("<div class='question'>").html("What is the meaning of life?").appendTo(div);
-		$("<div class='answer'>").html("42").appendTo(div);
-		$("<div class='question'>").html("What is the meaning of life?").appendTo(div);
-		$("<div class='answer'>").html("42").appendTo(div);
-		$("<div class='question'>").html("What is the meaning of life?").appendTo(div);
-		$("<div class='answer'>").html("42").appendTo(div);
+		$("<div class='question'>").html("How do I generate secure storage using cryptostorage.com?").appendTo(div);
+		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not be tampered using the signature file by executing these commands:</li></ol>").appendTo(div);
+		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(div);
+		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys recovered from cryptostorage.com into the wallet software of their choice to manage funds.  Support to send funds from cryptostorage.com may be considered in the future depending on interest and ease of implementation.").appendTo(div);
+		$("<div class='question'>").html("How can I trust this service?").appendTo(div);
+		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code ensures it will execute as advertised which may be audited by anyone.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(div);
 		
 		// done rendering
 		callback(div);
