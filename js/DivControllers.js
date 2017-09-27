@@ -1451,6 +1451,10 @@ function SaveController(div, state) {
 		// center page contents
 		div.attr("style", "display:flex; flex-direction:column; align-items:center;");
 		
+		// put page contents in container to share width
+		let container = $("<div>").appendTo(div);
+		div = container;
+		
 		// add title
 		let name = UiUtils.getCryptoName(state);
 		name = name === "mixed" ? "" : name;
@@ -1610,10 +1614,10 @@ function SaveController(div, state) {
 	function renderConfig(div) {
 		
 		// placement
-		div.attr("class", "download_config_div");
+		div.attr("class", "export_options_div");
 		
 		// render include public addresses checkbox
-		includePublicDiv = $("<div class='download_config_option'>").appendTo(div);
+		includePublicDiv = $("<div class='export_option'>").appendTo(div);
 		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(includePublicDiv);
 		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(includePublicDiv);
 		includePublicCheckboxLabel.html(" Include public addresses");
