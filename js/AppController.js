@@ -13,7 +13,6 @@
 // verify no name collisions
 // bip38 not working on old hardware
 // test on IE
-// keyboard popping up in ios on key creation flow
 // file import zip with invalid json shouldn't prevent others from importing
 // disable next if mix num keys change
 // live site warning to stop and download from github

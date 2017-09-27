@@ -624,8 +624,9 @@ function PasswordInputController(div, state, onPasswordInput) {
 		var btnNext = UiUtils.getNextButton("Next").appendTo(div);
 		btnNext.click(function() {
 			let password = passwordInput.val();
-			if (password === "") setErrorMessage("Password cannot be empty")
-			else if (password.length < 6) setErrorMessage("Password must be at least 6 characters");
+			let err;
+			if (password === "") err = "Password cannot be empty";
+			else if (password.length < 6) err = "Password must be at least 6 characters";
 			else {
 				setErrorMessage("");
 				for (let i = 0; i < state.mix.length; i++) {
@@ -634,7 +635,10 @@ function PasswordInputController(div, state, onPasswordInput) {
 				}
 				onPasswordInput();
 			}
-			passwordInput.focus();
+			if (err) {
+				setErrorMessage(err);
+				passwordInput.focus();
+			}
 		});
 		
 		// register pasword enter key
