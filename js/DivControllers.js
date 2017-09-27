@@ -860,7 +860,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			for (let elem of state.mix) {
 				numKeys += elem.numKeys;
 				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
-				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + Weights.getDecryptWeight(elem.encryption));
+				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + (VERIFY_ENCRYPTION ? Weights.getDecryptWeight(elem.encryption) : 0));
 			}
 			let piecesRendererWeight = CustomPieceRenderer.getWeight(numKeys, 1, null);
 			totalWeight += piecesRendererWeight;
@@ -875,7 +875,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			
 			// generate keys
 			let progressWeight = 0;
-			setProgress(progressWeight, totalWeight, "Creating keys");
+			setProgress(progressWeight, totalWeight, "Generating keys");
 			async.series(funcs, function(err, keys) {
 				if (err) throw err;
 				let originals = keys;
@@ -935,22 +935,39 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 							assertTrue(encryptedKeys[i].equals(keysFromPieces[i]));
 						}
 						
-						// collect decryption functions
-						funcs = [];
-						for (let i = 0; i < encryptedKeys.length; i++) {
-							funcs.push(decryptFunc(encryptedKeys[i].copy(), passwords[i]));
+						// verify encryption
+						if (VERIFY_ENCRYPTION) {
+							
+							// collect decryption functions
+							funcs = [];
+							for (let i = 0; i < encryptedKeys.length; i++) {
+								funcs.push(decryptFunc(encryptedKeys[i].copy(), passwords[i]));
+							}
+							
+							// decrypt keys
+							setProgress(progressWeight, totalWeight, "Verifying encryption");
+							async.series(funcs, function(err, decryptedKeys) {
+								if (err) throw err;
+								
+								// verify equivalence
+								assertEquals(originals.length, decryptedKeys.length);
+								for (let i = 0; i < originals.length; i++) {
+									assertTrue(originals[i].equals(decryptedKeys[i]));
+								}
+								
+								// render pieces to divs
+								setProgress(progressWeight, totalWeight, "Rendering");
+								renderPieceDivs(pieces, function(err, pieceDivs) {
+									if (err) throw err;
+									assertEquals(pieces.length, pieceDivs.length);
+									setProgress(1, 1, "Complete");
+									onKeysGenerated(encryptedKeys, pieces, pieceDivs);
+								});
+							});
 						}
 						
-						// decrypt keys
-						setProgress(progressWeight, totalWeight, "Verifying encryption");
-						async.series(funcs, function(err, decryptedKeys) {
-							if (err) throw err;
-							
-							// verify equivalence
-							assertEquals(originals.length, decryptedKeys.length);
-							for (let i = 0; i < originals.length; i++) {
-								assertTrue(originals[i].equals(decryptedKeys[i]));
-							}
+						// don't verify encryption
+						else {
 							
 							// render pieces to divs
 							setProgress(progressWeight, totalWeight, "Rendering");
@@ -959,8 +976,8 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 								assertEquals(pieces.length, pieceDivs.length);
 								setProgress(1, 1, "Complete");
 								onKeysGenerated(encryptedKeys, pieces, pieceDivs);
-							})
-						});
+							});
+						}
 					});
 				}
 			});

@@ -1,5 +1,4 @@
 // TODO
-// flag to verify encryption
 // prevent rendered page from showing after home, FAQ or donate clicked
 // bigger keys, smaller qr codes anchored to top/bottom corner
 // preview flickers even on first load
@@ -54,6 +53,7 @@
 const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
+const VERIFY_ENCRYPTION = false;
 const COMMON_DEPENDENCIES = ["lib/logos.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/progressbar.js"];
 var loader;
 
