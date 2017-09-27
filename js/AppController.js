@@ -20,7 +20,6 @@
 // live site warning to stop and download from github
 // focus on first text element if applicable
 // wording on front page / be consistent
-// note that password must be 6 characters
 // condense files to single files as much as possible
 // warning if live and/or online
 // switch to jquery-qrcode?

@@ -571,6 +571,9 @@ function PasswordInputController(div, state, onPasswordInput) {
 		// render title
 		div.append(UiUtils.getPageHeader("Enter a password to protect your private keys.", UiUtils.getCryptoLogo(state)));
 		
+		div.append("The password must be at least 6 characters long.");
+		div.append("<br><br>");
+		
 		// render error div
 		div.append(errorDiv);
 		errorDiv.attr("class", "error_msg");
