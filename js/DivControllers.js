@@ -2110,7 +2110,7 @@ function FaqController(div) {
 		// render title
 		div.append(UiUtils.getPageHeader("FAQ"));
 		
-		$("<div class='question'>").html("How do I generate secure storage using cryptostorage.com?").appendTo(div);
+		$("<div class='question'>").html("How should I generate storage using cryptostorage.com?").appendTo(div);
 		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not be tampered using the signature file by executing these commands:</li></ol>").appendTo(div);
 		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(div);
 		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys recovered from cryptostorage.com into the wallet software of their choice to manage funds.  Support to send funds from cryptostorage.com may be considered in the future depending on interest and ease of implementation.").appendTo(div);
