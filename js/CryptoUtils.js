@@ -12,8 +12,8 @@ let CryptoUtils = {
 			CryptoUtils.plugins = [];
 			CryptoUtils.plugins.push(new BitcoinPlugin());
 			CryptoUtils.plugins.push(new EthereumPlugin());
-			CryptoUtils.plugins.push(new LitecoinPlugin());
 			CryptoUtils.plugins.push(new MoneroPlugin());
+			CryptoUtils.plugins.push(new LitecoinPlugin());
 			CryptoUtils.plugins.push(new BitcoinCashPlugin());
 			CryptoUtils.plugins.push(new EthereumClassicPlugin());
 			CryptoUtils.plugins.push(new OmiseGoPlugin());
@@ -28,8 +28,8 @@ let CryptoUtils = {
 		let plugins = [];
 		plugins.push(new BitcoinPlugin());
 		plugins.push(new EthereumPlugin());
-		plugins.push(new LitecoinPlugin());
 		plugins.push(new MoneroPlugin());
+		plugins.push(new LitecoinPlugin());
 		return plugins;
 	},
 	
