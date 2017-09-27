@@ -16,7 +16,6 @@
 // keyboard popping up in ios on key creation flow
 // file import zip with invalid json shouldn't prevent others from importing
 // disable next if mix num keys change
-// "Successfully compiled asm.js code (loaded from cache in 6ms)" messages in moneroaddress and keythereum
 // live site warning to stop and download from github
 // focus on first text element if applicable
 // wording on front page / be consistent
