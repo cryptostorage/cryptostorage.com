@@ -1,6 +1,5 @@
 // TODO
 // all pieces in preview for print
-// height issues on chrome and safari
 // bigger keys, smaller qr codes anchored to top/bottom corner
 // preview flickers even on first load
 // flag to verify encryption
