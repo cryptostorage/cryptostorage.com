@@ -1,8 +1,7 @@
 // TODO
+// incorporate rendering into decrypt page
 // prevent rendered page from showing after home, FAQ or donate clicked
 // bigger keys, smaller qr codes anchored to top/bottom corner
-// preview flickers even on first load
-// minimum cannot be larger than num pieces
 // faq page
 // donation page
 // paste private key doesn't work in iphone safari

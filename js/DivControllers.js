@@ -152,6 +152,7 @@ DivController.prototype.onHide = function() { }
  */
 function PageController(div) {
 	
+	let that = this;
 	let pathTracker = new PathTracker(onPageChange);	// track path through decision tree
 	let pageDiv;										// container to render page content
 	let transitioning = false;							// indicates if transition in progress to prevent duplicates
@@ -211,6 +212,10 @@ function PageController(div) {
 		});
 	};
 	
+	this.clearNexts = function() {
+		pathTracker.clearNexts();
+	}
+	
 	this.getPathTracker = function() {
 		return pathTracker;
 	}
@@ -260,6 +265,7 @@ function PageController(div) {
 		// update arrows	
 		pathTracker.hasPrev() ? leftArrowDiv.show() : leftArrowDiv.hide();
 		pathTracker.hasNext() ? rightArrowDiv.show() : rightArrowDiv.hide();
+		that.setNavigable(true);
 	}
 }
 inheritsFrom(PageController, DivController);
@@ -483,7 +489,7 @@ function NumKeysController(div, state, onNumKeysInput) {
 		numKeysInput.attr("value", 10);
 		div.append(numKeysInput);
 		div.append("<br><br>");
-		numKeysInput.keypress(function() { state.pageController.getPathTracker().clearNexts(); });
+		numKeysInput.keypress(function() { state.pageController.clearNexts(); });
 		
 		// error message
 		errorDiv.attr("class", "error_msg");
@@ -577,7 +583,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		passwordInput.attr("class", "text_input");
 		div.append(passwordInput);
 		div.append("<br><br>");
-		passwordInput.keypress(function() { state.pageController.getPathTracker().clearNexts(); });
+		passwordInput.keypress(function() { state.pageController.clearNexts(); });
 		
 		// render advanced link
 		let advancedLink = $("<div class='mock_link'>").appendTo(div);
@@ -739,7 +745,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		numPiecesInput.attr("min", 2);
 		div.append(numPiecesInput);
 		div.append("<br><br>");
-		numPiecesInput.keypress(function() { state.pageController.getPathTracker().clearNexts(); });
+		numPiecesInput.keypress(function() { state.pageController.clearNexts(); });
 		
 		div.append("Number of pieces necessary to restore private keys: ");
 		var minPiecesInput = $("<input type='number'>");
@@ -748,7 +754,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		minPiecesInput.attr("value", 2);
 		div.append(minPiecesInput);
 		div.append("<br><br>");
-		minPiecesInput.keypress(function() { state.pageController.getPathTracker().clearNexts(); });
+		minPiecesInput.keypress(function() { state.pageController.clearNexts(); });
 		
 		// error message
 		errorDiv.empty();
@@ -827,10 +833,10 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		var btnGenerate = UiUtils.getNextButton("Generate storage");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
+			state.pageController.clearNexts();
 			state.pageController.setNavigable(false);
 			generateKeys(function(keys, pieces, pieceDivs) {
 				btnGenerate.removeAttr("disabled");
-				state.pageController.setNavigable(true);
 				onKeysGenerated(keys, pieces, pieceDivs);
 			});
 		});
@@ -1143,14 +1149,15 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 		btnDecrypt.click(function() {
 			setErrorMessage("");
 			btnDecrypt.attr("disabled", "disabled");
+			state.pageController.clearNexts();
 			state.pageController.setNavigable(false);
 			onDecrypt(function(err, pieces, pieceDivs) {
-				state.pageController.setNavigable(true);
 				if (err) {
 					setErrorMessage(err.message);
 					passwordInput.focus();
 					btnDecrypt.removeAttr("disabled");
 					progressDiv.hide();
+					state.pageController.setNavigable(true);
 				} else {
 					onKeysDecrypted(keys, pieces, pieceDivs);
 				}
@@ -1529,8 +1536,9 @@ function SaveController(div, state) {
 		
 		// handle pieces already set
 		if (pieces && pieceDivs) {
-			setPieces(pieces, pieceDivs);
-			if (onDone) onDone(null, pieces, pieceDivs);
+			setPieces(pieces, pieceDivs, function() {
+				if (onDone) onDone(null, pieces, pieceDivs);
+			});
 			return;
 		}
 		
@@ -1552,8 +1560,9 @@ function SaveController(div, state) {
 			if (err) {
 				if (onDone) onDone(err);
 			} else {
-				setPieces(pieces, pieceDivs);
-				if (onDone) onDone(null, pieces, pieceDivs);
+				setPieces(pieces, pieceDivs, function() {
+					if (onDone) onDone(null, pieces, pieceDivs);
+				});
 			}
 		});
 	
@@ -1563,7 +1572,7 @@ function SaveController(div, state) {
 			if (label) progressBar.setText(label);
 		}
 		
-		function setPieces(pieces, pieceDivs) {
+		function setPieces(pieces, pieceDivs, onDone) {
 			assertTrue(pieces.length > 0);
 			assertTrue(pieceDivs.length > 0);
 			
@@ -1624,6 +1633,9 @@ function SaveController(div, state) {
 				// enable print and download links
 				printLink.removeAttr("disabled");
 				downloadLink.removeAttr("disabled");
+				
+				// done setting pieces
+				onDone();
 			});
 		}
 	}
