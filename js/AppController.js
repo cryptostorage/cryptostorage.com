@@ -1,4 +1,5 @@
 // TODO
+// weight rendering more heavily
 // fetch mix dependencies as soon as known
 // bigger keys, smaller qr codes anchored to top/bottom corner (height issue with monero pushing into next page)
 // faq page
