@@ -5,7 +5,6 @@
 // bigger keys, smaller qr codes anchored to top/bottom corner (height issue with monero pushing into next page)
 // faq page
 // donation page
-// de-minify aes.java
 // todos throughout code
 // run minimum tests when site accessed
 // better mix logo
@@ -52,7 +51,7 @@ const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;
-const COMMON_DEPENDENCIES = ["lib/logos.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/aes.js", "lib/bitaddress.js", "lib/progressbar.js"];
+const COMMON_DEPENDENCIES = ["lib/logos.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js"];
 var loader;
 
 /**

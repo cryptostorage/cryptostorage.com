@@ -80,7 +80,7 @@ function BitcoinPlugin() {
 	this.getName = function() { return "Bitcoin"; }
 	this.getTicker = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
-	this.getDependencies = function() { return ["lib/aes.js", "lib/bitaddress.js"]; }
+	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js"]; }
 	this.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS, CryptoUtils.EncryptionScheme.BIP38]; }
 	this.newKey = function(str) {
 		
@@ -169,7 +169,7 @@ function EthereumPlugin() {
 	this.getName = function() { return "Ethereum"; }
 	this.getTicker = function() { return "ETH" };
 	this.getLogo = function() { return $("<img src='img/ethereum.png'>"); }
-	this.getDependencies = function() { return ["lib/aes.js", "lib/bitaddress.js", "lib/keythereum.js"]; }
+	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/keythereum.js"]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -271,7 +271,7 @@ function LitecoinPlugin() {
 	this.getName = function() { return "Litecoin"; }
 	this.getTicker = function() { return "LTC" };
 	this.getLogo = function() { return $("<img src='img/litecoin.png'>"); }
-	this.getDependencies = function() { return ["lib/aes.js", "lib/bitaddress.js", "lib/litecore.js"]; }
+	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/litecore.js"]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -322,7 +322,7 @@ function MoneroPlugin() {
 	this.getName = function() { return "Monero"; }
 	this.getTicker = function() { return "XMR" };
 	this.getLogo = function() { return $("<img src='img/monero.png'>"); }
-	this.getDependencies = function() { return ["lib/aes.js", "lib/bitaddress.js", "lib/moneroaddress.js"]; }
+	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/moneroaddress.js"]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
