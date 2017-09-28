@@ -1,4 +1,5 @@
 // TODO
+// fetch mix dependencies as soon as known
 // solve issue where next page may take time to load, but previous page is done
 // prevent rendered page from showing after home, FAQ or donate clicked
 // home button maintains state, doesn't start over
