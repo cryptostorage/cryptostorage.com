@@ -1,4 +1,5 @@
 // TODO
+// width collapsing on save page when rendering
 // incorporate rendering into decrypt page
 // prevent rendered page from showing after home, FAQ or donate clicked
 // bigger keys, smaller qr codes anchored to top/bottom corner
