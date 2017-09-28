@@ -3,7 +3,7 @@
 // incorporate rendering into decrypt page
 // update text file with currency label
 // prevent rendered page from showing after home, FAQ or donate clicked
-// bigger keys, smaller qr codes anchored to top/bottom corner
+// bigger keys, smaller qr codes anchored to top/bottom corner (height issue with monero pushing into next page)
 // home button maintains state, doesn't start over
 // faq page
 // donation page
