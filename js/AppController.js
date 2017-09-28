@@ -1,7 +1,4 @@
 // TODO
-// solve issue where next page may take time to load, but previous page is done
-// prevent rendered page from showing after home, FAQ or donate clicked
-// home button maintains state, doesn't start over
 // fetch mix dependencies as soon as known
 // bigger keys, smaller qr codes anchored to top/bottom corner (height issue with monero pushing into next page)
 // faq page
@@ -13,7 +10,6 @@
 // verify no name collisions
 // bip38 not working on old hardware
 // file import zip with invalid json shouldn't prevent others from importing
-// disable next if mix num keys change
 // live site warning to stop and download from github
 // wording on front page / be consistent
 // condense files to single files as much as possible
@@ -41,6 +37,10 @@
 // warnings to test before using.
 // register shortcut keys for page navigation (enter, y, n)
 // focus on first text element if applicable
+// solve issue where next page may take time to load, but previous page is done
+// prevent rendered page from showing after home, FAQ or donate clicked
+// home button maintains state, doesn't start over
+// disable next if mix num keys change
 
 // low priority
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
