@@ -643,7 +643,7 @@ function PasswordInputController(div, state, onPasswordInput) {
 		
 		// register pasword enter key
 		passwordInput.keyup(function(e) {
-			var code = e.which;
+			let code = e.which;
 		    if (code == 13) {
 		    	e.preventDefault();
 		        btnNext.click();
