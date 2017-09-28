@@ -11,16 +11,15 @@
 // test alert if key creation fails for any reason
 // verify no name collisions
 // bip38 not working on old hardware
-// test on IE
 // file import zip with invalid json shouldn't prevent others from importing
 // disable next if mix num keys change
 // live site warning to stop and download from github
-// focus on first text element if applicable
 // wording on front page / be consistent
 // condense files to single files as much as possible
 // warning if live and/or online
 // switch to jquery-qrcode?
 // csv import to support "bring your own keys"
+// test on IE
 
 // peer review key formats
 
@@ -38,6 +37,7 @@
 // navigation bar showing overall place in flow
 // warnings to test before using.
 // register shortcut keys for page navigation (enter, y, n)
+// focus on first text element if applicable
 
 // low priority
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
