@@ -298,6 +298,10 @@ input[type='file'] {
 	cursor: pointer;
 }
 
+.save_container {
+	width:820px;
+}
+
 .export_header {
 	display:flex;
 	align-items:center;

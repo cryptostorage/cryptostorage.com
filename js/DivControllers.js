@@ -1483,7 +1483,7 @@ function SaveController(div, state) {
 		div.attr("style", "display:flex; flex-direction:column; align-items:center;");
 		
 		// put page contents in container to share width
-		let container = $("<div>").appendTo(div);
+		let container = $("<div class='save_container'>").appendTo(div);
 		div = container;
 		
 		// add title
