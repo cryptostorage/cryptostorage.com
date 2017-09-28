@@ -237,7 +237,7 @@ let CryptoUtils = {
 			let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getWif()];
 			for (let i = 0; i < numPieces; i++) {
 				let piece = {};
-				piece.crypto = key.getPlugin().getTicker();
+				piece.ticker = key.getPlugin().getTicker();
 				piece.isSplit = numPieces > 1;
 				piece.address = key.getAddress();
 				piece.privateKey = keyPieces[i];
@@ -263,7 +263,7 @@ let CryptoUtils = {
 		if (pieces.length === 1) {
 			for (let pieceKey of pieces[0]) {
 				try {
-					let key = CryptoUtils.getCryptoPlugin(pieceKey.crypto).newKey(pieceKey.privateKey);
+					let key = CryptoUtils.getCryptoPlugin(pieceKey.ticker).newKey(pieceKey.privateKey);
 					if (key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);
 					keys.push(key);
 				} catch (err) {
@@ -290,8 +290,8 @@ let CryptoUtils = {
 				let address;
 				let encryption;
 				for (let piece of pieces) {
-					if (!crypto) crypto = piece[i].crypto;
-					else if (crypto !== piece[i].crypto) throw new Error("Pieces are for different cryptocurrencies");
+					if (!crypto) crypto = piece[i].ticker;
+					else if (crypto !== piece[i].ticker) throw new Error("Pieces are for different cryptocurrencies");
 					if (!isSplit) isSplit = piece[i].isSplit;
 					else if (isSplit !== piece[i].isSplit) throw new Error("Pieces have different split states");
 					if (!address) address = piece[i].address;
@@ -306,7 +306,7 @@ let CryptoUtils = {
 				let shares = [];
 				for (let piece of pieces) shares.push(piece[i].privateKey);
 				try {
-					let key = CryptoUtils.getCryptoPlugin(pieces[0][i].crypto).combine(shares);
+					let key = CryptoUtils.getCryptoPlugin(pieces[0][i].ticker).combine(shares);
 					if (key.isEncrypted() && pieces[0][i].address) key.setAddress(pieces[0][i].address);
 					keys.push(key);
 				} catch (err) {
@@ -329,11 +329,11 @@ let CryptoUtils = {
 		assertTrue(pieces.length > 0, "Pieces cannot be empty");
 		
 		// get crypto identifier
-		let cryptos = [];
+		let tickers = [];
 		for (let key of pieces[0]) {
-			if (!contains(cryptos, key.crypto)) cryptos.push(key.crypto);
+			if (!contains(tickers, key.ticker)) tickers.push(key.ticker);
 		}
-		let crypto = cryptos.length === 1 ? cryptos[0].toLowerCase() : "mix";
+		let crypto = tickers.length === 1 ? tickers[0].toLowerCase() : "mix";
 		
 		// prepare zips for each piece
 		let zips = [];
@@ -453,7 +453,7 @@ let CryptoUtils = {
 	pieceToStr: function(piece) {
 		var str = "";
 		for (var i = 0; i < piece.length; i++) {
-			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].crypto).getName() + " =====\n\n";
+			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
 			str += "Public Address:\n" + piece[i].address + "\n\n";
 			str += "Private Key:\n" + piece[i].privateKey + "\n\n";
 		}
@@ -463,7 +463,7 @@ let CryptoUtils = {
 	validatePiece: function(piece) {
 		assertTrue(piece.length > 0);
 		for (let key of piece) {
-			assertDefined(key.crypto, "piece.crypto is not defined");
+			assertDefined(key.ticker, "piece.ticker is not defined");
 			assertDefined(key.isSplit, "piece.isSplit is not defined");
 			assertDefined(key.privateKey, "piece.privateKey is not defined");
 		}

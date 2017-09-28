@@ -5,7 +5,6 @@
 // home button maintains state, doesn't start over
 // faq page
 // donation page
-// rename crypto to ticker or currency in json file
 // de-minify aes.java
 // todos throughout code
 // run minimum tests when site accessed

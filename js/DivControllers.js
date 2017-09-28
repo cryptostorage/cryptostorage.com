@@ -1394,7 +1394,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		
 		// collect cryptos being imported
 		let cryptos = new Set();
-		for (let elem of pieces[0]) cryptos.add(elem.crypto);
+		for (let elem of pieces[0]) cryptos.add(elem.ticker);
 		
 		// collect dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
@@ -1781,11 +1781,11 @@ let CustomPieceRenderer = {
 			// collect function to render key pair
 			let keyDiv = $("<div class='key_div'>").appendTo(pageDiv);
 			if (i % PAIRS_PER_PAGE === 0) keyDiv.css("border-top", "2px solid green");
-			let plugin = CryptoUtils.getCryptoPlugin(piece[i].crypto);
+			let plugin = CryptoUtils.getCryptoPlugin(piece[i].ticker);
 			let title = "#" + (i + 1);
 			let leftLabel = "\u25C4 Public Address";
 			let leftValue = piece[i].address;
-			let logo = $("<img width=100% height=100% src='" + getLogoData(piece[i].crypto) + "'>");
+			let logo = $("<img width=100% height=100% src='" + getLogoData(piece[i].ticker) + "'>");
 			let logoLabel = plugin.getName();
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = piece[i].privateKey;
