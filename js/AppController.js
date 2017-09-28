@@ -1,6 +1,7 @@
 // TODO
 // width collapsing on save page when rendering
 // incorporate rendering into decrypt page
+// update text file with currency label
 // prevent rendered page from showing after home, FAQ or donate clicked
 // bigger keys, smaller qr codes anchored to top/bottom corner
 // home button maintains state, doesn't start over
