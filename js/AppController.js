@@ -46,7 +46,7 @@
 // html export is horizontally centered with @media print for actual print
 // timeouts in tests so browser doesn't lock
 
-const RUN_TESTS = true;
+const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;
