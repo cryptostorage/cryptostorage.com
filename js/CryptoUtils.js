@@ -87,8 +87,12 @@ let CryptoUtils = {
 				} catch (err) { }
 				if (!hex) callback(new Error("Incorrect password"));
 				else {
-					key.setPrivateKey(hex);
-					callback(null, key);
+					try {
+						key.setPrivateKey(hex);
+						callback(null, key);
+					} catch (err) {
+						callback(new Error("Incorrect password"));
+					}
 				}
 				break;
 			case CryptoUtils.EncryptionScheme.BIP38:

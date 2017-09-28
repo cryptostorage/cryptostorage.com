@@ -244,7 +244,7 @@ let Tests = {
 				fail("Should have thrown an error");
 			} catch (error) { }	
 			
-			// test each encryption scheme
+			// collect functions to test each encryption scheme
 			assertTrue(plugin.getEncryptionSchemes().length >= 1);
 			let funcs = [];
 			for (let scheme of plugin.getEncryptionSchemes()) {
@@ -254,7 +254,14 @@ let Tests = {
 				for (let i = 0; i < max; i++) keys.push(plugin.newKey());
 				funcs.push(function(callback) { testEncryptKeys(keys, scheme, Tests.PASSWORD, callback); });
 			}
-			async.parallel(funcs, callback);
+			
+			// execute encryption tests
+			async.parallel(funcs, function(err) {
+				if (err) callback(err);
+				
+				// test wrong password decryption
+				testDecryptWrongPassword(plugin, callback);
+			});
 		}
 
 		function testEncryptKeys(keys, scheme, password, callback) {
@@ -371,6 +378,15 @@ let Tests = {
 					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
 					callback();
 				}
+			});
+		}
+		
+		function testDecryptWrongPassword(plugin, onDone) {
+			let privateKey = "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdGfEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy";
+			let key = plugin.newKey(privateKey);
+			key.decrypt("abctesting123", function(err, decryptedKey) {
+				assertEquals("Incorrect password", err.message);
+				onDone();
 			});
 		}
 
