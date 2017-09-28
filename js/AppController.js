@@ -1,7 +1,9 @@
 // TODO
+// last title
 // incorporate rendering into decrypt page
 // prevent rendered page from showing after home, FAQ or donate clicked
 // bigger keys, smaller qr codes anchored to top/bottom corner
+// home button maintains state, doesn't start over
 // faq page
 // donation page
 // de-minify aes.java
@@ -118,7 +120,7 @@ function ApplicationController(div) {
 		homeLink.click(function() { that.showHome(); });
 		let faqLink = UiUtils.getLink("#faq", "FAQ");
 		faqLink.click(function() { that.showFaq(); });
-		let gitHubLink = $("<a href='https://github.com/cryptostorage/cryptostorage.com'>");
+		let gitHubLink = $("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>");
 		gitHubLink.html("GitHub");
 		let donateLink = UiUtils.getLink("#donate", "Donate");
 		donateLink.click(function() { that.showDonate(); });
