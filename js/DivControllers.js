@@ -1164,7 +1164,6 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 					passwordInput.focus();
 					btnDecrypt.removeAttr("disabled");
 					progressDiv.hide();
-					state.pageController.setNavigable(true);
 				} else {
 					onKeysDecrypted(keys, pieces, pieceDivs);
 				}
@@ -1199,7 +1198,6 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			let progressWeight = 0;
 			setProgress(progressWeight, totalWeight, "Decrypting");
 			async.series(funcs, function(err, result) {
-				state.pageController.setNavigable(true);
 				if (err) onDone(err);
 				else {
 					// convert keys to a decrypted piece

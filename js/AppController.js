@@ -1,6 +1,4 @@
 // TODO
-// incorporate rendering into decrypt page
-// update text file with currency label
 // prevent rendered page from showing after home, FAQ or donate clicked
 // bigger keys, smaller qr codes anchored to top/bottom corner (height issue with monero pushing into next page)
 // home button maintains state, doesn't start over
@@ -23,6 +21,9 @@
 // switch to jquery-qrcode?
 // csv import to support "bring your own keys"
 // test on IE
+// backwards bitcoin cash logo
+// smaller html exports
+// solve issue where next page may take time to load, but previous page is done
 
 // peer review key formats
 
@@ -272,10 +273,12 @@ function ApplicationController(div) {
 		pageController.next(new ImportTextController($("<div>"), state, onKeysImported));
 	}
 	
-	function onKeysImported(keys) {
+	function onKeysImported(keys, pieces, pieceDivs) {
 		if (DEBUG) console.log("onKeysImported(" + keys.length + " keys)");
 		assertTrue(keys.length >= 1);
 		state.keys = keys;
+		state.pieces = pieces;
+		state.pieceDivs = pieceDivs;
 		if (keys[0].isEncrypted()) pageController.next(new DecryptKeysController($("<div>"), state, onKeysImported));
 		else {
 			pageController.next(new SaveController($("<div>"), state));
