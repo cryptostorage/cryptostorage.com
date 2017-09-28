@@ -109,7 +109,7 @@ function BitcoinPlugin() {
 		}
 		
 		// wif cryptojs
-		else if (str[0] === 'U') {
+		else if (str.startsWith("U2") && !hasWhitespace(str)) {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
@@ -200,7 +200,7 @@ function EthereumPlugin() {
 		}
 		
 		// wif cryptojs
-		else if (str[0] === 'U') {
+		else if (str.startsWith("U2") && !hasWhitespace(str)) {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
@@ -299,7 +299,7 @@ function LitecoinPlugin() {
 		}
 		
 		// wif cryptojs
-		else if (str[0] === 'U') {
+		else if (str.startsWith("U2") && !hasWhitespace(str)) {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
@@ -357,7 +357,7 @@ function MoneroPlugin() {
 		}
 		
 		// wif cryptojs
-		if (str[0] === 'U') {
+		if (str.startsWith("U2") && !hasWhitespace(str)) {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;

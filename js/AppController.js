@@ -44,8 +44,9 @@
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
 // all div controllers directly modify state
 // html export is horizontally centered with @media print for actual print
+// timeouts in tests so browser doesn't lock
 
-const RUN_TESTS = false;
+const RUN_TESTS = true;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;

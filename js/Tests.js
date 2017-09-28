@@ -5,7 +5,7 @@ let Tests = {
 	
 	// constants
 	REPEAT_LONG: 50,
-	REPEAT_SHORT: 1,
+	REPEAT_SHORT: 0,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSWORD: "MySuperSecretPasswordAbcTesting123",
@@ -228,7 +228,7 @@ let Tests = {
 			testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
 			
 			// test invalid private keys
-			let invalids = [" ", "ab", "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress(), "1ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a"];
+			let invalids = [" ", "ab", "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress(), "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "1ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a"];
 			for (let invalid of invalids) {
 				try {
 					let key = plugin.newKey(invalid);
@@ -249,6 +249,7 @@ let Tests = {
 			let funcs = [];
 			for (let scheme of plugin.getEncryptionSchemes()) {
 				let max = scheme === CryptoUtils.EncryptionScheme.BIP38 ? Tests.REPEAT_SHORT : Tests.REPEAT_LONG;
+				if (max < 1) continue;
 				let keys = [];
 				for (let i = 0; i < max; i++) keys.push(plugin.newKey());
 				funcs.push(function(callback) { testEncryptKeys(keys, scheme, Tests.PASSWORD, callback); });
