@@ -5,7 +5,7 @@ let Tests = {
 	
 	// constants
 	REPEAT_LONG: 50,
-	REPEAT_SHORT: 0,
+	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSWORD: "MySuperSecretPasswordAbcTesting123",
