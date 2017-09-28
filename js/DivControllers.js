@@ -1072,7 +1072,7 @@ function ImportTextController(div, state, onKeysImported) {
 		// render textarea input
 		textarea = $("<textarea>");
 		div.append(textarea);
-		textarea.keyup(function() {
+		textarea.on('input', function() {
 			
 			// load dependencies
 			let dependencies = new Set(COMMON_DEPENDENCIES);

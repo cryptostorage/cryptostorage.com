@@ -4,7 +4,6 @@
 // bigger keys, smaller qr codes anchored to top/bottom corner
 // faq page
 // donation page
-// paste private key doesn't work in iphone safari
 // de-minify aes.java
 // todos throughout code
 // run minimum tests when site accessed
