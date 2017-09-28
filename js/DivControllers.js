@@ -821,7 +821,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		
 		// render title
 		let name = UiUtils.getCryptoName(state);
-		let header = name === "mixed" ? "Ready to generate keys for multiple currencies?" : "Ready to generate " + name + " keys?";		
+		let header = "Ready to generate your keys?";		
 		div.append(UiUtils.getPageHeader(header, UiUtils.getCryptoLogo(state)));
 		
 		// render summary
@@ -837,7 +837,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		div.append("<br><br>");
 		
 		// render generate button
-		var btnGenerate = UiUtils.getNextButton("Generate storage");
+		var btnGenerate = UiUtils.getNextButton("Generate keys");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
 			state.pageController.clearNexts();
@@ -1489,7 +1489,7 @@ function SaveController(div, state) {
 		// add title
 		let name = UiUtils.getCryptoName(state);
 		name = name === "mixed" ? "" : name;
-		let header = state.mix ? "Your " + (name ? name : "") + " keys have been generated and are ready to download." : "Your " + (name ? name : "") + " keys have been imported.";
+		let header = "Your keys are ready to save.";
 		div.append(UiUtils.getPageHeader(header, UiUtils.getCryptoLogo(state)));
 		
 		// add save header
