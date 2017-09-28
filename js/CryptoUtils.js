@@ -42,6 +42,13 @@ let CryptoUtils = {
 	},
 	
 	/**
+	 * Determines if the given string is a valid CryptoJS WIF private key.
+	 */
+	isWifCryptoJs: function(str) {
+		return str.startsWith("U2") && str.length === 128 && !hasWhitespace(str);
+	},
+	
+	/**
 	 * Encrypts the given key with the given scheme and password.
 	 * 
 	 * Invokes callback(err, encryptedKey) when done.
