@@ -507,6 +507,16 @@ function countNonWhitespaceCharacters(str) {
 }
 
 /**
+ * Returns tokens separated by whitespace from the given string.
+ * 
+ * @param str is the string to get tokens from
+ * @returns string[] are the tokens separated by whitespace within the string
+ */
+function getTokens(str) {
+	return str.match(/\S+/g);
+}
+
+/**
  * Returns the document's first stylesheet which has no href.
  * 
  * @returns StyleSheet is the internal stylesheet

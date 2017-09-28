@@ -79,7 +79,7 @@ $(document).ready(function() {
 	
 	// run tests
 	if (RUN_TESTS) {
-		console.log("Running tests");
+		console.log("Running tests...");
 		Tests.runTests(function(error) {
 			if (error) throw error;
 			console.log("All tests pass");

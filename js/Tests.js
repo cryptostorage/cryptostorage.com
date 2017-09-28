@@ -10,13 +10,30 @@ let Tests = {
 	MIN_PIECES: 2,
 	PASSWORD: "MySuperSecretPasswordAbcTesting123",
 	
+	/**
+	 * Returns crypto plugins to test.
+	 */
+	getTestCryptoPlugins: function() {
+		let plugins = [];
+		plugins.push(new BitcoinPlugin());
+		plugins.push(new EthereumPlugin());
+		plugins.push(new MoneroPlugin());
+		plugins.push(new LitecoinPlugin());
+		return plugins;
+	},
+	
+	/**
+	 * Runs all tests.
+	 * 
+	 * Invokes callback() when done with an error argument if an error occurs.
+	 */
 	runTests: function(callback) {
 		
 		// window.crypto required for tests
 		if (!window.crypto) throw new Error("Cannot run tests without window.crypto");
 		
 		// get test plugins
-		let plugins = CryptoUtils.getTestCryptoPlugins();
+		let plugins = Tests.getTestCryptoPlugins();
 		
 		// load dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
@@ -33,6 +50,7 @@ let Tests = {
 			// run tests
 			testUtils();
 			testPathTracker();
+			testParseKey(plugins);
 			if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
 			testCryptoKeys(plugins, function(error) {
 				if (callback) callback(error);
@@ -50,6 +68,28 @@ let Tests = {
 			assertFalse(isString(null));
 			assertFalse(isString(undefined));
 			assertFalse(isString(123));
+		}
+		
+		function testParseKey(plugins) {
+			for (let plugin of plugins) {
+				
+				// parse unencrypted key
+				let wif = plugin.newKey().getWif();
+				let key = CryptoUtils.parseKey(plugin, wif);
+				assertEquals(key.getWif(), wif);
+				
+				// parse empty key
+				try {
+					CryptoUtils.parseKey(plugin, "");
+					fail("fail");
+				} catch (err) {
+					if (err.message === "fail") throw new Error("Should not have parsed key from empty string");
+				}
+				
+				// parse whitespace key
+				key = CryptoUtils.parseKey(plugin, " ");
+				assertNull(key, "Should not have parsed key from whitespace string");
+			}
 		}
 
 		function testPathTracker() {
@@ -188,10 +228,10 @@ let Tests = {
 			testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
 			
 			// test invalid private keys
-			let invalids = ["ab", "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress(), "1ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a"];
+			let invalids = [" ", "ab", "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress(), "1ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a"];
 			for (let invalid of invalids) {
 				try {
-					let key = new CryptoKey(plugin, invalid);
+					let key = plugin.newKey(invalid);
 					fail("fail");
 				} catch (err) {
 					if (err.message === "fail") throw new Error("Should not create key from invalid input: " + plugin.getTicker() + "(" + invalid + ")");

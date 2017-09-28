@@ -20,18 +20,6 @@ let CryptoUtils = {
 		}
 		return CryptoUtils.plugins;
 	},
-
-	/**
-	 * Returns test crypto plugins.
-	 */
-	getTestCryptoPlugins: function() {
-		let plugins = [];
-		plugins.push(new BitcoinPlugin());
-		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
-		plugins.push(new LitecoinPlugin());
-		return plugins;
-	},
 	
 	/**
 	 * Returns the crypto plugin with the given ticker symbol.
@@ -186,15 +174,23 @@ let CryptoUtils = {
 	 * @throws an exception if a private key cannot be parsed from the string
 	 */
 	parseKey: function(plugin, str) {
+		assertInitialized(str);
 		str = str.trim();
-		var lines = str.split('\n');
-		var components = [];
-		for (let line of lines) if (line) components.push(line);
-		if (components.length === 0) return null;
+		if (!str) return null;
+		
+		// first try string as key
 		try {
-			return components.length === 1 ? plugin.newKey(components[0]) : plugin.combine(components);
+			return plugin.newKey(str);
 		} catch (err) {
-			return null;	// error means key could not be parsed
+
+			// try tokenizing and combining
+			let tokens = getTokens(str);
+			if (tokens.length === 0) return null;
+			try {
+				return plugin.combine(tokens);
+			} catch (err) {
+				return null;	// error means key could not be parsed
+			}
 		}
 	},
 

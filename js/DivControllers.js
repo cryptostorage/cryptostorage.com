@@ -1053,9 +1053,9 @@ inheritsFrom(GenerateKeysController, DivController);
  */
 function ImportTextController(div, state, onKeysImported) {
 	DivController.call(this, div);
-	var errorDiv = $("<div>");
-	var lastCount = 0;
-	var textarea;
+	let errorDiv = $("<div>");
+	let lastInputs = [];
+	let textarea;
 	
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -1079,10 +1079,10 @@ function ImportTextController(div, state, onKeysImported) {
 			for (let dependency of state.plugin.getDependencies()) dependencies.add(dependency);
 			loader.load(Array.from(dependencies), function() {
 				
-				// only continue if new characters added
-				let count = countNonWhitespaceCharacters(textarea.val());
-				if (lastCount === count) return;
-				lastCount = count;
+				// only continue if new inputs
+				let inputs = getTokens(textarea.val());
+				if (arraysEqual(inputs, lastInputs)) return;
+				lastInputs = inputs;
 				
 				try {
 					if (textarea.val() === "") {
