@@ -21,7 +21,7 @@
 // warning if live and/or online
 // switch to jquery-qrcode?
 // csv import to support "bring your own keys"
-// copy/paste from pdf inserts space, when space removed window does not auto advance
+// U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG is too short of encrypted key but not length sensitive
 
 // peer review key formats
 
