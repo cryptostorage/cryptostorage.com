@@ -2146,12 +2146,14 @@ function FaqController(div) {
 		// render title
 		div.append(UiUtils.getPageHeader("FAQ"));
 		
-		$("<div class='question'>").html("How should I generate storage using cryptostorage.com?").appendTo(div);
+		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(div);
 		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not be tampered using the signature file by executing these commands:</li></ol>").appendTo(div);
 		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(div);
-		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys recovered from cryptostorage.com into the wallet software of their choice to manage funds.  Support to send funds from cryptostorage.com may be considered in the future depending on interest and ease of implementation.").appendTo(div);
+		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future depending on interest and ease of implementation.").appendTo(div);
 		$("<div class='question'>").html("How can I trust this service?").appendTo(div);
 		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code ensures it will execute as advertised which may be audited by anyone.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(div);
+		$("<div class='question'>").html("Do I have to have access to crypstorage.com, the domain, to recover my private keys?").appendTo(div);
+		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  It is advised that users save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com.").appendTo(div);
 		
 		// done rendering
 		callback(div);
