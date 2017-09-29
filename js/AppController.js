@@ -5,7 +5,6 @@
 // donation page
 // todos throughout code
 // run minimum tests when site accessed
-// better mix logo
 // test alert if key creation fails for any reason
 // verify no name collisions
 // bip38 not working on old hardware
