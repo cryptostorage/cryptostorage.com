@@ -110,7 +110,9 @@ let UiUtils = {
  * Derived from experimentation and used for representative progress bar.
  */
 let Weights = {
+
 	getCreateKeyWeight: function() { return 63; },
+	
 	getEncryptWeight: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
@@ -120,6 +122,7 @@ let Weights = {
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
+	
 	getDecryptWeight: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
@@ -129,7 +132,12 @@ let Weights = {
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
+	
 	getQrWeight: function() {
+		return 25;
+	},
+	
+	getLogoWeight: function() {
 		return 25;
 	}
 }
@@ -1694,6 +1702,7 @@ inheritsFrom(CustomExportController, DivController);
 let CustomPieceRenderer = {
 
 	defaultConfig: {
+		show_logos: true,
 		public_qr: true,
 		private_qr: true,
 		public_text: true,
@@ -1707,14 +1716,22 @@ let CustomPieceRenderer = {
 		add_table_width: 15	// spacing in pixels
 	},
 	
-	getNumQrs: function(numKeys, numPieces, config) {
-		config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
-		return numKeys * numPieces * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
-	},
-	
+	/**
+	 * Returns the total weight to render all keys across all pieces.
+	 */
 	getWeight: function(numKeys, numPieces, config) {
-		config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
-		return IndustrialPieceRenderer.getNumQrs(numKeys, numPieces, config) * Weights.getQrWeight();
+		
+		// merge configs
+		config = Object.assign({}, CustomPieceRenderer.defaultConfig, config);
+		
+		// get number of qr codes
+		let numQrs = numKeys * numPieces * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
+		
+		// get number of logos
+		let numLogos = config.show_logos ? numKeys * numPieces : 0;
+		
+		// return total weight
+		return numQrs * Weights.getQrWeight() + numLogos * Weights.getLogoWeight();
 	},
 	
 	/**

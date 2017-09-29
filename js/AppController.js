@@ -1,5 +1,6 @@
 // TODO
-// weight rendering more heavily
+// sev2 litecoin key generation
+// key and piece elem are nearly equivalent, make them same?
 // fetch mix dependencies as soon as known
 // bigger keys, smaller qr codes anchored to top/bottom corner (height issue with monero pushing into next page)
 // faq page
@@ -42,6 +43,7 @@
 // prevent rendered page from showing after home, FAQ or donate clicked
 // home button maintains state, doesn't start over
 // disable next if mix num keys change
+// render preview in real time without progress bar?
 
 // low priority
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
