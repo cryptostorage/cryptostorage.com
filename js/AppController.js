@@ -18,6 +18,7 @@
 // test on IE
 // backwards bitcoin cash logo
 // smaller html exports
+// render preview in real time without progress bar
 
 // peer review key formats
 
@@ -40,7 +41,6 @@
 // prevent rendered page from showing after home, FAQ or donate clicked
 // home button maintains state, doesn't start over
 // disable next if mix num keys change
-// render preview in real time without progress bar?
 
 // low priority
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
