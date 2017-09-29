@@ -1821,7 +1821,7 @@ let CustomPieceRenderer = {
 		
 		let keyPairsDone = 0;
 		let lastProgress = 0;
-		let notifyFrequency = .01;	// notifies every 1% progress
+		let notifyFrequency = .005;	// notifies every .5% progress
 		function onKeyPairDone() {
 			keyPairsDone++;
 			let progress = keyPairsDone / piece.length;
