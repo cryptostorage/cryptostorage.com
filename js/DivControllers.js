@@ -1475,8 +1475,6 @@ function SaveController(div, state) {
 	let downloadLink;
 	
 	// storage preview
-	let progressDiv;
-	let progressBar;
 	let previewDiv;
 	let currentPieceDiv;
 	
@@ -1548,6 +1546,10 @@ function SaveController(div, state) {
 		downloadLink.off('click');
 		downloadLink.attr("disabled", "disabled");
 		
+		// set up preview
+		previewDiv.empty();
+		let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
+		
 		// handle pieces already set
 		if (pieces && pieceDivs) {
 			setPieces(pieces, pieceDivs, function() {
@@ -1556,16 +1558,50 @@ function SaveController(div, state) {
 			return;
 		}
 		
-		// empty preview
-		previewDiv.empty();
-		
-		// add progress bar
-		progressDiv = $("<div>").appendTo(previewDiv);
-		progressDiv.hide();
-		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
-		
 		// get pieces
 		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, state.numPieces, state.minPieces);
+		
+		// create piece divs and attach first
+		pieceDivs = [];
+		for (let i = 0; i < pieces.length; i++) {
+			pieceDivs.push($("<div>"));
+		}
+		previewDiv.append(pieceDivs[0]);
+		
+		// render pieces
+		CustomPieceRenderer.renderPieces(pieceDivs, pieces, null, null, function(err) {
+			if (err) {
+				if (onDone) onDone(err);
+				return;
+			}
+			
+			// enable print and download links
+			printLink.removeAttr("disabled");
+			downloadLink.removeAttr("disabled");
+			
+			// done
+			if (onDone) onDone(null, pieces, pieceDivs);
+		});
+		
+		
+		
+		
+		
+		
+		// add piece selector to preview header
+		if (pieces.length > 1) {
+			let selector = $("<select class='piece_selector'>").appendTo(previewHeader);
+			selector.change(function() {
+				currentPieceDiv.empty();
+				currentPieceDiv.append(pieceDivs[parseFloat(selector.find(":selected").val())]);
+			});
+			for (let i = 0; i < pieceDivs.length; i++) {
+				let option = $("<option value='" + i + "'>").appendTo(selector);
+				option.html("Piece " + (i + 1));
+			}
+		}
+		
+		
 		
 		// render
 		CustomPieceRenderer.renderPieces(pieces, null, function(percent) {
@@ -1579,12 +1615,6 @@ function SaveController(div, state) {
 				});
 			}
 		});
-	
-		function setProgress(percent, label) {
-			progressDiv.show();
-			progressBar.set(percent);
-			if (label) progressBar.setText(label);
-		}
 		
 		function setPieces(pieces, pieceDivs, onDone) {
 			assertTrue(pieces.length > 0);
@@ -1593,26 +1623,14 @@ function SaveController(div, state) {
 			// empty existing preview
 			previewDiv.empty();
 			
-			// add header div
-			let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
+
 //			let previewHeaderLeft = $("<div class='preview_header_left'>").appendTo(previewHeader);
 //			let previewHeaderCenter = $("<div class='preview_header_center'>").appendTo(previewHeader);
 //			previewHeaderCenter.append("Preview");
 //			let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
 //			previewDiv.append("<br><br>");
 			
-			// add piece pull-down selector
-			if (pieceDivs.length > 1) {
-				let selector = $("<select class='piece_selector'>").appendTo(previewHeader);
-				selector.change(function() {
-					currentPieceDiv.empty();
-					currentPieceDiv.append(pieceDivs[parseFloat(selector.find(":selected").val())]);
-				});
-				for (let i = 0; i < pieceDivs.length; i++) {
-					let option = $("<option value='" + i + "'>").appendTo(selector);
-					option.html("Piece " + (i + 1));
-				}
-			}
+
 			
 			// collect all internal css
 			let internalCss = "";
@@ -1643,10 +1661,6 @@ function SaveController(div, state) {
 				// set currently showing piece
 				currentPieceDiv = $("<div>").appendTo(previewDiv);
 				currentPieceDiv.append(pieceDivs[0]);
-				
-				// enable print and download links
-				printLink.removeAttr("disabled");
-				downloadLink.removeAttr("disabled");
 				
 				// done setting pieces
 				onDone();
@@ -1703,18 +1717,17 @@ inheritsFrom(CustomExportController, DivController);
 let CustomPieceRenderer = {
 
 	defaultConfig: {
-		show_logos: true,
-		public_qr: true,
-		private_qr: true,
-		public_text: true,
-		private_text: true,
-		qr_size: 125,
-		qr_version: null,
-		qr_error_correction_level: 'H',
-		qr_scale: 4,
-		qr_padding: 5,		// spacing in pixels
-		col_spacing: 12,	// spacing in pixels
-		add_table_width: 15	// spacing in pixels
+		piecesPerPage: 6,
+		showLogos: true,
+		leftQr: true,
+		rightQr: true,
+		showLeftText: true,
+		showRightText: true,
+		qrSize: 125,
+		qrVersion: null,
+		qrErrorCorrectionLevel: 'H',
+		qrScale: 4,
+		qrPadding: 5,		// spacing in pixels
 	},
 	
 	/**
@@ -1726,10 +1739,10 @@ let CustomPieceRenderer = {
 		config = Object.assign({}, CustomPieceRenderer.defaultConfig, config);
 		
 		// get number of qr codes
-		let numQrs = numKeys * numPieces * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
+		let numQrs = numKeys * numPieces * ((config.leftQr ? 1 : 0) + (config.rightQr ? 1 : 0));
 		
 		// get number of logos
-		let numLogos = config.show_logos ? numKeys * numPieces : 0;
+		let numLogos = config.showLogos ? numKeys * numPieces : 0;
 		
 		// return total weight
 		return numQrs * Weights.getQrWeight() + numLogos * Weights.getLogoWeight();
@@ -1738,17 +1751,20 @@ let CustomPieceRenderer = {
 	/**
 	 * Renders pieces.
 	 * 
+	 * @param pieceDivs are the divs to render to
 	 * @param pieces are the pieces to render
 	 * @param config is the configuration to render
 	 * @param onProgress(percent) is invoked as progress is made
 	 * @param onDone(err, pieceDivs) is invoked when done
 	 */
-	renderPieces: function(pieces, config, onProgress, onDone) {
+	renderPieces: function(pieceDivs, pieces, config, onProgress, onDone) {
+		assertTrue(divs.length > 0);
+		assertEquals(divs.length, pieces.length);
 		
 		// collect functions to render
 		let funcs = [];
-		for (let piece of pieces) {
-			funcs.push(function(onDone) { CustomPieceRenderer.renderPiece(piece, config, onPieceProgress, onDone); });
+		for (let i = 0; i < pieces.length; i++) {
+			funcs.push(function(onDone) { CustomPieceRenderer.renderPiece(pieceDivs[i], pieces[i], config, onPieceProgress, onDone); });
 		}
 		
 		// render async
@@ -1768,37 +1784,36 @@ let CustomPieceRenderer = {
 	/**
 	 * Renders the given piece to a new div.
 	 * 
+	 * @param pieceDiv is the div to render to
 	 * @param piece is the piece to render
 	 * @param config is the configuration to render
 	 * @param onProgress(percent) is invoked as progress is made
 	 * @param onDone(err, pieceDiv) is invoked when done
 	 */
-	renderPiece: function(piece, config, onProgress, onDone) {
+	renderPiece: function(pieceDiv, piece, config, onProgress, onDone) {
+		
+		// div setup
+		pieceDiv.empty();
+		pieceDiv.css("class", "piece_div");
 		
 		// merge configs
 		config = Object.assign({}, CustomPieceRenderer.defaultConfig, config);
-		
-		// div to render entire piece to
-		let pieceDiv = $("<div class='piece_div'>");
-		
-		// create div per page
-		const PAIRS_PER_PAGE = 6;	// TODO: move to configuration
 
-		// setup pages with functions to render key pairs
+		// setup pages and collect functions to render keys
 		let pageDiv;
 		let funcs = [];
 		for (let i = 0; i < piece.length; i++) {
 			
 			// render new page
-			if (i % PAIRS_PER_PAGE === 0) {
+			if (i % config.pairsPerPage === 0) {
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
 				let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 				logoDiv.append($("<img class='piece_page_header_logo' src='" + getLogoData("cryptostorage") + "'>"));
 			}
 			
-			// collect function to render key pair
+			// collect functions to render key pair
 			let keyDiv = $("<div class='key_div'>").appendTo(pageDiv);
-			if (i % PAIRS_PER_PAGE === 0) keyDiv.css("border-top", "2px solid green");
+			if (i % config.pairsPerPage === 0) keyDiv.css("border-top", "2px solid green");
 			let plugin = CryptoUtils.getCryptoPlugin(piece[i].ticker);
 			let title = "#" + (i + 1);
 			let leftLabel = "\u25C4 Public Address";
@@ -1807,7 +1822,7 @@ let CustomPieceRenderer = {
 			let logoLabel = plugin.getName();
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = piece[i].privateKey;
-			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue,
+			funcs.push(function(onDone) { CustomPieceRenderer.renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue,
 				function() {
 					onKeyPairDone();
 					onDone();
@@ -1831,323 +1846,66 @@ let CustomPieceRenderer = {
 				onProgress(progress);
 			}
 		}
+	},
+	
+	/**
+	 * Renders a single key pair.
+	 */
+	renderKeyPair: function(div, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, onDone) {
 		
-		// render single pair
-		function renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, onDone) {
-			
-			// left qr code
-			let keyDivLeft = $("<div class='key_div_left'>").appendTo(keyDiv);
-			
-			// center title
-			let keyDivCenter = $("<div class='key_div_center'>").appendTo(keyDiv);
-			let titleDiv = $("<div class='key_div_center_title'>").appendTo(keyDivCenter);
-			titleDiv.html(title);
-			
-			// center left
-			let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
-			keyDivCenterLeftLabel.html(leftLabel);
-			let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
-			if (!hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
-			keyDivCenterLeftValue.html(leftValue);
-			
-			// center logo
-			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
-			let logoDiv = $("<div class='key_div_logo'>").appendTo(keyDivCenterLogo);
-			logoDiv.append(logo);
-			let logoLabelDiv = $("<div class='key_div_logo_label'>").appendTo(keyDivCenterLogo);
-			logoLabelDiv.html("&nbsp;" + logoLabel);
-			
-			// center right
-			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
-			if (rightValue.length > 150) keyDivCenterRightLabel.css("margin-top", "0");	// extra space for long right labels
-			keyDivCenterRightLabel.html(rightLabel);
-			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
-			if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
-			keyDivCenterRightValue.html(rightValue);
-			
-			// right qr code
-			let keyDivRight = $("<div class='key_div_right'>").appendTo(keyDiv);
-			
-			// add QR codes to left and right
-			CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
+		// left qr code
+		let keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
+		
+		// center title
+		let keyDivCenter = $("<div class='key_div_center'>").appendTo(div);
+		let titleDiv = $("<div class='key_div_center_title'>").appendTo(keyDivCenter);
+		titleDiv.html(title);
+		
+		// center left
+		let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
+		keyDivCenterLeftLabel.html(leftLabel);
+		let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
+		if (!hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
+		keyDivCenterLeftValue.html(leftValue);
+		
+		// center logo
+		let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
+		let logoDiv = $("<div class='key_div_logo'>").appendTo(keyDivCenterLogo);
+		logoDiv.append(logo);
+		let logoLabelDiv = $("<div class='key_div_logo_label'>").appendTo(keyDivCenterLogo);
+		logoLabelDiv.html("&nbsp;" + logoLabel);
+		
+		// center right
+		let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
+		if (rightValue.length > 150) keyDivCenterRightLabel.css("margin-top", "0");	// extra space for long right labels
+		keyDivCenterRightLabel.html(rightLabel);
+		let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
+		if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
+		keyDivCenterRightValue.html(rightValue);
+		
+		// right qr code
+		let keyDivRight = $("<div class='key_div_right'>").appendTo(div);
+		
+		// add QR codes to left and right
+		CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
+			img.attr("class", "key_div_qr");
+			keyDivLeft.append(img);
+			CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
 				img.attr("class", "key_div_qr");
-				keyDivLeft.append(img);
-				CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
-					img.attr("class", "key_div_qr");
-					keyDivRight.append(img);
-					onDone();
-				});
+				keyDivRight.append(img);
+				onDone();
 			});
-			
-			// translates from renderer config to QR config
-			function getQrConfig(config) {
-				let qr_config = {};
-				if ("undefined" !== config.qr_size) qr_config.size = config.qr_size;
-				if ("undefined" !== config.qr_version) qr_config.version = config.qr_version;
-				if ("undefined" !== config.qr_error_correction_level) qr_config.errorCorrectionLevel = config.qr_error_correction_level;
-				if ("undefined" !== config.qr_scale) qr_config.scale = config.qr_scale;
-				return qr_config;
-			}
-		}
-	}
-}
-
-/**
- * Utility functions for the "industrial" pieces renderer.
- */
-let IndustrialPieceRenderer = {
-		
-	// initialize default configuration
-	defaultConfig: {
-		public_qr: true,
-		private_qr: true,
-		public_text: true,
-		private_text: true,
-		num_columns: 2,
-		qr_size: 200,
-		qr_version: null,
-		qr_error_correction_level: 'H',
-		qr_scale: 4,
-		qr_padding: 5,		// spacing in pixels
-		col_spacing: 12,	// spacing in pixels
-		add_table_width: 15	// spacing in pixels
-	},
-	
-	/**
-	 * Renders pieces.
-	 * 
-	 * @param pieces are the pieces to render
-	 * @param config is the configuration to render
-	 * @param onProgress(percent) is invoked as progress is made
-	 * @param onDone(pieceDivs) is invoked with the rendered divs on done
-	 */
-	renderPieces: function(pieces, config, onProgress, onDone) {
-		
-		// collect functions to render
-		let funcs = [];
-		for (let piece of pieces) {
-			funcs.push(function(onDone) { IndustrialPieceRenderer.renderPiece(piece, config, onPieceProgress, onDone); });
-		}
-		
-		// render async
-		async.series(funcs, function(err, pieceDivs) {
-			if (err) throw err;
-			else onDone(null, pieceDivs);
 		});
 		
-		// collect progress
-		let prevProgress = 0;
-		function onPieceProgress(percent) {
-			onProgress(prevProgress + percent / pieces.length);
-			if (percent === 1) prevProgress += 1 / pieces.length;
+		// translates from renderer config to QR config
+		function getQrConfig(config) {
+			let qr_config = {};
+			if ("undefined" !== config.qrSize) qr_config.size = config.qrSize;
+			if ("undefined" !== config.qrVersion) qr_config.version = config.qrVersion;
+			if ("undefined" !== config.qrErrorCorrectionLevel) qr_config.errorCorrectionLevel = config.qrErrorCorrectionLevel;
+			if ("undefined" !== config.qrScale) qr_config.scale = config.qrScale;
+			return qr_config;
 		}
-	},
-	
-	/**
-	 * Renders a piece.
-	 * 
-	 * @param piece is the piece to render
-	 * @param config is the configuration to render
-	 * @param onProgress(percent) is invoked as progress is made
-	 * @param onDone(pieceDiv) is invoked with the rendered div on done
-	 */
-	renderPiece: function(piece, config, onProgress, onDone) {
-		
-		// merge configs
-		config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
-		
-		// compute total number of qr codes to render
-		let totalQrs = IndustrialPieceRenderer.getNumQrs(piece.length, 1, config);
-		let doneQrs = 0;
-		function qrCodeRendered() {
-			doneQrs++;
-			if (onProgress && (doneQrs % 5 === 0 || doneQrs === totalQrs)) onProgress(doneQrs / totalQrs);
-		}
-		
-		// div to render to
-		let div = $("<div>");
-		
-		// collect callback functions to render each piece pair
-		let funcs = [];
-		let rowDiv;
-		for (let i = 0; i < piece.length; i++) {
-			
-			// get public/private pair
-			let keyPiece = piece[i];
-			
-			// create pair div
-			let pairDiv = $("<div>");
-			pairDiv.css("margin", 0);
-			pairDiv.css("padding", 0);
-			pairDiv.css("border", 0);
-			pairDiv.css("flex", 1);
-			pairDiv.css("page-break-inside", "avoid");
-			
-			// prepare function to render pair
-			funcs.push(renderPairDivFunc(pairDiv, "==== " + (i + 1) + " ====", keyPiece.address, keyPiece.privateKey, config));
-			
-			// append pair div and row div
-			if (i % config.num_columns === 0) {
-				rowDiv = $("<div>");
-				rowDiv.css("display", "flex");
-				rowDiv.css("page-break-inside", "avoid");
-				rowDiv.css("margin", 0);
-				rowDiv.css("padding", 0);
-				rowDiv.css("border", 0);
-				div.append(rowDiv);
-				//if (i < piece.length - 1) div.append("<br>");
-			}
-			rowDiv.append(pairDiv);
-			if ((i + 1) % config.num_columns !== 0) {
-				let spaceDiv = $("<div>");
-				spaceDiv.css("min-width", config.col_spacing + "px");
-				spaceDiv.css("margin", 0);
-				spaceDiv.css("padding", 0);
-				spaceDiv.css("border", 0);
-				rowDiv.append(spaceDiv);
-			}
-		}
-		
-		// execute callback functions
-		async.series(funcs, function(err) {
-			onDone(err, div);
-		});
-		
-		/**
-		 * Returns a callback function (function with single callback argument) which will render a pair div.
-		 */
-		function renderPairDivFunc(pairDiv, name, publicKey, privateKey, config) {
-			
-			// callback function wraps rendering
-			return function(callback) {
-				renderPair(pairDiv, name, publicKey, privateKey, config, callback);
-			}
-			
-			/**
-			 * Renders a single public/private pair to a div.
-			 * 
-			 * @param div is the div to render to
-			 * @param name is the name of the key pair
-			 * @param publicKey is the public component of the wallet
-			 * @param privateKey is the private component of the wallet
-			 * @param config specifies the render configuration
-			 * @param callback is called when the rendering is complete
-			 */
-			function renderPair(div, name, publicKey, privateKey, config, callback) {
-				
-				// track number of threads to know when rendering is complete
-				let numThreads = (config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0) + (config.public_text || config.private_text ? 1 : 0);	// one for each qr and one for text
-				let tracker2 = new ThreadTracker();
-				tracker2.onIdle(function() {
-					if (tracker2.getNumStopped() === numThreads) callback();
-				});
-				
-				// global text style
-				let monoStyle = "font-size:11px; font-family:monospace;";
-						
-				// configure div
-				div.css("margin", 0);
-				div.css("padding", 0);
-				div.css("border", "none");
-				div.css("align-items", "stretch");
-				let numQrs = (config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0);
-				div.css("min-width", config.add_table_width + numQrs * (config.qr_size + (config.qr_padding * 2)) + "px");
-				div.css("page-break-inside", "avoid");
-
-				// create pair header
-				div.append($("<div style='" + monoStyle + " text-align:center; border:1'>").append(name));
-				div.append("<br>");
-				
-				// add qr codes
-				if (config.public_qr || config.private_qr) {
-					
-					// div to hold qr table
-					let qrTableDiv = $("<div>");
-					qrTableDiv.css("page-break-inside", "avoid");
-					qrTableDiv.css("width", "100%");
-					
-					// qr table
-					let qrTable = $("<table border='1' width='100%' style='table-layout:fixed'>");
-					qrTableDiv.append(qrTable);
-					let qrTr1 = $("<tr>");
-					qrTable.append(qrTr1);
-					let qrTr2 = $("<tr>");
-					qrTable.append(qrTr2);
-					
-					// render public QR
-					if (config.public_qr) {
-						tracker2.threadStarted();
-						CryptoUtils.renderQrCode(publicKey, getQrConfig(config), function(img) {
-							qrCodeRendered();
-							qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Public"));
-							qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
-							tracker2.threadStopped();
-							
-							// render private QR
-							if (config.private_qr) {
-								tracker2.threadStarted();
-								CryptoUtils.renderQrCode(privateKey, getQrConfig(config), function(img) {
-									qrCodeRendered();
-									qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Private"));
-									qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
-									tracker2.threadStopped();
-								});
-							}
-						});
-					}
-					
-					// render only private QR
-					else if (config.private_qr) {
-						tracker2.threadStarted();
-						CryptoUtils.renderQrCode(privateKey, getQrConfig(config), function(img) {
-							qrCodeRendered();
-							qrTr1.append($("<td align='center' style='" + monoStyle + "'>").html("Private"));
-							qrTr2.append($("<td align='center' style='margin:0; padding:" + config.qr_padding + "px;'>").append(img));
-							tracker2.threadStopped();
-						});
-					}
-					
-					qrTableDiv.append("<br>");
-					div.append(qrTableDiv);
-				}
-				
-				// add public/private text
-				if (config.public_text || config.private_text) {
-					tracker2.threadStarted();	// start writing text
-					
-					// add public text
-					if (config.public_text) {
-						div.append("<div style='" + monoStyle + " word-wrap:break-word;'>Public: " + publicKey + "<br><br></div>");
-					}
-					
-					// add private text
-					if (config.private_text) {
-						div.append("<div style='" + monoStyle + " word-wrap:break-word;'>Private: " + privateKey + "<br><br></div>");
-					}
-					
-					tracker2.threadStopped();
-				}
-				
-				function getQrConfig(config) {
-					let qr_config = {};
-					if ("undefined" !== config.qr_size) qr_config.size = config.qr_size;
-					if ("undefined" !== config.qr_version) qr_config.version = config.qr_version;
-					if ("undefined" !== config.qr_error_correction_level) qr_config.errorCorrectionLevel = config.qr_error_correction_level;
-					if ("undefined" !== config.qr_scale) qr_config.scale = config.qr_scale;
-					return qr_config;
-				}
-			}
-		}
-	},
-	
-	getNumQrs: function(numKeys, numPieces, config) {
-		config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
-		return numKeys * numPieces * ((config.public_qr ? 1 : 0) + (config.private_qr ? 1 : 0));
-	},
-	
-	getWeight: function(numKeys, numPieces, config) {
-		config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
-		return IndustrialPieceRenderer.getNumQrs(numKeys, numPieces, config) * Weights.getQrWeight();
 	}
 }
 
