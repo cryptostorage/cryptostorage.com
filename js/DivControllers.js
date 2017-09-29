@@ -419,6 +419,7 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 					let numKeys = numKeysInputs[i].val();
 					if (numKeys) {
 						let numKeysInt = parseFloat(numKeys);
+						if (numKeysInt > 0) loader.load(state.plugins[i].getDependencies());	// start loading dependencies
 						validateNumKeys(state.plugins[i].getName(), numKeysInt);
 						sum += numKeys;
 						numKeysInts.push(numKeysInt);
