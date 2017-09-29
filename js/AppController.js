@@ -1,5 +1,4 @@
 // TODO
-// sev2 litecoin key generation
 // key and piece elem are nearly equivalent, make them same?
 // fetch mix dependencies as soon as known
 // bigger keys, smaller qr codes anchored to top/bottom corner (height issue with monero pushing into next page)
