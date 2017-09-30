@@ -1,6 +1,6 @@
 // TODO
-// Include -> Omit public addresses
-// config to include public addresses, private keys, logos
+// config to exclude logos
+// cannot import pieces with missing private keys, add tests
 // faq page
 // donation page
 // todos throughout code
@@ -41,6 +41,7 @@
 // prevent rendered page from showing after home, FAQ or donate clicked
 // home button maintains state, doesn't start over
 // disable next if mix num keys change
+// Include -> Omit public addresses
 
 // low priority
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
