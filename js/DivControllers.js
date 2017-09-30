@@ -1705,7 +1705,7 @@ let PieceRenderer = {
 		rightQr: true,
 		showLeftText: true,
 		showRightText: true,
-		qrSize: 100,
+		qrSize: 105,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
 		qrScale: 4,
