@@ -48,6 +48,7 @@
 // html export is horizontally centered with @media print for actual print
 // timeouts in tests so browser doesn't lock
 // csv import to support "bring your own keys"
+// optimize tests by getting one set of keys of repeat_long size
 
 const RUN_TESTS = false;
 const DEBUG = true;
