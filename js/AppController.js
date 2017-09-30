@@ -1,4 +1,5 @@
 // TODO
+// Include -> Omit public addresses
 // config to include public addresses, private keys, logos
 // faq page
 // donation page

@@ -1676,7 +1676,7 @@ function SaveController(div, state) {
 		includePrivateDiv = $("<div class='export_option'>").appendTo(div);
 		includePrivateCheckbox = $("<input type='checkbox' id='includePrivateCheckbox'>").appendTo(includePrivateDiv);
 		let includePrivateCheckboxLabel = $("<label for='includePrivateCheckbox'>").appendTo(includePrivateDiv);
-		includePrivateCheckboxLabel.html(" Include private addresses");
+		includePrivateCheckboxLabel.html(" Include private keys");
 		includePrivateCheckbox.click(function() {
 			if (getIncludePrivate()) includePublicCheckbox.removeAttr("disabled");
 			else includePublicCheckbox.attr("disabled", "disabled");
