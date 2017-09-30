@@ -1594,7 +1594,8 @@ function SaveController(div, state) {
 		
 		// build piece render config
 		let config = {};
-		config.includePublic = getIncludePublicAddresses();
+		config.includePublic = getIncludePublic();
+		config.includePrivate = getIncludePrivate();
 		
 		// render pieces
 		PieceRenderer.renderPieces(pieceDivs, pieces, config, function(percent) {
@@ -1666,10 +1667,22 @@ function SaveController(div, state) {
 		includePublicCheckboxLabel.html(" Include public addresses");
 		includePublicCheckbox.click(function() { updatePieces(); });
 		includePublicCheckbox.prop('checked', true);
+		
+		// render include private key checkbox
+		includePrivateDiv = $("<div class='export_option'>").appendTo(div);
+		includePrivateCheckbox = $("<input type='checkbox' id='includePrivateCheckbox'>").appendTo(includePrivateDiv);
+		let includePrivateCheckboxLabel = $("<label for='includePrivateCheckbox'>").appendTo(includePrivateDiv);
+		includePrivateCheckboxLabel.html(" Include private addresses");
+		includePrivateCheckbox.click(function() { updatePieces(); });
+		includePrivateCheckbox.prop('checked', true);
 	}
 	
-	function getIncludePublicAddresses() {
+	function getIncludePublic() {
 		return includePublicCheckbox.prop('checked');
+	}
+	
+	function getIncludePrivate() {
+		return includePrivateCheckbox.prop('checked');
 	}
 }
 inheritsFrom(SaveController, DivController);
@@ -1745,7 +1758,6 @@ let PieceRenderer = {
 		
 		// merge default config with given confi
 		config = Object.assign({}, PieceRenderer.defaultConfig, config);
-		console.log(config);
 		
 		// initialize divs if they weren't given
 		if (pieceDivs) assertEquals(pieceDivs.length, pieces.length);
@@ -1760,18 +1772,18 @@ let PieceRenderer = {
 			funcs.push(function(onDone) { PieceRenderer.renderPiece(pieceDivs[i], pieces[i], config, onPieceProgress, onDone); });
 		}
 		
-		// render async
-		async.series(funcs, function(err, pieceDivs) {
-			if (err) onDone(err);
-			else onDone(null, pieceDivs);
-		});
-		
-		// collect progress
+		// handle progress
 		let prevProgress = 0;
 		function onPieceProgress(percent) {
 			if (onProgress) onProgress(prevProgress + percent / pieces.length);
 			if (percent === 1) prevProgress += 1 / pieces.length;
 		}
+		
+		// render async
+		async.series(funcs, function(err, pieceDivs) {
+			if (err) onDone(err);
+			else onDone(null, pieceDivs);
+		});
 	},
 		
 	/**
@@ -1824,11 +1836,7 @@ let PieceRenderer = {
 			)});
 		}
 		
-		// render pairs
-		async.series(funcs, function() {
-			onDone(null, pieceDiv);
-		});
-		
+		// handle progress
 		let keyPairsDone = 0;
 		let lastProgress = 0;
 		let notifyFrequency = .005;	// notifies every .5% progress
@@ -1840,6 +1848,11 @@ let PieceRenderer = {
 				onProgress(progress);
 			}
 		}
+		
+		// render pairs
+		async.series(funcs, function() {
+			onDone(null, pieceDiv);
+		});
 		
 		/**
 		 * Renders a single key pair.
@@ -1873,7 +1886,7 @@ let PieceRenderer = {
 			keyDivCenterRightLabel.html(rightLabel);
 			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
 			if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
-			keyDivCenterRightValue.html(rightValue);
+			keyDivCenterRightValue.html(config.includePrivate ? rightValue : "(omitted)");
 			
 			// collapse spacing for long keys
 			if (leftValue.length > 71) {
@@ -1904,9 +1917,10 @@ let PieceRenderer = {
 						img.attr("class", "key_div_qr");
 						keyDivRight.append(img);
 						onDone();
-					})
+					});
 				} else {
 					keyDivRight.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>")); // TODO: replace with b64
+					onDone();
 				}
 			}
 			
