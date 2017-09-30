@@ -339,7 +339,7 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		UiUtils.pageSetup(div);
 		
 		// render title
-		if (state.mix) div.append(UiUtils.getPageHeader("Select a currency to generate keys for."));
+		if (state.mix) div.append(UiUtils.getPageHeader("Select currencies to generate keys for."));
 		else div.append(UiUtils.getPageHeader("Select a currency to import."));
 		
 		// render mix and match button if creating new storage
@@ -488,7 +488,7 @@ function NumKeysController(div, state, onNumKeysInput) {
 		
 		// render title
 		let plugin = state.mix[0].plugin;
-		div.append(UiUtils.getPageHeader("How many keys do you want to create?", plugin.getLogo()));
+		div.append(UiUtils.getPageHeader("Enter the number of keys to create.", plugin.getLogo()));
 		
 		// num key keys input
 		let numKeysInput = $("<input>");
