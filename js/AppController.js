@@ -53,7 +53,7 @@ const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;
-const COMMON_DEPENDENCIES = ["lib/b64-logos.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js"];
+const COMMON_DEPENDENCIES = ["lib/b64-images.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js"];
 var loader;
 
 /**
@@ -68,9 +68,9 @@ $(document).ready(function() {
 	loader = new DependencyLoader();
 	loader.load(COMMON_DEPENDENCIES, function() {
 		
-//		// get data url of logo
+		// get data url of logo
 //		let plugin = CryptoUtils.getCryptoPlugin("BCH");
-//		console.log(imgToDataUrl(plugin.getLogo().get(0)));
+//		console.log(imgToDataUrl($("<img src='img/question_mark.png'>").get(0)));
 //		function imgToDataUrl(img, format) {
 //			let canvas = document.createElement('canvas');
 //		    canvas.height = img.naturalHeight;

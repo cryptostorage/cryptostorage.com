@@ -1822,7 +1822,7 @@ let PieceRenderer = {
 			if (i % config.pairsPerPage === 0) {
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
 				let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
-				logoDiv.append($("<img class='piece_page_header_logo' src='" + getLogoData("cryptostorage") + "'>"));
+				logoDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("cryptostorage") + "'>"));
 			}
 			
 			// collect functions to render key pair
@@ -1832,7 +1832,7 @@ let PieceRenderer = {
 			let title = "#" + (i + 1);
 			let leftLabel = "\u25C4 Public Address";
 			let leftValue = piece[i].address;
-			let logo = $("<img width=100% height=100% src='" + getLogoData(piece[i].ticker) + "'>");
+			let logo = $("<img width=100% height=100% src='" + getImageData(piece[i].ticker) + "'>");
 			let logoLabel = plugin.getName();
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = piece[i].privateKey;
@@ -1916,7 +1916,7 @@ let PieceRenderer = {
 					addPrivateQr();
 				});
 			} else {
-				keyDivLeft.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>")); // TODO: replace with b64
+				keyDivLeft.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>")); // TODO: replace with b64
 				addPrivateQr();
 			}
 			function addPrivateQr() {
@@ -1927,7 +1927,7 @@ let PieceRenderer = {
 						onDone();
 					});
 				} else {
-					keyDivRight.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>")); // TODO: replace with b64
+					keyDivRight.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>")); // TODO: replace with b64
 					onDone();
 				}
 			}

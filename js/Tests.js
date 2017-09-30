@@ -44,7 +44,7 @@ let Tests = {
 			
 			// verify each plugin has logo data
 			for (let plugin of CryptoUtils.getCryptoPlugins()) {
-				getLogoData(plugin.getTicker());	// throws exception if not found
+				getImageData(plugin.getTicker());	// throws exception if not found
 			}
 			
 			// run tests
