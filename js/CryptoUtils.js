@@ -273,7 +273,7 @@ let CryptoUtils = {
 		if (pieces.length === 1) {
 			for (let pieceKey of pieces[0]) {
 				try {
-					let key = CryptoUtils.getCryptoPlugin(pieceKey.ticker).newKey(pieceKey.privateKey);
+					let key = CryptoUtils.getCryptoPlugin(pieceKey.ticker).newKey(pieceKey.privateKey);	// TODO: bug right here, need to add test
 					if (key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);
 					keys.push(key);
 				} catch (err) {
@@ -475,7 +475,7 @@ let CryptoUtils = {
 		for (let key of piece) {
 			assertDefined(key.ticker, "piece.ticker is not defined");
 			assertDefined(key.isSplit, "piece.isSplit is not defined");
-			assertDefined(key.privateKey, "piece.privateKey is not defined");
+			//assertDefined(key.privateKey, "piece.privateKey is not defined");
 		}
 	}
 }
