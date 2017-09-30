@@ -1,6 +1,5 @@
 // TODO
 // config to include public addresses, private keys, logos
-// csv import to support "bring your own keys"
 // faq page
 // donation page
 // todos throughout code
@@ -46,6 +45,7 @@
 // all div controllers directly modify state
 // html export is horizontally centered with @media print for actual print
 // timeouts in tests so browser doesn't lock
+// csv import to support "bring your own keys"
 
 const RUN_TESTS = false;
 const DEBUG = true;
