@@ -1592,8 +1592,12 @@ function SaveController(div, state) {
 			return;
 		}
 		
+		// build piece render config
+		let config = {};
+		config.includePublic = getIncludePublicAddresses();
+		
 		// render pieces
-		PieceRenderer.renderPieces(pieceDivs, pieces, null, function(percent) {
+		PieceRenderer.renderPieces(pieceDivs, pieces, config, function(percent) {
 			setProgress(percent);
 		}, function(err) {
 			progressDiv.hide();
@@ -1738,6 +1742,10 @@ let PieceRenderer = {
 	 * @param onDone(err, pieceDivs) is invoked when done
 	 */
 	renderPieces: function(pieceDivs, pieces, config, onProgress, onDone) {
+		
+		// merge default config with given confi
+		config = Object.assign({}, PieceRenderer.defaultConfig, config);
+		console.log(config);
 		
 		// initialize divs if they weren't given
 		if (pieceDivs) assertEquals(pieceDivs.length, pieces.length);
