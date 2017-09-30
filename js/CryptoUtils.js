@@ -464,8 +464,8 @@ let CryptoUtils = {
 		var str = "";
 		for (var i = 0; i < piece.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
-			str += "Public Address:\n" + piece[i].address + "\n\n";
-			str += "Private Key:\n" + piece[i].privateKey + "\n\n";
+			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n\n";
+			if (piece[i].privateKey) str += "Private Key:\n" + piece[i].privateKey + "\n\n";
 		}
 		return str.trim();
 	},
