@@ -1,4 +1,5 @@
 // TODO
+// csv import to support "bring your own keys"
 // faq page
 // donation page
 // todos throughout code
@@ -12,7 +13,6 @@
 // condense files to single files as much as possible
 // warning if live and/or online
 // switch to jquery-qrcode?
-// csv import to support "bring your own keys"
 // test on IE
 // backwards bitcoin cash logo
 // smaller html exports
