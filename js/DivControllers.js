@@ -134,11 +134,11 @@ let Weights = {
 	},
 	
 	getQrWeight: function() {
-		return 10;
+		return 15;
 	},
 	
 	getLogoWeight: function() {
-		return 10;
+		return 15;
 	}
 }
 
