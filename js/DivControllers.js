@@ -884,7 +884,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
 				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + (VERIFY_ENCRYPTION ? Weights.getDecryptWeight(elem.encryption) : 0));
 			}
-			let piecesRendererWeight = PieceRenderer.getWeight(numKeys, state.numPieces, null);
+			let piecesRendererWeight = PieceRenderer.getPieceWeight(numKeys, state.numPieces, null);
 			totalWeight += piecesRendererWeight;
 			
 			// collect key creation functions
@@ -1198,7 +1198,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			for (let key of keys) {
 				totalWeight += Weights.getDecryptWeight(key.getEncryptionScheme());
 			}
-			let piecesRendererWeight = PieceRenderer.getWeight(keys.length, 1, null);
+			let piecesRendererWeight = PieceRenderer.getPieceWeight(keys.length, 1, null);
 			totalWeight += piecesRendererWeight;
 			
 			// decrypt keys
@@ -1701,10 +1701,8 @@ let PieceRenderer = {
 	defaultConfig: {
 		pairsPerPage: 6,
 		showLogos: true,
-		leftQr: true,
-		rightQr: true,
-		showLeftText: true,
-		showRightText: true,
+		includePublic: true,
+		includePrivate: true,
 		qrSize: 105,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
@@ -1715,13 +1713,13 @@ let PieceRenderer = {
 	/**
 	 * Returns the total weight to render all keys across all pieces.
 	 */
-	getWeight: function(numKeys, numPieces, config) {
+	getPieceWeight: function(numKeys, numPieces, config) {
 		
 		// merge configs
 		config = Object.assign({}, PieceRenderer.defaultConfig, config);
 		
 		// get number of qr codes
-		let numQrs = numKeys * numPieces * ((config.leftQr ? 1 : 0) + (config.rightQr ? 1 : 0));
+		let numQrs = numKeys * numPieces * 2;
 		
 		// get number of logos
 		let numLogos = config.showLogos ? numKeys * numPieces : 0;
