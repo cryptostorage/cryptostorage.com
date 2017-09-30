@@ -884,7 +884,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
 				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + (VERIFY_ENCRYPTION ? Weights.getDecryptWeight(elem.encryption) : 0));
 			}
-			let piecesRendererWeight = CustomPieceRenderer.getWeight(numKeys, 1, null);
+			let piecesRendererWeight = PieceRenderer.getWeight(numKeys, 1, null);
 			totalWeight += piecesRendererWeight;
 			
 			// collect key creation functions
@@ -1044,7 +1044,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 			}
 			
 			function renderPieceDivs(pieces, onDone) {
-				CustomPieceRenderer.renderPieces(pieces, null, function(percent) {
+				PieceRenderer.renderPieces(null, pieces, null, function(percent) {
 					setProgress(progressWeight + (percent * piecesRendererWeight), totalWeight);
 				}, onDone);
 			}
@@ -1198,7 +1198,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			for (let key of keys) {
 				totalWeight += Weights.getDecryptWeight(key.getEncryptionScheme());
 			}
-			let piecesRendererWeight = CustomPieceRenderer.getWeight(keys.length, 1, null);
+			let piecesRendererWeight = PieceRenderer.getWeight(keys.length, 1, null);
 			totalWeight += piecesRendererWeight;
 			
 			// decrypt keys
@@ -1246,7 +1246,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 			}
 			
 			function renderPieceDivs(pieces, onDone) {
-				CustomPieceRenderer.renderPieces(pieces, null, function(percent) {
+				PieceRenderer.renderPieces(null, pieces, null, function(percent) {
 					setProgress(progressWeight + (percent * piecesRendererWeight), totalWeight);
 				}, onDone);
 			}
@@ -1550,43 +1550,23 @@ function SaveController(div, state) {
 		previewDiv.empty();
 		let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
 		
-		// handle pieces already set
-		if (pieces && pieceDivs) {
-			setPieces(pieces, pieceDivs, function() {
-				if (onDone) onDone(null, pieces, pieceDivs);
-			});
-			return;
-		}
+//		// handle pieces already set (TODO)
+//		if (pieces && pieceDivs) {
+//			throw new Error("Not implemented");
+//			setPieces(pieces, pieceDivs, function() {
+//				if (onDone) onDone(null, pieces, pieceDivs);
+//			});
+//			return;
+//		}
 		
 		// get pieces
 		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, state.numPieces, state.minPieces);
 		
-		// create piece divs and attach first
+		// create piece divs and attach first to preview
 		pieceDivs = [];
-		for (let i = 0; i < pieces.length; i++) {
-			pieceDivs.push($("<div>"));
-		}
-		previewDiv.append(pieceDivs[0]);
-		
-		// render pieces
-		CustomPieceRenderer.renderPieces(pieceDivs, pieces, null, null, function(err) {
-			if (err) {
-				if (onDone) onDone(err);
-				return;
-			}
-			
-			// enable print and download links
-			printLink.removeAttr("disabled");
-			downloadLink.removeAttr("disabled");
-			
-			// done
-			if (onDone) onDone(null, pieces, pieceDivs);
-		});
-		
-		
-		
-		
-		
+		for (let i = 0; i < pieces.length; i++) pieceDivs.push($("<div>"));
+		currentPieceDiv = $("<div>").appendTo(previewDiv);
+		currentPieceDiv.append(pieceDivs[0]);
 		
 		// add piece selector to preview header
 		if (pieces.length > 1) {
@@ -1601,37 +1581,13 @@ function SaveController(div, state) {
 			}
 		}
 		
-		
-		
-		// render
-		CustomPieceRenderer.renderPieces(pieces, null, function(percent) {
-			setProgress(percent);
-		}, function(err, pieceDivs) {
+		// render pieces
+		PieceRenderer.renderPieces(pieceDivs, pieces, null, null, function(err) {
 			if (err) {
 				if (onDone) onDone(err);
-			} else {
-				setPieces(pieces, pieceDivs, function() {
-					if (onDone) onDone(null, pieces, pieceDivs);
-				});
+				return;
 			}
-		});
-		
-		function setPieces(pieces, pieceDivs, onDone) {
-			assertTrue(pieces.length > 0);
-			assertTrue(pieceDivs.length > 0);
-			
-			// empty existing preview
-			previewDiv.empty();
-			
-
-//			let previewHeaderLeft = $("<div class='preview_header_left'>").appendTo(previewHeader);
-//			let previewHeaderCenter = $("<div class='preview_header_center'>").appendTo(previewHeader);
-//			previewHeaderCenter.append("Preview");
-//			let previewHeaderRight = $("<div class='preview_header_right'>").appendTo(previewHeader);
-//			previewDiv.append("<br><br>");
-			
-
-			
+				
 			// collect all internal css
 			let internalCss = "";
 			let internalStyleSheet = getInternalStyleSheet();
@@ -1658,14 +1614,14 @@ function SaveController(div, state) {
 				downloadLink.click(function() { saveAs(blob, name); });
 				printLink.click(function() { printDiv(previewDiv, internalCss, "cryptostorage.com"); });
 				
-				// set currently showing piece
-				currentPieceDiv = $("<div>").appendTo(previewDiv);
-				currentPieceDiv.append(pieceDivs[0]);
+				// enable print and download links
+				printLink.removeAttr("disabled");
+				downloadLink.removeAttr("disabled");
 				
 				// done setting pieces
-				onDone();
+				if (onDone) onDone(null, pieces, pieceDivs);
 			});
-		}
+		});
 	}
 	
 	function renderConfig(div) {
@@ -1714,7 +1670,7 @@ inheritsFrom(CustomExportController, DivController);
 /**
  * Renders a piece to a div for HTML export.
  */
-let CustomPieceRenderer = {
+let PieceRenderer = {
 
 	defaultConfig: {
 		piecesPerPage: 6,
@@ -1736,7 +1692,7 @@ let CustomPieceRenderer = {
 	getWeight: function(numKeys, numPieces, config) {
 		
 		// merge configs
-		config = Object.assign({}, CustomPieceRenderer.defaultConfig, config);
+		config = Object.assign({}, PieceRenderer.defaultConfig, config);
 		
 		// get number of qr codes
 		let numQrs = numKeys * numPieces * ((config.leftQr ? 1 : 0) + (config.rightQr ? 1 : 0));
@@ -1758,13 +1714,18 @@ let CustomPieceRenderer = {
 	 * @param onDone(err, pieceDivs) is invoked when done
 	 */
 	renderPieces: function(pieceDivs, pieces, config, onProgress, onDone) {
-		assertTrue(divs.length > 0);
-		assertEquals(divs.length, pieces.length);
+		
+		// initialize divs if they weren't given
+		if (pieceDivs) assertEquals(pieceDivs.length, pieces.length);
+		else {
+			pieceDivs = [];
+			for (let i = 0; i < pieces.length; i++) pieceDivs.push($("<div>"));
+		}
 		
 		// collect functions to render
 		let funcs = [];
 		for (let i = 0; i < pieces.length; i++) {
-			funcs.push(function(onDone) { CustomPieceRenderer.renderPiece(pieceDivs[i], pieces[i], config, onPieceProgress, onDone); });
+			funcs.push(function(onDone) { PieceRenderer.renderPiece(pieceDivs[i], pieces[i], config, onPieceProgress, onDone); });
 		}
 		
 		// render async
@@ -1776,7 +1737,7 @@ let CustomPieceRenderer = {
 		// collect progress
 		let prevProgress = 0;
 		function onPieceProgress(percent) {
-			onProgress(prevProgress + percent / pieces.length);
+			if (onProgress) onProgress(prevProgress + percent / pieces.length);
 			if (percent === 1) prevProgress += 1 / pieces.length;
 		}
 	},
@@ -1791,13 +1752,14 @@ let CustomPieceRenderer = {
 	 * @param onDone(err, pieceDiv) is invoked when done
 	 */
 	renderPiece: function(pieceDiv, piece, config, onProgress, onDone) {
+		assertInitialized(pieceDiv);
 		
 		// div setup
 		pieceDiv.empty();
 		pieceDiv.css("class", "piece_div");
 		
 		// merge configs
-		config = Object.assign({}, CustomPieceRenderer.defaultConfig, config);
+		config = Object.assign({}, PieceRenderer.defaultConfig, config);
 
 		// setup pages and collect functions to render keys
 		let pageDiv;
@@ -1822,7 +1784,7 @@ let CustomPieceRenderer = {
 			let logoLabel = plugin.getName();
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = piece[i].privateKey;
-			funcs.push(function(onDone) { CustomPieceRenderer.renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue,
+			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue,
 				function() {
 					onKeyPairDone();
 					onDone();
@@ -1846,65 +1808,65 @@ let CustomPieceRenderer = {
 				onProgress(progress);
 			}
 		}
-	},
-	
-	/**
-	 * Renders a single key pair.
-	 */
-	renderKeyPair: function(div, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, onDone) {
 		
-		// left qr code
-		let keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
-		
-		// center title
-		let keyDivCenter = $("<div class='key_div_center'>").appendTo(div);
-		let titleDiv = $("<div class='key_div_center_title'>").appendTo(keyDivCenter);
-		titleDiv.html(title);
-		
-		// center left
-		let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
-		keyDivCenterLeftLabel.html(leftLabel);
-		let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
-		if (!hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
-		keyDivCenterLeftValue.html(leftValue);
-		
-		// center logo
-		let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
-		let logoDiv = $("<div class='key_div_logo'>").appendTo(keyDivCenterLogo);
-		logoDiv.append(logo);
-		let logoLabelDiv = $("<div class='key_div_logo_label'>").appendTo(keyDivCenterLogo);
-		logoLabelDiv.html("&nbsp;" + logoLabel);
-		
-		// center right
-		let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
-		if (rightValue.length > 150) keyDivCenterRightLabel.css("margin-top", "0");	// extra space for long right labels
-		keyDivCenterRightLabel.html(rightLabel);
-		let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
-		if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
-		keyDivCenterRightValue.html(rightValue);
-		
-		// right qr code
-		let keyDivRight = $("<div class='key_div_right'>").appendTo(div);
-		
-		// add QR codes to left and right
-		CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
-			img.attr("class", "key_div_qr");
-			keyDivLeft.append(img);
-			CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
+		/**
+		 * Renders a single key pair.
+		 */
+		function renderKeyPair(div, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, onDone) {
+			
+			// left qr code
+			let keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
+			
+			// center title
+			let keyDivCenter = $("<div class='key_div_center'>").appendTo(div);
+			let titleDiv = $("<div class='key_div_center_title'>").appendTo(keyDivCenter);
+			titleDiv.html(title);
+			
+			// center left
+			let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
+			keyDivCenterLeftLabel.html(leftLabel);
+			let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
+			if (!hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
+			keyDivCenterLeftValue.html(leftValue);
+			
+			// center logo
+			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
+			let logoDiv = $("<div class='key_div_logo'>").appendTo(keyDivCenterLogo);
+			logoDiv.append(logo);
+			let logoLabelDiv = $("<div class='key_div_logo_label'>").appendTo(keyDivCenterLogo);
+			logoLabelDiv.html("&nbsp;" + logoLabel);
+			
+			// center right
+			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
+			if (rightValue.length > 150) keyDivCenterRightLabel.css("margin-top", "0");	// extra space for long right labels
+			keyDivCenterRightLabel.html(rightLabel);
+			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
+			if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
+			keyDivCenterRightValue.html(rightValue);
+			
+			// right qr code
+			let keyDivRight = $("<div class='key_div_right'>").appendTo(div);
+			
+			// add QR codes to left and right
+			CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
 				img.attr("class", "key_div_qr");
-				keyDivRight.append(img);
-				onDone();
+				keyDivLeft.append(img);
+				CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
+					img.attr("class", "key_div_qr");
+					keyDivRight.append(img);
+					onDone();
+				});
 			});
-		});
-		
-		// translates from renderer config to QR config
-		function getQrConfig(config) {
-			let qr_config = {};
-			if ("undefined" !== config.qrSize) qr_config.size = config.qrSize;
-			if ("undefined" !== config.qrVersion) qr_config.version = config.qrVersion;
-			if ("undefined" !== config.qrErrorCorrectionLevel) qr_config.errorCorrectionLevel = config.qrErrorCorrectionLevel;
-			if ("undefined" !== config.qrScale) qr_config.scale = config.qrScale;
-			return qr_config;
+			
+			// translates from renderer config to QR config
+			function getQrConfig(config) {
+				let qr_config = {};
+				if ("undefined" !== config.qrSize) qr_config.size = config.qrSize;
+				if ("undefined" !== config.qrVersion) qr_config.version = config.qrVersion;
+				if ("undefined" !== config.qrErrorCorrectionLevel) qr_config.errorCorrectionLevel = config.qrErrorCorrectionLevel;
+				if ("undefined" !== config.qrScale) qr_config.scale = config.qrScale;
+				return qr_config;
+			}
 		}
 	}
 }
