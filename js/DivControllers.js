@@ -134,11 +134,11 @@ let Weights = {
 	},
 	
 	getQrWeight: function() {
-		return 25;
+		return 10;
 	},
 	
 	getLogoWeight: function() {
-		return 25;
+		return 10;
 	}
 }
 
@@ -884,7 +884,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
 				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + (VERIFY_ENCRYPTION ? Weights.getDecryptWeight(elem.encryption) : 0));
 			}
-			let piecesRendererWeight = PieceRenderer.getWeight(numKeys, 1, null);
+			let piecesRendererWeight = PieceRenderer.getWeight(numKeys, state.numPieces, null);
 			totalWeight += piecesRendererWeight;
 			
 			// collect key creation functions
