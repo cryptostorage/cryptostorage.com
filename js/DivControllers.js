@@ -1887,18 +1887,30 @@ let PieceRenderer = {
 			// right qr code
 			let keyDivRight = $("<div class='key_div_right'>").appendTo(div);
 			
-			// add QR codes to left and right
-			CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
-				img.attr("class", "key_div_qr");
-				keyDivLeft.append(img);
-				CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
+			// add qr codes
+			if (config.includePublic) {
+				CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
 					img.attr("class", "key_div_qr");
-					keyDivRight.append(img);
-					onDone();
+					keyDivLeft.append(img);
+					addPrivateQr();
 				});
-			});
+			} else {
+				keyDivLeft.append($("<img src='img/question_mark.png' class='key_div_qr' style='border:solid;'>")); // TODO: replace with b64
+				addPrivateQr();
+			}
+			function addPrivateQr() {
+				if (config.includePrivate) {
+					CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
+						img.attr("class", "key_div_qr");
+						keyDivRight.append(img);
+						onDone();
+					})
+				} else {
+					keyDivRight.append($("<img src='img/question_mark.png' class='key_div_qr' style='border:solid;'>")); // TODO: replace with b64
+				}
+			}
 			
-			// translates from renderer config to QR config
+			// translate from renderer config to QR config
 			function getQrConfig(config) {
 				let qr_config = {};
 				if ("undefined" !== config.qrSize) qr_config.size = config.qrSize;
