@@ -1527,8 +1527,10 @@ function SaveController(div, state) {
 		previewDiv = $("<div class='preview_div'>").appendTo(div);
 		updatePieces(state.pieces, state.pieceDivs, function(err) {
 			if (err) throw err;
-			if (onDone) onDone(div);
 		});
+		
+		// rendering of page is complete even if pieces are still rendering
+		if (onDone) onDone(div);
 	}
 	
 	/**
