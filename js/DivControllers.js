@@ -1475,6 +1475,8 @@ function SaveController(div, state) {
 	let downloadLink;
 	
 	// storage preview
+	let progressDiv;
+	let progressBar;
 	let previewDiv;
 	let currentPieceDiv;
 	
@@ -1550,6 +1552,13 @@ function SaveController(div, state) {
 		
 		// set up preview
 		previewDiv.empty();
+		
+		// add progress bar
+		progressDiv = $("<div>").appendTo(previewDiv);
+		progressDiv.hide();
+		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
+		
+		// add preview header and current piece div
 		let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
 		currentPieceDiv = $("<div>").appendTo(previewDiv);
 		
@@ -1584,13 +1593,22 @@ function SaveController(div, state) {
 		}
 		
 		// render pieces
-		PieceRenderer.renderPieces(pieceDivs, pieces, null, null, function(err) {
+		PieceRenderer.renderPieces(pieceDivs, pieces, null, function(percent) {
+			setProgress(percent);
+		}, function(err) {
+			progressDiv.hide();
 			if (err) {
 				if (onDone) onDone(err);
 			} else {
 				piecesUpdated(pieces, pieceDivs, function() { if (onDone) onDone(null, pieces, pieceDivs); });
 			}
 		});
+		
+		function setProgress(percent, label) {
+			progressDiv.show();
+			progressBar.set(percent);
+			if (label) progressBar.setText(label);
+		}
 		
 		// update print and download links
 		function piecesUpdated(pieces, pieceDivs, onDone) {
