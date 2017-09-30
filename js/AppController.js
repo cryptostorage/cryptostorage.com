@@ -17,6 +17,7 @@
 // backwards bitcoin cash logo
 // smaller html exports
 // note of how b64logos.js is created
+// how does jaxx generate zcash and bitcoin variations
 
 // peer review key formats
 
