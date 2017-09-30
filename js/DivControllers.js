@@ -1665,7 +1665,11 @@ function SaveController(div, state) {
 		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(includePublicDiv);
 		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(includePublicDiv);
 		includePublicCheckboxLabel.html(" Include public addresses");
-		includePublicCheckbox.click(function() { updatePieces(); });
+		includePublicCheckbox.click(function() {
+			if (getIncludePublic()) includePrivateCheckbox.removeAttr("disabled");
+			else includePrivateCheckbox.attr("disabled", "disabled");
+			updatePieces();
+		});
 		includePublicCheckbox.prop('checked', true);
 		
 		// render include private key checkbox
@@ -1673,7 +1677,11 @@ function SaveController(div, state) {
 		includePrivateCheckbox = $("<input type='checkbox' id='includePrivateCheckbox'>").appendTo(includePrivateDiv);
 		let includePrivateCheckboxLabel = $("<label for='includePrivateCheckbox'>").appendTo(includePrivateDiv);
 		includePrivateCheckboxLabel.html(" Include private addresses");
-		includePrivateCheckbox.click(function() { updatePieces(); });
+		includePrivateCheckbox.click(function() {
+			if (getIncludePrivate()) includePublicCheckbox.removeAttr("disabled");
+			else includePublicCheckbox.attr("disabled", "disabled");
+			updatePieces();
+		});
 		includePrivateCheckbox.prop('checked', true);
 	}
 	
