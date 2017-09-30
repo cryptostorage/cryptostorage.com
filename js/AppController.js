@@ -17,7 +17,6 @@
 // test on IE
 // backwards bitcoin cash logo
 // smaller html exports
-// safari SecurityError insecure operation
 // note of how b64logos.js is created
 
 // peer review key formats
