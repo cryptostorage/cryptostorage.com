@@ -1816,7 +1816,7 @@ let PieceRenderer = {
 			let logoLabel = plugin.getName();
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = piece[i].privateKey;
-			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue,
+			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config,
 				function() {
 					onKeyPairDone();
 					onDone();
@@ -1844,7 +1844,7 @@ let PieceRenderer = {
 		/**
 		 * Renders a single key pair.
 		 */
-		function renderKeyPair(div, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, onDone) {
+		function renderKeyPair(div, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config, onDone) {
 			
 			// left qr code
 			let keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
@@ -1859,7 +1859,7 @@ let PieceRenderer = {
 			keyDivCenterLeftLabel.html(leftLabel);
 			let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
 			if (!hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
-			keyDivCenterLeftValue.html(leftValue);
+			keyDivCenterLeftValue.html(config.includePublic ? leftValue : "(omitted)");
 			
 			// center logo
 			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
