@@ -1895,7 +1895,7 @@ let PieceRenderer = {
 					addPrivateQr();
 				});
 			} else {
-				keyDivLeft.append($("<img src='img/question_mark.png' class='key_div_qr' style='border:solid;'>")); // TODO: replace with b64
+				keyDivLeft.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>")); // TODO: replace with b64
 				addPrivateQr();
 			}
 			function addPrivateQr() {
@@ -1906,7 +1906,7 @@ let PieceRenderer = {
 						onDone();
 					})
 				} else {
-					keyDivRight.append($("<img src='img/question_mark.png' class='key_div_qr' style='border:solid;'>")); // TODO: replace with b64
+					keyDivRight.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>")); // TODO: replace with b64
 				}
 			}
 			
