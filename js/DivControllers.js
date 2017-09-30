@@ -1705,7 +1705,7 @@ let PieceRenderer = {
 		rightQr: true,
 		showLeftText: true,
 		showRightText: true,
-		qrSize: 125,
+		qrSize: 100,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
 		qrScale: 4,
@@ -1864,11 +1864,19 @@ let PieceRenderer = {
 			
 			// center right
 			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
-			if (rightValue.length > 150) keyDivCenterRightLabel.css("margin-top", "0");	// extra space for long right labels
 			keyDivCenterRightLabel.html(rightLabel);
 			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
 			if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
 			keyDivCenterRightValue.html(rightValue);
+			
+			// collapse spacing for long keys
+			if (leftValue.length > 71) {
+				keyDivCenterLogo.css("margin-top", "-15px");
+			}
+			if (rightValue.length > 150) {
+				keyDivCenterLogo.css("margin-top", "-10px");
+				keyDivCenterRightLabel.css("margin-top", "-15px");
+			}
 			
 			// right qr code
 			let keyDivRight = $("<div class='key_div_right'>").appendTo(div);
