@@ -1549,23 +1549,17 @@ function SaveController(div, state) {
 		// set up preview
 		previewDiv.empty();
 		let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
-		
-//		// handle pieces already set (TODO)
-//		if (pieces && pieceDivs) {
-//			throw new Error("Not implemented");
-//			setPieces(pieces, pieceDivs, function() {
-//				if (onDone) onDone(null, pieces, pieceDivs);
-//			});
-//			return;
-//		}
+		currentPieceDiv = $("<div>").appendTo(previewDiv);
 		
 		// get pieces
+		let alreadyRendered = isInitialized(pieces) && isInitialized(pieceDivs);
 		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, state.numPieces, state.minPieces);
 		
-		// create piece divs and attach first to preview
-		pieceDivs = [];
-		for (let i = 0; i < pieces.length; i++) pieceDivs.push($("<div>"));
-		currentPieceDiv = $("<div>").appendTo(previewDiv);
+		// set up piece divs and attach first to preview
+		if (!pieceDivs) {
+			pieceDivs = [];
+			for (let i = 0; i < pieces.length; i++) pieceDivs.push($("<div>"));
+		}
 		currentPieceDiv.append(pieceDivs[0]);
 		
 		// add piece selector to preview header
@@ -1581,13 +1575,25 @@ function SaveController(div, state) {
 			}
 		}
 		
+		// handle already rendered pieces
+		if (alreadyRendered) {
+			piecesUpdated(pieces, pieceDivs, function() { if (onDone) onDone(null, pieces, pieceDivs); });
+			return;
+		}
+		
 		// render pieces
 		PieceRenderer.renderPieces(pieceDivs, pieces, null, null, function(err) {
 			if (err) {
 				if (onDone) onDone(err);
-				return;
+			} else {
+				piecesUpdated(pieces, pieceDivs, function() { if (onDone) onDone(null, pieces, pieceDivs); });
 			}
-				
+		});
+		
+		// update print and download links
+		function piecesUpdated(pieces, pieceDivs, onDone) {
+			assertTrue(pieces.length > 0 && pieceDivs.length > 0);
+			
 			// collect all internal css
 			let internalCss = "";
 			let internalStyleSheet = getInternalStyleSheet();
@@ -1603,7 +1609,7 @@ function SaveController(div, state) {
 				$("<meta http-equiv='content-type' content='text/html;charset=utf-8'>").appendTo(head);
 				let style = $("<style>").appendTo(head);
 				style.html(internalCss);
-				html.append($("<body>").append(pieceDiv));
+				html.append($("<body>").append(pieceDiv.clone()));
 				htmls.push(html);
 			}
 			
@@ -1618,10 +1624,10 @@ function SaveController(div, state) {
 				printLink.removeAttr("disabled");
 				downloadLink.removeAttr("disabled");
 				
-				// done setting pieces
-				if (onDone) onDone(null, pieces, pieceDivs);
+				// done
+				if (onDone) onDone();
 			});
-		});
+		}
 	}
 	
 	function renderConfig(div) {
@@ -1673,7 +1679,7 @@ inheritsFrom(CustomExportController, DivController);
 let PieceRenderer = {
 
 	defaultConfig: {
-		piecesPerPage: 6,
+		pairsPerPage: 6,
 		showLogos: true,
 		leftQr: true,
 		rightQr: true,
@@ -1756,7 +1762,7 @@ let PieceRenderer = {
 		
 		// div setup
 		pieceDiv.empty();
-		pieceDiv.css("class", "piece_div");
+		pieceDiv.attr("class", "piece_div");
 		
 		// merge configs
 		config = Object.assign({}, PieceRenderer.defaultConfig, config);
