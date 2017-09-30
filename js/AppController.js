@@ -1,6 +1,5 @@
 // TODO
 // re-add progress bar to save page
-// render preview in real time without progress bar
 // bigger keys, smaller qr codes anchored to top/bottom corner (height issue with monero pushing into next page)
 // faq page
 // donation page
