@@ -1,4 +1,5 @@
 // TODO
+// config to include public addresses, private keys, logos
 // csv import to support "bring your own keys"
 // faq page
 // donation page
