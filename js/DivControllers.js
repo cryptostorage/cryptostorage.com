@@ -1562,9 +1562,14 @@ function SaveController(div, state) {
 		let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
 		currentPieceDiv = $("<div>").appendTo(previewDiv);
 		
+		// get export config
+		let config = {};
+		config.includePublic = getIncludePublic();
+		config.includePrivate = getIncludePrivate();
+		
 		// get pieces
 		let alreadyRendered = isInitialized(pieces) && isInitialized(pieceDivs);
-		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, state.numPieces, state.minPieces);
+		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, state.numPieces, state.minPieces, config);
 		
 		// set up piece divs and attach first to preview
 		if (!pieceDivs) {
@@ -1591,11 +1596,6 @@ function SaveController(div, state) {
 			piecesUpdated(pieces, pieceDivs, function() { if (onDone) onDone(null, pieces, pieceDivs); });
 			return;
 		}
-		
-		// build piece render config
-		let config = {};
-		config.includePublic = getIncludePublic();
-		config.includePrivate = getIncludePrivate();
 		
 		// render pieces
 		PieceRenderer.renderPieces(pieceDivs, pieces, config, function(percent) {
@@ -1879,8 +1879,8 @@ let PieceRenderer = {
 			let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
 			keyDivCenterLeftLabel.html(leftLabel);
 			let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
-			if (!hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
-			keyDivCenterLeftValue.html(config.includePublic ? leftValue : "(omitted)");
+			if (leftValue && !hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
+			keyDivCenterLeftValue.html(leftValue ? leftValue : "(omitted)");
 			
 			// center logo
 			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
@@ -1893,14 +1893,14 @@ let PieceRenderer = {
 			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
 			keyDivCenterRightLabel.html(rightLabel);
 			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
-			if (!hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
-			keyDivCenterRightValue.html(config.includePrivate ? rightValue : "(omitted)");
+			if (rightValue && !hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
+			keyDivCenterRightValue.html(rightValue ? rightValue : "(omitted)");
 			
 			// collapse spacing for long keys
-			if (leftValue.length > 71) {
+			if (leftValue && leftValue.length > 71) {
 				keyDivCenterLogo.css("margin-top", "-15px");
 			}
-			if (rightValue.length > 150) {
+			if (rightValue && rightValue.length > 150) {
 				keyDivCenterLogo.css("margin-top", "-10px");
 				keyDivCenterRightLabel.css("margin-top", "-15px");
 			}
@@ -1909,7 +1909,7 @@ let PieceRenderer = {
 			let keyDivRight = $("<div class='key_div_right'>").appendTo(div);
 			
 			// add qr codes
-			if (config.includePublic) {
+			if (leftValue) {
 				CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
 					img.attr("class", "key_div_qr");
 					keyDivLeft.append(img);
@@ -1920,7 +1920,7 @@ let PieceRenderer = {
 				addPrivateQr();
 			}
 			function addPrivateQr() {
-				if (config.includePrivate) {
+				if (rightValue) {
 					CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
 						img.attr("class", "key_div_qr");
 						keyDivRight.append(img);

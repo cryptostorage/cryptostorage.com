@@ -211,9 +211,19 @@ let CryptoUtils = {
 	 * @param keys are the keys to convert to pieces
 	 * @param numPieces are the number of pieces to split the keys into (must be >= 1)
 	 * @param minPieces are the minimum pieces to reconstitute the keys (optional)
+	 * @param config configures the transformation
 	 * @returns exportable pieces
 	 */
-	keysToPieces: function(keys, numPieces, minPieces) {
+	keysToPieces: function(keys, numPieces, minPieces, config) {
+		
+		// merge config with default
+		config = Object.assign({}, getDefaultConfig(), config);
+		function getDefaultConfig() {
+			return {
+				includePublic: true,
+				includePrivate: true
+			};
+		}
 		
 		// validate input
 		assertTrue(keys.length > 0);
@@ -239,8 +249,8 @@ let CryptoUtils = {
 				let piece = {};
 				piece.ticker = key.getPlugin().getTicker();
 				piece.isSplit = numPieces > 1;
-				piece.address = key.getAddress();
-				piece.privateKey = keyPieces[i];
+				if (config.includePublic) piece.address = key.getAddress();
+				if (config.includePrivate) piece.privateKey = keyPieces[i];
 				piece.encryption = key.getEncryptionScheme();
 				pieces[i].push(piece);
 			}
