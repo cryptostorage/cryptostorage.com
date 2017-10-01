@@ -4,8 +4,8 @@
 let Tests = {
 	
 	// constants
-	REPEAT_LONG: 50,
-	REPEAT_SHORT: 1,
+	REPEAT_LONG: 10,
+	REPEAT_SHORT: 0,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSWORD: "MySuperSecretPasswordAbcTesting123",
@@ -97,17 +97,25 @@ let Tests = {
 			// test exclude public
 			let copies = [];
 			for (let key of keys) copies.push(key.copy());
-			for (let key of copies) delete key.getState().address;
+			CryptoUtils.applyKeyConfig(copies, { includePublic: false});
+			for (let key of copies) {
+				assertUninitialized(key.getState().address);
+				assertInitialized(key.getState().wif);
+				assertInitialized(key.getState().hex);
+				assertDefined(key.getState().encryption);
+			}
 			testKeysToPieces(copies, 1);
 			testKeysToPieces(copies, Tests.NUM_PIECES, Tests.MIN_PIECES);
 			
 			// test exclude private
 			copies = [];
 			for (let key of keys) copies.push(key.copy());
+			CryptoUtils.applyKeyConfig(copies,  { includePrivate: false});
 			for (let key of copies) {
-				delete key.getState().hex;
-				delete key.getState().wif;
-				delete key.getState().encryption;
+				assertInitialized(key.getState().address);
+				assertUndefined(key.getState().wif);
+				assertUndefined(key.getState().hex);
+				assertUndefined(key.getState().encryption);
 			}
 			testKeysToPieces(copies, 1, null);
 			try {

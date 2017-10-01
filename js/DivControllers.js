@@ -1570,14 +1570,7 @@ function SaveController(div, state) {
 		// build keys based on config
 		let keys = [];
 		for (let key of state.keys) keys.push(key.copy());
-		for (let key of keys) {
-			let state = key.getState();
-			if (!config.includePublic) delete state.address;
-			if (!config.includePrivate) {
-				delete state.hex;
-				delete state.wif;
-			}
-		}
+		CryptoUtils.applyKeyConfig(keys, config);
 		
 		// get pieces
 		let alreadyRendered = isInitialized(pieces) && isInitialized(pieceDivs);

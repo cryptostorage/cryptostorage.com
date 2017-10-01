@@ -173,6 +173,36 @@ let CryptoUtils = {
 			img[0].src = url;
 		});
 	},
+	
+	/**
+	 * Applies the given config to the given keys.
+	 * 
+	 * config.includePublic specifies if public keys should be included
+	 * config.includePrivate specifies if private keys should be included
+	 */
+	applyKeyConfig: function(keys, config) {
+		
+		// merge config with default
+		config = Object.assign({}, getDefaultConfig(), config);
+		function getDefaultConfig() {
+			return {
+				includePublic: true,
+				includePrivate: true
+			};
+		}
+		
+		if (!config.includePublic) {
+			for (let key of keys) delete key.getState().address;
+		}
+		
+		if (!config.includePrivate) {
+			for (let key of keys) {
+				delete key.getState().hex;
+				delete key.getState().wif;
+				delete key.getState().encryption;
+			}
+		}
+	},
 
 	/**
 	 * Attempts to construct a key from the given string.  The string is expected to be a
