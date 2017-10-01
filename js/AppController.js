@@ -17,6 +17,7 @@
 // smaller html exports
 // note of how b64-images.js is created
 // how does jaxx generate zcash and bitcoin variations
+// pieces should be objects with versioning for future extension
 
 // peer review key formats
 
