@@ -1562,19 +1562,9 @@ function SaveController(div, state) {
 		let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
 		currentPieceDiv = $("<div>").appendTo(previewDiv);
 		
-		// get export config
-		let config = {};
-		config.includePublic = getIncludePublic();
-		config.includePrivate = getIncludePrivate();
-		
-		// build keys based on config
-		let keys = [];
-		for (let key of state.keys) keys.push(key.copy());
-		CryptoUtils.applyKeyConfig(keys, config);
-		
 		// get pieces
 		let alreadyRendered = isInitialized(pieces) && isInitialized(pieceDivs);
-		pieces = pieces ? pieces : CryptoUtils.keysToPieces(keys, state.numPieces, state.minPieces);
+		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, state.numPieces, state.minPieces);
 		
 		// set up piece divs and attach first to preview
 		if (!pieceDivs) {
@@ -1601,6 +1591,11 @@ function SaveController(div, state) {
 			piecesUpdated(pieces, pieceDivs, function() { if (onDone) onDone(null, pieces, pieceDivs); });
 			return;
 		}
+		
+		// get export config
+		let config = {};
+		config.includePublic = getIncludePublic();
+		config.includePrivate = getIncludePrivate();
 		
 		// render pieces
 		PieceRenderer.renderPieces(pieceDivs, pieces, config, function(percent) {
@@ -1669,7 +1664,7 @@ function SaveController(div, state) {
 		includePublicDiv = $("<div class='export_option'>").appendTo(div);
 		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(includePublicDiv);
 		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(includePublicDiv);
-		includePublicCheckboxLabel.html(" Include public addresses");
+		includePublicCheckboxLabel.html(" Include public addresses in HTML export");
 		includePublicCheckbox.click(function() {
 			if (getIncludePublic()) includePrivateCheckbox.removeAttr("disabled");
 			else includePrivateCheckbox.attr("disabled", "disabled");
@@ -1681,7 +1676,7 @@ function SaveController(div, state) {
 		includePrivateDiv = $("<div class='export_option'>").appendTo(div);
 		includePrivateCheckbox = $("<input type='checkbox' id='includePrivateCheckbox'>").appendTo(includePrivateDiv);
 		let includePrivateCheckboxLabel = $("<label for='includePrivateCheckbox'>").appendTo(includePrivateDiv);
-		includePrivateCheckboxLabel.html(" Include private keys");
+		includePrivateCheckboxLabel.html(" Include private keys in HTML export");
 		includePrivateCheckbox.click(function() {
 			if (getIncludePrivate()) includePublicCheckbox.removeAttr("disabled");
 			else includePublicCheckbox.attr("disabled", "disabled");
@@ -1836,11 +1831,11 @@ let PieceRenderer = {
 			let plugin = CryptoUtils.getCryptoPlugin(piece[i].ticker);
 			let title = "#" + (i + 1);
 			let leftLabel = "\u25C4 Public Address";
-			let leftValue = piece[i].address;
+			let leftValue = config.includePublic ? piece[i].address : null;
 			let logo = $("<img width=100% height=100% src='" + getImageData(piece[i].ticker) + "'>");
 			let logoLabel = plugin.getName();
 			let rightLabel = "Private Key" + (piece[i].isSplit ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
-			let rightValue = piece[i].wif;
+			let rightValue = config.includePrivate ? piece[i].wif : null;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config,
 				function() {
 					onKeyPairDone();

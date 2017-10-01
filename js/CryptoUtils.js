@@ -486,11 +486,20 @@ let CryptoUtils = {
 	},
 
 	pieceToStr: function(piece) {
-		var str = "";
-		for (var i = 0; i < piece.length; i++) {
+		let str = "";
+		for (let i = 0; i < piece.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
 			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n\n";
-			if (piece[i].wif) str += "Private Key:\n" + piece[i].wif + "\n\n";
+			if (piece[i].wif) str += "Private Key" + (piece[i].isSplit ? " (split)" : (piece[i].encryption ? " (encrypted)" : "")) + ":\n" + piece[i].wif + "\n\n";
+		}
+		return str.trim();
+	},
+	
+	pieceToAddresses: function(piece) {
+		let str = "";
+		for (let i = 0; i < piece.length; i++) {
+			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
+			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n\n";
 		}
 		return str.trim();
 	},
