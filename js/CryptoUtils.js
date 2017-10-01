@@ -250,7 +250,7 @@ let CryptoUtils = {
 				piece.ticker = key.getPlugin().getTicker();
 				piece.isSplit = numPieces > 1;
 				if (config.includePublic) piece.address = key.getAddress();
-				if (config.includePrivate) piece.privateKey = keyPieces[i];
+				if (config.includePrivate) piece.privateWif = keyPieces[i];
 				piece.encryption = key.getEncryptionScheme();
 				pieces[i].push(piece);
 			}
@@ -273,7 +273,7 @@ let CryptoUtils = {
 		if (pieces.length === 1) {
 			for (let pieceKey of pieces[0]) {
 				try {
-					let key = CryptoUtils.getCryptoPlugin(pieceKey.ticker).newKey(pieceKey.privateKey);	// TODO: bug right here, need to add test
+					let key = CryptoUtils.getCryptoPlugin(pieceKey.ticker).newKey(pieceKey.privateWif);	// TODO: bug right here, need to add test
 					if (key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);
 					keys.push(key);
 				} catch (err) {
@@ -314,7 +314,7 @@ let CryptoUtils = {
 			// combine keys across pieces
 			for (let i = 0; i < pieces[0].length; i++) {
 				let shares = [];
-				for (let piece of pieces) shares.push(piece[i].privateKey);
+				for (let piece of pieces) shares.push(piece[i].privateWif);
 				try {
 					let key = CryptoUtils.getCryptoPlugin(pieces[0][i].ticker).combine(shares);
 					if (key.isEncrypted() && pieces[0][i].address) key.setAddress(pieces[0][i].address);
@@ -449,7 +449,7 @@ let CryptoUtils = {
 		// convert piece to 2D array
 		var arr = [];
 		for (var i = 0; i < piece.length; i++) {
-			arr.push([piece[i].address, piece[i].privateKey]);
+			arr.push([piece[i].address, piece[i].privateWif]);
 		}
 		
 		// convert array to csv
@@ -465,7 +465,7 @@ let CryptoUtils = {
 		for (var i = 0; i < piece.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
 			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n\n";
-			if (piece[i].privateKey) str += "Private Key:\n" + piece[i].privateKey + "\n\n";
+			if (piece[i].privateWif) str += "Private Key:\n" + piece[i].privateWif + "\n\n";
 		}
 		return str.trim();
 	},
@@ -475,7 +475,7 @@ let CryptoUtils = {
 		for (let key of piece) {
 			assertDefined(key.ticker, "piece.ticker is not defined");
 			assertDefined(key.isSplit, "piece.isSplit is not defined");
-			//assertDefined(key.privateKey, "piece.privateKey is not defined");
+			//assertDefined(key.privateWif, "piece.privateWif is not defined");
 		}
 	}
 }

@@ -4,8 +4,8 @@
 let Tests = {
 	
 	// constants
-	REPEAT_LONG: 50,
-	REPEAT_SHORT: 1,
+	REPEAT_LONG: 10,
+	REPEAT_SHORT: 0,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSWORD: "MySuperSecretPasswordAbcTesting123",
@@ -89,6 +89,16 @@ let Tests = {
 				// parse whitespace key
 				key = CryptoUtils.parseKey(plugin, " ");
 				assertNull(key, "Should not have parsed key from whitespace string");
+			}
+		}
+		
+		function testKeyExclusion(keys) {
+			
+			// test exclude public
+			for (let key of keys) {
+				let state = key.copy().getState();
+				delete state.address;
+				console.log(state);
 			}
 		}
 
@@ -222,6 +232,9 @@ let Tests = {
 				key2 = new CryptoKey(plugin, key.getWif());
 				assertTrue(key.equals(key2));
 			}
+			
+			// test excluding keys
+			testKeyExclusion(keys);
 			
 			// test splitting unencrypted keys
 			for (let key of keys) testKeysToPieces([key], Tests.NUM_PIECES, Tests.MIN_PIECES);
@@ -448,10 +461,10 @@ let Tests = {
 					assertEquals(keys[i].getEncryptionScheme(), piece[i].encryption);
 					if (numPieces > 1) {
 						assertTrue(piece[i].isSplit);
-						assertFalse(keys[i].getWif() === piece[i].privateKey);
+						assertFalse(keys[i].getWif() === piece[i].privateWif);
 					} else {
 						assertFalse(piece[i].isSplit);
-						asserTrue(keys[i].getWif() === piece[i].privateKey);
+						asserTrue(keys[i].getWif() === piece[i].privateWif);
 					}
 				}
 			}
@@ -460,7 +473,7 @@ let Tests = {
 			if (numPieces > 1) {
 				for (let share of pieces[0]) {
 					if (!share.encryption && share.ticker === 'BTC') {
-						assertTrue(share.privateKey.startsWith("3X"));
+						assertTrue(share.privateWif.startsWith("3X"));
 					}
 				}
 			}

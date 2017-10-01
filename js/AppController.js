@@ -51,7 +51,7 @@
 // csv import to support "bring your own keys"
 // optimize tests by getting one set of keys of repeat_long size
 
-const RUN_TESTS = false;
+const RUN_TESTS = true;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;
