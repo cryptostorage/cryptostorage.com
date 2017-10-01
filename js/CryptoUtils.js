@@ -471,7 +471,7 @@ let CryptoUtils = {
 	},
 
 	pieceToCsv: function(piece) {
-		assertTrue(piece.length > 1);
+		assertTrue(piece.length > 0);
 		
 		// build csv header
 		let csvHeader = [];
