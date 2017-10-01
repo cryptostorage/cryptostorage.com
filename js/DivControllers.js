@@ -1850,8 +1850,10 @@ let PieceRenderer = {
 			// render new page
 			if (i % config.pairsPerPage === 0) {
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
-				let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
-				logoDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("cryptostorage") + "'>"));
+				if (config.includeCryptostorageLogos) {
+					let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
+					logoDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("cryptostorage") + "'>"));
+				}
 			}
 			
 			// collect functions to render key pair
@@ -1899,31 +1901,33 @@ let PieceRenderer = {
 			// left qr code
 			let keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
 			
-			// center title
+			// title
 			let keyDivCenter = $("<div class='key_div_center'>").appendTo(div);
 			let titleDiv = $("<div class='key_div_center_title'>").appendTo(keyDivCenter);
 			titleDiv.html(title);
 			
-			// center left
-			let keyDivCenterLeftLabel = $("<div class='key_div_center_left_label'>").appendTo(keyDivCenter);
-			keyDivCenterLeftLabel.html(leftLabel);
-			let keyDivCenterLeftValue = $("<div class='key_div_center_left_value'>").appendTo(keyDivCenter);
-			if (leftValue && !hasWhitespace(leftValue)) keyDivCenterLeftValue.css("word-break", "break-all");
-			keyDivCenterLeftValue.html(leftValue ? leftValue : "(omitted)");
+			// left label and value
+			let keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivCenter);
+			keyDivLeftLabel.html(leftLabel);
+			let keyDivLeftValue = $("<div class='key_div_left_value'>").appendTo(keyDivCenter);
+			if (leftValue && !hasWhitespace(leftValue)) keyDivLeftValue.css("word-break", "break-all");
+			keyDivLeftValue.html(leftValue ? leftValue : "(omitted)");
 			
-			// center logo
+			// center currency
 			let keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
-			let keyDivCurrencyLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
-			keyDivCurrencyLogo.append(logo);
+			if (config.includeCurrencyLogos) {
+				let keyDivCurrencyLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
+				keyDivCurrencyLogo.append(logo);
+			}
 			let keyDivCurrencyLabel = $("<div class='key_div_currency_label'>").appendTo(keyDivCurrency);
 			keyDivCurrencyLabel.html("&nbsp;" + logoLabel);
 			
-			// center right
-			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
-			keyDivCenterRightLabel.html(rightLabel);
-			let keyDivCenterRightValue = $("<div class='key_div_center_right_value'>").appendTo(keyDivCenter);
-			if (rightValue && !hasWhitespace(rightValue)) keyDivCenterRightValue.css("word-break", "break-all");
-			keyDivCenterRightValue.html(rightValue ? rightValue : "(omitted)");
+			// right label and value
+			let keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivCenter);
+			keyDivRightLabel.html(rightLabel);
+			let keyDivRightValue = $("<div class='key_div_right_value'>").appendTo(keyDivCenter);
+			if (rightValue && !hasWhitespace(rightValue)) keyDivRightValue.css("word-break", "break-all");
+			keyDivRightValue.html(rightValue ? rightValue : "(omitted)");
 			
 			// collapse spacing for long keys
 			if (leftValue && leftValue.length > 71) {
@@ -1931,7 +1935,7 @@ let PieceRenderer = {
 			}
 			if (rightValue && rightValue.length > 150) {
 				keyDivCurrency.css("margin-top", "-10px");
-				keyDivCenterRightLabel.css("margin-top", "-15px");
+				keyDivRightLabel.css("margin-top", "-15px");
 			}
 			
 			// right qr code
