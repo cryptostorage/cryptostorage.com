@@ -1592,13 +1592,8 @@ function SaveController(div, state) {
 			return;
 		}
 		
-		// get export config
-		let config = {};
-		config.includePublic = getIncludePublic();
-		config.includePrivate = getIncludePrivate();
-		
 		// render pieces
-		PieceRenderer.renderPieces(pieceDivs, pieces, config, function(percent) {
+		PieceRenderer.renderPieces(pieceDivs, pieces, getConfig(), function(percent) {
 			setProgress(percent);
 		}, function(err) {
 			progressDiv.hide();
@@ -1664,7 +1659,7 @@ function SaveController(div, state) {
 		includePublicDiv = $("<div class='export_option'>").appendTo(div);
 		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(includePublicDiv);
 		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(includePublicDiv);
-		includePublicCheckboxLabel.html(" Include public addresses in HTML export");
+		includePublicCheckboxLabel.html(" Show public addresses in HTML export");
 		includePublicCheckbox.click(function() {
 			if (getIncludePublic()) includePrivateCheckbox.removeAttr("disabled");
 			else includePrivateCheckbox.attr("disabled", "disabled");
@@ -1676,13 +1671,38 @@ function SaveController(div, state) {
 		includePrivateDiv = $("<div class='export_option'>").appendTo(div);
 		includePrivateCheckbox = $("<input type='checkbox' id='includePrivateCheckbox'>").appendTo(includePrivateDiv);
 		let includePrivateCheckboxLabel = $("<label for='includePrivateCheckbox'>").appendTo(includePrivateDiv);
-		includePrivateCheckboxLabel.html(" Include private keys in HTML export");
+		includePrivateCheckboxLabel.html(" Show private keys in HTML export");
 		includePrivateCheckbox.click(function() {
 			if (getIncludePrivate()) includePublicCheckbox.removeAttr("disabled");
 			else includePublicCheckbox.attr("disabled", "disabled");
 			updatePieces();
 		});
 		includePrivateCheckbox.prop('checked', true);
+		
+		// render include currency logos
+		includeCurrencyLogosDiv = $("<div class='export_option'>").appendTo(div);
+		includeCurrencyLogosCheckbox = $("<input type='checkbox' id='includeCurrencyLogosCheckbox'>").appendTo(includeCurrencyLogosDiv);
+		let includeCurrencyLogosCheckboxLabel = $("<label for='includeCurrencyLogosCheckbox'>").appendTo(includeCurrencyLogosDiv);
+		includeCurrencyLogosCheckboxLabel.html(" Show currency logos in HTML export");
+		includeCurrencyLogosCheckbox.click(function() { updatePieces(); });
+		includeCurrencyLogosCheckbox.prop('checked', true);
+		
+		// render include crpytostorage logo
+		includeCryptostorageLogosDiv = $("<div class='export_option'>").appendTo(div);
+		includeCryptostorageLogosCheckbox = $("<input type='checkbox' id='includeCryptostorageLogosCheckbox'>").appendTo(includeCryptostorageLogosDiv);
+		let includeCryptostorageLogosCheckboxLabel = $("<label for='includeCryptostorageLogosCheckbox'>").appendTo(includeCryptostorageLogosDiv);
+		includeCryptostorageLogosCheckboxLabel.html(" Show cryptostorage logos in HTML export");
+		includeCryptostorageLogosCheckbox.click(function() { updatePieces(); });
+		includeCryptostorageLogosCheckbox.prop('checked', true);
+	}
+	
+	function getConfig() {
+		let config = {};
+		config.includePublic = getIncludePublic();
+		config.includePrivate = getIncludePrivate();
+		config.includeCurrencyLogos = getIncludeCurrencyLogos();
+		config.includeCryptostorageLogos = getIncludeCryptostorageLogos();
+		return config;
 	}
 	
 	function getIncludePublic() {
@@ -1691,6 +1711,14 @@ function SaveController(div, state) {
 	
 	function getIncludePrivate() {
 		return includePrivateCheckbox.prop('checked');
+	}
+	
+	function getIncludeCurrencyLogos() {
+		return includeCurrencyLogosCheckbox.prop('checked');
+	}
+	
+	function getIncludeCryptostorageLogos() {
+		return includeCryptostorageLogosCheckbox.prop('checked');
 	}
 }
 inheritsFrom(SaveController, DivController);
@@ -1725,9 +1753,10 @@ let PieceRenderer = {
 
 	defaultConfig: {
 		pairsPerPage: 6,
-		showLogos: true,
 		includePublic: true,
 		includePrivate: true,
+		includeCurrencyLogos: true,
+		includeCryptostorageLogos: true,
 		qrSize: 105,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
@@ -1763,7 +1792,7 @@ let PieceRenderer = {
 	 * @param onDone(err, pieceDivs) is invoked when done
 	 */
 	renderPieces: function(pieceDivs, pieces, config, onProgress, onDone) {
-		
+
 		// merge default config with given confi
 		config = Object.assign({}, PieceRenderer.defaultConfig, config);
 		
@@ -1883,11 +1912,11 @@ let PieceRenderer = {
 			keyDivCenterLeftValue.html(leftValue ? leftValue : "(omitted)");
 			
 			// center logo
-			let keyDivCenterLogo = $("<div class='key_div_center_logo'>").appendTo(keyDivCenter);
-			let logoDiv = $("<div class='key_div_logo'>").appendTo(keyDivCenterLogo);
-			logoDiv.append(logo);
-			let logoLabelDiv = $("<div class='key_div_logo_label'>").appendTo(keyDivCenterLogo);
-			logoLabelDiv.html("&nbsp;" + logoLabel);
+			let keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
+			let keyDivCurrencyLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
+			keyDivCurrencyLogo.append(logo);
+			let keyDivCurrencyLabel = $("<div class='key_div_currency_label'>").appendTo(keyDivCurrency);
+			keyDivCurrencyLabel.html("&nbsp;" + logoLabel);
 			
 			// center right
 			let keyDivCenterRightLabel = $("<div class='key_div_center_right_label'>").appendTo(keyDivCenter);
@@ -1898,10 +1927,10 @@ let PieceRenderer = {
 			
 			// collapse spacing for long keys
 			if (leftValue && leftValue.length > 71) {
-				keyDivCenterLogo.css("margin-top", "-15px");
+				keyDivCurrency.css("margin-top", "-15px");
 			}
 			if (rightValue && rightValue.length > 150) {
-				keyDivCenterLogo.css("margin-top", "-10px");
+				keyDivCurrency.css("margin-top", "-10px");
 				keyDivCenterRightLabel.css("margin-top", "-15px");
 			}
 			
@@ -1959,7 +1988,7 @@ function FaqController(div) {
 		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(div);
 		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(div);
 		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(div);
-		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li></ol>").appendTo(div);
+		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(div);
 		$("<div class='question'>").html("How can I trust this service?").appendTo(div);
 		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is what is publically auditable.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(div);
 		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(div);
