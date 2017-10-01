@@ -379,6 +379,7 @@ let CryptoUtils = {
 			zip.file(path + ".html", getOuterHtml(pieceHtmls[i]));
 			zip.file(path + ".csv", CryptoUtils.pieceToCsv(pieces[i]));
 			zip.file(path + ".txt", CryptoUtils.pieceToStr(pieces[i]));
+			zip.file(path + "_addresses.txt", CryptoUtils.pieceToAddresses(pieces[i]));
 			zip.file(path + ".json", CryptoUtils.pieceToJson(pieces[i]));
 			zips.push(zip);
 		}
@@ -499,7 +500,7 @@ let CryptoUtils = {
 		let str = "";
 		for (let i = 0; i < piece.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
-			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n\n";
+			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n" + piece[i].address + "\n\n";
 		}
 		return str.trim();
 	},
