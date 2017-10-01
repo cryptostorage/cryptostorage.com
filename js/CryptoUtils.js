@@ -246,13 +246,13 @@ let CryptoUtils = {
 		for (let key of keys) {
 			let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getWif()];
 			for (let i = 0; i < numPieces; i++) {
-				let piece = {};
-				piece.ticker = key.getPlugin().getTicker();
-				piece.isSplit = numPieces > 1;
-				if (config.includePublic) piece.address = key.getAddress();
-				if (config.includePrivate) piece.privateWif = keyPieces[i];
-				piece.encryption = key.getEncryptionScheme();
-				pieces[i].push(piece);
+				let account = {};
+				account.ticker = key.getPlugin().getTicker();
+				account.isSplit = numPieces > 1;
+				if (config.includePublic) account.address = key.getAddress();
+				if (config.includePrivate) account.wif = keyPieces[i];
+				account.encryption = key.getEncryptionScheme();
+				pieces[i].push(account);
 			}
 		}
 		
@@ -273,7 +273,7 @@ let CryptoUtils = {
 		if (pieces.length === 1) {
 			for (let pieceKey of pieces[0]) {
 				try {
-					let key = CryptoUtils.getCryptoPlugin(pieceKey.ticker).newKey(pieceKey.privateWif);	// TODO: bug right here, need to add test
+					let key = CryptoUtils.getCryptoPlugin(pieceKey.ticker).newKey(pieceKey.wif);	// TODO: bug right here, need to add test
 					if (key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);
 					keys.push(key);
 				} catch (err) {
@@ -314,7 +314,7 @@ let CryptoUtils = {
 			// combine keys across pieces
 			for (let i = 0; i < pieces[0].length; i++) {
 				let shares = [];
-				for (let piece of pieces) shares.push(piece[i].privateWif);
+				for (let piece of pieces) shares.push(piece[i].wif);
 				try {
 					let key = CryptoUtils.getCryptoPlugin(pieces[0][i].ticker).combine(shares);
 					if (key.isEncrypted() && pieces[0][i].address) key.setAddress(pieces[0][i].address);
@@ -449,7 +449,7 @@ let CryptoUtils = {
 		// convert piece to 2D array
 		var arr = [];
 		for (var i = 0; i < piece.length; i++) {
-			arr.push([piece[i].address, piece[i].privateWif]);
+			arr.push([piece[i].address, piece[i].wif]);
 		}
 		
 		// convert array to csv
@@ -465,7 +465,7 @@ let CryptoUtils = {
 		for (var i = 0; i < piece.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
 			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n\n";
-			if (piece[i].privateWif) str += "Private Key:\n" + piece[i].privateWif + "\n\n";
+			if (piece[i].wif) str += "Private Key:\n" + piece[i].wif + "\n\n";
 		}
 		return str.trim();
 	},
@@ -475,7 +475,7 @@ let CryptoUtils = {
 		for (let key of piece) {
 			assertDefined(key.ticker, "piece.ticker is not defined");
 			assertDefined(key.isSplit, "piece.isSplit is not defined");
-			//assertDefined(key.privateWif, "piece.privateWif is not defined");
+			//assertDefined(key.wif, "piece.wif is not defined");
 		}
 	}
 }

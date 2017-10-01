@@ -461,10 +461,10 @@ let Tests = {
 					assertEquals(keys[i].getEncryptionScheme(), piece[i].encryption);
 					if (numPieces > 1) {
 						assertTrue(piece[i].isSplit);
-						assertFalse(keys[i].getWif() === piece[i].privateWif);
+						assertFalse(keys[i].getWif() === piece[i].wif);
 					} else {
 						assertFalse(piece[i].isSplit);
-						asserTrue(keys[i].getWif() === piece[i].privateWif);
+						asserTrue(keys[i].getWif() === piece[i].wif);
 					}
 				}
 			}
@@ -473,7 +473,7 @@ let Tests = {
 			if (numPieces > 1) {
 				for (let share of pieces[0]) {
 					if (!share.encryption && share.ticker === 'BTC') {
-						assertTrue(share.privateWif.startsWith("3X"));
+						assertTrue(share.wif.startsWith("3X"));
 					}
 				}
 			}
