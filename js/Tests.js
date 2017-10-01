@@ -422,26 +422,6 @@ let Tests = {
 				assertEquals(key.getEncryptionScheme(), combined.getEncryptionScheme());
 				if (!key.isEncrypted()) assertEquals(key.getAddress(), combined.getAddress());
 			}
-			
-//			// apparently these tests are invalid because shamir's can return some valid hex key without threshold met
-//			// test one share which does not meet minimum threshold
-//			try {
-//				key.getPlugin().newKey(shares[0]);
-//				fail("fail");
-//			} catch (err) {
-//				if (err.message === "fail") throw new Error("Creating key with too few shares should fail");
-//			}
-		//	
-//			// test two shares which does not meet minimum threshold
-//			try {
-//				let combined = key.getPlugin().combine([shares[0], shares[1]]);
-//				console.log(shares);
-//				console.log(key.getState());
-//				console.log(combined.getState());
-//				fail("fail");
-//			} catch (err) {
-//				if (err.message === "fail") throw new Error("Creating key with too few shares should fail");
-//			}
 		}
 
 		function testKeysToPieces(keys, numPieces, minPieces) {
@@ -488,27 +468,6 @@ let Tests = {
 					assertTrue(keys[i].equals(keysFromPieces[i]));
 				}
 			}
-			
-//			// apparently these tests are invalid because shamir's can return some valid hex key without threshold met
-//			// test keys from one piece which is too few
-//			if (minPieces >= 2) {
-//				let keysFromPieces = CryptoUtils.piecesToKeys([pieces[0]]);
-//				assertEquals(keysFromPieces.length, 0);
-//			}
-		//	
-//			// test keys from two pieces which is too few
-//			if (minPieces >= 3) {
-//				keysFromPieces = CryptoUtils.piecesToKeys([pieces[0], pieces[1]]);
-//				if (keysFromPieces.length !== 0) {
-//					console.log(pieces[0]);
-//					console.log(pieces[1]);
-//					console.log("Originals:");
-//					for (let key of keys) console.log(key.getState());
-//					console.log("Pieces to keys:");
-//					for (let key of keysFromPieces) console.log(key.getState());
-//				}
-//				assertEquals(0, keysFromPieces.length);
-//			}
 		}
 
 		function testInvalidPiecesToKeys(plugins) {
