@@ -1,4 +1,5 @@
 // TODO
+// common apply config to keys code
 // config to exclude logos
 // cannot import pieces with missing private keys, add tests
 // faq page
@@ -51,7 +52,7 @@
 // csv import to support "bring your own keys"
 // optimize tests by getting one set of keys of repeat_long size
 
-const RUN_TESTS = true;
+const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;
@@ -281,7 +282,7 @@ function ApplicationController(div) {
 		state.keys = keys;
 		state.pieces = pieces;
 		state.pieceDivs = pieceDivs;
-		if (keys[0].isEncrypted()) pageController.next(new DecryptKeysController($("<div>"), state, onKeysImported));
+		if (keys[0].wif && keys[0].isEncrypted()) pageController.next(new DecryptKeysController($("<div>"), state, onKeysImported));
 		else {
 			pageController.next(new SaveController($("<div>"), state));
 		}

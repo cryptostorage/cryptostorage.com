@@ -65,6 +65,7 @@ function CryptoKey(plugin, state) {
 	}
 	
 	this.isEncrypted = function() {
+		if (!this.state.hex || !this.state.wif) throw new Error("Cannot check encryption state if private components unknown");
 		return isInitialized(this.state.encryption);
 	}
 	

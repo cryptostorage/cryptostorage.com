@@ -4,8 +4,8 @@
 let Tests = {
 	
 	// constants
-	REPEAT_LONG: 10,
-	REPEAT_SHORT: 0,
+	REPEAT_LONG: 50,
+	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSWORD: "MySuperSecretPasswordAbcTesting123",
@@ -95,10 +95,26 @@ let Tests = {
 		function testKeyExclusion(keys) {
 			
 			// test exclude public
-			for (let key of keys) {
-				let state = key.copy().getState();
-				delete state.address;
-				console.log(state);
+			let copies = [];
+			for (let key of keys) copies.push(key.copy());
+			for (let key of copies) delete key.getState().address;
+			testKeysToPieces(copies, 1);
+			testKeysToPieces(copies, Tests.NUM_PIECES, Tests.MIN_PIECES);
+			
+			// test exclude private
+			copies = [];
+			for (let key of keys) copies.push(key.copy());
+			for (let key of copies) {
+				delete key.getState().hex;
+				delete key.getState().wif;
+				delete key.getState().encryption;
+			}
+			testKeysToPieces(copies, 1, null);
+			try {
+				testKeysToPieces(copies, Tests.NUM_PIECES, Tests.MIN_PIECES);
+				fail("fail");
+			} catch (err) {
+				if (err.message === "fail") throw new Error("Should not have been able to split keys without private components")
 			}
 		}
 
@@ -236,7 +252,8 @@ let Tests = {
 			// test excluding keys
 			testKeyExclusion(keys);
 			
-			// test splitting unencrypted keys
+			// test piece conversion with and without splitting
+			testKeysToPieces([keys[0]], 1);
 			for (let key of keys) testKeysToPieces([key], Tests.NUM_PIECES, Tests.MIN_PIECES);
 			testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
 			
@@ -289,7 +306,11 @@ let Tests = {
 			async.parallel(funcs, function(err, result) {
 				if (err) throw err;
 				
-				// test splitting encrypted keys
+				// test key exclusion
+				testKeyExclusion(keys);
+				
+				// test piece conversion
+				testKeysToPieces([keys[0]], 1);
 				for (let key of keys) testKeysToPieces([key], Tests.NUM_PIECES, Tests.MIN_PIECES);
 				testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
 				
@@ -403,34 +424,18 @@ let Tests = {
 			});
 		}
 
-		function testSplit(key, numPieces, minPieces) {
-			assertInitialized(key);
-			assertTrue(numPieces >= 2);
-			assertTrue(minPieces >= 2);
-			
-			// split private key into shares
-			let shares = key.getPlugin().split(key, numPieces, minPieces);
-			assertEquals(numPieces, shares.length);
-			
-			// test each share combination
-			let combinations = getCombinations(shares, minPieces);
-			for (let i = 0; i < combinations.length; i++) {
-				let combination = combinations[i];
-				let combined = key.getPlugin().combine(combination);
-				assertEquals(key.getHex(), combined.getHex());
-				assertEquals(key.getWif(), combined.getWif());
-				assertEquals(key.getEncryptionScheme(), combined.getEncryptionScheme());
-				if (!key.isEncrypted()) assertEquals(key.getAddress(), combined.getAddress());
-			}
-		}
-
 		function testKeysToPieces(keys, numPieces, minPieces) {
 			
 			// validate input
 			assertTrue(keys.length > 0);
-			minPieces = minPieces ? minPieces : 1;
+			assertInitialized(numPieces);
+			if (numPieces > 1) assertInitialized(minPieces);
+			if (minPieces) {
+				assertTrue(minPieces <= numPieces);
+				assertTrue(minPieces > 1);
+			}
 			
-			// split keys into pieces
+			// convert keys to pieces
 			let pieces = CryptoUtils.keysToPieces(keys, numPieces, minPieces);
 			
 			// test each share in each piece
@@ -444,7 +449,7 @@ let Tests = {
 						assertFalse(keys[i].getWif() === piece[i].wif);
 					} else {
 						assertFalse(piece[i].isSplit);
-						asserTrue(keys[i].getWif() === piece[i].wif);
+						assertTrue(keys[i].getWif() === piece[i].wif);
 					}
 				}
 			}
@@ -459,7 +464,7 @@ let Tests = {
 			}
 			
 			// test each piece combination
-			let combinations = getCombinations(pieces, minPieces);
+			let combinations = getCombinations(pieces, minPieces ? minPieces : 1);
 			for (let i = 0; i < combinations.length; i++) {
 				let combination = combinations[i];
 				let keysFromPieces = CryptoUtils.piecesToKeys(pieces);

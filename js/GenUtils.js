@@ -302,14 +302,17 @@ function getPowerSet(arr) {
  * returns [][] is the power set of the given array whose elements are the given size 
  */
 function getPowerSetOfLength(arr, size) {
-	var power_set = getPowerSet(arr);
-	var power_set_of_length = [];
-	for (var i = 0; i < power_set.length; i++) {
-		if (power_set[i].length == size) {
-			power_set_of_length.push(power_set[i]);
+	assertInitialized(arr);
+	assertInitialized(size);
+	assertTrue(size >= 1);
+	let powerSet = getPowerSet(arr);
+	let powerSetOfLength = [];
+	for (let i = 0; i < powerSet.length; i++) {
+		if (powerSet[i].length === size) {
+			powerSetOfLength.push(powerSet[i]);
 		}
 	}
-	return power_set_of_length;
+	return powerSetOfLength;
 }
 
 /**
@@ -389,24 +392,29 @@ String.prototype.replaceAt=function(idx, replacement) {
  * Returns combinations of the given array of the given size.
  * 
  * @param arr is the array to get combinations from
- * @param combination_size specifies the size of each combination
+ * @param combinationSize specifies the size of each combination
  */
-function getCombinations(arr, combination_size) {
-	var combinations = [];
+function getCombinations(arr, combinationSize) {
+	
+	// validate input
+	assertInitialized(arr);
+	assertInitialized(combinationSize);
+	assertTrue(combinationSize >= 1);
 	
 	// get combinations of array indices of the given size
-	var index_combinations = getPowerSetOfLength(getIndices(arr.length), combination_size);
+	let indexCombinations = getPowerSetOfLength(getIndices(arr.length), combinationSize);
 	
 	// collect combinations from each combination of array indices
-	for (var index_combinations_idx = 0; index_combinations_idx < index_combinations.length; index_combinations_idx++) {
+	let combinations = [];
+	for (let indexCombinationsIdx = 0; indexCombinationsIdx < indexCombinations.length; indexCombinationsIdx++) {
 		
 		// get combination of array indices
-		var index_combination = index_combinations[index_combinations_idx];
+		let indexCombination = indexCombinations[indexCombinationsIdx];
 		
 		// build combination from array
-		var combination = [];
-		for (var index_combination_idx = 0; index_combination_idx < index_combination.length; index_combination_idx++) {
-			combination.push(arr[index_combination_idx]);
+		let combination = [];
+		for (let indexCombinationIdx = 0; indexCombinationIdx < indexCombinations.length; indexCombinationIdx++) {
+			combination.push(arr[indexCombinationIdx]);
 		}
 		
 		// add to combinations

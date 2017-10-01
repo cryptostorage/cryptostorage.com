@@ -211,19 +211,9 @@ let CryptoUtils = {
 	 * @param keys are the keys to convert to pieces
 	 * @param numPieces are the number of pieces to split the keys into (must be >= 1)
 	 * @param minPieces are the minimum pieces to reconstitute the keys (optional)
-	 * @param config configures the transformation
 	 * @returns exportable pieces
 	 */
-	keysToPieces: function(keys, numPieces, minPieces, config) {
-		
-		// merge config with default
-		config = Object.assign({}, getDefaultConfig(), config);
-		function getDefaultConfig() {
-			return {
-				includePublic: true,
-				includePrivate: true
-			};
-		}
+	keysToPieces: function(keys, numPieces, minPieces) {
 		
 		// validate input
 		assertTrue(keys.length > 0);
@@ -244,15 +234,16 @@ let CryptoUtils = {
 		
 		// add keys to each piece
 		for (let key of keys) {
+			if (!key.getWif() && !key.getHex() && numPieces > 1) throw new Error("Cannot split piece without private key");
 			let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getWif()];
 			for (let i = 0; i < numPieces; i++) {
-				let account = {};
-				account.ticker = key.getPlugin().getTicker();
-				account.isSplit = numPieces > 1;
-				if (config.includePublic) account.address = key.getAddress();
-				if (config.includePrivate) account.wif = keyPieces[i];
-				account.encryption = key.getEncryptionScheme();
-				pieces[i].push(account);
+				let pieceKey = {};
+				pieceKey.ticker = key.getPlugin().getTicker();
+				pieceKey.isSplit = numPieces > 1;
+				pieceKey.address = key.getAddress();
+				pieceKey.wif = keyPieces[i];
+				pieceKey.encryption = key.getEncryptionScheme();
+				pieces[i].push(pieceKey);
 			}
 		}
 		
@@ -273,8 +264,12 @@ let CryptoUtils = {
 		if (pieces.length === 1) {
 			for (let pieceKey of pieces[0]) {
 				try {
-					let key = CryptoUtils.getCryptoPlugin(pieceKey.ticker).newKey(pieceKey.wif);	// TODO: bug right here, need to add test
-					if (key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);
+					let state = {};
+					state.address = pieceKey.address;
+					state.wif = pieceKey.wif;
+					state.encryption = pieceKey.encryption;
+					let key = new CryptoKey(CryptoUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
+					if (key.getHex() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// check that address derived from private keys
 					keys.push(key);
 				} catch (err) {
 					return [];

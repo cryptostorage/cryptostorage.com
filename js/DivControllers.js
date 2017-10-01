@@ -1567,9 +1567,21 @@ function SaveController(div, state) {
 		config.includePublic = getIncludePublic();
 		config.includePrivate = getIncludePrivate();
 		
+		// build keys based on config
+		let keys = [];
+		for (let key of state.keys) keys.push(key.copy());
+		for (let key of keys) {
+			let state = key.getState();
+			if (!config.includePublic) delete state.address;
+			if (!config.includePrivate) {
+				delete state.hex;
+				delete state.wif;
+			}
+		}
+		
 		// get pieces
 		let alreadyRendered = isInitialized(pieces) && isInitialized(pieceDivs);
-		pieces = pieces ? pieces : CryptoUtils.keysToPieces(state.keys, state.numPieces, state.minPieces, config);
+		pieces = pieces ? pieces : CryptoUtils.keysToPieces(keys, state.numPieces, state.minPieces);
 		
 		// set up piece divs and attach first to preview
 		if (!pieceDivs) {
