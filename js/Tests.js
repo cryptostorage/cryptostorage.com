@@ -453,10 +453,10 @@ let Tests = {
 					assertEquals(keys[i].getAddress(), piece[i].address);
 					assertEquals(keys[i].getEncryptionScheme(), piece[i].encryption);
 					if (numPieces > 1) {
-						assertTrue(piece[i].isSplit);
+						assertTrue(piece[i].split);
 						assertFalse(keys[i].getWif() === piece[i].wif);
 					} else {
-						assertFalse(piece[i].isSplit);
+						assertFalse(piece[i].split);
 						assertTrue(keys[i].getWif() === piece[i].wif);
 					}
 				}

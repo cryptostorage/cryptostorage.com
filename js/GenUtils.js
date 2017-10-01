@@ -25,6 +25,7 @@ function isUndefined(arg) {
  * @returns true if the given arg is initialized, false otherwise
  */
 function isInitialized(arg) {
+	if (arg === false) return true;
 	if (arg) return true;
 	return false;
 }

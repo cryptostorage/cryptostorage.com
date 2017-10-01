@@ -1,7 +1,5 @@
 // TODO
-// common apply config to keys code
 // config to exclude logos
-// cannot import pieces with missing private keys, add tests
 // faq page
 // donation page
 // todos throughout code
@@ -16,9 +14,8 @@
 // warning if live and/or online
 // switch to jquery-qrcode?
 // test on IE
-// backwards bitcoin cash logo
 // smaller html exports
-// note of how b64logos.js is created
+// note of how b64-images.js is created
 // how does jaxx generate zcash and bitcoin variations
 
 // peer review key formats

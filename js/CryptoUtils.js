@@ -269,10 +269,10 @@ let CryptoUtils = {
 			for (let i = 0; i < numPieces; i++) {
 				let pieceKey = {};
 				pieceKey.ticker = key.getPlugin().getTicker();
-				pieceKey.isSplit = numPieces > 1;
 				pieceKey.address = key.getAddress();
 				pieceKey.wif = keyPieces[i];
 				pieceKey.encryption = key.getEncryptionScheme();
+				pieceKey.split = numPieces > 1;
 				pieces[i].push(pieceKey);
 			}
 		}
@@ -321,14 +321,14 @@ let CryptoUtils = {
 			// validate consistent keys across pieces
 			for (let i = 0; i < pieces[0].length; i++) {
 				let crypto;
-				let isSplit;
+				let split;
 				let address;
 				let encryption;
 				for (let piece of pieces) {
 					if (!crypto) crypto = piece[i].ticker;
 					else if (crypto !== piece[i].ticker) throw new Error("Pieces are for different cryptocurrencies");
-					if (!isSplit) isSplit = piece[i].isSplit;
-					else if (isSplit !== piece[i].isSplit) throw new Error("Pieces have different split states");
+					if (!split) split = piece[i].split;
+					else if (split !== piece[i].split) throw new Error("Pieces have different split states");
 					if (!address) address = piece[i].address;
 					else if (address !== piece[i].address) throw new Error("Pieces have different addresses");
 					if (!encryption) encryption = piece[i].encryption;
@@ -471,15 +471,29 @@ let CryptoUtils = {
 	},
 
 	pieceToCsv: function(piece) {
+		assertTrue(piece.length > 1);
 		
-		// convert piece to 2D array
-		var arr = [];
-		for (var i = 0; i < piece.length; i++) {
-			arr.push([piece[i].address, piece[i].wif]);
+		// build csv header
+		let csvHeader = [];
+		for (let prop in piece[0]) {
+	    if (piece[0].hasOwnProperty(prop)) {
+	    	csvHeader.push(prop.toString().toUpperCase());
+	    }
 		}
 		
+		// build csv
+		let csvArr = [];
+		csvArr.push(csvHeader);
+		for (let pieceKey of piece) {
+			let csvPieceKey = [];
+			for (let prop in pieceKey) {
+				csvPieceKey.push(isInitialized(pieceKey[prop]) ? pieceKey[prop] : "");
+			}
+			csvArr.push(csvPieceKey);
+		}
+	
 		// convert array to csv
-		return arrToCsv(arr);
+		return arrToCsv(csvArr);
 	},
 
 	pieceToJson: function(piece) {
@@ -491,7 +505,7 @@ let CryptoUtils = {
 		for (let i = 0; i < piece.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
 			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n\n";
-			if (piece[i].wif) str += "Private Key" + (piece[i].isSplit ? " (split)" : (piece[i].encryption ? " (encrypted)" : "")) + ":\n" + piece[i].wif + "\n\n";
+			if (piece[i].wif) str += "Private Key " + (piece[i].split ? "(split)" : (piece[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece[i].wif + "\n\n";
 		}
 		return str.trim();
 	},
@@ -509,7 +523,7 @@ let CryptoUtils = {
 		assertTrue(piece.length > 0);
 		for (let key of piece) {
 			assertDefined(key.ticker, "piece.ticker is not defined");
-			assertDefined(key.isSplit, "piece.isSplit is not defined");
+			assertDefined(key.split, "piece.split is not defined");
 			//assertDefined(key.wif, "piece.wif is not defined");
 		}
 	}
