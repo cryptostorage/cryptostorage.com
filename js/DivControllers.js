@@ -1679,14 +1679,6 @@ function SaveController(div, state) {
 		});
 		includePrivateCheckbox.prop('checked', true);
 		
-		// render include currency logos
-		includeCurrencyLogosDiv = $("<div class='export_option'>").appendTo(div);
-		includeCurrencyLogosCheckbox = $("<input type='checkbox' id='includeCurrencyLogosCheckbox'>").appendTo(includeCurrencyLogosDiv);
-		let includeCurrencyLogosCheckboxLabel = $("<label for='includeCurrencyLogosCheckbox'>").appendTo(includeCurrencyLogosDiv);
-		includeCurrencyLogosCheckboxLabel.html(" Show currency logos in HTML export");
-		includeCurrencyLogosCheckbox.click(function() { updatePieces(); });
-		includeCurrencyLogosCheckbox.prop('checked', true);
-		
 		// render include crpytostorage logo
 		includeCryptostorageLogosDiv = $("<div class='export_option'>").appendTo(div);
 		includeCryptostorageLogosCheckbox = $("<input type='checkbox' id='includeCryptostorageLogosCheckbox'>").appendTo(includeCryptostorageLogosDiv);
@@ -1694,6 +1686,14 @@ function SaveController(div, state) {
 		includeCryptostorageLogosCheckboxLabel.html(" Show cryptostorage logos in HTML export");
 		includeCryptostorageLogosCheckbox.click(function() { updatePieces(); });
 		includeCryptostorageLogosCheckbox.prop('checked', true);
+		
+		// render include currency logos
+		includeCurrencyLogosDiv = $("<div class='export_option'>").appendTo(div);
+		includeCurrencyLogosCheckbox = $("<input type='checkbox' id='includeCurrencyLogosCheckbox'>").appendTo(includeCurrencyLogosDiv);
+		let includeCurrencyLogosCheckboxLabel = $("<label for='includeCurrencyLogosCheckbox'>").appendTo(includeCurrencyLogosDiv);
+		includeCurrencyLogosCheckboxLabel.html(" Show currency logos in HTML export");
+		includeCurrencyLogosCheckbox.click(function() { updatePieces(); });
+		includeCurrencyLogosCheckbox.prop('checked', true);
 	}
 	
 	function getConfig() {
@@ -1752,7 +1752,7 @@ inheritsFrom(CustomExportController, DivController);
 let PieceRenderer = {
 
 	defaultConfig: {
-		pairsPerPage: 6,
+		pairsPerPage: 7,
 		includePublic: true,
 		includePrivate: true,
 		includeCurrencyLogos: true,
@@ -1934,7 +1934,7 @@ let PieceRenderer = {
 				keyDivCurrency.css("margin-top", "-15px");
 			}
 			if (rightValue && rightValue.length > 150) {
-				keyDivCurrency.css("margin-top", "-10px");
+				keyDivCurrency.css("margin-top", "-12px");
 				keyDivRightLabel.css("margin-top", "-15px");
 			}
 			
