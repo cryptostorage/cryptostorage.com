@@ -1,6 +1,5 @@
 // TODO
 // horizontal scrolling bars on chrome and safari
-// buttons do not click withy any movement on chrome
 // 7 addresses per page, clip crypstorage logo
 // faq page
 // donation page
