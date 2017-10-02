@@ -71,7 +71,7 @@ $(document).ready(function() {
 		
 		// get data url of logo
 //		let plugin = CryptoUtils.getCryptoPlugin("BCH");
-//		console.log(imgToDataUrl($("<img src='img/question_mark.png'>").get(0)));
+//		console.log(imgToDataUrl($("<img src='img/cryptostorage.png'>").get(0)));
 //		function imgToDataUrl(img, format) {
 //			let canvas = document.createElement('canvas');
 //		    canvas.height = img.naturalHeight;
