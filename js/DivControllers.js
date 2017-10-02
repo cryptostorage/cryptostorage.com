@@ -1679,7 +1679,7 @@ function SaveController(div, state) {
 		});
 		includePrivateCheckbox.prop('checked', true);
 		
-		// render include crpytostorage logo
+		// render include cryptostorage logo
 		includeCryptostorageLogosDiv = $("<div class='export_option'>").appendTo(div);
 		includeCryptostorageLogosCheckbox = $("<input type='checkbox' id='includeCryptostorageLogosCheckbox'>").appendTo(includeCryptostorageLogosDiv);
 		let includeCryptostorageLogosCheckboxLabel = $("<label for='includeCryptostorageLogosCheckbox'>").appendTo(includeCryptostorageLogosDiv);
@@ -1752,7 +1752,7 @@ inheritsFrom(CustomExportController, DivController);
 let PieceRenderer = {
 
 	defaultConfig: {
-		pairsPerPage: 7,
+		pairsPerPage: 6,
 		includePublic: true,
 		includePrivate: true,
 		includeCurrencyLogos: true,

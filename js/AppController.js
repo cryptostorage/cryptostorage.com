@@ -1,4 +1,5 @@
 // TODO
+// scrolling and buttons sometimes not responding on chrome and safari
 // 7 addresses per page, clip crypstorage logo
 // faq page
 // donation page
