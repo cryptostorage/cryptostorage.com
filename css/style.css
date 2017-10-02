@@ -361,6 +361,12 @@ input[type='file'] {
 	width:125px;
 }
 
+.current_piece_div {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+}
+
 .question {
 	font-weight: bold;
 	font-size: 22px;

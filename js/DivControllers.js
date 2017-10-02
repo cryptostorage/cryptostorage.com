@@ -1560,7 +1560,7 @@ function SaveController(div, state) {
 		
 		// add preview header and current piece div
 		let previewHeader = $("<div class='preview_header'>").appendTo(previewDiv);
-		currentPieceDiv = $("<div>").appendTo(previewDiv);
+		currentPieceDiv = $("<div class='current_piece_div'>").appendTo(previewDiv);
 		
 		// get pieces
 		let alreadyRendered = isInitialized(pieces) && isInitialized(pieceDivs);
