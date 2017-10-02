@@ -382,3 +382,7 @@ input[type='file'] {
 ol {
 	padding-left:25px;
 }
+
+.piece_page_spacer {
+	height:40px;
+}

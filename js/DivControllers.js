@@ -1849,6 +1849,7 @@ let PieceRenderer = {
 			
 			// render new page
 			if (i % config.pairsPerPage === 0) {
+				if (i > 0) pieceDiv.append($("<div class='piece_page_spacer'>"));
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
 				if (config.includeCryptostorageLogos) {
 					let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
