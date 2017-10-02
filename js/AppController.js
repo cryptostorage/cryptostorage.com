@@ -111,7 +111,7 @@ function ApplicationController(div) {
 		// header
 		let headerDiv = $("<div class='header'>").appendTo(div);
 		let logoLink = $("<a href='index.html'>").appendTo(headerDiv);
-		$("<img width='500px' height='500px' src='img/cryptostorage.png'>").appendTo(logoLink);
+		$("<img class='header_logo' src='img/cryptostorage.png'>").appendTo(logoLink);
 		
 		// body
 		let bodyDiv = $("<div class='content'>").appendTo(div);

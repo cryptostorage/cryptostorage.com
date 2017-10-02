@@ -19,6 +19,10 @@ body {
 	justify-content:center;
 }
 
+.header_logo {
+	width:250px;
+}
+
 .content {
 	flex:1;
 	display:flex;
