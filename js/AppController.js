@@ -1,5 +1,5 @@
 // TODO
-// config to exclude logos
+// 7 addresses per page
 // faq page
 // donation page
 // todos throughout code
