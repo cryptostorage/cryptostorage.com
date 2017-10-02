@@ -1752,12 +1752,12 @@ inheritsFrom(CustomExportController, DivController);
 let PieceRenderer = {
 
 	defaultConfig: {
-		pairsPerPage: 6,
+		pairsPerPage: 7,
 		includePublic: true,
 		includePrivate: true,
 		includeCurrencyLogos: true,
 		includeCryptostorageLogos: true,
-		qrSize: 105,
+		qrSize: 90,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
 		qrScale: 4,
