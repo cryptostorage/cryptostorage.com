@@ -1,5 +1,5 @@
 // TODO
-// 7 addresses per page
+// 7 addresses per page, clip cs logo
 // faq page
 // donation page
 // todos throughout code
