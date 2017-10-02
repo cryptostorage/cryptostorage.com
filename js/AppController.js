@@ -1,6 +1,11 @@
 // TODO
+// new design
+// switch to jquery-qrcode
 // faq page
 // donation page
+// peer review key formats
+// pieces should be objects with versioning for future extension
+
 // todos throughout code
 // run minimum tests when site accessed
 // test alert if key creation fails for any reason
@@ -11,14 +16,10 @@
 // wording on front page / be consistent
 // condense files to single files as much as possible
 // warning if live and/or online
-// switch to jquery-qrcode?
 // test on IE
 // smaller html exports
 // note of how b64-images.js is created
 // how does jaxx generate zcash and bitcoin variations
-// pieces should be objects with versioning for future extension
-
-// peer review key formats
 
 // consult designers
 // icons of supported currencies on home page
@@ -43,7 +44,6 @@
 // horizontal scrolling bars on chrome and safari
 
 // low priority
-// keys -> addresses (an "address" is a public/private key pair in this terminology).
 // all div controllers directly modify state
 // html export is horizontally centered with @media print for actual print
 // timeouts in tests so browser doesn't lock
