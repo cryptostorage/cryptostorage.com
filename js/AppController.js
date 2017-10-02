@@ -1,5 +1,4 @@
 // TODO
-// horizontal scrolling bars on chrome and safari
 // 7 addresses per page, clip crypstorage logo
 // faq page
 // donation page
@@ -42,6 +41,7 @@
 // home button maintains state, doesn't start over
 // disable next if mix num keys change
 // Include -> Omit public addresses
+// horizontal scrolling bars on chrome and safari
 
 // low priority
 // keys -> addresses (an "address" is a public/private key pair in this terminology).
