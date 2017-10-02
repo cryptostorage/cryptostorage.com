@@ -1,5 +1,5 @@
 // TODO
-// 7 addresses per page, clip cs logo
+// 7 addresses per page, clip crypstorage logo
 // faq page
 // donation page
 // todos throughout code
