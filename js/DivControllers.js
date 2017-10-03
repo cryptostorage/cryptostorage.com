@@ -1950,7 +1950,7 @@ let PieceRenderer = {
 					addPrivateQr();
 				});
 			} else {
-				keyDivLeft.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>")); // TODO: replace with b64
+				keyDivLeft.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>"));
 				addPrivateQr();
 			}
 			function addPrivateQr() {
@@ -1961,7 +1961,7 @@ let PieceRenderer = {
 						onDone();
 					});
 				} else {
-					keyDivRight.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>")); // TODO: replace with b64
+					keyDivRight.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>"));
 					onDone();
 				}
 			}
