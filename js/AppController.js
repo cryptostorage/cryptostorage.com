@@ -1,6 +1,6 @@
 // TODO
-// new design
 // switch to jquery-qrcode
+// new design
 // faq page
 // donation page
 // peer review key formats
