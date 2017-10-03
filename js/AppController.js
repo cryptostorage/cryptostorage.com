@@ -280,7 +280,7 @@ function ApplicationController(div) {
 		state.keys = keys;
 		state.pieces = pieces;
 		state.pieceDivs = pieceDivs;
-		if (keys[0].wif && keys[0].isEncrypted()) pageController.next(new DecryptKeysController($("<div>"), state, onKeysImported));
+		if (keys[0].getWif() && keys[0].isEncrypted()) pageController.next(new DecryptKeysController($("<div>"), state, onKeysImported));
 		else {
 			pageController.next(new SaveController($("<div>"), state));
 		}
