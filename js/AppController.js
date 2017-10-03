@@ -1,5 +1,4 @@
 // TODO
-// switch to jquery-qrcode
 // new design
 // faq page
 // donation page
