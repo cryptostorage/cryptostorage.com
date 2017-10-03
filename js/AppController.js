@@ -2,8 +2,10 @@
 // new design
 // faq page
 // donation page
+// label keys with pieces e.g. #1.3, #2.3, #3.3
 // peer review key formats
 
+// use @media to dynamically space piece pages
 // todos throughout code
 // run minimum tests when site accessed
 // test alert if key creation fails for any reason
