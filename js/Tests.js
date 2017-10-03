@@ -449,24 +449,24 @@ let Tests = {
 			// test each share in each piece
 			for (let piece of pieces) {
 				for (let i = 0; i < keys.length; i++) {
-					assertEquals(keys[i].getPlugin().getTicker(), piece[i].ticker);
-					assertEquals(keys[i].getAddress(), piece[i].address);
-					assertEquals(keys[i].getEncryptionScheme(), piece[i].encryption);
+					assertEquals(keys[i].getPlugin().getTicker(), piece.keys[i].ticker);
+					assertEquals(keys[i].getAddress(), piece.keys[i].address);
+					assertEquals(keys[i].getEncryptionScheme(), piece.keys[i].encryption);
 					if (numPieces > 1) {
-						assertTrue(piece[i].split);
-						assertFalse(keys[i].getWif() === piece[i].wif);
+						assertTrue(piece.keys[i].split);
+						assertFalse(keys[i].getWif() === piece.keys[i].wif);
 					} else {
-						assertFalse(piece[i].split);
-						assertTrue(keys[i].getWif() === piece[i].wif);
+						assertFalse(piece.keys[i].split);
+						assertTrue(keys[i].getWif() === piece.keys[i].wif);
 					}
 				}
 			}
 			
 			// verify secrets is initialized with 7 bits
 			if (numPieces > 1) {
-				for (let share of pieces[0]) {
-					if (!share.encryption && share.ticker === 'BTC') {
-						assertTrue(share.wif.startsWith("3X"));
+				for (let pieceKey of pieces[0].keys) {
+					if (!pieceKey.encryption && pieceKey.ticker === 'BTC') {
+						assertTrue(pieceKey.wif.startsWith("3X"));
 					}
 				}
 			}

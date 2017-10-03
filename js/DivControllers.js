@@ -1403,7 +1403,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 		
 		// collect cryptos being imported
 		let cryptos = new Set();
-		for (let account of pieces[0]) cryptos.add(account.ticker);
+		for (let pieceKey of pieces[0].keys) cryptos.add(pieceKey.ticker);
 		
 		// collect dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
@@ -1845,7 +1845,7 @@ let PieceRenderer = {
 		// setup pages and collect functions to render keys
 		let pageDiv;
 		let funcs = [];
-		for (let i = 0; i < piece.length; i++) {
+		for (let i = 0; i < piece.keys.length; i++) {
 			
 			// render new page
 			if (i % config.pairsPerPage === 0) {
@@ -1860,14 +1860,14 @@ let PieceRenderer = {
 			// collect functions to render key pair
 			let keyDiv = $("<div class='key_div'>").appendTo(pageDiv);
 			if (i % config.pairsPerPage === 0) keyDiv.css("border-top", "2px solid green");
-			let plugin = CryptoUtils.getCryptoPlugin(piece[i].ticker);
+			let plugin = CryptoUtils.getCryptoPlugin(piece.keys[i].ticker);
 			let title = "#" + (i + 1);
 			let leftLabel = "\u25C4 Public Address";
-			let leftValue = config.includePublic ? piece[i].address : null;
-			let logo = $("<img width=100% height=100% src='" + getImageData(piece[i].ticker) + "'>");
+			let leftValue = config.includePublic ? piece.keys[i].address : null;
+			let logo = $("<img width=100% height=100% src='" + getImageData(piece.keys[i].ticker) + "'>");
 			let logoLabel = plugin.getName();
-			let rightLabel = "Private Key" + (piece[i].split ? " (split)" : piece[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
-			let rightValue = config.includePrivate ? piece[i].wif : null;
+			let rightLabel = "Private Key" + (piece.keys[i].split ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
+			let rightValue = config.includePrivate ? piece.keys[i].wif : null;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config,
 				function() {
 					onKeyPairDone();
@@ -1882,7 +1882,7 @@ let PieceRenderer = {
 		let notifyFrequency = .005;	// notifies every .5% progress
 		function onKeyPairDone() {
 			keyPairsDone++;
-			let progress = keyPairsDone / piece.length;
+			let progress = keyPairsDone / piece.keys.length;
 			if (progress === 1 || progress - lastProgress >= notifyFrequency) {
 				lastProgress = progress;
 				onProgress(progress);

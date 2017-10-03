@@ -259,7 +259,10 @@ let CryptoUtils = {
 		// initialize pieces
 		let pieces = [];
 		for (let i = 0; i < numPieces; i++) {
-			pieces.push([]);
+			let piece = {};
+			piece.version = "1.0";
+			piece.keys = [];
+			pieces.push(piece);
 		}
 		
 		// add keys to each piece
@@ -273,7 +276,7 @@ let CryptoUtils = {
 				pieceKey.wif = keyPieces[i];
 				pieceKey.encryption = key.getEncryptionScheme();
 				pieceKey.split = numPieces > 1;
-				pieces[i].push(pieceKey);
+				pieces[i].keys.push(pieceKey);
 			}
 		}
 		
@@ -292,7 +295,7 @@ let CryptoUtils = {
 		
 		// handle one piece
 		if (pieces.length === 1) {
-			for (let pieceKey of pieces[0]) {
+			for (let pieceKey of pieces[0].keys) {
 				try {
 					let state = {};
 					state.address = pieceKey.address;
@@ -314,35 +317,35 @@ let CryptoUtils = {
 			let numKeys;
 			for (let i = 0; i < pieces.length; i++) {
 				let piece = pieces[i];
-				if (!numKeys) numKeys = piece.length;
-				else if (numKeys !== piece.length) throw new Error("Pieces contain different number of keys");
+				if (!numKeys) numKeys = piece.keys.length;
+				else if (numKeys !== piece.keys.length) throw new Error("Pieces contain different number of keys");
 			}
 			
 			// validate consistent keys across pieces
-			for (let i = 0; i < pieces[0].length; i++) {
+			for (let i = 0; i < pieces[0].keys.length; i++) {
 				let crypto;
 				let split;
 				let address;
 				let encryption;
 				for (let piece of pieces) {
-					if (!crypto) crypto = piece[i].ticker;
-					else if (crypto !== piece[i].ticker) throw new Error("Pieces are for different cryptocurrencies");
-					if (!split) split = piece[i].split;
-					else if (split !== piece[i].split) throw new Error("Pieces have different split states");
-					if (!address) address = piece[i].address;
-					else if (address !== piece[i].address) throw new Error("Pieces have different addresses");
-					if (!encryption) encryption = piece[i].encryption;
-					else if (encryption !== piece[i].encryption) throw new Error("Pieces have different encryption states");
+					if (!crypto) crypto = piece.keys[i].ticker;
+					else if (crypto !== piece.keys[i].ticker) throw new Error("Pieces are for different cryptocurrencies");
+					if (!split) split = piece.keys[i].split;
+					else if (split !== piece.keys[i].split) throw new Error("Pieces have different split states");
+					if (!address) address = piece.keys[i].address;
+					else if (address !== piece.keys[i].address) throw new Error("Pieces have different addresses");
+					if (!encryption) encryption = piece.keys[i].encryption;
+					else if (encryption !== piece.keys[i].encryption) throw new Error("Pieces have different encryption states");
 				}
 			}
 			
 			// combine keys across pieces
-			for (let i = 0; i < pieces[0].length; i++) {
+			for (let i = 0; i < pieces[0].keys.length; i++) {
 				let shares = [];
-				for (let piece of pieces) shares.push(piece[i].wif);
+				for (let piece of pieces) shares.push(piece.keys[i].wif);
 				try {
-					let key = CryptoUtils.getCryptoPlugin(pieces[0][i].ticker).combine(shares);
-					if (key.isEncrypted() && pieces[0][i].address) key.setAddress(pieces[0][i].address);
+					let key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
+					if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
 					keys.push(key);
 				} catch (err) {
 					return [];
@@ -365,8 +368,8 @@ let CryptoUtils = {
 		
 		// get crypto identifier
 		let tickers = [];
-		for (let key of pieces[0]) {
-			if (!contains(tickers, key.ticker)) tickers.push(key.ticker);
+		for (let pieceKey of pieces[0].keys) {
+			if (!contains(tickers, pieceKey.ticker)) tickers.push(pieceKey.ticker);
 		}
 		let crypto = tickers.length === 1 ? tickers[0].toLowerCase() : "mix";
 		
@@ -471,12 +474,12 @@ let CryptoUtils = {
 	},
 
 	pieceToCsv: function(piece) {
-		assertTrue(piece.length > 0);
+		assertTrue(piece.keys.length > 0);
 		
 		// build csv header
 		let csvHeader = [];
-		for (let prop in piece[0]) {
-	    if (piece[0].hasOwnProperty(prop)) {
+		for (let prop in piece.keys[0]) {
+	    if (piece.keys[0].hasOwnProperty(prop)) {
 	    	csvHeader.push(prop.toString().toUpperCase());
 	    }
 		}
@@ -484,12 +487,12 @@ let CryptoUtils = {
 		// build csv
 		let csvArr = [];
 		csvArr.push(csvHeader);
-		for (let pieceKey of piece) {
-			let csvPieceKey = [];
-			for (let prop in pieceKey) {
-				csvPieceKey.push(isInitialized(pieceKey[prop]) ? pieceKey[prop] : "");
+		for (let key of piece.keys) {
+			let csvKey = [];
+			for (let prop in key) {
+				csvKey.push(isInitialized(key[prop]) ? key[prop] : "");
 			}
-			csvArr.push(csvPieceKey);
+			csvArr.push(csvKey);
 		}
 	
 		// convert array to csv
@@ -502,26 +505,26 @@ let CryptoUtils = {
 
 	pieceToStr: function(piece) {
 		let str = "";
-		for (let i = 0; i < piece.length; i++) {
-			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
-			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n\n";
-			if (piece[i].wif) str += "Private Key " + (piece[i].split ? "(split)" : (piece[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece[i].wif + "\n\n";
+		for (let i = 0; i < piece.keys.length; i++) {
+			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
+			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n\n";
+			if (piece.keys[i].wif) str += "Private Key " + (piece.keys[i].split ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
 		}
 		return str.trim();
 	},
 	
 	pieceToAddresses: function(piece) {
 		let str = "";
-		for (let i = 0; i < piece.length; i++) {
-			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece[i].ticker).getName() + " =====\n\n";
-			if (piece[i].address) str += "Public Address:\n" + piece[i].address + "\n" + piece[i].address + "\n\n";
+		for (let i = 0; i < piece.keys.length; i++) {
+			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
+			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n" + piece.keys[i].address + "\n\n";
 		}
 		return str.trim();
 	},
 
 	validatePiece: function(piece) {
-		assertTrue(piece.length > 0);
-		for (let key of piece) {
+		assertTrue(piece.keys.length > 0);
+		for (let key of piece.keys) {
 			assertDefined(key.ticker, "piece.ticker is not defined");
 			assertDefined(key.split, "piece.split is not defined");
 			//assertDefined(key.wif, "piece.wif is not defined");
