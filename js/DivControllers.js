@@ -1468,7 +1468,7 @@ function SaveController(div, state) {
 	assertTrue(state.keys.length > 0);
 	
 	// config elements
-	let includePublicCheckbox;
+	let hidePublicCheckbox;
 	
 	// save links
 	let printLink;
@@ -1656,69 +1656,69 @@ function SaveController(div, state) {
 		div.attr("class", "export_options_div");
 		
 		// render include public addresses checkbox
-		includePublicDiv = $("<div class='export_option'>").appendTo(div);
-		includePublicCheckbox = $("<input type='checkbox' id='includePublicCheckbox'>").appendTo(includePublicDiv);
-		let includePublicCheckboxLabel = $("<label for='includePublicCheckbox'>").appendTo(includePublicDiv);
-		includePublicCheckboxLabel.html(" Show public addresses in HTML export");
-		includePublicCheckbox.click(function() {
-			if (getIncludePublic()) includePrivateCheckbox.removeAttr("disabled");
-			else includePrivateCheckbox.attr("disabled", "disabled");
+		hidePublicDiv = $("<div class='export_option'>").appendTo(div);
+		hidePublicCheckbox = $("<input type='checkbox' id='hidePublicCheckbox'>").appendTo(hidePublicDiv);
+		let hidePublicCheckboxLabel = $("<label for='hidePublicCheckbox'>").appendTo(hidePublicDiv);
+		hidePublicCheckboxLabel.html(" Hide public addresses in HTML export");
+		hidePublicCheckbox.click(function() {
+			if (getHidePublic()) hidePrivateCheckbox.attr("disabled", "disabled");
+			else hidePrivateCheckbox.removeAttr("disabled");
 			updatePieces();
 		});
-		includePublicCheckbox.prop('checked', true);
+		hidePublicCheckbox.prop('checked', false);
 		
 		// render include private key checkbox
-		includePrivateDiv = $("<div class='export_option'>").appendTo(div);
-		includePrivateCheckbox = $("<input type='checkbox' id='includePrivateCheckbox'>").appendTo(includePrivateDiv);
-		let includePrivateCheckboxLabel = $("<label for='includePrivateCheckbox'>").appendTo(includePrivateDiv);
-		includePrivateCheckboxLabel.html(" Show private keys in HTML export");
-		includePrivateCheckbox.click(function() {
-			if (getIncludePrivate()) includePublicCheckbox.removeAttr("disabled");
-			else includePublicCheckbox.attr("disabled", "disabled");
+		hidePrivateDiv = $("<div class='export_option'>").appendTo(div);
+		hidePrivateCheckbox = $("<input type='checkbox' id='hidePrivateCheckbox'>").appendTo(hidePrivateDiv);
+		let hidePrivateCheckboxLabel = $("<label for='hidePrivateCheckbox'>").appendTo(hidePrivateDiv);
+		hidePrivateCheckboxLabel.html(" Hide private keys in HTML export");
+		hidePrivateCheckbox.click(function() {
+			if (getHidePrivate()) hidePublicCheckbox.attr("disabled", "disabled");
+			else hidePublicCheckbox.removeAttr("disabled");
 			updatePieces();
 		});
-		includePrivateCheckbox.prop('checked', true);
+		hidePrivateCheckbox.prop('checked', false);
 		
 		// render include cryptostorage logo
-		includeCryptostorageLogosDiv = $("<div class='export_option'>").appendTo(div);
-		includeCryptostorageLogosCheckbox = $("<input type='checkbox' id='includeCryptostorageLogosCheckbox'>").appendTo(includeCryptostorageLogosDiv);
-		let includeCryptostorageLogosCheckboxLabel = $("<label for='includeCryptostorageLogosCheckbox'>").appendTo(includeCryptostorageLogosDiv);
-		includeCryptostorageLogosCheckboxLabel.html(" Show cryptostorage logos in HTML export");
-		includeCryptostorageLogosCheckbox.click(function() { updatePieces(); });
-		includeCryptostorageLogosCheckbox.prop('checked', true);
+		hideCryptostorageLogosDiv = $("<div class='export_option'>").appendTo(div);
+		hideCryptostorageLogosCheckbox = $("<input type='checkbox' id='hideCryptostorageLogosCheckbox'>").appendTo(hideCryptostorageLogosDiv);
+		let hideCryptostorageLogosCheckboxLabel = $("<label for='hideCryptostorageLogosCheckbox'>").appendTo(hideCryptostorageLogosDiv);
+		hideCryptostorageLogosCheckboxLabel.html(" Hide cryptostorage logos in HTML export");
+		hideCryptostorageLogosCheckbox.click(function() { updatePieces(); });
+		hideCryptostorageLogosCheckbox.prop('checked', false);
 		
 		// render include currency logos
-		includeCurrencyLogosDiv = $("<div class='export_option'>").appendTo(div);
-		includeCurrencyLogosCheckbox = $("<input type='checkbox' id='includeCurrencyLogosCheckbox'>").appendTo(includeCurrencyLogosDiv);
-		let includeCurrencyLogosCheckboxLabel = $("<label for='includeCurrencyLogosCheckbox'>").appendTo(includeCurrencyLogosDiv);
-		includeCurrencyLogosCheckboxLabel.html(" Show currency logos in HTML export");
-		includeCurrencyLogosCheckbox.click(function() { updatePieces(); });
-		includeCurrencyLogosCheckbox.prop('checked', true);
+		hideCurrencyLogosDiv = $("<div class='export_option'>").appendTo(div);
+		hideCurrencyLogosCheckbox = $("<input type='checkbox' id='hideCurrencyLogosCheckbox'>").appendTo(hideCurrencyLogosDiv);
+		let hideCurrencyLogosCheckboxLabel = $("<label for='hideCurrencyLogosCheckbox'>").appendTo(hideCurrencyLogosDiv);
+		hideCurrencyLogosCheckboxLabel.html(" Hide currency logos in HTML export");
+		hideCurrencyLogosCheckbox.click(function() { updatePieces(); });
+		hideCurrencyLogosCheckbox.prop('checked', false);
 	}
 	
 	function getConfig() {
 		let config = {};
-		config.includePublic = getIncludePublic();
-		config.includePrivate = getIncludePrivate();
-		config.includeCurrencyLogos = getIncludeCurrencyLogos();
-		config.includeCryptostorageLogos = getIncludeCryptostorageLogos();
+		config.hidePublic = getHidePublic();
+		config.hidePrivate = getHidePrivate();
+		config.hideCryptostorageLogos = getHideCryptostorageLogos();
+		config.hideCurrencyLogos = getHideCurrencyLogos();
 		return config;
 	}
 	
-	function getIncludePublic() {
-		return includePublicCheckbox.prop('checked');
+	function getHidePublic() {
+		return hidePublicCheckbox.prop('checked');
 	}
 	
-	function getIncludePrivate() {
-		return includePrivateCheckbox.prop('checked');
+	function getHidePrivate() {
+		return hidePrivateCheckbox.prop('checked');
 	}
 	
-	function getIncludeCurrencyLogos() {
-		return includeCurrencyLogosCheckbox.prop('checked');
+	function getHideCurrencyLogos() {
+		return hideCurrencyLogosCheckbox.prop('checked');
 	}
 	
-	function getIncludeCryptostorageLogos() {
-		return includeCryptostorageLogosCheckbox.prop('checked');
+	function getHideCryptostorageLogos() {
+		return hideCryptostorageLogosCheckbox.prop('checked');
 	}
 }
 inheritsFrom(SaveController, DivController);
@@ -1753,10 +1753,10 @@ let PieceRenderer = {
 
 	defaultConfig: {
 		pairsPerPage: 7,
-		includePublic: true,
-		includePrivate: true,
-		includeCurrencyLogos: true,
-		includeCryptostorageLogos: true,
+		hidePublic: false,
+		hidePrivate: false,
+		hideCurrencyLogos: false,
+		hideCryptostorageLogos: false,
 		qrSize: 90,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
@@ -1851,7 +1851,7 @@ let PieceRenderer = {
 			if (i % config.pairsPerPage === 0) {
 				if (i > 0) pieceDiv.append($("<div class='piece_page_spacer'>"));
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
-				if (config.includeCryptostorageLogos) {
+				if (!config.hideCryptostorageLogos) {
 					let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					logoDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("cryptostorage") + "'>"));
 				}
@@ -1863,11 +1863,11 @@ let PieceRenderer = {
 			let plugin = CryptoUtils.getCryptoPlugin(piece.keys[i].ticker);
 			let title = "#" + (i + 1);
 			let leftLabel = "\u25C4 Public Address";
-			let leftValue = config.includePublic ? piece.keys[i].address : null;
+			let leftValue = config.hidePublic ? null : piece.keys[i].address;
 			let logo = $("<img width=100% height=100% src='" + getImageData(piece.keys[i].ticker) + "'>");
 			let logoLabel = plugin.getName();
 			let rightLabel = "Private Key" + (piece.keys[i].split ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
-			let rightValue = config.includePrivate ? piece.keys[i].wif : null;
+			let rightValue = config.hidePrivate ? null : piece.keys[i].wif;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config,
 				function() {
 					onKeyPairDone();
@@ -1916,7 +1916,7 @@ let PieceRenderer = {
 			
 			// center currency
 			let keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
-			if (config.includeCurrencyLogos) {
+			if (!config.hideCurrencyLogos) {
 				let keyDivCurrencyLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
 				keyDivCurrencyLogo.append(logo);
 			}
