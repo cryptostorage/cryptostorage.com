@@ -4,7 +4,6 @@
 // faq page
 // donation page
 // peer review key formats
-// pieces should be objects with versioning for future extension
 
 // todos throughout code
 // run minimum tests when site accessed
