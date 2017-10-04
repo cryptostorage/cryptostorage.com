@@ -18,6 +18,7 @@ body {
 	display:flex;
 	align-items:center;
 	justify-content:center;
+	z-index:1;
 }
 
 .app_header_logo {
@@ -44,7 +45,6 @@ body {
 .nav_div {
 	margin-top:-75px;
 	position:absolute;
-	z-index:1;
 	flex:1;
 	padding:10x;
 	height:80px;
