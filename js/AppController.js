@@ -20,6 +20,7 @@
 // smaller html exports
 // note of how b64-images.js is created
 // how does jaxx generate zcash and bitcoin variations
+// warning to discard storage
 
 // consult designers
 // icons of supported currencies on home page
@@ -33,7 +34,7 @@
 // make it clearer what to do next on save page
 // less wasted space
 // navigation bar showing overall place in flow
-// warnings to test before using.
+// warnings to test before using
 // register shortcut keys for page navigation (enter, y, n)
 // focus on first text element if applicable
 // solve issue where next page may take time to load, but previous page is done
