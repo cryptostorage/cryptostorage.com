@@ -1,5 +1,5 @@
 // TODO
-// polish: disable arrow transparent, piece selector misplaced when cs logo hidden, coin logos throughout pages
+// polish: disable arrow transparent, piece selector misplaced when cs logo hidden, coin logos throughout pages, min page height
 // new design
 // faq page
 // donation page
