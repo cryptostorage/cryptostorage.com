@@ -28,7 +28,7 @@ body {
 .app_content {
 	flex:1;
 	position:relative;
-	width:800px;
+	width:900px;
 }
 
 .footer {
@@ -95,6 +95,7 @@ body {
 }
 
 .page {
+	min-height:600px;
 	text-align:left;
 	border:none;
 	font-size: 19px;
