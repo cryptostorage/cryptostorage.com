@@ -21,27 +21,25 @@ let UiUtils = {
 	getNextButton: function(label, icon) {
 		return this.getButton(label, true, icon);
 	},
-
-	pageSetup: function(div) {
+	
+	initPage: function(div, title, icon) {
+		
+		// set up div
 		div.empty();
 		div.attr("class", "page");
-	},
-	
-	getPageHeader: function(title, icon) {
-		var headerDiv = $("<div>");
-		headerDiv.attr("class", "page_header_div");
 		
-		var contentDiv = $("<div>").appendTo(headerDiv);
-		contentDiv.attr("class", "page_header_content_div");
+		// set up header
+		let headerDiv = $("<div class='page_header_div'>");
+		let contentDiv = $("<div class='page_header_content_div'>").appendTo(headerDiv);
 		if (icon) {
-			var iconDiv = $("<div>").appendTo(contentDiv);
+			let iconDiv = $("<div>").appendTo(contentDiv);
 			iconDiv.attr("class", "page_header_icon_div");
 			icon.attr("class", "page_header_icon");
 			iconDiv.append(icon);
 		}
 		contentDiv.append(title);
 		
-		return headerDiv;
+		div.append(headerDiv);
 	},
 
 	getCryptoName: function(state) {
@@ -379,10 +377,7 @@ inheritsFrom(MainController, DivController);
 function PageControllerHome(div, onSelectCreate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
-
-		// render title
-		div.append(UiUtils.getPageHeader("Welcome to cryptostorage.com."));
+		UiUtils.initPage(div, "Welcome to cryptostorage.com");
 		
 		div.append(getCheckmarkDiv("Generate public/private keys for multiple cryptocurrencies."));
 		div.append(getCheckmarkDiv("Private keys can be password protected and split into pieces."));
@@ -431,11 +426,10 @@ inheritsFrom(PageControllerHome, DivController);
 function PageControllerSelectCrypto(div, state, onCryptoSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		if (state.mix) div.append(UiUtils.getPageHeader("Select currencies to generate keys for."));
-		else div.append(UiUtils.getPageHeader("Select a currency to import."));
+		// page setup
+		let title = state.mix ? "Select currencies to generate keys for." : "Select a currency to import.";
+		UiUtils.initPage(div, title);
 		
 		// render mix and match button if creating new storage
 		if (state.mix) {
@@ -473,10 +467,9 @@ function PageControllerNumKeysMix(div, state, onMixNumKeysInput) {
 	let numKeysInputs;
 	
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		div.append(UiUtils.getPageHeader("Enter the number of keys to generate for each currency.", UiUtils.getMixLogo()));
+		// page setup
+		UiUtils.initPage(div, "Enter the number of keys to generate.");
 		
 		// render num key inputs
 		numKeysInputs = [];
@@ -579,11 +572,9 @@ function PageControllerNumKeysSingle(div, state, onNumKeysInput) {
 	var errorDiv = $("<div>");
 	
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		let plugin = state.mix[0].plugin;
-		div.append(UiUtils.getPageHeader("Enter the number of keys to create.", plugin.getLogo()));
+		// page setup
+		UiUtils.initPage(div, "Enter the number of keys to create.");
 		
 		// num key keys input
 		let numKeysInput = $("<input>");
@@ -639,10 +630,9 @@ inheritsFrom(PageControllerNumKeysSingle, DivController);
 function PageControllerPasswordSelection(div, state, onPasswordSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		div.append(UiUtils.getPageHeader("Do you want to password protect your private keys?", UiUtils.getCryptoLogo(state)));
+		// page setup
+		UiUtils.initPage(div, "Do you want to password protect your private keys?");
 		
 		var btnYes = UiUtils.getNextButton("Yes (recommended)");
 		btnYes.click(function() { onPasswordSelection(true); });
@@ -670,10 +660,9 @@ function PageControllerPasswordInput(div, state, onPasswordInput) {
 	let advancedOpen;
 	
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
-
-		// render title
-		div.append(UiUtils.getPageHeader("Enter a password to protect your private keys.", UiUtils.getCryptoLogo(state)));
+		
+		// page setup
+		UiUtils.initPage(div, "Enter a password to protect your private keys.");
 		
 		div.append("The password must be at least 6 characters long.");
 		div.append("<br><br>");
@@ -817,10 +806,9 @@ inheritsFrom(PageControllerPasswordInput, DivController);
 function PageControllerSplitSelection(div, state, onSplitSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		div.append(UiUtils.getPageHeader("Do you want to split your private keys into separate pieces?", UiUtils.getCryptoLogo(state)));
+		// page setup
+		UiUtils.initPage(div, "Do you want to split your private keys into separate pieces?");
 		
 		div.append("The pieces must be recombined to recover the private keys.");
 		div.append("<br><br>");
@@ -844,10 +832,9 @@ function PageControllerSplitInput(div, state, onPiecesInput) {
 	var errorDiv = $("<div>");
 
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
-
-		// render title
-		div.append(UiUtils.getPageHeader("How many pieces do you want to split your private keys into?", UiUtils.getCryptoLogo(state)));
+		
+		// page setup
+		UiUtils.initPage(div, "How many pieces do you want to split your private keys into?");
 		
 		div.append("Number of pieces: ");
 		var numPiecesInput = $("<input type='number'>");
@@ -921,12 +908,9 @@ function PageControllerGenerateKeys(div, state, onKeysGenerated) {
 	let progressBar;
 	
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		let name = UiUtils.getCryptoName(state);
-		let header = "Ready to generate your keys?";		
-		div.append(UiUtils.getPageHeader(header, UiUtils.getCryptoLogo(state)));
+		// page setup
+		UiUtils.initPage(div, "Ready to generate your keys?");
 		
 		// render summary
 		div.append("<b>Summary:</b><br><br>");
@@ -1162,10 +1146,9 @@ function PageControllerImportText(div, state, onKeysImported) {
 	let textarea;
 	
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		div.append(UiUtils.getPageHeader("Enter " + state.plugin.getName() + " private key or pieces:", state.plugin.getLogo()));
+		// page setup
+		UiUtils.initPage(div, "Enter " + state.plugin.getName() + " private key or pieces:", state.plugin.getLogo());
 		
 		// render error div
 		errorDiv.empty();
@@ -1233,13 +1216,12 @@ function PageControllerDecryptKeys(div, state, onKeysDecrypted) {
 	let progressBar;
 	
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
 		
-		// render title
+		// page setup
 		let name = UiUtils.getCryptoName(state);
 		name = name === "mixed" ? " " : " " + name + " ";
 		var title = "Imported " + keys.length + name + " keys which are password protected.  Enter the password to decrypt them.";
-		div.append(UiUtils.getPageHeader(title, UiUtils.getCryptoLogo(state)));
+		UiUtils.initPage(div, title, UiUtils.getCryptoLogo(state));
 		
 		// add error div
 		div.append(errorDiv);
@@ -1384,10 +1366,9 @@ function PageControllerImportFiles(div, onKeysImported, onSelectImportText) {
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		div.append(UiUtils.getPageHeader("Import zip or json files created from this site."));
+		// page setup
+		UiUtils.initPage(div, "Import zip or json files created from this site.");
 		
 		// add error div
 		div.append(errorDiv);
@@ -1579,7 +1560,12 @@ function PageControllerExport(div, state) {
 	 * Main render function.
 	 */
 	this.render = function(onDone) {
-		UiUtils.pageSetup(div);
+		
+		// page setup
+		let name = UiUtils.getCryptoName(state);
+		name = name === "mixed" ? "" : name;
+		let header = state.mix ? "Your keys are ready to save." : "Your keys have been imported.";
+		UiUtils.initPage(div, header, UiUtils.getCryptoLogo(state));
 		
 		// center page contents
 		div.attr("style", "display:flex; flex-direction:column; align-items:center;");
@@ -1587,12 +1573,6 @@ function PageControllerExport(div, state) {
 		// put page contents in container to share width
 		let container = $("<div class='save_container'>").appendTo(div);
 		div = container;
-		
-		// add title
-		let name = UiUtils.getCryptoName(state);
-		name = name === "mixed" ? "" : name;
-		let header = state.mix ? "Your keys are ready to save." : "Your keys have been imported.";
-		div.append(UiUtils.getPageHeader(header, UiUtils.getCryptoLogo(state)));
 		
 		// add save header
 		let exportHeader = $("<div class='export_header'>").appendTo(div);
@@ -1819,38 +1799,14 @@ function PageControllerExport(div, state) {
 inheritsFrom(PageControllerExport, DivController);
 
 /**
- * Controls the custom export page.
- * 
- * @param div is the div to render to
- * @param state is the current state of the application
- * @param pieces are the pieces to custom export
- */
-function CustomExportController(div, state, pieces) {
-	DivController.call(this, div);
-	assertTrue(pieces.length > 0);
-	
-	this.render = function(callback) {
-		UiUtils.pageSetup(div);
-		
-		// render mock png
-		let mock = $("<img src='img/mock_export.png'>").appendTo(div);
-		mock.css("width", "100%");
-		
-		callback(div);
-	}
-}
-inheritsFrom(CustomExportController, DivController);
-
-/**
  * FAQ page.
  */
 function PageControllerFaq(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		div.append(UiUtils.getPageHeader("FAQ"));
+		// page setup
+		UiUtils.initPage(div, "FAQ");
 		
 		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(div);
 		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(div);
@@ -1877,12 +1833,9 @@ inheritsFrom(PageControllerFaq, DivController);
 function PageControllerDonate(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
-		UiUtils.pageSetup(div);
 		
-		// render title
-		div.append(UiUtils.getPageHeader("Donate"));
-		
-		$("<div class='question'>").html("*heart*");
+		// page setup
+		UiUtils.initPage(div, "Donate");
 		
 		// done rendering
 		if (onDone) onDone(div);
