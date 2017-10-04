@@ -194,12 +194,35 @@ function MainController(mainDiv, appController) {
 	let that = this;
 	let pathTracker = new PathTracker(onPageChange);
 	let transitioning = false;
+	let leftArrowDiv;									// container for left arrow
+	let leftArrow;										// left navigation arrow
+	let leftArrowDisabled;								// left navigation arrow when navigation disabled
+	let rightArrowDiv;									// container for right arrow
+	let rightArrow;										// right navigation arrow
+	let rightArrowDisabled;								// right navigation arrow when navigation disabled
 	
 	// --------------------------------- PUBLIC ---------------------------------
 	
 	this.render = function(onDone) {
+		
+		// initialize state
 		initState();
-		set(new PageControllerHome($("<div>"), appController, onSelectCreate, onSelectImport), onDone);	// start at home page
+		
+		// add navigation bar
+		let navDiv = $("<div class='nav_div'>").appendTo(mainDiv);
+		leftArrowDiv = $("<div class='left_arrow_div'>").appendTo(navDiv);
+		leftArrowDiv.hide();
+		leftArrow = $("<img class='nav_arrow left_arrow' src='img/closed_arrow.png'>").appendTo(leftArrowDiv);
+		leftArrow.click(function() { pathTracker.prev(); });
+		leftArrowDisabled = $("<img class='nav_arrow_disabled left_arrow' src='img/closed_arrow_grey.png'>");
+		rightArrowDiv = $("<div class='right_arrow_div'>").appendTo(navDiv);
+		rightArrowDiv.hide();
+		rightArrow = $("<img class='nav_arrow right_arrow' src='img/closed_arrow.png'>").appendTo(rightArrowDiv);
+		rightArrow.click(function() { pathTracker.next(); });
+		rightArrowDisabled = $("<img class='nav_arrow_disabled right_arrow' src='img/closed_arrow_grey.png'>");
+		
+		// start at home page
+		set(new PageControllerHome($("<div>"), appController, onSelectCreate, onSelectImport), onDone);
 	}
 	
 	this.clearNexts = function() {
@@ -208,6 +231,12 @@ function MainController(mainDiv, appController) {
 	
 	this.setNavigable = function(navigable) {
 		if (DEBUG) console.log("setNavigable(" + navigable + ")");
+		leftArrow.detach();
+		leftArrowDisabled.detach();
+		rightArrow.detach();
+		rightArrowDisabled.detach();
+		leftArrowDiv.append(navigable ? leftArrow : leftArrowDisabled);
+		rightArrowDiv.append(navigable ? rightArrow : rightArrowDisabled);
 	}
 	
 	this.getState = function() {
@@ -288,8 +317,10 @@ function MainController(mainDiv, appController) {
 			}
 		}
 		
-//		// update arrows	
-//		that.setNavigable(true);
+		// update arrows	
+		pathTracker.hasPrev() ? leftArrowDiv.show() : leftArrowDiv.hide();
+		pathTracker.hasNext() ? rightArrowDiv.show() : rightArrowDiv.hide();
+		that.setNavigable(true);
 	}
 
 	// ------------------------------ CREATE NEW --------------------------------
