@@ -122,8 +122,8 @@ function ApplicationController(div) {
 		// initialize controllers
 		mainController = new MainController($("<div class='main_container'>"));
 		faqController = new PageControllerFaq($("<div>"));
-		faqController.render();
 		donateController = new PageControllerDonate($("<div>"));
+		faqController.render();
 		donateController.render();
 		
 		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
