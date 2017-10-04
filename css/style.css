@@ -42,11 +42,11 @@ body {
 }
 
 .nav_div {
-	margin-top:-90px;
+	margin-top:-75px;
 	position:absolute;
 	z-index:1;
 	flex:1;
-	padding:25px;
+	padding:10x;
 	height:80px;
 	display:flex;
 	align-items:center;
