@@ -159,6 +159,8 @@ DivController.prototype.onHide = function() { }
 function MainController(mainDiv) {
 	DivController.call(this, mainDiv);
 	
+	const TRANSITION_DURATION = 250;	// time to transition pages
+	
 	let state;	// main application state
 	let that = this;
 	let pathTracker = new PathTracker(onPageChange);
@@ -237,14 +239,14 @@ function MainController(mainDiv) {
 			
 			// animate next
 			if (lastIdx < curIdx) {
-				lastDiv.toggle("slide", {direction: "left"}, 250);
-				curDiv.toggle("slide", {direction: "right", complete:function() { transitioning = false; renderer.onShow(); }}, 250);
+				lastDiv.toggle("slide", {direction: "left"}, TRANSITION_DURATION);
+				curDiv.toggle("slide", {direction: "right", complete:function() { transitioning = false; renderer.onShow(); }}, TRANSITION_DURATION);
 			}
 			
 			// animate previous
 			else {
-				lastDiv.toggle("slide", {direction: "right"}, 250);
-				curDiv.toggle("slide", {direction: "left", complete:function() { transitioning = false; renderer.onShow(); }}, 250);
+				lastDiv.toggle("slide", {direction: "right"}, TRANSITION_DURATION);
+				curDiv.toggle("slide", {direction: "left", complete:function() { transitioning = false; renderer.onShow(); }}, TRANSITION_DURATION);
 			}
 		}
 		
