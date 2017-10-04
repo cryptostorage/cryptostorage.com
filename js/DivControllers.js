@@ -245,54 +245,54 @@ function MainController(mainDiv) {
 		if (DEBUG) console.log("onSelectCreate()");
 		initState();
 		state.mix = [];	// fill out mix to create as we go
-		pageController.next(new PageControllerSelectCrypto($("<div>"), state, onSelectCryptoCreate));
+		next(new PageControllerSelectCrypto($("<div>"), state, onSelectCryptoCreate));
 	}
 	
 	function onSelectCryptoCreate(selection) {
 		if (DEBUG) console.log("onSelectCrypto(" + selection + ")");
 		if (selection === "MIX") {
-			pageController.next(new PageControllerNumKeysMix($("<div>"), state, onMixNumKeysInput))
+			next(new PageControllerNumKeysMix($("<div>"), state, onMixNumKeysInput))
 		} else {
 			state.mix = [{plugin: CryptoUtils.getCryptoPlugin(selection)}];
-			pageController.next(new PageControllerNumKeysSingle($("<div>"), state, onNumKeysInput));
+			next(new PageControllerNumKeysSingle($("<div>"), state, onNumKeysInput));
 		}
 	}
 	
 	function onMixNumKeysInput() {
 		if (DEBUG) console.log("onMixNumKeysInput()");
-		pageController.next(new PageControllerPasswordSelection($("<div>"), state, onPasswordSelection))
+		next(new PageControllerPasswordSelection($("<div>"), state, onPasswordSelection))
 	}
 	
 	function onNumKeysInput(numKeys) {
 		if (DEBUG) console.log("onNumKeysInput(" + numKeys + ")");
 		assertInt(numKeys);
 		state.mix[0].numKeys = numKeys;
-		pageController.next(new PageControllerPasswordSelection($("<div>"), state, onPasswordSelection))
+		next(new PageControllerPasswordSelection($("<div>"), state, onPasswordSelection))
 	}
 	
 	function onPasswordSelection(passwordEnabled) {
 		if (DEBUG) console.log("onPasswordSelection(" + passwordEnabled + ")");
 		state.passwordEnabled = passwordEnabled;
-		if (passwordEnabled) pageController.next(new PageControllerPasswordInput($("<div>"), state, onPasswordInput));
+		if (passwordEnabled) next(new PageControllerPasswordInput($("<div>"), state, onPasswordInput));
 		else {
 			for (let elem of state.mix) elem.encryption = null;
-			pageController.next(new PageControllerSplitSelection($("<div>"), state, onSplitSelection));
+			next(new PageControllerSplitSelection($("<div>"), state, onSplitSelection));
 		}
 	}
 	
 	function onPasswordInput() {
 		if (DEBUG) console.log("onPasswordInput()");
-		pageController.next(new PageControllerSplitSelection($("<div>"), state, onSplitSelection));
+		next(new PageControllerSplitSelection($("<div>"), state, onSplitSelection));
 	}
 	
 	function onSplitSelection(splitEnabled) {
 		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
 		state.splitEnabled = splitEnabled;
-		if (splitEnabled) pageController.next(new PageControllerSplitInput($("<div>"), state, onSplitInput));
+		if (splitEnabled) next(new PageControllerSplitInput($("<div>"), state, onSplitInput));
 		else {
 			state.numPieces = 1;
 			delete state.minPieces;
-			pageController.next(new PageControllerGenerateKeys($("<div>"), state, onKeysGenerated));
+			next(new PageControllerGenerateKeys($("<div>"), state, onKeysGenerated));
 		}
 	}
 	
@@ -302,7 +302,7 @@ function MainController(mainDiv) {
 		assertInt(minPieces);
 		state.numPieces = numPieces;
 		state.minPieces = minPieces;
-		pageController.next(new PageControllerGenerateKeys($("<div>"), state, onKeysGenerated));
+		next(new PageControllerGenerateKeys($("<div>"), state, onKeysGenerated));
 	}
 	
 	function onKeysGenerated(keys, pieces, pieceDivs) {
@@ -312,7 +312,7 @@ function MainController(mainDiv) {
 		state.keys = keys;
 		state.pieces = pieces;
 		state.pieceDivs = pieceDivs;
-		pageController.next(new PageControllerExport($("<div>"), state));
+		next(new PageControllerExport($("<div>"), state));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------
@@ -320,13 +320,13 @@ function MainController(mainDiv) {
 	function onSelectImport() {
 		if (DEBUG) console.log("onSelectImport()");
 		initState();
-		pageController.next(new PageControllerImportFiles($("<div>"), onKeysImported, onSelectImportText));
+		next(new PageControllerImportFiles($("<div>"), onKeysImported, onSelectImportText));
 	}
 	
 	function onSelectImportText() {
 		if (DEBUG) console.log("onSelectImportText()");
 		delete state.pieceDivs;
-		pageController.next(new PageControllerSelectCrypto($("<div>"), state, onSelectCryptoImport));
+		next(new PageControllerSelectCrypto($("<div>"), state, onSelectCryptoImport));
 	}
 	
 	function onSelectCryptoImport(tickerSymbol) {
@@ -335,7 +335,7 @@ function MainController(mainDiv) {
 			if (plugin.getTicker() === tickerSymbol) state.plugin = plugin;
 		}
 		if (!state.plugin) throw new Error("plugin not found with ticker symbol: " + tickerSymbol);
-		pageController.next(new PageControllerImportText($("<div>"), state, onKeysImported));
+		next(new PageControllerImportText($("<div>"), state, onKeysImported));
 	}
 	
 	function onKeysImported(keys, pieces, pieceDivs) {
@@ -344,9 +344,9 @@ function MainController(mainDiv) {
 		state.keys = keys;
 		state.pieces = pieces;
 		state.pieceDivs = pieceDivs;
-		if (keys[0].getWif() && keys[0].isEncrypted()) pageController.next(new PageControllerDecryptKeys($("<div>"), state, onKeysImported));
+		if (keys[0].getWif() && keys[0].isEncrypted()) next(new PageControllerDecryptKeys($("<div>"), state, onKeysImported));
 		else {
-			pageController.next(new PageControllerExport($("<div>"), state));
+			next(new PageControllerExport($("<div>"), state));
 		}
 	}
 }
