@@ -149,92 +149,51 @@ function DivController(div) {
 	this.div = div;
 }
 DivController.prototype.getDiv = function() { return this.div; }
-DivController.prototype.render = function(callback) { }	// callback called with rendered div
+DivController.prototype.render = function(onDone) { }	// callback called with rendered div
 DivController.prototype.onShow = function() { }
 DivController.prototype.onHide = function() { }
 
 /**
- * Controls page navigation and rendering.
- * 
- * @param div is the div to render navigable pages to
+ * Main application flow to generate and import keys.
  */
-function PageController(div) {
+function MainController(mainDiv) {
+	DivController.call(this, mainDiv);
 	
+	let state;	// main application state
 	let that = this;
-	let pathTracker = new PathTracker(onPageChange);	// track path through decision tree
-	let pageDiv;										// container to render page content
-	let transitioning = false;							// indicates if transition in progress to prevent duplicates
-	let leftArrowDiv;									// container for left arrow
-	let leftArrow;										// left navigation arrow
-	let leftArrowDisabled;								// left navigation arrow when navigation disabled
-	let rightArrowDiv;									// container for right arrow
-	let rightArrow;										// right navigation arrow
-	let rightArrowDisabled;								// right navigation arrow when navigation disabled
+	let pathTracker = new PathTracker(onPageChange);
+	let transitioning = false;
 	
-	this.render = function(callback) {
-		
-		// swipe div
-		let scrollDiv = $("<div class='swipe_div'>").appendTo(div);
-		
-		// left arrow
-		let leftDiv = $("<div class='side_div'>").appendTo(scrollDiv);
-		leftArrowDiv = $("<div>").appendTo(leftDiv);
-		leftArrowDiv.hide();
-		leftArrow = $("<img class='nav_arrow left_arrow' src='img/closed_arrow.png'>").appendTo(leftArrowDiv);
-		leftArrow.click(function() { pathTracker.prev(); });
-		leftArrowDisabled = $("<img class='nav_arrow_disabled left_arrow' src='img/closed_arrow_grey.png'>");
-		
-		// page div
-		pageDiv = $("<div class='page_div'>").appendTo(scrollDiv);
-		
-		// right arrow
-		let rightDiv = $("<div class='side_div'>").appendTo(scrollDiv);
-		rightArrowDiv = $("<div>").appendTo(rightDiv);
-		rightArrowDiv.hide();
-		rightArrow = $("<img class='nav_arrow right_arrow' src='img/closed_arrow.png'>").appendTo(rightArrowDiv);
-		rightArrow.click(function() { pathTracker.next(); });
-		rightArrowDisabled = $("<img class='nav_arrow_disabled right_arrow' src='img/closed_arrow_grey.png'>");
-		
-		// done rendering
-		callback();
+	this.render = function(onDone) {
+		initState();
+		set(new PageControllerHome($("<div>"), onSelectCreate, onSelectImport), onDone);	// start at home page
 	}
 	
-	this.set = function(renderer) {
+	function initState() {
+		state = {};
+		state.plugins = CryptoUtils.getCryptoPlugins();
+		state.mainController = this;
+	}
+	
+	function set(renderer, onDone) {
 		transitioning = false;
 		renderer.render(function(div) {
 			for (let renderer of pathTracker.getItems()) renderer.getDiv().remove();
 			pathTracker.clear();
 			pathTracker.next(renderer);
+			if (onDone) onDone();
 		});
-		leftArrowDiv.hide();
-		rightArrowDiv.hide();
 	}
 	
-	this.next = function(renderer) {
+	function next(renderer, onDone) {
 		if (transitioning) return;	// cannot add page if transitioning
 		transitioning = true;
 		renderer.render(function(div) {
 			let toRemoves = pathTracker.getNexts();
 			pathTracker.next(renderer);
 			for (let toRemove of toRemoves) toRemove.getDiv().remove();
+			if (onDone) onDone();
 		});
-	};
-	
-	this.clearNexts = function() {
-		pathTracker.clearNexts();
-	}
-	
-	this.getPathTracker = function() {
-		return pathTracker;
-	}
-	
-	this.setNavigable = function(enabled) {
-		leftArrow.detach();
-		leftArrowDisabled.detach();
-		rightArrow.detach();
-		rightArrowDisabled.detach();
-		leftArrowDiv.append(enabled ? leftArrow : leftArrowDisabled);
-		rightArrowDiv.append(enabled ? rightArrow : rightArrowDisabled);
 	}
 	
 	/**
@@ -249,71 +208,35 @@ function PageController(div) {
 		// handle first page
 		if (lastIdx === -1) {
 			transitioning = false;
-			pageDiv.append(renderer.getDiv());
+			mainDiv.append(renderer.getDiv());
 		}
 		
 		// handle non-first page change
-		else if (lastIdx !== curIdx){
-			renderer.getDiv().hide();
-			pageDiv.append(renderer.getDiv());
+		else if (lastIdx !== curIdx) {
 			
-			// swipe right
+			// get last and soon-to-be current div
+			let lastDiv = pathTracker.getItems()[lastIdx].getDiv();
+			let curDiv = pathTracker.getItems()[curIdx].getDiv();
+			
+			// set up page to be rendered
+			curDiv.hide();
+			mainDiv.append(curDiv);
+			
+			// animate next
 			if (lastIdx < curIdx) {
-				pathTracker.getItems()[lastIdx].getDiv().toggle("slide", {direction: "left"}, 250);
-				pathTracker.getItems()[curIdx].getDiv().toggle("slide", {direction: "right", complete:function() { transitioning = false; renderer.onShow(); }}, 250);
+				lastDiv.toggle("slide", {direction: "left"}, 250);
+				curDiv.toggle("slide", {direction: "right", complete:function() { transitioning = false; renderer.onShow(); }}, 250);
 			}
 			
-			// swipe left
+			// animate previous
 			else {
-				pathTracker.getItems()[lastIdx].getDiv().toggle("slide", {direction: "right"}, 250);
-				pathTracker.getItems()[curIdx].getDiv().toggle("slide", {direction: "left", complete:function() { transitioning = false; renderer.onShow(); }}, 250);
+				lastDiv.toggle("slide", {direction: "right"}, 250);
+				curDiv.toggle("slide", {direction: "left", complete:function() { transitioning = false; renderer.onShow(); }}, 250);
 			}
 		}
 		
-		// update arrows	
-		pathTracker.hasPrev() ? leftArrowDiv.show() : leftArrowDiv.hide();
-		pathTracker.hasNext() ? rightArrowDiv.show() : rightArrowDiv.hide();
-		that.setNavigable(true);
-	}
-}
-inheritsFrom(PageController, DivController);
-
-/**
- * Main application to generate and import keys.
- */
-function HomeController(div) {
-	
-	let state;
-	let pageController;
-	let that = this;
-	
-	this.render = function() {
-		
-		pageController.set(new PageControllerHome($("<div>"), onSelectCreate, onSelectImport));
-
-		
-		initState();
-	}
-	
-	this.showHome = function() {
-		if (DEBUG) console.log("showHome()");
-		pageController.set(new PageControllerHome($("<div>"), onSelectCreate, onSelectImport));
-	}
-	
-	this.showFaq = function() {
-		if (DEBUG) console.log("showFaq()");
-		pageController.set(new PageControllerFaq($("<div>")));
-	}
-	
-	this.showDonate = function() {
-		if (DEBUG) console.log("showDonate()");
-		pageController.set(new PageControllerDonate($("<div>")));
-	}
-	
-	function initState() {
-		state = {};
-		state.pageController = pageController;
-		state.plugins = CryptoUtils.getCryptoPlugins();
+//		// update arrows	
+//		that.setNavigable(true);
 	}
 
 	// ------------------------------ CREATE NEW --------------------------------
@@ -427,7 +350,7 @@ function HomeController(div) {
 		}
 	}
 }
-inheritsFrom(HomeController, DivController);
+inheritsFrom(MainController, DivController);
 
 /**
  * Render home page.

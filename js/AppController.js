@@ -104,7 +104,8 @@ $(document).ready(function() {
 function ApplicationController(div) {
 	
 	let that = this;
-	let homeController;
+	let contentDiv;
+	let mainController;
 	let faqController;
 	let donateController;
 	
@@ -116,10 +117,10 @@ function ApplicationController(div) {
 		$("<img class='header_logo' src='img/cryptostorage.png'>").appendTo(logoLink);
 		
 		// main content
-		let contentDiv = $("<div class='content'>").appendTo(div);
+		contentDiv = $("<div class='content'>").appendTo(div);
 		
 		// initialize controllers
-		homeController = new HomeController($("<div>"));
+		mainController = new MainController($("<div>"));
 		faqController = new PageControllerFaq($("<div>"));
 		donateController = new PageControllerDonate($("<div>"));
 		
@@ -127,7 +128,7 @@ function ApplicationController(div) {
 		setTimeout(function() {
 			
 			// render body and start on home
-			homeController.render(function() {
+			mainController.render(function() {
 				
 				// get identifier
 				let href = window.location.href;
@@ -145,7 +146,7 @@ function ApplicationController(div) {
 	this.showHome = function() {
 		if (DEBUG) console.log("showHome()");
 		contentDiv.empty();
-		contentDiv.append(homeController.getDiv());
+		contentDiv.append(mainController.getDiv());
 	}
 	
 	this.showFaq = function() {
