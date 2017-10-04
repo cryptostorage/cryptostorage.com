@@ -1187,13 +1187,10 @@ inheritsFrom(PageControllerGenerateKeys, DivController);
 
 /**
  * Render page to import private components from text.
- * 
- * @param div is the div to render to
- * @param plugin is the crypto plugin for key generation
- * @param onKeysImported(key) is invoked with the imported key
  */
-function PageControllerImportText(div, state, onKeysImported) {
+function PageControllerImportText(div, appController, onKeysImported) {
 	DivController.call(this, div);
+	let state = appController.getMainState();
 	let errorDiv = $("<div>");
 	let lastInputs = [];
 	let textarea;
@@ -1201,7 +1198,7 @@ function PageControllerImportText(div, state, onKeysImported) {
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, "Enter " + state.plugin.getName() + " private key or pieces:", state.plugin.getLogo());
+		let page = new Page(div, appController, "Enter " + state.plugin.getName() + " private key or pieces:", state.plugin.getLogo());
 		let contentDiv = page.getContentDiv();
 		
 		// render error contentDiv
