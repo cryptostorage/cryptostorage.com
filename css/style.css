@@ -12,7 +12,7 @@ body {
 	overflow-y:scroll;
 }
 
-.header {
+.app_header {
 	height:100px;
 	flex:none;
 	display:flex;
@@ -20,11 +20,11 @@ body {
 	justify-content:center;
 }
 
-.header_logo {
+.app_header_logo {
 	width:350px;
 }
 
-.content {
+.app_content {
 	flex:1;
 	position:relative;
 	width:800px;

@@ -112,12 +112,12 @@ function ApplicationController(div) {
 	this.render = function() {
 		
 		// header
-		let headerDiv = $("<div class='header'>").appendTo(div);
+		let headerDiv = $("<div class='app_header'>").appendTo(div);
 		let logoLink = $("<a href='index.html'>").appendTo(headerDiv);
-		$("<img class='header_logo' src='img/cryptostorage.png'>").appendTo(logoLink);
+		$("<img class='app_header_logo' src='img/cryptostorage.png'>").appendTo(logoLink);
 		
 		// main content
-		contentDiv = $("<div class='content'>").appendTo(div);
+		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
 		mainController = new MainController($("<div class='main_container'>"));
