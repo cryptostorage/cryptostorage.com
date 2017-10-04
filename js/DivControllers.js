@@ -127,7 +127,7 @@ function Page(div, appController, title, icon) {
 	assertInitialized(div, "Page div must be initialized");
 	assertInitialized(title, "Page title must be initialized");
 	
-	// page div
+	// page container setup
 	div.empty();
 	div.attr("class", "page_container");
 	
@@ -273,8 +273,8 @@ function MainController(mainDiv, appController) {
 			if (lastIdx < curIdx) {
 				lastDiv.css("opacity", 1);
 				curDiv.css("opacity", 0);
-				lastDiv.animate({left:'-10%', opacity:0}, TRANSITION_DURATION, function() { lastDiv.hide(); });
-				curDiv.animate({left:'10%'}, 0, function() { curDiv.show(); });
+				lastDiv.animate({left:'-15%', opacity:0}, TRANSITION_DURATION, function() { lastDiv.hide(); });
+				curDiv.animate({left:'15%'}, 0, function() { curDiv.show(); });
 				curDiv.animate({left:'0px', opacity:1}, TRANSITION_DURATION, function() { transitioning = false; renderer.onShow(); });
 			}
 			
@@ -282,8 +282,8 @@ function MainController(mainDiv, appController) {
 			else {
 				lastDiv.css("opacity", 1);
 				curDiv.css("opacity", 0);
-				lastDiv.animate({left:'10%', opacity:0}, TRANSITION_DURATION, function() { lastDiv.hide(); });
-				curDiv.animate({left:'-10%'}, 0, function() { curDiv.show(); });
+				lastDiv.animate({left:'15%', opacity:0}, TRANSITION_DURATION, function() { lastDiv.hide(); });
+				curDiv.animate({left:'-15%'}, 0, function() { curDiv.show(); });
 				curDiv.animate({left:'0px', opacity:1}, TRANSITION_DURATION, function() { transitioning = false; renderer.onShow(); });
 			}
 		}
