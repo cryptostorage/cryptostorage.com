@@ -544,8 +544,8 @@ function PageControllerNumKeysMix(div, appController, onMixNumKeysInput) {
 		// render num key inputs
 		numKeysInputs = [];
 		for (let plugin of state.plugins) {
-			let numKeysDiv = $("<contentDiv class='crypto_num_keys_div'>").appendTo(contentDiv);
-			let numKeysLogoDiv = $("<contentDiv class='crypto_icon_div'>").appendTo(numKeysDiv);
+			let numKeysDiv = $("<div class='crypto_num_keys_div'>").appendTo(contentDiv);
+			let numKeysLogoDiv = $("<div class='crypto_icon_div'>").appendTo(numKeysDiv);
 			let logo = plugin.getLogo().appendTo(numKeysLogoDiv);
 			logo.attr("class", "crypto_icon");
 			numKeysDiv.append(plugin.getName());
@@ -759,7 +759,7 @@ function PageControllerPasswordInput(div, appController, onPasswordInput) {
 		passwordInput.keypress(function() { state.mainController.clearNexts(); });
 		
 		// render advanced link
-		let advancedLink = $("<contentDiv class='mock_link'>").appendTo(contentDiv);
+		let advancedLink = $("<div class='mock_link'>").appendTo(contentDiv);
 		advancedLink.click(function() { toggleAdvanced(); });
 		function toggleAdvanced() {
 			advancedOpen = !advancedOpen;
@@ -768,13 +768,13 @@ function PageControllerPasswordInput(div, appController, onPasswordInput) {
 		}
 		
 		// render each encryption selection contentDiv
-		let advancedDiv = $("<contentDiv>").appendTo(contentDiv);
+		let advancedDiv = $("<div>").appendTo(contentDiv);
 		let options = false;
 		let encryptionSelectors = [];
 		for (let elem of state.mix) {
 			if (elem.plugin.getEncryptionSchemes().length > 1) {
 				options = true;
-				let encryptionSelector = new EncryptionSelector(elem.plugin, $("<contentDiv>"));
+				let encryptionSelector = new EncryptionSelector(elem.plugin, $("<div>"));
 				encryptionSelectors.push(encryptionSelector);
 				advancedDiv.append(encryptionSelector.getDiv());
 			} else {
@@ -1022,7 +1022,7 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 		contentDiv.append(btnGenerate);
 		
 		// add progress bar
-		progressDiv = $("<contentDiv>").appendTo(contentDiv);
+		progressDiv = $("<div>").appendTo(contentDiv);
 		progressDiv.hide();
 		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
 		
@@ -1341,7 +1341,7 @@ function PageControllerDecryptKeys(div, appController, onKeysDecrypted) {
 		});
 		
 		// add progress bar
-		progressDiv = $("<contentDiv>").appendTo(contentDiv);
+		progressDiv = $("<div>").appendTo(contentDiv);
 		progressDiv.hide();
 		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
 		
@@ -1659,17 +1659,17 @@ function PageControllerExport(div, appController) {
 		contentDiv.attr("style", "display:flex; flex-direction:column; align-items:center;");
 		
 		// put page contents in container to share width
-		let container = $("<contentDiv class='save_container'>").appendTo(contentDiv);
+		let container = $("<div class='save_container'>").appendTo(contentDiv);
 		contentDiv = container;
 		
 		// add save header
-		let exportHeader = $("<contentDiv class='export_header'>").appendTo(contentDiv);
-		let exportHeaderLeft = $("<contentDiv class='export_header_left'>").appendTo(exportHeader);
-		let exportHeaderRight = $("<contentDiv class='export_header_right'>").appendTo(exportHeader);
+		let exportHeader = $("<div class='export_header'>").appendTo(contentDiv);
+		let exportHeaderLeft = $("<div class='export_header_left'>").appendTo(exportHeader);
+		let exportHeaderRight = $("<div class='export_header_right'>").appendTo(exportHeader);
 		
 		// add config link (closed by default)
-		let configLink = $("<contentDiv class='mock_link'>").appendTo(exportHeaderLeft);
-		let configDiv = $("<contentDiv>").appendTo(contentDiv);
+		let configLink = $("<div class='mock_link'>").appendTo(exportHeaderLeft);
+		let configDiv = $("<div>").appendTo(contentDiv);
 		let configOpen = true;
 		toggleConfig();
 		configLink.click(function() { toggleConfig(); });
@@ -1689,7 +1689,7 @@ function PageControllerExport(div, appController) {
 		
 		// add preview contentDiv
 		contentDiv.append("<br>");
-		previewDiv = $("<contentDiv class='preview_div'>").appendTo(contentDiv);
+		previewDiv = $("<div class='preview_div'>").appendTo(contentDiv);
 		updatePieces(state.pieces, state.pieceDivs, function(err) {
 			if (err) throw err;
 		});
