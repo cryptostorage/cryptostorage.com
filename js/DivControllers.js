@@ -21,26 +21,6 @@ let UiUtils = {
 	getNextButton: function(label, icon) {
 		return this.getButton(label, true, icon);
 	},
-	
-	initPage: function(div, title, icon) {
-		
-		// set up div
-		div.empty();
-		div.attr("class", "page");
-		
-		// set up header
-		let headerDiv = $("<div class='page_header_div'>");
-		let contentDiv = $("<div class='page_header_content_div'>").appendTo(headerDiv);
-		if (icon) {
-			let iconDiv = $("<div>").appendTo(contentDiv);
-			iconDiv.attr("class", "page_header_icon_div");
-			icon.attr("class", "page_header_icon");
-			iconDiv.append(icon);
-		}
-		contentDiv.append(title);
-		
-		div.append(headerDiv);
-	},
 
 	getCryptoName: function(state) {
 		if (state.mix) return state.mix.length > 1 ? "mixed" : state.mix[0].plugin.getName();
@@ -99,16 +79,10 @@ let UiUtils = {
 				}
 			}
 		});
-	}
-}
-
-/**
- * Relative weights of key creation and encryption/decryption operations.
- * 
- * Derived from experimentation and used for representative progress bar.
- */
-let Weights = {
-
+	},
+	
+	// --- relative weights of key generation derived from experimentation and used for representative progress bar ---
+	
 	getCreateKeyWeight: function() { return 63; },
 	
 	getEncryptWeight: function(scheme) {
@@ -137,6 +111,47 @@ let Weights = {
 	
 	getLogoWeight: function() {
 		return 15;
+	}
+}
+
+/**
+ * Encapsulates the creation of a page.
+ * 
+ * @param div is the div to render the page to
+ * @param title is the title of the page
+ * @param icon is the icon of the page (optional)
+ */
+function Page(div, title, icon) {
+	assertInitialized(div, "Page must have a div to render to");
+	assertInitialized(title, "Page must have a title");
+	
+	// page div
+	div.empty();
+	div.attr("class", "page_container");
+	
+	let pageDiv = $("<div class='page'>").appendTo(div);
+	
+	// page header div
+	let headerDiv = $("<div class='page_header_div'>").appendTo(pageDiv);
+	
+	// page header icon and title
+	let headerTitleDiv = $("<div class='page_header_title_div'>").appendTo(headerDiv);
+	if (icon) {
+		let iconDiv = $("<div class='page_header_icon_div'>").appendTo(headerTitleDiv);
+		icon.attr("class", "page_header_icon");
+		iconDiv.append(icon);
+	}
+	headerTitleDiv.append(title);
+	
+	// page content
+	let contentDiv = $("<div>").appendTo(pageDiv);
+	
+	// footer
+	let footerDiv = $("<div class='footer'>").appendTo(div);
+	footerDiv.html("Hello.  This is the footer.");
+	
+	this.getContentDiv = function() {
+		return contentDiv;
 	}
 }
 
@@ -377,34 +392,35 @@ inheritsFrom(MainController, DivController);
 function PageControllerHome(div, onSelectCreate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		UiUtils.initPage(div, "Welcome to cryptostorage.com");
+		let page = new Page(div, "Welcome to cryptostorage.com");
 		
-		div.append(getCheckmarkDiv("Generate public/private keys for multiple cryptocurrencies."));
-		div.append(getCheckmarkDiv("Private keys can be password protected and split into pieces."));
-		div.append(getCheckmarkDiv("Export to digital and printable formats which can be easily recovered."));
-		div.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
-		div.append("<br>");
+		let contentDiv = page.getContentDiv();
+		contentDiv.append(getCheckmarkDiv("Generate public/private keys for multiple cryptocurrencies."));
+		contentDiv.append(getCheckmarkDiv("Private keys can be password protected and split into pieces."));
+		contentDiv.append(getCheckmarkDiv("Export to digital and printable formats which can be easily recovered."));
+		contentDiv.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
+		contentDiv.append("<br>");
 		
-		div.append("Select an option to get started.")
-		div.append("<br><br>");
+		contentDiv.append("Select an option to get started.")
+		contentDiv.append("<br><br>");
 		
 		// render create button
 		if (window.crypto) {
-			let btnCreate = UiUtils.getNextButton("Generate new keys").appendTo(div);
+			let btnCreate = UiUtils.getNextButton("Generate new keys").appendTo(contentDiv);
 			btnCreate.click(function() { onSelectCreate(); });
 		} else {
-			let btnCreate = UiUtils.getNextButton("Generate new keys (your browser does not support window.crypto)").appendTo(div);
+			let btnCreate = UiUtils.getNextButton("Generate new keys (your browser does not support window.crypto)").appendTo(contentDiv);
 			btnCreate.attr("disabled", "disabled");
 		}
 		
 		// render import button
 		let btnExisting = UiUtils.getNextButton("Import existing keys");
 		btnExisting.click(function() { onSelectImport(); });
-		div.append(btnExisting);
+		contentDiv.append(btnExisting);
 		
 //		// render create crypto-cash button
 //		var btnCreateCash = UiUtils.getNextButton("Create crypto-cash (coming soon)");
-//		div.append(btnCreateCash);
+//		contentDiv.append(btnCreateCash);
 		
 		// done rendering
 		callback(div);
@@ -429,17 +445,18 @@ function PageControllerSelectCrypto(div, state, onCryptoSelection) {
 		
 		// page setup
 		let title = state.mix ? "Select currencies to generate keys for." : "Select a currency to import.";
-		UiUtils.initPage(div, title);
+		let page = new Page(div, title);
+		let contentDiv = page.getContentDiv();
 		
 		// render mix and match button if creating new storage
 		if (state.mix) {
-			let btn = UiUtils.getNextButton("Select multiple currencies", UiUtils.getMixLogo()).appendTo(div);
+			let btn = UiUtils.getNextButton("Select multiple currencies", UiUtils.getMixLogo()).appendTo(contentDiv);
 			btn.click(function() { onCryptoSelection("MIX"); });
 		}
 		
 		// render crypto buttons
 		for (let plugin of state.plugins) {
-			let btn = UiUtils.getNextButton(plugin.getName(), plugin.getLogo()).appendTo(div);
+			let btn = UiUtils.getNextButton(plugin.getName(), plugin.getLogo()).appendTo(contentDiv);
 			btn.click(function() {
 				
 				// start loading dependencies but don't wait
@@ -469,13 +486,14 @@ function PageControllerNumKeysMix(div, state, onMixNumKeysInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		UiUtils.initPage(div, "Enter the number of keys to generate.");
+		let page = new Page(div, "Enter the number of keys to generate.");
+		let contentDiv = page.getContentDiv();
 		
 		// render num key inputs
 		numKeysInputs = [];
 		for (let plugin of state.plugins) {
-			let numKeysDiv = $("<div class='crypto_num_keys_div'>").appendTo(div);
-			let numKeysLogoDiv = $("<div class='crypto_icon_div'>").appendTo(numKeysDiv);
+			let numKeysDiv = $("<contentDiv class='crypto_num_keys_div'>").appendTo(contentDiv);
+			let numKeysLogoDiv = $("<contentDiv class='crypto_icon_div'>").appendTo(numKeysDiv);
 			let logo = plugin.getLogo().appendTo(numKeysLogoDiv);
 			logo.attr("class", "crypto_icon");
 			numKeysDiv.append(plugin.getName());
@@ -487,13 +505,13 @@ function PageControllerNumKeysMix(div, state, onMixNumKeysInput) {
 			numKeysInputs.push(numKeysInput);
 		}
 		
-		// add error div
+		// add error contentDiv
 		errorDiv.attr("class", "error_msg");
 		setErrorMessage("");
-		div.append(errorDiv);
+		contentDiv.append(errorDiv);
 		
 		// next button
-		let btnNext = UiUtils.getNextButton("Next").appendTo(div);
+		let btnNext = UiUtils.getNextButton("Next").appendTo(contentDiv);
 		
 		// validate num keys when button clicked
 		btnNext.click(function() {
@@ -574,7 +592,8 @@ function PageControllerNumKeysSingle(div, state, onNumKeysInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		UiUtils.initPage(div, "Enter the number of keys to create.");
+		let page = new Page(div, "Enter the number of keys to create.");
+		let contentDiv = page.getContentDiv();
 		
 		// num key keys input
 		let numKeysInput = $("<input>");
@@ -582,17 +601,17 @@ function PageControllerNumKeysSingle(div, state, onNumKeysInput) {
 		numKeysInput.attr("type", "number");
 		numKeysInput.attr("min", 1);
 		numKeysInput.attr("value", 10);
-		div.append(numKeysInput);
-		div.append("<br><br>");
+		contentDiv.append(numKeysInput);
+		contentDiv.append("<br><br>");
 		numKeysInput.keypress(function() { state.mainController.clearNexts(); });
 		
 		// error message
 		errorDiv.attr("class", "error_msg");
 		setErrorMessage("");
-		div.append(errorDiv);
+		contentDiv.append(errorDiv);
 		
 		// next button
-		let btnNext = UiUtils.getNextButton("Next").appendTo(div);
+		let btnNext = UiUtils.getNextButton("Next").appendTo(contentDiv);
 		
 		// validate num keys when button clicked
 		btnNext.click(function() {
@@ -632,14 +651,15 @@ function PageControllerPasswordSelection(div, state, onPasswordSelection) {
 	this.render = function(callback) {
 		
 		// page setup
-		UiUtils.initPage(div, "Do you want to password protect your private keys?");
+		let page = new Page(div, "Do you want to password protect your private keys?");
+		let contentDiv = page.getContentDiv();
 		
 		var btnYes = UiUtils.getNextButton("Yes (recommended)");
 		btnYes.click(function() { onPasswordSelection(true); });
-		div.append(btnYes);
+		contentDiv.append(btnYes);
 		var btnNo = UiUtils.getNextButton("No");
 		btnNo.click(function() { onPasswordSelection(false); });
-		div.append(btnNo);
+		contentDiv.append(btnNo);
 		
 		// done rendering
 		callback(div);
@@ -662,27 +682,28 @@ function PageControllerPasswordInput(div, state, onPasswordInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		UiUtils.initPage(div, "Enter a password to protect your private keys.");
+		let page = new Page(div, "Enter a password to protect your private keys.");
+		let contentDiv = page.getContentDiv();
 		
-		div.append("The password must be at least 6 characters long.");
-		div.append("<br><br>");
+		contentDiv.append("The password must be at least 6 characters long.");
+		contentDiv.append("<br><br>");
 		
-		// render error div
-		div.append(errorDiv);
+		// render error contentDiv
+		contentDiv.append(errorDiv);
 		errorDiv.attr("class", "error_msg");
 		errorDiv.hide();
-		div.append(errorDiv);
+		contentDiv.append(errorDiv);
 		
 		// render password input
-		div.append("Password: ");
+		contentDiv.append("Password: ");
 		passwordInput = $("<input type='text'>");
 		passwordInput.attr("class", "text_input");
-		div.append(passwordInput);
-		div.append("<br><br>");
+		contentDiv.append(passwordInput);
+		contentDiv.append("<br><br>");
 		passwordInput.keypress(function() { state.mainController.clearNexts(); });
 		
 		// render advanced link
-		let advancedLink = $("<div class='mock_link'>").appendTo(div);
+		let advancedLink = $("<contentDiv class='mock_link'>").appendTo(contentDiv);
 		advancedLink.click(function() { toggleAdvanced(); });
 		function toggleAdvanced() {
 			advancedOpen = !advancedOpen;
@@ -690,14 +711,14 @@ function PageControllerPasswordInput(div, state, onPasswordInput) {
 			advancedOpen ? advancedDiv.show() : advancedDiv.hide();
 		}
 		
-		// render each encryption selection div
-		let advancedDiv = $("<div>").appendTo(div);
+		// render each encryption selection contentDiv
+		let advancedDiv = $("<contentDiv>").appendTo(contentDiv);
 		let options = false;
 		let encryptionSelectors = [];
 		for (let elem of state.mix) {
 			if (elem.plugin.getEncryptionSchemes().length > 1) {
 				options = true;
-				let encryptionSelector = new EncryptionSelector(elem.plugin, $("<div>"));
+				let encryptionSelector = new EncryptionSelector(elem.plugin, $("<contentDiv>"));
 				encryptionSelectors.push(encryptionSelector);
 				advancedDiv.append(encryptionSelector.getDiv());
 			} else {
@@ -709,12 +730,12 @@ function PageControllerPasswordInput(div, state, onPasswordInput) {
 		advancedOpen = true;
 		toggleAdvanced();
 		
-		// only render advanced div if options exist
+		// only render advanced contentDiv if options exist
 		if (!options) advancedLink.hide();
 		
 		// render next button
-		div.append("<br>");
-		var btnNext = UiUtils.getNextButton("Next").appendTo(div);
+		contentDiv.append("<br>");
+		var btnNext = UiUtils.getNextButton("Next").appendTo(contentDiv);
 		btnNext.click(function() {
 			let password = passwordInput.val();
 			let err;
@@ -808,14 +829,15 @@ function PageControllerSplitSelection(div, state, onSplitSelection) {
 	this.render = function(callback) {
 		
 		// page setup
-		UiUtils.initPage(div, "Do you want to split your private keys into separate pieces?");
+		let page = new Page(div, "Do you want to split your private keys into separate pieces?");
+		let contentDiv = page.getContentDiv();
 		
-		div.append("The pieces must be recombined to recover the private keys.");
-		div.append("<br><br>");
+		contentDiv.append("The pieces must be recombined to recover the private keys.");
+		contentDiv.append("<br><br>");
 		
-		var btnYes = UiUtils.getNextButton("Yes").appendTo(div);
+		var btnYes = UiUtils.getNextButton("Yes").appendTo(contentDiv);
 		btnYes.click(function() { onSplitSelection(true); });
-		var btnNo = UiUtils.getNextButton("No").appendTo(div);
+		var btnNo = UiUtils.getNextButton("No").appendTo(contentDiv);
 		btnNo.click(function() { onSplitSelection(false); });
 		
 		// done rendering
@@ -834,31 +856,32 @@ function PageControllerSplitInput(div, state, onPiecesInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		UiUtils.initPage(div, "How many pieces do you want to split your private keys into?");
+		let page = new Page(div, "How many pieces do you want to split your private keys into?");
+		let contentDiv = page.getContentDiv();
 		
-		div.append("Number of pieces: ");
+		contentDiv.append("Number of pieces: ");
 		var numPiecesInput = $("<input type='number'>");
 		numPiecesInput.attr("class", "num_input");
 		numPiecesInput.attr("value", 3);
 		numPiecesInput.attr("min", 2);
-		div.append(numPiecesInput);
-		div.append("<br><br>");
+		contentDiv.append(numPiecesInput);
+		contentDiv.append("<br><br>");
 		numPiecesInput.keypress(function() { state.mainController.clearNexts(); });
 		
-		div.append("Number of pieces necessary to restore private keys: ");
+		contentDiv.append("Number of pieces necessary to restore private keys: ");
 		var minPiecesInput = $("<input type='number'>");
 		minPiecesInput.attr("min", 2);
 		minPiecesInput.attr("class", "num_input");
 		minPiecesInput.attr("value", 2);
-		div.append(minPiecesInput);
-		div.append("<br><br>");
+		contentDiv.append(minPiecesInput);
+		contentDiv.append("<br><br>");
 		minPiecesInput.keypress(function() { state.mainController.clearNexts(); });
 		
 		// error message
 		errorDiv.empty();
 		errorDiv.attr("class", "error_msg");
 		setErrorMessage("");
-		div.append(errorDiv);
+		contentDiv.append(errorDiv);
 		
 		// render next button
 		var btnNext = UiUtils.getNextButton("Next");
@@ -873,7 +896,7 @@ function PageControllerSplitInput(div, state, onPiecesInput) {
 				setErrorMessage(err.message);
 			}
 		});
-		div.append(btnNext);
+		contentDiv.append(btnNext);
 		
 		// done rendering
 		callback(div);
@@ -910,19 +933,20 @@ function PageControllerGenerateKeys(div, state, onKeysGenerated) {
 	this.render = function(callback) {
 		
 		// page setup
-		UiUtils.initPage(div, "Ready to generate your keys?");
+		let page = new Page(div, "Ready to generate your keys?");
+		let contentDiv = page.getContentDiv();
 		
 		// render summary
-		div.append("<b>Summary:</b><br><br>");
+		contentDiv.append("<b>Summary:</b><br><br>");
 		for (let elem of state.mix) {
-			div.append(elem.numKeys + " " + elem.plugin.getName() + " keys" + (elem.encryption ? " encrypted with " + elem.encryption : " unencrypted") + "<br>");
+			contentDiv.append(elem.numKeys + " " + elem.plugin.getName() + " keys" + (elem.encryption ? " encrypted with " + elem.encryption : " unencrypted") + "<br>");
 		}
 		if (state.numPieces > 1) {
-			div.append("Split private keys into " + state.numPieces + " pieces with a minimum of " + state.minPieces + " to restore")
+			contentDiv.append("Split private keys into " + state.numPieces + " pieces with a minimum of " + state.minPieces + " to restore")
 		} else {
-			div.append("Private keys will not be split")
+			contentDiv.append("Private keys will not be split")
 		}
-		div.append("<br><br>");
+		contentDiv.append("<br><br>");
 		
 		// render generate button
 		var btnGenerate = UiUtils.getNextButton("Generate keys");
@@ -935,10 +959,10 @@ function PageControllerGenerateKeys(div, state, onKeysGenerated) {
 				onKeysGenerated(keys, pieces, pieceDivs);
 			});
 		});
-		div.append(btnGenerate);
+		contentDiv.append(btnGenerate);
 		
 		// add progress bar
-		progressDiv = $("<div>").appendTo(div);
+		progressDiv = $("<contentDiv>").appendTo(contentDiv);
 		progressDiv.hide();
 		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
 		
@@ -960,8 +984,8 @@ function PageControllerGenerateKeys(div, state, onKeysGenerated) {
 			let numKeys = 0;
 			for (let elem of state.mix) {
 				numKeys += elem.numKeys;
-				totalWeight += elem.numKeys * Weights.getCreateKeyWeight();
-				if (elem.encryption) totalWeight += elem.numKeys * (Weights.getEncryptWeight(elem.encryption) + (VERIFY_ENCRYPTION ? Weights.getDecryptWeight(elem.encryption) : 0));
+				totalWeight += elem.numKeys * UiUtils.getCreateKeyWeight();
+				if (elem.encryption) totalWeight += elem.numKeys * (UiUtils.getEncryptWeight(elem.encryption) + (VERIFY_ENCRYPTION ? UiUtils.getDecryptWeight(elem.encryption) : 0));
 			}
 			let piecesRendererWeight = PieceRenderer.getPieceWeight(numKeys, state.numPieces, null);
 			totalWeight += piecesRendererWeight;
@@ -1094,7 +1118,7 @@ function PageControllerGenerateKeys(div, state, onKeysGenerated) {
 				return function(callback) {
 					setTimeout(function() {
 						let key = plugin.newKey();
-						progressWeight += Weights.getCreateKeyWeight();
+						progressWeight += UiUtils.getCreateKeyWeight();
 						setProgress(progressWeight, totalWeight);
 						callback(null, key);
 					}, 0);	// let UI breath
@@ -1104,7 +1128,7 @@ function PageControllerGenerateKeys(div, state, onKeysGenerated) {
 			function encryptFunc(key, scheme, password) {
 				return function(callback) {
 					key.encrypt(scheme, password, function(err, key) {
-						progressWeight += Weights.getEncryptWeight(scheme);
+						progressWeight += UiUtils.getEncryptWeight(scheme);
 						setProgress(progressWeight, totalWeight);
 						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
@@ -1115,7 +1139,7 @@ function PageControllerGenerateKeys(div, state, onKeysGenerated) {
 				return function(callback) {
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
-						progressWeight += Weights.getDecryptWeight(scheme);
+						progressWeight += UiUtils.getDecryptWeight(scheme);
 						setProgress(progressWeight, totalWeight);
 						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
@@ -1148,17 +1172,18 @@ function PageControllerImportText(div, state, onKeysImported) {
 	this.render = function(callback) {
 		
 		// page setup
-		UiUtils.initPage(div, "Enter " + state.plugin.getName() + " private key or pieces:", state.plugin.getLogo());
+		let page = new Page(div, "Enter " + state.plugin.getName() + " private key or pieces:", state.plugin.getLogo());
+		let contentDiv = page.getContentDiv();
 		
-		// render error div
+		// render error contentDiv
 		errorDiv.empty();
 		errorDiv.attr("class", "error_msg");
 		setErrorMessage("");
-		div.append(errorDiv);
+		contentDiv.append(errorDiv);
 		
 		// render textarea input
 		textarea = $("<textarea>");
-		div.append(textarea);
+		contentDiv.append(textarea);
 		textarea.on('input', function() {
 			
 			// load dependencies
@@ -1221,24 +1246,25 @@ function PageControllerDecryptKeys(div, state, onKeysDecrypted) {
 		let name = UiUtils.getCryptoName(state);
 		name = name === "mixed" ? " " : " " + name + " ";
 		var title = "Imported " + keys.length + name + " keys which are password protected.  Enter the password to decrypt them.";
-		UiUtils.initPage(div, title, UiUtils.getCryptoLogo(state));
+		let page = new Page(div, title, UiUtils.getCryptoLogo(state));
+		let contentDiv = page.getContentDiv();
 		
-		// add error div
-		div.append(errorDiv);
+		// add error contentDiv
+		contentDiv.append(errorDiv);
 		errorDiv.attr("class", "error_msg");
 		errorDiv.hide();
-		div.append(errorDiv);
+		contentDiv.append(errorDiv);
 		
 		// add password input
-		div.append("Password: ");
+		contentDiv.append("Password: ");
 		passwordInput = $("<input type='text'>");
 		passwordInput.attr("class", "text_input");
 
-		div.append(passwordInput);
-		div.append("<br><br>");
+		contentDiv.append(passwordInput);
+		contentDiv.append("<br><br>");
 		
 		// add decrypt button
-		let btnDecrypt = UiUtils.getButton("Decrypt").appendTo(div);
+		let btnDecrypt = UiUtils.getButton("Decrypt").appendTo(contentDiv);
 		btnDecrypt.click(function() {
 			setErrorMessage("");
 			btnDecrypt.attr("disabled", "disabled");
@@ -1257,9 +1283,12 @@ function PageControllerDecryptKeys(div, state, onKeysDecrypted) {
 		});
 		
 		// add progress bar
-		progressDiv = $("<div>").appendTo(div);
+		progressDiv = $("<contentDiv>").appendTo(contentDiv);
 		progressDiv.hide();
 		progressBar = UiUtils.getProgressBar(progressDiv.get(0));
+		
+		// done rendering
+		callback(div);
 		
 		function onDecrypt(onDone) {
 			
@@ -1273,7 +1302,7 @@ function PageControllerDecryptKeys(div, state, onKeysDecrypted) {
 			// compute total weight for progress bar
 			let totalWeight = 0;
 			for (let key of keys) {
-				totalWeight += Weights.getDecryptWeight(key.getEncryptionScheme());
+				totalWeight += UiUtils.getDecryptWeight(key.getEncryptionScheme());
 			}
 			let piecesRendererWeight = PieceRenderer.getPieceWeight(keys.length, 1, null);
 			totalWeight += piecesRendererWeight;
@@ -1314,7 +1343,7 @@ function PageControllerDecryptKeys(div, state, onKeysDecrypted) {
 					key.decrypt(password, function(err, key) {
 						if (err) callback(err);
 						else {
-							progressWeight += Weights.getDecryptWeight(scheme);
+							progressWeight += UiUtils.getDecryptWeight(scheme);
 							setProgress(progressWeight, totalWeight);
 							setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 						}
@@ -1337,9 +1366,6 @@ function PageControllerDecryptKeys(div, state, onKeysDecrypted) {
 		    	btnDecrypt.click();
 		    }
 		});
-		
-		// done rendering
-		callback();
 	}
 	
 	this.onShow = function() {
@@ -1368,22 +1394,23 @@ function PageControllerImportFiles(div, onKeysImported, onSelectImportText) {
 	this.render = function(callback) {
 		
 		// page setup
-		UiUtils.initPage(div, "Import zip or json files created from this site.");
+		let page = new Page(div, "Import zip or json files created from this site.");
+		let contentDiv = page.getContentDiv();
 		
-		// add error div
-		div.append(errorDiv);
+		// add error contentDiv
+		contentDiv.append(errorDiv);
 		
 		// add upload button
-		var input = $("<input type='file' multiple>").appendTo(div);
+		var input = $("<input type='file' multiple>").appendTo(contentDiv);
 		input.change(function() { onFilesImported($(this).get(0).files); });
-		div.append("<br><br>");
+		contentDiv.append("<br><br>");
 		
-		// add file list div
-		div.append(fileList);
+		// add file list contentDiv
+		contentDiv.append(fileList);
 		
 		// add button to import from text
-		div.append("<br><br>");
-		var btnImportText = UiUtils.getNextButton("Import private key from text instead").appendTo(div);
+		contentDiv.append("<br><br>");
+		var btnImportText = UiUtils.getNextButton("Import private key from text instead").appendTo(contentDiv);
 		btnImportText.click(function() {
 			removePieces();
 			onSelectImportText();
@@ -1412,7 +1439,7 @@ function PageControllerImportFiles(div, onKeysImported, onSelectImportText) {
 		}
 		
 		// done rendering
-		callback();
+		callback(div);
 	};
 	
 	function setErrorMessage(str) {
@@ -1565,23 +1592,24 @@ function PageControllerExport(div, state) {
 		let name = UiUtils.getCryptoName(state);
 		name = name === "mixed" ? "" : name;
 		let header = state.mix ? "Your keys are ready to save." : "Your keys have been imported.";
-		UiUtils.initPage(div, header, UiUtils.getCryptoLogo(state));
+		let page = new Page(div, header, UiUtils.getCryptoLogo(state));
+		let contentDiv = page.getContentDiv();
 		
 		// center page contents
-		div.attr("style", "display:flex; flex-direction:column; align-items:center;");
+		contentDiv.attr("style", "display:flex; flex-direction:column; align-items:center;");
 		
 		// put page contents in container to share width
-		let container = $("<div class='save_container'>").appendTo(div);
-		div = container;
+		let container = $("<contentDiv class='save_container'>").appendTo(contentDiv);
+		contentDiv = container;
 		
 		// add save header
-		let exportHeader = $("<div class='export_header'>").appendTo(div);
-		let exportHeaderLeft = $("<div class='export_header_left'>").appendTo(exportHeader);
-		let exportHeaderRight = $("<div class='export_header_right'>").appendTo(exportHeader);
+		let exportHeader = $("<contentDiv class='export_header'>").appendTo(contentDiv);
+		let exportHeaderLeft = $("<contentDiv class='export_header_left'>").appendTo(exportHeader);
+		let exportHeaderRight = $("<contentDiv class='export_header_right'>").appendTo(exportHeader);
 		
 		// add config link (closed by default)
-		let configLink = $("<div class='mock_link'>").appendTo(exportHeaderLeft);
-		let configDiv = $("<div>").appendTo(div);
+		let configLink = $("<contentDiv class='mock_link'>").appendTo(exportHeaderLeft);
+		let configDiv = $("<contentDiv>").appendTo(contentDiv);
 		let configOpen = true;
 		toggleConfig();
 		configLink.click(function() { toggleConfig(); });
@@ -1596,12 +1624,12 @@ function PageControllerExport(div, state) {
 		exportHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderRight);
 
-		// add config div
+		// add config contentDiv
 		renderConfig(configDiv);
 		
-		// add preview div
-		div.append("<br>");
-		previewDiv = $("<div class='preview_div'>").appendTo(div);
+		// add preview contentDiv
+		contentDiv.append("<br>");
+		previewDiv = $("<contentDiv class='preview_div'>").appendTo(contentDiv);
 		updatePieces(state.pieces, state.pieceDivs, function(err) {
 			if (err) throw err;
 		});
@@ -1806,20 +1834,21 @@ function PageControllerFaq(div) {
 	this.render = function(onDone) {
 		
 		// page setup
-		UiUtils.initPage(div, "FAQ");
+		let page = new Page(div, "FAQ");
 		
-		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(div);
-		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(div);
-		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(div);
-		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(div);
-		$("<div class='question'>").html("How can I trust this service?").appendTo(div);
-		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is what is publically auditable.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(div);
-		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(div);
-		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(div);
-		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(div);
-		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future depending on interest and ease of implementation.").appendTo(div);
-		$("<div class='question'>").html("What formats can I export to?").appendTo(div);
-		$("<div class='answer'>").html("TODO").appendTo(div);
+		let contentDiv = page.getContentDiv();
+		$("<contentDiv class='question'>").html("What is cryptostorage.com?").appendTo(contentDiv);
+		$("<contentDiv class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(contentDiv);
+		$("<contentDiv class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(contentDiv);
+		$("<contentDiv class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(contentDiv);
+		$("<contentDiv class='question'>").html("How can I trust this service?").appendTo(contentDiv);
+		$("<contentDiv class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is what is publically auditable.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(contentDiv);
+		$("<contentDiv class='question'>").html("Do I need internet access to recover my private keys?").appendTo(contentDiv);
+		$("<contentDiv class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(contentDiv);
+		$("<contentDiv class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(contentDiv);
+		$("<contentDiv class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future depending on interest and ease of implementation.").appendTo(contentDiv);
+		$("<contentDiv class='question'>").html("What formats can I export to?").appendTo(contentDiv);
+		$("<contentDiv class='answer'>").html("TODO").appendTo(contentDiv);
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -1835,7 +1864,7 @@ function PageControllerDonate(div) {
 	this.render = function(onDone) {
 		
 		// page setup
-		UiUtils.initPage(div, "Donate");
+		let page = new Page(div, "Donate");
 		
 		// done rendering
 		if (onDone) onDone(div);

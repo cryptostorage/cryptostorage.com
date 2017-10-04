@@ -63,13 +63,17 @@ body {
 }
 
 .main_container {
-	
+	position:relative;
+	width:100%;
 }
 
-.page {
+.page_container {
 	flex:1;
 	position:absolute;
 	width:100%;
+}
+
+.page {
 	text-align:left;
 	border:none;
 	font-size: 19px;
@@ -88,7 +92,7 @@ body {
 	margin-bottom:20px;
 }
 
-.page_header_content_div {
+.page_header_title_div {
 	font-weight: bold;
 	font-size: 24px;
 	display:flex;
