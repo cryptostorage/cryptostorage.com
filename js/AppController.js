@@ -120,9 +120,9 @@ function ApplicationController(div) {
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		mainController = new MainController($("<div class='main_container'>"));
-		faqController = new PageControllerFaq($("<div>"));
-		donateController = new PageControllerDonate($("<div>"));
+		mainController = new MainController($("<div class='main_container'>"), that);
+		faqController = new PageControllerFaq($("<div>"), that);
+		donateController = new PageControllerDonate($("<div>"), that);
 		faqController.render();
 		donateController.render();
 		
@@ -145,21 +145,35 @@ function ApplicationController(div) {
 		}, 0);
 	}
 	
+	this.getMainController = function() {
+		return mainController;
+	}
+	
+	this.getMainState = function() {
+		return mainController.getState();
+	}
+	
 	this.showHome = function() {
 		if (DEBUG) console.log("showHome()");
-		contentDiv.empty();
+		clearContents();
 		contentDiv.append(mainController.getDiv());
 	}
 	
 	this.showFaq = function() {
 		if (DEBUG) console.log("showFaq()");
-		contentDiv.empty();
+		clearContents();
 		contentDiv.append(faqController.getDiv());
 	}
 	
 	this.showDonate = function() {
 		if (DEBUG) console.log("showDonate()");
-		contentDiv.empty();
+		clearContents();
 		contentDiv.append(donateController.getDiv());
+	}
+	
+	function clearContents() {
+		while (contentDiv.get(0).hasChildNodes()) {
+			contentDiv.get(0).removeChild(contentDiv.get(0).lastChild);
+		}
 	}
 }
