@@ -164,15 +164,28 @@ function MainController(mainDiv) {
 	let pathTracker = new PathTracker(onPageChange);
 	let transitioning = false;
 	
+	// --------------------------------- PUBLIC ---------------------------------
+	
 	this.render = function(onDone) {
 		initState();
 		set(new PageControllerHome($("<div>"), onSelectCreate, onSelectImport), onDone);	// start at home page
 	}
 	
+	this.clearNexts = function() {
+		if (DEBUG) console.log("clearNexts()");
+		pathTracker.clearNexts();
+	}
+	
+	this.setNavigable = function(navigable) {
+		if (DEBUG) console.log("setNavigable(" + navigable + ")");
+	}
+	
+	// --------------------------------- PRIVATE ---------------------------------
+	
 	function initState() {
 		state = {};
 		state.plugins = CryptoUtils.getCryptoPlugins();
-		state.mainController = this;
+		state.mainController = that;
 	}
 	
 	function set(renderer, onDone) {
@@ -572,7 +585,7 @@ function PageControllerNumKeysSingle(div, state, onNumKeysInput) {
 		numKeysInput.attr("value", 10);
 		div.append(numKeysInput);
 		div.append("<br><br>");
-		numKeysInput.keypress(function() { state.pageController.clearNexts(); });
+		numKeysInput.keypress(function() { state.mainController.clearNexts(); });
 		
 		// error message
 		errorDiv.attr("class", "error_msg");
@@ -669,7 +682,7 @@ function PageControllerPasswordInput(div, state, onPasswordInput) {
 		passwordInput.attr("class", "text_input");
 		div.append(passwordInput);
 		div.append("<br><br>");
-		passwordInput.keypress(function() { state.pageController.clearNexts(); });
+		passwordInput.keypress(function() { state.mainController.clearNexts(); });
 		
 		// render advanced link
 		let advancedLink = $("<div class='mock_link'>").appendTo(div);
@@ -835,7 +848,7 @@ function PageControllerSplitInput(div, state, onPiecesInput) {
 		numPiecesInput.attr("min", 2);
 		div.append(numPiecesInput);
 		div.append("<br><br>");
-		numPiecesInput.keypress(function() { state.pageController.clearNexts(); });
+		numPiecesInput.keypress(function() { state.mainController.clearNexts(); });
 		
 		div.append("Number of pieces necessary to restore private keys: ");
 		var minPiecesInput = $("<input type='number'>");
@@ -844,7 +857,7 @@ function PageControllerSplitInput(div, state, onPiecesInput) {
 		minPiecesInput.attr("value", 2);
 		div.append(minPiecesInput);
 		div.append("<br><br>");
-		minPiecesInput.keypress(function() { state.pageController.clearNexts(); });
+		minPiecesInput.keypress(function() { state.mainController.clearNexts(); });
 		
 		// error message
 		errorDiv.empty();
@@ -923,8 +936,8 @@ function PageControllerGenerateKeys(div, state, onKeysGenerated) {
 		var btnGenerate = UiUtils.getNextButton("Generate keys");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
-			state.pageController.clearNexts();
-			state.pageController.setNavigable(false);
+			state.mainController.clearNexts();
+			state.mainController.setNavigable(false);
 			generateKeys(function(keys, pieces, pieceDivs) {
 				btnGenerate.removeAttr("disabled");
 				onKeysGenerated(keys, pieces, pieceDivs);
@@ -1239,8 +1252,8 @@ function PageControllerDecryptKeys(div, state, onKeysDecrypted) {
 		btnDecrypt.click(function() {
 			setErrorMessage("");
 			btnDecrypt.attr("disabled", "disabled");
-			state.pageController.clearNexts();
-			state.pageController.setNavigable(false);
+			state.mainController.clearNexts();
+			state.mainController.setNavigable(false);
 			onDecrypt(function(err, pieces, pieceDivs) {
 				if (err) {
 					setErrorMessage(err.message);
