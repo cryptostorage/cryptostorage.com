@@ -120,7 +120,7 @@ function ApplicationController(div) {
 		contentDiv = $("<div class='content'>").appendTo(div);
 		
 		// initialize controllers
-		mainController = new MainController($("<div>"));
+		mainController = new MainController($("<div class='main_container'>"));
 		faqController = new PageControllerFaq($("<div>"));
 		faqController.render();
 		donateController = new PageControllerDonate($("<div>"));

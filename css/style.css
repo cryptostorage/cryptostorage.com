@@ -28,7 +28,6 @@ body {
 	flex:1;
 	position:relative;
 	width:800px;
-	position:relative;
 }
 
 .footer {
@@ -61,6 +60,10 @@ body {
 	-ms-transform: rotate(0deg); /* IE 9 */
     -webkit-transform: rotate(0deg); /* Chrome, Safari, Opera */
     transform: rotate(0deg);
+}
+
+.main_container {
+	
 }
 
 .page {
