@@ -1840,7 +1840,7 @@ inheritsFrom(CustomExportController, DivController);
  */
 function PageControllerFaq(div) {
 	DivController.call(this, div);
-	this.render = function(callback) {
+	this.render = function(onDone) {
 		UiUtils.pageSetup(div);
 		
 		// render title
@@ -1860,7 +1860,7 @@ function PageControllerFaq(div) {
 		$("<div class='answer'>").html("TODO").appendTo(div);
 		
 		// done rendering
-		callback(div);
+		if (onDone) onDone(div);
 	}
 }
 inheritsFrom(PageControllerFaq, DivController);
@@ -1870,7 +1870,7 @@ inheritsFrom(PageControllerFaq, DivController);
  */
 function PageControllerDonate(div) {
 	DivController.call(this, div);
-	this.render = function(callback) {
+	this.render = function(onDone) {
 		UiUtils.pageSetup(div);
 		
 		// render title
@@ -1879,7 +1879,7 @@ function PageControllerDonate(div) {
 		$("<div class='question'>").html("*heart*");
 		
 		// done rendering
-		callback(div);
+		if (onDone) onDone(div);
 	}
 }
 inheritsFrom(PageControllerDonate, DivController);

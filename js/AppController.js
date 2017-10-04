@@ -122,7 +122,9 @@ function ApplicationController(div) {
 		// initialize controllers
 		mainController = new MainController($("<div>"));
 		faqController = new PageControllerFaq($("<div>"));
+		faqController.render();
 		donateController = new PageControllerDonate($("<div>"));
+		donateController.render();
 		
 		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
 		setTimeout(function() {
