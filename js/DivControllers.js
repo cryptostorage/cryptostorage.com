@@ -279,9 +279,160 @@ function PageController(div) {
 inheritsFrom(PageController, DivController);
 
 /**
+ * Main application to generate and import keys.
+ */
+function HomeController(div) {
+	
+	let state;
+	let pageController;
+	let that = this;
+	
+	this.render = function() {
+		
+		pageController.set(new PageControllerHome($("<div>"), onSelectCreate, onSelectImport));
+
+		
+		initState();
+	}
+	
+	this.showHome = function() {
+		if (DEBUG) console.log("showHome()");
+		pageController.set(new PageControllerHome($("<div>"), onSelectCreate, onSelectImport));
+	}
+	
+	this.showFaq = function() {
+		if (DEBUG) console.log("showFaq()");
+		pageController.set(new PageControllerFaq($("<div>")));
+	}
+	
+	this.showDonate = function() {
+		if (DEBUG) console.log("showDonate()");
+		pageController.set(new PageControllerDonate($("<div>")));
+	}
+	
+	function initState() {
+		state = {};
+		state.pageController = pageController;
+		state.plugins = CryptoUtils.getCryptoPlugins();
+	}
+
+	// ------------------------------ CREATE NEW --------------------------------
+	
+	function onSelectCreate() {
+		if (DEBUG) console.log("onSelectCreate()");
+		initState();
+		state.mix = [];	// fill out mix to create as we go
+		pageController.next(new PageControllerSelectCrypto($("<div>"), state, onSelectCryptoCreate));
+	}
+	
+	function onSelectCryptoCreate(selection) {
+		if (DEBUG) console.log("onSelectCrypto(" + selection + ")");
+		if (selection === "MIX") {
+			pageController.next(new PageControllerNumKeysMix($("<div>"), state, onMixNumKeysInput))
+		} else {
+			state.mix = [{plugin: CryptoUtils.getCryptoPlugin(selection)}];
+			pageController.next(new PageControllerNumKeysSingle($("<div>"), state, onNumKeysInput));
+		}
+	}
+	
+	function onMixNumKeysInput() {
+		if (DEBUG) console.log("onMixNumKeysInput()");
+		pageController.next(new PageControllerPasswordSelection($("<div>"), state, onPasswordSelection))
+	}
+	
+	function onNumKeysInput(numKeys) {
+		if (DEBUG) console.log("onNumKeysInput(" + numKeys + ")");
+		assertInt(numKeys);
+		state.mix[0].numKeys = numKeys;
+		pageController.next(new PageControllerPasswordSelection($("<div>"), state, onPasswordSelection))
+	}
+	
+	function onPasswordSelection(passwordEnabled) {
+		if (DEBUG) console.log("onPasswordSelection(" + passwordEnabled + ")");
+		state.passwordEnabled = passwordEnabled;
+		if (passwordEnabled) pageController.next(new PageControllerPasswordInput($("<div>"), state, onPasswordInput));
+		else {
+			for (let elem of state.mix) elem.encryption = null;
+			pageController.next(new PageControllerSplitSelection($("<div>"), state, onSplitSelection));
+		}
+	}
+	
+	function onPasswordInput() {
+		if (DEBUG) console.log("onPasswordInput()");
+		pageController.next(new PageControllerSplitSelection($("<div>"), state, onSplitSelection));
+	}
+	
+	function onSplitSelection(splitEnabled) {
+		if (DEBUG) console.log("onSplitSelection(" + splitEnabled + ")");
+		state.splitEnabled = splitEnabled;
+		if (splitEnabled) pageController.next(new PageControllerSplitInput($("<div>"), state, onSplitInput));
+		else {
+			state.numPieces = 1;
+			delete state.minPieces;
+			pageController.next(new PageControllerGenerateKeys($("<div>"), state, onKeysGenerated));
+		}
+	}
+	
+	function onSplitInput(numPieces, minPieces) {
+		if (DEBUG) console.log("onSplitInput(" + numPieces + ", " + minPieces + ")");
+		assertInt(numPieces);
+		assertInt(minPieces);
+		state.numPieces = numPieces;
+		state.minPieces = minPieces;
+		pageController.next(new PageControllerGenerateKeys($("<div>"), state, onKeysGenerated));
+	}
+	
+	function onKeysGenerated(keys, pieces, pieceDivs) {
+		if (DEBUG) console.log("onKeysGenerated(" + keys.length + ")");
+		assertTrue(keys.length > 0);
+		assertEquals(state.numPieces, pieces.length);
+		state.keys = keys;
+		state.pieces = pieces;
+		state.pieceDivs = pieceDivs;
+		pageController.next(new PageControllerExport($("<div>"), state));
+	}
+	
+	// ------------------------------ RESTORE --------------------------------
+	
+	function onSelectImport() {
+		if (DEBUG) console.log("onSelectImport()");
+		initState();
+		pageController.next(new PageControllerImportFiles($("<div>"), onKeysImported, onSelectImportText));
+	}
+	
+	function onSelectImportText() {
+		if (DEBUG) console.log("onSelectImportText()");
+		delete state.pieceDivs;
+		pageController.next(new PageControllerSelectCrypto($("<div>"), state, onSelectCryptoImport));
+	}
+	
+	function onSelectCryptoImport(tickerSymbol) {
+		if (DEBUG) console.log("onSelectCryptoImport(" + tickerSymbol + ")");
+		for (let plugin of state.plugins) {
+			if (plugin.getTicker() === tickerSymbol) state.plugin = plugin;
+		}
+		if (!state.plugin) throw new Error("plugin not found with ticker symbol: " + tickerSymbol);
+		pageController.next(new PageControllerImportText($("<div>"), state, onKeysImported));
+	}
+	
+	function onKeysImported(keys, pieces, pieceDivs) {
+		if (DEBUG) console.log("onKeysImported(" + keys.length + " keys)");
+		assertTrue(keys.length >= 1);
+		state.keys = keys;
+		state.pieces = pieces;
+		state.pieceDivs = pieceDivs;
+		if (keys[0].getWif() && keys[0].isEncrypted()) pageController.next(new PageControllerDecryptKeys($("<div>"), state, onKeysImported));
+		else {
+			pageController.next(new PageControllerExport($("<div>"), state));
+		}
+	}
+}
+inheritsFrom(HomeController, DivController);
+
+/**
  * Render home page.
  */
-function HomeController(div, onSelectCreate, onSelectImport) {
+function PageControllerHome(div, onSelectCreate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -328,12 +479,12 @@ function HomeController(div, onSelectCreate, onSelectImport) {
 		return div;
 	}
 }
-inheritsFrom(HomeController, DivController);
+inheritsFrom(PageControllerHome, DivController);
 
 /**
  * Render crypto selection.
  */
-function SelectCryptoController(div, state, onCryptoSelection) {
+function PageControllerSelectCrypto(div, state, onCryptoSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -365,14 +516,14 @@ function SelectCryptoController(div, state, onCryptoSelection) {
 		callback(div);
 	}
 }
-inheritsFrom(SelectCryptoController, DivController);
+inheritsFrom(PageControllerSelectCrypto, DivController);
 
 /**
  * Render mixed num keys input.
  * 
  * Modifies state.mix and invokes onMixNumKeysInput() on input.
  */
-function MixNumKeysController(div, state, onMixNumKeysInput) {
+function PageControllerNumKeysMix(div, state, onMixNumKeysInput) {
 	DivController.call(this, div);
 	let errorDiv = $("<div>");
 	let numKeysInputs;
@@ -472,14 +623,14 @@ function MixNumKeysController(div, state, onMixNumKeysInput) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-inheritsFrom(MixNumKeysController, DivController);
+inheritsFrom(PageControllerNumKeysMix, DivController);
 
 /**
  * Render number of keys.
  * 
  * Invokes onNumKeysInput(numKeys) when done.
  */
-function NumKeysController(div, state, onNumKeysInput) {
+function PageControllerNumKeysSingle(div, state, onNumKeysInput) {
 	DivController.call(this, div);
 	var errorDiv = $("<div>");
 	
@@ -536,12 +687,12 @@ function NumKeysController(div, state, onNumKeysInput) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-inheritsFrom(NumKeysController, DivController);
+inheritsFrom(PageControllerNumKeysSingle, DivController);
 
 /**
  * Render password selection page.
  */
-function PasswordSelectionController(div, state, onPasswordSelection) {
+function PageControllerPasswordSelection(div, state, onPasswordSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -560,7 +711,7 @@ function PasswordSelectionController(div, state, onPasswordSelection) {
 		callback(div);
 	}
 }
-inheritsFrom(PasswordSelectionController, DivController);
+inheritsFrom(PageControllerPasswordSelection, DivController);
 
 /**
  * Render password input page.
@@ -568,7 +719,7 @@ inheritsFrom(PasswordSelectionController, DivController);
  * @param div is the div to render to
  * @param state is updated with the new password configuration
  */
-function PasswordInputController(div, state, onPasswordInput) {
+function PageControllerPasswordInput(div, state, onPasswordInput) {
 	DivController.call(this, div);
 	var passwordInput;	// for later focus on show
 	var errorDiv = $("<div>");
@@ -714,12 +865,12 @@ function PasswordInputController(div, state, onPasswordInput) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-inheritsFrom(PasswordInputController, DivController);
+inheritsFrom(PageControllerPasswordInput, DivController);
 
 /**
  * Render split selection page.
  */
-function SplitSelectionController(div, state, onSplitSelection) {
+function PageControllerSplitSelection(div, state, onSplitSelection) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -739,12 +890,12 @@ function SplitSelectionController(div, state, onSplitSelection) {
 		callback(div);
 	}
 }
-inheritsFrom(SplitSelectionController, DivController);
+inheritsFrom(PageControllerSplitSelection, DivController);
 
 /**
  * Number of pieces input page.
  */
-function NumPiecesInputController(div, state, onPiecesInput) {
+function PageControllerSplitInput(div, state, onPiecesInput) {
 	DivController.call(this, div);
 	var errorDiv = $("<div>");
 
@@ -810,7 +961,7 @@ function NumPiecesInputController(div, state, onPiecesInput) {
 		else if (minPieces > numPieces) throw new Error("Minimum pieces cannot be more than the number of pieces");
 	}
 }
-inheritsFrom(NumPiecesInputController, DivController);
+inheritsFrom(PageControllerSplitInput, DivController);
 
 /**
  * Summarize and generate keys, piece, and piece divs.
@@ -819,7 +970,7 @@ inheritsFrom(NumPiecesInputController, DivController);
  * @param state contains the configuration to generate
  * @param onKeysGenerated(keys, pieces, pieceDivs) is invoked after generation
  */
-function GenerateKeysController(div, state, onKeysGenerated) {
+function PageControllerGenerateKeys(div, state, onKeysGenerated) {
 	DivController.call(this, div);
 	
 	let progressDiv;
@@ -1051,7 +1202,7 @@ function GenerateKeysController(div, state, onKeysGenerated) {
 		});
 	}
 }
-inheritsFrom(GenerateKeysController, DivController);
+inheritsFrom(PageControllerGenerateKeys, DivController);
 
 /**
  * Render page to import private components from text.
@@ -1060,7 +1211,7 @@ inheritsFrom(GenerateKeysController, DivController);
  * @param plugin is the crypto plugin for key generation
  * @param onKeysImported(key) is invoked with the imported key
  */
-function ImportTextController(div, state, onKeysImported) {
+function PageControllerImportText(div, state, onKeysImported) {
 	DivController.call(this, div);
 	let errorDiv = $("<div>");
 	let lastInputs = [];
@@ -1121,7 +1272,7 @@ function ImportTextController(div, state, onKeysImported) {
 		str === "" ? errorDiv.hide() : errorDiv.show();
 	}
 }
-inheritsFrom(ImportTextController, DivController);
+inheritsFrom(PageControllerImportText, DivController);
 
 /**
  * Render page to decrypt keys.
@@ -1130,7 +1281,7 @@ inheritsFrom(ImportTextController, DivController);
  * @param state.keys are the keys to decrypt
  * @param onKeysDecrypted(keys, pieces, pieceDivs) when done
  */
-function DecryptKeysController(div, state, onKeysDecrypted) {
+function PageControllerDecryptKeys(div, state, onKeysDecrypted) {
 	DivController.call(this, div);
 	let keys = state.keys;
 	let passwordInput;
@@ -1276,7 +1427,7 @@ function DecryptKeysController(div, state, onKeysDecrypted) {
 	
 	var errorDiv = $("<div>");
 }
-inheritsFrom(DecryptKeysController, DivController);
+inheritsFrom(PageControllerDecryptKeys, DivController);
 
 /**
  * Render import files page.
@@ -1285,7 +1436,7 @@ inheritsFrom(DecryptKeysController, DivController);
  * @param onKeysImported is invoked when keys are extracted from uploaded files
  * @param onSelectImportText is invoked if the user prefers to import a private key from text
  */
-function ImportFilesController(div, onKeysImported, onSelectImportText) {
+function PageControllerImportFiles(div, onKeysImported, onSelectImportText) {
 	DivController.call(this, div);
 	
 	this.render = function(callback) {
@@ -1455,7 +1606,7 @@ function ImportFilesController(div, onKeysImported, onSelectImportText) {
 	let lastKeys;				// tracks last imported keys so page only advances if keys change
 	setErrorMessage("");
 }
-inheritsFrom(ImportFilesController, DivController);
+inheritsFrom(PageControllerImportFiles, DivController);
 
 /**
  * Page to view and save pieces.
@@ -1463,7 +1614,7 @@ inheritsFrom(ImportFilesController, DivController);
  * @param div is the div to render to
  * @param state is the current application state to render
  */
-function SaveController(div, state) {
+function PageControllerExport(div, state) {
 	DivController.call(this, div);
 	assertTrue(state.keys.length > 0);
 	
@@ -1721,7 +1872,7 @@ function SaveController(div, state) {
 		return hideCryptostorageLogosCheckbox.prop('checked');
 	}
 }
-inheritsFrom(SaveController, DivController);
+inheritsFrom(PageControllerExport, DivController);
 
 /**
  * Controls the custom export page.
@@ -1747,242 +1898,9 @@ function CustomExportController(div, state, pieces) {
 inheritsFrom(CustomExportController, DivController);
 
 /**
- * Renders a piece to a div for HTML export.
- */
-let PieceRenderer = {
-
-	defaultConfig: {
-		pairsPerPage: 7,
-		hidePublic: false,
-		hidePrivate: false,
-		hideCurrencyLogos: false,
-		hideCryptostorageLogos: false,
-		qrSize: 90,
-		qrVersion: null,
-		qrErrorCorrectionLevel: 'H',
-		qrScale: 4,
-		qrPadding: 5,		// spacing in pixels
-	},
-	
-	/**
-	 * Returns the total weight to render all keys across all pieces.
-	 */
-	getPieceWeight: function(numKeys, numPieces, config) {
-		
-		// merge configs
-		config = Object.assign({}, PieceRenderer.defaultConfig, config);
-		
-		// get number of qr codes
-		let numQrs = numKeys * numPieces * 2;
-		
-		// get number of logos
-		let numLogos = config.showLogos ? numKeys * numPieces : 0;
-		
-		// return total weight
-		return numQrs * Weights.getQrWeight() + numLogos * Weights.getLogoWeight();
-	},
-	
-	/**
-	 * Renders pieces.
-	 * 
-	 * @param pieceDivs are the divs to render to
-	 * @param pieces are the pieces to render
-	 * @param config is the configuration to render
-	 * @param onProgress(percent) is invoked as progress is made
-	 * @param onDone(err, pieceDivs) is invoked when done
-	 */
-	renderPieces: function(pieceDivs, pieces, config, onProgress, onDone) {
-
-		// merge default config with given confi
-		config = Object.assign({}, PieceRenderer.defaultConfig, config);
-		
-		// initialize divs if they weren't given
-		if (pieceDivs) assertEquals(pieceDivs.length, pieces.length);
-		else {
-			pieceDivs = [];
-			for (let i = 0; i < pieces.length; i++) pieceDivs.push($("<div>"));
-		}
-		
-		// collect functions to render
-		let funcs = [];
-		for (let i = 0; i < pieces.length; i++) {
-			funcs.push(function(onDone) { PieceRenderer.renderPiece(pieceDivs[i], pieces[i], config, onPieceProgress, onDone); });
-		}
-		
-		// handle progress
-		let prevProgress = 0;
-		function onPieceProgress(percent) {
-			if (onProgress) onProgress(prevProgress + percent / pieces.length);
-			if (percent === 1) prevProgress += 1 / pieces.length;
-		}
-		
-		// render async
-		async.series(funcs, function(err, pieceDivs) {
-			if (err) onDone(err);
-			else onDone(null, pieceDivs);
-		});
-	},
-		
-	/**
-	 * Renders the given piece to a new div.
-	 * 
-	 * @param pieceDiv is the div to render to
-	 * @param piece is the piece to render
-	 * @param config is the configuration to render
-	 * @param onProgress(percent) is invoked as progress is made
-	 * @param onDone(err, pieceDiv) is invoked when done
-	 */
-	renderPiece: function(pieceDiv, piece, config, onProgress, onDone) {
-		assertInitialized(pieceDiv);
-		
-		// div setup
-		pieceDiv.empty();
-		pieceDiv.attr("class", "piece_div");
-		
-		// merge configs
-		config = Object.assign({}, PieceRenderer.defaultConfig, config);
-
-		// setup pages and collect functions to render keys
-		let pageDiv;
-		let funcs = [];
-		for (let i = 0; i < piece.keys.length; i++) {
-			
-			// render new page
-			if (i % config.pairsPerPage === 0) {
-				if (i > 0) pieceDiv.append($("<div class='piece_page_spacer'>"));
-				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
-				if (!config.hideCryptostorageLogos) {
-					let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
-					logoDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("cryptostorage") + "'>"));
-				}
-			}
-			
-			// collect functions to render key pair
-			let keyDiv = $("<div class='key_div'>").appendTo(pageDiv);
-			if (i % config.pairsPerPage === 0) keyDiv.css("border-top", "2px solid green");
-			let plugin = CryptoUtils.getCryptoPlugin(piece.keys[i].ticker);
-			let title = "#" + (i + 1);
-			let leftLabel = "\u25C4 Public Address";
-			let leftValue = config.hidePublic ? null : piece.keys[i].address;
-			let logo = $("<img width=100% height=100% src='" + getImageData(piece.keys[i].ticker) + "'>");
-			let logoLabel = plugin.getName();
-			let rightLabel = "Private Key" + (piece.keys[i].split ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
-			let rightValue = config.hidePrivate ? null : piece.keys[i].wif;
-			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config,
-				function() {
-					onKeyPairDone();
-					onDone();
-				}
-			)});
-		}
-		
-		// handle progress
-		let keyPairsDone = 0;
-		let lastProgress = 0;
-		let notifyFrequency = .005;	// notifies every .5% progress
-		function onKeyPairDone() {
-			keyPairsDone++;
-			let progress = keyPairsDone / piece.keys.length;
-			if (progress === 1 || progress - lastProgress >= notifyFrequency) {
-				lastProgress = progress;
-				onProgress(progress);
-			}
-		}
-		
-		// render pairs
-		async.series(funcs, function() {
-			onDone(null, pieceDiv);
-		});
-		
-		/**
-		 * Renders a single key pair.
-		 */
-		function renderKeyPair(div, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config, onDone) {
-			
-			// left qr code
-			let keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
-			
-			// title
-			let keyDivCenter = $("<div class='key_div_center'>").appendTo(div);
-			let titleDiv = $("<div class='key_div_center_title'>").appendTo(keyDivCenter);
-			titleDiv.html(title);
-			
-			// left label and value
-			let keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivCenter);
-			keyDivLeftLabel.html(leftLabel);
-			let keyDivLeftValue = $("<div class='key_div_left_value'>").appendTo(keyDivCenter);
-			if (leftValue && !hasWhitespace(leftValue)) keyDivLeftValue.css("word-break", "break-all");
-			keyDivLeftValue.html(leftValue ? leftValue : "(omitted)");
-			
-			// center currency
-			let keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
-			if (!config.hideCurrencyLogos) {
-				let keyDivCurrencyLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
-				keyDivCurrencyLogo.append(logo);
-			}
-			let keyDivCurrencyLabel = $("<div class='key_div_currency_label'>").appendTo(keyDivCurrency);
-			keyDivCurrencyLabel.html("&nbsp;" + logoLabel);
-			
-			// right label and value
-			let keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivCenter);
-			keyDivRightLabel.html(rightLabel);
-			let keyDivRightValue = $("<div class='key_div_right_value'>").appendTo(keyDivCenter);
-			if (rightValue && !hasWhitespace(rightValue)) keyDivRightValue.css("word-break", "break-all");
-			keyDivRightValue.html(rightValue ? rightValue : "(omitted)");
-			
-			// collapse spacing for long keys
-			if (leftValue && leftValue.length > 71) {
-				keyDivCurrency.css("margin-top", "-15px");
-			}
-			if (rightValue && rightValue.length > 150) {
-				keyDivCurrency.css("margin-top", "-12px");
-				keyDivRightLabel.css("margin-top", "-15px");
-			}
-			
-			// right qr code
-			let keyDivRight = $("<div class='key_div_right'>").appendTo(div);
-			
-			// add qr codes
-			if (leftValue) {
-				CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
-					img.attr("class", "key_div_qr");
-					keyDivLeft.append(img);
-					addPrivateQr();
-				});
-			} else {
-				keyDivLeft.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>"));
-				addPrivateQr();
-			}
-			function addPrivateQr() {
-				if (rightValue) {
-					CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
-						img.attr("class", "key_div_qr");
-						keyDivRight.append(img);
-						onDone();
-					});
-				} else {
-					keyDivRight.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>"));
-					onDone();
-				}
-			}
-			
-			// translate from renderer config to QR config
-			function getQrConfig(config) {
-				let qr_config = {};
-				if ("undefined" !== config.qrSize) qr_config.size = config.qrSize;
-				if ("undefined" !== config.qrVersion) qr_config.version = config.qrVersion;
-				if ("undefined" !== config.qrErrorCorrectionLevel) qr_config.errorCorrectionLevel = config.qrErrorCorrectionLevel;
-				if ("undefined" !== config.qrScale) qr_config.scale = config.qrScale;
-				return qr_config;
-			}
-		}
-	}
-}
-
-/**
  * FAQ page.
  */
-function FaqController(div) {
+function PageControllerFaq(div) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -2007,12 +1925,12 @@ function FaqController(div) {
 		callback(div);
 	}
 }
-inheritsFrom(FaqController, DivController);
+inheritsFrom(PageControllerFaq, DivController);
 
 /**
  * Donate page.
  */
-function DonateController(div) {
+function PageControllerDonate(div) {
 	DivController.call(this, div);
 	this.render = function(callback) {
 		UiUtils.pageSetup(div);
@@ -2026,4 +1944,4 @@ function DonateController(div) {
 		callback(div);
 	}
 }
-inheritsFrom(DonateController, DivController);
+inheritsFrom(PageControllerDonate, DivController);
