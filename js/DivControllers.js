@@ -159,7 +159,7 @@ DivController.prototype.onHide = function() { }
 function MainController(mainDiv) {
 	DivController.call(this, mainDiv);
 	
-	const TRANSITION_DURATION = 250;	// time to transition pages
+	const TRANSITION_DURATION = 200;	// time to transition pages
 	
 	let state;	// main application state
 	let that = this;
@@ -239,14 +239,20 @@ function MainController(mainDiv) {
 			
 			// animate next
 			if (lastIdx < curIdx) {
-				lastDiv.toggle("slide", {direction: "left"}, TRANSITION_DURATION);
-				curDiv.toggle("slide", {direction: "right", complete:function() { transitioning = false; renderer.onShow(); }}, TRANSITION_DURATION);
+				lastDiv.css("opacity", 1);
+				curDiv.css("opacity", 0);
+				lastDiv.animate({left:'-10%', opacity:0}, TRANSITION_DURATION, function() { lastDiv.hide(); });
+				curDiv.animate({left:'10%'}, 0, function() { curDiv.show(); });
+				curDiv.animate({left:'0px', opacity:1}, TRANSITION_DURATION, function() { transitioning = false; renderer.onShow(); });
 			}
 			
 			// animate previous
 			else {
-				lastDiv.toggle("slide", {direction: "right"}, TRANSITION_DURATION);
-				curDiv.toggle("slide", {direction: "left", complete:function() { transitioning = false; renderer.onShow(); }}, TRANSITION_DURATION);
+				lastDiv.css("opacity", 1);
+				curDiv.css("opacity", 0);
+				lastDiv.animate({left:'10%', opacity:0}, TRANSITION_DURATION, function() { lastDiv.hide(); });
+				curDiv.animate({left:'-10%'}, 0, function() { curDiv.show(); });
+				curDiv.animate({left:'0px', opacity:1}, TRANSITION_DURATION, function() { transitioning = false; renderer.onShow(); });
 			}
 		}
 		
