@@ -1,6 +1,6 @@
 // TODO
-// bug: export split mix, encryption is set even though split (need test), failing to import
-// polish: disable arrow transparent, piece selector misplaced when cs logo hidden, coin logos throughout pages, min page height
+// polish: undefline options, disable arrow transparent, piece selector misplaced when cs logo hidden, coin logos throughout pages, min page height
+// memory profiling
 // new design
 // faq page
 // donation page

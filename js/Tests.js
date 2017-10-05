@@ -451,13 +451,15 @@ let Tests = {
 				for (let i = 0; i < keys.length; i++) {
 					assertEquals(keys[i].getPlugin().getTicker(), piece.keys[i].ticker);
 					assertEquals(keys[i].getAddress(), piece.keys[i].address);
+					if (piece.keys[i].wif) {
+						assertDefined(piece.keys[i].encryption);
+						assertEquals(keys[i].getEncryptionScheme(), piece.keys[i].encryption);
+					}
+					else assertUndefined(piece.keys[i].encryption);
 					if (numPieces > 1) {
-						assertUndefined(piece.keys[i].encryption);
 						assertTrue(piece.keys[i].split);
 						assertFalse(keys[i].getWif() === piece.keys[i].wif);
 					} else {
-						if (piece.keys[i].wif) assertDefined(piece.keys[i].encryption);
-						assertEquals(keys[i].getEncryptionScheme(), piece.keys[i].encryption);
 						assertFalse(piece.keys[i].split);
 						assertTrue(keys[i].getWif() === piece.keys[i].wif);
 					}

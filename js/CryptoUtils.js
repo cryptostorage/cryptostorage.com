@@ -275,7 +275,7 @@ let CryptoUtils = {
 				pieceKey.address = key.getAddress();
 				pieceKey.wif = keyPieces[i];
 				pieceKey.split = numPieces > 1;
-				if (!pieceKey.split) pieceKey.encryption = key.getEncryptionScheme();
+				if (pieceKey.wif) pieceKey.encryption = key.getEncryptionScheme();
 				pieces[i].keys.push(pieceKey);
 			}
 		}
