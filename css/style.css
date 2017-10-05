@@ -349,8 +349,9 @@ input[type='file'] {
 }
 
 .preview_header {
-	position:absolute;
-	margin-top:10px;
+	width:100%;
+	display:flex;
+	justify-content:flex-end;
 }
 
 .preview_header_left {

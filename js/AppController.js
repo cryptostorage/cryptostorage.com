@@ -1,5 +1,5 @@
 // TODO
-// polish: undefline options, disable arrow transparent, piece selector misplaced when cs logo hidden, coin logos throughout pages, min page height
+// polish: disable arrow transparent, coin logos throughout pages, min page height
 // memory profiling
 // new design
 // faq page
