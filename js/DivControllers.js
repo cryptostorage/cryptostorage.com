@@ -185,8 +185,8 @@ DivController.prototype.onHide = function() { }
 /**
  * Main application flow to generate and import keys.
  */
-function FlowController(mainDiv, appController) {
-	DivController.call(this, mainDiv);
+function FlowController(flowDiv, appController) {
+	DivController.call(this, flowDiv);
 	
 	const TRANSITION_DURATION = 200;	// time to transition pages
 	
@@ -209,7 +209,7 @@ function FlowController(mainDiv, appController) {
 		initState();
 		
 		// add navigation bar
-		let navDiv = $("<div class='nav_div'>").appendTo(mainDiv);
+		let navDiv = $("<div class='nav_div'>").appendTo(flowDiv);
 		leftArrowDiv = $("<div class='left_arrow_div'>").appendTo(navDiv);
 		leftArrowDiv.hide();
 		leftArrow = $("<img class='nav_arrow left_arrow' src='img/closed_arrow.png'>").appendTo(leftArrowDiv);
@@ -284,7 +284,7 @@ function FlowController(mainDiv, appController) {
 		// handle first page
 		if (lastIdx === -1) {
 			transitioning = false;
-			mainDiv.append(renderer.getDiv());
+			flowDiv.append(renderer.getDiv());
 		}
 		
 		// handle non-first page change
@@ -296,7 +296,7 @@ function FlowController(mainDiv, appController) {
 			
 			// set up page to be rendered
 			curDiv.hide();
-			mainDiv.append(curDiv);
+			flowDiv.append(curDiv);
 			
 			// animate next
 			if (lastIdx < curIdx) {
