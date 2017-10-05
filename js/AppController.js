@@ -45,6 +45,7 @@
 // disable next if mix num keys change
 // Include -> Omit public addresses
 // horizontal scrolling bars on chrome and safari
+// hide page breaks in previews with @media print
 
 // low priority
 // all div controllers directly modify state
