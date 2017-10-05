@@ -22,6 +22,7 @@
 // note of how b64-images.js is created
 // how does jaxx generate zcash and bitcoin variations
 // warning to discard storage
+// double click keys should select call
 
 // consult designers
 // icons of supported currencies on home page
