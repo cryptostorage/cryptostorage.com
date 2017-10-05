@@ -1,5 +1,5 @@
 // TODO
-// polish: disable arrow transparent, coin logos throughout pages, min page height
+// polish: disable arrow transparent, coin logos throughout pages
 // memory profiling
 // new design
 // faq page
