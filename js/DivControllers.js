@@ -185,7 +185,7 @@ DivController.prototype.onHide = function() { }
 /**
  * Main application flow to generate and import keys.
  */
-function MainController(mainDiv, appController) {
+function FlowController(mainDiv, appController) {
 	DivController.call(this, mainDiv);
 	
 	const TRANSITION_DURATION = 200;	// time to transition pages
@@ -248,7 +248,7 @@ function MainController(mainDiv, appController) {
 	function initState() {
 		state = {};
 		state.plugins = CryptoUtils.getCryptoPlugins();
-		state.mainController = that;
+		state.FlowController = that;
 	}
 	
 	function set(renderer, onDone) {
@@ -434,7 +434,7 @@ function MainController(mainDiv, appController) {
 		}
 	}
 }
-inheritsFrom(MainController, DivController);
+inheritsFrom(FlowController, DivController);
 
 /**
  * Render home page.
@@ -656,7 +656,7 @@ function PageControllerNumKeysSingle(div, appController, onNumKeysInput) {
 		numKeysInput.attr("value", 10);
 		contentDiv.append(numKeysInput);
 		contentDiv.append("<br><br>");
-		numKeysInput.keypress(function() { state.mainController.clearNexts(); });
+		numKeysInput.keypress(function() { state.FlowController.clearNexts(); });
 		
 		// error message
 		errorDiv.attr("class", "error_msg");
@@ -756,7 +756,7 @@ function PageControllerPasswordInput(div, appController, onPasswordInput) {
 		passwordInput.attr("class", "text_input");
 		contentDiv.append(passwordInput);
 		contentDiv.append("<br><br>");
-		passwordInput.keypress(function() { state.mainController.clearNexts(); });
+		passwordInput.keypress(function() { state.FlowController.clearNexts(); });
 		
 		// render advanced link
 		let advancedLink = $("<div class='mock_link'>").appendTo(contentDiv);
@@ -925,7 +925,7 @@ function PageControllerSplitInput(div, appController, onPiecesInput) {
 		numPiecesInput.attr("min", 2);
 		contentDiv.append(numPiecesInput);
 		contentDiv.append("<br><br>");
-		numPiecesInput.keypress(function() { state.mainController.clearNexts(); });
+		numPiecesInput.keypress(function() { state.FlowController.clearNexts(); });
 		
 		contentDiv.append("Number of pieces necessary to restore private keys: ");
 		var minPiecesInput = $("<input type='number'>");
@@ -934,7 +934,7 @@ function PageControllerSplitInput(div, appController, onPiecesInput) {
 		minPiecesInput.attr("value", 2);
 		contentDiv.append(minPiecesInput);
 		contentDiv.append("<br><br>");
-		minPiecesInput.keypress(function() { state.mainController.clearNexts(); });
+		minPiecesInput.keypress(function() { state.FlowController.clearNexts(); });
 		
 		// error message
 		errorDiv.empty();
@@ -1012,8 +1012,8 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 		var btnGenerate = UiUtils.getNextButton("Generate keys");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
-			state.mainController.clearNexts();
-			state.mainController.setNavigable(false);
+			state.FlowController.clearNexts();
+			state.FlowController.setNavigable(false);
 			generateKeys(function(keys, pieces, pieceDivs) {
 				btnGenerate.removeAttr("disabled");
 				onKeysGenerated(keys, pieces, pieceDivs);
@@ -1326,8 +1326,8 @@ function PageControllerDecryptKeys(div, appController, onKeysDecrypted) {
 		btnDecrypt.click(function() {
 			setErrorMessage("");
 			btnDecrypt.attr("disabled", "disabled");
-			state.mainController.clearNexts();
-			state.mainController.setNavigable(false);
+			state.FlowController.clearNexts();
+			state.FlowController.setNavigable(false);
 			onDecrypt(function(err, pieces, pieceDivs) {
 				if (err) {
 					setErrorMessage(err.message);

@@ -1,4 +1,5 @@
 // TODO
+// use onHide(), don't auto advance if not next, ability to cancel
 // polish: disable arrow transparent, coin logos throughout pages
 // memory profiling
 // new design
@@ -108,7 +109,7 @@ function ApplicationController(div) {
 	
 	let that = this;
 	let contentDiv;
-	let mainController;
+	let flowController;
 	let faqController;
 	let donateController;
 	
@@ -123,7 +124,7 @@ function ApplicationController(div) {
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		mainController = new MainController($("<div class='main_container'>"), that);
+		flowController = new FlowController($("<div class='flow_container'>"), that);
 		faqController = new PageControllerFaq($("<div>"), that);
 		donateController = new PageControllerDonate($("<div>"), that);
 		faqController.render();
@@ -133,7 +134,7 @@ function ApplicationController(div) {
 		setTimeout(function() {
 			
 			// render body and start on home
-			mainController.render(function() {
+			flowController.render(function() {
 				
 				// get identifier
 				let href = window.location.href;
@@ -148,18 +149,18 @@ function ApplicationController(div) {
 		}, 0);
 	}
 	
-	this.getMainController = function() {
-		return mainController;
+	this.getFlowController = function() {
+		return flowController;
 	}
 	
 	this.getMainState = function() {
-		return mainController.getState();
+		return flowController.getState();
 	}
 	
 	this.showHome = function() {
 		if (DEBUG) console.log("showHome()");
 		clearContents();
-		contentDiv.append(mainController.getDiv());
+		contentDiv.append(flowController.getDiv());
 	}
 	
 	this.showFaq = function() {

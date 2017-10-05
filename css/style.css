@@ -83,7 +83,7 @@ body {
     transform: rotate(0deg);
 }
 
-.main_container {
+.flow_container {
 	position:relative;
 	width:100%;
 }
