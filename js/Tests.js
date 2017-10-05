@@ -451,11 +451,13 @@ let Tests = {
 				for (let i = 0; i < keys.length; i++) {
 					assertEquals(keys[i].getPlugin().getTicker(), piece.keys[i].ticker);
 					assertEquals(keys[i].getAddress(), piece.keys[i].address);
-					assertEquals(keys[i].getEncryptionScheme(), piece.keys[i].encryption);
 					if (numPieces > 1) {
+						assertUndefined(piece.keys[i].encryption);
 						assertTrue(piece.keys[i].split);
 						assertFalse(keys[i].getWif() === piece.keys[i].wif);
 					} else {
+						if (piece.keys[i].wif) assertDefined(piece.keys[i].encryption);
+						assertEquals(keys[i].getEncryptionScheme(), piece.keys[i].encryption);
 						assertFalse(piece.keys[i].split);
 						assertTrue(keys[i].getWif() === piece.keys[i].wif);
 					}
@@ -465,7 +467,7 @@ let Tests = {
 			// verify secrets is initialized with 7 bits
 			if (numPieces > 1) {
 				for (let pieceKey of pieces[0].keys) {
-					if (!pieceKey.encryption && pieceKey.ticker === 'BTC') {
+					if (pieceKey.wif && !pieceKey.encryption && pieceKey.ticker === 'BTC') {
 						assertTrue(pieceKey.wif.startsWith("3X"));
 					}
 				}

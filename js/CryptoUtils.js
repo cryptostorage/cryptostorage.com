@@ -274,8 +274,8 @@ let CryptoUtils = {
 				pieceKey.ticker = key.getPlugin().getTicker();
 				pieceKey.address = key.getAddress();
 				pieceKey.wif = keyPieces[i];
-				pieceKey.encryption = key.getEncryptionScheme();
 				pieceKey.split = numPieces > 1;
+				if (!pieceKey.split) pieceKey.encryption = key.getEncryptionScheme();
 				pieces[i].keys.push(pieceKey);
 			}
 		}
