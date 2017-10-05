@@ -35,7 +35,7 @@ let UiUtils = {
 	},
 	
 	getCryptoLogo: function(state) {
-		if (state.mix) return state.mix.length > 1 ? this.getMixLogo() : state.mix[0].plugin.getLogo();
+		if (state.mix) return state.mix.length === 1 ? state.mix[0].plugin.getLogo() : this.getMixLogo();
 		else {
 			let ticker;
 			for (let key of state.keys) {
@@ -544,7 +544,7 @@ function PageControllerNumKeysMix(div, appController, onMixNumKeysInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, appController, "Enter the number of keys to generate.");
+		let page = new Page(div, appController, "Enter the number of keys to generate.", UiUtils.getCryptoLogo(state));
 		let contentDiv = page.getContentDiv();
 		
 		// render num key inputs
@@ -651,7 +651,7 @@ function PageControllerNumKeysSingle(div, appController, onNumKeysInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, appController, "Enter the number of keys to create.");
+		let page = new Page(div, appController, "Enter the number of keys to generate.", UiUtils.getCryptoLogo(state));
 		let contentDiv = page.getContentDiv();
 		
 		// num key keys input
@@ -712,7 +712,7 @@ function PageControllerPasswordSelection(div, appController, onPasswordSelection
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, appController, "Do you want to password protect your private keys?");
+		let page = new Page(div, appController, "Do you want to password protect your private keys?", UiUtils.getCryptoLogo(state));
 		let contentDiv = page.getContentDiv();
 		
 		var btnYes = UiUtils.getNextButton("Yes (recommended)");
@@ -744,7 +744,7 @@ function PageControllerPasswordInput(div, appController, onPasswordInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, appController, "Enter a password to protect your private keys.");
+		let page = new Page(div, appController, "Enter a password to protect your private keys.", UiUtils.getCryptoLogo(state));
 		let contentDiv = page.getContentDiv();
 		
 		contentDiv.append("The password must be at least 6 characters long.");
@@ -893,7 +893,7 @@ function PageControllerSplitSelection(div, appController, onSplitSelection) {
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, appController, "Do you want to split your private keys into separate pieces?");
+		let page = new Page(div, appController, "Do you want to split your private keys into separate pieces?", UiUtils.getCryptoLogo(state));
 		let contentDiv = page.getContentDiv();
 		
 		contentDiv.append("The pieces must be recombined to recover all private keys.");
@@ -921,7 +921,7 @@ function PageControllerSplitInput(div, appController, onPiecesInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, appController, "How many pieces do you want to split your private keys into?");
+		let page = new Page(div, appController, "Enter the number of pieces to split your storage into?", UiUtils.getCryptoLogo(state));
 		let contentDiv = page.getContentDiv();
 		
 		contentDiv.append("Number of pieces: ");
@@ -1005,7 +1005,7 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, appController, "Ready to generate your keys?");
+		let page = new Page(div, appController, "Ready to generate your keys?", UiUtils.getCryptoLogo(state));
 		let contentDiv = page.getContentDiv();
 		
 		// render summary
@@ -1700,7 +1700,7 @@ function PageControllerExport(div, appController) {
 		let name = UiUtils.getCryptoName(state);
 		name = name === "mixed" ? "" : name;
 		let header = state.mix ? "Your keys are ready to save." : "Your keys have been imported.";
-		let page = new Page(div, appController, header, UiUtils.getCryptoLogo(state));
+		let page = new Page(div, appController, header);
 		let contentDiv = page.getContentDiv();
 		
 		// center page contents

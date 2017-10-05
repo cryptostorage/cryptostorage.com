@@ -1,6 +1,4 @@
 // TODO
-// use onHide(), don't auto advance if not next, ability to cancel
-// polish: disable arrow transparent, coin logos throughout pages
 // memory profiling
 // new design
 // faq page
