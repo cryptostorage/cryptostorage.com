@@ -192,7 +192,7 @@ function FlowController(flowDiv, appController) {
 	
 	let state;	// main application state
 	let that = this;
-	let pathTracker = new PathTracker(onPageChange);
+	let pathTracker = new PathTracker(onPageChange, onPagesRemoved);
 	let transitioning = false;
 	let leftArrowDiv;									// container for left arrow
 	let leftArrow;										// left navigation arrow
@@ -229,16 +229,6 @@ function FlowController(flowDiv, appController) {
 		pathTracker.clearNexts();
 	}
 	
-	this.setNavigable = function(navigable) {
-		if (DEBUG) console.log("setNavigable(" + navigable + ")");
-		leftArrow.detach();
-		leftArrowDisabled.detach();
-		rightArrow.detach();
-		rightArrowDisabled.detach();
-		leftArrowDiv.append(navigable ? leftArrow : leftArrowDisabled);
-		rightArrowDiv.append(navigable ? rightArrow : rightArrowDisabled);
-	}
-	
 	this.getState = function() {
 		return state;
 	}
@@ -248,13 +238,12 @@ function FlowController(flowDiv, appController) {
 	function initState() {
 		state = {};
 		state.plugins = CryptoUtils.getCryptoPlugins();
-		state.FlowController = that;
+		state.flowController = that;
 	}
 	
 	function set(renderer, onDone) {
 		transitioning = false;
 		renderer.render(function(div) {
-			for (let renderer of pathTracker.getItems()) renderer.getDiv().remove();
 			pathTracker.clear();
 			pathTracker.next(renderer);
 			if (onDone) onDone();
@@ -265,11 +254,26 @@ function FlowController(flowDiv, appController) {
 		if (transitioning) return;	// cannot add page if transitioning
 		transitioning = true;
 		renderer.render(function(div) {
-			let toRemoves = pathTracker.getNexts();
 			pathTracker.next(renderer);
-			for (let toRemove of toRemoves) toRemove.getDiv().remove();
 			if (onDone) onDone();
 		});
+	}
+	
+	function append(renderer, onDone) {
+		if (transitioning) return;	// cannot add page if transitioning
+		transitioning = true;
+		renderer.render(function(div) {
+			pathTracker.append(renderer);
+			if (onDone) onDone();
+		});
+	}
+	
+	function onPagesRemoved(renderers) {
+		for (let renderer of renderers) {
+			renderer.getDiv().remove();
+			if (renderer.decommission) renderer.decommission();
+		}
+		updateArrows();
 	}
 	
 	/**
@@ -317,10 +321,12 @@ function FlowController(flowDiv, appController) {
 			}
 		}
 		
-		// update arrows	
+		updateArrows();
+	}
+	
+	function updateArrows() {
 		pathTracker.hasPrev() ? leftArrowDiv.show() : leftArrowDiv.hide();
 		pathTracker.hasNext() ? rightArrowDiv.show() : rightArrowDiv.hide();
-		that.setNavigable(true);
 	}
 
 	// ------------------------------ CREATE NEW --------------------------------
@@ -396,7 +402,7 @@ function FlowController(flowDiv, appController) {
 		state.keys = keys;
 		state.pieces = pieces;
 		state.pieceDivs = pieceDivs;
-		next(new PageControllerExport($("<div>"), appController));
+		append(new PageControllerExport($("<div>"), appController));
 	}
 	
 	// ------------------------------ RESTORE --------------------------------
@@ -430,7 +436,7 @@ function FlowController(flowDiv, appController) {
 		state.pieceDivs = pieceDivs;
 		if (keys[0].getWif() && keys[0].isEncrypted()) next(new PageControllerDecryptKeys($("<div>"), appController, onKeysImported));
 		else {
-			next(new PageControllerExport($("<div>"), appController));
+			append(new PageControllerExport($("<div>"), appController));
 		}
 	}
 }
@@ -656,7 +662,7 @@ function PageControllerNumKeysSingle(div, appController, onNumKeysInput) {
 		numKeysInput.attr("value", 10);
 		contentDiv.append(numKeysInput);
 		contentDiv.append("<br><br>");
-		numKeysInput.keypress(function() { state.FlowController.clearNexts(); });
+		numKeysInput.keypress(function() { state.flowController.clearNexts(); });
 		
 		// error message
 		errorDiv.attr("class", "error_msg");
@@ -756,7 +762,7 @@ function PageControllerPasswordInput(div, appController, onPasswordInput) {
 		passwordInput.attr("class", "text_input");
 		contentDiv.append(passwordInput);
 		contentDiv.append("<br><br>");
-		passwordInput.keypress(function() { state.FlowController.clearNexts(); });
+		passwordInput.keypress(function() { state.flowController.clearNexts(); });
 		
 		// render advanced link
 		let advancedLink = $("<div class='mock_link'>").appendTo(contentDiv);
@@ -890,7 +896,7 @@ function PageControllerSplitSelection(div, appController, onSplitSelection) {
 		let page = new Page(div, appController, "Do you want to split your private keys into separate pieces?");
 		let contentDiv = page.getContentDiv();
 		
-		contentDiv.append("The pieces must be recombined to recover the private keys.");
+		contentDiv.append("The pieces must be recombined to recover all private keys.");
 		contentDiv.append("<br><br>");
 		
 		var btnYes = UiUtils.getNextButton("Yes").appendTo(contentDiv);
@@ -925,7 +931,7 @@ function PageControllerSplitInput(div, appController, onPiecesInput) {
 		numPiecesInput.attr("min", 2);
 		contentDiv.append(numPiecesInput);
 		contentDiv.append("<br><br>");
-		numPiecesInput.keypress(function() { state.FlowController.clearNexts(); });
+		numPiecesInput.keypress(function() { state.flowController.clearNexts(); });
 		
 		contentDiv.append("Number of pieces necessary to restore private keys: ");
 		var minPiecesInput = $("<input type='number'>");
@@ -934,7 +940,7 @@ function PageControllerSplitInput(div, appController, onPiecesInput) {
 		minPiecesInput.attr("value", 2);
 		contentDiv.append(minPiecesInput);
 		contentDiv.append("<br><br>");
-		minPiecesInput.keypress(function() { state.FlowController.clearNexts(); });
+		minPiecesInput.keypress(function() { state.flowController.clearNexts(); });
 		
 		// error message
 		errorDiv.empty();
@@ -986,9 +992,15 @@ inheritsFrom(PageControllerSplitInput, DivController);
 function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 	DivController.call(this, div);
 	
+	let decommissioned = false;
 	let state = appController.getMainState();
 	let progressDiv;
 	let progressBar;
+	
+	this.decommission = function() {
+		console.log("PageControllerGenerateKeys.decommission()");
+		decommissioned = true;
+	}
 	
 	this.render = function(callback) {
 		
@@ -1012,11 +1024,10 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 		var btnGenerate = UiUtils.getNextButton("Generate keys");
 		btnGenerate.click(function() {
 			btnGenerate.attr("disabled", "disabled");
-			state.FlowController.clearNexts();
-			state.FlowController.setNavigable(false);
+			state.flowController.clearNexts();
 			generateKeys(function(keys, pieces, pieceDivs) {
 				btnGenerate.removeAttr("disabled");
-				onKeysGenerated(keys, pieces, pieceDivs);
+				if (!decommissioned) onKeysGenerated(keys, pieces, pieceDivs);
 			});
 		});
 		contentDiv.append(btnGenerate);
@@ -1062,6 +1073,10 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 			let progressWeight = 0;
 			setProgress(progressWeight, totalWeight, "Generating keys");
 			async.series(funcs, function(err, keys) {
+				if (decommissioned) {
+					onKeysGenerated();
+					return;
+				}
 				if (err) throw err;
 				let originals = keys;
 				
@@ -1108,6 +1123,10 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 					// encrypt keys
 					setProgress(progressWeight, totalWeight, "Encrypting keys");
 					async.series(funcs, function(err, encryptedKeys) {
+						if (decommissioned) {
+							onKeysGenerated();
+							return;
+						}
 						if (err) throw err;
 						
 						// convert keys to pieces
@@ -1132,6 +1151,10 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 							// decrypt keys
 							setProgress(progressWeight, totalWeight, "Verifying encryption");
 							async.series(funcs, function(err, decryptedKeys) {
+								if (decommissioned) {
+									onKeysGenerated();
+									return;
+								}
 								if (err) throw err;
 								
 								// verify equivalence
@@ -1176,6 +1199,10 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 			
 			function newKeyFunc(plugin, callback) {
 				return function(callback) {
+					if (decommissioned) {
+						callback();
+						return;
+					}
 					setTimeout(function() {
 						let key = plugin.newKey();
 						progressWeight += UiUtils.getCreateKeyWeight();
@@ -1187,6 +1214,10 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 			
 			function encryptFunc(key, scheme, password) {
 				return function(callback) {
+					if (decommissioned) {
+						callback();
+						return;
+					}
 					key.encrypt(scheme, password, function(err, key) {
 						progressWeight += UiUtils.getEncryptWeight(scheme);
 						setProgress(progressWeight, totalWeight);
@@ -1197,6 +1228,10 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 			
 			function decryptFunc(key, password) {
 				return function(callback) {
+					if (decommissioned) {
+						callback();
+						return;
+					}
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
 						progressWeight += UiUtils.getDecryptWeight(scheme);
@@ -1297,6 +1332,12 @@ function PageControllerDecryptKeys(div, appController, onKeysDecrypted) {
 	let passwordInput;
 	let progressDiv
 	let progressBar;
+	let decommissioned = false;
+	
+	this.decommission = function() {
+		if (DEBUG) console.log("PageControllerDecryptKeys.decommission()");
+		decommissioned = true;
+	}
 	
 	this.render = function(callback) {
 		
@@ -1326,16 +1367,15 @@ function PageControllerDecryptKeys(div, appController, onKeysDecrypted) {
 		btnDecrypt.click(function() {
 			setErrorMessage("");
 			btnDecrypt.attr("disabled", "disabled");
-			state.FlowController.clearNexts();
-			state.FlowController.setNavigable(false);
-			onDecrypt(function(err, pieces, pieceDivs) {
+			state.flowController.clearNexts();
+			decrypt(function(err, pieces, pieceDivs) {
 				if (err) {
 					setErrorMessage(err.message);
 					passwordInput.focus();
 					btnDecrypt.removeAttr("disabled");
 					progressDiv.hide();
 				} else {
-					onKeysDecrypted(keys, pieces, pieceDivs);
+					if (!decommissioned) onKeysDecrypted(keys, pieces, pieceDivs);
 				}
 			});
 		});
@@ -1348,7 +1388,7 @@ function PageControllerDecryptKeys(div, appController, onKeysDecrypted) {
 		// done rendering
 		callback(div);
 		
-		function onDecrypt(onDone) {
+		function decrypt(onDone) {
 			
 			// get passwords
 			var password = passwordInput.val();
@@ -1371,6 +1411,10 @@ function PageControllerDecryptKeys(div, appController, onKeysDecrypted) {
 			let progressWeight = 0;
 			setProgress(progressWeight, totalWeight, "Decrypting");
 			async.series(funcs, function(err, result) {
+				if (decommissioned) {
+					onDone();
+					return;
+				}
 				if (err) onDone(err);
 				else {
 					// convert keys to a decrypted piece
@@ -1397,6 +1441,10 @@ function PageControllerDecryptKeys(div, appController, onKeysDecrypted) {
 			
 			function decryptFunc(key, password) {
 				return function(callback) {
+					if (decommissioned) {
+						callback();
+						return;
+					}
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
 						if (err) callback(err);
