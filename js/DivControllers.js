@@ -921,7 +921,7 @@ function PageControllerSplitInput(div, appController, onPiecesInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, appController, "Enter the number of pieces to split your storage into?", UiUtils.getCryptoLogo(state));
+		let page = new Page(div, appController, "Enter the number of pieces to split your storage into.", UiUtils.getCryptoLogo(state));
 		let contentDiv = page.getContentDiv();
 		
 		contentDiv.append("Number of pieces: ");
