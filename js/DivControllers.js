@@ -659,7 +659,7 @@ function PageControllerNumKeysSingle(div, appController, onNumKeysInput) {
 		numKeysInput.attr("class", "num_input");
 		numKeysInput.attr("type", "number");
 		numKeysInput.attr("min", 1);
-		numKeysInput.attr("value", 10);
+		numKeysInput.attr("value", 7);
 		contentDiv.append(numKeysInput);
 		contentDiv.append("<br><br>");
 		numKeysInput.keypress(function() { state.flowController.clearNexts(); });
