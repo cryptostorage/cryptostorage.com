@@ -41,6 +41,8 @@
 // disable next if mix num keys change
 // hide page breaks in previews with @media print
 // copy line break in pdf inserts space
+// code review
+// import html / other formats?
 
 // low priority
 // all div controllers directly modify state
