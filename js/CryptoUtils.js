@@ -10,13 +10,13 @@ let CryptoUtils = {
 	getCryptoPlugins: function() {
 		if (!CryptoUtils.plugins) {
 			CryptoUtils.plugins = [];
-			CryptoUtils.plugins.push(new BitcoinPlugin());
-			CryptoUtils.plugins.push(new EthereumPlugin());
 			CryptoUtils.plugins.push(new MoneroPlugin());
-			CryptoUtils.plugins.push(new LitecoinPlugin());
+			CryptoUtils.plugins.push(new EthereumPlugin());
 			CryptoUtils.plugins.push(new BitcoinCashPlugin());
-			CryptoUtils.plugins.push(new EthereumClassicPlugin());
+			CryptoUtils.plugins.push(new LitecoinPlugin());
+			CryptoUtils.plugins.push(new BitcoinPlugin());
 			CryptoUtils.plugins.push(new OmiseGoPlugin());
+			CryptoUtils.plugins.push(new EthereumClassicPlugin());
 		}
 		return CryptoUtils.plugins;
 	},

@@ -46,6 +46,7 @@
 // Include -> Omit public addresses
 // horizontal scrolling bars on chrome and safari
 // hide page breaks in previews with @media print
+// copy line break in pdf inserts space
 
 // low priority
 // all div controllers directly modify state
