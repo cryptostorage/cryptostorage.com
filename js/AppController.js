@@ -22,29 +22,23 @@
 // note of how b64-images.js is created
 // how does jaxx generate zcash and bitcoin variations
 // warning to discard storage
-// double click keys should select call
+// double click keys should select all
 
 // consult designers
 // icons of supported currencies on home page
 // use tabs for pieces?
 // password confirmation - re-enter or show
-// title bar should not scroll
+// title bar should not scroll?
 // select one or more currencies to store (consistent look with number of addresses input)
 // enter the number of addresses for each currency || enter the number of Bitcoin addresses to create)
 // summary page has table with logos
 // potentially collapse selection and address input
 // make it clearer what to do next on save page
-// less wasted space
 // navigation bar showing overall place in flow
 // warnings to test before using
 // register shortcut keys for page navigation (enter, y, n)
 // focus on first text element if applicable
-// solve issue where next page may take time to load, but previous page is done
-// prevent rendered page from showing after home, FAQ or donate clicked
-// home button maintains state, doesn't start over
 // disable next if mix num keys change
-// Include -> Omit public addresses
-// horizontal scrolling bars on chrome and safari
 // hide page breaks in previews with @media print
 // copy line break in pdf inserts space
 

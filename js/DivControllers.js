@@ -448,13 +448,14 @@ inheritsFrom(FlowController, DivController);
 function PageControllerHome(div, appController, onSelectCreate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(callback) {
-		let page = new Page(div, appController, "Welcome to cryptostorage.com");
+		let page = new Page(div, appController, "Welcome.");
 		
 		let contentDiv = page.getContentDiv();
-		contentDiv.append(getCheckmarkDiv("Generate public/private keys for multiple cryptocurrencies."));
+		contentDiv.append(getCheckmarkDiv("Generate public/private key pairs to store multiple cryptocurrencies."));
 		contentDiv.append(getCheckmarkDiv("Private keys can be password protected and split into pieces."));
-		contentDiv.append(getCheckmarkDiv("Export to digital and printable formats which can be easily recovered."));
-		contentDiv.append(getCheckmarkDiv("100% open source and free to use.  No registration or trusted third parties."));
+		contentDiv.append(getCheckmarkDiv("Export to digital and printable formats for easy recovery."));
+		contentDiv.append(getCheckmarkDiv("Keys are generated in your browser so funds are never entrusted to a third party."));
+		contentDiv.append(getCheckmarkDiv("100% open source, verifiable, and free to use."));
 		contentDiv.append("<br>");
 		
 		contentDiv.append("Select an option to get started.")
@@ -544,7 +545,7 @@ function PageControllerNumKeysMix(div, appController, onMixNumKeysInput) {
 	this.render = function(callback) {
 		
 		// page setup
-		let page = new Page(div, appController, "Enter the number of keys to generate.", UiUtils.getCryptoLogo(state));
+		let page = new Page(div, appController, "Enter the number of keys to generate for each currency.", UiUtils.getCryptoLogo(state));
 		let contentDiv = page.getContentDiv();
 		
 		// render num key inputs
