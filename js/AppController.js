@@ -43,6 +43,7 @@
 // copy line break in pdf inserts space
 // code review
 // import html / other formats?
+// restrict file types for file picker
 
 // low priority
 // all div controllers directly modify state
