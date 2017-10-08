@@ -2,6 +2,11 @@
  * UI utilities.
  */
 let UiUtils = {
+		
+	setupContentDiv: function(div) {
+		div.empty();
+		div.attr("class", "content_div");
+	},
 
 	getCryptoName: function(state) {
 		if (state.mix) return state.mix.length > 1 ? "mixed" : state.mix[0].plugin.getName();
@@ -112,6 +117,7 @@ DivController.prototype.onHide = function() { }
 function HomeController(div, onSelectCreate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
+		UiUtils.setupContentDiv(div);
 		
 		div.append("Home");
 		if (onDone) onDone();
@@ -125,6 +131,7 @@ inheritsFrom(HomeController, DivController);
 function FormController(div, onSelectCreate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
+		UiUtils.setupContentDiv(div);
 		
 		div.append("Form.");
 		if (onDone) onDone();
@@ -138,21 +145,21 @@ inheritsFrom(FormController, DivController);
 function FaqController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
+		UiUtils.setupContentDiv(div);
 		
-		let contentDiv = div;
-		contentDiv.append("FAQ");
-		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(contentDiv);
-		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(contentDiv);
-		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(contentDiv);
-		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(contentDiv);
-		$("<div class='question'>").html("How can I trust this service?").appendTo(contentDiv);
-		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is what is publically auditable.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(contentDiv);
-		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(contentDiv);
-		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(contentDiv);
-		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(contentDiv);
-		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future depending on interest and ease of implementation.").appendTo(contentDiv);
-		$("<div class='question'>").html("What formats can I export to?").appendTo(contentDiv);
-		$("<div class='answer'>").html("TODO").appendTo(contentDiv);
+		div.append("FAQ");
+		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(div);
+		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(div);
+		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(div);
+		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(div);
+		$("<div class='question'>").html("How can I trust this service?").appendTo(div);
+		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is what is publically auditable.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(div);
+		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(div);
+		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(div);
+		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(div);
+		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future depending on interest and ease of implementation.").appendTo(div);
+		$("<div class='question'>").html("What formats can I export to?").appendTo(div);
+		$("<div class='answer'>").html("TODO").appendTo(div);
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -166,6 +173,7 @@ inheritsFrom(FaqController, DivController);
 function DonateController(div, appController) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
+		UiUtils.setupContentDiv(div);
 		
 		div.append("Donate");
 		

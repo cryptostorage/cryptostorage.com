@@ -118,7 +118,6 @@ function ApplicationController(div) {
 		let logoLink = $("<a href='index.html'>").appendTo(headerDiv);
 		$("<img class='app_header_logo_img' src='img/cryptostorage.png'>").appendTo(logoLink);
 		
-		
 		// header links
 		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerDiv);
 		let homeLink = UiUtils.getLink("#", "Home");
