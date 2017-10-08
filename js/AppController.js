@@ -106,7 +106,8 @@ function ApplicationController(div) {
 	
 	let that = this;
 	let contentDiv;
-	let flowController;
+	let homeController;
+	let formController;
 	let faqController;
 	let donateController;
 	
@@ -115,13 +116,31 @@ function ApplicationController(div) {
 		// header
 		let headerDiv = $("<div class='app_header'>").appendTo(div);
 		let logoLink = $("<a href='index.html'>").appendTo(headerDiv);
-		$("<img class='app_header_logo' src='img/cryptostorage.png'>").appendTo(logoLink);
+		$("<img class='app_header_logo_img' src='img/cryptostorage.png'>").appendTo(logoLink);
+		
+		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerDiv);
+		let homeLink = UiUtils.getLink("#", "Home");
+		homeLink.click(function() { that.showHome(); });
+		let faqLink = UiUtils.getLink("#faq", "FAQ");
+		faqLink.click(function() { that.showFaq(); });
+		let gitHubLink = $("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>");
+		gitHubLink.html("GitHub");
+		let donateLink = UiUtils.getLink("#donate", "Donate");
+		donateLink.click(function() { that.showDonate(); });
+		linksDiv.append(homeLink);
+		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		linksDiv.append(faqLink);
+		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		linksDiv.append(gitHubLink);
+		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		linksDiv.append(donateLink);
 		
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		flowController = new FlowController($("<div class='flow_container'>"), that);
+		homeController = new HomeController($("<div>"), that);
+		formController = new FormController($("<div>"), that);
 		faqController = new PageControllerFaq($("<div>"), that);
 		donateController = new PageControllerDonate($("<div>"), that);
 		faqController.render();
@@ -131,7 +150,7 @@ function ApplicationController(div) {
 		setTimeout(function() {
 			
 			// render body and start on home
-			flowController.render(function() {
+			homeController.render(function() {
 				
 				// get identifier
 				let href = window.location.href;
@@ -146,18 +165,16 @@ function ApplicationController(div) {
 		}, 0);
 	}
 	
-	this.getFlowController = function() {
-		return flowController;
-	}
-	
-	this.getMainState = function() {
-		return flowController.getState();
-	}
-	
 	this.showHome = function() {
 		if (DEBUG) console.log("showHome()");
 		clearContents();
-		contentDiv.append(flowController.getDiv());
+		contentDiv.append(homeController.getDiv());
+	}
+	
+	this.showForm = function() {
+		if (DEBUG) console.log("showForm()");
+		clearContents();
+		contentDiv.append(formController.getDiv());
 	}
 	
 	this.showFaq = function() {
