@@ -114,12 +114,19 @@ DivController.prototype.onHide = function() { }
 /**
  * Home page.
  */
-function HomeController(div, onSelectCreate, onSelectImport) {
+function HomeController(div, onSelectGenerate, onSelectRecover) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
-		div.append("Home");
+		let btnGenerate = $("<div class='btn btn_generate'>").appendTo(div);
+		btnGenerate.append("Generate new keys");
+		btnGenerate.click(function() { onSelectGenerate(); });
+		
+		let btnRecover = $("<div class='btn btn_recover'>").appendTo(div);
+		btnRecover.append("Or recover existing keys");
+		btnRecover.click(function() { onSelectRecover(); });
+		
 		if (onDone) onDone();
 	}
 }
@@ -128,11 +135,10 @@ inheritsFrom(HomeController, DivController);
 /**
  * Form page.
  */
-function FormController(div, onSelectCreate, onSelectImport) {
+function FormController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
-		
 		div.append("Form.");
 		if (onDone) onDone();
 	}

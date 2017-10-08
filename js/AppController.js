@@ -140,30 +140,27 @@ function ApplicationController(div) {
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		homeController = new HomeController($("<div>"), that);
-		formController = new FormController($("<div>"), that);
-		faqController = new FaqController($("<div>"), that);
-		donateController = new DonateController($("<div>"), that);
+		homeController = new HomeController($("<div>"), onSelectGenerate, onSelectRecover);
+		formController = new FormController($("<div>"));
+		faqController = new FaqController($("<div>"));
+		donateController = new DonateController($("<div>"));
+		formController.render();
 		faqController.render();
 		donateController.render();
 		
-		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
-		setTimeout(function() {
+		// render body and start on home
+		homeController.render(function() {
 			
-			// render body and start on home
-			homeController.render(function() {
-				
-				// get identifier
-				let href = window.location.href;
-				let lastIdx = href.lastIndexOf("#");
-				let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
-				
-				// show page based on identifier
-				if (identifier === "faq") that.showFaq();
-				else if (identifier === "donate") that.showDonate();
-				else that.showHome();
-			});
-		}, 0);
+			// get identifier
+			let href = window.location.href;
+			let lastIdx = href.lastIndexOf("#");
+			let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+			
+			// show page based on identifier
+			if (identifier === "faq") that.showFaq();
+			else if (identifier === "donate") that.showDonate();
+			else that.showHome();
+		});
 	}
 	
 	this.showHome = function() {
@@ -194,5 +191,16 @@ function ApplicationController(div) {
 		while (contentDiv.get(0).hasChildNodes()) {
 			contentDiv.get(0).removeChild(contentDiv.get(0).lastChild);
 		}
+	}
+	
+	// ---------------------------------- PRIVATE -------------------------------
+	
+	function onSelectGenerate() {
+		if (DEBUG) console.log("onSelectGenerate()");
+		that.showForm();
+	}
+	
+	function onSelectRecover() {
+		if (DEBUG) console.log("onSelectRecover()");
 	}
 }

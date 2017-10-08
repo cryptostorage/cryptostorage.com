@@ -41,3 +41,21 @@ body {
 	width:900px;
 	background-color:white;
 }
+
+.btn_generate {
+	height:75px;
+	width:225px;
+	background-color:green;
+	color:white;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+
+.btn_recover {
+	
+}
+
+.btn:hover {
+	cursor: pointer;
+}
