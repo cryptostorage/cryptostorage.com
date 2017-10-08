@@ -140,13 +140,13 @@ function FormController(div) {
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
-		let passwordCheckbox = $("<input type='checkbox' id='passwordCheckbox'>").appendTo(div);
-		let passwordCheckboxLabel = $("<label for='passwordCheckbox'>").appendTo(div);
-		passwordCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
-		passwordCheckbox.click(function() {
+		let passphraseCheckbox = $("<input type='checkbox' id='passphraseCheckbox'>").appendTo(div);
+		let passphraseCheckboxLabel = $("<label for='passphraseCheckbox'>").appendTo(div);
+		passphraseCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
+		passphraseCheckbox.click(function() {
 			console.log("passphrase checkbox clicked");
 		})
-		passwordCheckbox.prop('checked', true);
+		passphraseCheckbox.prop('checked', true);
 		
 		if (onDone) onDone();
 	}
