@@ -120,11 +120,11 @@ function HomeController(div, onSelectGenerate, onSelectRecover) {
 		UiUtils.setupContentDiv(div);
 		
 		let btnGenerate = $("<div class='btn btn_generate'>").appendTo(div);
-		btnGenerate.append("Generate new keys");
+		btnGenerate.append("Generate New Keys");
 		btnGenerate.click(function() { onSelectGenerate(); });
 		
 		let btnRecover = $("<div class='btn btn_recover'>").appendTo(div);
-		btnRecover.append("Or recover existing keys");
+		btnRecover.append("or Recover Existing Keys");
 		btnRecover.click(function() { onSelectRecover(); });
 		
 		if (onDone) onDone();
@@ -142,9 +142,9 @@ function FormController(div) {
 		
 		let passwordCheckbox = $("<input type='checkbox' id='passwordCheckbox'>").appendTo(div);
 		let passwordCheckboxLabel = $("<label for='passwordCheckbox'>").appendTo(div);
-		passwordCheckboxLabel.html("&nbsp;Do you want to password protect your private keys?");
+		passwordCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
 		passwordCheckbox.click(function() {
-			console.log("Password checkbox clicked");
+			console.log("passphrase checkbox clicked");
 		})
 		passwordCheckbox.prop('checked', true);
 		
