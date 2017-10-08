@@ -139,7 +139,15 @@ function FormController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
-		div.append("Form.");
+		
+		let passwordCheckbox = $("<input type='checkbox' id='passwordCheckbox'>").appendTo(div);
+		let passwordCheckboxLabel = $("<label for='passwordCheckbox'>").appendTo(div);
+		passwordCheckboxLabel.html("&nbsp;Do you want to password protect your private keys?");
+		passwordCheckbox.click(function() {
+			console.log("Password checkbox clicked");
+		})
+		passwordCheckbox.prop('checked', true);
+		
 		if (onDone) onDone();
 	}
 }
