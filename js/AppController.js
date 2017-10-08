@@ -113,11 +113,13 @@ function ApplicationController(div) {
 	
 	this.render = function() {
 		
-		// header
+		// header logo
 		let headerDiv = $("<div class='app_header'>").appendTo(div);
 		let logoLink = $("<a href='index.html'>").appendTo(headerDiv);
 		$("<img class='app_header_logo_img' src='img/cryptostorage.png'>").appendTo(logoLink);
 		
+		
+		// header links
 		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerDiv);
 		let homeLink = UiUtils.getLink("#", "Home");
 		homeLink.click(function() { that.showHome(); });
@@ -141,8 +143,8 @@ function ApplicationController(div) {
 		// initialize controllers
 		homeController = new HomeController($("<div>"), that);
 		formController = new FormController($("<div>"), that);
-		faqController = new PageControllerFaq($("<div>"), that);
-		donateController = new PageControllerDonate($("<div>"), that);
+		faqController = new FaqController($("<div>"), that);
+		donateController = new DonateController($("<div>"), that);
 		faqController.render();
 		donateController.render();
 		
