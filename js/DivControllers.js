@@ -170,7 +170,7 @@ function FaqController(div) {
 		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(div);
 		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(div);
 		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(div);
-		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future depending on interest and ease of implementation.").appendTo(div);
+		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future.").appendTo(div);
 		$("<div class='question'>").html("What formats can I export to?").appendTo(div);
 		$("<div class='answer'>").html("TODO").appendTo(div);
 		
