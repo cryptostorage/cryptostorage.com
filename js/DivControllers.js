@@ -161,7 +161,7 @@ function FormController(div) {
 		// passphrase input
 		let passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
 		let passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
-		passphraseWarnDiv.append("This passphrase be required to access funds later on.  Don’t lose it!");
+		passphraseWarnDiv.append("This passphrase is required to access funds later on.  Don’t lose it!");
 		passphraseInputDiv.append("Passphrase");
 		passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
 		let showPassphraseCheckboxDiv = $("<div class='passphrase_checkbox_div'>").appendTo(passphraseInputDiv);
