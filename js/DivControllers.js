@@ -200,7 +200,7 @@ function FormController(div) {
 		
 		// currency inputs
 		let currencyDiv = $("<div class='form_section_div'>").appendTo(div);
-		currencyInputsDiv = $("<div>").appendTo(currencyDiv);
+		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(currencyDiv);
 		
 		// link to add currency
 		let addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
@@ -253,9 +253,6 @@ function FormController(div) {
 			console.log("Currency input deleted");
 			removeCurrency(currencyInput);
 		});
-		
-		// paint very top border
-		if (currencyInputs.length === 0) currencyInput.getDiv().css("border-top", "2px solid");
 		
 		// add to page and track
 		currencyInputs.push(currencyInput);

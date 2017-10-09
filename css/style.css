@@ -109,6 +109,10 @@ input[type='number'] {
 	flex-direction:column;
 }
 
+.currency_inputs_div:first-child {
+	border-top:2px solid;
+}
+
 .currency_input_div {
 	border-style:solid;
 	border-width:0 2px 2px 2px;
