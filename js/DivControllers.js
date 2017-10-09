@@ -137,11 +137,15 @@ inheritsFrom(HomeController, DivController);
  */
 function FormController(div) {
 	DivController.call(this, div);
+	
+	let currencyInputsDiv;		// container for each currency input
+	let currencyInputs = [];	// tracks each currency input
+	
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
 		// passphrase checkbox
-		let passphraseDiv = $("<div class='form_input_div'>").appendTo(div);
+		let passphraseDiv = $("<div class='form_section_div'>").appendTo(div);
 		let passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
 		let passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
 		passphraseCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
@@ -164,7 +168,7 @@ function FormController(div) {
 		});
 		
 		// split checkbox
-		let splitDiv = $("<div class='form_input_div'>").appendTo(div);
+		let splitDiv = $("<div class='form_section_div'>").appendTo(div);
 		let splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
 		let splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.html("&nbsp;Do you want to split your private keys into separate pieces?");
@@ -189,7 +193,65 @@ function FormController(div) {
 		splitCheckbox.prop('checked', false);
 		splitInputDiv.hide();
 		
+		// currency inputs
+		let currencyDiv = $("<div class='form_section_div'>").appendTo(div);
+		currencyInputsDiv = $("<div>").appendTo(currencyDiv);
+		
+		// link to add currency
+		let addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
+		let addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
+		addCurrencySpan.html("+ Add another currency");
+		addCurrencySpan.click(function() {
+			addCurrency();
+		});
+		
+		// add first currency input
+		addCurrency();
+		
+		// done rendering
 		if (onDone) onDone();
+	}
+	
+	function addCurrency() {
+		if (DEBUG) console.log("addCurrency()");
+		
+		let currencyInput = new CurrencyInput($("<div>"), function() {
+			console.log("Currency input deleted");
+			throw new Error("Not implemented");
+		});
+		
+		currencyInput.getDiv().appendTo(currencyInputsDiv);
+		if (currencyInputs.length === 0) currencyInput.getDiv().css("border-top", "2px solid");
+		
+		currencyInputs.push(currencyInput);
+	}
+	
+	/**
+	 * Encapsulate a currency input.
+	 * 
+	 * @param div is the div to render to
+	 * @param onDelete is invoked when the user delets this input
+	 */
+	function CurrencyInput(div, onDelete) {
+		
+		// render input
+		render();
+		function render() {
+			div.empty();
+			div.attr("class", "currency_input_div");
+		}
+		
+		this.getDiv = function() {
+			return div;
+		}
+		
+		this.getTicker = function() {
+			
+		}
+		
+		this.getNumKeys = function() {
+			
+		}
 	}
 }
 inheritsFrom(FormController, DivController);

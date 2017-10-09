@@ -40,6 +40,7 @@ body {
 .content_div {
 	width:900px;
 	background-color:white;
+	padding:25px;
 }
 
 .btn_generate {
@@ -72,8 +73,8 @@ body {
 	margin-bottom:30px;
 }
 
-.form_input_div {
-	padding:20px 20px 0px 20px;
+.form_section_div {
+	margin-bottom:20px;
 }
 
 .passphrase_input_div {
@@ -101,4 +102,22 @@ body {
 	margin:20px 20px 0px 20px;
 	display:flex;
 	flex-direction:column;
+}
+
+.currency_input_div {
+	border-style:solid;
+	border-width:0 2px 2px 2px;
+	padding:10px;
+}
+
+.add_currency_div {
+	text-align:center;
+}
+
+.add_currency_span {
+	color:blue;
+}
+
+.add_currency_span:hover {
+	cursor:pointer;
 }
