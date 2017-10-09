@@ -40,7 +40,6 @@ body {
 .content_div {
 	width:900px;
 	background-color:white;
-	padding:25px;
 }
 
 .btn_generate {
@@ -73,6 +72,10 @@ body {
 	margin-bottom:30px;
 }
 
+.form_input_div {
+	margin:20px;
+}
+
 .passphrase_input_div {
 	margin:20px;
 	display:flex;
@@ -83,7 +86,7 @@ body {
 	color:red;
 	width:100%;
 	text-align:center;
-	margin-bottom:20px;
+	margin-bottom:15px;
 }
 
 .passphrase_checkbox_div {

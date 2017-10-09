@@ -141,15 +141,16 @@ function FormController(div) {
 		UiUtils.setupContentDiv(div);
 		
 		// passphrase checkbox
-		let passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(div);
-		let passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(div);
+		let passphraseDiv = $("<div class='form_input_div'>").appendTo(div);
+		let passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
+		let passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
 		passphraseCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
 		passphraseCheckbox.click(function() {
 			passphraseCheckbox.prop('checked') ? passphraseInputDiv.show() : passphraseInputDiv.hide();
-		})
+		});
 		
 		// passphrase input
-		let passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(div);
+		let passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
 		let passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
 		passphraseWarnDiv.append("This will be required to access funds later on.  Don’t lose it!");
 		passphraseInputDiv.append("Passphrase");
@@ -162,9 +163,22 @@ function FormController(div) {
 			passphraseInput.attr("type", showPassphraseCheckbox.prop('checked') ? "text" : "password");
 		});
 		
+		// split checkbox
+		let splitDiv = $("<div class='form_input_div'>").appendTo(div);
+		let splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
+		let splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitDiv);
+		splitCheckboxLabel.html("&nbsp;Do you want to split your private keys into separate pieces?");
+		splitCheckbox.click(function() {
+			splitCheckbox.prop('checked') ? splitInputDiv.show() : splitInputDiv.hide();
+		});
+		
+		// split input
+		let splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);		
+		
 		// apply default configuration
 		passphraseCheckbox.prop('checked', true);
 		showPassphraseCheckbox.prop('checked', false);
+		splitCheckbox.prop('checked', false);
 		
 		if (onDone) onDone();
 	}
