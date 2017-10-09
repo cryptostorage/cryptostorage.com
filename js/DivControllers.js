@@ -140,13 +140,28 @@ function FormController(div) {
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
-		let passphraseCheckbox = $("<input type='checkbox' id='passphraseCheckbox'>").appendTo(div);
-		let passphraseCheckboxLabel = $("<label for='passphraseCheckbox'>").appendTo(div);
+		// passphrase checkbox
+		let passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(div);
+		let passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(div);
 		passphraseCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
 		passphraseCheckbox.click(function() {
-			console.log("passphrase checkbox clicked");
+			passphraseCheckbox.prop('checked') ? passphraseInputDiv.show() : passphraseInputDiv.hide();
 		})
+		
+		// passphrase input
+		let passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(div);
+		let passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
+		let showPassphraseCheckboxDiv = $("<div class='passphrase_checkbox_div'>").appendTo(passphraseInputDiv);
+		let showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
+		let showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
+		showPassphraseCheckboxLabel.html("&nbsp;Show passphrase");
+		showPassphraseCheckbox.click(function() {
+			passphraseInput.attr("type", showPassphraseCheckbox.prop('checked') ? "text" : "password");
+		});
+		
+		// apply default configuration
 		passphraseCheckbox.prop('checked', true);
+		showPassphraseCheckbox.prop('checked', false);
 		
 		if (onDone) onDone();
 	}

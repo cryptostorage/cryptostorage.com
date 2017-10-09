@@ -72,3 +72,17 @@ body {
 	line-height:30px;
 	margin-bottom:30px;
 }
+
+.passphrase_input_div {
+	margin:20px;
+	display:flex;
+	flex-direction:column;
+}
+
+.passphrase_checkbox_div {
+	margin-left:auto;
+}
+
+.passphrase_input {
+	width:100%;
+}
