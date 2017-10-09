@@ -138,6 +138,11 @@ inheritsFrom(HomeController, DivController);
 function FormController(div) {
 	DivController.call(this, div);
 	
+	let passphraseCheckbox;
+	let passphraseInput;
+	let splitCheckbox;
+	let numPiecesInput;
+	let minPiecesInput;
 	let currencyInputsDiv;		// container for each currency input
 	let currencyInputs = [];	// tracks each currency input
 	
@@ -146,7 +151,7 @@ function FormController(div) {
 		
 		// passphrase checkbox
 		let passphraseDiv = $("<div class='form_section_div'>").appendTo(div);
-		let passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
+		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
 		let passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
 		passphraseCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
 		passphraseCheckbox.click(function() {
@@ -158,7 +163,7 @@ function FormController(div) {
 		let passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
 		passphraseWarnDiv.append("This passphrase be required to access funds later on.  Don’t lose it!");
 		passphraseInputDiv.append("Passphrase");
-		let passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
+		passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
 		let showPassphraseCheckboxDiv = $("<div class='passphrase_checkbox_div'>").appendTo(passphraseInputDiv);
 		let showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 		let showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
@@ -169,7 +174,7 @@ function FormController(div) {
 		
 		// split checkbox
 		let splitDiv = $("<div class='form_section_div'>").appendTo(div);
-		let splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
+		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
 		let splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.html("&nbsp;Do you want to split your private keys into separate pieces?");
 		splitCheckbox.click(function() {
@@ -180,11 +185,11 @@ function FormController(div) {
 		let splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
 		let splitNumPiecesDiv = $("<div>").appendTo(splitInputDiv);
 		splitNumPiecesDiv.append("Split each key into ");
-		let splitNumPiecesInput = $("<input type='number'>").appendTo(splitNumPiecesDiv);
+		numPiecesInput = $("<input type='number'>").appendTo(splitNumPiecesDiv);
 		splitNumPiecesDiv.append(" pieces");
 		let splitMinPiecesDiv = $("<div>").appendTo(splitInputDiv);
 		splitMinPiecesDiv.append("Require ");
-		let splitMinPiecesInput = $("<input type='number'>").appendTo(splitMinPiecesDiv);
+		minPiecesInput = $("<input type='number'>").appendTo(splitMinPiecesDiv);
 		splitMinPiecesDiv.append(" to recover");
 		
 		// apply default configuration
@@ -212,15 +217,33 @@ function FormController(div) {
 		let generateDiv = $("<div class='generate_div'>").appendTo(div);
 		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
 		btnGenerate.append("Generate key pairs");
-		btnGenerate.click(function() {
-			console.log("generate button clicked");
-		});
+		btnGenerate.click(function() { generateKeys() });
 		
 		// done rendering
 		if (onDone) onDone(div);
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
+	
+	function generateKeys() {
+		console.log("generating keys");
+		console.log(getConfig());
+		for (let currencyInput of getConfig().currencies) {
+			console.log(currencyInput.getTicker());
+			console.log(currencyInput.getNumKeys());
+		}
+	}
+	
+	function getConfig() {
+		return {
+			passphraseChecked: passphraseCheckbox.prop('checked'),
+			passphrase: passphraseInput.val(),
+			splitChecked: splitCheckbox.prop('checked'),
+			numPieces: parseFloat(numPiecesInput.val()),
+			minPieces: parseFloat(minPiecesInput.val()),
+			currencies: currencyInputs,
+		};
+	}
 	
 	function addCurrency() {
 		if (DEBUG) console.log("addCurrency()");
@@ -304,7 +327,7 @@ function FormController(div) {
 			let rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 			rightDiv.append("Number of keys&nbsp;&nbsp;");
 			numKeysInput = $("<input type='number'>").appendTo(rightDiv);
-			rightDiv.append("&nbsp;");
+			rightDiv.append("&nbsp;&nbsp;");
 			let trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 			trashDiv.click(function() { onDelete(); });
 			let trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
