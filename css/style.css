@@ -73,11 +73,11 @@ body {
 }
 
 .form_input_div {
-	margin:20px;
+	padding:20px;
 }
 
 .passphrase_input_div {
-	margin:20px;
+	margin:20px 20px 0px 20px;
 	display:flex;
 	flex-direction:column;
 }
