@@ -152,7 +152,7 @@ function FormController(div) {
 		// passphrase input
 		let passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
 		let passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
-		passphraseWarnDiv.append("This will be required to access funds later on.  Don’t lose it!");
+		passphraseWarnDiv.append("This passphrase be required to access funds later on.  Don’t lose it!");
 		passphraseInputDiv.append("Passphrase");
 		let passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
 		let showPassphraseCheckboxDiv = $("<div class='passphrase_checkbox_div'>").appendTo(passphraseInputDiv);
@@ -173,12 +173,21 @@ function FormController(div) {
 		});
 		
 		// split input
-		let splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);		
+		let splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
+		let splitNumPiecesDiv = $("<div>").appendTo(splitInputDiv);
+		splitNumPiecesDiv.append("Split each key into ");
+		let splitNumPiecesInput = $("<input type='number'>").appendTo(splitNumPiecesDiv);
+		splitNumPiecesDiv.append(" pieces");
+		let splitMinPiecesDiv = $("<div>").appendTo(splitInputDiv);
+		splitMinPiecesDiv.append("Require ");
+		let splitMinPiecesInput = $("<input type='number'>").appendTo(splitMinPiecesDiv);
+		splitMinPiecesDiv.append(" to recover");
 		
 		// apply default configuration
 		passphraseCheckbox.prop('checked', true);
 		showPassphraseCheckbox.prop('checked', false);
 		splitCheckbox.prop('checked', false);
+		splitInputDiv.hide();
 		
 		if (onDone) onDone();
 	}
