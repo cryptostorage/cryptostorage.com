@@ -79,6 +79,13 @@ body {
 	flex-direction:column;
 }
 
+.passphrase_warn_div {
+	color:red;
+	width:100%;
+	text-align:center;
+	margin-bottom:20px;
+}
+
 .passphrase_checkbox_div {
 	margin-left:auto;
 }
