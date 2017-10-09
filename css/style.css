@@ -43,7 +43,7 @@ body {
 	padding:25px;
 }
 
-.btn_generate {
+.btn_start_generate {
 	height:75px;
 	width:225px;
 	background-color:green;
@@ -147,5 +147,22 @@ input[type='number'] {
 }
 
 .add_currency_span:hover {
+	cursor:pointer;
+}
+
+.generate_div {
+	width:100%;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+
+.btn_generate {
+	background-color:green;
+	color:white;
+	padding:20px;
+}
+
+.btn_generate:hover {
 	cursor:pointer;
 }

@@ -119,7 +119,7 @@ function HomeController(div, onSelectGenerate, onSelectRecover) {
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
-		let btnGenerate = $("<div class='btn btn_generate'>").appendTo(div);
+		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(div);
 		btnGenerate.append("Generate New Keys");
 		btnGenerate.click(function() { onSelectGenerate(); });
 		
@@ -208,9 +208,19 @@ function FormController(div) {
 		// add first currency input
 		addCurrency();
 		
+		// add generate button
+		let generateDiv = $("<div class='generate_div'>").appendTo(div);
+		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
+		btnGenerate.append("Generate key pairs");
+		btnGenerate.click(function() {
+			console.log("generate button clicked");
+		});
+		
 		// done rendering
 		if (onDone) onDone(div);
 	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
 	
 	function addCurrency() {
 		if (DEBUG) console.log("addCurrency()");
@@ -282,7 +292,6 @@ function FormController(div) {
 			let selector = $("<div>").appendTo(div);
 			selector.ddslick({
 				data:data,
-				width:300,
 				background: "white",
 				imagePosition: "left",
 				selectText: "Select a Currency",
