@@ -56,7 +56,7 @@ const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;
-const COMMON_DEPENDENCIES = ["lib/b64-images.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js"];
+const COMMON_DEPENDENCIES = ["lib/b64-images.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js"];
 var loader;
 
 /**
@@ -144,7 +144,6 @@ function ApplicationController(div) {
 		formController = new FormController($("<div>"));
 		faqController = new FaqController($("<div>"));
 		donateController = new DonateController($("<div>"));
-		formController.render();
 		faqController.render();
 		donateController.render();
 		
@@ -172,7 +171,9 @@ function ApplicationController(div) {
 	this.showForm = function() {
 		if (DEBUG) console.log("showForm()");
 		clearContents();
-		contentDiv.append(formController.getDiv());
+		formController.render(function(div) {
+			contentDiv.append(div);
+		});
 	}
 	
 	this.showFaq = function() {

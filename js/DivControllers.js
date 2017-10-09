@@ -209,21 +209,24 @@ function FormController(div) {
 		addCurrency();
 		
 		// done rendering
-		if (onDone) onDone();
+		if (onDone) onDone(div);
 	}
 	
 	function addCurrency() {
 		if (DEBUG) console.log("addCurrency()");
 		
-		let currencyInput = new CurrencyInput($("<div>"), function() {
+		// create input
+		let currencyInput = new CurrencyInput($("<div>"), CryptoUtils.getCryptoPlugins(), function() {
 			console.log("Currency input deleted");
 			throw new Error("Not implemented");
-		});
+		});		
 		
-		currencyInput.getDiv().appendTo(currencyInputsDiv);
+		// paint very top border
 		if (currencyInputs.length === 0) currencyInput.getDiv().css("border-top", "2px solid");
 		
+		// add to page and track
 		currencyInputs.push(currencyInput);
+		currencyInput.getDiv().appendTo(currencyInputsDiv);
 	}
 	
 	/**
@@ -232,13 +235,66 @@ function FormController(div) {
 	 * @param div is the div to render to
 	 * @param onDelete is invoked when the user delets this input
 	 */
-	function CurrencyInput(div, onDelete) {
+	function CurrencyInput(div, plugins, onDelete) {
+		assertInitialized(div);
+		assertInitialized(plugins);
 		
 		// render input
 		render();
 		function render() {
 			div.empty();
 			div.attr("class", "currency_input_div");
+			
+			var ddData = [
+		    {
+		        text: "Facebook",
+		        value: 1,
+		        selected: false,
+		        description: "Description with Facebook",
+		        imageSrc: "http://i.imgur.com/XkuTj3B.png"
+		    },
+		    {
+		        text: "Twitter",
+		        value: 2,
+		        selected: false,
+		        description: "Description with Twitter",
+		        imageSrc: "http://i.imgur.com/8ScLNnk.png"
+		    },
+		    {
+		        text: "LinkedIn",
+		        value: 3,
+		        selected: true,
+		        description: "Description with LinkedIn",
+		        imageSrc: "http://i.imgur.com/aDNdibj.png"
+		    },
+		    {
+		        text: "Foursquare",
+		        value: 4,
+		        selected: false,
+		        description: "Description with Foursquare",
+		        imageSrc: "http://i.imgur.com/kFAk2DX.png"
+		    }
+		];
+			
+			// format pull down plugin data
+			let data = [];
+			for (let plugin of plugins) {
+				data.push({
+					text: plugin.getName(),
+				});
+			}
+			
+			// create pull down
+			let selector = $("<div>").appendTo(div);
+			selector.ddslick({
+				data:ddData,
+				width:300,
+				imagePosition: "left",
+				selectText: "Select currency",
+				onSelected: function(data) {
+					console.log(data);
+				},
+			});
 		}
 		
 		this.getDiv = function() {
