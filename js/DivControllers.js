@@ -239,6 +239,22 @@ function FormController(div) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
+		let selectedPlugin;
+		
+		this.getDiv = function() {
+			return div;
+		}
+		
+		this.getTicker = function() {
+			let plugin = getSelectedPlugin();
+			if (!plugin) return null;
+			return plugin.getTicker();
+		}
+		
+		this.getNumKeys = function() {
+			
+		}
+		
 		// render input
 		render();
 		function render() {
@@ -261,24 +277,15 @@ function FormController(div) {
 				width:300,
 				background: "white",
 				imagePosition: "left",
-				selectText: "Select currency",
+				selectText: "Select a Currency",
 				onSelected: function(data) {
-					console.log(data);
-					selector.ddslick("destroy");
+					selectedPlugin = plugins[data.selectedIndex];
 				},
 			});
 		}
 		
-		this.getDiv = function() {
-			return div;
-		}
-		
-		this.getTicker = function() {
-			
-		}
-		
-		this.getNumKeys = function() {
-			
+		function getSelectedPlugin() {
+			return selectedPlugin;
 		}
 	}
 }
