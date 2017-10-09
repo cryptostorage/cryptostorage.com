@@ -38,7 +38,7 @@ body {
 }
 
 .content_div {
-	width:900px;
+	width:850px;
 	background-color:white;
 	padding:25px;
 }
@@ -62,7 +62,7 @@ body {
 }
 
 input[type='number'] {
-	width:55px;
+	width:70px;
 	text-align:center;
 }
 
