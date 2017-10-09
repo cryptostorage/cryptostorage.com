@@ -218,8 +218,8 @@ function FormController(div) {
 		// create input
 		let currencyInput = new CurrencyInput($("<div>"), CryptoUtils.getCryptoPlugins(), function() {
 			console.log("Currency input deleted");
-			throw new Error("Not implemented");
-		});		
+			removeCurrency(currencyInput);
+		});
 		
 		// paint very top border
 		if (currencyInputs.length === 0) currencyInput.getDiv().css("border-top", "2px solid");
@@ -227,6 +227,13 @@ function FormController(div) {
 		// add to page and track
 		currencyInputs.push(currencyInput);
 		currencyInput.getDiv().appendTo(currencyInputsDiv);
+	}
+	
+	function removeCurrency(currencyInput) {
+		let idx = currencyInputs.indexOf(currencyInput);
+		if (idx < 0) throw new Error("Could not find currency input");
+		currencyInputs.splice(idx, 1);
+		currencyInput.getDiv().remove();
 	}
 	
 	/**
@@ -240,6 +247,7 @@ function FormController(div) {
 		assertInitialized(plugins);
 		
 		let selectedPlugin;
+		let numKeysInput;
 		
 		this.getDiv = function() {
 			return div;
@@ -252,7 +260,7 @@ function FormController(div) {
 		}
 		
 		this.getNumKeys = function() {
-			
+			return parseFloat(numKeysInput.val());
 		}
 		
 		// render input
@@ -282,6 +290,15 @@ function FormController(div) {
 					selectedPlugin = plugins[data.selectedIndex];
 				},
 			});
+			
+			// create right div
+			let rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
+			rightDiv.append("Number of keys&nbsp;&nbsp;");
+			numKeysInput = $("<input type='number'>").appendTo(rightDiv);
+			rightDiv.append("&nbsp;");
+			let trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
+			trashDiv.click(function() { onDelete(); });
+			let trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
 		}
 		
 		function getSelectedPlugin() {

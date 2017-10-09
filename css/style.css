@@ -61,6 +61,11 @@ body {
 	cursor: pointer;
 }
 
+input[type='number'] {
+	width:55px;
+	text-align:center;
+}
+
 .question {
 	font-weight: bold;
 	font-size: 22px;
@@ -108,10 +113,33 @@ body {
 	border-style:solid;
 	border-width:0 2px 2px 2px;
 	padding:10px;
+	display:flex;
+	align-items:center;
+}
+
+.currency_input_right_div {
+	margin-left:auto;
+	display:flex;
+	align-items:center;
+}
+
+.trash_div {
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+
+.trash_div:hover {
+	cursor:pointer;
+}
+
+.trash_img {
+	height:30px;
 }
 
 .add_currency_div {
 	text-align:center;
+	margin:20px;
 }
 
 .add_currency_span {
