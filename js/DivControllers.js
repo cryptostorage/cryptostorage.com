@@ -145,6 +145,7 @@ function FormController(div) {
 	let minPiecesInput;
 	let currencyInputsDiv;		// container for each currency input
 	let currencyInputs = [];	// tracks each currency input
+	let decommissioned = false;
 	
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
@@ -217,7 +218,11 @@ function FormController(div) {
 		let generateDiv = $("<div class='generate_div'>").appendTo(div);
 		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
 		btnGenerate.append("Generate key pairs");
-		btnGenerate.click(function() { generateKeys() });
+		btnGenerate.click(function() { generateKeys(function(done, total, label) {
+			console.log("onProgress(" + done + ", " + total + ", " + label + ")");
+		}, function(keys, pieces, pieceDivs) {
+			console.log("onDone(" + keys.length + ", " + pieces.length + ", " + pieceDivs.length + ")");
+		})});
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -225,24 +230,22 @@ function FormController(div) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
-	function generateKeys() {
-		console.log("generating keys");
-		console.log(getConfig());
-		for (let currencyInput of getConfig().currencies) {
-			console.log(currencyInput.getTicker());
-			console.log(currencyInput.getNumKeys());
-		}
-	}
-	
 	function getConfig() {
-		return {
-			passphraseChecked: passphraseCheckbox.prop('checked'),
-			passphrase: passphraseInput.val(),
-			splitChecked: splitCheckbox.prop('checked'),
-			numPieces: parseFloat(numPiecesInput.val()),
-			minPieces: parseFloat(minPiecesInput.val()),
-			currencies: currencyInputs,
-		};
+		let config = {};
+		config.passphraseChecked = passphraseCheckbox.prop('checked');
+		config.passphrase = passphraseInput.val();
+		config.splitChecked = splitCheckbox.prop('checked');
+		config.numPieces = config.splitChecked ? parseFloat(numPiecesInput.val()) : 1;
+		config.minPieces = parseFloat(minPiecesInput.val());
+		config.currencies = [];
+		for (let currencyInput of currencyInputs) {
+			config.currencies.push({
+				plugin: currencyInput.getSelectedPlugin(),
+				numKeys: currencyInput.getNumKeys(),
+				encryption: config.passphraseChecked ? CryptoUtils.EncryptionScheme.CRYPTOJS : null	// TODO: collect encryption scheme from UI
+			});
+		}
+		return config;
 	}
 	
 	function addCurrency() {
@@ -283,10 +286,8 @@ function FormController(div) {
 			return div;
 		}
 		
-		this.getTicker = function() {
-			let plugin = getSelectedPlugin();
-			if (!plugin) return null;
-			return plugin.getTicker();
+		this.getSelectedPlugin = function() {
+			return selectedPlugin;
 		}
 		
 		this.getNumKeys = function() {
@@ -329,10 +330,218 @@ function FormController(div) {
 			trashDiv.click(function() { onDelete(); });
 			let trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
 		}
+	}
+	
+	/**
+	 * Generates keys, pieces, rendered pieces.
+	 * 
+	 * @param onProgress(done, total, label) is invoked as progress is made
+	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
+	 */
+	function generateKeys(onProgress, onDone) {
 		
-		function getSelectedPlugin() {
-			return selectedPlugin;
+		// get current configuration
+		let config = getConfig();
+
+		// load dependencies
+		let dependencies = new Set(COMMON_DEPENDENCIES);
+		for (let currency of config.currencies) {
+			for (let dependency of currency.plugin.getDependencies()) {
+				dependencies.add(dependency);
+			}
 		}
+		loader.load(Array.from(dependencies), function() {
+			
+			// compute total weight for progress bar
+			let totalWeight = 0;
+			let numKeys = 0;
+			for (let currency of config.currencies) {
+				numKeys += currency.numKeys;
+				totalWeight += currency.numKeys * UiUtils.getCreateKeyWeight();
+				if (currency.encryption) totalWeight += currency.numKeys * (UiUtils.getEncryptWeight(currency.encryption) + (VERIFY_ENCRYPTION ? UiUtils.getDecryptWeight(currency.encryption) : 0));
+			}
+			let piecesRendererWeight = PieceRenderer.getPieceWeight(numKeys, config.numPieces, null);
+			totalWeight += piecesRendererWeight;
+			
+			// collect key creation functions
+			let funcs = [];
+			for (let currency of config.currencies) {
+				for (let i = 0; i < currency.numKeys; i++) {
+					funcs.push(newKeyFunc(currency.plugin));
+				}
+			}
+			
+			// generate keys
+			let progressWeight = 0;
+			onProgress(progressWeight, totalWeight, "Generating keys");
+			async.series(funcs, function(err, keys) {
+				if (decommissioned) {
+					onDone();
+					return;
+				}
+				if (err) throw err;
+				let originals = keys;
+				
+				// collect encryption functions
+				funcs = [];
+				let keyIdx = 0;
+				let passphrases = [];
+				for (let currency of config.currencies) {
+					for (let i = 0; i < currency.numKeys; i++) {
+						if (currency.encryption) {
+							funcs.push(encryptFunc(originals[keyIdx].copy(), currency.encryption, config.passphrase));
+							passphrases.push(config.passphrase);
+						}
+						keyIdx++;
+					}
+				}
+				
+				// no encryption
+				if (!funcs.length) {
+					
+					// convert keys to pieces
+					let pieces = CryptoUtils.keysToPieces(originals, config.numPieces, config.minPieces);
+					
+					// validate pieces can recreate originals
+					let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
+					assertEquals(originals.length, keysFromPieces.length);
+					for (let i = 0; i < originals.length; i++) {
+						assertTrue(originals[i].equals(keysFromPieces[i]));
+					}
+					
+					// render pieces to divs
+					onProgress(progressWeight, totalWeight, "Rendering");
+					renderPieceDivs(pieces, function(err, pieceDivs) {
+						if (err) throw err;
+						assertEquals(pieces.length, pieceDivs.length);
+						onProgress(1, 1, "Complete");
+						onDone(keys, pieces, pieceDivs);
+					});
+				}
+				
+				// handle encryption
+				else {
+					
+					// encrypt keys
+					onProgress(progressWeight, totalWeight, "Encrypting keys");
+					async.series(funcs, function(err, encryptedKeys) {
+						if (decommissioned) {
+							onDone();
+							return;
+						}
+						if (err) throw err;
+						
+						// convert keys to pieces
+						let pieces = CryptoUtils.keysToPieces(encryptedKeys, config.numPieces, config.minPieces);
+						
+						// validate pieces can recreate originals
+						let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
+						assertEquals(encryptedKeys.length, keysFromPieces.length);
+						for (let i = 0; i < encryptedKeys.length; i++) {
+							assertTrue(encryptedKeys[i].equals(keysFromPieces[i]));
+						}
+						
+						// verify encryption
+						if (VERIFY_ENCRYPTION) {
+							
+							// collect decryption functions
+							funcs = [];
+							for (let i = 0; i < encryptedKeys.length; i++) {
+								funcs.push(decryptFunc(encryptedKeys[i].copy(), passphrases[i]));
+							}
+							
+							// decrypt keys
+							onProgress(progressWeight, totalWeight, "Verifying encryption");
+							async.series(funcs, function(err, decryptedKeys) {
+								if (decommissioned) {
+									onDone();
+									return;
+								}
+								if (err) throw err;
+								
+								// verify equivalence
+								assertEquals(originals.length, decryptedKeys.length);
+								for (let i = 0; i < originals.length; i++) {
+									assertTrue(originals[i].equals(decryptedKeys[i]));
+								}
+								
+								// render pieces to divs
+								onProgress(progressWeight, totalWeight, "Rendering");
+								renderPieceDivs(pieces, function(err, pieceDivs) {
+									if (err) throw err;
+									assertEquals(pieces.length, pieceDivs.length);
+									onProgress(1, 1, "Complete");
+									onDone(encryptedKeys, pieces, pieceDivs);
+								});
+							});
+						}
+						
+						// don't verify encryption
+						else {
+							
+							// render pieces to divs
+							onProgress(progressWeight, totalWeight, "Rendering");
+							renderPieceDivs(pieces, function(err, pieceDivs) {
+								if (err) throw err;
+								assertEquals(pieces.length, pieceDivs.length);
+								onProgress(1, 1, "Complete");
+								onDone(encryptedKeys, pieces, pieceDivs);
+							});
+						}
+					});
+				}
+			});
+			
+			function newKeyFunc(plugin, callback) {
+				return function(callback) {
+					if (decommissioned) {
+						callback();
+						return;
+					}
+					setTimeout(function() {
+						let key = plugin.newKey();
+						progressWeight += UiUtils.getCreateKeyWeight();
+						onProgress(progressWeight, totalWeight, "Generating keys");
+						callback(null, key);
+					}, 0);	// let UI breath
+				}
+			}
+			
+			function encryptFunc(key, scheme, password) {
+				return function(callback) {
+					if (decommissioned) {
+						callback();
+						return;
+					}
+					key.encrypt(scheme, password, function(err, key) {
+						progressWeight += UiUtils.getEncryptWeight(scheme);
+						onProgress(progressWeight, totalWeight, "Encrypting");
+						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
+					});
+				}
+			}
+			
+			function decryptFunc(key, password) {
+				return function(callback) {
+					if (decommissioned) {
+						callback();
+						return;
+					}
+					let scheme = key.getEncryptionScheme();
+					key.decrypt(password, function(err, key) {
+						progressWeight += UiUtils.getDecryptWeight(scheme);
+						onProgress(progressWeight, totalWeight, "Decrypting");
+						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
+					});
+				}
+			}
+			
+			function renderPieceDivs(pieces, onDone) {
+				PieceRenderer.renderPieces(null, pieces, null, function(percent) {
+					onProgress(progressWeight + (percent * piecesRendererWeight), totalWeight, "Rendering");
+				}, onDone);
+			}
+		});
 	}
 }
 inheritsFrom(FormController, DivController);
