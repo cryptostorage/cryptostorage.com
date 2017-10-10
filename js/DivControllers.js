@@ -222,7 +222,12 @@ function FormController(div) {
 			console.log("onProgress(" + done + ", " + total + ", " + label + ")");
 		}, function(keys, pieces, pieceDivs) {
 			console.log("onDone(" + keys.length + ", " + pieces.length + ", " + pieceDivs.length + ")");
+			pieceDiv.empty();
+			pieceDiv.append(pieceDivs[0]);
 		})});
+		
+		// add div to contain rendered page
+		let pieceDiv = $("<div class='preview_piece_div'>").appendTo(div);
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -342,6 +347,7 @@ function FormController(div) {
 		
 		// get current configuration
 		let config = getConfig();
+		console.log(config);
 
 		// load dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);

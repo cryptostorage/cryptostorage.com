@@ -162,11 +162,23 @@ input[type='number'] {
 }
 
 .btn_generate {
-	background-color:green;
+	background-color:#007500;
 	color:white;
 	padding:20px;
 }
 
 .btn_generate:hover {
 	cursor:pointer;
+	background-color:#009100;
+}
+
+.btn_generate:active {
+	background-color:#006000;
+}
+
+.preview_piece_div {
+	margin-top:25px;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
 }
