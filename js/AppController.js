@@ -147,11 +147,14 @@ function ApplicationController(div) {
 		// intro slider
 		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(introDiv);
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		for (let i = 0; i < 2; i++) {
-			let slide = $("<div>");
-			slide.html("Slide " + (i + 1));
-			sliderDiv.append(slide);
-		}
+		let slide1 = $("<div class='slide'>").appendTo(sliderDiv);
+		slide1.html("Generate public/private keys for multiple cryptocurrencies.");
+		let slide2 = $("<div class='slide'>").appendTo(sliderDiv);
+		slide2.html("Private keys can be password protected and split into pieces.");
+		let slide3 = $("<div class='slide'>").appendTo(sliderDiv);
+		slide3.html("Export to digital and printable formats which can be easily recovered.");
+		let slide4 = $("<div class='slide'>").appendTo(sliderDiv);
+		slide4.html("100% open source and free to use. No registration or trusted third parties.");
 		sliderDiv.slick({dots: true});
 		
 		// button to generate keys
