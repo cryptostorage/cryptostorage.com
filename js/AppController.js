@@ -109,6 +109,7 @@ $(document).ready(function() {
 function ApplicationController(div) {
 	
 	let that = this;
+	let introDiv;
 	let contentDiv;
 	let homeController;
 	let formController;
@@ -141,7 +142,7 @@ function ApplicationController(div) {
 		linksDiv.append(donateLink);
 		
 		// intro container
-		let introDiv = $("<div class='intro_div'>").appendTo(div);
+		introDiv = $("<div class='intro_div'>").appendTo(div);
 		
 		// intro slider
 		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(introDiv);
@@ -191,23 +192,27 @@ function ApplicationController(div) {
 	
 	this.showHome = function() {
 		if (DEBUG) console.log("showHome()");
+		introDiv.show();
 		setContentDiv(homeController.getDiv());
 	}
 	
 	this.showForm = function() {
 		if (DEBUG) console.log("showForm()");
 		formController.render(function(div) {
+			introDiv.hide();
 			setContentDiv(div);
 		});
 	}
 	
 	this.showFaq = function() {
 		if (DEBUG) console.log("showFaq()");
+		introDiv.hide();
 		setContentDiv(faqController.getDiv());
 	}
 	
 	this.showDonate = function() {
 		if (DEBUG) console.log("showDonate()");
+		introDiv.hide();
 		setContentDiv(donateController.getDiv());
 	}
 	
