@@ -185,12 +185,15 @@ input[type='number'] {
 
 .intro_div {
 	width:100%;
-	background-color:rgb(66, 116, 184)
+	background-color:rgb(66, 116, 184);
+	display:flex;
+	flex-direction:column;
+	align-items:center;
 }
 
 .slider_container {
 	margin: 0 auto;
-	padding: 40px;
+	padding: 0 50px 0 50px;
 	width: 100%;
 	background-color:rgb(66, 116, 184)
 }
@@ -198,7 +201,6 @@ input[type='number'] {
 .slide {
 	font-size:40px;
 	text-align: center;
-	margin:20px;
 	color: white;
 	background-color:rgb(66, 116, 184);
 }
