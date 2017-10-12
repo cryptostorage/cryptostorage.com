@@ -158,12 +158,12 @@ function ApplicationController(div) {
 		sliderDiv.slick({dots: true});
 		
 		// button to generate keys
-		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(div);
+		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(introDiv);
 		btnGenerate.append("Generate New Keys");
 		btnGenerate.click(function() { onSelectGenerate(); });
 		
 		// button to recover keys
-		let btnRecover = $("<div class='btn btn_recover'>").appendTo(div);
+		let btnRecover = $("<div class='btn btn_recover'>").appendTo(introDiv);
 		btnRecover.append("or Recover Existing Keys");
 		btnRecover.click(function() { onSelectRecover(); });
 		
