@@ -168,34 +168,31 @@ function ApplicationController(div) {
 	
 	this.showHome = function() {
 		if (DEBUG) console.log("showHome()");
-		clearContents();
-		contentDiv.append(homeController.getDiv());
+		setContentDiv(homeController.getDiv());
 	}
 	
 	this.showForm = function() {
 		if (DEBUG) console.log("showForm()");
-		clearContents();
 		formController.render(function(div) {
-			contentDiv.append(div);
+			setContentDiv(div);
 		});
 	}
 	
 	this.showFaq = function() {
 		if (DEBUG) console.log("showFaq()");
-		clearContents();
-		contentDiv.append(faqController.getDiv());
+		setContentDiv(faqController.getDiv());
 	}
 	
 	this.showDonate = function() {
 		if (DEBUG) console.log("showDonate()");
-		clearContents();
-		contentDiv.append(donateController.getDiv());
+		setContentDiv(donateController.getDiv());
 	}
 	
-	function clearContents() {
+	function setContentDiv(div) {
 		while (contentDiv.get(0).hasChildNodes()) {
 			contentDiv.get(0).removeChild(contentDiv.get(0).lastChild);
 		}
+		contentDiv.append(div);
 	}
 	
 	// ---------------------------------- PRIVATE -------------------------------
