@@ -35,11 +35,11 @@ body {
 
 .app_content {
 	flex:1;
-	width:100%;
+	width:850px;
 }
 
-.content_div {
-	width:850px;
+.page_div {
+	width:100%;
 	background-color:white;
 	padding:25px;
 }

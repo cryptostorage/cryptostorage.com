@@ -5,7 +5,7 @@ let UiUtils = {
 		
 	setupContentDiv: function(div) {
 		div.empty();
-		div.attr("class", "content_div");
+		div.attr("class", "page_div");
 	},
 
 	getCryptoName: function(state) {
@@ -123,7 +123,7 @@ function HomeController(div, onSelectGenerate, onSelectRecover) {
 		// intro slider
 		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		for (let i = 0; i < 5; i++) {
+		for (let i = 0; i < 2; i++) {
 			let slide = $("<div>");
 			slide.html("Slide " + (i + 1));
 			sliderDiv.append(slide);
