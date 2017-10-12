@@ -117,28 +117,9 @@ DivController.prototype.onHide = function() { }
 function HomeController(div, onSelectGenerate, onSelectRecover) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
-		div.empty();
-		div.attr("class", "home_div");
+		UiUtils.setupContentDiv(div);
 		
-		// intro slider
-		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
-		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		for (let i = 0; i < 2; i++) {
-			let slide = $("<div>");
-			slide.html("Slide " + (i + 1));
-			sliderDiv.append(slide);
-		}
-		sliderDiv.slick({dots: true});
-		
-		// button to generate keys
-		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(div);
-		btnGenerate.append("Generate New Keys");
-		btnGenerate.click(function() { onSelectGenerate(); });
-		
-		// button to recover keys
-		let btnRecover = $("<div class='btn btn_recover'>").appendTo(div);
-		btnRecover.append("or Recover Existing Keys");
-		btnRecover.click(function() { onSelectRecover(); });
+		div.append("Supports the most popular cryptocurrencies");
 		
 		if (onDone) onDone();
 	}

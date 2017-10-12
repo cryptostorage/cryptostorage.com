@@ -19,7 +19,6 @@ body {
 	width:100%;
 	display:flex;
 	align-items:center;
-	z-index:1;
 	background-color:rgb(66, 116, 184)
 }
 
@@ -184,12 +183,17 @@ input[type='number'] {
 	align-items:center;
 }
 
+.intro_div {
+	width:100%;
+	background-color:rgb(66, 116, 184)
+}
+
 .slider_container {
   margin: 0 auto;
   padding: 40px;
-  width: 80%;
+  width: 100%;
   color: #333;
-  background: #419be0;
+  background-color:rgb(66, 116, 184)
 }
 
 .slick-slide {

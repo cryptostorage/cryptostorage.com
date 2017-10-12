@@ -140,6 +140,29 @@ function ApplicationController(div) {
 		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		linksDiv.append(donateLink);
 		
+		// intro container
+		let introDiv = $("<div class='intro_div'>").appendTo(div);
+		
+		// intro slider
+		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(introDiv);
+		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
+		for (let i = 0; i < 2; i++) {
+			let slide = $("<div>");
+			slide.html("Slide " + (i + 1));
+			sliderDiv.append(slide);
+		}
+		sliderDiv.slick({dots: true});
+		
+		// button to generate keys
+		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(div);
+		btnGenerate.append("Generate New Keys");
+		btnGenerate.click(function() { onSelectGenerate(); });
+		
+		// button to recover keys
+		let btnRecover = $("<div class='btn btn_recover'>").appendTo(div);
+		btnRecover.append("or Recover Existing Keys");
+		btnRecover.click(function() { onSelectRecover(); });
+		
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
