@@ -46,7 +46,7 @@ body {
 .btn_start_generate {
 	height:75px;
 	width:225px;
-	background-color:green;
+	background-color:rgb(129, 215, 43);
 	color:white;
 	display:flex;
 	align-items:center;
