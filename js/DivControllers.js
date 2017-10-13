@@ -118,8 +118,9 @@ function HomeController(div, onSelectGenerate, onSelectRecover) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
+		div.attr("class", "home_div");
 		
-		div.append("Supports the most popular cryptocurrencies");
+		div.append("Supports these popular cryptocurrencies");
 		
 		if (onDone) onDone();
 	}

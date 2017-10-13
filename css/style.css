@@ -51,6 +51,7 @@ body {
 	display:flex;
 	align-items:center;
 	justify-content:center;
+	margin-bottom:10px;
 }
 
 .btn_recover {
@@ -186,27 +187,18 @@ input[type='number'] {
 .intro_div {
 	padding-top:20px;
 	width:100%;
-	min-width:914px;
+	min-width:1016px;
 	background-color:rgb(66, 116, 184);
 	display:flex;
 	flex-direction:column;
 	align-items:center;
-	height:260px;
+	height:300px;
 	position:relative;
-}
-
-.cta_div {
-	position:absolute;
-	bottom:20px;
-	right:20px;
-	display:flex;
-	flex-direction:column;
-	align-items:center;
 }
 
 .slider_container {
 	margin: 0 auto;
-	padding: 0 30px 0 30px;
+	padding: 0 40px 0 40px;
 	width: 100%;
 	background-color:rgb(66, 116, 184);
 }
@@ -220,14 +212,31 @@ input[type='number'] {
 }
 
 .slide_img {
-	width:200px;
-	height:200px;
+	width:250px;
+	height:250px;
 }
 
 .slide_label {
-	font-size:40px;
+	font-size:42px;
+	line-height:55px;
 	text-align: center;
 	color: white;
 	text-align:left;
 	margin-left:20px;
+}
+
+.cta_div {
+	position:absolute;
+	bottom:20px;
+	right:20px;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+}
+
+.home_div {
+	padding-top:25px;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
 }
