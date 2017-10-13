@@ -154,7 +154,9 @@ function ApplicationController(div) {
 		let slide3 = $("<div class='slide'>").appendTo(sliderDiv);
 		slide3.html("Export to digital and printable formats which can be easily recovered.");
 		let slide4 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide4.html("100% open source and free to use. No registration or trusted third parties.");
+		slide4.html("100% open source and free to use.");
+		let slide5 = $("<div class='slide'>").appendTo(sliderDiv);
+		slide5.html("No registration or trusted third parties.");
 		sliderDiv.slick({autoplay:true, dots: true});
 		
 		// button to generate keys
