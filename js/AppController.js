@@ -145,9 +145,9 @@ function ApplicationController(div) {
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
 		getSlide($("<img src='img/mix.png'>"), "Generate public/private keys for multiple cryptocurrencies.").appendTo(sliderDiv);
 		getSlide($("<img src='img/security.png'>"), "Keys are generated in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-		getSlide(null, "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
-		getSlide(null, "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
-		getSlide(null, "100% open source and free to use.<br>No account necessary.").appendTo(sliderDiv);
+		getSlide($("<img src='img/visibility.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
+		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
+		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.<br>No account necessary.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true});
 		
 		function getSlide(img, text) {
