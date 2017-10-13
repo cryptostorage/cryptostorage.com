@@ -67,6 +67,20 @@ let UiUtils = {
 		});
 	},
 	
+	getCurrencyRow: function(plugins, isMajor) {
+		let row = $("<div class='currency_row'>");
+		for (let plugin of plugins) {
+			let item = $("<div class='currency_row_item'>").appendTo(row);
+			let img = $("<div>").appendTo(item);
+			img.attr("class", isMajor ? "currency_row_logo_major" : "currency_row_logo_minor");
+			img.append(plugin.getLogo());
+			let label = $("<div>").appendTo(item);
+			label.attr("class", isMajor ? "currency_row_label_major" : "currency_row_label_minor");
+			label.html(plugin.getName());
+		}
+		return row;
+	},
+	
 	// --- relative weights of key generation derived from experimentation and used for representative progress bar ---
 	
 	getCreateKeyWeight: function() { return 63; },
@@ -120,9 +134,15 @@ function HomeController(div, onSelectGenerate, onSelectRecover) {
 		UiUtils.setupContentDiv(div);
 		div.attr("class", "home_div");
 		
+		// supported currencies
 		div.append("Supports these popular cryptocurrencies");
+		let plugins = CryptoUtils.getCryptoPlugins();
+		div.append(UiUtils.getCurrencyRow(plugins.slice(0, 3), true));
+		for (let i = 3; i < plugins.length; i += 4) {
+			div.append(UiUtils.getCurrencyRow(plugins.slice(i, 4), false));
+		}
 		
-		if (onDone) onDone();
+		if (onDone) onDone(div);
 	}
 }
 inheritsFrom(HomeController, DivController);
