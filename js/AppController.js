@@ -157,7 +157,7 @@ function ApplicationController(div) {
 		slide4.html("100% open source and free to use.");
 		let slide5 = $("<div class='slide'>").appendTo(sliderDiv);
 		slide5.html("No registration or trusted third parties.");
-		sliderDiv.slick({autoplay:true, dots: true});
+		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots: true});
 		
 		// button to generate keys
 		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(introDiv);
