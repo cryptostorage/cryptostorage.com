@@ -177,7 +177,12 @@ function FormController(div) {
 		let passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
 		passphraseCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
 		passphraseCheckbox.click(function() {
-			passphraseCheckbox.prop('checked') ? passphraseInputDiv.show() : passphraseInputDiv.hide();
+			if (passphraseCheckbox.prop('checked')) {
+				passphraseInputDiv.show();
+				passphraseInput.focus();
+			} else {
+				passphraseInputDiv.hide();
+			}
 		});
 		
 		// passphrase input
@@ -191,7 +196,12 @@ function FormController(div) {
 		let showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 		showPassphraseCheckboxLabel.html("&nbsp;Show passphrase");
 		showPassphraseCheckbox.click(function() {
-			passphraseInput.attr("type", showPassphraseCheckbox.prop('checked') ? "text" : "password");
+			if (showPassphraseCheckbox.prop('checked')) {
+				passphraseInput.attr("type", "text");
+			} else {
+				passphraseInput.attr("type", "password");
+			}
+			passphraseInput.focus();
 		});
 		
 		// split checkbox
@@ -200,18 +210,23 @@ function FormController(div) {
 		let splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.html("&nbsp;Do you want to split your private keys into separate pieces?");
 		splitCheckbox.click(function() {
-			splitCheckbox.prop('checked') ? splitInputDiv.show() : splitInputDiv.hide();
+			if (splitCheckbox.prop('checked')) {
+				splitInputDiv.show();
+				numPiecesInput.focus();
+			} else {
+				splitInputDiv.hide();
+			}
 		});
 		
 		// split input
 		let splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
 		let splitNumPiecesDiv = $("<div>").appendTo(splitInputDiv);
 		splitNumPiecesDiv.append("Split each key into ");
-		numPiecesInput = $("<input type='number'>").appendTo(splitNumPiecesDiv);
+		numPiecesInput = $("<input type='number' value='3'>").appendTo(splitNumPiecesDiv);
 		splitNumPiecesDiv.append(" pieces");
 		let splitMinPiecesDiv = $("<div>").appendTo(splitInputDiv);
 		splitMinPiecesDiv.append("Require ");
-		minPiecesInput = $("<input type='number'>").appendTo(splitMinPiecesDiv);
+		minPiecesInput = $("<input type='number' value='2'>").appendTo(splitMinPiecesDiv);
 		splitMinPiecesDiv.append(" to recover");
 		
 		// apply default configuration
@@ -352,6 +367,7 @@ function FormController(div) {
 				selectText: "Select a Currency",
 				onSelected: function(data) {
 					selectedPlugin = plugins[data.selectedIndex];
+					numKeysInput.focus();
 				},
 			});
 			
