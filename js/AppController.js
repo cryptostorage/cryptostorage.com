@@ -147,17 +147,25 @@ function ApplicationController(div) {
 		// intro slider
 		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(introDiv);
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		let slide1 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide1.html("Generate public/private keys for multiple cryptocurrencies.");	
-		let slide2 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide2.html("Keys are generated in your browser so funds are never entrusted to a third party.");
-		let slide3 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide3.html("Private keys can be password protected and split into pieces.");
-		let slide4 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide4.html("Export to digital and printable formats which can be easily recovered.");
-		let slide5 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide5.html("100% open source and free to use.<br>No account necessary.");
+		getSlide($("<img src='img/mix.png'>"), "Generate public/private keys for multiple cryptocurrencies.").appendTo(sliderDiv);
+		getSlide($("<img src='img/security.png'>"), "Keys are generated in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
+		getSlide(null, "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
+		getSlide(null, "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
+		getSlide(null, "100% open source and free to use.<br>No account necessary.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true});
+		
+		function getSlide(img, text) {
+			let slide = $("<div class='slide'>");
+			let slideContent = $("<div class='slide_content'>").appendTo(slide);
+			if (img) {
+				let imgDiv = $("<div>").appendTo(slideContent);
+				img.appendTo(imgDiv);
+				img.attr("class", "slide_img");
+			}
+			let labelDiv = $("<div class='slide_label'>").appendTo(slideContent);
+			labelDiv.html(text);
+			return slide;
+		}
 		
 		// call to action is overlaid
 		let ctaDiv = $("<div class='cta_div'>").appendTo(introDiv);
