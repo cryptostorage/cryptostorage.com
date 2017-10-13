@@ -148,24 +148,27 @@ function ApplicationController(div) {
 		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(introDiv);
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
 		let slide1 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide1.html("Generate public/private keys for multiple cryptocurrencies.");
+		slide1.html("Generate public/private keys for multiple cryptocurrencies.");	
 		let slide2 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide2.html("Private keys can be password protected and split into pieces.");
+		slide2.html("Keys are generated in your browser so funds are never entrusted to a third party.");
 		let slide3 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide3.html("Export to digital and printable formats which can be easily recovered.");
+		slide3.html("Private keys can be password protected and split into pieces.");
 		let slide4 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide4.html("100% open source and free to use.");
+		slide4.html("Export to digital and printable formats which can be easily recovered.");
 		let slide5 = $("<div class='slide'>").appendTo(sliderDiv);
-		slide5.html("No registration or trusted third parties.");
-		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots: true});
+		slide5.html("100% open source and free to use.<br>No account necessary.");
+		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true});
+		
+		// call to action is overlaid
+		let ctaDiv = $("<div class='cta_div'>").appendTo(introDiv);
 		
 		// button to generate keys
-		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(introDiv);
+		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(ctaDiv);
 		btnGenerate.append("Generate New Keys");
 		btnGenerate.click(function() { onSelectGenerate(); });
 		
 		// button to recover keys
-		let btnRecover = $("<div class='btn btn_recover'>").appendTo(introDiv);
+		let btnRecover = $("<div class='btn btn_recover'>").appendTo(ctaDiv);
 		btnRecover.append("or Recover Existing Keys");
 		btnRecover.click(function() { onSelectRecover(); });
 		
