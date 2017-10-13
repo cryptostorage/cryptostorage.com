@@ -186,7 +186,7 @@ input[type='number'] {
 .intro_div {
 	padding-top:20px;
 	width:100%;
-	min-width:889px;
+	min-width:914px;
 	background-color:rgb(66, 116, 184);
 	display:flex;
 	flex-direction:column;
@@ -220,8 +220,8 @@ input[type='number'] {
 }
 
 .slide_img {
-	width:175px;
-	height:175px;
+	width:200px;
+	height:200px;
 }
 
 .slide_label {
