@@ -53,7 +53,7 @@
 // optimize tests by getting one set of keys of repeat_long size
 
 const RUN_TESTS = false;
-const DEBUG = true;
+const DEBUG = false;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;
 const COMMON_DEPENDENCIES = ["lib/b64-images.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js"];
