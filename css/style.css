@@ -245,27 +245,37 @@ input[type='number'] {
 	display:flex;
 }
 
-.currency_row_item {
+.currency_row_item_major {
 	display:flex;
 	flex-direction:column;
 	align-items:center;
+	margin:20px;
+}
+
+.currency_row_item_minor {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	margin:20px;
 }
 
 .currency_row_logo_major {
-	width:75px;
-	height:75px;
+	width:110px;
+	height:110px;
+	margin:15px;
 }
 
 .currency_row_logo_minor {
-	width:50px;
-	height:50px;
+	width:75px;
+	height:75px;
+	margin:15px;
 }
 
 .currency_row_label_major {
 	font-weight:bold;
-	font-size:25px;
+	font-size:20px;
 }
 
 .currency_row_label_minor {
-	font-size:22px;
+	font-size:20px;
 }

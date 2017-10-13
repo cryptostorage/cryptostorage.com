@@ -70,8 +70,9 @@ let UiUtils = {
 	getCurrencyRow: function(plugins, isMajor) {
 		let row = $("<div class='currency_row'>");
 		for (let plugin of plugins) {
-			let item = $("<div class='currency_row_item'>").appendTo(row);
-			let img = $("<div>").appendTo(item);
+			let item = $("<div>").appendTo(row);
+			item.attr("class", isMajor ? "currency_row_item_major" : "currency_row_item_minor");
+			let img = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(item);
 			img.attr("class", isMajor ? "currency_row_logo_major" : "currency_row_logo_minor");
 			img.append(plugin.getLogo());
 			let label = $("<div>").appendTo(item);
@@ -131,15 +132,15 @@ DivController.prototype.onHide = function() { }
 function HomeController(div, onSelectGenerate, onSelectRecover) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
-		UiUtils.setupContentDiv(div);
-		div.attr("class", "home_div");
+		div.empty();
+		div.attr("class", "page_div home_div");
 		
 		// supported currencies
 		div.append("Supports these popular cryptocurrencies");
 		let plugins = CryptoUtils.getCryptoPlugins();
 		div.append(UiUtils.getCurrencyRow(plugins.slice(0, 3), true));
 		for (let i = 3; i < plugins.length; i += 4) {
-			div.append(UiUtils.getCurrencyRow(plugins.slice(i, 4), false));
+			div.append(UiUtils.getCurrencyRow(plugins.slice(i, i + 4), false));
 		}
 		
 		if (onDone) onDone(div);
