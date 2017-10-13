@@ -1,10 +1,10 @@
 // TODO
-// memory profiling
-// new design
-// faq page
-// donation page
+// memory bug in bip38 encryption
+// faq
+// donate
 // label keys with pieces e.g. #1.3, #2.3, #3.3
 // peer review key formats
+// piece export: print, download, select pieces
 
 // use @media to dynamically space piece pages
 // todos throughout code
