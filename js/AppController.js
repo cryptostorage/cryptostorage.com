@@ -67,10 +67,6 @@ $(document).ready(function() {
 	// delete window.crypto for testing
 	if (DELETE_WINDOW_CRYPTO) delete window.crypto;
 	
-	$("#slick_test").slick({
-		dots: true
-	});
-	
 	// start loading common dependencies
 	loader = new DependencyLoader();
 	loader.load(COMMON_DEPENDENCIES, function() {
