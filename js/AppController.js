@@ -112,7 +112,7 @@ function ApplicationController(div) {
 	let faqController;
 	let donateController;
 	
-	this.render = function() {
+	this.render = function(onDone) {
 		
 		// header
 		let headerDiv = $("<div class='app_header'>").appendTo(div);
@@ -202,6 +202,9 @@ function ApplicationController(div) {
 			if (identifier === "faq") that.showFaq();
 			else if (identifier === "donate") that.showDonate();
 			else that.showHome();
+			
+			// done rendering
+			if (onDone) onDone(div);
 		});
 	}
 	
@@ -249,3 +252,4 @@ function ApplicationController(div) {
 		if (DEBUG) console.log("onSelectRecover()");
 	}
 }
+inheritsFrom(AppController, DivController);

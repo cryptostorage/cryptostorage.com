@@ -159,12 +159,15 @@ function FormController(div) {
 	let splitCheckbox;
 	let numPiecesInput;
 	let minPiecesInput;
-	let currencyInputsDiv;		// container for each currency input
-	let currencyInputs = [];	// tracks each currency input
-	let decommissioned = false;
+	let currencyInputsDiv;	// container for each currency input
+	let currencyInputs;			// tracks each currency input
+	let decommissioned;
 	
 	this.render = function(onDone) {
+		
+		// initial state
 		UiUtils.setupContentDiv(div);
+		decommissioned = false;
 		
 		// passphrase checkbox
 		let passphraseDiv = $("<div class='form_section_div'>").appendTo(div);
@@ -216,6 +219,7 @@ function FormController(div) {
 		splitInputDiv.hide();
 		
 		// currency inputs
+		currencyInputs = [];
 		let currencyDiv = $("<div class='form_section_div'>").appendTo(div);
 		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(currencyDiv);
 		
