@@ -285,7 +285,7 @@ function FormController(div) {
 		config.passphrase = passphraseInput.val();
 		config.splitChecked = splitCheckbox.prop('checked');
 		config.numPieces = config.splitChecked ? parseFloat(numPiecesInput.val()) : 1;
-		config.minPieces = parseFloat(minPiecesInput.val());
+		config.minPieces = config.splitChecked ? parseFloat(minPiecesInput.val()) : null;
 		config.currencies = [];
 		for (let currencyInput of currencyInputs) {
 			config.currencies.push({
