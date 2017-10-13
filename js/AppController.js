@@ -114,13 +114,16 @@ function ApplicationController(div) {
 	
 	this.render = function() {
 		
-		// header logo
+		// header
 		let headerDiv = $("<div class='app_header'>").appendTo(div);
-		let logoLink = $("<a href='index.html'>").appendTo(headerDiv);
+		
+		// header logo
+		let headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
+		let logoLink = $("<a href='index.html'>").appendTo(headerTopDiv);
 		$("<img class='app_header_logo_img' src='img/cryptostorage.png'>").appendTo(logoLink);
 		
 		// header links
-		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerDiv);
+		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
 		let homeLink = UiUtils.getLink("#", "Home");
 		homeLink.click(function() { that.showHome(); });
 		let faqLink = UiUtils.getLink("#faq", "FAQ");
@@ -138,7 +141,7 @@ function ApplicationController(div) {
 		linksDiv.append(donateLink);
 		
 		// intro container
-		introDiv = $("<div class='intro_div'>").appendTo(div);
+		introDiv = $("<div class='intro_div'>").appendTo(headerDiv);
 		
 		// intro slider
 		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(introDiv);
