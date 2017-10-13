@@ -44,7 +44,7 @@ let UiUtils = {
 	},
 	
 	getProgressBar: function(div) {
-		return new ProgressBar.Line(div, {
+		return new ProgressBar.Line(div.get(0), {
 			strokeWidth: 2.5,
 			color: 'rgb(96, 178, 198)',	// cryptostorage teal
 			duration: 0,
@@ -53,15 +53,15 @@ let UiUtils = {
 				className: 'progresbar-text',
 				style: {
 					color: 'black',
-		            position: 'absolute',
-		            left: '50%',
-		            top: '50%',
-		            padding: 0,
-		            margin: 0,
-		            transform: {
-		                prefix: true,
-		                value: 'translate(-50%, -50%)'
-		            }
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          padding: 0,
+          margin: 0,
+          transform: {
+              prefix: true,
+              value: 'translate(-50%, -50%)'
+          }
 				}
 			}
 		});
@@ -162,6 +162,8 @@ function FormController(div) {
 	let currencyInputsDiv;	// container for each currency input
 	let currencyInputs;			// tracks each currency input
 	let decommissioned;
+	let progressDiv;
+	let progressBar;
 	
 	this.render = function(onDone) {
 		
@@ -239,12 +241,19 @@ function FormController(div) {
 		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
 		btnGenerate.append("Generate key pairs");
 		btnGenerate.click(function() { generateKeys(function(done, total, label) {
-			console.log("onProgress(" + done + ", " + total + ", " + label + ")");
+			progressBar.set(done / total);
+			if (label) progressBar.setText(label);
+			progressDiv.show();
 		}, function(keys, pieces, pieceDivs) {
-			console.log("onDone(" + keys.length + ", " + pieces.length + ", " + pieceDivs.length + ")");
+			progressDiv.hide();
 			pieceDiv.empty();
 			pieceDiv.append(pieceDivs[0]);
 		})});
+		
+		// add progress bar and div
+		let progressDiv = $("<div>").appendTo(div);
+		progressDiv.hide();
+		let progressBar = UiUtils.getProgressBar(progressDiv);
 		
 		// add div to contain rendered page
 		let pieceDiv = $("<div class='preview_piece_div'>").appendTo(div);

@@ -219,6 +219,7 @@ input[type='number'] {
 	background-color:#007500;
 	color:white;
 	padding:20px;
+	margin-bottom:25px;
 }
 
 .btn_generate:hover {
