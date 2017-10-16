@@ -642,10 +642,15 @@ function DonateController(div, appController) {
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
-		div.append("Donate");
-		renderAddresses(addresses, function(addressesDiv) {
-			div.append(addressesDiv);
-			if (onDone) onDone(div);
+		// load qr code dependency
+		loader.load("lib/qrcode.js", function() {
+			
+			// build page
+			div.append("Donate");
+			renderAddresses(addresses, function(addressesDiv) {
+				div.append(addressesDiv);
+				if (onDone) onDone(div);
+			});
 		});
 		
 		/**
@@ -665,9 +670,9 @@ function DonateController(div, appController) {
 				if (addresses.hasOwnProperty(key)) {
 					let addressDiv = $("<div>").appendTo(addressesDiv); 
 					if (left) {
-						funcs.push(function(onDone) { renderLeft(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses.key, onDone); });
+						funcs.push(function(onDone) { renderLeft(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses[key], onDone); });
 					} else {
-						funcs.push(function(onDone) { renderRight(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses.key, onDone); });
+						funcs.push(function(onDone) { renderRight(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses[key], onDone); });
 					}
 					left = !left;
 				}
@@ -681,11 +686,19 @@ function DonateController(div, appController) {
 		}
 		
 		function renderLeft(div, plugin, address, onDone) {
-			console.log("renderLeft(" + plugin.getTicker() + ")");
+			div.attr("class", "donate_div_left");
+			let qrDiv = $("<div>").appendTo(div);
+			let img = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(div);
+			img.attr("class", "donate_logo");
+			let textDiv = $("<div>").appendTo(div);
+			textDiv.append(plugin.getName() + ": " + address);
 			
-			div.html("Left");
-			
-			onDone();
+			// render the qr code
+			CryptoUtils.renderQrCode(address, null, function(img) {
+				img.attr("class", "donate_qr");
+				qrDiv.append(img);
+				onDone();
+			});
 		}
 		
 		function renderRight(div, plugin, address, onDone) {

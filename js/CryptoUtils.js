@@ -141,7 +141,6 @@ let CryptoUtils = {
 
 	// specifies default QR configuration
 	DefaultQrConfig: {
-		size: 250,
 		version: null,
 		errorCorrectionLevel: 'Q',
 		margin: 0,
@@ -165,8 +164,8 @@ let CryptoUtils = {
 		qrcodelib.toDataURL(segments, config, function(err, url) {
 			if (err) throw err;
 			var img = $("<img>");
-			img.css("width", config.size + "px");
-			img.css("height", config.size + "px");
+			if (config.size) img.css("width", config.size + "px");
+			if (config.size) img.css("height", config.size + "px");
 			img[0].onload = function() {
 				callback(img);
 			}

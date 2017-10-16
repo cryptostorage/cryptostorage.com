@@ -189,7 +189,6 @@ function ApplicationController(div) {
 		faqController = new FaqController($("<div>"));
 		donateController = new DonateController($("<div>"));
 		faqController.render();
-		donateController.render();
 		
 		// render body and start on home
 		homeController.render(function() {
@@ -232,7 +231,9 @@ function ApplicationController(div) {
 	this.showDonate = function() {
 		if (DEBUG) console.log("showDonate()");
 		introDiv.hide();
-		setContentDiv(donateController.getDiv());
+		donateController.render(function(div) {
+			setContentDiv(div);
+		});
 	}
 	
 	function setContentDiv(div) {

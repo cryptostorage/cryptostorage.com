@@ -283,3 +283,18 @@ input[type='number'] {
 .currency_row_label_minor {
 	font-size:20px;
 }
+
+.donate_div_left {
+	display:flex;
+	align-items:center;
+}
+
+.donate_qr {
+	width:100px;
+	height:100px;
+}
+
+.donate_logo {
+	height:50px;
+	width:50px;
+}
