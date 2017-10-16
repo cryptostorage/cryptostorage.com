@@ -629,10 +629,61 @@ inheritsFrom(FaqController, DivController);
  */
 function DonateController(div, appController) {
 	DivController.call(this, div);
+	
+	/**
+	 * Ticker to address donation key pairs.
+	 */
+	let addresses = {
+		"XMR": "abctesting123",
+		"BTC": "hello there",
+		"ETH": "hi"
+	};
+	
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
 		div.append("Donate");
+		renderAddresses(addresses, function(div) {
+			div.append(div);
+			if (onDone) onDone(div);
+		});
+		
+		/**
+		 * Renders the given addresses.
+		 * 
+		 * @param addresses are ticker: address key pairs
+		 * @param onDone(div) is invoked when done
+		 */
+		function renderAddresses(addresses, onDone) {
+			
+			let div = $("<div>");
+			
+			// collect function render addresses
+			let left = true;
+			let funcs = [];
+			for (let key in addresses) {
+				if (addresses.hasOwnProperty(key)) {
+					let addressDiv = $("<div>").appendTo(div); 
+					if (left) {
+						funcs.push(function(onDone) { renderLeft(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses.key, onDone); });
+					} else {
+						funcs.push(function(onDone) { renderRight(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses.key, onDone); });
+					}
+				}
+			}
+			
+			// render addresses in parallel
+			async.parallel(funcs);
+		}
+		
+		function renderLeft(div, plugin, address, onDone) {
+			console.log("renderLeft(" + plugin.getTicker() + ")");
+			onDone();
+		}
+		
+		function renderRight(div, plugin, address, onDone) {
+			onDone();
+		}
 		
 		// done rendering
 		if (onDone) onDone(div);
