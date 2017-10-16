@@ -643,8 +643,8 @@ function DonateController(div, appController) {
 		UiUtils.setupContentDiv(div);
 		
 		div.append("Donate");
-		renderAddresses(addresses, function(div) {
-			div.append(div);
+		renderAddresses(addresses, function(addressesDiv) {
+			div.append(addressesDiv);
 			if (onDone) onDone(div);
 		});
 		
@@ -656,32 +656,41 @@ function DonateController(div, appController) {
 		 */
 		function renderAddresses(addresses, onDone) {
 			
-			let div = $("<div>");
+			let addressesDiv = $("<div>");
 			
 			// collect function render addresses
 			let left = true;
 			let funcs = [];
 			for (let key in addresses) {
 				if (addresses.hasOwnProperty(key)) {
-					let addressDiv = $("<div>").appendTo(div); 
+					let addressDiv = $("<div>").appendTo(addressesDiv); 
 					if (left) {
 						funcs.push(function(onDone) { renderLeft(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses.key, onDone); });
 					} else {
 						funcs.push(function(onDone) { renderRight(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses.key, onDone); });
 					}
+					left = !left;
 				}
 			}
 			
 			// render addresses in parallel
-			async.parallel(funcs);
+			async.parallel(funcs, function(err, results) {
+				if (err) throw err;
+				onDone(addressesDiv);
+			});
 		}
 		
 		function renderLeft(div, plugin, address, onDone) {
 			console.log("renderLeft(" + plugin.getTicker() + ")");
+			
+			div.html("Left");
+			
 			onDone();
 		}
 		
 		function renderRight(div, plugin, address, onDone) {
+			console.log("renderRight(" + plugin.getTicker() + ")");
+			div.html("Right");
 			onDone();
 		}
 		

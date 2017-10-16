@@ -253,4 +253,4 @@ function ApplicationController(div) {
 		if (DEBUG) console.log("onSelectRecover()");
 	}
 }
-inheritsFrom(AppController, DivController);
+inheritsFrom(ApplicationController, DivController);
