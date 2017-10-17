@@ -294,7 +294,7 @@ input[type='number'] {
 .value_left {
 	display:flex;
 	align-items:center;
-	margin-top:-10px;
+	margin-top:10px;
 }
 
 .value_right {
@@ -326,24 +326,25 @@ input[type='number'] {
 }
 
 .value_logo {
-	height:40px;
-	width:40px;
+	height:35px;
+	width:35px;
 }
 
 .value_label {
 	padding-left:7px;
 	font-weight:bold;
+	font-size:20px;
 }
 
 .value_left_value {
-	font-size:20px;
+	font-size:18px;
 	font-family:monospace;
 	word-break:break-all;
 	padding-top:5px;
 }
 
 .value_right_value {
-	font-size:20px;
+	font-size:18px;
 	font-family:monospace;
 	word-break:break-all;
 	padding-top:5px;

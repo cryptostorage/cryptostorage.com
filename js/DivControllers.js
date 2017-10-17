@@ -630,21 +630,6 @@ inheritsFrom(FaqController, DivController);
 function DonateController(div, appController) {
 	DivController.call(this, div);
 	
-	/**
-	 * Ticker to address donation key pairs.
-	 * 
-	 * TODO: move this to plugin
-	 */
-	let addresses = {
-		"XMR": "48gtXgAv6nSJobAt2Keb5BY6wauSPUNZA2zQbGAKpiGo2P4Y4TWpJiP1C1g9voeRtuFpixdeMMpFGNPZXbvZcWuUVpWNvHh",
-		"BTC": "1MLCDdnMSpjWkRrgu8vRCjHeacBzoV7zfK",
-		"ETH": "0x1a60f442b6573dd342e715c3557ab90f10bff624",
-		"LTC": "Li11ygcrVVQ5RwWDFtY1jdtddT4UTxJdtn",
-		"BCH": "1GzTC6EiGEXjdLQRNy1WEbmxqatLvwUpuN",
-		"ETC": "0x5b11fb40231b3857ab06e399cf4e1e6defa5ac4d",
-		"OMG": "0xb08cf3bade0750cf38a3ed8a13f9ef3c45f6d830"
-	};
-	
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
@@ -666,6 +651,7 @@ function DonateController(div, appController) {
 				div.append(valuesDiv);
 				
 				// build credits section
+				div.append("<br><br>");
 				titleDiv = $("<div class='title'>").appendTo(div);
 				titleDiv.html("Credits");
 				let values = [];
@@ -709,7 +695,7 @@ function DonateController(div, appController) {
 				} else {
 					funcs.push(function(onDone) { renderRight(valueDiv, value, onDone); });
 				}
-				left = !left;
+				//left = !left;
 			}
 			
 			// render addresses in parallel
