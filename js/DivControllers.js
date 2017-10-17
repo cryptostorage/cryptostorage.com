@@ -664,7 +664,25 @@ function DonateController(div, appController) {
 			}
 			renderValues(values, null, null, function(valuesDiv) {
 				div.append(valuesDiv);
-				if (onDone) onDone(div);
+				
+				// build credits section
+				titleDiv = $("<div class='title'>").appendTo(div);
+				titleDiv.html("Credits");
+				let values = [];
+				values.push({
+					logo: CryptoUtils.getCryptoPlugin("BTC").getLogo(),
+					label: "bitaddress.org",
+					value: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
+				});
+				values.push({
+					logo: CryptoUtils.getCryptoPlugin("XMR").getLogo(),
+					label: "moneroaddress.org",
+					value: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
+				});
+				renderValues(values, null, null, function(valuesDiv) {
+					div.append(valuesDiv);
+					if (onDone) onDone(div);
+				});
 			});
 		});
 		
@@ -710,7 +728,7 @@ function DonateController(div, appController) {
 			logo.attr("class", "value_logo");
 			let valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
 			valueLabelDiv.append(value.label);
-			let valueDiv = $("<div class='value_value'>").appendTo(labelValueDiv);
+			let valueDiv = $("<div class='value_left_value'>").appendTo(labelValueDiv);
 			valueDiv.append(value.value);
 			
 			// render qr code
@@ -729,7 +747,7 @@ function DonateController(div, appController) {
 			logo.attr("class", "value_logo");
 			let valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
 			valueLabelDiv.append(value.label);
-			let valueDiv = $("<div class='value_value'>").appendTo(labelValueDiv);
+			let valueDiv = $("<div class='value_right_value'>").appendTo(labelValueDiv);
 			valueDiv.append(value.value);
 			let qrDiv = $("<div>").appendTo(div);
 			

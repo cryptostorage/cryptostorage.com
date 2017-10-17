@@ -294,14 +294,14 @@ input[type='number'] {
 .value_left {
 	display:flex;
 	align-items:center;
-	margin-top:20px;
+	margin-top:-10px;
 }
 
 .value_right {
 	display:flex;
 	align-items:center;
 	justify-content:flex-end;
-	margin-top:0px;
+	margin-top:-10px;
 }
 
 .value_qr {
@@ -335,9 +335,17 @@ input[type='number'] {
 	font-weight:bold;
 }
 
-.value_value {
+.value_left_value {
 	font-size:20px;
 	font-family:monospace;
 	word-break:break-all;
 	padding-top:5px;
+}
+
+.value_right_value {
+	font-size:20px;
+	font-family:monospace;
+	word-break:break-all;
+	padding-top:5px;
+	text-align:right;
 }
