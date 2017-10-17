@@ -632,11 +632,17 @@ function DonateController(div, appController) {
 	
 	/**
 	 * Ticker to address donation key pairs.
+	 * 
+	 * TODO: move this to plugin
 	 */
 	let addresses = {
-		"XMR": "abctesting123",
-		"BTC": "hello there",
-		"ETH": "hi"
+		"XMR": "48gtXgAv6nSJobAt2Keb5BY6wauSPUNZA2zQbGAKpiGo2P4Y4TWpJiP1C1g9voeRtuFpixdeMMpFGNPZXbvZcWuUVpWNvHh",
+		"BTC": "1MLCDdnMSpjWkRrgu8vRCjHeacBzoV7zfK",
+		"ETH": "0x1a60f442b6573dd342e715c3557ab90f10bff624",
+		"LTC": "Li11ygcrVVQ5RwWDFtY1jdtddT4UTxJdtn",
+		"BCH": "1GzTC6EiGEXjdLQRNy1WEbmxqatLvwUpuN",
+		"ETC": "0x5b11fb40231b3857ab06e399cf4e1e6defa5ac4d",
+		"OMG": "0xb08cf3bade0750cf38a3ed8a13f9ef3c45f6d830"
 	};
 	
 	this.render = function(onDone) {
@@ -674,7 +680,7 @@ function DonateController(div, appController) {
 					} else {
 						funcs.push(function(onDone) { renderRight(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses[key], onDone); });
 					}
-					left = !left;
+					//left = !left;
 				}
 			}
 			
@@ -688,10 +694,14 @@ function DonateController(div, appController) {
 		function renderLeft(div, plugin, address, onDone) {
 			div.attr("class", "donate_div_left");
 			let qrDiv = $("<div>").appendTo(div);
-			let img = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(div);
-			img.attr("class", "donate_logo");
-			let textDiv = $("<div>").appendTo(div);
-			textDiv.append(plugin.getName() + ": " + address);
+			let textDiv = $("<div class='donate_div_text'>").appendTo(div);
+			let currencyDiv = $("<div class='donate_div_currency'>").appendTo(textDiv);
+			let logo = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(currencyDiv);
+			logo.attr("class", "donate_logo");
+			let currencyNameDiv = $("<div class='donate_currency_name'>").appendTo(currencyDiv);
+			currencyNameDiv.append(plugin.getName());
+			let addressDiv = $("<div class='donate_address'>").appendTo(textDiv);
+			addressDiv.append(address);
 			
 			// render the qr code
 			CryptoUtils.renderQrCode(address, null, function(img) {
