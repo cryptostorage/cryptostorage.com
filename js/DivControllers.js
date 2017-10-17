@@ -652,7 +652,8 @@ function DonateController(div, appController) {
 		loader.load("lib/qrcode.js", function() {
 			
 			// build page
-			div.append("Donate");
+			let titleDiv = $("<div class='title'>").appendTo(div);
+			titleDiv.html("Donate");
 			renderAddresses(addresses, function(addressesDiv) {
 				div.append(addressesDiv);
 				if (onDone) onDone(div);
@@ -680,7 +681,7 @@ function DonateController(div, appController) {
 					} else {
 						funcs.push(function(onDone) { renderRight(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses[key], onDone); });
 					}
-					//left = !left;
+					left = !left;
 				}
 			}
 			
@@ -695,7 +696,7 @@ function DonateController(div, appController) {
 			div.attr("class", "donate_div_left");
 			let qrDiv = $("<div>").appendTo(div);
 			let textDiv = $("<div class='donate_div_text'>").appendTo(div);
-			let currencyDiv = $("<div class='donate_div_currency'>").appendTo(textDiv);
+			let currencyDiv = $("<div class='donate_div_currency_left'>").appendTo(textDiv);
 			let logo = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(currencyDiv);
 			logo.attr("class", "donate_logo");
 			let currencyNameDiv = $("<div class='donate_currency_name'>").appendTo(currencyDiv);
@@ -703,7 +704,7 @@ function DonateController(div, appController) {
 			let addressDiv = $("<div class='donate_address'>").appendTo(textDiv);
 			addressDiv.append(address);
 			
-			// render the qr code
+			// render qr code
 			CryptoUtils.renderQrCode(address, null, function(img) {
 				img.attr("class", "donate_qr");
 				qrDiv.append(img);
@@ -712,9 +713,23 @@ function DonateController(div, appController) {
 		}
 		
 		function renderRight(div, plugin, address, onDone) {
-			console.log("renderRight(" + plugin.getTicker() + ")");
-			div.html("Right");
-			onDone();
+			div.attr("class", "donate_div_right");
+			let textDiv = $("<div class='donate_div_text'>").appendTo(div);
+			let currencyDiv = $("<div class='donate_div_currency_right'>").appendTo(textDiv);
+			let logo = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(currencyDiv);
+			logo.attr("class", "donate_logo");
+			let currencyNameDiv = $("<div class='donate_currency_name'>").appendTo(currencyDiv);
+			currencyNameDiv.append(plugin.getName());
+			let addressDiv = $("<div class='donate_address'>").appendTo(textDiv);
+			addressDiv.append(address);
+			let qrDiv = $("<div>").appendTo(div);
+			
+			// render qr code
+			CryptoUtils.renderQrCode(address, null, function(img) {
+				img.attr("class", "donate_qr");
+				qrDiv.append(img);
+				onDone();
+			});
 		}
 		
 		// done rendering
