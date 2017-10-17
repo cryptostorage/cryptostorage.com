@@ -681,7 +681,7 @@ function DonateController(div, appController) {
 					} else {
 						funcs.push(function(onDone) { renderRight(addressDiv, CryptoUtils.getCryptoPlugin(key), addresses[key], onDone); });
 					}
-					left = !left;
+					//left = !left;
 				}
 			}
 			

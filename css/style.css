@@ -294,20 +294,20 @@ input[type='number'] {
 .donate_div_left {
 	display:flex;
 	align-items:center;
-	margin-top:-10px;
+	margin-top:20px;
 }
 
 .donate_div_right {
 	display:flex;
 	align-items:center;
 	justify-content:flex-end;
-	margin-top:-10px;
+	margin-top:0px;
 }
 
 .donate_qr {
 	width:100px;
 	height:100px;
-	margin:15px
+	margin:10px
 }
 
 .donate_div_text {
@@ -326,8 +326,8 @@ input[type='number'] {
 }
 
 .donate_logo {
-	height:45px;
-	width:45px;
+	height:40px;
+	width:40px;
 }
 
 .donate_currency_name {

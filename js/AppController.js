@@ -127,17 +127,17 @@ function ApplicationController(div) {
 		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
 		let homeLink = UiUtils.getLink("#", "Home");
 		homeLink.click(function() { that.showHome(); });
-		let faqLink = UiUtils.getLink("#faq", "FAQ");
-		faqLink.click(function() { that.showFaq(); });
 		let gitHubLink = $("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>");
 		gitHubLink.html("GitHub");
+		let faqLink = UiUtils.getLink("#faq", "FAQ");
+		faqLink.click(function() { that.showFaq(); });
 		let donateLink = UiUtils.getLink("#donate", "Donate");
 		donateLink.click(function() { that.showDonate(); });
 		linksDiv.append(homeLink);
 		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-		linksDiv.append(faqLink);
-		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		linksDiv.append(gitHubLink);
+		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		linksDiv.append(faqLink);
 		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		linksDiv.append(donateLink);
 		
