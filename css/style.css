@@ -291,51 +291,51 @@ input[type='number'] {
 	margin-bottom:15px;
 }
 
-.donate_div_left {
+.value_left {
 	display:flex;
 	align-items:center;
 	margin-top:20px;
 }
 
-.donate_div_right {
+.value_right {
 	display:flex;
 	align-items:center;
 	justify-content:flex-end;
 	margin-top:0px;
 }
 
-.donate_qr {
+.value_qr {
 	width:100px;
 	height:100px;
 	margin:10px
 }
 
-.donate_div_text {
+.value_label_value {
 	
 }
 
-.donate_div_currency_left {
+.value_left_logo_label {
 	display:flex;
 	align-items:center;
 }
 
-.donate_div_currency_right {
+.value_right_logo_label {
 	display:flex;
 	align-items:center;
 	justify-content:flex-end;
 }
 
-.donate_logo {
+.value_logo {
 	height:40px;
 	width:40px;
 }
 
-.donate_currency_name {
+.value_label {
 	padding-left:7px;
 	font-weight:bold;
 }
 
-.donate_address {
+.value_value {
 	font-size:20px;
 	font-family:monospace;
 	word-break:break-all;

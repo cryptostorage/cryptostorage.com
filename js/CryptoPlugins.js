@@ -86,7 +86,7 @@ function BitcoinPlugin() {
 	this.getTicker = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
 	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js"]; }
-	this.getDonationAddress = function() { return "hello there!" }
+	this.getDonationAddress = function() { return "1MLCDdnMSpjWkRrgu8vRCjHeacBzoV7zfK"; }
 	this.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS, CryptoUtils.EncryptionScheme.BIP38]; }
 	this.newKey = function(str) {
 		
@@ -165,6 +165,7 @@ function BitcoinCashPlugin() {
 	this.getName = function() { return "Bitcoin Cash"; }
 	this.getTicker = function() { return "BCH" };
 	this.getLogo = function() { return $("<img src='img/bitcoin_cash.png'>"); }
+	this.getDonationAddress = function() { return "1GzTC6EiGEXjdLQRNy1WEbmxqatLvwUpuN"; }
 }
 inheritsFrom(BitcoinCashPlugin, BitcoinPlugin);
 
@@ -176,6 +177,7 @@ function EthereumPlugin() {
 	this.getTicker = function() { return "ETH" };
 	this.getLogo = function() { return $("<img src='img/ethereum.png'>"); }
 	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/keythereum.js"]; }
+	this.getDonationAddress = function() { return "0x1a60f442b6573dd342e715c3557ab90f10bff624"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -256,6 +258,7 @@ function EthereumClassicPlugin() {
 	this.getName = function() { return "Ethereum Classic"; }
 	this.getTicker = function() { return "ETC" };
 	this.getLogo = function() { return $("<img src='img/ethereum_classic.png'>"); }
+	this.getDonationAddress = function() { return "0x5b11fb40231b3857ab06e399cf4e1e6defa5ac4d"; }
 }
 inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
 
@@ -267,6 +270,7 @@ function OmiseGoPlugin() {
 	this.getName = function() { return "OmiseGo"; }
 	this.getTicker = function() { return "OMG" };
 	this.getLogo = function() { return $("<img src='img/omisego.png'>"); }
+	this.getDonationAddress = function() { return "0xb08cf3bade0750cf38a3ed8a13f9ef3c45f6d830"; }
 }
 inheritsFrom(OmiseGoPlugin, EthereumPlugin);
 
@@ -278,6 +282,7 @@ function LitecoinPlugin() {
 	this.getTicker = function() { return "LTC" };
 	this.getLogo = function() { return $("<img src='img/litecoin.png'>"); }
 	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/litecore.js"]; }
+	this.getDonationAddress = function() { return "Li11ygcrVVQ5RwWDFtY1jdtddT4UTxJdtn"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -329,6 +334,7 @@ function MoneroPlugin() {
 	this.getTicker = function() { return "XMR" };
 	this.getLogo = function() { return $("<img src='img/monero.png'>"); }
 	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/moneroaddress.js"]; }
+	this.getDonationAddress = function() { return "48gtXgAv6nSJobAt2Keb5BY6wauSPUNZA2zQbGAKpiGo2P4Y4TWpJiP1C1g9voeRtuFpixdeMMpFGNPZXbvZcWuUVpWNvHh"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
