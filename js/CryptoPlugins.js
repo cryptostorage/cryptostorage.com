@@ -24,6 +24,11 @@ CryptoPlugin.prototype.getLogo = function() { throw new Error("Subclass must imp
 CryptoPlugin.prototype.getDependencies = function() { throw new Error("Subclass must implement"); }
 
 /**
+ * Returns the donation address associated with the currency.
+ */
+CryptoPlugin.prototype.getDonationAddress = function() { throw new Error("Subclass must implement"); }
+
+/**
  * Returns the supported encryption schemes.  All support CryptoJS by default.
  */
 CryptoPlugin.prototype.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS]; }
@@ -81,6 +86,7 @@ function BitcoinPlugin() {
 	this.getTicker = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
 	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js"]; }
+	this.getDonationAddress = function() { return "hello there!" }
 	this.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS, CryptoUtils.EncryptionScheme.BIP38]; }
 	this.newKey = function(str) {
 		
