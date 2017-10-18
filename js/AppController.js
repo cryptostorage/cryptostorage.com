@@ -1,6 +1,5 @@
 // TODO
 // lazy loading is too lazy
-// improve selling points
 // clicking on currency takes action
 // memory bug in bip38 encryption
 // faq
@@ -30,7 +29,7 @@
 // double click keys should select all
 
 // consult designers
-// icons of supported currencies on home page
+// improve selling points
 // use tabs for pieces?
 // password confirmation - re-enter or show
 // title bar should not scroll?
