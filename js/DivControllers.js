@@ -143,7 +143,7 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		getSlide($("<img data-lazy='img/security.png'>"), "Keys are generated in your browser and are never entrusted to a third party.").appendTo(sliderDiv);
 		getSlide($("<img data-lazy='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
 		getSlide($("<img data-lazy='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
-		getSlide($("<img data-lazy='img/printer.png'>"), "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/printer.png'>"), "Export to digital and printable formats for long term storage and easy recovery.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true, autoplaySpeed:4000});
 		
 		function getSlide(img, text) {
