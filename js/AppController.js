@@ -1,5 +1,4 @@
 // TODO
-// branches with main releases
 // more padding around header
 // slower transition speed
 // fix distortion when header hidden
