@@ -1,5 +1,4 @@
 // TODO
-// fix distortion when header hidden
 // prevent scroll revealing some of next picture
 // clicking on currency takes action
 // no lag in clicking donate page waiting for page to paint
@@ -113,7 +112,8 @@ $(document).ready(function() {
 function ApplicationController(div) {
 	
 	let that = this;
-	let introDiv;
+	let sliderController;
+	let sliderDiv;
 	let contentDiv;
 	let homeController;
 	let formController;
@@ -149,50 +149,15 @@ function ApplicationController(div) {
 		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
 		linksDiv.append(donateLink);
 		
-		// intro container
-		introDiv = $("<div class='intro_div'>").appendTo(headerDiv);
-		
-		// intro slider
-		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(introDiv);
-		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		getSlide($("<img data-lazy='img/mix.png'>"), "Generate keys for multiple cryptocurrencies in your browser.").appendTo(sliderDiv);
-		getSlide($("<img data-lazy='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-		getSlide($("<img data-lazy='img/security.png'>"), "Funds are never entrusted to a third party.").appendTo(sliderDiv);
-		getSlide($("<img data-lazy='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
-		getSlide($("<img data-lazy='img/printer.png'>"), "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
-		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true, autoplaySpeed:4000});
-		
-		function getSlide(img, text) {
-			let slide = $("<div class='slide'>");
-			let slideContent = $("<div class='slide_content'>").appendTo(slide);
-			if (img) {
-				let imgDiv = $("<div>").appendTo(slideContent);
-				img.appendTo(imgDiv);
-				img.attr("class", "slide_img");
-			}
-			let labelDiv = $("<div class='slide_label'>").appendTo(slideContent);
-			labelDiv.html(text);
-			return slide;
-		}
-		
-		// call to action is overlaid
-		let ctaDiv = $("<div class='cta_div'>").appendTo(introDiv);
-		
-		// button to generate keys
-		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(ctaDiv);
-		btnGenerate.append("Generate New Keys");
-		btnGenerate.click(function() { onSelectGenerate(); });
-		
-		// button to recover keys
-		let btnRecover = $("<div class='btn btn_recover'>").appendTo(ctaDiv);
-		btnRecover.append("or Recover Existing Keys");
-		btnRecover.click(function() { onSelectRecover(); });
+		// slider
+		sliderDiv = $("<div>").appendTo(headerDiv);
+		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectRecover);
 		
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		homeController = new HomeController($("<div>"), onSelectGenerate, onSelectRecover);
+		homeController = new HomeController($("<div>"));
 		formController = new FormController($("<div>"));
 		faqController = new FaqController($("<div>"));
 		donateController = new DonateController($("<div>"));
@@ -218,28 +183,30 @@ function ApplicationController(div) {
 	
 	this.showHome = function() {
 		if (DEBUG) console.log("showHome()");
-		introDiv.show();
-		setContentDiv(homeController.getDiv());
+		sliderController.render(function(div) {
+			sliderDiv.show();
+			setContentDiv(homeController.getDiv());
+		});
 	}
 	
 	this.showForm = function() {
 		if (DEBUG) console.log("showForm()");
 		formController.render(function(div) {
-			introDiv.hide();
+			sliderDiv.hide();
 			setContentDiv(div);
 		});
 	}
 	
 	this.showFaq = function() {
 		if (DEBUG) console.log("showFaq()");
-		introDiv.hide();
+		sliderDiv.hide();
 		setContentDiv(faqController.getDiv());
 	}
 	
 	this.showDonate = function() {
 		if (DEBUG) console.log("showDonate()");
 		donateController.render(function(div) {
-			introDiv.hide();
+			sliderDiv.hide();
 			setContentDiv(div);
 		});
 	}

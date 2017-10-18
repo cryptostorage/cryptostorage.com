@@ -127,9 +127,59 @@ DivController.prototype.onShow = function() { }
 DivController.prototype.onHide = function() { }
 
 /**
+ * Slider main features.
+ */
+function SliderController(div, onSelectGenerate, onSelectRecover) {
+	DivController.call(this, div);
+	this.render = function(onDone) {
+		div.empty();
+		div.attr("class", "intro_div");
+		
+		// intro slider
+		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
+		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
+		getSlide($("<img src='img/mix.png'>"), "Generate keys for multiple cryptocurrencies in your browser.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/security.png'>"), "Funds are never entrusted to a third party.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/printer.png'>"), "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
+		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true, autoplaySpeed:4000});
+		
+		function getSlide(img, text) {
+			let slide = $("<div class='slide'>");
+			let slideContent = $("<div class='slide_content'>").appendTo(slide);
+			if (img) {
+				let imgDiv = $("<div>").appendTo(slideContent);
+				img.appendTo(imgDiv);
+				img.attr("class", "slide_img");
+			}
+			let labelDiv = $("<div class='slide_label'>").appendTo(slideContent);
+			labelDiv.html(text);
+			return slide;
+		}
+		
+		// call to action is overlaid
+		let ctaDiv = $("<div class='cta_div'>").appendTo(div);
+		
+		// button to generate keys
+		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(ctaDiv);
+		btnGenerate.append("Generate New Keys");
+		btnGenerate.click(function() { onSelectGenerate(); });
+		
+		// button to recover keys
+		let btnRecover = $("<div class='btn btn_recover'>").appendTo(ctaDiv);
+		btnRecover.append("or Recover Existing Keys");
+		btnRecover.click(function() { onSelectRecover(); });
+		
+		if (onDone) onDone(div);
+	}
+}
+inheritsFrom(SliderController, DivController);
+
+/**
  * Home page.
  */
-function HomeController(div, onSelectGenerate, onSelectRecover) {
+function HomeController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		div.empty();
