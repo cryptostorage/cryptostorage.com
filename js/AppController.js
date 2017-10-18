@@ -1,8 +1,5 @@
 // TODO
-// prevent scroll revealing some of next picture
 // clicking on currency takes action
-// no lag in clicking donate page waiting for page to paint
-// start pre-loading currency when selected in form
 // memory bug in bip38 encryption
 // faq
 // donate
@@ -11,6 +8,7 @@
 // piece export: print, download, select pieces
 // mobile static frame?
 // improve selling points
+// prevent scroll revealing some of next picture
 
 // use @media to dynamically space piece pages
 // todos throughout code
@@ -157,7 +155,9 @@ function ApplicationController(div) {
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		homeController = new HomeController($("<div>"));
+		homeController = new HomeController($("<div>"), function(plugin) {
+			console.log(plugin.getName());
+		});
 		formController = new FormController($("<div>"));
 		faqController = new FaqController($("<div>"));
 		donateController = new DonateController($("<div>"));

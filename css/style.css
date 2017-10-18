@@ -253,11 +253,19 @@ input[type='number'] {
 	margin:20px;
 }
 
+.currency_row_item_major:hover {
+	cursor:pointer;
+}
+
 .currency_row_item_minor {
 	display:flex;
 	flex-direction:column;
 	align-items:center;
 	margin:20px;
+}
+
+.currency_row_item_minor:hover {
+	cursor:pointer;
 }
 
 .currency_row_logo_major {

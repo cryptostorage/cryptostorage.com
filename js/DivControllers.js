@@ -67,11 +67,12 @@ let UiUtils = {
 		});
 	},
 	
-	getCurrencyRow: function(plugins, isMajor) {
+	getCurrencyRow: function(plugins, isMajor, onCurrencyClicked) {
 		let row = $("<div class='currency_row'>");
 		for (let plugin of plugins) {
 			let item = $("<div>").appendTo(row);
 			item.attr("class", isMajor ? "currency_row_item_major" : "currency_row_item_minor");
+			item.click(function() { onCurrencyClicked(plugin); });
 			let img = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(item);
 			img.attr("class", isMajor ? "currency_row_logo_major" : "currency_row_logo_minor");
 			img.append(plugin.getLogo());
@@ -177,9 +178,12 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 inheritsFrom(SliderController, DivController);
 
 /**
- * Home page.
+ * Home page content.
+ * 
+ * @param div is the div to render to
+ * @param onCurrencyClicked(plugin) is called when the user clicks a currency
  */
-function HomeController(div) {
+function HomeController(div, onCurrencyClicked) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		div.empty();
@@ -188,9 +192,9 @@ function HomeController(div) {
 		// supported currencies
 		div.append("Supports these popular cryptocurrencies");
 		let plugins = CryptoUtils.getCryptoPlugins();
-		div.append(UiUtils.getCurrencyRow(plugins.slice(0, 3), true));
+		div.append(UiUtils.getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 		for (let i = 3; i < plugins.length; i += 4) {
-			div.append(UiUtils.getCurrencyRow(plugins.slice(i, i + 4), false));
+			div.append(UiUtils.getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked));
 		}
 		
 		if (onDone) onDone(div);
@@ -417,6 +421,7 @@ function FormController(div) {
 				selectText: "Select a Currency",
 				onSelected: function(data) {
 					selectedPlugin = plugins[data.selectedIndex];
+					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
 					numKeysInput.focus();
 				},
 			});
