@@ -1,4 +1,5 @@
 // TODO
+// lazy loading is too lazy
 // improve selling points
 // clicking on currency takes action
 // memory bug in bip38 encryption
