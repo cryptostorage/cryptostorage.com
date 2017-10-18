@@ -1,5 +1,7 @@
 // TODO
 // lazy loading is too lazy
+// prevent scroll revealing some of next picture
+// sometimes scroll timer doesn't start for like 8 seconds - new slider?
 // clicking on currency takes action
 // memory bug in bip38 encryption
 // faq
@@ -8,7 +10,6 @@
 // peer review key formats
 // piece export: print, download, select pieces
 // mobile static frame?
-// prevent scroll revealing some of next picture
 
 // use @media to dynamically space piece pages
 // todos throughout code
@@ -51,7 +52,6 @@
 // code scan
 
 // low priority
-// all div controllers directly modify state
 // html export is horizontally centered with @media print for actual print
 // timeouts in tests so browser doesn't lock
 // csv import to support "bring your own keys"
