@@ -1,8 +1,10 @@
 // TODO
+// lines to represent split
+// render donation as soon as available
+// clicking on currency takes action
 // lazy loading is too lazy
 // prevent scroll revealing some of next picture
 // sometimes scroll timer doesn't start for like 8 seconds - new slider?
-// clicking on currency takes action
 // memory bug in bip38 encryption
 // faq
 // donate
@@ -31,6 +33,7 @@
 
 // consult designers
 // improve selling points
+// render progress bar and status
 // use tabs for pieces?
 // password confirmation - re-enter or show
 // title bar should not scroll?

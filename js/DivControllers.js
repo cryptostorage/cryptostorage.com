@@ -225,6 +225,22 @@ function FormController(div) {
 		UiUtils.setupContentDiv(div);
 		decommissioned = false;
 		
+		// currency inputs
+		currencyInputs = [];
+		let currencyDiv = $("<div class='form_section_div'>").appendTo(div);
+		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(currencyDiv);
+		
+		// link to add currency
+		let addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
+		let addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
+		addCurrencySpan.html("+ Add another currency");
+		addCurrencySpan.click(function() {
+			addCurrency();
+		});
+		
+		// add first currency input
+		addCurrency();
+		
 		// passphrase checkbox
 		let passphraseDiv = $("<div class='form_section_div'>").appendTo(div);
 		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
@@ -290,26 +306,10 @@ function FormController(div) {
 		splitCheckbox.prop('checked', false);
 		splitInputDiv.hide();
 		
-		// currency inputs
-		currencyInputs = [];
-		let currencyDiv = $("<div class='form_section_div'>").appendTo(div);
-		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(currencyDiv);
-		
-		// link to add currency
-		let addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
-		let addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
-		addCurrencySpan.html("+ Add another currency");
-		addCurrencySpan.click(function() {
-			addCurrency();
-		});
-		
-		// add first currency input
-		addCurrency();
-		
 		// add generate button
 		let generateDiv = $("<div class='generate_div'>").appendTo(div);
 		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
-		btnGenerate.append("Generate key pairs");
+		btnGenerate.append("Generate keys");
 		btnGenerate.click(function() { generateKeys(function(done, total, label) {
 			progressBar.set(done / total);
 			if (label) progressBar.setText(label);
