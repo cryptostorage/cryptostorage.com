@@ -139,9 +139,9 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		// intro slider
 		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		getSlide($("<img src='img/mix.png'>"), "Generate keys for multiple cryptocurrencies in your browser.").appendTo(sliderDiv);
+		getSlide($("<img src='img/mix.png'>"), "Generate keys for multiple cryptocurrencies.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/security.png'>"), "Keys are generated in your browser and are never entrusted to a third party.").appendTo(sliderDiv);
 		getSlide($("<img data-lazy='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-		getSlide($("<img data-lazy='img/security.png'>"), "Funds are never entrusted to a third party.").appendTo(sliderDiv);
 		getSlide($("<img data-lazy='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
 		getSlide($("<img data-lazy='img/printer.png'>"), "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true, autoplaySpeed:4000});
