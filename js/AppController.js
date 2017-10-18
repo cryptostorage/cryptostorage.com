@@ -12,6 +12,7 @@
 // label keys with pieces e.g. #1.3, #2.3, #3.3
 // peer review key formats
 // piece export: print, download, select pieces
+// mobile static frame?
 
 // use @media to dynamically space piece pages
 // todos throughout code
@@ -154,11 +155,11 @@ function ApplicationController(div) {
 		// intro slider
 		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(introDiv);
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		getSlide($("<img src='img/mix.png'>"), "Generate public/private keys for multiple cryptocurrencies.").appendTo(sliderDiv);
-		getSlide($("<img src='img/security.png'>"), "Keys are generated in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
+		getSlide($("<img src='img/mix.png'>"), "Generate keys for multiple cryptocurrencies in your browser.").appendTo(sliderDiv);
+		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
+		getSlide($("<img src='img/security.png'>"), "Funds are never entrusted to a third party.").appendTo(sliderDiv);
 		getSlide($("<img src='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
 		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
-		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.<br>No account necessary.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true});
 		
 		function getSlide(img, text) {

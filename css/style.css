@@ -11,16 +11,16 @@ body {
 	flex-direction:column;
 	align-items:center;
 	background-color:rgb(235, 242, 254);
+	min-width:875px;
 }
 
 .app_header {
+	padding:20px;
 	width:100%;
 	background-color:rgb(66, 116, 184);
-	min-width:1016px;
 }
 
 .app_header_top {
-	padding:20px;
 	width:100%;
 	display:flex;
 	align-items:center;
@@ -43,13 +43,11 @@ body {
 	display:flex;
 	flex-direction:column;
 	align-items:center;
-	height:300px;
 	position:relative;
 }
 
 .slider_container {
-	margin: 0 auto;
-	padding: 0 40px 0 40px;
+	padding: 0;
 	width: 100%;
 	background-color:rgb(66, 116, 184);
 }
@@ -63,7 +61,6 @@ body {
 }
 
 .slide_img {
-	width:250px;
 	height:250px;
 }
 
@@ -73,13 +70,13 @@ body {
 	text-align: center;
 	color: white;
 	text-align:left;
-	margin-left:20px;
+	margin-left:15px;
 }
 
 .cta_div {
 	position:absolute;
-	bottom:30px;
-	right:30px;
+	bottom:10px;
+	right:10px;
 	display:flex;
 	flex-direction:column;
 	align-items:center;
@@ -106,7 +103,7 @@ body {
 
 .app_content {
 	flex:1;
-	width:850px;
+	width:875px;
 }
 
 .page_div {
