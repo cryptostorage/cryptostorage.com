@@ -155,11 +155,11 @@ function ApplicationController(div) {
 		// intro slider
 		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(introDiv);
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		getSlide($("<img src='img/mix.png'>"), "Generate keys for multiple cryptocurrencies in your browser.").appendTo(sliderDiv);
-		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-		getSlide($("<img src='img/security.png'>"), "Funds are never entrusted to a third party.").appendTo(sliderDiv);
-		getSlide($("<img src='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
-		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/mix.png'>"), "Generate keys for multiple cryptocurrencies in your browser.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/security.png'>"), "Funds are never entrusted to a third party.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
+		getSlide($("<img data-lazy='img/printer.png'>"), "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true, autoplaySpeed:4000});
 		
 		function getSlide(img, text) {
@@ -238,8 +238,8 @@ function ApplicationController(div) {
 	
 	this.showDonate = function() {
 		if (DEBUG) console.log("showDonate()");
-		introDiv.hide();
 		donateController.render(function(div) {
+			introDiv.hide();
 			setContentDiv(div);
 		});
 	}
