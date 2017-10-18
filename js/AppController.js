@@ -106,7 +106,13 @@ $(document).ready(function() {
 	}
 	
 	// render application to html body
-	new ApplicationController($("body")).render();
+	var appController = new AppController($("body"));
+	appController.render();
+	
+	// preload donation page
+	loader.load("lib/qrcode.js", function() {
+		appController.loadDonationPage();
+	});
 });
 
 /**
@@ -114,7 +120,7 @@ $(document).ready(function() {
  * 
  * @param div is the div to render the application to
  */
-function ApplicationController(div) {
+function AppController(div) {
 	
 	let that = this;
 	let sliderController;
@@ -210,10 +216,12 @@ function ApplicationController(div) {
 	
 	this.showDonate = function() {
 		if (DEBUG) console.log("showDonate()");
-		donateController.render(function(div) {
-			setContentDiv(div);
-			sliderDiv.hide();
-		});
+		sliderDiv.hide();
+		setContentDiv(donateController.getDiv());
+	}
+	
+	this.loadDonationPage = function() {
+		donateController.render();
 	}
 	
 	// ---------------------------------- PRIVATE -------------------------------
@@ -239,4 +247,4 @@ function ApplicationController(div) {
 		that.showForm();
 	}
 }
-inheritsFrom(ApplicationController, DivController);
+inheritsFrom(AppController, DivController);
