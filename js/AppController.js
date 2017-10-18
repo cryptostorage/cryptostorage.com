@@ -1,5 +1,4 @@
 // TODO
-// more padding around header
 // slower transition speed
 // fix distortion when header hidden
 // prevent scroll revealing some of next picture
@@ -13,6 +12,7 @@
 // peer review key formats
 // piece export: print, download, select pieces
 // mobile static frame?
+// improve selling points
 
 // use @media to dynamically space piece pages
 // todos throughout code
@@ -160,7 +160,7 @@ function ApplicationController(div) {
 		getSlide($("<img src='img/security.png'>"), "Funds are never entrusted to a third party.").appendTo(sliderDiv);
 		getSlide($("<img src='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
 		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats which can be easily recovered.").appendTo(sliderDiv);
-		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true});
+		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true, autoplaySpeed:4000});
 		
 		function getSlide(img, text) {
 			let slide = $("<div class='slide'>");
