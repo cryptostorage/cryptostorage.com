@@ -1,4 +1,5 @@
 // TODO
+// improve selling points
 // clicking on currency takes action
 // memory bug in bip38 encryption
 // faq
@@ -7,7 +8,6 @@
 // peer review key formats
 // piece export: print, download, select pieces
 // mobile static frame?
-// improve selling points
 // prevent scroll revealing some of next picture
 
 // use @media to dynamically space piece pages
@@ -155,9 +155,7 @@ function ApplicationController(div) {
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		homeController = new HomeController($("<div>"), function(plugin) {
-			console.log(plugin.getName());
-		});
+		homeController = new HomeController($("<div>"), onCurrencyClicked);
 		formController = new FormController($("<div>"));
 		faqController = new FaqController($("<div>"));
 		donateController = new DonateController($("<div>"));
@@ -211,14 +209,14 @@ function ApplicationController(div) {
 		});
 	}
 	
+	// ---------------------------------- PRIVATE -------------------------------
+	
 	function setContentDiv(div) {
 		while (contentDiv.get(0).hasChildNodes()) {
 			contentDiv.get(0).removeChild(contentDiv.get(0).lastChild);
 		}
 		contentDiv.append(div);
 	}
-	
-	// ---------------------------------- PRIVATE -------------------------------
 	
 	function onSelectGenerate() {
 		if (DEBUG) console.log("onSelectGenerate()");
@@ -227,6 +225,10 @@ function ApplicationController(div) {
 	
 	function onSelectRecover() {
 		if (DEBUG) console.log("onSelectRecover()");
+	}
+	
+	function onCurrencyClicked(plugin) {
+		console.log("onCurrencyClicked(" + plugin.getName() + ")");
 	}
 }
 inheritsFrom(ApplicationController, DivController);
