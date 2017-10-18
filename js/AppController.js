@@ -1,18 +1,20 @@
 // TODO
+// faq formatting
 // lines to represent split
 // render donation as soon as available
 // clicking on currency takes action
 // all the error messages
-// lazy loading is too lazy
-// prevent scroll revealing some of next picture
-// sometimes scroll timer doesn't start for like 8 seconds - new slider?
 // memory bug in bip38 encryption
 // faq
 // donate
 // label keys with pieces e.g. #1.3, #2.3, #3.3
 // peer review key formats
 // piece export: print, download, select pieces
-// mobile static frame?
+
+// slider:
+// lazy loading is too lazy
+// prevent scroll revealing some of next picture
+// sometimes scroll timer doesn't start for like 8 seconds - new slider?
 
 // use @media to dynamically space piece pages
 // todos throughout code
@@ -35,6 +37,7 @@
 // consult designers
 // improve selling points
 // render progress bar and status
+// mobile static frame?
 // use tabs for pieces?
 // password confirmation - re-enter or show
 // title bar should not scroll?
