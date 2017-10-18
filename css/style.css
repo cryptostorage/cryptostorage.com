@@ -14,6 +14,10 @@ body {
 	min-width:875px;
 }
 
+ol {
+   list-style-position: inside;
+}
+
 .app_header {
 	padding:20px;
 	width:100%;
@@ -122,8 +126,14 @@ input[type='number'] {
 	margin-bottom:10px;
 }
 
+.answer * {
+	font-size:18px;
+	line-height:25px;
+}
+
 .answer {
 	font-size:18px;
+	line-height:25px;
 	margin-bottom:30px;
 }
 
@@ -290,8 +300,7 @@ input[type='number'] {
 .title {
 	text-align: center;
 	font-size:35px;
-	font-weight:bold;
-	margin-bottom:15px;
+	margin-bottom:30px;
 }
 
 .value_left {

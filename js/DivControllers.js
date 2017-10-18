@@ -662,6 +662,9 @@ function FaqController(div) {
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
+		let titleDiv = $("<div class='title'>").appendTo(div);
+		titleDiv.html("Frequently Asked Questions");
+		
 		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(div);
 		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(div);
 		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(div);
