@@ -114,6 +114,7 @@ ol {
 	width:100%;
 	background-color:white;
 	padding:25px;
+	min-height:700px;
 }
 
 input[type='number'] {
