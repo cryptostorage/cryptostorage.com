@@ -1,4 +1,12 @@
 // TODO
+// branches with main releases
+// more padding around header
+// slower transition speed
+// fix distortion when header hidden
+// prevent scroll revealing some of next picture
+// clicking on currency takes action
+// no lag in clicking donate page waiting for page to paint
+// start pre-loading currency when selected in form
 // memory bug in bip38 encryption
 // faq
 // donate
