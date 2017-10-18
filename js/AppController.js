@@ -1,5 +1,4 @@
 // TODO
-// slower transition speed
 // fix distortion when header hidden
 // prevent scroll revealing some of next picture
 // clicking on currency takes action
@@ -122,6 +121,7 @@ function ApplicationController(div) {
 	let donateController;
 	
 	this.render = function(onDone) {
+		div.empty();
 		
 		// header
 		let headerDiv = $("<div class='app_header'>").appendTo(div);
