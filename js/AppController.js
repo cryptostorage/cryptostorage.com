@@ -3,7 +3,7 @@
 // new design
 // faq page
 // donation page
-// label keys with pieces e.g. #1.3, #2.3, #3.3
+// label keys with pieces e.g. #1.3, #2.3, #3.3 etc
 // peer review key formats
 
 // use @media to dynamically space piece pages
