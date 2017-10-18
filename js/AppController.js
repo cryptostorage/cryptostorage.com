@@ -2,6 +2,7 @@
 // lines to represent split
 // render donation as soon as available
 // clicking on currency takes action
+// all the error messages
 // lazy loading is too lazy
 // prevent scroll revealing some of next picture
 // sometimes scroll timer doesn't start for like 8 seconds - new slider?
