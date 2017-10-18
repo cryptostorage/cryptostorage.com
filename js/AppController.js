@@ -229,6 +229,7 @@ function ApplicationController(div) {
 	
 	function onCurrencyClicked(plugin) {
 		console.log("onCurrencyClicked(" + plugin.getName() + ")");
+		that.showForm();
 	}
 }
 inheritsFrom(ApplicationController, DivController);
