@@ -15,6 +15,7 @@
 // lazy loading is too lazy
 // prevent scroll revealing some of next picture
 // sometimes scroll timer doesn't start for like 8 seconds - new slider?
+// css warnings / errors
 
 // use @media to dynamically space piece pages
 // todos throughout code
