@@ -181,8 +181,8 @@ function ApplicationController(div) {
 	
 	this.showHome = function() {
 		if (DEBUG) console.log("showHome()");
+		sliderDiv.show();
 		sliderController.render(function(div) {
-			sliderDiv.show();
 			setContentDiv(homeController.getDiv());
 		});
 	}
@@ -190,22 +190,22 @@ function ApplicationController(div) {
 	this.showForm = function() {
 		if (DEBUG) console.log("showForm()");
 		formController.render(function(div) {
-			sliderDiv.hide();
 			setContentDiv(div);
+			sliderDiv.hide();
 		});
 	}
 	
 	this.showFaq = function() {
 		if (DEBUG) console.log("showFaq()");
-		sliderDiv.hide();
 		setContentDiv(faqController.getDiv());
+		sliderDiv.hide();
 	}
 	
 	this.showDonate = function() {
 		if (DEBUG) console.log("showDonate()");
 		donateController.render(function(div) {
-			sliderDiv.hide();
 			setContentDiv(div);
+			sliderDiv.hide();
 		});
 	}
 	
