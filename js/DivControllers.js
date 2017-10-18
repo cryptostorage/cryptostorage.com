@@ -284,7 +284,8 @@ function FormController(div) {
 		splitMinPiecesDiv.append(" to recover");
 		
 		// apply default configuration
-		passphraseCheckbox.prop('checked', true);
+		passphraseCheckbox.prop('checked', false);
+		passphraseInputDiv.hide();
 		showPassphraseCheckbox.prop('checked', false);
 		splitCheckbox.prop('checked', false);
 		splitInputDiv.hide();
@@ -430,6 +431,7 @@ function FormController(div) {
 			let rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 			rightDiv.append("Number of keys&nbsp;&nbsp;");
 			numKeysInput = $("<input type='number'>").appendTo(rightDiv);
+			numKeysInput.attr("value", 1);
 			rightDiv.append("&nbsp;&nbsp;");
 			let trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 			trashDiv.click(function() { onDelete(); });
