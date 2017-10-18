@@ -1,4 +1,5 @@
 // TODO
+// depressed blue format on hover for links
 // faq formatting
 // lines to represent split
 // render donation as soon as available

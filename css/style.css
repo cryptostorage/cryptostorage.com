@@ -118,14 +118,12 @@ input[type='number'] {
 }
 
 .question {
-	font-weight: bold;
-	font-size: 22px;
-	margin-bottom:5px;
+	font-size: 24px;
+	margin-bottom:10px;
 }
 
 .answer {
 	font-size:18px;
-	line-height:30px;
 	margin-bottom:30px;
 }
 
