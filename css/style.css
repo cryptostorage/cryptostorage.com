@@ -318,14 +318,14 @@ input[type='number'] {
 .value_left {
 	display:flex;
 	align-items:center;
-	margin-top:10px;
+	margin-top:-5px;
 }
 
 .value_right {
 	display:flex;
 	align-items:center;
 	justify-content:flex-end;
-	margin-top:-10px;
+	margin-top:-5px;
 }
 
 .value_qr {

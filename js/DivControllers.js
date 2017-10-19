@@ -758,7 +758,7 @@ function DonateController(div, appController) {
 				} else {
 					funcs.push(function(onDone) { renderRight(valueDiv, value, onDone); });
 				}
-				//left = !left;
+				left = !left;
 			}
 			
 			// render addresses in parallel
