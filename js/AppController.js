@@ -1,7 +1,6 @@
 // TODO
 // depressed blue format on hover for links
 // lines to represent split
-// render donation as soon as available
 // clicking on currency takes action
 // all the error messages
 // memory bug in bip38 encryption
