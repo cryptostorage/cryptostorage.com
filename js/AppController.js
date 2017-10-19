@@ -1,5 +1,6 @@
 // TODO
-// depressed blue format on hover for links
+// donation addresses different sizes on mobile
+// depressed blue format on hover for links - why does it stay hovered?
 // lines to represent split
 // clicking on currency takes action
 // all the error messages
