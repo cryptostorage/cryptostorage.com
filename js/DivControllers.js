@@ -36,11 +36,14 @@ let UiUtils = {
 		return $("<img src='img/mix.png'>");
 	},
 	
-	getLink: function(href, label) {
+	getLinkDiv: function(href, label, target) {
+		let div = $("<div class='link_div'>");
 		if (!href) href = '';
 		let link = $("<a href='" + href + "'>");
+		if (target) link.attr("target", target);
 		link.html(label);
-		return link;
+		div.append(link);
+		return div;
 	},
 	
 	getProgressBar: function(div) {

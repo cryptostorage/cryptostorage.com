@@ -34,10 +34,21 @@ ol {
 	width:275px;
 }
 
-.app_header_links_div, .app_header_links_div > * {
+.app_header_links_div, .app_header_links_div * {
 	margin-left:auto;
 	color:white;
 	text-decoration: none;
+	display:flex;
+	align-items:center;
+}
+
+.link_div {
+	padding:10px;
+}
+
+.link_div:hover {
+	cursor:pointer;
+	background-color:rgb(93, 159, 252);
 }
 
 .intro_div {

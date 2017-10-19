@@ -144,20 +144,19 @@ function AppController(div) {
 		
 		// header links
 		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
-		let homeLink = UiUtils.getLink("#", "Home");
+		let homeLink = UiUtils.getLinkDiv("#", "Home");
 		homeLink.click(function() { that.showHome(); });
-		let gitHubLink = $("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>");
-		gitHubLink.html("GitHub");
-		let faqLink = UiUtils.getLink("#faq", "FAQ");
+		let gitHubLink = UiUtils.getLinkDiv("https://github.com/cryptostorage/cryptostorage.com", "GitHub", "_blank");
+		let faqLink = UiUtils.getLinkDiv("#faq", "FAQ");
 		faqLink.click(function() { that.showFaq(); });
-		let donateLink = UiUtils.getLink("#donate", "Donate");
+		let donateLink = UiUtils.getLinkDiv("#donate", "Donate");
 		donateLink.click(function() { that.showDonate(); });
 		linksDiv.append(homeLink);
-		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		linksDiv.append("&nbsp|&nbsp;");
 		linksDiv.append(gitHubLink);
-		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		linksDiv.append("&nbsp;|&nbsp;");
 		linksDiv.append(faqLink);
-		linksDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
+		linksDiv.append("&nbsp;|&nbsp;");
 		linksDiv.append(donateLink);
 		
 		// slider

@@ -150,13 +150,13 @@ function Page(div, appController, title, icon) {
 	
 	// footer		
 	let footerDiv = $("<div class='footer'>").appendTo(div);
-	let homeLink = UiUtils.getLink("#", "Home");
+	let homeLink = UiUtils.getLinkDiv("#", "Home");
 	homeLink.click(function() { appController.showHome(); });
-	let faqLink = UiUtils.getLink("#faq", "FAQ");
+	let faqLink = UiUtils.getLinkDiv("#faq", "FAQ");
 	faqLink.click(function() { appController.showFaq(); });
 	let gitHubLink = $("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>");
 	gitHubLink.html("GitHub");
-	let donateLink = UiUtils.getLink("#donate", "Donate");
+	let donateLink = UiUtils.getLinkDiv("#donate", "Donate");
 	donateLink.click(function() { appController.showDonate(); });
 	footerDiv.append(homeLink);
 	footerDiv.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
@@ -1729,9 +1729,9 @@ function PageControllerExport(div, appController) {
 		}
 		
 		// add print and download links
-		printLink = UiUtils.getLink("#", "Print").appendTo(exportHeaderRight);
+		printLink = UiUtils.getLinkDiv("#", "Print").appendTo(exportHeaderRight);
 		exportHeaderRight.append("&nbsp;&nbsp;|&nbsp;&nbsp;");
-		downloadLink = UiUtils.getLink("#", "Download").appendTo(exportHeaderRight);
+		downloadLink = UiUtils.getLinkDiv("#", "Download").appendTo(exportHeaderRight);
 
 		// add config contentDiv
 		renderConfig(configDiv);
