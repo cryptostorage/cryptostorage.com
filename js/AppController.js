@@ -152,11 +152,11 @@ function AppController(div) {
 		let donateLink = UiUtils.getLinkDiv("#donate", "Donate");
 		donateLink.click(function() { that.showDonate(); });
 		linksDiv.append(homeLink);
-		linksDiv.append("&nbsp|&nbsp;");
+		//linksDiv.append("&nbsp|&nbsp;");
 		linksDiv.append(gitHubLink);
-		linksDiv.append("&nbsp;|&nbsp;");
+		//linksDiv.append("&nbsp;|&nbsp;");
 		linksDiv.append(faqLink);
-		linksDiv.append("&nbsp;|&nbsp;");
+		//linksDiv.append("&nbsp;|&nbsp;");
 		linksDiv.append(donateLink);
 		
 		// slider
