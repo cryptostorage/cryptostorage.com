@@ -137,7 +137,7 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
 		getSlide($("<img src='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
 		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats for long term storage and easy recovery.").appendTo(sliderDiv);
-		sliderDiv.slick({autoplay:!DEBUG, arrows:false, dots:true, autoplaySpeed:4000});
+		sliderDiv.slick({autoplay:true, arrows:false, dots:true, autoplaySpeed:4000});
 		
 		function getSlide(img, text) {
 			let slide = $("<div class='slide'>");
@@ -325,6 +325,10 @@ function FormController(div) {
 		if (onDone) onDone(div);
 	}
 	
+	this.quickGenerate = function(plugin) {
+		if (DEBUG) console.log("quickGenerate(" + plugin.getTicker() + ")");
+	}
+	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function getConfig() {
@@ -385,6 +389,11 @@ function FormController(div) {
 		
 		this.getSelectedPlugin = function() {
 			return selectedPlugin;
+		}
+		
+		this.setSelectedPlugin = function(plugin) {
+			selectedPlugin = plugin;
+			
 		}
 		
 		this.getNumKeys = function() {
