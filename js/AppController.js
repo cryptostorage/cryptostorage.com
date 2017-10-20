@@ -1,4 +1,5 @@
 // TODO
+// /faq /donate
 // donation addresses different sizes on mobile
 // depressed blue format on hover for links - why does it stay hovered?
 // lines to represent split
@@ -145,13 +146,23 @@ function AppController(div) {
 		
 		// header links
 		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
-		let homeLink = UiUtils.getLinkDiv("#", "Home");
-		homeLink.click(function() { that.showHome(); });
-		let gitHubLink = UiUtils.getLinkDiv("https://github.com/cryptostorage/cryptostorage.com", "GitHub", "_blank");
-		let faqLink = UiUtils.getLinkDiv("#faq", "FAQ");
-		faqLink.click(function() { that.showFaq(); });
-		let donateLink = UiUtils.getLinkDiv("#donate", "Donate");
-		donateLink.click(function() { that.showDonate(); });
+		let homeLink = getLinkDiv("Home");
+		homeLink.click(function() {
+			window.location.href = "#";
+			that.showHome();
+		});
+		let gitHubLink = getLinkDiv("GitHub");
+		gitHubLink.click(function() { window.open("https://github.com/cryptostorage/cryptostorage.com", "_blank"); });
+		let faqLink = getLinkDiv("FAQ");
+		faqLink.click(function() {
+			window.location.href = "#faq";
+			that.showFaq();
+		});
+		let donateLink = getLinkDiv("Donate");
+		donateLink.click(function() {
+			window.location.href = "#donate";
+			that.showDonate();
+		});
 		linksDiv.append(homeLink);
 		//linksDiv.append("&nbsp|&nbsp;");
 		linksDiv.append(gitHubLink);
@@ -159,6 +170,12 @@ function AppController(div) {
 		linksDiv.append(faqLink);
 		//linksDiv.append("&nbsp;|&nbsp;");
 		linksDiv.append(donateLink);
+		
+		function getLinkDiv(label) {
+			let div = $("<div class='link_div'>");
+			div.html(label);
+			return div;
+		}
 		
 		// slider
 		sliderDiv = $("<div>").appendTo(headerDiv);

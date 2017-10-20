@@ -36,16 +36,6 @@ let UiUtils = {
 		return $("<img src='img/mix.png'>");
 	},
 	
-	getLinkDiv: function(href, label, target) {
-		let div = $("<div class='link_div'>");
-		if (!href) href = '';
-		let link = $("<a href='" + href + "'>");
-		if (target) link.attr("target", target);
-		link.html(label);
-		div.append(link);
-		return div;
-	},
-	
 	getProgressBar: function(div) {
 		return new ProgressBar.Line(div.get(0), {
 			strokeWidth: 2.5,
