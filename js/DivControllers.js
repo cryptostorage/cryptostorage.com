@@ -425,7 +425,6 @@ function FormController(div) {
 				onSelected: function(data) {
 					selectedPlugin = plugins[data.selectedIndex];
 					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
-					numKeysInput.focus();
 				},
 			});
 			
