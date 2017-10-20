@@ -1,5 +1,4 @@
 // TODO
-// /faq /donate
 // donation addresses different sizes on mobile
 // depressed blue format on hover for links - why does it stay hovered?
 // lines to represent split
@@ -13,10 +12,8 @@
 // piece export: print, download, select pieces
 
 // slider:
-// lazy loading is too lazy
 // prevent scroll revealing some of next picture
 // sometimes scroll timer doesn't start for like 8 seconds - new slider?
-// css warnings / errors
 
 // use @media to dynamically space piece pages
 // todos throughout code
