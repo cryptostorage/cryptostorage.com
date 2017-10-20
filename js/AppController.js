@@ -138,8 +138,10 @@ function AppController(div) {
 		
 		// header logo
 		let headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
-		let logoLink = $("<a href='index.html'>").appendTo(headerTopDiv);
-		$("<img class='app_header_logo_img' src='img/cryptostorage.png'>").appendTo(logoLink);
+		let logo = $("<img class='app_header_logo_img' src='img/cryptostorage.png'>").appendTo(headerTopDiv);
+		logo.click(function() {
+			that.showHome();
+		});
 		
 		// header links
 		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);

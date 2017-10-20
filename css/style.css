@@ -34,6 +34,10 @@ ol {
 	width:275px;
 }
 
+.app_header_logo_img:hover {
+	cursor:pointer;
+}
+
 .app_header_links_div, .app_header_links_div * {
 	margin-left:auto;
 	color:white;
