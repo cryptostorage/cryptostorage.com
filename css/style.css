@@ -76,12 +76,12 @@ ol {
 }
 
 .slide_img {
-	height:250px;
+	height:225px;
 }
 
 .slide_label {
-	font-size:42px;
-	line-height:55px;
+	font-size:38px;
+	line-height:50px;
 	text-align: center;
 	color: white;
 	text-align:left;
@@ -90,8 +90,8 @@ ol {
 
 .cta_div {
 	position:absolute;
-	bottom:10px;
-	right:10px;
+	bottom:0px;
+	right:0px;
 	display:flex;
 	flex-direction:column;
 	align-items:center;
