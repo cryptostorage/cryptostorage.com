@@ -325,6 +325,11 @@ function FormController(div) {
 		generateKeys(onDone);
 	}
 	
+	this.setSelectedCurrency = function(plugin) {
+		assertTrue(currencyInputs.length === 1);
+		currencyInputs[0].setSelectedCurrency(plugin.getName());
+	}
+	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function getConfig() {

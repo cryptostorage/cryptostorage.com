@@ -9,6 +9,10 @@
 // peer review key formats
 // piece export: print, download, select pieces
 
+// drop down:
+// tweak styling
+// console warning
+
 // slider:
 // prevent scroll revealing some of next picture
 // sometimes scroll timer doesn't start for like 8 seconds - new slider?
@@ -260,15 +264,18 @@ function AppController(div) {
 	
 	function onCurrencyClicked(plugin) {
 		if (DEBUG) console.log("onCurrencyClicked(" + plugin.getName() + ")");
-//		formController.render(function(div) {
-//			formController.quickGenerate(plugin, function() {
-//				setContentDiv(formController.getDiv());
-//				sliderDiv.hide();
-//			});
-//		});
-		that.showForm(function() {
-			formController.quickGenerate(plugin);
+//			setContentDiv(formController.getDiv());
+//			sliderDiv.hide();
+		formController.render(function(div) {
+			formController.quickGenerate(plugin, function() {
+				setContentDiv(formController.getDiv());
+				sliderDiv.hide();
+				formController.setSelectedCurrency(plugin);
+			});
 		});
+//		that.showForm(function() {
+//			formController.quickGenerate(plugin);
+//		});
 	}
 }
 inheritsFrom(AppController, DivController);
