@@ -318,11 +318,11 @@ function FormController(div) {
 		if (onDone) onDone(div);
 	}
 	
-	this.quickGenerate = function(plugin) {
+	this.quickGenerate = function(plugin, onDone) {
 		if (DEBUG) console.log("quickGenerate(" + plugin.getTicker() + ")");
 		assertTrue(currencyInputs.length === 1);
 		currencyInputs[0].setSelectedCurrency(plugin.getName());
-		generateKeys();
+		generateKeys(onDone);
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -450,7 +450,7 @@ function FormController(div) {
 	/**
 	 * Generates keys based on the current configuration and updates the GUI.
 	 */
-	function generateKeys() {
+	function generateKeys(onDone) {
 		generateKeysAux(function(done, total, label) {
 			progressBar.set(done / total);
 			if (label) progressBar.setText(label);
@@ -459,6 +459,7 @@ function FormController(div) {
 			progressDiv.hide();
 			pieceDiv.empty();
 			pieceDiv.append(pieceDivs[0]);
+			if (onDone) onDone();
 		});
 	}
 	
