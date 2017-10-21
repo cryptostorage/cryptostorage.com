@@ -260,11 +260,14 @@ function AppController(div) {
 	
 	function onCurrencyClicked(plugin) {
 		if (DEBUG) console.log("onCurrencyClicked(" + plugin.getName() + ")");
-		formController.render(function(div) {
-			formController.quickGenerate(plugin, function() {
-				setContentDiv(div);
-				sliderDiv.hide();
-			});
+//		formController.render(function(div) {
+//			formController.quickGenerate(plugin, function() {
+//				setContentDiv(formController.getDiv());
+//				sliderDiv.hide();
+//			});
+//		});
+		that.showForm(function() {
+			formController.quickGenerate(plugin);
 		});
 	}
 }
