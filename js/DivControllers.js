@@ -211,6 +211,7 @@ function FormController(div) {
 	let decommissioned;
 	let progressDiv;
 	let progressBar;
+	let pieceDiv;
 	
 	this.render = function(onDone) {
 		
@@ -303,23 +304,15 @@ function FormController(div) {
 		let generateDiv = $("<div class='generate_div'>").appendTo(div);
 		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
 		btnGenerate.append("Generate keys");
-		btnGenerate.click(function() { generateKeys(function(done, total, label) {
-			progressBar.set(done / total);
-			if (label) progressBar.setText(label);
-			progressDiv.show();
-		}, function(keys, pieces, pieceDivs) {
-			progressDiv.hide();
-			pieceDiv.empty();
-			pieceDiv.append(pieceDivs[0]);
-		})});
+		btnGenerate.click(function() { generateKeys() });
 		
 		// add progress bar and div
-		let progressDiv = $("<div>").appendTo(div);
+		progressDiv = $("<div>").appendTo(div);
 		progressDiv.hide();
-		let progressBar = UiUtils.getProgressBar(progressDiv);
+		progressBar = UiUtils.getProgressBar(progressDiv);
 		
 		// add div to contain rendered page
-		let pieceDiv = $("<div class='preview_piece_div'>").appendTo(div);
+		pieceDiv = $("<div class='preview_piece_div'>").appendTo(div);
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -329,6 +322,7 @@ function FormController(div) {
 		if (DEBUG) console.log("quickGenerate(" + plugin.getTicker() + ")");
 		assertTrue(currencyInputs.length === 1);
 		currencyInputs[0].setSelectedCurrency(plugin.getName());
+		generateKeys();
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -397,13 +391,11 @@ function FormController(div) {
 		
 		this.setSelectedCurrency = function(name) {
 			selector = $("#currency_selector");
-			console.log(selector);
 			for (let i = 0; i < selectorData.length; i++) {
 				if (selectorData[i].text === name) {
 					console.log(i);
-					selector = $("#currency_selector");
 					selector.ddslick('select', {index: i});
-					selectedPlugin = plugins[selectorData.selectedIndex];
+					selectedPlugin = plugins[i];
 					break;
 				}
 			}
@@ -436,6 +428,7 @@ function FormController(div) {
 				imagePosition: "left",
 				selectText: "Select a Currency",
 				onSelected: function(selection) {
+					console.log("Selected!");
 					selectedPlugin = plugins[selection.selectedIndex];
 					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
@@ -455,15 +448,31 @@ function FormController(div) {
 	}
 	
 	/**
+	 * Generates keys based on the current configuration and updates the GUI.
+	 */
+	function generateKeys() {
+		generateKeysAux(function(done, total, label) {
+			progressBar.set(done / total);
+			if (label) progressBar.setText(label);
+			progressDiv.show();
+		}, function(keys, pieces, pieceDivs) {
+			progressDiv.hide();
+			pieceDiv.empty();
+			pieceDiv.append(pieceDivs[0]);
+		});
+	}
+	
+	/**
 	 * Generates keys, pieces, rendered pieces.
 	 * 
 	 * @param onProgress(done, total, label) is invoked as progress is made
 	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
 	 */
-	function generateKeys(onProgress, onDone) {
+	function generateKeysAux(onProgress, onDone) {
 		
 		// get current configuration
 		let config = getConfig();
+		console.log(config);
 
 		// load dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
@@ -495,10 +504,10 @@ function FormController(div) {
 			
 			// generate keys
 			let progressWeight = 0;
-			onProgress(progressWeight, totalWeight, "Generating keys");
+			if (onProgress) onProgress(progressWeight, totalWeight, "Generating keys");
 			async.series(funcs, function(err, keys) {
 				if (decommissioned) {
-					onDone();
+					if (onDone) onDone();
 					return;
 				}
 				if (err) throw err;
@@ -532,12 +541,12 @@ function FormController(div) {
 					}
 					
 					// render pieces to divs
-					onProgress(progressWeight, totalWeight, "Rendering");
+					if (onProgress) onProgress(progressWeight, totalWeight, "Rendering");
 					renderPieceDivs(pieces, function(err, pieceDivs) {
 						if (err) throw err;
 						assertEquals(pieces.length, pieceDivs.length);
-						onProgress(1, 1, "Complete");
-						onDone(keys, pieces, pieceDivs);
+						if (onProgress) onProgress(1, 1, "Complete");
+						if (onDone) onDone(keys, pieces, pieceDivs);
 					});
 				}
 				
@@ -548,7 +557,7 @@ function FormController(div) {
 					onProgress(progressWeight, totalWeight, "Encrypting keys");
 					async.series(funcs, function(err, encryptedKeys) {
 						if (decommissioned) {
-							onDone();
+							if (onDone) onDone();
 							return;
 						}
 						if (err) throw err;
@@ -576,7 +585,7 @@ function FormController(div) {
 							onProgress(progressWeight, totalWeight, "Verifying encryption");
 							async.series(funcs, function(err, decryptedKeys) {
 								if (decommissioned) {
-									onDone();
+									if (onDone) onDone();
 									return;
 								}
 								if (err) throw err;
@@ -592,8 +601,8 @@ function FormController(div) {
 								renderPieceDivs(pieces, function(err, pieceDivs) {
 									if (err) throw err;
 									assertEquals(pieces.length, pieceDivs.length);
-									onProgress(1, 1, "Complete");
-									onDone(encryptedKeys, pieces, pieceDivs);
+									if (onProgress) onProgress(1, 1, "Complete");
+									if (onDone) onDone(encryptedKeys, pieces, pieceDivs);
 								});
 							});
 						}
@@ -623,7 +632,7 @@ function FormController(div) {
 					setTimeout(function() {
 						let key = plugin.newKey();
 						progressWeight += UiUtils.getCreateKeyWeight();
-						onProgress(progressWeight, totalWeight, "Generating keys");
+						if (onProgress) onProgress(progressWeight, totalWeight, "Generating keys");
 						callback(null, key);
 					}, 0);	// let UI breath
 				}
@@ -637,7 +646,7 @@ function FormController(div) {
 					}
 					key.encrypt(scheme, password, function(err, key) {
 						progressWeight += UiUtils.getEncryptWeight(scheme);
-						onProgress(progressWeight, totalWeight, "Encrypting");
+						if (onProgress) onProgress(progressWeight, totalWeight, "Encrypting");
 						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
 				}
@@ -652,7 +661,7 @@ function FormController(div) {
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
 						progressWeight += UiUtils.getDecryptWeight(scheme);
-						onProgress(progressWeight, totalWeight, "Decrypting");
+						if (onProgress) onProgress(progressWeight, totalWeight, "Decrypting");
 						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
 				}
@@ -660,7 +669,7 @@ function FormController(div) {
 			
 			function renderPieceDivs(pieces, onDone) {
 				PieceRenderer.renderPieces(null, pieces, null, function(percent) {
-					onProgress(progressWeight + (percent * piecesRendererWeight), totalWeight, "Rendering");
+					if (onProgress) onProgress(progressWeight + (percent * piecesRendererWeight), totalWeight, "Rendering");
 				}, onDone);
 			}
 		});
