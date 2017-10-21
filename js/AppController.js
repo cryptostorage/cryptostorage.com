@@ -264,7 +264,6 @@ function AppController(div) {
 			formController.quickGenerate(plugin, function() {
 				setContentDiv(div);
 				sliderDiv.hide();
-				if (onDone) onDone();
 			});
 		});
 	}
