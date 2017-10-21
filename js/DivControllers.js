@@ -327,6 +327,8 @@ function FormController(div) {
 	
 	this.quickGenerate = function(plugin) {
 		if (DEBUG) console.log("quickGenerate(" + plugin.getTicker() + ")");
+		assertTrue(currencyInputs.length === 1);
+		currencyInputs[0].setSelectedCurrency(plugin.getName());
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -382,6 +384,8 @@ function FormController(div) {
 		
 		let selectedPlugin;
 		let numKeysInput;
+		let selector;
+		let selectorData;
 		
 		this.getDiv = function() {
 			return div;
@@ -391,9 +395,18 @@ function FormController(div) {
 			return selectedPlugin;
 		}
 		
-		this.setSelectedPlugin = function(plugin) {
-			selectedPlugin = plugin;
-			
+		this.setSelectedCurrency = function(name) {
+			selector = $("#currency_selector");
+			console.log(selector);
+			for (let i = 0; i < selectorData.length; i++) {
+				if (selectorData[i].text === name) {
+					console.log(i);
+					selector = $("#currency_selector");
+					selector.ddslick('select', {index: i});
+					selectedPlugin = plugins[selectorData.selectedIndex];
+					break;
+				}
+			}
 		}
 		
 		this.getNumKeys = function() {
@@ -407,27 +420,27 @@ function FormController(div) {
 			div.attr("class", "currency_input_div");
 			
 			// format pull down plugin data
-			let data = [];
+			selectorData = [];
 			for (let plugin of plugins) {
-				data.push({
+				selectorData.push({
 					text: plugin.getName(),
 					imageSrc: plugin.getLogo().get(0).src
 				});
 			}
 			
 			// create pull down
-			let selector = $("<div>").appendTo(div);
+			selector = $("<div id='currency_selector'>").appendTo(div);
 			selector.ddslick({
-				data:data,
+				data:selectorData,
 				background: "white",
 				imagePosition: "left",
 				selectText: "Select a Currency",
-				onSelected: function(data) {
-					selectedPlugin = plugins[data.selectedIndex];
+				onSelected: function(selection) {
+					selectedPlugin = plugins[selection.selectedIndex];
 					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
-					console.log(selector.data("ddslick"));
 				},
 			});
+			selector = $("#currency_selector");	// necessary for proper reference which ddslick uses
 			
 			// create right div
 			let rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
@@ -451,7 +464,6 @@ function FormController(div) {
 		
 		// get current configuration
 		let config = getConfig();
-		console.log(config);
 
 		// load dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);

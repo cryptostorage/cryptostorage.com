@@ -215,11 +215,12 @@ function AppController(div) {
 		});
 	}
 	
-	this.showForm = function() {
+	this.showForm = function(onDone) {
 		if (DEBUG) console.log("showForm()");
 		formController.render(function(div) {
 			setContentDiv(div);
 			sliderDiv.hide();
+			if (onDone) onDone();
 		});
 	}
 	
@@ -259,8 +260,9 @@ function AppController(div) {
 	
 	function onCurrencyClicked(plugin) {
 		console.log("onCurrencyClicked(" + plugin.getName() + ")");
-		that.showForm();
-		formController.quickGenerate(plugin);
+		that.showForm(function() {
+			formController.quickGenerate(plugin);
+		});
 	}
 }
 inheritsFrom(AppController, DivController);
