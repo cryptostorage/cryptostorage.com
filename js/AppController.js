@@ -9,9 +9,6 @@
 // peer review key formats
 // piece export: print, download, select pieces
 
-// drop down:
-// console warning
-
 // slider:
 // prevent scroll revealing some of next picture
 // sometimes scroll timer doesn't start for like 8 seconds - new slider?
@@ -59,6 +56,7 @@
 // code scan
 
 // low priority
+// console warning "unexpected end of file" in firefox caused by ddslick
 // html export is horizontally centered with @media print for actual print
 // timeouts in tests so browser doesn't lock
 // csv import to support "bring your own keys"
