@@ -30,6 +30,7 @@
 // double click keys should select all
 
 // consult designers
+// contrast to low on first generate keys button + color of second
 // slider points and logos
 // what to do after key generation
 // import flow including currency import by text
