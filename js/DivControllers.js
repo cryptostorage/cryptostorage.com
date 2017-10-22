@@ -355,7 +355,6 @@ function FormController(div) {
 		
 		// create input
 		let currencyInput = new CurrencyInput($("<div>"), CryptoUtils.getCryptoPlugins(), function() {
-			console.log("Currency input deleted");
 			removeCurrency(currencyInput);
 		});
 		
@@ -398,7 +397,6 @@ function FormController(div) {
 			selector = $("#currency_selector");
 			for (let i = 0; i < selectorData.length; i++) {
 				if (selectorData[i].text === name) {
-					console.log(i);
 					selector.ddslick('select', {index: i});
 					selectedPlugin = plugins[i];
 					break;
@@ -433,7 +431,6 @@ function FormController(div) {
 				imagePosition: "left",
 				selectText: "Select a Currency",
 				onSelected: function(selection) {
-					console.log("Selected!");
 					selectedPlugin = plugins[selection.selectedIndex];
 					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
@@ -478,7 +475,6 @@ function FormController(div) {
 		
 		// get current configuration
 		let config = getConfig();
-		console.log(config);
 
 		// load dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
