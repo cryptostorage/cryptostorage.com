@@ -3,6 +3,7 @@
 // clicking on currency takes action
 // all the error messages
 // memory bug in bip38 encryption
+// num keys input flashes on first load
 // faq
 // donate
 // label keys with pieces e.g. #1.3, #2.3, #3.3
