@@ -10,7 +10,6 @@
 // piece export: print, download, select pieces
 
 // drop down:
-// tweak styling
 // console warning
 
 // slider:
