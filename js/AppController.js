@@ -18,9 +18,7 @@
 // run minimum tests when site accessed
 // test alert if key creation fails for any reason
 // verify no name collisions
-// bip38 not working on old hardware
 // file import zip with invalid json shouldn't prevent others from importing
-// live site warning to stop and download from github
 // wording on front page / be consistent
 // condense files to single files as much as possible
 // warning if live and/or online
@@ -32,22 +30,16 @@
 // double click keys should select all
 
 // consult designers
-// improve selling points
-// render progress bar and status
-// mobile static frame?
+// slider points and logos
+// what to do after key generation
+// import flow including currency import by text
+// how to handle progress bar during key generation
+// live site warning to stop and download from github
 // use tabs for pieces?
+// mobile static frame?
 // password confirmation - re-enter or show
 // title bar should not scroll?
-// select one or more currencies to store (consistent look with number of addresses input)
-// enter the number of addresses for each currency || enter the number of Bitcoin addresses to create)
-// summary page has table with logos
-// potentially collapse selection and address input
-// make it clearer what to do next on save page
-// navigation bar showing overall place in flow
 // warnings to test before using
-// register shortcut keys for page navigation (enter, y, n)
-// focus on first text element if applicable
-// disable next if mix num keys change
 // hide page breaks in previews with @media print
 // copy line break in pdf inserts space
 // code review

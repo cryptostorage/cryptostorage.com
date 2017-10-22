@@ -105,12 +105,20 @@ ol {
 .btn_start_generate {
 	height:65px;
 	width:225px;
-	background-color:rgb(129, 215, 43);
 	color:white;
 	display:flex;
 	align-items:center;
 	justify-content:center;
 	margin-bottom:10px;
+	background-color:rgb(121, 217, 25);
+}
+
+.btn_start_generate:hover {
+	background-color:rgb(135, 230, 37);
+}
+
+.btn_start_generate:active {
+	background-color:rgb(100, 192, 20);
 }
 
 .btn_recover {
