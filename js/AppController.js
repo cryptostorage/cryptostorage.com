@@ -4,6 +4,7 @@
 // all the error messages
 // memory bug in bip38 encryption
 // num keys input flashes on first load
+// cannot delete first currency
 // faq
 // donate
 // label keys with pieces e.g. #1.3, #2.3, #3.3
