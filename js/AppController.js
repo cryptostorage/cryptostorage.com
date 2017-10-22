@@ -190,22 +190,26 @@ function AppController(div) {
 		donateController = new DonateController($("<div>"));
 		faqController.render();
 		
-		// render body and start on home
-		homeController.render(function() {
+		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
+		setTimeout(function() {
 			
-			// get identifier
-			let href = window.location.href;
-			let lastIdx = href.lastIndexOf("#");
-			let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
-			
-			// show page based on identifier
-			if (identifier === "faq") that.showFaq();
-			else if (identifier === "donate") that.showDonate();
-			else that.showHome();
-			
-			// done rendering
-			if (onDone) onDone(div);
-		});
+			// render body and start on home
+			homeController.render(function() {
+				
+				// get identifier
+				let href = window.location.href;
+				let lastIdx = href.lastIndexOf("#");
+				let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+				
+				// show page based on identifier
+				if (identifier === "faq") that.showFaq();
+				else if (identifier === "donate") that.showDonate();
+				else that.showHome();
+				
+				// done rendering
+				if (onDone) onDone(div);
+			});
+		}, 0);
 	}
 	
 	this.showHome = function() {
