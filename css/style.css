@@ -204,7 +204,7 @@ input[type='number'] {
 
 .split_qr {
 	width:100px;
-	height:100px;
+	height:115x;
 	margin:10px;
 }
 
@@ -219,7 +219,7 @@ input[type='number'] {
 	flex-direction:column;
 	align-items:center;
 	margin:10px;
-	width:100px;
+	width:115px;
 }
 
 .split_num_label_top {
