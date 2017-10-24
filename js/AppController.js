@@ -36,6 +36,8 @@
 // code scan
 
 // consult designers
+// hover colors on front page
+// opinion on donate page + ui designer tip address
 // color of 'c' within cs logo
 // error messages on key generation page
 // disable generate button until input valid?
