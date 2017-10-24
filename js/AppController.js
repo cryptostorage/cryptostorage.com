@@ -31,11 +31,13 @@
 // double click keys should select all
 
 // consult designers
-// contrast to low on first generate keys button + color of second
-// slider points and logos
-// what to do after key generation
-// import flow including currency import by text
-// how to handle progress bar during key generation
+// error messages on key generation page
+// disable generate button until input valid?
+// color of generate buttons / pulsing?
+// slider points, logos, and supporting content
+// export flow after key generation + options
+// import flow to read zip + import from private key
+// how to handle progress bar + status during key generation
 // live site warning to stop and download from github
 // use tabs for pieces?
 // mobile static frame?
