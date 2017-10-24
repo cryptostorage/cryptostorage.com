@@ -1,6 +1,4 @@
 // TODO
-// add warning under development
-// 404 cryptostorage.com/css/ajax-loader.gif
 // lines to represent split
 // clicking on currency takes action
 // all the error messages
