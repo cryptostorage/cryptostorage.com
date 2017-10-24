@@ -31,6 +31,7 @@
 // double click keys should select all
 
 // consult designers
+// color of 'c' within cs logo
 // error messages on key generation page
 // disable generate button until input valid?
 // color of generate buttons / pulsing?
