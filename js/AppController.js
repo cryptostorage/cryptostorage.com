@@ -143,10 +143,6 @@ function AppController(div) {
 			that.showHome();
 		});
 		
-		// under development warning
-		let warningDiv = $("<div class='app_header_warning'>").appendTo(headerTopDiv);
-		warningDiv.append("Under Development: Not Ready For Use");
-		
 		// header links
 		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
 		let homeLink = getLinkDiv("Home");

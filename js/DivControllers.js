@@ -312,6 +312,10 @@ function FormController(div) {
 		btnGenerate.append("Generate keys");
 		btnGenerate.click(function() { generateKeys() });
 		
+		// under development warning
+		let warningDiv = $("<div class='app_header_warning'>").appendTo(div);
+		warningDiv.append("Under Development: Not Ready for Use");
+		
 		// add progress bar and div
 		progressDiv = $("<div>").appendTo(div);
 		progressDiv.hide();
