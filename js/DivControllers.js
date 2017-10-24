@@ -276,7 +276,6 @@ function FormController(div) {
 		splitCheckbox.click(function() {
 			if (splitCheckbox.prop('checked')) {
 				splitInputDiv.show();
-				numPiecesInput.focus();
 			} else {
 				splitInputDiv.hide();
 			}
@@ -299,15 +298,6 @@ function FormController(div) {
 		minPiecesInput = $("<input type='number' value='2'>").appendTo(splitMinDiv);
 		let splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
 		splitMinLabelBottom.html("To Recover");		
-		
-//		let splitNumPiecesDiv = $("<div>").appendTo(splitInputDiv);
-//		splitNumPiecesDiv.append("Split each key into ");
-//		numPiecesInput = $("<input type='number' value='3'>").appendTo(splitNumPiecesDiv);
-//		splitNumPiecesDiv.append(" pieces");
-//		let splitMinPiecesDiv = $("<div>").appendTo(splitInputDiv);
-//		splitMinPiecesDiv.append("Require ");
-//		minPiecesInput = $("<input type='number' value='2'>").appendTo(splitMinPiecesDiv);
-//		splitMinPiecesDiv.append(" to recover");
 		
 		// apply default configuration
 		passphraseCheckbox.prop('checked', false);
