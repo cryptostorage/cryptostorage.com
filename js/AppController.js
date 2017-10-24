@@ -1,6 +1,5 @@
 // TODO
 // lines to represent split
-// clicking on currency takes action
 // all the error messages
 // memory bug in bip38 encryption
 // num keys input flashes on first load
