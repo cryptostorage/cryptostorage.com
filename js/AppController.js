@@ -1,4 +1,7 @@
 // TODO
+// multikey generation not working on domain
+// add warning under development
+// 404 cryptostorage.com/css/ajax-loader.gif
 // lines to represent split
 // clicking on currency takes action
 // all the error messages
@@ -10,6 +13,7 @@
 // label keys with pieces e.g. #1.3, #2.3, #3.3
 // peer review key formats
 // piece export: print, download, select pieces
+// faster load time
 
 // slider:
 // prevent scroll revealing some of next picture
