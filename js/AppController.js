@@ -29,6 +29,11 @@
 // how does jaxx generate zcash and bitcoin variations
 // warning to discard storage
 // double click keys should select all
+// hide page breaks in previews with @media print
+// copy line break in pdf inserts space
+// import html / other formats?
+// restrict file types for file picker
+// code scan
 
 // consult designers
 // color of 'c' within cs logo
@@ -46,12 +51,7 @@
 // password confirmation - re-enter or show
 // title bar should not scroll?
 // warnings to test before using
-// hide page breaks in previews with @media print
-// copy line break in pdf inserts space
 // code review
-// import html / other formats?
-// restrict file types for file picker
-// code scan
 
 // low priority
 // console warning "unexpected end of file" in firefox caused by ddslick
