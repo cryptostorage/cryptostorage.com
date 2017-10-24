@@ -1,5 +1,4 @@
 // TODO
-// multikey generation not working on domain
 // add warning under development
 // 404 cryptostorage.com/css/ajax-loader.gif
 // lines to represent split
@@ -141,6 +140,10 @@ function AppController(div) {
 		logo.click(function() {
 			that.showHome();
 		});
+		
+		// under development warning
+		let warningDiv = $("<div class='app_header_warning'>").appendTo(headerTopDiv);
+		warningDiv.append("Under Development: Not Ready For Use");
 		
 		// header links
 		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
