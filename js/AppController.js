@@ -36,6 +36,7 @@
 // disable generate button until input valid?
 // color of generate buttons / pulsing?
 // slider points, logos, and supporting content
+// BIP38 vs CryptoJS encryption option for BTC/BCH
 // export flow after key generation + options
 // import flow to read zip + import from private key
 // how to handle progress bar + status during key generation
