@@ -198,8 +198,64 @@ input[type='number'] {
 .split_input_div {
 	margin:20px 20px 0px 20px;
 	display:flex;
-	flex-direction:column;
+	align-items:center;
+	justify-content:center;
 }
+
+.split_qr {
+	width:100px;
+	height:100px;
+	margin:10px;
+}
+
+.split_lines_3 {
+	width:100px;
+	height:100px;
+	margin:10px;
+}
+
+.split_num_div {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	margin:10px;
+	width:100px;
+}
+
+.split_num_label_top {
+	text-align:center;
+	padding-bottom:10px;
+}
+
+.split_num_label_bottom {
+	text-align:center;
+	padding-top:10px;
+}
+
+.split_lines_2 {
+	width:100px;
+	height:100px;
+	margin:10px;
+}
+
+.split_min_div {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	margin:10px;
+	width:115px;
+}
+
+.split_min_label_top {
+	text-align:center;
+	padding-bottom:10px;
+}
+
+.split_min_label_bottom {
+	text-align:center;
+	padding-top:10px;
+}
+
 
 .currency_inputs_div:first-child {
 	border-top:2px solid;

@@ -284,14 +284,30 @@ function FormController(div) {
 		
 		// split input
 		let splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
-		let splitNumPiecesDiv = $("<div>").appendTo(splitInputDiv);
-		splitNumPiecesDiv.append("Split each key into ");
-		numPiecesInput = $("<input type='number' value='3'>").appendTo(splitNumPiecesDiv);
-		splitNumPiecesDiv.append(" pieces");
-		let splitMinPiecesDiv = $("<div>").appendTo(splitInputDiv);
-		splitMinPiecesDiv.append("Require ");
-		minPiecesInput = $("<input type='number' value='2'>").appendTo(splitMinPiecesDiv);
-		splitMinPiecesDiv.append(" to recover");
+		let splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitInputDiv);
+		let splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
+		let splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
+		let splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
+		splitNumLabelTop.html("Split Each Key Into");
+		numPiecesInput = $("<input type='number' value='3'>").appendTo(splitNumDiv);
+		let splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
+		splitNumLabelBottom.html("Pieces");
+		let splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitInputDiv);
+		let splitMinDiv = $("<div class='split_min_div'>").appendTo(splitInputDiv);
+		let splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
+		splitMinLabelTop.html("Require");
+		minPiecesInput = $("<input type='number' value='2'>").appendTo(splitMinDiv);
+		let splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
+		splitMinLabelBottom.html("To Recover");		
+		
+//		let splitNumPiecesDiv = $("<div>").appendTo(splitInputDiv);
+//		splitNumPiecesDiv.append("Split each key into ");
+//		numPiecesInput = $("<input type='number' value='3'>").appendTo(splitNumPiecesDiv);
+//		splitNumPiecesDiv.append(" pieces");
+//		let splitMinPiecesDiv = $("<div>").appendTo(splitInputDiv);
+//		splitMinPiecesDiv.append("Require ");
+//		minPiecesInput = $("<input type='number' value='2'>").appendTo(splitMinPiecesDiv);
+//		splitMinPiecesDiv.append(" to recover");
 		
 		// apply default configuration
 		passphraseCheckbox.prop('checked', false);
