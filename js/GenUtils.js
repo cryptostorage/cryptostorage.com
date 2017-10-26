@@ -551,12 +551,12 @@ function getInternalStyleSheet() {
 /**
  * Builds an HTML document with the given div in the body.
  * 
- * @param div is the div to embed within the document's body
+ * @param div is the div to embed within the document's body (optional)
  * @param title is the title of the tab (optional)
  * @param jsPaths are paths to javascript files (optional)
  * @param cssPaths are paths to css files (optional)
- * @param internalCss are css rules to embed within the document's style
- * @returns str with the html content
+ * @param internalCss are css rules to embed within the document's style (optional)
+ * @returns str is the document string
  */
 function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
 	let str = "<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (internalCss ? "<style>" + internalCss + "</style>" : "");
@@ -573,7 +573,7 @@ function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
 		}
 	}
 	str += "</head><body>";
-	str += div.html();
+	if (div) str += div.html();
 	str += "</body></html>";
 	return str;
 }

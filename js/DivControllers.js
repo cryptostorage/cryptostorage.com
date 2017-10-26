@@ -622,11 +622,11 @@ function FormController(div) {
 			if (label) progressBar.setText(label);
 			progressDiv.show();
 		}, function(keys, pieces, pieceDivs) {
-			let exportDiv = $("<div>");
-			let exportController = new ExportController(exportDiv, pieces, pieceDivs);
-			exportController.render(function(div) {
-				progressDiv.hide();
-				newWindow(div, "Export Storage", null, "css/style.css", "body { background-color:white; }");
+			progressDiv.hide();
+			let window = newWindow(null, "Export Storage", null, "css/style.css", null);
+			let body = $("body", window.document);
+			console.log(body);
+			new ExportController(body, pieces, pieceDivs).render(function(div) {
 				if (onDone) onDone();
 			});
 		});
@@ -904,21 +904,31 @@ function ExportController(div, pieces, pieceDivs) {
 	this.render = function(onDone) {
 		div.empty();
 		
+		// export header
 		let exportHeader = $("<div class='export_header'>").appendTo(div);
+		
+		// export buttons
 		let exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
 		let printButton = $("<div class='export_button'>").appendTo(exportButtons);
 		printButton.html("Print All");
+		printButton.click(function() { console.log("Print All"); });
 		let exportButton = $("<div class='export_button'>").appendTo(exportButtons);
 		exportButton.html("Export All");
+		exportButton.click(function() { console.log("Export All"); });
 		let savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
+		savePublicButton.click(function() { console.log("Save Public Addresses"); });
 		let moreButton = $("<div class='export_button'>").appendTo(exportButtons);
 		moreButton.html("...");
+		moreButton.click(function() { console.log("More button clicked"); });
 		
+		// export checkboxes
+		let exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
 		
-		
-		let exportOptions = $("<div class='export_checkboxes'>").appendTo(exportHeader);
+		// export piece selection
 		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
+		
+		// currently showing piece
 		let exportPiece = $("<div class='export_content'>").appendTo(div);
 		
 		// done rendering
