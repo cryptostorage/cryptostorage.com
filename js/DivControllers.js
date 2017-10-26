@@ -196,6 +196,164 @@ function HomeController(div, onCurrencyClicked) {
 inheritsFrom(HomeController, DivController);
 
 /**
+ * FAQ page.
+ */
+function FaqController(div) {
+	DivController.call(this, div);
+	this.render = function(onDone) {
+		UiUtils.setupContentDiv(div);
+		
+		let titleDiv = $("<div class='title'>").appendTo(div);
+		titleDiv.html("Frequently Asked Questions");
+		
+		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(div);
+		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(div);
+		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(div);
+		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(div);
+		$("<div class='question'>").html("How can I trust this service?").appendTo(div);
+		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is publicly audited.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(div);
+		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(div);
+		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(div);
+		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(div);
+		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future.").appendTo(div);
+		$("<div class='question'>").html("What formats can I export to?").appendTo(div);
+		$("<div class='answer'>").html("TODO").appendTo(div);
+		
+		// done rendering
+		if (onDone) onDone(div);
+	}
+}
+inheritsFrom(FaqController, DivController);
+
+/**
+ * Donate page.
+ */
+function DonateController(div, appController) {
+	DivController.call(this, div);
+	
+	this.render = function(onDone) {
+		UiUtils.setupContentDiv(div);
+		
+		// load qr code dependency
+		loader.load("lib/qrcode.js", function() {
+			
+			// build donate section
+			let titleDiv = $("<div class='title'>").appendTo(div);
+			titleDiv.html("Donate");
+			let values = [];
+			for (let plugin of CryptoUtils.getCryptoPlugins()) {
+				values.push({
+					logo: plugin.getLogo(),
+					label: plugin.getName(),
+					value: plugin.getDonationAddress()
+				});
+			}
+			renderValues(values, null, null, function(valuesDiv) {
+				div.append(valuesDiv);
+				
+				// build credits section
+				div.append("<br><br>");
+				titleDiv = $("<div class='title'>").appendTo(div);
+				titleDiv.html("Credits");
+				let values = [];
+				values.push({
+					logo: CryptoUtils.getCryptoPlugin("BTC").getLogo(),
+					label: "bitaddress.org",
+					value: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
+				});
+				values.push({
+					logo: CryptoUtils.getCryptoPlugin("XMR").getLogo(),
+					label: "moneroaddress.org",
+					value: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
+				});
+				renderValues(values, null, null, function(valuesDiv) {
+					div.append(valuesDiv);
+					if (onDone) onDone(div);
+				});
+			});
+		});
+		
+		/**
+		 * Renders the given values.
+		 * 
+		 * @param values are [{logo: <logo>, label: <label>, value: <value>}, ...].
+		 * @param config is the config to render (TODO)
+		 * @param onProgress(done, total, label) is invoked as progress is made (TODO)
+		 * @param onDone(div) is invoked when done
+		 */
+		function renderValues(values, config, onProgress, onDone) {
+			
+			// div to render to
+			let valuesDiv = $("<div>");
+			
+			// collect functions to render values
+			let left = true;
+			let funcs = [];
+			for (let value of values) {
+				let valueDiv = $("<div>").appendTo(valuesDiv); 
+				if (left) {
+					funcs.push(function(onDone) { renderLeft(valueDiv, value, onDone); });
+				} else {
+					funcs.push(function(onDone) { renderRight(valueDiv, value, onDone); });
+				}
+				left = !left;
+			}
+			
+			// render addresses in parallel
+			async.parallel(funcs, function(err, results) {
+				if (err) throw err;
+				onDone(valuesDiv);
+			});
+		}
+		
+		function renderLeft(div, value, onDone) {
+			div.attr("class", "value_left");
+			let qrDiv = $("<div>").appendTo(div);
+			let labelValueDiv = $("<div class='value_label_value'>").appendTo(div);
+			let logoLabelDiv = $("<div class='value_left_logo_label'>").appendTo(labelValueDiv);
+			let logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
+			logo.attr("class", "value_logo");
+			let valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
+			valueLabelDiv.append(value.label);
+			let valueDiv = $("<div class='value_left_value'>").appendTo(labelValueDiv);
+			valueDiv.append(value.value);
+			
+			// render qr code
+			CryptoUtils.renderQrCode(value.value, null, function(img) {
+				img.attr("class", "value_qr");
+				qrDiv.append(img);
+				onDone();
+			});
+		}
+		
+		function renderRight(div, value, onDone) {
+			div.attr("class", "value_right");
+			let labelValueDiv = $("<div class='value_label_value'>").appendTo(div);
+			let logoLabelDiv = $("<div class='value_right_logo_label'>").appendTo(labelValueDiv);
+			let logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
+			logo.attr("class", "value_logo");
+			let valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
+			valueLabelDiv.append(value.label);
+			let valueDiv = $("<div class='value_right_value'>").appendTo(labelValueDiv);
+			valueDiv.append(value.value);
+			let qrDiv = $("<div>").appendTo(div);
+			
+			// render qr code
+			CryptoUtils.renderQrCode(value.value, null, function(img) {
+				img.attr("class", "value_qr");
+				qrDiv.append(img);
+				onDone();
+			});
+		}
+		
+		function renderValuePairs(values, config, onProgress, onDone) {
+			// TODO: reconcile with PieceRenderer
+		}
+	}
+}
+inheritsFrom(DonateController, DivController);
+
+/**
  * Form page.
  */
 function FormController(div) {
@@ -690,159 +848,38 @@ function FormController(div) {
 inheritsFrom(FormController, DivController);
 
 /**
- * FAQ page.
+ * Recover page.
  */
-function FaqController(div) {
+function RecoverController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
 		let titleDiv = $("<div class='title'>").appendTo(div);
-		titleDiv.html("Frequently Asked Questions");
-		
-		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(div);
-		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(div);
-		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(div);
-		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(div);
-		$("<div class='question'>").html("How can I trust this service?").appendTo(div);
-		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is publicly audited.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(div);
-		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(div);
-		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(div);
-		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(div);
-		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future.").appendTo(div);
-		$("<div class='question'>").html("What formats can I export to?").appendTo(div);
-		$("<div class='answer'>").html("TODO").appendTo(div);
+		titleDiv.html("Recover");
 		
 		// done rendering
 		if (onDone) onDone(div);
 	}
 }
-inheritsFrom(FaqController, DivController);
+inheritsFrom(RecoverController, DivController);
 
 /**
- * Donate page.
+ * Export page.
+ * 
+ * @param div is the div to render to
+ * @param pieces are the pieces to export
  */
-function DonateController(div, appController) {
+function ExportController(div, pieces) {
 	DivController.call(this, div);
-	
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
-		// load qr code dependency
-		loader.load("lib/qrcode.js", function() {
-			
-			// build donate section
-			let titleDiv = $("<div class='title'>").appendTo(div);
-			titleDiv.html("Donate");
-			let values = [];
-			for (let plugin of CryptoUtils.getCryptoPlugins()) {
-				values.push({
-					logo: plugin.getLogo(),
-					label: plugin.getName(),
-					value: plugin.getDonationAddress()
-				});
-			}
-			renderValues(values, null, null, function(valuesDiv) {
-				div.append(valuesDiv);
-				
-				// build credits section
-				div.append("<br><br>");
-				titleDiv = $("<div class='title'>").appendTo(div);
-				titleDiv.html("Credits");
-				let values = [];
-				values.push({
-					logo: CryptoUtils.getCryptoPlugin("BTC").getLogo(),
-					label: "bitaddress.org",
-					value: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
-				});
-				values.push({
-					logo: CryptoUtils.getCryptoPlugin("XMR").getLogo(),
-					label: "moneroaddress.org",
-					value: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
-				});
-				renderValues(values, null, null, function(valuesDiv) {
-					div.append(valuesDiv);
-					if (onDone) onDone(div);
-				});
-			});
-		});
+		let titleDiv = $("<div class='title'>").appendTo(div);
+		titleDiv.html("Export");
 		
-		/**
-		 * Renders the given values.
-		 * 
-		 * @param values are [{logo: <logo>, label: <label>, value: <value>}, ...].
-		 * @param config is the config to render (TODO)
-		 * @param onProgress(done, total, label) is invoked as progress is made (TODO)
-		 * @param onDone(div) is invoked when done
-		 */
-		function renderValues(values, config, onProgress, onDone) {
-			
-			// div to render to
-			let valuesDiv = $("<div>");
-			
-			// collect functions to render values
-			let left = true;
-			let funcs = [];
-			for (let value of values) {
-				let valueDiv = $("<div>").appendTo(valuesDiv); 
-				if (left) {
-					funcs.push(function(onDone) { renderLeft(valueDiv, value, onDone); });
-				} else {
-					funcs.push(function(onDone) { renderRight(valueDiv, value, onDone); });
-				}
-				left = !left;
-			}
-			
-			// render addresses in parallel
-			async.parallel(funcs, function(err, results) {
-				if (err) throw err;
-				onDone(valuesDiv);
-			});
-		}
-		
-		function renderLeft(div, value, onDone) {
-			div.attr("class", "value_left");
-			let qrDiv = $("<div>").appendTo(div);
-			let labelValueDiv = $("<div class='value_label_value'>").appendTo(div);
-			let logoLabelDiv = $("<div class='value_left_logo_label'>").appendTo(labelValueDiv);
-			let logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-			logo.attr("class", "value_logo");
-			let valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
-			valueLabelDiv.append(value.label);
-			let valueDiv = $("<div class='value_left_value'>").appendTo(labelValueDiv);
-			valueDiv.append(value.value);
-			
-			// render qr code
-			CryptoUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "value_qr");
-				qrDiv.append(img);
-				onDone();
-			});
-		}
-		
-		function renderRight(div, value, onDone) {
-			div.attr("class", "value_right");
-			let labelValueDiv = $("<div class='value_label_value'>").appendTo(div);
-			let logoLabelDiv = $("<div class='value_right_logo_label'>").appendTo(labelValueDiv);
-			let logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-			logo.attr("class", "value_logo");
-			let valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
-			valueLabelDiv.append(value.label);
-			let valueDiv = $("<div class='value_right_value'>").appendTo(labelValueDiv);
-			valueDiv.append(value.value);
-			let qrDiv = $("<div>").appendTo(div);
-			
-			// render qr code
-			CryptoUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "value_qr");
-				qrDiv.append(img);
-				onDone();
-			});
-		}
-		
-		function renderValuePairs(values, config, onProgress, onDone) {
-			// TODO: reconcile with PieceRenderer
-		}
+		// done rendering
+		if (onDone) onDone(div);
 	}
 }
-inheritsFrom(DonateController, DivController);
+inheritsFrom(ExportController, DivController);

@@ -127,6 +127,7 @@ function AppController(div) {
 	let contentDiv;
 	let homeController;
 	let formController;
+	let recoverController;
 	let faqController;
 	let donateController;
 	
@@ -186,8 +187,10 @@ function AppController(div) {
 		// initialize controllers
 		homeController = new HomeController($("<div>"), onCurrencyClicked);
 		formController = new FormController($("<div>"));
+		recoverController = new RecoverController($("<div>"));
 		faqController = new FaqController($("<div>"));
 		donateController = new DonateController($("<div>"));
+		recoverController.render();
 		faqController.render();
 		
 		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
@@ -241,6 +244,12 @@ function AppController(div) {
 		setContentDiv(donateController.getDiv());
 	}
 	
+	this.showRecover = function() {
+		if (DEBUG) console.log("showRecover()");
+		sliderDiv.hide();
+		setContentDiv(recoverController.getDiv());
+	}
+	
 	this.loadDonationPage = function() {
 		donateController.render();
 	}
@@ -255,12 +264,11 @@ function AppController(div) {
 	}
 	
 	function onSelectGenerate() {
-		if (DEBUG) console.log("onSelectGenerate()");
 		that.showForm();
 	}
 	
 	function onSelectRecover() {
-		if (DEBUG) console.log("onSelectRecover()");
+		that.showRecover();
 	}
 	
 	function onCurrencyClicked(plugin) {
