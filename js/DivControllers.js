@@ -632,7 +632,7 @@ function FormController(div) {
 			exportController.render(function(div) {
 				console.log("Export controller done rendering");
 				progressDiv.hide();
-				newWindow(div, null, null);	// TODO: remove pieceDiv
+				newWindow(div, "Export Storage", null, "css/style.css", null);	// TODO: remove pieceDiv
 				if (onDone) onDone();
 			});
 		});

@@ -346,6 +346,16 @@ function contains(arr, obj) {
 }
 
 /**
+ * Listifies the given argument.
+ * 
+ * @param arrOrElem is an array or an element in the array
+ * @returns an array which is the given arg if it's an array or an array with the given arg as an element
+ */
+function listify(arrOrElem) {
+	return isArray(arrOrElem) ? arrOrElem : [arrOrElem];
+}
+
+/**
  * Determines if two arrays are equal.
  * 
  * @param arr1 is an array to compare
@@ -539,16 +549,33 @@ function getInternalStyleSheet() {
 }
 
 /**
- * Prints the given div in a new window.
+ * Builds an HTML document with the given div in the body.
  * 
- * @param div is the jquery div to print
- * @param css are css rules to add (optional)
- * @param title is the title of the new window (optional)
+ * @param div is the div to embed within the document's body
+ * @param title is the title of the tab (optional)
+ * @param jsPaths are paths to javascript files (optional)
+ * @param cssPaths are paths to css files (optional)
+ * @param internalCss are css rules to embed within the document's style
+ * @returns str with the html content
  */
-function printDiv(div, css, title) {
-	let w = newWindow(div, css, title);
-	w.print();
-	w.close();
+function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
+	let str = "<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (internalCss ? "<style>" + internalCss + "</style>" : "");
+	if (jsPaths) {
+		jsPaths = listify(jsPaths);
+		for (let jsPath of jsPaths) {
+			str += "<script src='" + jsPath + "'></script>";
+		}
+	}
+	if (cssPaths) {
+		cssPaths = listify(cssPaths);
+		for (let cssPath of cssPaths) {
+			str += "<link rel='stylesheet' type='text/css' href='" + cssPath + "'/>";
+		}
+	}
+	str += "</head><body>";
+	str += div.html();
+	str += "</body></html>";
+	return str;
 }
 
 /**
@@ -559,11 +586,9 @@ function printDiv(div, css, title) {
  * @param title title is the title of the new window (optional)
  * @returns a reference to the opened window
  */
-function newWindow(div, css, title) {
+function newWindow(div, title, jsPaths, cssPaths, internalCss) {
 	let w = window.open();
-	w.document.write("<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (css ? "<style>" + css + "</style>" : "") + "</head><body>");
-	w.document.write(div.html());
-	w.document.write("</body></html>");
+	w.document.write(buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss));
 	w.document.close();
 	return w;
 }
