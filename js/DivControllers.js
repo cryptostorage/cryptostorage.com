@@ -858,7 +858,8 @@ inheritsFrom(FormController, DivController);
 function RecoverController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
-		UiUtils.setupContentDiv(div);
+		div.empty();
+		div.attr("class", "recover_page");
 		
 		$("<div class='recover_filler'>").appendTo(div);
 		let importDiv = $("<div class='import_div'>").appendTo(div);

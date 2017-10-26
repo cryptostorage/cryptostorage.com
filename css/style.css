@@ -454,8 +454,14 @@ input[type='number'] {
 	text-align:right;
 }
 
+.recover_page {
+	width:100%;
+	background-color:white;
+	min-height:700px;
+}
+
 .recover_filler {
-	height:100x;
+	height:100px;
 }
 
 .import_div {
