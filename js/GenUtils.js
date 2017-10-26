@@ -546,10 +546,23 @@ function getInternalStyleSheet() {
  * @param title is the title of the new window (optional)
  */
 function printDiv(div, css, title) {
+	let w = newWindow(div, css, title);
+	w.print();
+	w.close();
+}
+
+/**
+ * Opens the given div in a new window.
+ * 
+ * @param div is the jquery div to render
+ * @param css are css rules to add (optional)
+ * @param title title is the title of the new window (optional)
+ * @returns a reference to the opened window
+ */
+function newWindow(div, css, title) {
 	let w = window.open();
 	w.document.write("<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (css ? "<style>" + css + "</style>" : "") + "</head><body>");
 	w.document.write(div.html());
 	w.document.write("</body></html>");
-	w.print();
-	w.close();
+	return w;
 }

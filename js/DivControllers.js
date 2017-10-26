@@ -632,8 +632,7 @@ function FormController(div) {
 			exportController.render(function(div) {
 				console.log("Export controller done rendering");
 				progressDiv.hide();
-				pieceDiv.empty();
-				pieceDiv.append(div);
+				newWindow(div, null, null);	// TODO: remove pieceDiv
 				if (onDone) onDone();
 			});
 		});
