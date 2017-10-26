@@ -564,5 +564,6 @@ function newWindow(div, css, title) {
 	w.document.write("<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (css ? "<style>" + css + "</style>" : "") + "</head><body>");
 	w.document.write(div.html());
 	w.document.write("</body></html>");
+	w.document.close();
 	return w;
 }
