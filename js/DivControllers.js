@@ -482,13 +482,6 @@ function FormController(div) {
 		if (onDone) onDone(div);
 	}
 	
-	this.quickGenerate = function(plugin, onDone) {
-		if (DEBUG) console.log("quickGenerate(" + plugin.getTicker() + ")");
-		assertTrue(currencyInputs.length === 1);
-		currencyInputs[0].setSelectedCurrency(plugin.getName());
-		generateKeys(onDone);
-	}
-	
 	this.setSelectedCurrency = function(plugin) {
 		assertTrue(currencyInputs.length === 1);
 		currencyInputs[0].setSelectedCurrency(plugin.getName());
@@ -623,9 +616,8 @@ function FormController(div) {
 			progressDiv.show();
 		}, function(keys, pieces, pieceDivs) {
 			progressDiv.hide();
-			let window = newWindow(null, "Export Storage", null, "css/style.css", null);
+			let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
 			let body = $("body", window.document);
-			console.log(body);
 			new ExportController(body, pieces, pieceDivs).render(function(div) {
 				if (onDone) onDone();
 			});
@@ -930,6 +922,7 @@ function ExportController(div, pieces, pieceDivs) {
 		
 		// currently showing piece
 		let exportPiece = $("<div class='export_content'>").appendTo(div);
+		exportPiece.append(pieceDivs[0].clone());
 		
 		// done rendering
 		if (onDone) onDone(div);

@@ -270,18 +270,6 @@ function AppController(div) {
 	
 	function onCurrencyClicked(plugin) {
 		if (DEBUG) console.log("onCurrencyClicked(" + plugin.getName() + ")");
-//			setContentDiv(formController.getDiv());
-//			sliderDiv.hide();
-		formController.render(function(div) {
-			formController.quickGenerate(plugin, function() {
-				setContentDiv(formController.getDiv());
-				sliderDiv.hide();
-				formController.setSelectedCurrency(plugin);
-			});
-		});
-//		that.showForm(function() {
-//			formController.quickGenerate(plugin);
-//		});
 	}
 }
 inheritsFrom(AppController, DivController);

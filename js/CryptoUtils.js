@@ -163,7 +163,7 @@ let CryptoUtils = {
 		var segments = [{data: text, mode: 'byte'}];	// manually specify mode
 		qrcodelib.toDataURL(segments, config, function(err, url) {
 			if (err) throw err;
-			var img = $("<img>");
+			let img = $("<img>");
 			if (config.size) img.css("width", config.size + "px");
 			if (config.size) img.css("height", config.size + "px");
 			img[0].onload = function() {

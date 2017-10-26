@@ -549,6 +549,20 @@ function getInternalStyleSheet() {
 }
 
 /**
+ * Returns the document's internal stylesheet as text.
+ * 
+ * @returns str is the document's internal stylesheet
+ */
+function getInternalStyleSheetText() {
+	let internalCss = "";
+	let internalStyleSheet = getInternalStyleSheet();
+	for (let i = 0; i < internalStyleSheet.cssRules.length; i++) {
+		internalCss += internalStyleSheet.cssRules[i].cssText + "\n";
+	}
+	return internalCss;
+}
+
+/**
  * Builds an HTML document with the given div in the body.
  * 
  * @param div is the div to embed within the document's body (optional)
