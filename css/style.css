@@ -453,3 +453,31 @@ input[type='number'] {
 	padding-top:5px;
 	text-align:right;
 }
+
+.recover_filler {
+	height:100x;
+}
+
+.import_div {
+	background-color:rgb(66, 116, 184);
+}
+
+.import_tabs_div {
+	display:flex;
+}
+
+.import_tab_div {
+	flex:1;
+	text-align:center;
+	padding:20px;
+	color: white;
+	font-size:24px;
+}
+
+.import_tab_div:hover {
+	cursor:pointer;
+}
+
+.active_tab {
+	background-color:rgb(93, 159, 252);
+}

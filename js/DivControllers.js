@@ -860,11 +860,39 @@ function RecoverController(div) {
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
-		let titleDiv = $("<div class='title'>").appendTo(div);
-		titleDiv.html("Recover");
+		$("<div class='recover_filler'>").appendTo(div);
+		let importDiv = $("<div class='import_div'>").appendTo(div);
+		let tabsDiv = $("<div class='import_tabs_div'>").appendTo(importDiv);
+		let importFromFileTab = $("<div class='import_tab_div'>").appendTo(tabsDiv);
+		importFromFileTab.html("Import From File");
+		importFromFileTab.click(function() { selectTab("file"); });
+		let importFromTextTab = $("<div class='import_tab_div'>").appendTo(tabsDiv);
+		importFromTextTab.html("Import From Text");
+		importFromTextTab.click(function() { selectTab("text"); });
+		let importContentDiv = $("<div class='import_content_div'>").appendTo(importDiv);
+		importContentDiv.append("Content");
+		
+		// start on file tab by default
+		selectTab("file");
 		
 		// done rendering
 		if (onDone) onDone(div);
+		
+		function selectTab(selected) {
+			switch (selected) {
+			case "file":
+				importFromFileTab.addClass("active_tab");
+				importFromTextTab.removeClass("active_tab");
+				console.log("Import From File");
+				break;
+			case "text":
+				importFromFileTab.removeClass("active_tab");
+				importFromTextTab.addClass("active_tab");
+				console.log("Import From Text");
+				break;
+			default: throw new Error("Unrecognized selection: " + selected);
+			}
+		}
 	}
 }
 inheritsFrom(RecoverController, DivController);
