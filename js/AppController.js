@@ -36,23 +36,23 @@
 // code scan
 
 // consult designers
-// hover colors on front page
-// opinion on donate page + ui designer tip address
-// color of 'c' within cs logo
-// error messages on key generation page
+// hover colors on front page - underlines on links
+// opinion on donate page + ui designer tip address - link to open user's wallet
+// color of 'c' within cs logo - little bit lighter
+// error messages on key generation page - let them click button once, outline with red, deactivate until they fix.  Constrain split input and keep in sync
 // disable generate button until input valid?
-// color of generate buttons / pulsing?
-// slider points, logos, and supporting content
-// BIP38 vs CryptoJS encryption option for BTC/BCH
+// color of generate buttons / pulsing? - form button same as home page, maybe shift to darker
+// slider points, logos, and supporting content - fill icons with white, multiple locks
+// BIP38 vs CryptoJS encryption option for BTC/BCH - checkbox on same line as "Show passphrase", "Use BIP38 for Bitcoin and Bitcoin Cash"
 // export flow after key generation + options
 // import flow to read zip + import from private key
-// how to handle progress bar + status during key generation
-// live site warning to stop and download from github
+// how to handle progress bar + status during key generation - hijack button to display both progress and status
+// live site warning to stop and download from github - orange bar on form page encouraging users to download
 // use tabs for pieces?
 // mobile static frame?
 // password confirmation - re-enter or show
 // title bar should not scroll?
-// warnings to test before using
+// warnings to test before using - add FAQ
 // code review
 
 // low priority
