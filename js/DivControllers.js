@@ -468,7 +468,7 @@ function FormController(div) {
 		let generateDiv = $("<div class='generate_div'>").appendTo(div);
 		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
 		btnGenerate.append("Generate keys");
-		btnGenerate.click(function() { generateKeys() });
+		btnGenerate.click(function() { onGeneratePieces() });
 		
 		// under development warning
 		let warningDiv = $("<div class='app_header_warning'>").appendTo(div);
@@ -618,10 +618,10 @@ function FormController(div) {
 	}
 	
 	/**
-	 * Generates keys based on the current configuration and updates the GUI.
+	 * Generates pieces based on the current configuration and updates the GUI.
 	 */
-	function generateKeys(onDone) {
-		generateKeysAux(function(done, total, label) {
+	function onGeneratePieces(onDone) {
+		generateKeys(function(done, total, label) {
 			progressBar.set(done / total);
 			if (label) progressBar.setText(label);
 			progressDiv.show();
@@ -639,7 +639,7 @@ function FormController(div) {
 	 * @param onProgress(done, total, label) is invoked as progress is made
 	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
 	 */
-	function generateKeysAux(onProgress, onDone) {
+	function generateKeys(onProgress, onDone) {
 		
 		// get current configuration
 		let config = getConfig();
