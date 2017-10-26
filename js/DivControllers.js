@@ -916,6 +916,21 @@ function ExportController(div, pieces, pieceDivs) {
 		
 		// export checkboxes
 		let exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
+		let showPublicCheckbox = $("<input type='checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
+		let showPublicCheckboxLabel = $("<label for='showPublicCheckbox'>").appendTo(exportCheckboxes);
+		showPublicCheckboxLabel.html("&nbspShow public addresses");
+		showPublicCheckbox.click(function() { console.log("Show public address checkbox"); });
+		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
+		let showPrivateCheckbox = $("<input type='checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
+		let showPrivateCheckboxLabel = $("<label for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
+		showPrivateCheckboxLabel.html("&nbspShow private keys");
+		showPrivateCheckbox.click(function() { console.log("Show private keys checkbox"); });
+		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
+		let showLogosCheckbox = $("<input type='checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
+		let showLogosCheckboxLabel = $("<label for='showLogosCheckbox'>").appendTo(exportCheckboxes);
+		showLogosCheckboxLabel.html("&nbspShow currency logos");
+		showLogosCheckbox.click(function() { console.log("Show logos"); });
+		
 		
 		// export piece selection
 		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
