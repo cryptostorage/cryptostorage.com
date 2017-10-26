@@ -626,10 +626,16 @@ function FormController(div) {
 			if (label) progressBar.setText(label);
 			progressDiv.show();
 		}, function(keys, pieces, pieceDivs) {
-			progressDiv.hide();
-			pieceDiv.empty();
-			pieceDiv.append(pieceDivs[0]);
-			if (onDone) onDone();
+			
+			let exportDiv = $("<div>");
+			let exportController = new ExportController(exportDiv, pieces, pieceDivs);
+			exportController.render(function(div) {
+				console.log("Export controller done rendering");
+				progressDiv.hide();
+				pieceDiv.empty();
+				pieceDiv.append(div);
+				if (onDone) onDone();
+			});
 		});
 	}
 	
@@ -869,8 +875,9 @@ inheritsFrom(RecoverController, DivController);
  * 
  * @param div is the div to render to
  * @param pieces are the pieces to export
+ * @param pieceDivs are pre-rendered piece divs for display
  */
-function ExportController(div, pieces) {
+function ExportController(div, pieces, pieceDivs) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
