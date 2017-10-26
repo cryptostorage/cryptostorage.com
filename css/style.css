@@ -10,9 +10,12 @@ body {
 	display:flex;
 	flex-direction:column;
 	align-items:center;
-	background-color:rgb(235, 242, 254);
 	min-width:971px;
 	-webkit-text-size-adjust: 100%;
+}
+
+.app_body {
+	background-color:rgb(235, 242, 254);
 }
 
 ol {
