@@ -325,13 +325,6 @@ input[type='number'] {
 	background-color:#006000;
 }
 
-.preview_piece_div {
-	margin-top:25px;
-	display:flex;
-	flex-direction:column;
-	align-items:center;
-}
-
 .home_div {
 	padding-top:25px;
 	display:flex;
@@ -352,7 +345,7 @@ input[type='number'] {
 
 .currency_row_item_major:hover {
 	cursor:pointer;
-	background:#EBEDEF;
+	background-color:#EBEDEF;
 }
 
 .currency_row_item_minor {
@@ -364,7 +357,7 @@ input[type='number'] {
 
 .currency_row_item_minor:hover {
 	cursor:pointer;
-	background:#EBEDEF;
+	background-color:#EBEDEF;
 }
 
 .currency_row_logo_major {
@@ -486,4 +479,51 @@ input[type='number'] {
 
 .active_tab {
 	background-color:rgb(93, 159, 252);
+}
+
+.export_header {
+	background-color:rgb(66, 116, 184);
+	height:100px;
+	width:100%;
+	padding:20px;
+}
+
+.export_buttons {
+	display:flex;
+	justify-content:center;
+}
+
+.export_checkboxes {
+	display:flex;
+	justify-content:center;
+}
+
+.export_piece_selection {
+	display:flex;
+	justify-content:center;
+}
+
+.export_content {
+	background-color:white;
+}
+
+.export_button {
+	background-color:white;
+	color:black;
+	margin:15px;
+	padding:5px 20px 5px 20px;
+	border:2px solid;
+	-webkit-user-select: none;  
+	-moz-user-select: none;    
+	-ms-user-select: none;      
+	user-select: none;
+}
+
+.export_button:hover {
+	cursor:pointer;
+	background-color:#EBEDEF;
+}
+
+.export_button:active {
+	background-color:#ABB2B9;
 }

@@ -164,11 +164,8 @@ function AppController(div) {
 			that.showDonate();
 		});
 		linksDiv.append(homeLink);
-		//linksDiv.append("&nbsp|&nbsp;");
 		linksDiv.append(gitHubLink);
-		//linksDiv.append("&nbsp;|&nbsp;");
 		linksDiv.append(faqLink);
-		//linksDiv.append("&nbsp;|&nbsp;");
 		linksDiv.append(donateLink);
 		
 		function getLinkDiv(label) {

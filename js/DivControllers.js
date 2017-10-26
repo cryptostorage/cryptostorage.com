@@ -369,7 +369,6 @@ function FormController(div) {
 	let decommissioned;
 	let progressDiv;
 	let progressBar;
-	let pieceDiv;
 	
 	this.render = function(onDone) {
 		
@@ -478,9 +477,6 @@ function FormController(div) {
 		progressDiv = $("<div>").appendTo(div);
 		progressDiv.hide();
 		progressBar = UiUtils.getProgressBar(progressDiv);
-		
-		// add div to contain rendered page
-		pieceDiv = $("<div class='preview_piece_div'>").appendTo(div);
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -626,13 +622,11 @@ function FormController(div) {
 			if (label) progressBar.setText(label);
 			progressDiv.show();
 		}, function(keys, pieces, pieceDivs) {
-			
 			let exportDiv = $("<div>");
 			let exportController = new ExportController(exportDiv, pieces, pieceDivs);
 			exportController.render(function(div) {
-				console.log("Export controller done rendering");
 				progressDiv.hide();
-				newWindow(div, "Export Storage", null, "css/style.css", null);	// TODO: remove pieceDiv
+				newWindow(div, "Export Storage", null, "css/style.css", "body { background-color:white; }");
 				if (onDone) onDone();
 			});
 		});
@@ -908,10 +902,24 @@ inheritsFrom(RecoverController, DivController);
 function ExportController(div, pieces, pieceDivs) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
-		UiUtils.setupContentDiv(div);
+		div.empty();
 		
-		let titleDiv = $("<div class='title'>").appendTo(div);
-		titleDiv.html("Export");
+		let exportHeader = $("<div class='export_header'>").appendTo(div);
+		let exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
+		let printButton = $("<div class='export_button'>").appendTo(exportButtons);
+		printButton.html("Print All");
+		let exportButton = $("<div class='export_button'>").appendTo(exportButtons);
+		exportButton.html("Export All");
+		let savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
+		savePublicButton.html("Save Public Addresses");
+		let moreButton = $("<div class='export_button'>").appendTo(exportButtons);
+		moreButton.html("...");
+		
+		
+		
+		let exportOptions = $("<div class='export_checkboxes'>").appendTo(exportHeader);
+		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
+		let exportPiece = $("<div class='export_content'>").appendTo(div);
 		
 		// done rendering
 		if (onDone) onDone(div);
