@@ -941,9 +941,9 @@ function ExportController(div, pieces, pieceDivs) {
 		showLogosCheckbox.prop('checked', true);
 		
 		// register click events
-		showPublicCheckbox.click(function() { setIncludePublic(showPublicCheckbox.prop('checked')); });
-		showPrivateCheckbox.click(function() { setIncludePrivate(showPrivateCheckbox.prop('checked')); });
-		showLogosCheckbox.click(function() { setIncludeLogos(showLogosCheckbox.prop('checked')); });
+		showPublicCheckbox.click(function() { update(pieces); });
+		showPrivateCheckbox.click(function() { update(pieces); });
+		showLogosCheckbox.click(function() { update(pieces); });
 		
 		// export piece selection
 		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
@@ -952,26 +952,10 @@ function ExportController(div, pieces, pieceDivs) {
 		currentPiece = $("<div class='export_current_piece'>").appendTo(div);
 		
 		// update pieces
-		updatePieces(pieces, pieceDivs);
+		update(pieces, pieceDivs);
 		
 		// done rendering
 		if (onDone) onDone(div);
-	}
-	
-	function setIncludePublic(bool) {
-		updatePieces(pieces);
-	}
-	
-	function setIncludePrivate(bool) {
-		updatePieces(pieces);
-	}
-	
-	function setIncludeLogos(bool) {
-		updatePieces(pieces);
-	}
-	
-	function setHeaderEnabled(bool) {
-		console.log("setHeaderEnabled(" + bool + ")");
 	}
 	
 	function getPieceRendererConfig() {
@@ -982,8 +966,8 @@ function ExportController(div, pieces, pieceDivs) {
 		};
 	}
 	
-	function updatePieces(pieces, pieceDivs, onDone) {
-		setHeaderEnabled(false);
+	function update(pieces, pieceDivs, onDone) {
+		updateHeader();
 		
 		// handle pieces already exist
 		if (pieceDivs) {
@@ -1000,9 +984,14 @@ function ExportController(div, pieces, pieceDivs) {
 		currentPiece.empty();
 		currentPiece.append(pieceDivs[0]);
 		PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
-			setHeaderEnabled(true);
 			if (onDone) onDone();
 		});
+	}
+	
+	function updateHeader() {
+		showPrivateCheckbox.prop('checked') ? showPublicCheckbox.removeAttr('disabled') : showPublicCheckbox.attr('disabled', 'disabled');
+		showPublicCheckbox.prop('checked') ? showPrivateCheckbox.removeAttr('disabled') : showPrivateCheckbox.attr('disabled', 'disabled');
+		showLogosCheckbox.removeAttr('disabled');
 	}
 }
 inheritsFrom(ExportController, DivController);
