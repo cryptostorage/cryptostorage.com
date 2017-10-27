@@ -167,6 +167,7 @@ let CryptoUtils = {
 			if (config.size) img.css("width", config.size + "px");
 			if (config.size) img.css("height", config.size + "px");
 			img[0].onload = function() {
+				img[0].onload = null;
 				callback(img);
 			}
 			img[0].src = url;

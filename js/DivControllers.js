@@ -829,7 +829,7 @@ function FormController(div) {
 			}
 			
 			function renderPieceDivs(pieces, onDone) {
-				PieceRenderer.renderPieces(null, pieces, null, function(percent) {
+				PieceRenderer.renderPieces(pieces, null, null, function(percent) {
 					if (onProgress) onProgress(progressWeight + (percent * piecesRendererWeight), totalWeight, "Rendering");
 				}, onDone);
 			}
@@ -893,6 +893,12 @@ inheritsFrom(RecoverController, DivController);
  */
 function ExportController(div, pieces, pieceDivs) {
 	DivController.call(this, div);
+	
+	let showPublicCheckbox;
+	let showPrivateCheckbox;
+	let showLogosCheckbox;
+	let currentPiece;
+	
 	this.render = function(onDone) {
 		div.empty();
 		
@@ -916,31 +922,63 @@ function ExportController(div, pieces, pieceDivs) {
 		
 		// export checkboxes
 		let exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
-		let showPublicCheckbox = $("<input type='checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
+		showPublicCheckbox = $("<input type='checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		let showPublicCheckboxLabel = $("<label for='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		showPublicCheckboxLabel.html("&nbspShow public addresses");
-		showPublicCheckbox.click(function() { console.log("Show public address checkbox"); });
+		showPublicCheckbox.click(function() { setIncludePublic(showPublicCheckbox.prop('checked')); });
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
-		let showPrivateCheckbox = $("<input type='checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
+		showPrivateCheckbox = $("<input type='checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
 		let showPrivateCheckboxLabel = $("<label for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
 		showPrivateCheckboxLabel.html("&nbspShow private keys");
-		showPrivateCheckbox.click(function() { console.log("Show private keys checkbox"); });
+		showPrivateCheckbox.click(function() { setIncludePrivate(showPrivateCheckbox.prop('checked')); });
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
-		let showLogosCheckbox = $("<input type='checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
+		showLogosCheckbox = $("<input type='checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
 		let showLogosCheckboxLabel = $("<label for='showLogosCheckbox'>").appendTo(exportCheckboxes);
 		showLogosCheckboxLabel.html("&nbspShow currency logos");
-		showLogosCheckbox.click(function() { console.log("Show logos"); });
-		
+		showLogosCheckbox.click(function() { setIncludeLogos(showLogosCheckbox.prop('checked')); });
 		
 		// export piece selection
 		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
 		
 		// currently showing piece
-		let exportPiece = $("<div class='export_content'>").appendTo(div);
-		exportPiece.append(pieceDivs[0].clone());
+		currentPiece = $("<div class='export_current_piece'>").appendTo(div);
+		//currentPiece.append(pieceDivs[0].clone());
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	function setIncludePublic(bool) {
+		console.log("setIncludePublic(" + bool + ")");
+		setHeaderEnabled(false);
+		
+		let pieceDivs = [];
+		for (piece of pieces) pieceDivs.push($("<div>"));
+		currentPiece.empty();
+		currentPiece.append(pieceDivs[0]);
+		PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
+			console.log("Done rendering piece!");
+		});
+	}
+	
+	function setIncludePrivate(bool) {
+		console.log("setIncludePrivate(" + bool + ")");
+	}
+	
+	function setIncludeLogos(bool) {
+		console.log("setIncludeLogos(" + bool + ")");
+	}
+	
+	function setHeaderEnabled(bool) {
+		console.log("setHeaderEnabled(" + bool + ")");
+	}
+	
+	function getPieceRendererConfig() {
+		return {
+			showPublic: showPublicCheckbox.prop('checked'),
+			showPrivate: showPrivateCheckbox.prop('checked'),
+			showCurrencyLogos: showLogosCheckbox.prop('checked')
+		};
 	}
 }
 inheritsFrom(ExportController, DivController);

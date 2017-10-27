@@ -5,10 +5,10 @@ let PieceRenderer = {
 
 	defaultConfig: {
 		pairsPerPage: 7,
-		hidePublic: false,
-		hidePrivate: false,
-		hideCurrencyLogos: false,
-		hideCryptostorageLogos: false,
+		showPublic: true,
+		showPrivate: true,
+		showCurrencyLogos: true,
+		showCryptostorageLogos: true,
 		qrSize: 90,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
@@ -37,13 +37,13 @@ let PieceRenderer = {
 	/**
 	 * Renders pieces.
 	 * 
-	 * @param pieceDivs are the divs to render to
 	 * @param pieces are the pieces to render
+	 * @param pieceDivs are the divs to render to (optional)
 	 * @param config is the configuration to render
 	 * @param onProgress(percent) is invoked as progress is made
 	 * @param onDone(err, pieceDivs) is invoked when done
 	 */
-	renderPieces: function(pieceDivs, pieces, config, onProgress, onDone) {
+	renderPieces: function(pieces, pieceDivs, config, onProgress, onDone) {
 
 		// merge default config with given confi
 		config = Object.assign({}, PieceRenderer.defaultConfig, config);
@@ -103,7 +103,7 @@ let PieceRenderer = {
 			if (i % config.pairsPerPage === 0) {
 				if (i > 0) pieceDiv.append($("<div class='piece_page_spacer'>"));
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
-				if (!config.hideCryptostorageLogos) {
+				if (config.showCryptostorageLogos) {
 					let logoDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					logoDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("cryptostorage") + "'>"));
 				}
@@ -115,11 +115,11 @@ let PieceRenderer = {
 			let plugin = CryptoUtils.getCryptoPlugin(piece.keys[i].ticker);
 			let title = "#" + (i + 1);
 			let leftLabel = "\u25C4 Public Address";
-			let leftValue = config.hidePublic ? null : piece.keys[i].address;
+			let leftValue = config.showPublic ? piece.keys[i].address : null;
 			let logo = $("<img width=100% height=100% src='" + getImageData(piece.keys[i].ticker) + "'>");
 			let logoLabel = plugin.getName();
 			let rightLabel = "Private Key" + (piece.keys[i].split ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
-			let rightValue = config.hidePrivate ? null : piece.keys[i].wif;
+			let rightValue = config.showPrivate ? piece.keys[i].wif : null;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config,
 				function() {
 					onKeyPairDone();
@@ -168,7 +168,7 @@ let PieceRenderer = {
 			
 			// center currency
 			let keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
-			if (!config.hideCurrencyLogos) {
+			if (config.showCurrencyLogos) {
 				let keyDivCurrencyLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
 				keyDivCurrencyLogo.append(logo);
 			}
