@@ -206,7 +206,7 @@ input[type='number'] {
 }
 
 .split_qr {
-	width:100px;
+	width:115px;
 	height:115px;
 	margin:10px;
 }
@@ -492,14 +492,28 @@ input[type='number'] {
 
 .export_buttons {
 	display:flex;
+	align-items:center;
 	justify-content:center;
+	margin:15px;
+}
+
+.export_button {
+	background-color:white;
+	color:black;
+	margin:0 10px 0 10px;
+	padding:5px 20px 5px 20px;
+	border:2px solid;
+	-webkit-user-select: none;  
+	-moz-user-select: none;    
+	-ms-user-select: none;      
+	user-select: none;
 }
 
 .export_checkboxes {
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	padding:10px;
+	margin:15px;
 }
 
 .export_checkbox {
@@ -519,24 +533,14 @@ input[type='number'] {
 
 .export_piece_selection {
 	display:flex;
+	align-items:center;
 	justify-content:center;
-	padding:10px;
+	margin:15px;
 }
 
 .export_current_piece {
 	background-color:white;
-}
-
-.export_button {
-	background-color:white;
-	color:black;
-	margin:15px;
-	padding:5px 20px 5px 20px;
-	border:2px solid;
-	-webkit-user-select: none;  
-	-moz-user-select: none;    
-	-ms-user-select: none;      
-	user-select: none;
+	padding:25px;
 }
 
 .export_button:hover {
