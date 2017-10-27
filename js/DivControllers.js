@@ -587,7 +587,7 @@ function FormController(div) {
 				background: "white",
 				imagePosition: "left",
 				selectText: "Select a Currency",
-				defaultSelectedIndex: 0,
+				//defaultSelectedIndex: 0,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
 					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
@@ -950,31 +950,24 @@ function ExportController(div, pieces, pieceDivs) {
 		
 		// currently showing piece
 		currentPiece = $("<div class='export_current_piece'>").appendTo(div);
-		//currentPiece.append(pieceDivs[0].clone());
+		
+		// update pieces
+		updatePieces(pieces, pieceDivs);
 		
 		// done rendering
 		if (onDone) onDone(div);
 	}
 	
 	function setIncludePublic(bool) {
-		console.log("setIncludePublic(" + bool + ")");
-		setHeaderEnabled(false);
-		
-		let pieceDivs = [];
-		for (piece of pieces) pieceDivs.push($("<div>"));
-		currentPiece.empty();
-		currentPiece.append(pieceDivs[0]);
-		PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
-			console.log("Done rendering piece!");
-		});
+		updatePieces(pieces);
 	}
 	
 	function setIncludePrivate(bool) {
-		console.log("setIncludePrivate(" + bool + ")");
+		updatePieces(pieces);
 	}
 	
 	function setIncludeLogos(bool) {
-		console.log("setIncludeLogos(" + bool + ")");
+		updatePieces(pieces);
 	}
 	
 	function setHeaderEnabled(bool) {
@@ -987,6 +980,29 @@ function ExportController(div, pieces, pieceDivs) {
 			showPrivate: showPrivateCheckbox.prop('checked'),
 			showCurrencyLogos: showLogosCheckbox.prop('checked')
 		};
+	}
+	
+	function updatePieces(pieces, pieceDivs, onDone) {
+		setHeaderEnabled(false);
+		
+		// handle pieces already exist
+		if (pieceDivs) {
+			currentPiece.empty();
+			currentPiece.append(pieceDivs[0]);
+			setHeaderEnabled(true);
+			if (onDone) onDone();
+			return;
+		}
+		
+		// render pieces
+		pieceDivs = [];
+		for (piece of pieces) pieceDivs.push($("<div>"));
+		currentPiece.empty();
+		currentPiece.append(pieceDivs[0]);
+		PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
+			setHeaderEnabled(true);
+			if (onDone) onDone();
+		});
 	}
 }
 inheritsFrom(ExportController, DivController);
