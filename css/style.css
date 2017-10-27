@@ -529,3 +529,9 @@ input[type='number'] {
 .export_button:active {
 	background-color:#ABB2B9;
 }
+
+.piece_selector {
+	padding:5px;
+	font-size:18px;
+	width:125px;
+}

@@ -489,6 +489,25 @@ function FormController(div) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
+	
+	/**
+	 * Generates pieces based on the current configuration and updates the GUI.
+	 */
+	function onGeneratePieces(onDone) {
+		generateKeys(function(done, total, label) {
+			progressBar.set(done / total);
+			if (label) progressBar.setText(label);
+			progressDiv.show();
+		}, function(keys, pieces, pieceDivs) {
+			progressDiv.hide();
+			let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
+			let body = $("body", window.document);
+			new ExportController(body, pieces, null).render(function(div) {
+				if (onDone) onDone();
+			});
+		});
+	}
+	
 	function getConfig() {
 		let config = {};
 		config.passphraseChecked = passphraseCheckbox.prop('checked');
@@ -605,24 +624,6 @@ function FormController(div) {
 			trashDiv.click(function() { onDelete(); });
 			let trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
 		}
-	}
-	
-	/**
-	 * Generates pieces based on the current configuration and updates the GUI.
-	 */
-	function onGeneratePieces(onDone) {
-		generateKeys(function(done, total, label) {
-			progressBar.set(done / total);
-			if (label) progressBar.setText(label);
-			progressDiv.show();
-		}, function(keys, pieces, pieceDivs) {
-			progressDiv.hide();
-			let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
-			let body = $("body", window.document);
-			new ExportController(body, pieces, pieceDivs).render(function(div) {
-				if (onDone) onDone();
-			});
-		});
 	}
 	
 	/**
@@ -899,6 +900,7 @@ function ExportController(div, pieces, pieceDivs) {
 	let showPrivateCheckbox;
 	let showLogosCheckbox;
 	let currentPiece;
+	let pieceSelector;
 	
 	this.render = function(onDone) {
 		div.empty();
@@ -940,31 +942,29 @@ function ExportController(div, pieces, pieceDivs) {
 		showPrivateCheckbox.prop('checked', true);
 		showLogosCheckbox.prop('checked', true);
 		
-		// register click events
-		showPublicCheckbox.click(function() { update(pieces); });
-		showPrivateCheckbox.click(function() { update(pieces); });
-		showLogosCheckbox.click(function() { update(pieces); });
-		
-		// export piece selection
+		// piece selection
 		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
+		pieceSelector = $("<select class='piece_selector'>").appendTo(exportPieceSelection);
+		for (let i = 0; i < pieces.length; i++) {
+			let option = $("<option value='" + i + "'>").appendTo(pieceSelector);
+			option.html("Piece " + (i + 1));
+		}
 		
 		// currently showing piece
 		currentPiece = $("<div class='export_current_piece'>").appendTo(div);
 		
 		// update pieces
-		update(pieces, pieceDivs);
+		update(pieceDivs);
 		
-		// piece selector
-		let selector = $("<select class='piece_selector'>").appendTo(exportPieceSelection);
-		selector.change(function() {
+		// register events
+		showPublicCheckbox.click(function() { update(); });
+		showPrivateCheckbox.click(function() { update(); });
+		showLogosCheckbox.click(function() { update(); });
+		pieceSelector.change(function() {
 			currentPiece.empty();
-			currentPiece.append(pieceDivs[parseFloat(selector.find(":selected").val())]);
+			currentPiece.append(pieceDivs[parseFloat(pieceSelector.find(":selected").val())]);
 		});
-		for (let i = 0; i < pieceDivs.length; i++) {
-			let option = $("<option value='" + i + "'>").appendTo(selector);
-			option.html("Piece " + (i + 1));
-		}
-		
+
 		// done rendering
 		if (onDone) onDone(div);
 	}
@@ -977,13 +977,14 @@ function ExportController(div, pieces, pieceDivs) {
 		};
 	}
 	
-	function update(pieces, pieceDivs, onDone) {
+	function update(existingPieceDivs, onDone) {
 		updateHeader();
+		pieceDivs = existingPieceDivs;
 		
 		// handle pieces already exist
 		if (pieceDivs) {
 			currentPiece.empty();
-			currentPiece.append(pieceDivs[0]);
+			currentPiece.append(pieceDivs[parseFloat(pieceSelector.find(":selected").val())]);
 			if (onDone) onDone();
 			return;
 		}
@@ -992,7 +993,7 @@ function ExportController(div, pieces, pieceDivs) {
 		pieceDivs = [];
 		for (piece of pieces) pieceDivs.push($("<div>"));
 		currentPiece.empty();
-		currentPiece.append(pieceDivs[0]);
+		currentPiece.append(pieceDivs[parseFloat(pieceSelector.find(":selected").val())]);
 		PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
 			if (onDone) onDone();
 		});
