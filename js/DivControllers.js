@@ -587,12 +587,13 @@ function FormController(div) {
 				background: "white",
 				imagePosition: "left",
 				selectText: "Select a Currency",
+				defaultSelectedIndex: 0,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
 					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
 			});
-			selector = $("#currency_selector");	// necessary for proper reference which ddslick uses
+			selector = $("#currency_selector");	// ddslick requires id reference
 			
 			// create right div
 			let rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
@@ -925,16 +926,23 @@ function ExportController(div, pieces, pieceDivs) {
 		showPublicCheckbox = $("<input type='checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		let showPublicCheckboxLabel = $("<label for='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		showPublicCheckboxLabel.html("&nbspShow public addresses");
-		showPublicCheckbox.click(function() { setIncludePublic(showPublicCheckbox.prop('checked')); });
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
 		showPrivateCheckbox = $("<input type='checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
 		let showPrivateCheckboxLabel = $("<label for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
 		showPrivateCheckboxLabel.html("&nbspShow private keys");
-		showPrivateCheckbox.click(function() { setIncludePrivate(showPrivateCheckbox.prop('checked')); });
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
 		showLogosCheckbox = $("<input type='checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
 		let showLogosCheckboxLabel = $("<label for='showLogosCheckbox'>").appendTo(exportCheckboxes);
 		showLogosCheckboxLabel.html("&nbspShow currency logos");
+		
+		// apply default state
+		showPublicCheckbox.prop('checked', true);
+		showPrivateCheckbox.prop('checked', true);
+		showLogosCheckbox.prop('checked', true);
+		
+		// register click events
+		showPublicCheckbox.click(function() { setIncludePublic(showPublicCheckbox.prop('checked')); });
+		showPrivateCheckbox.click(function() { setIncludePrivate(showPrivateCheckbox.prop('checked')); });
 		showLogosCheckbox.click(function() { setIncludeLogos(showLogosCheckbox.prop('checked')); });
 		
 		// export piece selection
