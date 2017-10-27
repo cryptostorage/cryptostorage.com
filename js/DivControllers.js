@@ -502,7 +502,7 @@ function FormController(div) {
 			progressDiv.hide();
 			let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
 			let body = $("body", window.document);
-			new ExportController(body, pieces, null).render(function(div) {
+			new ExportController(body, pieces, pieceDivs).render(function(div) {
 				if (onDone) onDone();
 			});
 		});
