@@ -10,6 +10,9 @@
 // piece export: print, download, select pieces
 // faster load time
 
+// kill old render jobs if no longer needed
+// ddslick defaultSelectedIndex:0 error
+
 // slider:
 // prevent scroll revealing some of next picture
 // sometimes scroll timer doesn't start for like 8 seconds - new slider?
