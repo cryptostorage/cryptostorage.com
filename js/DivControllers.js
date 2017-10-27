@@ -925,17 +925,17 @@ function ExportController(div, pieces, pieceDivs) {
 		
 		// export checkboxes
 		let exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
-		showPublicCheckbox = $("<input type='checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
-		let showPublicCheckboxLabel = $("<label for='showPublicCheckbox'>").appendTo(exportCheckboxes);
-		showPublicCheckboxLabel.html("&nbspShow public addresses");
+		showPublicCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
+		let showPublicCheckboxLabel = $("<label class='export_checkbox_label' for='showPublicCheckbox'>").appendTo(exportCheckboxes);
+		showPublicCheckboxLabel.html("Show public addresses");
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
-		showPrivateCheckbox = $("<input type='checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
-		let showPrivateCheckboxLabel = $("<label for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
-		showPrivateCheckboxLabel.html("&nbspShow private keys");
+		showPrivateCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
+		let showPrivateCheckboxLabel = $("<label class='export_checkbox_label' for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
+		showPrivateCheckboxLabel.html("Show private keys");
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
-		showLogosCheckbox = $("<input type='checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
-		let showLogosCheckboxLabel = $("<label for='showLogosCheckbox'>").appendTo(exportCheckboxes);
-		showLogosCheckboxLabel.html("&nbspShow currency logos");
+		showLogosCheckbox = $("<input type='checkbox' class='export_checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
+		let showLogosCheckboxLabel = $("<label class='export_checkbox_label' for='showLogosCheckbox'>").appendTo(exportCheckboxes);
+		showLogosCheckboxLabel.html("Show currency logos");
 		
 		// apply default state
 		showPublicCheckbox.prop('checked', true);
