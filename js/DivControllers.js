@@ -954,6 +954,17 @@ function ExportController(div, pieces, pieceDivs) {
 		// update pieces
 		update(pieces, pieceDivs);
 		
+		// piece selector
+		let selector = $("<select class='piece_selector'>").appendTo(exportPieceSelection);
+		selector.change(function() {
+			currentPiece.empty();
+			currentPiece.append(pieceDivs[parseFloat(selector.find(":selected").val())]);
+		});
+		for (let i = 0; i < pieceDivs.length; i++) {
+			let option = $("<option value='" + i + "'>").appendTo(selector);
+			option.html("Piece " + (i + 1));
+		}
+		
 		// done rendering
 		if (onDone) onDone(div);
 	}
@@ -973,7 +984,6 @@ function ExportController(div, pieces, pieceDivs) {
 		if (pieceDivs) {
 			currentPiece.empty();
 			currentPiece.append(pieceDivs[0]);
-			setHeaderEnabled(true);
 			if (onDone) onDone();
 			return;
 		}
