@@ -996,6 +996,7 @@ function ExportController(div, window, pieces, pieceDivs) {
 	}
 	
 	function update(existingPieceDivs, onDone) {
+		updateHeader();
 		pieceDivs = existingPieceDivs;
 		
 		// handle pieces already exist
