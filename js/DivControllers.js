@@ -962,13 +962,14 @@ function ExportController(div, window, pieces, pieceDivs) {
 		showPrivateCheckbox.click(function() { update(); });
 		showLogosCheckbox.click(function() { update(); });
 		pieceSelector.change(function() {
-			currentPiece.empty();
-			currentPiece.append(pieceDivs[parseFloat(pieceSelector.find(":selected").val())]);
+			setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
 		});
 
 		// done rendering
 		if (onDone) onDone(div);
 	}
+	
+	// --------------------------------- PRIVATE --------------------------------
 	
 	function getPieceRendererConfig() {
 		return {
@@ -978,28 +979,9 @@ function ExportController(div, window, pieces, pieceDivs) {
 		};
 	}
 	
-	function update(existingPieceDivs, onDone) {
-		pieceDivs = existingPieceDivs;
-		
-		// handle pieces already exist
-		if (pieceDivs) {
-			currentPiece.empty();
-			currentPiece.append(pieceDivs[parseFloat(pieceSelector.find(":selected").val())]);
-			setPrintEnabled(true);
-			if (onDone) onDone();
-			return;
-		}
-		
-		// render pieces
-		pieceDivs = [];
-		for (piece of pieces) pieceDivs.push($("<div>"));
-		currentPiece.empty();
-		currentPiece.append(pieceDivs[parseFloat(pieceSelector.find(":selected").val())]);
-		setPrintEnabled(false);
-		PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
-			setPrintEnabled(true);
-			if (onDone) onDone();
-		});
+	function printAll() {
+		if (!printEnabled) return;
+		window.print();
 	}
 	
 	function setPrintEnabled(bool) {
@@ -1013,10 +995,44 @@ function ExportController(div, window, pieces, pieceDivs) {
 		}
 	}
 	
-	function printAll() {
-		if (!printEnabled) return;
-		console.log("PRINT!");
-		window.print();
+	function update(existingPieceDivs, onDone) {
+		pieceDivs = existingPieceDivs;
+		
+		// handle pieces already exist
+		if (pieceDivs) {
+			setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
+			setPieceDivs(pieceDivs);
+			setPrintEnabled(true);
+			if (onDone) onDone();
+			return;
+		}
+		
+		// render pieces
+		pieceDivs = [];
+		for (piece of pieces) pieceDivs.push($("<div>"));
+		setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
+		setPieceDivs(pieceDivs);
+		setPrintEnabled(false);
+		PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
+			setPrintEnabled(true);
+			if (onDone) onDone();
+		});
+	}
+	
+	function setPieceDivs(pieceDivs) {
+		currentPiece.empty();
+		for (let pieceDiv of pieceDivs) currentPiece.append(pieceDiv);
+	}
+	
+	/**
+	 * Adds the hidden class to each of the given divs except at the given idx.
+	 */
+	function setVisible(divs, idx) {
+		console.log("setVisible(" + idx + ")");
+		for (let i = 0; i < divs.length; i++) {
+			if (i === idx) divs[i].removeClass("hidden");
+			else divs[i].addClass("hidden");
+		}
 	}
 	
 	function updateHeader() {

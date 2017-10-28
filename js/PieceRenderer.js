@@ -89,7 +89,7 @@ let PieceRenderer = {
 		
 		// div setup
 		pieceDiv.empty();
-		pieceDiv.attr("class", "piece_div");
+		pieceDiv.addClass("piece_div");
 		
 		// merge configs
 		config = Object.assign({}, PieceRenderer.defaultConfig, config);

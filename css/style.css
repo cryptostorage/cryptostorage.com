@@ -577,12 +577,21 @@ input[type='number'] {
 	body * {
 	  visibility: hidden;
 	}
-	.piece_div, .piece_div * {
-	  visibility: visible;
+	.export_current_piece, .export_current_piece * {
+		visibility: visible;
+	}
+	.export_current_piece {
+		position: absolute;
+		left:0;
+		top;0;
+		margin:0;
+		padding:0;
 	}
 	.piece_div {
-	  position: absolute;
-	  left: 0;
-	  top: 0;
+		display:block !important;
 	}
+}
+
+.hidden {
+	display:none;
 }
