@@ -990,7 +990,6 @@ function ExportController(div, window, pieces, pieceDivs) {
 		assertTrue(pieces.length > 0);
 		if (pieces.length === 1) {
 			let jsonStr = CryptoUtils.pieceToJson(pieces[0]);
-			console.log(jsonStr);
 			saveAs(new Blob([jsonStr]), "piece.json");
 		} else {
 			
