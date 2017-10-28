@@ -555,6 +555,7 @@ function FormController(div) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
+		let that = this;
 		let selectedPlugin;
 		let numKeysInput;
 		let selector;
@@ -605,13 +606,14 @@ function FormController(div) {
 				background: "white",
 				imagePosition: "left",
 				selectText: "Select a Currency",
-				//defaultSelectedIndex: 0,
+				defaultSelectedIndex: 0,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
 					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
 			});
 			selector = $("#currency_selector");	// ddslick requires id reference
+			that.setSelectedCurrency("Bitcoin");	// default value
 			
 			// create right div
 			let rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
