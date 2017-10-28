@@ -492,7 +492,7 @@ function FormController(div) {
 	/**
 	 * Generates pieces based on the current configuration and updates the GUI.
 	 */
-	function onGeneratePieces(window, onDone) {
+	function onGeneratePieces(onDone) {
 		generateKeys(function(done, total, label) {
 			progressBar.set(done / total);
 			if (label) progressBar.setText(label);
