@@ -489,7 +489,6 @@ function FormController(div) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
-	
 	/**
 	 * Generates pieces based on the current configuration and updates the GUI.
 	 */
@@ -502,7 +501,7 @@ function FormController(div) {
 			progressDiv.hide();
 			let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
 			let body = $("body", window.document);
-			new ExportController(body, pieces, pieceDivs).render(function(div) {
+			new ExportController(body, window, pieces, pieceDivs).render(function(div) {
 				if (onDone) onDone();
 			});
 		});
@@ -893,7 +892,7 @@ inheritsFrom(RecoverController, DivController);
  * @param pieces are the pieces to export
  * @param pieceDivs are pre-rendered piece divs for display
  */
-function ExportController(div, pieces, pieceDivs) {
+function ExportController(div, window, pieces, pieceDivs) {
 	DivController.call(this, div);
 	
 	let printButton;
@@ -986,6 +985,7 @@ function ExportController(div, pieces, pieceDivs) {
 		if (pieceDivs) {
 			currentPiece.empty();
 			currentPiece.append(pieceDivs[parseFloat(pieceSelector.find(":selected").val())]);
+			setPrintEnabled(true);
 			if (onDone) onDone();
 			return;
 		}
@@ -1016,6 +1016,7 @@ function ExportController(div, pieces, pieceDivs) {
 	function printAll() {
 		if (!printEnabled) return;
 		console.log("PRINT!");
+		window.print();
 	}
 	
 	function updateHeader() {

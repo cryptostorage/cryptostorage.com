@@ -569,3 +569,17 @@ input[type='number'] {
 	font-size:18px;
 	width:125px;
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .export_current_piece, .export_current_piece * {
+    visibility: visible;
+  }
+  .export_current_piece {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}
