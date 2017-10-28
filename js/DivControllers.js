@@ -896,11 +896,13 @@ inheritsFrom(RecoverController, DivController);
 function ExportController(div, pieces, pieceDivs) {
 	DivController.call(this, div);
 	
+	let printButton;
 	let showPublicCheckbox;
 	let showPrivateCheckbox;
 	let showLogosCheckbox;
 	let currentPiece;
 	let pieceSelector;
+	let printEnabled;
 	
 	this.render = function(onDone) {
 		div.empty();
@@ -910,9 +912,9 @@ function ExportController(div, pieces, pieceDivs) {
 		
 		// export buttons
 		let exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
-		let printButton = $("<div class='export_button'>").appendTo(exportButtons);
+		printButton = $("<div class='export_button'>").appendTo(exportButtons);
 		printButton.html("Print All");
-		printButton.click(function() { console.log("Print All"); });
+		printButton.click(function() { printAll(); });
 		let exportButton = $("<div class='export_button'>").appendTo(exportButtons);
 		exportButton.html("Export All");
 		exportButton.click(function() { console.log("Export All"); });
@@ -978,7 +980,6 @@ function ExportController(div, pieces, pieceDivs) {
 	}
 	
 	function update(existingPieceDivs, onDone) {
-		updateHeader();
 		pieceDivs = existingPieceDivs;
 		
 		// handle pieces already exist
@@ -994,9 +995,27 @@ function ExportController(div, pieces, pieceDivs) {
 		for (piece of pieces) pieceDivs.push($("<div>"));
 		currentPiece.empty();
 		currentPiece.append(pieceDivs[parseFloat(pieceSelector.find(":selected").val())]);
+		setPrintEnabled(false);
 		PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
+			setPrintEnabled(true);
 			if (onDone) onDone();
 		});
+	}
+	
+	function setPrintEnabled(bool) {
+		printEnabled = bool;
+		if (bool) {
+			printButton.addClass("export_button");
+			printButton.removeClass("export_button_disabled");
+		} else {
+			printButton.addClass("export_button_disabled");
+			printButton.removeClass("export_button");
+		}
+	}
+	
+	function printAll() {
+		if (!printEnabled) return;
+		console.log("PRINT!");
 	}
 	
 	function updateHeader() {

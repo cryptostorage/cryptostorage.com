@@ -509,6 +509,27 @@ input[type='number'] {
 	user-select: none;
 }
 
+.export_button:hover {
+	cursor:pointer;
+	background-color:#EBEDEF;
+}
+
+.export_button:active {
+	background-color:#ABB2B9;
+}
+
+.export_button_disabled {
+	background-color:white;
+	color:grey;
+	margin:0 10px 0 10px;
+	padding:5px 20px 5px 20px;
+	border:2px solid black;
+	-webkit-user-select: none;  
+	-moz-user-select: none;    
+	-ms-user-select: none;      
+	user-select: none;
+}
+
 .export_checkboxes {
 	display:flex;
 	align-items:center;
@@ -541,15 +562,6 @@ input[type='number'] {
 .export_current_piece {
 	background-color:white;
 	padding:25px;
-}
-
-.export_button:hover {
-	cursor:pointer;
-	background-color:#EBEDEF;
-}
-
-.export_button:active {
-	background-color:#ABB2B9;
 }
 
 .piece_selector {
