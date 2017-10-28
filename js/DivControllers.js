@@ -918,7 +918,7 @@ function ExportController(div, window, pieces, pieceDivs) {
 		printButton.click(function() { printAll(); });
 		let exportButton = $("<div class='export_button'>").appendTo(exportButtons);
 		exportButton.html("Export All");
-		exportButton.click(function() { console.log("Export All"); });
+		exportButton.click(function() { exportAll(); });
 		let savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
 		savePublicButton.click(function() { console.log("Save Public Addresses"); });
@@ -984,6 +984,17 @@ function ExportController(div, window, pieces, pieceDivs) {
 	function printAll() {
 		if (!printEnabled) return;
 		window.print();
+	}
+	
+	function exportAll() {
+		assertTrue(pieces.length > 0);
+		if (pieces.length === 1) {
+			let jsonStr = CryptoUtils.pieceToJson(pieces[0]);
+			console.log(jsonStr);
+			saveAs(new Blob([jsonStr]), "piece.json");
+		} else {
+			
+		}
 	}
 	
 	function setPrintEnabled(bool) {
