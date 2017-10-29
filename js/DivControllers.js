@@ -1043,7 +1043,6 @@ function ExportController(div, window, pieces, pieceDivs) {
 	 * Adds the hidden class to each of the given divs except at the given idx.
 	 */
 	function setVisible(divs, idx) {
-		console.log("setVisible(" + idx + ")");
 		for (let i = 0; i < divs.length; i++) {
 			if (i === idx) divs[i].removeClass("hidden");
 			else divs[i].addClass("hidden");
