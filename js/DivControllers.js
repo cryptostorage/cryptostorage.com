@@ -881,7 +881,11 @@ inheritsFrom(RecoverController, DivController);
 function RecoverFileController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
-		div.append("Recover from file");
+		
+		let additionalPiecesDiv = $("<div class='recover_additional_pieces'>").appendTo(div);
+		additionalPiecesDiv.append("Need additional pieces to recover private keys");
+		let dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(div);
+		dragDropDiv.append("Drag and drop");
 		
 		// done rendering
 		if (onDone) onDone(div);

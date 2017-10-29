@@ -486,6 +486,22 @@ input[type='number'] {
 	background-color:rgb(93, 159, 252);
 }
 
+.recover_content_div {
+	padding:20px 50px 15px 50px;
+}
+
+.recover_additional_pieces {
+	padding:5px;
+	margin-bottom:20px;
+	text-align:center;
+	background-color:rgb(247, 185, 43);
+}
+
+.recover_drag_drop {
+	background-color:white;
+	padding:25px;
+}
+
 .export_header {
 	background-color:rgb(17, 119, 184);
 	width:100%;
