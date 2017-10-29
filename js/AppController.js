@@ -10,6 +10,7 @@
 // piece export: print, download, select pieces
 // faster load time
 
+// load all of home page when all images loaded
 // kill old render jobs if no longer needed
 // ddslick defaultSelectedIndex:0 error
 // ddslick id cannot be re-used across selectors
