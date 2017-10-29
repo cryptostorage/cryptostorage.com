@@ -548,6 +548,7 @@ input[type='number'] {
 .export_checkbox_label {
 	color:white;
 	cursor:pointer;
+	font-size:24px;
 	font-weight:lighter;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
