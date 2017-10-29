@@ -462,15 +462,15 @@ input[type='number'] {
 	height:100px;
 }
 
-.import_div {
+.recover_div {
 	background-color:rgb(17, 119, 184);
 }
 
-.import_tabs_div {
+.recover_tabs_div {
 	display:flex;
 }
 
-.import_tab_div {
+.recover_tab_div {
 	flex:1;
 	text-align:center;
 	padding:20px;
@@ -478,7 +478,7 @@ input[type='number'] {
 	font-size:24px;
 }
 
-.import_tab_div:hover {
+.recover_tab_div:hover {
 	cursor:pointer;
 }
 

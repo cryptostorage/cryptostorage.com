@@ -823,35 +823,48 @@ function RecoverController(div) {
 		div.empty();
 		div.attr("class", "recover_page");
 		
+		// filler to push recover div down
 		$("<div class='recover_filler'>").appendTo(div);
-		let importDiv = $("<div class='import_div'>").appendTo(div);
-		let tabsDiv = $("<div class='import_tabs_div'>").appendTo(importDiv);
-		let importFromFileTab = $("<div class='import_tab_div'>").appendTo(tabsDiv);
-		importFromFileTab.html("Import From File");
-		importFromFileTab.click(function() { selectTab("file"); });
-		let importFromTextTab = $("<div class='import_tab_div'>").appendTo(tabsDiv);
-		importFromTextTab.html("Import From Text");
-		importFromTextTab.click(function() { selectTab("text"); });
-		let importContentDiv = $("<div class='import_content_div'>").appendTo(importDiv);
-		importContentDiv.append("Content");
+		let recoverDiv = $("<div class='recover_div'>").appendTo(div);
 		
-		// start on file tab by default
-		selectTab("file");
+		// set up recover div
+		let tabsDiv = $("<div class='recover_tabs_div'>").appendTo(recoverDiv);
+		let recoverFileTab = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		recoverFileTab.html("Recover From File");
+		recoverFileTab.click(function() { selectTab("file"); });
+		let recoverTextTab = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		recoverTextTab.html("Recover From Text");
+		recoverTextTab.click(function() { selectTab("text"); });
+		let recoverContentDiv = $("<div class='recover_content_div'>").appendTo(recoverDiv);
+		recoverContentDiv.append("Content");
 		
-		// done rendering
-		if (onDone) onDone(div);
+		// render recover file and text divs
+		let recoverFileDiv = $("<div>");
+		let recoverTextDiv = $("<div>");
+		new RecoverFileController(recoverFileDiv).render(function() {
+			new RecoverTextController(recoverTextDiv).render(function() {
+				
+				// start on file tab by default
+				selectTab("file");
+				
+				// done rendering
+				if (onDone) onDone(div);
+			});
+		});
 		
 		function selectTab(selected) {
 			switch (selected) {
 			case "file":
-				importFromFileTab.addClass("active_tab");
-				importFromTextTab.removeClass("active_tab");
-				console.log("Import From File");
+				recoverFileTab.addClass("active_tab");
+				recoverTextTab.removeClass("active_tab");
+				recoverContentDiv.empty();
+				recoverContentDiv.append(recoverFileDiv);
 				break;
 			case "text":
-				importFromFileTab.removeClass("active_tab");
-				importFromTextTab.addClass("active_tab");
-				console.log("Import From Text");
+				recoverFileTab.removeClass("active_tab");
+				recoverTextTab.addClass("active_tab");
+				recoverContentDiv.empty();
+				recoverContentDiv.append(recoverTextDiv);
 				break;
 			default: throw new Error("Unrecognized selection: " + selected);
 			}
@@ -859,6 +872,38 @@ function RecoverController(div) {
 	}
 }
 inheritsFrom(RecoverController, DivController);
+
+/**
+ * Controller to recover from file.
+ * 
+ * @param div is the div to render to
+ */
+function RecoverFileController(div) {
+	DivController.call(this, div);
+	this.render = function(onDone) {
+		div.append("Recover from file");
+		
+		// done rendering
+		if (onDone) onDone(div);
+	}
+}
+inheritsFrom(RecoverFileController, DivController);
+
+/**
+ * Controller to recover from text.
+ * 
+ * @param div is the div to render to
+ */
+function RecoverTextController(div) {
+	DivController.call(this, div);
+	this.render = function(onDone) {
+		div.append("Recover from text");
+		
+		// done rendering
+		if (onDone) onDone(div);
+	}
+}
+inheritsFrom(RecoverTextController, DivController);
 
 /**
  * Export page.
