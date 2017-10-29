@@ -992,7 +992,9 @@ function ExportController(div, window, pieces, pieceDivs) {
 			let jsonStr = CryptoUtils.pieceToJson(pieces[0]);
 			saveAs(new Blob([jsonStr]), "piece.json");
 		} else {
-			
+			CryptoUtils.piecesToZip(pieces, function(name, blob) {
+				saveAs(blob, name);
+			});
 		}
 	}
 	

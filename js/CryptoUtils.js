@@ -360,10 +360,9 @@ let CryptoUtils = {
 	 * Zips the given pieces.
 	 * 
 	 * @param pieces are the pieces to zip
-	 * @param pieceHtmls are rendered HTML pieces to include in the zips
 	 * @param callback(name, blob) is invoked when zipping is complete
 	 */
-	piecesToZip: function(pieces, pieceHtmls, callback) {
+	piecesToZip: function(pieces, callback) {
 		assertTrue(pieces.length > 0, "Pieces cannot be empty");
 		
 		// get crypto identifier
@@ -373,42 +372,16 @@ let CryptoUtils = {
 		}
 		let crypto = tickers.length === 1 ? tickers[0].toLowerCase() : "mix";
 		
-		// prepare zips for each piece
-		let zips = [];
+		// prepare zip
+		let zip = JSZip();
 		for (let i = 0; i < pieces.length; i++) {
 			let name = crypto + (pieces.length > 1 ? "_" + (i + 1) : "");
-			let path = "cryptostorage_" + name + "/" + name;
-			let zip = new JSZip();
-			zip.file(path + ".html", getOuterHtml(pieceHtmls[i]));
-			zip.file(path + ".csv", CryptoUtils.pieceToCsv(pieces[i]));
-			zip.file(path + ".txt", CryptoUtils.pieceToStr(pieces[i]));
-			zip.file(path + "_addresses.txt", CryptoUtils.pieceToAddresses(pieces[i]));
-			zip.file(path + ".json", CryptoUtils.pieceToJson(pieces[i]));
-			zips.push(zip);
+			zip.file(name + ".json", CryptoUtils.pieceToJson(pieces[i]));
 		}
 		
-		// get callback functions to generate zips
-		let funcs = [];
-		for (let zip of zips) {
-			funcs.push(function(callback) { zip.generateAsync({type:"blob"}).then(function(blob) { callback(null, blob) }); });
-		}
-		
-		// zip in parallel
-		async.parallel(funcs, function(err, blobs) {
-			if (err) throw err;
-			let name = "cryptostorage_" + crypto;
-			if (blobs.length === 1) callback(name + ".zip", blobs[0]);
-			else {
-				
-				// zip the zips
-				let zip = new JSZip();
-				for (let i = 0; i < blobs.length; i++) {
-					zip.file(name + "/" + name + "_" + (i + 1) + ".zip", blobs[i]);
-				}
-				zip.generateAsync({type:"blob"}).then(function(blob) {
-					callback(name + ".zip", blob);
-				});
-			}
+		// create zip
+		zip.generateAsync({type:"blob"}).then(function(blob) {
+			callback("cryptostorage_" + crypto + ".zip", blob);
 		});
 	},
 
