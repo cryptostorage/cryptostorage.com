@@ -541,7 +541,6 @@ input[type='number'] {
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	padding:5px;
 }
 
 .recover_files_start_over_link {
@@ -572,7 +571,7 @@ input[type='number'] {
 	color:black;
 	margin:0 10px 0 10px;
 	padding:5px 20px 5px 20px;
-	border:2px solid;
+	border:2px solid black;
 	font-size:26px;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
@@ -595,6 +594,7 @@ input[type='number'] {
 	margin:0 10px 0 10px;
 	padding:5px 20px 5px 20px;
 	border:2px solid black;
+	font-size:26px;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
 	-ms-user-select: none;      

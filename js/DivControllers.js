@@ -885,6 +885,7 @@ function RecoverFileController(div) {
 		// additional pieces div
 		let additionalPiecesDiv = $("<div class='recover_additional_pieces'>").appendTo(div);
 		additionalPiecesDiv.append("Need additional pieces to recover private keys");
+		//additionalPiecesDiv.hide();
 		
 		// drag and drop div
 		let dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(div);
@@ -898,6 +899,7 @@ function RecoverFileController(div) {
 		// imported files
 		let importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(div);
 		importedFilesDiv.append("Imported files go here...");
+		//importedFilesDiv.hide();
 		
 		// start over
 		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(div);
