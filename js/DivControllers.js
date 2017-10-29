@@ -529,7 +529,7 @@ function FormController(div) {
 		if (DEBUG) console.log("addCurrency()");
 		
 		// create input
-		let currencyInput = new CurrencyInput($("<div>"), CryptoUtils.getCryptoPlugins(), function() {
+		let currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, CryptoUtils.getCryptoPlugins(), function() {
 			removeCurrency(currencyInput);
 		});
 		
@@ -549,9 +549,10 @@ function FormController(div) {
 	 * Encapsulate a currency input.
 	 * 
 	 * @param div is the div to render to
+	 * @param idx is the index of this input relative to the other inputs to accomodate ddslick's id requirement
 	 * @param onDelete is invoked when the user delets this input
 	 */
-	function CurrencyInput(div, plugins, onDelete) {
+	function CurrencyInput(div, idx, plugins, onDelete) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
@@ -570,7 +571,7 @@ function FormController(div) {
 		}
 		
 		this.setSelectedCurrency = function(name) {
-			selector = $("#currency_selector");
+			//selector = $("#currency_selector");
 			for (let i = 0; i < selectorData.length; i++) {
 				if (selectorData[i].text === name) {
 					selector.ddslick('select', {index: i});
@@ -600,7 +601,7 @@ function FormController(div) {
 			}
 			
 			// create pull down
-			selector = $("<div id='currency_selector'>").appendTo(div);
+			selector = $("<div id='currency_selector_" + idx + "'>").appendTo(div);
 			selector.ddslick({
 				data:selectorData,
 				background: "white",
@@ -612,7 +613,7 @@ function FormController(div) {
 					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
 			});
-			selector = $("#currency_selector");	// ddslick requires id reference
+			selector = $("#currency_selector_" + idx);	// ddslick requires id reference
 			that.setSelectedCurrency("Bitcoin");	// default value
 			
 			// create right div
