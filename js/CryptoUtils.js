@@ -365,23 +365,19 @@ let CryptoUtils = {
 	piecesToZip: function(pieces, callback) {
 		assertTrue(pieces.length > 0, "Pieces cannot be empty");
 		
-		// get crypto identifier
-		let tickers = [];
-		for (let pieceKey of pieces[0].keys) {
-			if (!contains(tickers, pieceKey.ticker)) tickers.push(pieceKey.ticker);
-		}
-		let crypto = tickers.length === 1 ? tickers[0].toLowerCase() : "mix";
+		// get common ticker
+		let ticker = CryptoUtils.getCommonTicker(pieces[0]).toLowerCase();
 		
 		// prepare zip
 		let zip = JSZip();
 		for (let i = 0; i < pieces.length; i++) {
-			let name = crypto + (pieces.length > 1 ? "_" + (i + 1) : "");
+			let name = ticker + (pieces.length > 1 ? "_" + (i + 1) : "");
 			zip.file(name + ".json", CryptoUtils.pieceToJson(pieces[i]));
 		}
 		
 		// create zip
 		zip.generateAsync({type:"blob"}).then(function(blob) {
-			callback("cryptostorage_" + crypto + ".zip", blob);
+			callback("cryptostorage_" + ticker + ".zip", blob);
 		});
 	},
 
@@ -502,5 +498,15 @@ let CryptoUtils = {
 			assertDefined(key.split, "piece.split is not defined");
 			//assertDefined(key.wif, "piece.wif is not defined");
 		}
+	},
+	
+	getCommonTicker: function(piece) {
+		assertTrue(piece.keys.length > 0);
+		let ticker;
+		for (let pieceKey of piece.keys) {
+			if (!ticker) ticker = pieceKey.ticker;
+			else if (ticker !== pieceKey.ticker) return "mix";
+		}
+		return ticker;
 	}
 }

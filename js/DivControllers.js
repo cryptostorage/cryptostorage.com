@@ -7,34 +7,6 @@ let UiUtils = {
 		div.empty();
 		div.attr("class", "page_div");
 	},
-
-	getCryptoName: function(state) {
-		if (state.mix) return state.mix.length > 1 ? "mixed" : state.mix[0].plugin.getName();
-		else {
-			let name;
-			for (let key of state.keys) {
-				if (!name) name = key.getPlugin().getName();
-				else if (name !== key.getPlugin().getName()) return "mixed";
-			}
-			return name;
-		}
-	},
-	
-	getCryptoLogo: function(state) {
-		if (state.mix) return state.mix.length === 1 ? state.mix[0].plugin.getLogo() : this.getMixLogo();
-		else {
-			let ticker;
-			for (let key of state.keys) {
-				if (!ticker) ticker = key.getPlugin().getTicker();
-				else if (ticker !== key.getPlugin().getTicker()) return this.getMixLogo();
-			}
-			return CryptoUtils.getCryptoPlugin(ticker).getLogo();
-		}
-	},
-	
-	getMixLogo: function() {
-		return $("<img src='img/mix.png'>");
-	},
 	
 	getProgressBar: function(div) {
 		return new ProgressBar.Line(div.get(0), {
@@ -922,7 +894,7 @@ function ExportController(div, window, pieces, pieceDivs) {
 		exportButton.click(function() { exportAll(); });
 		let savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
-		savePublicButton.click(function() { console.log("Save Public Addresses"); });
+		savePublicButton.click(function() { savePublicAddresses(); });
 		let moreButton = $("<div class='export_button'>").appendTo(exportButtons);
 		moreButton.html("...");
 		moreButton.click(function() { console.log("More button clicked"); });
@@ -991,12 +963,18 @@ function ExportController(div, window, pieces, pieceDivs) {
 		assertTrue(pieces.length > 0);
 		if (pieces.length === 1) {
 			let jsonStr = CryptoUtils.pieceToJson(pieces[0]);
-			saveAs(new Blob([jsonStr]), "piece.json");
+			saveAs(new Blob([jsonStr]), "cryptostorage_" + CryptoUtils.getCommonTicker(pieces[0]).toLowerCase() + ".json");
 		} else {
 			CryptoUtils.piecesToZip(pieces, function(name, blob) {
 				saveAs(blob, name);
 			});
 		}
+	}
+	
+	function savePublicAddresses() {
+		assertTrue(pieces.length > 0);
+		let publicAddressesStr = CryptoUtils.pieceToAddresses(pieces[0]);
+		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + CryptoUtils.getCommonTicker(pieces[0]).toLowerCase() + "_public_addresses.txt");
 	}
 	
 	function setPrintEnabled(bool) {
