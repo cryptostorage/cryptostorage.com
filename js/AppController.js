@@ -14,6 +14,7 @@
 // kill old render jobs if no longer needed
 // ddslick defaultSelectedIndex:0 error
 // ddslick id cannot be re-used across selectors
+// no padding on slider
 
 // slider:
 // prevent scroll revealing some of next picture
