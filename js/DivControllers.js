@@ -882,10 +882,27 @@ function RecoverFileController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		
+		// additional pieces div
 		let additionalPiecesDiv = $("<div class='recover_additional_pieces'>").appendTo(div);
 		additionalPiecesDiv.append("Need additional pieces to recover private keys");
+		
+		// drag and drop div
 		let dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(div);
-		dragDropDiv.append("Drag and drop");
+		let dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
+		let dragDropText = $("<div class='drag_drop_text'>").appendTo(dragDropDiv);
+		let dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
+		dragDropLabel.append("Drag and Drop Files To Import");
+		let dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
+		dragDropBrowse.append("or click to browse");
+		
+		// imported files
+		let importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(div);
+		importedFilesDiv.append("Imported files go here...");
+		
+		// start over
+		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(div);
+		let startOverLink = $("<div class='recover_files_start_over_link'>").appendTo(startOverDiv);
+		startOverLink.append("start over");
 		
 		// done rendering
 		if (onDone) onDone(div);

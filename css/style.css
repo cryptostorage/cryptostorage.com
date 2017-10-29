@@ -487,7 +487,7 @@ input[type='number'] {
 }
 
 .recover_content_div {
-	padding:20px 50px 15px 50px;
+	padding:20px 50px 20px 50px;
 }
 
 .recover_additional_pieces {
@@ -499,7 +499,59 @@ input[type='number'] {
 
 .recover_drag_drop {
 	background-color:white;
-	padding:25px;
+	padding:30px;
+	margin-bottom:20px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+
+.drag_drop_img {
+	width:150px;
+	height:150px;
+	margin-right:60px;
+}
+
+.drag_drop_text {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+}
+
+.drag_drop_label {
+	font-size:30px;
+	font-weight:bold;
+}
+
+.drag_drop_browse {
+	font-size:20px;
+	color: rgb(21, 121, 185);
+}
+
+.drag_drop_browse:hover {
+	cursor:pointer;
+}
+
+.recover_files_imported {
+	color:white;
+	padding:5px;
+}
+
+.recover_files_start_over {
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	padding:5px;
+}
+
+.recover_files_start_over_link {
+	font-size:20px;
+	color:white;
+	text-decoration:underline;
+}
+
+.recover_files_start_over_link:hover {
+	cursor:pointer;
 }
 
 .export_header {
