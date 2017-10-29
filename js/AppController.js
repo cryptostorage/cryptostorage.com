@@ -12,8 +12,6 @@
 
 // load all of home page when all images loaded
 // kill old render jobs if no longer needed
-// ddslick defaultSelectedIndex:0 error
-// ddslick id cannot be re-used across selectors
 // no padding on slider
 
 // slider:
@@ -42,7 +40,6 @@
 // code scan
 
 // consult designers
-// hover colors on front page - underlines on links
 // opinion on donate page + ui designer tip address - link to open user's wallet
 // color of 'c' within cs logo - little bit lighter
 // error messages on key generation page - let them click button once, outline with red, deactivate until they fix.  Constrain split input and keep in sync
