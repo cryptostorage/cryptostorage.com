@@ -25,7 +25,7 @@ ol {
 .app_header {
 	padding:20px;
 	width:100%;
-	background-color:rgb(66, 116, 184);
+	background-color:rgb(17, 119, 184);
 }
 
 .app_header_top {
@@ -70,7 +70,7 @@ ol {
 .intro_div {
 	padding-top:20px;
 	width:100%;
-	background-color:rgb(66, 116, 184);
+	background-color:rgb(17, 119, 184);
 	display:flex;
 	flex-direction:column;
 	align-items:center;
@@ -80,11 +80,11 @@ ol {
 .slider_container {
 	padding: 0;
 	width: 100%;
-	background-color:rgb(66, 116, 184);
+	background-color:rgb(17, 119, 184);
 }
 
 .slide {
-	background-color:rgb(66, 116, 184);
+	background-color:rgb(17, 119, 184);
 }
 
 .slide_content {
@@ -102,6 +102,7 @@ ol {
 	color: white;
 	text-align:left;
 	margin-left:15px;
+	max-width:1100px;
 }
 
 .cta_div {
@@ -121,15 +122,15 @@ ol {
 	align-items:center;
 	justify-content:center;
 	margin-bottom:10px;
-	background-color:rgb(121, 217, 25);
+	background-color:rgb(55, 218, 44);
 }
 
 .btn_start_generate:hover {
-	background-color:rgb(135, 230, 37);
+	background-color:rgb(60, 240, 60);
 }
 
 .btn_start_generate:active {
-	background-color:rgb(100, 192, 20);
+	background-color:rgb(40, 200, 40);
 }
 
 .btn_recover {
@@ -461,7 +462,7 @@ input[type='number'] {
 }
 
 .import_div {
-	background-color:rgb(66, 116, 184);
+	background-color:rgb(17, 119, 184);
 }
 
 .import_tabs_div {
@@ -485,7 +486,7 @@ input[type='number'] {
 }
 
 .export_header {
-	background-color:rgb(66, 116, 184);
+	background-color:rgb(17, 119, 184);
 	width:100%;
 	padding:10px;
 }
@@ -503,6 +504,7 @@ input[type='number'] {
 	margin:0 10px 0 10px;
 	padding:5px 20px 5px 20px;
 	border:2px solid;
+	font-size:26px;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
 	-ms-user-select: none;      
@@ -546,6 +548,7 @@ input[type='number'] {
 .export_checkbox_label {
 	color:white;
 	cursor:pointer;
+	font-weight:lighter;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
 	-ms-user-select: none;      
