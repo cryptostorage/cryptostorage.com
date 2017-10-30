@@ -1001,7 +1001,6 @@ function RecoverFileController(div) {
 	}
 	
 	function updatePieces() {
-		console.log("updatePieces()");
 		renderImportedPieces(importedPieces);
 	}
 	
