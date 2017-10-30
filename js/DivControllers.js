@@ -1146,6 +1146,7 @@ function RecoverTextController(div) {
 	DivController.call(this, div);
 	
 	let warningDiv;
+	let textArea;
 	let importedPieces = [];	// string[]
 	let piecesAndControls;		// div for imported pieces and controls
 	let importedPiecesDiv;		// div for imported pieces
@@ -1156,6 +1157,13 @@ function RecoverTextController(div) {
 		// warning div
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
 		warningDiv.hide();
+		
+		// text area
+		textArea = $("<textarea class='recover_textarea'>").appendTo(div);
+		
+		// submit button
+		let submit = $("<div class='recover_submit'>").appendTo(div);
+		submit.html("Submit");
 		
 		// pieces and controls
 		piecesAndControls = $("<div>").appendTo(div);

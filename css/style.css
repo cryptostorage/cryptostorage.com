@@ -547,6 +547,30 @@ input[type='number'] {
 	cursor:pointer;
 }
 
+.recover_textarea {
+	width:100%;
+	height:100px;
+	margin-bottom:10px;
+}
+
+.recover_submit {
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	height:50px;
+	font-size:28px;
+	color:white;
+	background-color:rgb(55, 218, 44);
+}
+
+.recover_submit:hover {
+	background-color:rgb(60, 240, 60);
+}
+
+.recover_submit:active {
+	background-color:rgb(40, 200, 40);
+}
+
 .recover_pieces {
 	padding:5px;
 }
