@@ -882,6 +882,7 @@ function RecoverFileController(div) {
 	
 	let warningDiv;
 	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
+	let filesAndControls;			// div for imported files and controls
 	let importedFilesDiv;
 	let lastKeys;
 	
@@ -911,18 +912,23 @@ function RecoverFileController(div) {
 		// setup drag and drop
 		setupDragAndDrop(dragDropDiv, onFilesImported);
 		
+		// files and controls
+		filesAndControls = $("<div>").appendTo(div);
+		filesAndControls.hide();
+		
 		// imported files
-		importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(div);
+		importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(filesAndControls);
 		importedFilesDiv.hide();
 		
 		// start over
-		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(div);
+		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(filesAndControls);
 		let startOverLink = $("<div class='recover_files_start_over_link'>").appendTo(startOverDiv);
 		startOverLink.append("start over");
-		startOverLink.click(function() {
+		startOverLink.click(function(e) {
 			warningDiv.empty();
 			warningDiv.hide();
 			removePieces();
+			filesAndControls.hide();
 		});
 		
 		// done rendering
@@ -949,7 +955,12 @@ function RecoverFileController(div) {
 	}
 	
 	function setWarning(str, img) {
-		warningDiv.html(str);
+		warningDiv.empty();
+		if (img) {
+			warningDiv.append(img);
+			img.addClass("recover_warning_div_icon");
+		}
+		warningDiv.append(str);
 		str === "" ? warningDiv.hide() : warningDiv.show();
 	}
 	
@@ -1049,7 +1060,7 @@ function RecoverFileController(div) {
 			try {
 				let keys = CryptoUtils.piecesToKeys(pieces);
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
-				if (!keys.length) setWarning("Additional pieces needed to recover private keys");
+				if (!keys.length) setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
 				lastKeys = keys;
 			} catch (err) {
 				setWarning(err.message);
@@ -1070,17 +1081,20 @@ function RecoverFileController(div) {
 	function renderImportedPieces(namedPieces) {
 		importedFilesDiv.empty();
 		if (namedPieces.length === 0) {
+			filesAndControls.hide();
 			importedFilesDiv.hide();
 			return;
 		}
+		
 		importedFilesDiv.show();
+		filesAndControls.show();
 		for (let namedPiece of namedPieces) {
 			importedFilesDiv.append(getImportedFileDiv(namedPiece));
 		}
 		
 		function getImportedFileDiv(namedPiece) {
 			let importedFileDiv = $("<div class='recover_imported_item'>").appendTo(importedFilesDiv);
-			let icon = $("<img src='img/document.png' class='recover_imported_icon'>").appendTo(importedFileDiv);
+			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedFileDiv);
 			importedFileDiv.append(namedPiece.name);
 			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedFileDiv);
 			trash.click(function() { removePiece(namedPiece.name); });

@@ -495,6 +495,15 @@ input[type='number'] {
 	margin-bottom:20px;
 	text-align:center;
 	background-color:rgb(247, 185, 43);
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+
+.recover_warning_div_icon {
+	width:25px;
+	height:25px;
+	margin-right:5px;
 }
 
 .recover_drag_drop {
@@ -508,7 +517,7 @@ input[type='number'] {
 
 .inner_outline {
     outline: 3px dotted black;
-    outline-offset: -15px;
+    outline-offset: -10px;
 }
 
 .drag_drop_img {
