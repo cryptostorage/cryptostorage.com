@@ -1,4 +1,7 @@
 // TODO
+// private key import
+// piece labeling
+// async operations in new tab
 // all the error messages
 // memory bug in bip38 encryption
 // num keys input flashes on first load
