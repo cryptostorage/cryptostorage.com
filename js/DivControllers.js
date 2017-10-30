@@ -919,6 +919,11 @@ function RecoverFileController(div) {
 		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(div);
 		let startOverLink = $("<div class='recover_files_start_over_link'>").appendTo(startOverDiv);
 		startOverLink.append("start over");
+		startOverLink.click(function() {
+			warningDiv.empty();
+			warningDiv.hide();
+			removePieces();
+		});
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -1004,8 +1009,11 @@ function RecoverFileController(div) {
 	}
 	
 	function renderImportedPieces(namedPieces) {
-		assertTrue(namedPieces.length > 0);
 		importedFilesDiv.empty();
+		if (namedPieces.length === 0) {
+			importedFilesDiv.hide();
+			return;
+		}
 		importedFilesDiv.show();
 		for (let namedPiece of namedPieces) {
 			importedFilesDiv.append(getImportedFileDiv(namedPiece));
