@@ -857,12 +857,14 @@ function RecoverController(div) {
 			case "file":
 				recoverFileTab.addClass("active_tab");
 				recoverTextTab.removeClass("active_tab");
+				recoverContentDiv.children().first().detach();
 				recoverContentDiv.empty();
 				recoverContentDiv.append(recoverFileDiv);
 				break;
 			case "text":
 				recoverFileTab.removeClass("active_tab");
 				recoverTextTab.addClass("active_tab");
+				recoverContentDiv.children().first().detach();
 				recoverContentDiv.empty();
 				recoverContentDiv.append(recoverTextDiv);
 				break;
