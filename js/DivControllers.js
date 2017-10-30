@@ -960,6 +960,7 @@ function RecoverFileController(div) {
 		div.get(0).ondragover = function(event) {
 			event.preventDefault();  
 	    event.stopPropagation();
+	    event.dataTransfer.dropEffect = 'copy';
 		}
 	}
 }
