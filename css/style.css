@@ -541,10 +541,23 @@ input[type='number'] {
 	padding:5px;
 }
 
-.recover_files_imported_file {
+.recover_imported_item {
 	display:flex;
 	align-items:center;
 	color:white;
+	padding:5px;
+}
+
+.recover_imported_icon {
+	width:25px;
+	height:25px;
+	margin-right:5px;
+}
+
+.recover_imported_trash {
+	width:20px;
+	height:20px;
+	margin-left:auto;
 }
 
 .recover_files_start_over {

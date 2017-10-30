@@ -913,8 +913,7 @@ function RecoverFileController(div) {
 		
 		// imported files
 		importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(div);
-		importedFilesDiv.append("Imported files go here...");
-		//importedFilesDiv.hide();
+		importedFilesDiv.hide();
 		
 		// start over
 		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(div);
@@ -1004,23 +1003,21 @@ function RecoverFileController(div) {
 		renderImportedPieces(importedPieces);
 	}
 	
-	function renderImportedPieces(importedPieces) {
+	function renderImportedPieces(namedPieces) {
+		assertTrue(namedPieces.length > 0);
 		importedFilesDiv.empty();
-		for (let importedPiece of importedPieces) {
-			let importedFileDiv = $("<div class='recover_files_imported_file'>").appendTo(importedFilesDiv);
-			
-			
-			
-			importedFileDiv.append(importedPiece.name);
+		importedFilesDiv.show();
+		for (let namedPiece of namedPieces) {
+			importedFilesDiv.append(getImportedFileDiv(namedPiece));
 		}
-
-//		fileList.empty();
-//		for (let importedPiece of importedPieces) {
-//			var trashIcon = $("<img src='img/trash.png' class='trash_icon'>").appendTo(fileList);
-//			trashIcon.click(function() { removePiece(importedPiece.name); });
-//			fileList.append(importedPiece.name);
-//			fileList.append("<br>");
-//		}
+		
+		function getImportedFileDiv(namedPiece) {
+			let importedFileDiv = $("<div class='recover_imported_item'>").appendTo(importedFilesDiv);
+			let icon = $("<img src='img/document.png' class='recover_imported_icon'>").appendTo(importedFileDiv);
+			importedFileDiv.append(namedPiece.name);
+			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedFileDiv);
+			return importedFileDiv;
+		}
 	}
 	
 	/**
