@@ -546,7 +546,7 @@ input[type='number'] {
 	cursor:pointer;
 }
 
-.recover_files_imported {
+.recover_pieces {
 	padding:5px;
 }
 
@@ -573,18 +573,18 @@ input[type='number'] {
 	cursor:pointer;
 }
 
-.recover_files_start_over {
+.recover_controls {
 	display:flex;
 	align-items:center;
 	justify-content:center;
 }
 
-.recover_files_start_over_link {
+.recover_start_over {
 	font-size:20px;
 	color:white;
 }
 
-.recover_files_start_over_link:hover {
+.recover_start_over:hover {
 	cursor:pointer;
 	text-decoration:underline;
 }

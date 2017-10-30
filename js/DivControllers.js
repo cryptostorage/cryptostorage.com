@@ -882,8 +882,8 @@ function RecoverFileController(div) {
 	
 	let warningDiv;
 	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
-	let filesAndControls;			// div for imported files and controls
-	let importedFilesDiv;
+	let piecesAndControls;		// div for imported files and controls
+	let importedPiecesDiv;
 	let lastKeys;
 	
 	this.render = function(onDone) {
@@ -913,22 +913,22 @@ function RecoverFileController(div) {
 		setupDragAndDrop(dragDropDiv, onFilesImported);
 		
 		// files and controls
-		filesAndControls = $("<div>").appendTo(div);
-		filesAndControls.hide();
+		piecesAndControls = $("<div>").appendTo(div);
+		piecesAndControls.hide();
 		
 		// imported files
-		importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(filesAndControls);
-		importedFilesDiv.hide();
+		importedPiecesDiv = $("<div class='recover_pieces'>").appendTo(piecesAndControls);
+		importedPiecesDiv.hide();
 		
 		// start over
-		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(filesAndControls);
+		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(piecesAndControls);
 		let startOverLink = $("<div class='recover_files_start_over_link'>").appendTo(startOverDiv);
 		startOverLink.append("start over");
 		startOverLink.click(function(e) {
 			warningDiv.empty();
 			warningDiv.hide();
 			removePieces();
-			filesAndControls.hide();
+			piecesAndControls.hide();
 		});
 		
 		// done rendering
@@ -941,17 +941,6 @@ function RecoverFileController(div) {
 		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
 		new ExportController(body, window, pieces, null).render();
-		
-		// old flow controller
-//		if (DEBUG) console.log("onKeysImported(" + keys.length + " keys)");
-//		assertTrue(keys.length >= 1);
-//		state.keys = keys;
-//		state.pieces = pieces;
-//		state.pieceDivs = pieceDivs;
-//		if (keys[0].getWif() && keys[0].isEncrypted()) next(new PageControllerDecryptKeys($("<div>"), appController, onKeysImported));
-//		else {
-//			append(new PageControllerExport($("<div>"), appController));
-//		}
 	}
 	
 	function setWarning(str, img) {
@@ -1079,21 +1068,21 @@ function RecoverFileController(div) {
 	}
 	
 	function renderImportedPieces(namedPieces) {
-		importedFilesDiv.empty();
+		importedPiecesDiv.empty();
 		if (namedPieces.length === 0) {
-			filesAndControls.hide();
-			importedFilesDiv.hide();
+			piecesAndControls.hide();
+			importedPiecesDiv.hide();
 			return;
 		}
 		
-		importedFilesDiv.show();
-		filesAndControls.show();
+		importedPiecesDiv.show();
+		piecesAndControls.show();
 		for (let namedPiece of namedPieces) {
-			importedFilesDiv.append(getImportedFileDiv(namedPiece));
+			importedPiecesDiv.append(getImportedFileDiv(namedPiece));
 		}
 		
 		function getImportedFileDiv(namedPiece) {
-			let importedFileDiv = $("<div class='recover_imported_item'>").appendTo(importedFilesDiv);
+			let importedFileDiv = $("<div class='recover_imported_item'>").appendTo(importedPiecesDiv);
 			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedFileDiv);
 			importedFileDiv.append(namedPiece.name);
 			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedFileDiv);
@@ -1155,11 +1144,174 @@ inheritsFrom(RecoverFileController, DivController);
  */
 function RecoverTextController(div) {
 	DivController.call(this, div);
+	
+	let warningDiv;
+	let importedPieces = [];	// string[]
+	let piecesAndControls;		// div for imported files and controls
+	let importedPiecesDiv;
+	let lastKeys;
+	
 	this.render = function(onDone) {
-		div.append("Recover from text");
+		
+		// additional pieces div
+		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
+		warningDiv.hide();
+		
+		// pieces and controls
+		piecesAndControls = $("<div>").appendTo(div);
+		piecesAndControls.hide();
+		
+		// imported pieces
+		importedPiecesDiv = $("<div class='recover_pieces'>").appendTo(piecesAndControls);
+		importedPiecesDiv.hide();
+		
+		// start over
+		let startOverDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
+		let startOverLink = $("<div class='recover_start_over'>").appendTo(startOverDiv);
+		startOverLink.append("start over");
+		startOverLink.click(function(e) {
+			warningDiv.empty();
+			warningDiv.hide();
+			removePieces();
+			piecesAndControls.hide();
+		});
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	function onKeysImported(keys) {
+		assertTrue(keys.length > 0);
+		let pieces = CryptoUtils.keysToPieces(keys);
+		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+		let body = $("body", window.document);
+		new ExportController(body, window, pieces, null).render();
+	}
+	
+	function setWarning(str, img) {
+		warningDiv.empty();
+		if (img) {
+			warningDiv.append(img);
+			img.addClass("recover_warning_div_icon");
+		}
+		warningDiv.append(str);
+		str === "" ? warningDiv.hide() : warningDiv.show();
+	}
+	
+	function getNamedPiecesFromFile(file, data, onNamedPieces) {
+		if (file.type === 'application/json') {
+			let piece = JSON.parse(data);
+			CryptoUtils.validatePiece(piece);
+			let namedPiece = {name: file.name, piece: piece};
+			onNamedPieces([namedPiece]);
+		}
+		else if (file.type === 'application/zip') {
+			CryptoUtils.zipToPieces(data, function(namedPieces) {
+				onNamedPieces(namedPieces);
+			});
+		}
+	}
+	
+	function addNamedPieces(namedPieces) {
+		for (let namedPiece of namedPieces) {
+			if (!isPieceImported(namedPiece.name)) importedPieces.push(namedPiece);
+		}
+		updatePieces();
+	}
+	
+	function isPieceImported(name) {
+		for (let importedPiece of importedPieces) {
+			if (importedPiece.name === name) return true;
+		}
+		return false;
+	}
+	
+	function removePieces() {
+		importedPieces = [];
+		lastKeys = undefined;
+		updatePieces();
+	}
+	
+	function removePiece(name) {
+		for (let i = 0; i < importedPieces.length; i++) {
+			if (importedPieces[i].name === name) {
+				importedPieces.splice(i, 1);
+				updatePieces();
+				return;
+			}
+		}
+		throw new Error("No piece with name '" + name + "' imported");
+	}
+	
+	function updatePieces() {
+		
+		// update UI
+		setWarning("");
+		renderImportedPieces(importedPieces);
+		
+		// collect all pieces
+		let pieces = [];
+		for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
+		if (!pieces.length) return;
+		
+		// collect cryptos being imported
+		let cryptos = new Set();
+		for (let pieceKey of pieces[0].keys) cryptos.add(pieceKey.ticker);
+		
+		// collect dependencies
+		let dependencies = new Set(COMMON_DEPENDENCIES);
+		for (let crypto of cryptos) {
+			let plugin = CryptoUtils.getCryptoPlugin(crypto);
+			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
+		}
+		
+		// load dependencies
+		loader.load(Array.from(dependencies), function() {
+			
+			// create keys
+			try {
+				let keys = CryptoUtils.piecesToKeys(pieces);
+				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
+				if (!keys.length) setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
+				lastKeys = keys;
+			} catch (err) {
+				setWarning(err.message);
+			}
+		});
+		
+		function keysDifferent(keys1, keys2) {
+			if (!keys1 && keys2) return true;
+			if (keys1 && !keys2) return true;
+			if (keys1.length !== keys2.length) return true;
+			for (let i = 0; i < keys1.length; i++) {
+				if (!keys1[i].equals(keys2[i])) return true;
+			}
+			return false;
+		}
+	}
+	
+	function renderImportedPieces(namedPieces) {
+		importedPiecesDiv.empty();
+		if (namedPieces.length === 0) {
+			piecesAndControls.hide();
+			importedPiecesDiv.hide();
+			return;
+		}
+		
+		importedPiecesDiv.show();
+		piecesAndControls.show();
+		for (let namedPiece of namedPieces) {
+			importedPiecesDiv.append(getImportedFileDiv(namedPiece));
+		}
+		
+		function getImportedFileDiv(namedPiece) {
+			let importedFileDiv = $("<div class='recover_imported_item'>").appendTo(importedPiecesDiv);
+			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedFileDiv);
+			importedFileDiv.append(namedPiece.name);
+			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedFileDiv);
+			trash.click(function() { removePiece(namedPiece.name); });
+			return importedFileDiv;
+		}
 	}
 }
 inheritsFrom(RecoverTextController, DivController);
