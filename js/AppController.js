@@ -10,6 +10,7 @@
 // piece export: print, download, select pieces
 // faster load time
 
+// header links full div hover
 // load all of home page when all images loaded
 // kill old render jobs if no longer needed
 // no padding on slider
