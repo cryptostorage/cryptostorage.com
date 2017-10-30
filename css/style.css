@@ -564,6 +564,7 @@ input[type='number'] {
 }
 
 .recover_submit:hover {
+	cursor:pointer;
 	background-color:rgb(60, 240, 60);
 }
 

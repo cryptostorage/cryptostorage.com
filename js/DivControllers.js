@@ -1078,16 +1078,16 @@ function RecoverFileController(div) {
 		importedPiecesDiv.show();
 		piecesAndControls.show();
 		for (let namedPiece of namedPieces) {
-			importedPiecesDiv.append(getImportedFileDiv(namedPiece));
+			importedPiecesDiv.append(getImportedPieceDiv(namedPiece));
 		}
 		
-		function getImportedFileDiv(namedPiece) {
-			let importedFileDiv = $("<div class='recover_imported_item'>").appendTo(importedPiecesDiv);
-			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedFileDiv);
-			importedFileDiv.append(namedPiece.name);
-			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedFileDiv);
+		function getImportedPieceDiv(namedPiece) {
+			let importedPieceDiv = $("<div class='recover_imported_item'>").appendTo(importedPiecesDiv);
+			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
+			importedPieceDiv.append(namedPiece.name);
+			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(namedPiece.name); });
-			return importedFileDiv;
+			return importedPieceDiv;
 		}
 	}
 	
@@ -1164,6 +1164,10 @@ function RecoverTextController(div) {
 		// submit button
 		let submit = $("<div class='recover_submit'>").appendTo(div);
 		submit.html("Submit");
+		submit.click(function() {
+			addPieces([textArea.val()]);
+			textArea.val('');
+		});
 		
 		// pieces and controls
 		piecesAndControls = $("<div>").appendTo(div);
@@ -1208,7 +1212,7 @@ function RecoverTextController(div) {
 	
 	function addPieces(pieces) {
 		for (let piece of pieces) {
-			if (!contains(importedPieces.pieces)) importedPieces.push(piece);
+			if (!contains(importedPieces)) importedPieces.push(piece);
 		}
 		updatePieces();
 	}
@@ -1237,7 +1241,7 @@ function RecoverTextController(div) {
 		renderImportedPieces(importedPieces);
 		
 		// done if no pieces imported
-		if (!pieces.length) return;
+		if (!importedPieces.length) return;
 		
 		// get dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
@@ -1269,13 +1273,13 @@ function RecoverTextController(div) {
 			importedPiecesDiv.append(getImportedPieceDiv(piece));
 		}
 		
-		function getImportedFileDiv(namedPiece) {
-			let importedFileDiv = $("<div class='recover_imported_item'>").appendTo(importedPiecesDiv);
-			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedFileDiv);
-			importedFileDiv.append(piece);
-			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedFileDiv);
+		function getImportedPieceDiv(piece) {
+			let importedPieceDiv = $("<div class='recover_imported_item'>").appendTo(importedPiecesDiv);
+			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
+			importedPieceDiv.append(piece);
+			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
-			return importedFileDiv;
+			return importedPieceDiv;
 		}
 	}
 }
