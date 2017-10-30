@@ -896,6 +896,14 @@ function RecoverFileController(div) {
 		let dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
 		dragDropBrowse.append("or click to browse");
 		
+		// register browse link with hidden input
+		let inputFiles = $("<input type='file' multiple>").appendTo(dragDropDiv);
+		inputFiles.change(function() { onFilesImported($(this).get(0).files); });
+		inputFiles.hide();
+		dragDropBrowse.click(function() {
+			inputFiles.click();
+		});
+		
 		// setup drag and drop
 		setupDragAndDrop(dragDropDiv, onFilesImported);
 		
@@ -915,6 +923,7 @@ function RecoverFileController(div) {
 	
 	// handle imported files
 	function onFilesImported(files) {
+		console.log(files);
 		for (let file of files) {
 			console.log(file);
 		}
