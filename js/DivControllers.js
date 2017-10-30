@@ -917,12 +917,12 @@ function RecoverFileController(div) {
 		piecesAndControls.hide();
 		
 		// imported files
-		importedPiecesDiv = $("<div class='recover_pieces'>").appendTo(piecesAndControls);
+		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(piecesAndControls);
 		importedPiecesDiv.hide();
 		
 		// start over
-		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(piecesAndControls);
-		let startOverLink = $("<div class='recover_files_start_over_link'>").appendTo(startOverDiv);
+		let startOverDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
+		let startOverLink = $("<div class='recover_start_over'>").appendTo(startOverDiv);
 		startOverLink.append("start over");
 		startOverLink.click(function(e) {
 			warningDiv.empty();
@@ -1174,7 +1174,7 @@ function RecoverTextController(div) {
 		piecesAndControls.hide();
 		
 		// imported pieces
-		importedPiecesDiv = $("<div class='recover_pieces'>").appendTo(piecesAndControls);
+		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(piecesAndControls);
 		importedPiecesDiv.hide();
 		
 		// start over
