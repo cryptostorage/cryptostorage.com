@@ -1023,6 +1023,7 @@ function RecoverFileController(div) {
 	function updatePieces() {
 		
 		// update UI
+		setWarning("");
 		renderImportedPieces(importedPieces);
 		
 		// collect all pieces
@@ -1047,8 +1048,8 @@ function RecoverFileController(div) {
 			// create keys
 			try {
 				let keys = CryptoUtils.piecesToKeys(pieces);
-				setWarning("");
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
+				if (!keys.length) setWarning("Additional pieces needed to recover private keys");
 				lastKeys = keys;
 			} catch (err) {
 				setWarning(err.message);
