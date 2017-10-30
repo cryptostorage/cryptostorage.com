@@ -560,6 +560,10 @@ input[type='number'] {
 	margin-left:auto;
 }
 
+.recover_imported_trash:hover {
+	cursor:pointer;
+}
+
 .recover_files_start_over {
 	display:flex;
 	align-items:center;
@@ -569,11 +573,11 @@ input[type='number'] {
 .recover_files_start_over_link {
 	font-size:20px;
 	color:white;
-	text-decoration:underline;
 }
 
 .recover_files_start_over_link:hover {
 	cursor:pointer;
+	text-decoration:underline;
 }
 
 .export_header {

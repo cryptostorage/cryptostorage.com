@@ -836,7 +836,6 @@ function RecoverController(div) {
 		recoverTextTab.html("Recover From Text");
 		recoverTextTab.click(function() { selectTab("text"); });
 		let recoverContentDiv = $("<div class='recover_content_div'>").appendTo(recoverDiv);
-		recoverContentDiv.append("Content");
 		
 		// render recover file and text divs
 		let recoverFileDiv = $("<div>");
@@ -942,8 +941,8 @@ function RecoverFileController(div) {
 			reader.onload = function(event) {
 				getNamedPiecesFromFile(file, reader.result, function(namedPieces) {
 					if (namedPieces.length === 0) {
-						if (file.type === "application/json") setWarning("File '" + file.name + "' is not a valid JSON piece");
-						else if (file.type === "application/zip") setWarning("Zip '" + file.name + "' does not contain any valid JSON pieces");
+						if (file.type === "application/json") setWarning("File '" + file.name + "' is not a valid json piece");
+						else if (file.type === "application/zip") setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
 						addNamedPieces(namedPieces);
@@ -993,10 +992,8 @@ function RecoverFileController(div) {
 	function removePiece(name) {
 		for (let i = 0; i < importedPieces.length; i++) {
 			if (importedPieces[i].name === name) {
-				if (confirm("Are you sure you want to remove " + name + "?")) {
-					importedPieces.splice(i, 1);
-					updatePieces();
-				}
+				importedPieces.splice(i, 1);
+				updatePieces();
 				return;
 			}
 		}
@@ -1024,6 +1021,7 @@ function RecoverFileController(div) {
 			let icon = $("<img src='img/document.png' class='recover_imported_icon'>").appendTo(importedFileDiv);
 			importedFileDiv.append(namedPiece.name);
 			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedFileDiv);
+			trash.click(function() { removePiece(namedPiece.name); });
 			return importedFileDiv;
 		}
 	}
