@@ -1164,10 +1164,7 @@ function RecoverTextController(div) {
 		// submit button
 		let submit = $("<div class='recover_submit'>").appendTo(div);
 		submit.html("Submit");
-		submit.click(function() {
-			addPieces([textArea.val()]);
-			textArea.val('');
-		});
+		submit.click(function() { importPieces(); });
 		
 		// pieces and controls
 		piecesAndControls = $("<div>").appendTo(div);
@@ -1208,6 +1205,11 @@ function RecoverTextController(div) {
 		}
 		warningDiv.append(str);
 		str === "" ? warningDiv.hide() : warningDiv.show();
+	}
+	
+	function importPieces() {
+		addPieces([textArea.val()]);
+		textArea.val('');
 	}
 	
 	function addPieces(pieces) {
