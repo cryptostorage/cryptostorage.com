@@ -930,7 +930,22 @@ function RecoverFileController(div) {
 	}
 	
 	function onKeysImported(keys) {
+		assertTrue(keys.length > 0);
+		let pieces = CryptoUtils.keysToPieces(keys);
+		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+		let body = $("body", window.document);
+		new ExportController(body, window, pieces, null).render();
 		
+		// old flow controller
+//		if (DEBUG) console.log("onKeysImported(" + keys.length + " keys)");
+//		assertTrue(keys.length >= 1);
+//		state.keys = keys;
+//		state.pieces = pieces;
+//		state.pieceDivs = pieceDivs;
+//		if (keys[0].getWif() && keys[0].isEncrypted()) next(new PageControllerDecryptKeys($("<div>"), appController, onKeysImported));
+//		else {
+//			append(new PageControllerExport($("<div>"), appController));
+//		}
 	}
 	
 	function setWarning(str, img) {
@@ -1036,7 +1051,7 @@ function RecoverFileController(div) {
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
 				lastKeys = keys;
 			} catch (err) {
-				setErrorMessage(err.message);
+				setWarning(err.message);
 			}
 		});
 		
