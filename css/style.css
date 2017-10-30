@@ -506,6 +506,11 @@ input[type='number'] {
 	justify-content:center;
 }
 
+.inner_outline {
+    outline: 3px dotted black;
+    outline-offset: -15px;
+}
+
 .drag_drop_img {
 	width:150px;
 	height:150px;

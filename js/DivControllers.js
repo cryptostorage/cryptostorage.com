@@ -896,6 +896,66 @@ function RecoverFileController(div) {
 		let dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
 		dragDropBrowse.append("or click to browse");
 		
+		dragDropDiv.get(0).ondrop = function(event) {
+			console.log("ondrop!");
+			console.log(event.isTrusted);
+			event.preventDefault();  
+	    event.stopPropagation();
+	    
+			dragDropDiv.removeClass("inner_outline");
+	    
+	    // If dropped items aren't files, reject them
+	    var dt = event.dataTransfer;
+	    if (dt.items) {
+	      // Use DataTransferItemList interface to access the file(s)
+	      for (var i=0; i < dt.items.length; i++) {
+	        if (dt.items[i].kind == "file") {
+	          var f = dt.items[i].getAsFile();
+	          console.log("... file[" + i + "].name = " + f.name);
+	        }
+	      }
+	    } else {
+	      // Use DataTransfer interface to access the file(s)
+	      for (var i=0; i < dt.files.length; i++) {
+	        console.log("... file[" + i + "].name = " + dt.files[i].name);
+	      }  
+	    }
+		}
+		dragDropDiv.get(0).ondragenter = function(event) {
+			console.log("ondragenter!");
+			dragDropDiv.addClass("inner_outline");
+		}
+		dragDropDiv.get(0).ondragexit = function(event) {
+			console.log("ondragexit!");
+			dragDropDiv.removeClass("inner_outline");
+		}
+		
+		dragDropDiv.get(0).ondragover = function(event) {
+			console.log("ondragover!");
+			event.preventDefault();  
+	    event.stopPropagation();
+		}
+		
+		dragDropDiv.get(0).ondragend = function(event) {
+			console.log("ondragend!");
+			event.preventDefault();  
+	    event.stopPropagation();
+	    
+			dragDropDiv.removeClass("inner_outline");
+	    
+	    // Remove all of the drag data
+	    var dt = event.dataTransfer;
+	    if (dt.items) {
+	      // Use DataTransferItemList interface to remove the drag data
+	      for (var i = 0; i < dt.items.length; i++) {
+	        dt.items.remove(i);
+	      }
+	    } else {
+	      // Use DataTransfer interface to remove the drag data
+	      event.dataTransfer.clearData();
+	    }
+		}
+		
 		// imported files
 		let importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(div);
 		importedFilesDiv.append("Imported files go here...");
