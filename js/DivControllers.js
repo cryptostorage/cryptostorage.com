@@ -896,11 +896,43 @@ function RecoverFileController(div) {
 		let dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
 		dragDropBrowse.append("or click to browse");
 		
-		// handle drag and drop events
-		dragDropDiv.get(0).ondrop = function(event) {
+		// setup drag and drop
+		setupDragAndDrop(dragDropDiv, onFilesImported);
+		
+		// imported files
+		let importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(div);
+		importedFilesDiv.append("Imported files go here...");
+		//importedFilesDiv.hide();
+		
+		// start over
+		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(div);
+		let startOverLink = $("<div class='recover_files_start_over_link'>").appendTo(startOverDiv);
+		startOverLink.append("start over");
+		
+		// done rendering
+		if (onDone) onDone(div);
+	}
+	
+	// handle imported files
+	function onFilesImported(files) {
+		for (let file of files) {
+			console.log(file);
+		}
+	}
+	
+	/**
+	 * Sets up a drag and drop zone.
+	 * 
+	 * @param div is the drop zone as a jquery node
+	 * @param onFilesImported(files) is called when files are dropped into the drop zone
+	 */
+	function setupDragAndDrop(div, onFilesImported) {
+		
+		// register drag and drop events
+		div.get(0).ondrop = function(event) {
 			event.preventDefault();  
 	    event.stopPropagation();
-			dragDropDiv.removeClass("inner_outline");
+			div.removeClass("inner_outline");
 			let dt = event.dataTransfer;
 			
 			// use DataTransferItemList interface to access file(s)
@@ -919,36 +951,16 @@ function RecoverFileController(div) {
 				onFilesImported(dt.files);
 			}
 		}
-		dragDropDiv.get(0).ondragenter = function(event) {
-			dragDropDiv.addClass("inner_outline");
+		div.get(0).ondragenter = function(event) {
+			div.addClass("inner_outline");
 		}
-		dragDropDiv.get(0).ondragexit = function(event) {
-			dragDropDiv.removeClass("inner_outline");
+		div.get(0).ondragexit = function(event) {
+			div.removeClass("inner_outline");
 		}
-		dragDropDiv.get(0).ondragover = function(event) {
+		div.get(0).ondragover = function(event) {
 			event.preventDefault();  
 	    event.stopPropagation();
 		}
-		
-		// handle imported files
-		function onFilesImported(files) {
-			for (let file of files) {
-				console.log(file);
-			}
-		}
-		
-		// imported files
-		let importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(div);
-		importedFilesDiv.append("Imported files go here...");
-		//importedFilesDiv.hide();
-		
-		// start over
-		let startOverDiv = $("<div class='recover_files_start_over'>").appendTo(div);
-		let startOverLink = $("<div class='recover_files_start_over_link'>").appendTo(startOverDiv);
-		startOverLink.append("start over");
-		
-		// done rendering
-		if (onDone) onDone(div);
 	}
 }
 inheritsFrom(RecoverFileController, DivController);
