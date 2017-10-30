@@ -880,12 +880,15 @@ inheritsFrom(RecoverController, DivController);
  */
 function RecoverFileController(div) {
 	DivController.call(this, div);
+	
+	let warningDiv;
+	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
+	
 	this.render = function(onDone) {
 		
 		// additional pieces div
-		let additionalPiecesDiv = $("<div class='recover_additional_pieces'>").appendTo(div);
-		additionalPiecesDiv.append("Need additional pieces to recover private keys");
-		//additionalPiecesDiv.hide();
+		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
+		warningDiv.hide();
 		
 		// drag and drop div
 		let dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(div);
@@ -921,12 +924,83 @@ function RecoverFileController(div) {
 		if (onDone) onDone(div);
 	}
 	
+	function setWarningMessage(str, img) {
+		warningDiv.html(str);
+		str === "" ? warningDiv.hide() : warningDiv.show();
+	}
+	
 	// handle imported files
 	function onFilesImported(files) {
-		console.log(files);
-		for (let file of files) {
-			console.log(file);
+		for (let i = 0; i < files.length; i++) readFile(files[0]);
+		function readFile(file) {
+			let reader = new FileReader();
+			reader.onload = function(event) {
+				getNamedPiecesFromFile(file, reader.result, function(namedPieces) {
+					if (namedPieces.length === 0) {
+						if (file.type === "application/json") setWarningMessage("File '" + file.name + "' is not a valid JSON piece");
+						else if (file.type === "application/zip") setWarningMessage("Zip '" + file.name + "' does not contain any valid JSON pieces");
+						else throw new Error("Unrecognized file type: " + file.type);
+					} else {
+						addNamedPieces(namedPieces);
+					}
+				});
+			}
+			if (file.type === 'application/json') reader.readAsText(file);
+			else if (file.type === 'application/zip') reader.readAsArrayBuffer(file);
+			else setWarningMessage("'" + file.name + "' is not a zip or json file");
 		}
+	}
+	
+	function getNamedPiecesFromFile(file, data, onNamedPieces) {
+		if (file.type === 'application/json') {
+			let piece = JSON.parse(data);
+			CryptoUtils.validatePiece(piece);
+			let namedPiece = {name: file.name, piece: piece};
+			onNamedPieces([namedPiece]);
+		}
+		else if (file.type === 'application/zip') {
+			CryptoUtils.zipToPieces(data, function(namedPieces) {
+				onNamedPieces(namedPieces);
+			});
+		}
+	}
+	
+	function addNamedPieces(namedPieces) {
+		for (let namedPiece of namedPieces) {
+			if (!isPieceImported(namedPiece.name)) importedPieces.push(namedPiece);
+		}
+		updatePieces();
+	}
+	
+	function isPieceImported(name) {
+		for (let importedPiece of importedPieces) {
+			if (importedPiece.name === name) return true;
+		}
+		return false;
+	}
+	
+	function removePieces() {
+		importedPieces = [];
+		lastKeys = undefined;
+		updatePieces();
+	}
+	
+	function removePiece(name) {
+		for (let i = 0; i < importedPieces.length; i++) {
+			if (importedPieces[i].name === name) {
+				if (confirm("Are you sure you want to remove " + name + "?")) {
+					importedPieces.splice(i, 1);
+					updatePieces();
+				}
+				return;
+			}
+		}
+		throw new Error("No piece with name '" + name + "' imported");
+	}
+	
+	function updatePieces() {
+		console.log("updatePieces()");
+		console.log(importedPieces);
 	}
 	
 	/**
