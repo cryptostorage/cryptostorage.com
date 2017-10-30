@@ -883,6 +883,7 @@ function RecoverFileController(div) {
 	let warningDiv;
 	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
 	let importedFilesDiv;
+	let lastKeys;
 	
 	this.render = function(onDone) {
 		
@@ -926,6 +927,10 @@ function RecoverFileController(div) {
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	function onKeysImported(keys) {
+		
 	}
 	
 	function setWarning(str, img) {
@@ -1001,7 +1006,49 @@ function RecoverFileController(div) {
 	}
 	
 	function updatePieces() {
+		
+		// update UI
 		renderImportedPieces(importedPieces);
+		
+		// collect all pieces
+		let pieces = [];
+		for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
+		if (!pieces.length) return;
+		
+		// collect cryptos being imported
+		let cryptos = new Set();
+		for (let pieceKey of pieces[0].keys) cryptos.add(pieceKey.ticker);
+		
+		// collect dependencies
+		let dependencies = new Set(COMMON_DEPENDENCIES);
+		for (let crypto of cryptos) {
+			let plugin = CryptoUtils.getCryptoPlugin(crypto);
+			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
+		}
+		
+		// load dependencies
+		loader.load(Array.from(dependencies), function() {
+			
+			// create keys
+			try {
+				let keys = CryptoUtils.piecesToKeys(pieces);
+				setWarning("");
+				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
+				lastKeys = keys;
+			} catch (err) {
+				setErrorMessage(err.message);
+			}
+		});
+		
+		function keysDifferent(keys1, keys2) {
+			if (!keys1 && keys2) return true;
+			if (keys1 && !keys2) return true;
+			if (keys1.length !== keys2.length) return true;
+			for (let i = 0; i < keys1.length; i++) {
+				if (!keys1[i].equals(keys2[i])) return true;
+			}
+			return false;
+		}
 	}
 	
 	function renderImportedPieces(namedPieces) {
