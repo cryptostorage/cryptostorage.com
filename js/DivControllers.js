@@ -932,7 +932,7 @@ function RecoverFileController(div) {
 	
 	// handle imported files
 	function onFilesImported(files) {
-		for (let i = 0; i < files.length; i++) readFile(files[0]);
+		for (let i = 0; i < files.length; i++) readFile(files[i]);
 		function readFile(file) {
 			let reader = new FileReader();
 			reader.onload = function(event) {
@@ -1001,7 +1001,6 @@ function RecoverFileController(div) {
 	
 	function updatePieces() {
 		console.log("updatePieces()");
-		console.log(importedPieces);
 		renderImportedPieces(importedPieces);
 	}
 	
