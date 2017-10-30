@@ -888,7 +888,7 @@ function RecoverFileController(div) {
 	
 	this.render = function(onDone) {
 		
-		// additional pieces div
+		// warning div
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
 		warningDiv.hide();
 		
@@ -1031,14 +1031,14 @@ function RecoverFileController(div) {
 		for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
 		if (!pieces.length) return;
 		
-		// collect cryptos being imported
-		let cryptos = new Set();
-		for (let pieceKey of pieces[0].keys) cryptos.add(pieceKey.ticker);
+		// collect tickers being imported
+		let tickers = new Set();
+		for (let pieceKey of pieces[0].keys) tickers.add(pieceKey.ticker);
 		
 		// collect dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
-		for (let crypto of cryptos) {
-			let plugin = CryptoUtils.getCryptoPlugin(crypto);
+		for (let ticker of tickers) {
+			let plugin = CryptoUtils.getCryptoPlugin(ticker);
 			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
 		}
 		
@@ -1147,13 +1147,13 @@ function RecoverTextController(div) {
 	
 	let warningDiv;
 	let importedPieces = [];	// string[]
-	let piecesAndControls;		// div for imported files and controls
-	let importedPiecesDiv;
+	let piecesAndControls;		// div for imported pieces and controls
+	let importedPiecesDiv;		// div for imported pieces
 	let lastKeys;
 	
 	this.render = function(onDone) {
 		
-		// additional pieces div
+		// warning div
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
 		warningDiv.hide();
 		
@@ -1198,32 +1198,11 @@ function RecoverTextController(div) {
 		str === "" ? warningDiv.hide() : warningDiv.show();
 	}
 	
-	function getNamedPiecesFromFile(file, data, onNamedPieces) {
-		if (file.type === 'application/json') {
-			let piece = JSON.parse(data);
-			CryptoUtils.validatePiece(piece);
-			let namedPiece = {name: file.name, piece: piece};
-			onNamedPieces([namedPiece]);
-		}
-		else if (file.type === 'application/zip') {
-			CryptoUtils.zipToPieces(data, function(namedPieces) {
-				onNamedPieces(namedPieces);
-			});
-		}
-	}
-	
-	function addNamedPieces(namedPieces) {
-		for (let namedPiece of namedPieces) {
-			if (!isPieceImported(namedPiece.name)) importedPieces.push(namedPiece);
+	function addPieces(pieces) {
+		for (let piece of pieces) {
+			if (!contains(importedPieces.pieces)) importedPieces.push(piece);
 		}
 		updatePieces();
-	}
-	
-	function isPieceImported(name) {
-		for (let importedPiece of importedPieces) {
-			if (importedPiece.name === name) return true;
-		}
-		return false;
 	}
 	
 	function removePieces() {
@@ -1232,15 +1211,15 @@ function RecoverTextController(div) {
 		updatePieces();
 	}
 	
-	function removePiece(name) {
+	function removePiece(piece) {
 		for (let i = 0; i < importedPieces.length; i++) {
-			if (importedPieces[i].name === name) {
+			if (importedPieces[i] === piece) {
 				importedPieces.splice(i, 1);
 				updatePieces();
 				return;
 			}
 		}
-		throw new Error("No piece with name '" + name + "' imported");
+		throw new Error("No piece imported: " + piece);
 	}
 	
 	function updatePieces() {
@@ -1249,50 +1228,28 @@ function RecoverTextController(div) {
 		setWarning("");
 		renderImportedPieces(importedPieces);
 		
-		// collect all pieces
-		let pieces = [];
-		for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
+		// done if no pieces imported
 		if (!pieces.length) return;
 		
-		// collect cryptos being imported
-		let cryptos = new Set();
-		for (let pieceKey of pieces[0].keys) cryptos.add(pieceKey.ticker);
-		
-		// collect dependencies
+		// get dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
-		for (let crypto of cryptos) {
-			let plugin = CryptoUtils.getCryptoPlugin(crypto);
-			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
-		}
+		let ticker = "BTC";	// TODO: get from pulldown
+		let plugin = CryptoUtils.getCryptoPlugin(ticker);
+		for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
 		
 		// load dependencies
 		loader.load(Array.from(dependencies), function() {
 			
-			// create keys
-			try {
-				let keys = CryptoUtils.piecesToKeys(pieces);
-				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
-				if (!keys.length) setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
-				lastKeys = keys;
-			} catch (err) {
-				setWarning(err.message);
-			}
+			// TODO: ready to implement
+			console.log("Ready to import pieces");
+			console.log(plugin.getTicker());
+			console.log(importedPieces);
 		});
-		
-		function keysDifferent(keys1, keys2) {
-			if (!keys1 && keys2) return true;
-			if (keys1 && !keys2) return true;
-			if (keys1.length !== keys2.length) return true;
-			for (let i = 0; i < keys1.length; i++) {
-				if (!keys1[i].equals(keys2[i])) return true;
-			}
-			return false;
-		}
 	}
 	
-	function renderImportedPieces(namedPieces) {
+	function renderImportedPieces(pieces) {
 		importedPiecesDiv.empty();
-		if (namedPieces.length === 0) {
+		if (pieces.length === 0) {
 			piecesAndControls.hide();
 			importedPiecesDiv.hide();
 			return;
@@ -1300,16 +1257,16 @@ function RecoverTextController(div) {
 		
 		importedPiecesDiv.show();
 		piecesAndControls.show();
-		for (let namedPiece of namedPieces) {
-			importedPiecesDiv.append(getImportedFileDiv(namedPiece));
+		for (let piece of pieces) {
+			importedPiecesDiv.append(getImportedPieceDiv(piece));
 		}
 		
 		function getImportedFileDiv(namedPiece) {
 			let importedFileDiv = $("<div class='recover_imported_item'>").appendTo(importedPiecesDiv);
 			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedFileDiv);
-			importedFileDiv.append(namedPiece.name);
+			importedFileDiv.append(piece);
 			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedFileDiv);
-			trash.click(function() { removePiece(namedPiece.name); });
+			trash.click(function() { removePiece(piece); });
 			return importedFileDiv;
 		}
 	}

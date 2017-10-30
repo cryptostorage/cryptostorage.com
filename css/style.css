@@ -476,6 +476,7 @@ input[type='number'] {
 	padding:20px;
 	color: white;
 	font-size:24px;
+	background-color:rgb(93, 159, 252);
 }
 
 .recover_tab_div:hover {
@@ -483,7 +484,7 @@ input[type='number'] {
 }
 
 .active_tab {
-	background-color:rgb(93, 159, 252);
+	background-color:rgb(17, 119, 184);
 }
 
 .recover_content_div {
