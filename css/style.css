@@ -538,8 +538,13 @@ input[type='number'] {
 }
 
 .recover_files_imported {
-	color:white;
 	padding:5px;
+}
+
+.recover_files_imported_file {
+	display:flex;
+	align-items:center;
+	color:white;
 }
 
 .recover_files_start_over {

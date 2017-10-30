@@ -883,6 +883,7 @@ function RecoverFileController(div) {
 	
 	let warningDiv;
 	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
+	let importedFilesDiv;
 	
 	this.render = function(onDone) {
 		
@@ -911,7 +912,7 @@ function RecoverFileController(div) {
 		setupDragAndDrop(dragDropDiv, onFilesImported);
 		
 		// imported files
-		let importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(div);
+		importedFilesDiv = $("<div class='recover_files_imported'>").appendTo(div);
 		importedFilesDiv.append("Imported files go here...");
 		//importedFilesDiv.hide();
 		
@@ -924,7 +925,7 @@ function RecoverFileController(div) {
 		if (onDone) onDone(div);
 	}
 	
-	function setWarningMessage(str, img) {
+	function setWarning(str, img) {
 		warningDiv.html(str);
 		str === "" ? warningDiv.hide() : warningDiv.show();
 	}
@@ -937,8 +938,8 @@ function RecoverFileController(div) {
 			reader.onload = function(event) {
 				getNamedPiecesFromFile(file, reader.result, function(namedPieces) {
 					if (namedPieces.length === 0) {
-						if (file.type === "application/json") setWarningMessage("File '" + file.name + "' is not a valid JSON piece");
-						else if (file.type === "application/zip") setWarningMessage("Zip '" + file.name + "' does not contain any valid JSON pieces");
+						if (file.type === "application/json") setWarning("File '" + file.name + "' is not a valid JSON piece");
+						else if (file.type === "application/zip") setWarning("Zip '" + file.name + "' does not contain any valid JSON pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
 						addNamedPieces(namedPieces);
@@ -947,7 +948,7 @@ function RecoverFileController(div) {
 			}
 			if (file.type === 'application/json') reader.readAsText(file);
 			else if (file.type === 'application/zip') reader.readAsArrayBuffer(file);
-			else setWarningMessage("'" + file.name + "' is not a zip or json file");
+			else setWarning("'" + file.name + "' is not a zip or json file");
 		}
 	}
 	
@@ -1001,6 +1002,26 @@ function RecoverFileController(div) {
 	function updatePieces() {
 		console.log("updatePieces()");
 		console.log(importedPieces);
+		renderImportedPieces(importedPieces);
+	}
+	
+	function renderImportedPieces(importedPieces) {
+		importedFilesDiv.empty();
+		for (let importedPiece of importedPieces) {
+			let importedFileDiv = $("<div class='recover_files_imported_file'>").appendTo(importedFilesDiv);
+			
+			
+			
+			importedFileDiv.append(importedPiece.name);
+		}
+
+//		fileList.empty();
+//		for (let importedPiece of importedPieces) {
+//			var trashIcon = $("<img src='img/trash.png' class='trash_icon'>").appendTo(fileList);
+//			trashIcon.click(function() { removePiece(importedPiece.name); });
+//			fileList.append(importedPiece.name);
+//			fileList.append("<br>");
+//		}
 	}
 	
 	/**
