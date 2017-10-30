@@ -858,14 +858,12 @@ function RecoverController(div) {
 				recoverFileTab.addClass("active_tab");
 				recoverTextTab.removeClass("active_tab");
 				recoverContentDiv.children().detach();
-				recoverContentDiv.empty();
 				recoverContentDiv.append(recoverFileDiv);
 				break;
 			case "text":
 				recoverFileTab.removeClass("active_tab");
 				recoverTextTab.addClass("active_tab");
 				recoverContentDiv.children().detach();
-				recoverContentDiv.empty();
 				recoverContentDiv.append(recoverTextDiv);
 				break;
 			default: throw new Error("Unrecognized selection: " + selected);
