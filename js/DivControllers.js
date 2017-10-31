@@ -1177,6 +1177,7 @@ function RecoverTextController(div, plugins) {
 				background: "white",
 				imagePosition: "left",
 				selectText: "Select a Currency",
+				width:'100%',
 				defaultSelectedIndex: 0,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
