@@ -68,6 +68,16 @@ let Tests = {
 			assertFalse(isString(null));
 			assertFalse(isString(undefined));
 			assertFalse(isString(123));
+			
+			// test isBase58()
+			for (let plugin of Tests.getTestCryptoPlugins()) {
+				let key = plugin.newKey()
+				assertFalse(CryptoUtils.isBase58(key.getHex()));
+				let pieces = plugin.split(key, 3, 2);
+				for (let piece of pieces) {
+					assertTrue(CryptoUtils.isBase58(piece));
+				}
+			}
 		}
 		
 		function testParseKey(plugins) {

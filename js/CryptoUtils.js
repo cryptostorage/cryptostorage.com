@@ -49,6 +49,24 @@ let CryptoUtils = {
 	},
 	
 	/**
+	 * Determines if the given string is base58.
+	 */
+	isBase58: function(str) {
+		return /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(str)
+	},
+	
+	/**
+	 * Determines if the given string is a possible split piece of a private key (cannot be excluded as one).
+	 * 
+	 * A piece must be at least 64 characters and base58 encoded.
+	 * 
+	 * @returns true if the given string meets the minimum requirements to be a split piece
+	 */
+	isPossiblePiece: function(str) {
+		return str.length >= 64 && CryptoUtils.isBase58(str);
+	},
+	
+	/**
 	 * Encrypts the given key with the given scheme and password.
 	 * 
 	 * Invokes callback(err, encryptedKey) when done.
