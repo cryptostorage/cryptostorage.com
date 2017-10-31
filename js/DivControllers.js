@@ -955,17 +955,39 @@ function RecoverFileController(div) {
 	
 	// handle imported files
 	function onFilesImported(files) {
-		for (let i = 0; i < files.length; i++) readFile(files[i]);
-		function readFile(file) {
+		
+		// collect functions to read files
+		let funcs = [];
+		for (let i = 0; i < files.length; i++) {
+			funcs.push(function(callback) {
+				readFile(files[i], callback);
+			});
+		};
+		
+		// read files asynchronously
+		async.parallel(funcs, function(err, results) {
+			
+			// collect named pieces from results
+			let namedPieces = [];
+			for (let result of results) {
+				namedPieces = namedPieces.concat(result);
+			}
+			
+			// add all named pieces
+			addNamedPieces(namedPieces);
+		});
+		
+		// reads the given file and calls onNamedPieces(err, namedPieces) when done
+		function readFile(file, onNamedPieces) {
 			let reader = new FileReader();
-			reader.onload = function(event) {
+			reader.onload = function() {
 				getNamedPiecesFromFile(file, reader.result, function(namedPieces) {
 					if (namedPieces.length === 0) {
 						if (file.type === "application/json") setWarning("File '" + file.name + "' is not a valid json piece");
 						else if (file.type === "application/zip") setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
-						addNamedPieces(namedPieces);
+						onNamedPieces(null, namedPieces);
 					}
 				});
 			}
