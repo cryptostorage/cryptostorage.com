@@ -543,7 +543,6 @@ function FormController(div) {
 		}
 		
 		this.setSelectedCurrency = function(name) {
-			//selector = $("#currency_selector");
 			for (let i = 0; i < selectorData.length; i++) {
 				if (selectorData[i].text === name) {
 					selector.ddslick('select', {index: i});
@@ -841,7 +840,7 @@ function RecoverController(div) {
 		let recoverFileDiv = $("<div>");
 		let recoverTextDiv = $("<div>");
 		new RecoverFileController(recoverFileDiv).render(function() {
-			new RecoverTextController(recoverTextDiv).render(function() {
+			new RecoverTextController(recoverTextDiv, CryptoUtils.getCryptoPlugins()).render(function() {
 				
 				// start on file tab by default
 				selectTab("file");
@@ -1142,10 +1141,13 @@ inheritsFrom(RecoverFileController, DivController);
  * 
  * @param div is the div to render to
  */
-function RecoverTextController(div) {
+function RecoverTextController(div, plugins) {
 	DivController.call(this, div);
+	assertTrue(plugins.length > 0);
 	
 	let warningDiv;
+	let selector;
+	let selectedPlugin;
 	let textArea;
 	let importedPieces = [];	// string[]
 	let piecesAndControls;		// div for imported pieces and controls
@@ -1157,6 +1159,33 @@ function RecoverTextController(div) {
 		// warning div
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
 		warningDiv.hide();
+		
+		// currency selector data
+		selectorData = [];
+		for (let plugin of plugins) {
+			selectorData.push({
+				text: plugin.getName(),
+				imageSrc: plugin.getLogo().get(0).src
+			});
+		}
+		
+		// currency selector
+		selector = $("<div id='recover_currency_selector'>").appendTo(div);
+		loader.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
+			selector.ddslick({
+				data:selectorData,
+				background: "white",
+				imagePosition: "left",
+				selectText: "Select a Currency",
+				defaultSelectedIndex: 0,
+				onSelected: function(selection) {
+					selectedPlugin = plugins[selection.selectedIndex];
+					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
+				},
+			});
+			selector = $("#recover_currency_selector");	// ddslick requires id reference
+			setSelectedCurrency("Bitcoin");							// default value
+		});
 		
 		// text area
 		textArea = $("<textarea class='recover_textarea'>").appendTo(div);
@@ -1195,6 +1224,16 @@ function RecoverTextController(div) {
 		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
 		new ExportController(body, window, pieces, null).render();
+	}
+	
+	function setSelectedCurrency(name) {
+		for (let i = 0; i < selectorData.length; i++) {
+			if (selectorData[i].text === name) {
+				selector.ddslick('select', {index: i});
+				selectedPlugin = plugins[i];
+				break;
+			}
+		}
 	}
 	
 	function setWarning(str, img) {
