@@ -492,13 +492,15 @@ input[type='number'] {
 }
 
 .recover_warning_div {
-	padding:5px;
+	padding:8px;
 	margin-bottom:20px;
 	text-align:center;
 	background-color:rgb(247, 185, 43);
 	display:flex;
 	align-items:center;
 	justify-content:center;
+	border:2.5px solid black;
+	font-size:24px;
 }
 
 .recover_warning_div_icon {
@@ -513,6 +515,7 @@ input[type='number'] {
 	display:flex;
 	align-items:center;
 	justify-content:center;
+	border:2.5px solid black;
 }
 
 .inner_outline {
@@ -546,12 +549,17 @@ input[type='number'] {
 	cursor:pointer;
 }
 
+#recover_currency_selector {
+	border:2.5px solid black;
+}
+
 .recover_textarea {
 	margin-top:10px;
 	width:100%;
 	height:100px;
 	margin-bottom:10px;
 	font-family:monospace;
+	border:2.5px solid black;
 }
 
 .recover_submit {
@@ -562,6 +570,7 @@ input[type='number'] {
 	font-size:28px;
 	color:white;
 	background-color:rgb(55, 218, 44);
+	border:2.5px solid black;
 }
 
 .recover_submit:hover {
