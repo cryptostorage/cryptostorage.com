@@ -935,6 +935,7 @@ function RecoverFileController(div) {
 	}
 	
 	function onKeysImported(keys) {
+		keys = listify(keys);
 		assertTrue(keys.length > 0);
 		let pieces = CryptoUtils.keysToPieces(keys);
 		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
@@ -1220,6 +1221,7 @@ function RecoverTextController(div, plugins) {
 	}
 	
 	function onKeysImported(keys) {
+		keys = listify(keys);
 		assertTrue(keys.length > 0);
 		let pieces = CryptoUtils.keysToPieces(keys);
 		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
@@ -1307,21 +1309,14 @@ function RecoverTextController(div, plugins) {
 		
 		// get dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);
-		let ticker = "BTC";	// TODO: get from pulldown
-		let plugin = CryptoUtils.getCryptoPlugin(ticker);
-		for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
+		for (let dependency of selectedPlugin.getDependencies()) dependencies.add(dependency);
 		
 		// load dependencies
 		loader.load(Array.from(dependencies), function() {
 			
-			// TODO: ready to implement
-			console.log("Ready to import pieces");
-			console.log(plugin.getTicker());
-			console.log(importedPieces);
-			
-			// try to get key from strings
-			let key = CryptoUtils.getKey(CryptoUtils.getCryptoPlugin("BTC"), importedPieces);
-			console.log(key);
+			// try to get key from pieces
+			let key = CryptoUtils.getKey(selectedPlugin, importedPieces);
+			if (key) onKeysImported(key);
 		});
 	}
 	
