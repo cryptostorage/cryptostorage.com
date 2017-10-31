@@ -536,6 +536,16 @@ function getTokens(str) {
 }
 
 /**
+ * Returns lines separated by newlines from the given string.
+ * 
+ * @param str is the string to get lines from
+ * @param string[] are the lines separated by newlines within the string
+ */
+function getLines(str) {
+	return str.match(/[^\r\n]+/g);
+}
+
+/**
  * Returns the document's first stylesheet which has no href.
  * 
  * @returns StyleSheet is the internal stylesheet

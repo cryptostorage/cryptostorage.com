@@ -234,6 +234,38 @@ let CryptoUtils = {
 			}
 		}
 	},
+	
+	/**
+	 * Attempts to get a key from the given strings.
+	 * 
+	 * @param plugin is the currency plugin to parse the strings to a key
+	 * @param strings is expected to be a private key or pieces
+	 * @return CryptoKey if possible, null otherwise
+	 */
+	getKey: function(plugin, strs) {
+		
+		// validate input
+		assertInitialized(strs);
+		assertTrue(strs.length > 0);
+		
+		// parse single string
+		if (strs.length === 1) {
+			try {
+				return plugin.newKey(strs[0]);
+			} catch (err) {
+				return null;
+			}
+		}
+		
+		// parse multiple strings
+		else {
+			try {
+				return plugin.combine(strs);
+			} catch (err) {
+				return null;
+			}
+		}
+	},
 
 	/**
 	 * Converts the given keys to pieces.

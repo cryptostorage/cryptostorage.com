@@ -1194,7 +1194,7 @@ function RecoverTextController(div, plugins) {
 		// submit button
 		let submit = $("<div class='recover_submit'>").appendTo(div);
 		submit.html("Submit");
-		submit.click(function() { importPieces(); });
+		submit.click(function() { submitPieces(); });
 		
 		// pieces and controls
 		piecesAndControls = $("<div>").appendTo(div);
@@ -1247,9 +1247,29 @@ function RecoverTextController(div, plugins) {
 		str === "" ? warningDiv.hide() : warningDiv.show();
 	}
 	
-	function importPieces() {
-		addPieces([textArea.val()]);
-		textArea.val('');
+	function submitPieces() {
+		
+		// get and clear text
+		let val = textArea.val();
+		textArea.val("");
+		
+		// check for empty text
+		if (val.trim() === "") {
+			setWarning("No text entered");
+			return;
+		}
+		
+		// get lines
+		let lines = getLines(val);
+		
+		// get lines with content
+		let contentLines = [];
+		for (let line of lines) {
+			if (line.trim() !== "") contentLines.push(line);
+		}
+		
+		// add pieces
+		addPieces(contentLines);
 	}
 	
 	function addPieces(pieces) {
@@ -1298,6 +1318,10 @@ function RecoverTextController(div, plugins) {
 			console.log("Ready to import pieces");
 			console.log(plugin.getTicker());
 			console.log(importedPieces);
+			
+			// try to get key from strings
+			let key = CryptoUtils.getKey(CryptoUtils.getCryptoPlugin("BTC"), importedPieces);
+			console.log(key);
 		});
 	}
 	
