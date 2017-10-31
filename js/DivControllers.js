@@ -1195,6 +1195,7 @@ function RecoverTextController(div, plugins) {
 		
 		// text area
 		textArea = $("<textarea class='recover_textarea'>").appendTo(div);
+		textArea.attr("placeholder", "Enter a private key or split pieces of a private key");
 		
 		// submit button
 		let submit = $("<div class='recover_submit'>").appendTo(div);
