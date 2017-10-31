@@ -1148,6 +1148,7 @@ function RecoverTextController(div, plugins) {
 	
 	let warningDiv;
 	let selector;
+	let selectorDisabler;
 	let selectedPlugin;
 	let textArea;
 	let importedPieces = [];	// string[]
@@ -1171,7 +1172,8 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		// currency selector
-		selector = $("<div id='recover_currency_selector'>").appendTo(div);
+		let selectorContainer = $("<div class='recover_selector_container'>").appendTo(div);
+		selector = $("<div id='recover_selector'>").appendTo(selectorContainer);
 		loader.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
 			selector.ddslick({
 				data:selectorData,
@@ -1185,8 +1187,10 @@ function RecoverTextController(div, plugins) {
 					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
 			});
-			selector = $("#recover_currency_selector");	// ddslick requires id reference
-			setSelectedCurrency("Bitcoin");							// default value
+			selector = $("#recover_selector");	// ddslick requires id reference
+			setSelectedCurrency("Bitcoin");			// default value
+			selectorDisabler = $("<div class='recover_selector_disabler'>").appendTo(selectorContainer);
+			setSelectorEnabled(true);
 		});
 		
 		// text area
@@ -1218,6 +1222,16 @@ function RecoverTextController(div, plugins) {
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	function setSelectorEnabled(bool) {
+		if (bool) {
+			$("#recover_selector *").removeClass("disabled_text");
+			selectorDisabler.hide();
+		} else {
+			$("#recover_selector *").addClass("disabled_text");
+			selectorDisabler.show();
+		}
 	}
 	
 	function onKeysImported(keys) {
@@ -1304,8 +1318,13 @@ function RecoverTextController(div, plugins) {
 		setWarning("");
 		renderImportedPieces(importedPieces);
 		
-		// done if no pieces imported
-		if (!importedPieces.length) return;
+		// enable or disable selector
+		if (!importedPieces.length) {
+			setSelectorEnabled(true);
+			return;
+		} else {
+			setSelectorEnabled(false);
+		}
 		
 		// get dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);

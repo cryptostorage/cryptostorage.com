@@ -549,8 +549,27 @@ input[type='number'] {
 	cursor:pointer;
 }
 
-#recover_currency_selector {
+.recover_selector_container {
+	width:100%;
+	height:62px;
+	position:relative;
 	border:2.5px solid black;
+}
+
+#recover_selector, .recover_selector_disabler {
+	width:100%;
+	position:absolute;
+	top:0px;
+	left:0px;
+}
+
+.recover_selector_disabler {
+	z-index:10;
+	height:100%;
+}
+
+.disabled_text {
+	color:grey;
 }
 
 .recover_textarea {
