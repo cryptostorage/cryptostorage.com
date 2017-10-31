@@ -1081,7 +1081,7 @@ function RecoverFileController(div) {
 		}
 		
 		function getImportedPieceDiv(namedPiece) {
-			let importedPieceDiv = $("<div class='recover_imported_item'>").appendTo(importedPiecesDiv);
+			let importedPieceDiv = $("<div class='recover_file_imported_piece'>").appendTo(importedPiecesDiv);
 			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
 			importedPieceDiv.append(namedPiece.name);
 			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
@@ -1316,7 +1316,7 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		function getImportedPieceDiv(piece) {
-			let importedPieceDiv = $("<div class='recover_imported_item'>").appendTo(importedPiecesDiv);
+			let importedPieceDiv = $("<div class='recover_text_imported_piece'>").appendTo(importedPiecesDiv);
 			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
 			importedPieceDiv.append(piece);
 			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);

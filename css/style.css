@@ -577,10 +577,18 @@ input[type='number'] {
 	padding:5px;
 }
 
-.recover_imported_item {
+.recover_file_imported_piece {
 	display:flex;
 	align-items:center;
 	color:white;
+	padding:5px;
+}
+
+.recover_text_imported_piece {
+	display:flex;
+	align-items:center;
+	color:white;
+	font-family:monospace;
 	padding:5px;
 }
 
