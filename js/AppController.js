@@ -13,6 +13,7 @@
 // piece export: print, download, select pieces
 // faster load time
 
+// public address "decrypt private key to view"
 // ddslick pulldown loading before homepage loads, dependency management
 // header links full div hover
 // load all of home page when all images loaded
