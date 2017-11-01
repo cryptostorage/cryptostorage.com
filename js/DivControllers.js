@@ -1168,6 +1168,7 @@ function RecoverTextController(div, plugins) {
 	DivController.call(this, div);
 	assertTrue(plugins.length > 0);
 	
+	const MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
 	let warningDiv;
 	let selector;
 	let selectorDisabler;
@@ -1313,47 +1314,8 @@ function RecoverTextController(div, plugins) {
 		loader.load(Array.from(dependencies), function() {
 			
 			// add pieces
-			addPieces(contentLines);
+			updatePieces(contentLines);
 		});
-	}
-	
-	function addPieces(pieces) {
-		
-		// add each piece
-		for (let piece of pieces) {
-			if (contains(importedPieces, piece)) continue;
-			try {
-				let key = selectedPlugin.newKey(piece);
-				if (importedPieces.length > 0) {
-					console.log("setting warning");
-					console.log(importedPieces);
-					setWarning("Cannot add private key to existing pieces");
-				} else {
-					setWarning("");
-					importedPieces.push(piece);
-					onKeysImported(key);
-				}
-			} catch (err) {
-				if (CryptoUtils.isPossibleSplitPiece(piece)) {
-					setWarning("");
-					importedPieces.push(piece);
-				}
-				else setWarning("Invalid private key or piece: " + piece);
-			}
-		}
-		
-		// attempt get key by combining pieces
-		if (importedPieces.length > 1) {
-			try {
-				let key = selectedPlugin.combine(importedPieces);
-				onKeysImported(key);
-			} catch (err) {
-				setWarning("Additional pieces needed to recover private key");
-			}
-		}
-		
-		// update UI
-		updatePieces();
 	}
 	
 	function removePieces() {
@@ -1373,17 +1335,63 @@ function RecoverTextController(div, plugins) {
 		throw new Error("No piece imported: " + piece);
 	}
 	
-	function updatePieces() {
+	function updatePieces(newPieces) {
+		
+		// add valid pieces
+		let warningSet = false;
+		if (newPieces) {
+			let pkAdded;
+			for (let piece of newPieces) {
+				if (contains(importedPieces, piece)) continue;
+				try {
+					let key = selectedPlugin.newKey(piece);
+					if (importedPieces.length > 0) {
+						setWarning("Cannot mix private keys and split pieces");
+						warningSet = true;
+					} else {
+						pkAdded = true;
+						importedPieces.push(piece);
+					}
+				} catch (err) {
+					if (CryptoUtils.isPossibleSplitPiece(piece)) {
+						if (pkAdded) {
+							setWarning("Cannot mix private keys and split pieces");
+							warningSet = true;
+						} else {
+							importedPieces.push(piece);
+						}
+					}
+					else {
+						setWarning("Invalid private key or piece: " + CryptoUtils.getShortenedString(piece, 10));
+						warningSet = true;
+					}
+				}
+			}
+		}
 		
 		// render pieces
 		renderImportedPieces(importedPieces);
 		
-		// enable or disable selector
-		if (!importedPieces.length) {
-			setSelectorEnabled(true);
-			return;
-		} else {
-			setSelectorEnabled(false);
+		// selector only enabled if no pieces
+		setSelectorEnabled(importedPieces.length === 0);
+		
+		// attempt to extract keys
+		if (importedPieces.length === 0) setWarning("");
+		else if (importedPieces.length === 1) {
+			try {
+				let key = selectedPlugin.newKey(importedPieces[0]);
+				onKeysImported(key);
+			} catch (err) {
+				if (!warningSet) setWarning("Need additional pieces to recover private key");
+			}
+		} else if (importedPieces.length > 1) {
+			try {
+				let key = selectedPlugin.combine(importedPieces);
+				setWarning("");
+				onKeysImported(key);
+			} catch (err) {
+				if (!warningSet) setWarning("Need additional pieces to recover private key");
+			}
 		}
 	}
 	
@@ -1404,7 +1412,7 @@ function RecoverTextController(div, plugins) {
 		function getImportedPieceDiv(piece) {
 			let importedPieceDiv = $("<div class='recover_text_imported_piece'>").appendTo(importedPiecesDiv);
 			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
-			importedPieceDiv.append(piece);
+			importedPieceDiv.append(CryptoUtils.getShortenedString(piece, MAX_PIECE_LENGTH));
 			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
 			return importedPieceDiv;

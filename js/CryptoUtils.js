@@ -58,12 +58,12 @@ let CryptoUtils = {
 	/**
 	 * Determines if the given string is a possible split piece of a private key (cannot be excluded as one).
 	 * 
-	 * A piece must be at least 64 characters and base58 encoded.
+	 * A piece must be at least 47 characters and base58 encoded.
 	 * 
 	 * @returns true if the given string meets the minimum requirements to be a split piece
 	 */
 	isPossibleSplitPiece: function(str) {
-		return str.length >= 64 && CryptoUtils.isBase58(str);
+		return str.length >= 47 && CryptoUtils.isBase58(str);
 	},
 	
 	/**
@@ -558,5 +558,23 @@ let CryptoUtils = {
 			else if (ticker !== pieceKey.ticker) return "mix";
 		}
 		return ticker;
+	},
+	
+	/**
+	 * Returns a version of the string up to the given maxLength characters.
+	 * 
+	 * If the string is longer than maxLength, shortens the string by replacing middle characters with '...'.
+	 * 
+	 * @param str is the string to shorten
+	 * @param maxLength is the maximum length of the string
+	 * @return the given str if str.length <= maxLength, shortened version otherwise
+	 */
+	getShortenedString: function(str, maxLength) {
+		assertString(str);
+		if (str.length <= maxLength) return str;
+		let insert = '...';
+		let sideLength = Math.floor((maxLength - insert.length) / 2);
+		if (sideLength === 0) throw new Error("Cannot create string of length " + maxLength + " from string '" + str + "'");
+		return str.substring(0, sideLength) + insert + str.substring(str.length - sideLength);
 	}
 }

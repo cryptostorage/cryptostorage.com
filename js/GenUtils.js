@@ -235,6 +235,16 @@ function assertNumber(arg, msg) {
 }
 
 /**
+ * Asserts that the given argument is a string.
+ * 
+ * @param arg is the argument to assert as a string
+ * @param msg is the message to throw if the argument is not a string
+ */
+function assertString(arg, msg) {
+	if (!isString(arg)) throw new Error(msg ? msg : "Argument asserted as a string but is not a string");
+}
+
+/**
  * Asserts that the given argument is an object with the given name.
  * 
  * @param arg is the argument to test
