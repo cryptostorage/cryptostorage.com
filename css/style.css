@@ -59,13 +59,12 @@ ol {
 }
 
 .link_div {
-	padding:5px 0px 5px 0px;
-	margin:5px 10px 5px 10px;
+	padding:10px 10px 10px 10px;
 }
 
 .link_div:hover {
 	cursor:pointer;
-	box-shadow: inset 0 0px 0 white, inset 0 -2.5px 0 white
+	text-decoration:underline;
 }
 
 .intro_div {
@@ -116,7 +115,7 @@ ol {
 }
 
 .btn_start_generate {
-	height:65px;
+	height:75px;
 	width:225px;
 	color:white;
 	display:flex;
@@ -315,9 +314,13 @@ input[type='number'] {
 }
 
 .btn_generate {
+	height:65px;
+	width:220px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
 	background-color:#007500;
 	color:white;
-	padding:20px;
 	margin-bottom:25px;
 }
 
