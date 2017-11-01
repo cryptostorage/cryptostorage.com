@@ -765,6 +765,9 @@ input[type='number'] {
 		margin:0;
 		padding:0;
 	}
+	.piece_page_div {
+		margin-bottom:0px;
+	}
 	.piece_div {
 		display:block !important
 	}

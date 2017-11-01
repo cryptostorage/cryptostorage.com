@@ -18,7 +18,7 @@
 // kill old render jobs if no longer needed
 // no padding on slider
 // plugin.newKey() returns null for unrecognized strs instead of throws error
-// storage preview padding between pages
+// ios print spans more than one page
 
 // slider:
 // prevent scroll revealing some of next picture
