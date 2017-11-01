@@ -20,6 +20,7 @@
 // load all of home page when all images loaded
 // kill old render jobs if no longer needed
 // no padding on slider
+// plugin.newKey() returns null for unrecognized strs instead of throws error
 
 // slider:
 // prevent scroll revealing some of next picture

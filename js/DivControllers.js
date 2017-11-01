@@ -1307,14 +1307,52 @@ function RecoverTextController(div, plugins) {
 			if (line.trim() !== "") contentLines.push(line);
 		}
 		
-		// add pieces
-		addPieces(contentLines);
+		// load dependencies
+		let dependencies = new Set(COMMON_DEPENDENCIES);
+		for (let dependency of selectedPlugin.getDependencies()) dependencies.add(dependency);
+		loader.load(Array.from(dependencies), function() {
+			
+			// add pieces
+			addPieces(contentLines);
+		});
 	}
 	
 	function addPieces(pieces) {
+		
+		// add each piece
 		for (let piece of pieces) {
-			if (!contains(importedPieces)) importedPieces.push(piece);
+			if (contains(importedPieces, piece)) continue;
+			try {
+				let key = selectedPlugin.newKey(piece);
+				if (importedPieces.length > 0) {
+					console.log("setting warning");
+					console.log(importedPieces);
+					setWarning("Cannot add private key to existing pieces");
+				} else {
+					setWarning("");
+					importedPieces.push(piece);
+					onKeysImported(key);
+				}
+			} catch (err) {
+				if (CryptoUtils.isPossibleSplitPiece(piece)) {
+					setWarning("");
+					importedPieces.push(piece);
+				}
+				else setWarning("Invalid private key or piece: " + piece);
+			}
 		}
+		
+		// attempt get key by combining pieces
+		if (importedPieces.length > 1) {
+			try {
+				let key = selectedPlugin.combine(importedPieces);
+				onKeysImported(key);
+			} catch (err) {
+				setWarning("Additional pieces needed to recover private key");
+			}
+		}
+		
+		// update UI
 		updatePieces();
 	}
 	
@@ -1337,8 +1375,7 @@ function RecoverTextController(div, plugins) {
 	
 	function updatePieces() {
 		
-		// update UI
-		setWarning("");
+		// render pieces
 		renderImportedPieces(importedPieces);
 		
 		// enable or disable selector
@@ -1348,18 +1385,6 @@ function RecoverTextController(div, plugins) {
 		} else {
 			setSelectorEnabled(false);
 		}
-		
-		// get dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
-		for (let dependency of selectedPlugin.getDependencies()) dependencies.add(dependency);
-		
-		// load dependencies
-		loader.load(Array.from(dependencies), function() {
-			
-			// try to get key from pieces
-			let key = CryptoUtils.getKey(selectedPlugin, importedPieces);
-			if (key) onKeysImported(key);
-		});
 	}
 	
 	function renderImportedPieces(pieces) {

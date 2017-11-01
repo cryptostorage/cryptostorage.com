@@ -62,7 +62,7 @@ let CryptoUtils = {
 	 * 
 	 * @returns true if the given string meets the minimum requirements to be a split piece
 	 */
-	isPossiblePiece: function(str) {
+	isPossibleSplitPiece: function(str) {
 		return str.length >= 64 && CryptoUtils.isBase58(str);
 	},
 	
