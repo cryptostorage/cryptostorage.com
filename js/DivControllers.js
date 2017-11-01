@@ -1212,8 +1212,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		div.empty();
 		
 		// key generation
-		let keyGenDiv = $("<div class='key_gen_div'>").appendTo(div);
-		progressDiv = $("<div>").appendTo(keyGenDiv);
+		progressDiv = $("<div class='export_progress_div'>").appendTo(div);
 		progressDiv.hide();
 		progressBar = UiUtils.getProgressBar(progressDiv);
 		
@@ -1361,7 +1360,10 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			else {
 				assertInitialized(keyGenConfig);
 				CryptoUtils.generateKeys(keyGenConfig, function(done, total, label) {
-					console.log(done + "/" + total);
+					console.log(done + " / " + total + " " + label);
+					progressBar.set(done / total);
+					if (label) progressBar.setText(label);
+					progressDiv.show();
 				}, function(_keys, _pieces, _pieceDivs) {
 					keys = _keys;
 					pieces = _pieces;

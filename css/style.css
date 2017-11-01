@@ -658,6 +658,11 @@ input[type='number'] {
 	text-decoration:underline;
 }
 
+.export_progress_div {
+	width:100%;
+	height:50px;
+}
+
 .export_header {
 	background-color:rgb(17, 119, 184);
 	width:100%;
