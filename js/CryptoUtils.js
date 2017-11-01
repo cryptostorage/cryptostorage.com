@@ -586,6 +586,8 @@ let CryptoUtils = {
 	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
 	 */
 	generateKeys: function(config, onProgress, onDone) {
+		
+		let decommissioned = false;	// TODO: remove altogether?
 
 		// load dependencies
 		let dependencies = new Set(COMMON_DEPENDENCIES);

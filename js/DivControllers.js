@@ -429,9 +429,7 @@ function FormController(div) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
-	/**
-	 * Handles when generate button clicked.
-	 */
+	// handle when generate button clicked
 	function onGenerate(onDone) {
 		let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
@@ -440,6 +438,7 @@ function FormController(div) {
 		});
 	}
 	
+	// get current form configuration
 	function getConfig() {
 		let config = {};
 		config.passphraseChecked = passphraseCheckbox.prop('checked');
@@ -1360,11 +1359,15 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			
 			// otherwise generate keys from config
 			else {
-				
-				
 				assertInitialized(keyGenConfig);
-				console.log(keyGenConfig);
-				throw Error("Key generation from config not implemented");
+				CryptoUtils.generateKeys(keyGenConfig, function(done, total, label) {
+					console.log(done + "/" + total);
+				}, function(_keys, _pieces, _pieceDivs) {
+					keys = _keys;
+					pieces = _pieces;
+					pieceDivs = _pieceDivs;
+					update(onDone);
+				});
 			}
 		}
 	}
