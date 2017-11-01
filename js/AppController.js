@@ -13,13 +13,10 @@
 
 // public address "decrypt private key to view"
 // ddslick pulldown loading before homepage loads, dependency management
-// header links full div hover
 // load all of home page when all images loaded
-// kill old render jobs if no longer needed
 // no padding on slider
 // plugin.newKey() returns null for unrecognized strs instead of throws error
 // ios print spans more than one page
-// move cryto utils out of UiUtils
 
 // slider:
 // prevent scroll revealing some of next picture
