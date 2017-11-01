@@ -201,7 +201,7 @@ function AppController(div) {
 		faqController.render();
 		
 		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
-		setTimeout(function() {
+		setImmediate(function() {
 			
 			// render body and start on home
 			homeController.render(function() {
@@ -219,7 +219,7 @@ function AppController(div) {
 				// done rendering
 				if (onDone) onDone(div);
 			});
-		}, 0);
+		});
 	}
 	
 	this.showHome = function() {

@@ -744,12 +744,12 @@ let CryptoUtils = {
 						callback();
 						return;
 					}
-					setTimeout(function() {
+					setImmediate(function() {
 						let key = plugin.newKey();
 						progressWeight += CryptoUtils.getCreateKeyWeight();
 						if (onProgress) onProgress(progressWeight, totalWeight, "Generating keys");
 						callback(null, key);
-					}, 0);	// let UI breath
+					});	// let UI breath
 				}
 			}
 			
@@ -762,7 +762,7 @@ let CryptoUtils = {
 					key.encrypt(scheme, password, function(err, key) {
 						progressWeight += CryptoUtils.getEncryptWeight(scheme);
 						if (onProgress) onProgress(progressWeight, totalWeight, "Encrypting");
-						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
+						setImmediate(function() { callback(err, key); });	// let UI breath
 					});
 				}
 			}
@@ -777,7 +777,7 @@ let CryptoUtils = {
 					key.decrypt(password, function(err, key) {
 						progressWeight += CryptoUtils.getDecryptWeight(scheme);
 						if (onProgress) onProgress(progressWeight, totalWeight, "Decrypting");
-						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
+						setImmediate(function() { callback(err, key); });	// let UI breath
 					});
 				}
 			}
