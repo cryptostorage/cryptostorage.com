@@ -760,6 +760,9 @@ input[type='number'] {
 	body * {
 	  visibility: hidden;
 	}
+	.export_progress_div {
+		display:none;
+	}
 	.export_header {
 		display:none;
 	}
