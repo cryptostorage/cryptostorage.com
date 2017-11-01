@@ -1269,7 +1269,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		});
 		
 		// build ui based on keyGenConfig, pieces, and pieceDivs
-		update();
+		update(pieceDivs);
 
 		// done rendering
 		if (onDone) onDone(div);
@@ -1321,8 +1321,9 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		}
 	}
 	
-	function update(onDone) {
+	function update(_pieceDivs, onDone) {
 		updateHeader();
+		pieceDivs = _pieceDivs;
 		
 		// add piece divs if given
 		if (pieceDivs) {
