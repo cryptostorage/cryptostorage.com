@@ -1,5 +1,4 @@
 // TODO
-// private key import
 // piece labeling
 // async operations in new tab
 // all the error messages
