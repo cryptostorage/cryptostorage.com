@@ -46,38 +46,6 @@ let UiUtils = {
 			label.html(plugin.getName());
 		}
 		return row;
-	},
-	
-	// --- relative weights of key generation derived from experimentation and used for representative progress bar ---
-	
-	getCreateKeyWeight: function() { return 63; },
-	
-	getEncryptWeight: function(scheme) {
-		switch (scheme) {
-			case CryptoUtils.EncryptionScheme.BIP38:
-				return 4187;
-			case CryptoUtils.EncryptionScheme.CRYPTOJS:
-				return 10;
-			default: throw new Error("Unrecognized encryption scheme: " + scheme);
-		}
-	},
-	
-	getDecryptWeight: function(scheme) {
-		switch (scheme) {
-			case CryptoUtils.EncryptionScheme.BIP38:
-				return 4581;
-			case CryptoUtils.EncryptionScheme.CRYPTOJS:
-				return 100;
-			default: throw new Error("Unrecognized encryption scheme: " + scheme);
-		}
-	},
-	
-	getQrWeight: function() {
-		return 15;
-	},
-	
-	getLogoWeight: function() {
-		return 15;
 	}
 }
 
@@ -439,7 +407,7 @@ function FormController(div) {
 		let generateDiv = $("<div class='generate_div'>").appendTo(div);
 		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
 		btnGenerate.append("Generate keys");
-		btnGenerate.click(function() { onGeneratePieces() });
+		btnGenerate.click(function() { onGenerate() });
 		
 		// under development warning
 		let warningDiv = $("<div class='app_header_warning'>").appendTo(div);
@@ -462,20 +430,13 @@ function FormController(div) {
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	/**
-	 * Generates pieces based on the current configuration and updates the GUI.
+	 * Handles when generate button clicked.
 	 */
-	function onGeneratePieces(onDone) {
-		generateKeys(function(done, total, label) {
-			progressBar.set(done / total);
-			if (label) progressBar.setText(label);
-			progressDiv.show();
-		}, function(keys, pieces, pieceDivs) {
-			progressDiv.hide();
-			let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
-			let body = $("body", window.document);
-			new ExportController(body, window, getConfig()).render(function(div) {
-				if (onDone) onDone();
-			});
+	function onGenerate(onDone) {
+		let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
+		let body = $("body", window.document);
+		new ExportController(body, window, getConfig()).render(function(div) {
+			if (onDone) onDone();
 		});
 	}
 	
@@ -597,218 +558,6 @@ function FormController(div) {
 			trashDiv.click(function() { onDelete(); });
 			let trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
 		}
-	}
-	
-	/**
-	 * Generates keys, pieces, rendered pieces.
-	 * 
-	 * @param onProgress(done, total, label) is invoked as progress is made
-	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
-	 */
-	function generateKeys(onProgress, onDone) {
-		
-		// get current configuration
-		let config = getConfig();
-
-		// load dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
-		for (let currency of config.currencies) {
-			for (let dependency of currency.plugin.getDependencies()) {
-				dependencies.add(dependency);
-			}
-		}
-		loader.load(Array.from(dependencies), function() {
-			
-			// compute total weight for progress bar
-			let totalWeight = 0;
-			let numKeys = 0;
-			for (let currency of config.currencies) {
-				numKeys += currency.numKeys;
-				totalWeight += currency.numKeys * UiUtils.getCreateKeyWeight();
-				if (currency.encryption) totalWeight += currency.numKeys * (UiUtils.getEncryptWeight(currency.encryption) + (VERIFY_ENCRYPTION ? UiUtils.getDecryptWeight(currency.encryption) : 0));
-			}
-			let piecesRendererWeight = PieceRenderer.getPieceWeight(numKeys, config.numPieces, null);
-			totalWeight += piecesRendererWeight;
-			
-			// collect key creation functions
-			let funcs = [];
-			for (let currency of config.currencies) {
-				for (let i = 0; i < currency.numKeys; i++) {
-					funcs.push(newKeyFunc(currency.plugin));
-				}
-			}
-			
-			// generate keys
-			let progressWeight = 0;
-			if (onProgress) onProgress(progressWeight, totalWeight, "Generating keys");
-			async.series(funcs, function(err, keys) {
-				if (decommissioned) {
-					if (onDone) onDone();
-					return;
-				}
-				if (err) throw err;
-				let originals = keys;
-				
-				// collect encryption functions
-				funcs = [];
-				let keyIdx = 0;
-				let passphrases = [];
-				for (let currency of config.currencies) {
-					for (let i = 0; i < currency.numKeys; i++) {
-						if (currency.encryption) {
-							funcs.push(encryptFunc(originals[keyIdx].copy(), currency.encryption, config.passphrase));
-							passphrases.push(config.passphrase);
-						}
-						keyIdx++;
-					}
-				}
-				
-				// no encryption
-				if (!funcs.length) {
-					
-					// convert keys to pieces
-					let pieces = CryptoUtils.keysToPieces(originals, config.numPieces, config.minPieces);
-					
-					// validate pieces can recreate originals
-					let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
-					assertEquals(originals.length, keysFromPieces.length);
-					for (let i = 0; i < originals.length; i++) {
-						assertTrue(originals[i].equals(keysFromPieces[i]));
-					}
-					
-					// render pieces to divs
-					if (onProgress) onProgress(progressWeight, totalWeight, "Rendering");
-					renderPieceDivs(pieces, function(err, pieceDivs) {
-						if (err) throw err;
-						assertEquals(pieces.length, pieceDivs.length);
-						if (onProgress) onProgress(1, 1, "Complete");
-						if (onDone) onDone(keys, pieces, pieceDivs);
-					});
-				}
-				
-				// handle encryption
-				else {
-					
-					// encrypt keys
-					onProgress(progressWeight, totalWeight, "Encrypting keys");
-					async.series(funcs, function(err, encryptedKeys) {
-						if (decommissioned) {
-							if (onDone) onDone();
-							return;
-						}
-						if (err) throw err;
-						
-						// convert keys to pieces
-						let pieces = CryptoUtils.keysToPieces(encryptedKeys, config.numPieces, config.minPieces);
-						
-						// validate pieces can recreate originals
-						let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
-						assertEquals(encryptedKeys.length, keysFromPieces.length);
-						for (let i = 0; i < encryptedKeys.length; i++) {
-							assertTrue(encryptedKeys[i].equals(keysFromPieces[i]));
-						}
-						
-						// verify encryption
-						if (VERIFY_ENCRYPTION) {
-							
-							// collect decryption functions
-							funcs = [];
-							for (let i = 0; i < encryptedKeys.length; i++) {
-								funcs.push(decryptFunc(encryptedKeys[i].copy(), passphrases[i]));
-							}
-							
-							// decrypt keys
-							onProgress(progressWeight, totalWeight, "Verifying encryption");
-							async.series(funcs, function(err, decryptedKeys) {
-								if (decommissioned) {
-									if (onDone) onDone();
-									return;
-								}
-								if (err) throw err;
-								
-								// verify equivalence
-								assertEquals(originals.length, decryptedKeys.length);
-								for (let i = 0; i < originals.length; i++) {
-									assertTrue(originals[i].equals(decryptedKeys[i]));
-								}
-								
-								// render pieces to divs
-								onProgress(progressWeight, totalWeight, "Rendering");
-								renderPieceDivs(pieces, function(err, pieceDivs) {
-									if (err) throw err;
-									assertEquals(pieces.length, pieceDivs.length);
-									if (onProgress) onProgress(1, 1, "Complete");
-									if (onDone) onDone(encryptedKeys, pieces, pieceDivs);
-								});
-							});
-						}
-						
-						// don't verify encryption
-						else {
-							
-							// render pieces to divs
-							onProgress(progressWeight, totalWeight, "Rendering");
-							renderPieceDivs(pieces, function(err, pieceDivs) {
-								if (err) throw err;
-								assertEquals(pieces.length, pieceDivs.length);
-								onProgress(1, 1, "Complete");
-								onDone(encryptedKeys, pieces, pieceDivs);
-							});
-						}
-					});
-				}
-			});
-			
-			function newKeyFunc(plugin, callback) {
-				return function(callback) {
-					if (decommissioned) {
-						callback();
-						return;
-					}
-					setTimeout(function() {
-						let key = plugin.newKey();
-						progressWeight += UiUtils.getCreateKeyWeight();
-						if (onProgress) onProgress(progressWeight, totalWeight, "Generating keys");
-						callback(null, key);
-					}, 0);	// let UI breath
-				}
-			}
-			
-			function encryptFunc(key, scheme, password) {
-				return function(callback) {
-					if (decommissioned) {
-						callback();
-						return;
-					}
-					key.encrypt(scheme, password, function(err, key) {
-						progressWeight += UiUtils.getEncryptWeight(scheme);
-						if (onProgress) onProgress(progressWeight, totalWeight, "Encrypting");
-						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
-					});
-				}
-			}
-			
-			function decryptFunc(key, password) {
-				return function(callback) {
-					if (decommissioned) {
-						callback();
-						return;
-					}
-					let scheme = key.getEncryptionScheme();
-					key.decrypt(password, function(err, key) {
-						progressWeight += UiUtils.getDecryptWeight(scheme);
-						if (onProgress) onProgress(progressWeight, totalWeight, "Decrypting");
-						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
-					});
-				}
-			}
-			
-			function renderPieceDivs(pieces, onDone) {
-				PieceRenderer.renderPieces(pieces, null, null, function(percent) {
-					if (onProgress) onProgress(progressWeight + (percent * piecesRendererWeight), totalWeight, "Rendering");
-				}, onDone);
-			}
-		});
 	}
 }
 inheritsFrom(FormController, DivController);
@@ -1611,7 +1360,10 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			
 			// otherwise generate keys from config
 			else {
+				
+				
 				assertInitialized(keyGenConfig);
+				console.log(keyGenConfig);
 				throw Error("Key generation from config not implemented");
 			}
 		}
