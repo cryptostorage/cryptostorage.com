@@ -225,6 +225,16 @@ function assertNotEquals(arg1, arg2, msg) {
 }
 
 /**
+ * Asserts that the given argument is an integer.
+ * 
+ * @param arg is the argument to assert as an integer
+ * @param msg is the message to throw if the argument is not an integer
+ */
+function assertInt(arg, msg) {
+	if (!isInt(arg)) throw new Error(msg ? msg : "Argument asserted as an integer but is not an integer");
+}
+
+/**
  * Asserts that the given argument is a number.
  * 
  * @param arg is the argument to assert as a number
@@ -245,6 +255,16 @@ function assertString(arg, msg) {
 }
 
 /**
+ * Asserts that the given argument is an array.
+ * 
+ * @param arg is the argument to assert as an array
+ * @param msg is the message to throw if the argument is not an array
+ */
+function assertArray(arg, msg) {
+	if (!isArray(arg)) throw new Error(msg ? msg : "Argument asserted as an array but is not an array");
+}
+
+/**
  * Asserts that the given argument is an object with the given name.
  * 
  * @param arg is the argument to test
@@ -255,16 +275,6 @@ function assertObject(arg, name, msg) {
 	if (!isObject(arg, name)) {
 		throw new Error(msg ? msg : "Argument asserted as object with name '" + name + "' but was not");
 	}
-}
-
-/**
- * Asserts that the given argument is an integer.
- * 
- * @param arg is the argument to assert as an integer
- * @param msg is the message to throw if the argument is not an integer
- */
-function assertInt(arg, msg) {
-	if (!isInt(arg)) throw new Error(msg ? msg : "Argument asserted as an integer but is not an integer");
 }
 
 /**

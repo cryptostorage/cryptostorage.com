@@ -4,7 +4,7 @@
 let Tests = {
 	
 	// constants
-	REPEAT_LONG: 50,
+	REPEAT_LONG: 25,
 	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
@@ -49,8 +49,8 @@ let Tests = {
 			
 			// run tests
 			testUtils();
-			testPathTracker();
 			testParseKey(plugins);
+			for (plugin of plugins) testSplitAndCombine(plugin);
 			if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
 			testCryptoKeys(plugins, function(error) {
 				if (callback) callback(error);
@@ -68,11 +68,12 @@ let Tests = {
 			assertFalse(isString(null));
 			assertFalse(isString(undefined));
 			assertFalse(isString(123));
+			assertTrue(CryptoUtils.isBase58("abcd"))
+			assertFalse(CryptoUtils.isBase58("abcd0"))
 			
 			// test isBase58()
 			for (let plugin of Tests.getTestCryptoPlugins()) {
 				let key = plugin.newKey()
-				assertFalse(CryptoUtils.isBase58(key.getHex()));
 				let pieces = plugin.split(key, 3, 2);
 				for (let piece of pieces) {
 					assertTrue(CryptoUtils.isBase58(piece));
@@ -133,88 +134,6 @@ let Tests = {
 				fail("fail");
 			} catch (err) {
 				if (err.message === "fail") throw new Error("Should not have been able to split keys without private components")
-			}
-		}
-
-		function testPathTracker() {
-			var tracker = new PathTracker(onUpdate);
-			
-			// assert initial state
-			assertEquals(-1, tracker.getIndex());
-			assertEquals(0, tracker.getItems().length);
-			assertFalse(tracker.hasNext());
-			assertFalse(tracker.hasPrev());
-			assertNull(tracker.current());
-			try {
-				tracker.next();
-				throw new Error("fail");
-			} catch (err) {
-				if (err.message === "fail") throw err;
-			}
-			try {
-				tracker.prev();
-				throw new Error("fail");
-			} catch (err) {
-				if (err.message === "fail") throw err;
-			}
-			
-			// add item
-			tracker.next("1");
-			assertEquals("1", tracker.current());
-			assertFalse(tracker.hasPrev());
-			assertFalse(tracker.hasNext());
-			try {
-				tracker.next();
-				throw new Error("fail");
-			} catch (err) {
-				if (err.message === "fail") throw new Error("fail");
-			}
-			try {
-				tracker.prev();
-				throw new Error("fail");
-			} catch (err) {
-				if (err.message === "fail") throw new Error("fail");
-			}
-			
-			// add another item
-			tracker.next("2");
-			assertEquals("2", tracker.current());
-			assertTrue(tracker.hasPrev());
-			assertFalse(tracker.hasNext());
-			assertEquals("1", tracker.prev());
-			assertEquals("1", tracker.current());
-			assertTrue(tracker.hasNext());
-			assertFalse(tracker.hasPrev());
-			assertEquals("2", tracker.next());
-			assertTrue(tracker.hasPrev());
-			assertFalse(tracker.hasNext());
-			
-			// test current
-			try {
-				tracker.current("3");
-				throw new Error("fail");
-			} catch (err) {
-				if (err.message === "fail") throw err;
-			}
-			tracker.current("1");
-			assertFalse(tracker.hasPrev());
-			assertTrue(tracker.hasNext());
-			assertEquals("2", tracker.next());
-			assertEquals("3", tracker.next("3"));
-			assertFalse(tracker.hasNext());
-			assertTrue(tracker.hasPrev());
-			assertEquals("2", tracker.prev());
-			assertTrue(tracker.hasNext());
-			assertTrue(tracker.hasPrev());
-			assertEquals("1", tracker.prev());
-			assertEquals("2", tracker.next("2"));
-			assertTrue(tracker.hasPrev());
-			assertFalse(tracker.hasNext());
-			
-			function onUpdate(lastIdx, curIdx, item) {
-				assertNotNull(lastIdx);
-				assertNotNull(curIdx);
-				assertNotNull(item);
 			}
 		}
 
@@ -525,6 +444,31 @@ let Tests = {
 			let copies = [];
 			for (let key of keys) copies.push(key.copy());
 			return copies;
+		}
+		
+		function testSplitAndCombine(plugin) {
+			for (let i = 0; i < Tests.REPEAT_LONG; i++) {
+				let key = plugin.newKey();
+				let pieces = plugin.split(key, Tests.NUM_PIECES, Tests.MIN_PIECES);
+				
+				// test that single pieces cannot create key
+				for (let piece of pieces) {
+					try {
+						plugin.combine([piece]);
+						throw Error("fail");
+					} catch (err) {
+						if (err.message === "fail") throw new Error("Cannot combine single pieces");
+					}
+				}
+				
+				// test each piece combination
+				let combinations = getCombinations(pieces, Tests.MIN_PIECES);
+				for (let i = 0; i < combinations.length; i++) {
+					let combination = combinations[i];
+					let combined = plugin.combine(combination);
+					assertTrue(key.equals(combined));
+				}
+			}
 		}
 	}
 }

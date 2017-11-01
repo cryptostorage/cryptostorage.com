@@ -1168,7 +1168,8 @@ function RecoverTextController(div, plugins) {
 	DivController.call(this, div);
 	assertTrue(plugins.length > 0);
 	
-	const MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
+	const MAX_PIECE_LENGTH = 58;					// max length of piece strings to render
+	const MAX_INVALID_PIECE_LENGTH = 25;	// max length of invalid piece string to display in warning
 	let warningDiv;
 	let selector;
 	let selectorDisabler;
@@ -1337,35 +1338,65 @@ function RecoverTextController(div, plugins) {
 	
 	function updatePieces(newPieces) {
 		
-		// add valid pieces
+		// reset warning
+		setWarning("");
+		
+		// interanl warning setter to track if warning is set
 		let warningSet = false;
+		function setWarningAux(str) {
+			setWarning(str);
+			warningSet = true;
+		}
+		
+		// scenarios:
+		// add private key, don't allow anything after
+		// add private keys, add first, don't allow anything after
+		// add piece, need additional, allow pieces, don't allow private key
+		// add pieces, check if key created, allow pieces, don't allow private key
+		
+		// check for existing private key
+		let key;
+		if (importedPieces.length === 1) {
+			try {
+				key = selectedPlugin.newKey(importedPieces[0]);
+			} catch (err) {
+				// nothing to do
+			}
+		}
+		
+		// add new pieces
 		if (newPieces) {
-			let pkAdded;
-			for (let piece of newPieces) {
-				if (contains(importedPieces, piece)) continue;
-				try {
-					let key = selectedPlugin.newKey(piece);
-					if (importedPieces.length > 0) {
-						setWarning("Cannot mix private keys and split pieces");
-						warningSet = true;
-					} else {
-						pkAdded = true;
-						importedPieces.push(piece);
+			if (key) setWarningAux("Private key already added");
+			else {
+				for (let piece of newPieces) {
+					if (contains(importedPieces, piece)) {
+						setWarningAux("Piece already added");
+						continue;
 					}
-				} catch (err) {
-					if (CryptoUtils.isPossibleSplitPiece(piece)) {
-						if (pkAdded) {
-							setWarning("Cannot mix private keys and split pieces");
-							warningSet = true;
-						} else {
-							importedPieces.push(piece);
+					if (key) setWarningAux("Private key alread added");
+					else {
+						try {
+							let thisKey = selectedPlugin.newKey(piece);
+							if (importedPieces.length > 0) setWarningAux("Cannot add private key to existing pieces");
+							else {
+								key = thisKey;
+								importedPieces.push(piece);
+							}
+						} catch (err) {
+							if (CryptoUtils.isPossibleSplitPiece(piece)) importedPieces.push(piece);
+							else setWarningAux("Invalid private key or piece: " + CryptoUtils.getShortenedString(piece, MAX_INVALID_PIECE_LENGTH));
 						}
 					}
-					else {
-						setWarning("Invalid private key or piece: " + CryptoUtils.getShortenedString(piece, 10));
-						warningSet = true;
-					}
 				}
+			}
+		}
+		
+		// check if pieces combine to make private key
+		if (!key && importedPieces.length > 0) {
+			try {
+				key = selectedPlugin.combine(importedPieces);
+			} catch (err) {
+				if (!warningSet) setWarning("Need additional pieces to recover private keys");
 			}
 		}
 		
@@ -1375,24 +1406,8 @@ function RecoverTextController(div, plugins) {
 		// selector only enabled if no pieces
 		setSelectorEnabled(importedPieces.length === 0);
 		
-		// attempt to extract keys
-		if (importedPieces.length === 0) setWarning("");
-		else if (importedPieces.length === 1) {
-			try {
-				let key = selectedPlugin.newKey(importedPieces[0]);
-				onKeysImported(key);
-			} catch (err) {
-				if (!warningSet) setWarning("Need additional pieces to recover private key");
-			}
-		} else if (importedPieces.length > 1) {
-			try {
-				let key = selectedPlugin.combine(importedPieces);
-				setWarning("");
-				onKeysImported(key);
-			} catch (err) {
-				if (!warningSet) setWarning("Need additional pieces to recover private key");
-			}
-		}
+		// handle if key exists
+		if (key) onKeysImported(key);
 	}
 	
 	function renderImportedPieces(pieces) {

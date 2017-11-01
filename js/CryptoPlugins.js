@@ -65,6 +65,8 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
  * @return CryptoKey is the key built by combining the shares
  */
 CryptoPlugin.prototype.combine = function(shares) {
+	assertArray(shares);
+	assertTrue(shares.length > 1);
 	return this.newKey(secrets.combine(shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
 }
 
