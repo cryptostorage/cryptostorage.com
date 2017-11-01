@@ -1221,12 +1221,12 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		
 		// export buttons
 		let exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
+		let saveButton = $("<div class='export_button'>").appendTo(exportButtons);
+		saveButton.html("Save All");
+		saveButton.click(function() { saveAll(pieces); });
 		printButton = $("<div class='export_button'>").appendTo(exportButtons);
 		printButton.html("Print All");
 		printButton.click(function() { printAll(); });
-		let exportButton = $("<div class='export_button'>").appendTo(exportButtons);
-		exportButton.html("Export All");
-		exportButton.click(function() { exportAll(pieces); });
 		let savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
 		savePublicButton.click(function() { savePublicAddresses(); });
@@ -1290,7 +1290,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		window.print();
 	}
 	
-	function exportAll(pieces) {
+	function saveAll(pieces) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
 		if (pieces.length === 1) {
