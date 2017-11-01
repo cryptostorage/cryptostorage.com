@@ -19,6 +19,7 @@
 // no padding on slider
 // plugin.newKey() returns null for unrecognized strs instead of throws error
 // ios print spans more than one page
+// move cryto utils out of UiUtils
 
 // slider:
 // prevent scroll revealing some of next picture

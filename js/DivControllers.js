@@ -473,7 +473,7 @@ function FormController(div) {
 			progressDiv.hide();
 			let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
 			let body = $("body", window.document);
-			new ExportController(body, window, pieces, pieceDivs).render(function(div) {
+			new ExportController(body, window, getConfig()).render(function(div) {
 				if (onDone) onDone();
 			});
 		});
@@ -940,7 +940,7 @@ function RecoverFileController(div) {
 		let pieces = CryptoUtils.keysToPieces(keys);
 		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
-		new ExportController(body, window, pieces, null).render();
+		new ExportController(body, window, null, pieces, null).render();
 	}
 	
 	function setWarning(str, img) {
@@ -1264,7 +1264,7 @@ function RecoverTextController(div, plugins) {
 		let pieces = CryptoUtils.keysToPieces(keys);
 		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
-		new ExportController(body, window, pieces, null).render();
+		new ExportController(body, window, null, pieces, null).render();
 	}
 	
 	function setSelectedCurrency(name) {
@@ -1438,12 +1438,16 @@ inheritsFrom(RecoverTextController, DivController);
  * Export page.
  * 
  * @param div is the div to render to
+ * @param keyGenConfig is a configuration to generate new storage 
  * @param pieces are the pieces to export
  * @param pieceDivs are pre-rendered piece divs for display
  */
-function ExportController(div, window, pieces, pieceDivs) {
+function ExportController(div, window, keyGenConfig, pieces, pieceDivs) {
 	DivController.call(this, div);
 	
+	// global variables
+	let progressDiv;
+	let progressBar;
 	let printButton;
 	let showPublicCheckbox;
 	let showPrivateCheckbox;
@@ -1454,6 +1458,12 @@ function ExportController(div, window, pieces, pieceDivs) {
 	
 	this.render = function(onDone) {
 		div.empty();
+		
+		// key generation
+		let keyGenDiv = $("<div class='key_gen_div'>").appendTo(div);
+		progressDiv = $("<div>").appendTo(keyGenDiv);
+		progressDiv.hide();
+		progressBar = UiUtils.getProgressBar(progressDiv);
 		
 		// export header
 		let exportHeader = $("<div class='export_header'>").appendTo(div);
@@ -1495,16 +1505,9 @@ function ExportController(div, window, pieces, pieceDivs) {
 		// piece selection
 		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
 		pieceSelector = $("<select class='piece_selector'>").appendTo(exportPieceSelection);
-		for (let i = 0; i < pieces.length; i++) {
-			let option = $("<option value='" + i + "'>").appendTo(pieceSelector);
-			option.html("Piece " + (i + 1));
-		}
 		
 		// currently showing piece
 		currentPiece = $("<div class='export_current_piece'>").appendTo(div);
-		
-		// update pieces
-		update(pieceDivs);
 		
 		// register events
 		showPublicCheckbox.click(function() { update(); });
@@ -1513,6 +1516,9 @@ function ExportController(div, window, pieces, pieceDivs) {
 		pieceSelector.change(function() {
 			setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
 		});
+		
+		// build ui based on keyGenConfig, pieces, and pieceDivs
+		update();
 
 		// done rendering
 		if (onDone) onDone(div);
@@ -1562,29 +1568,48 @@ function ExportController(div, window, pieces, pieceDivs) {
 		}
 	}
 	
-	function update(existingPieceDivs, onDone) {
+	function update(onDone) {
 		updateHeader();
-		pieceDivs = existingPieceDivs;
 		
-		// handle pieces already exist
+		// add piece divs if given
 		if (pieceDivs) {
+			updateSelector(pieceSelector, pieces.length);
 			setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
 			setPieceDivs(pieceDivs);
 			setPrintEnabled(true);
 			if (onDone) onDone();
-			return;
 		}
 		
-		// render pieces
-		pieceDivs = [];
-		for (piece of pieces) pieceDivs.push($("<div>"));
-		setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
-		setPieceDivs(pieceDivs);
-		setPrintEnabled(false);
-		PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
-			setPrintEnabled(true);
-			if (onDone) onDone();
-		});
+		// else render from pieces
+		else {
+			pieceDivs = [];
+			
+			// render pieces if given
+			if (pieces) {
+				for (piece of pieces) pieceDivs.push($("<div>"));
+				updateSelector(pieceSelector, pieces.length);
+				setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
+				setPieceDivs(pieceDivs);
+				setPrintEnabled(false);
+				PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
+					setPrintEnabled(true);
+					if (onDone) onDone();
+				});
+			}
+			
+			// 
+			else {
+				throw new Error("Not yet implemented");
+			}
+		}
+	}
+	
+	function updateSelector(pieceSelector, numPieces) {
+		pieceSelector.empty();
+		for (let i = 0; i < numPieces; i++) {
+			let option = $("<option value='" + i + "'>").appendTo(pieceSelector);
+			option.html("Piece " + (i + 1));
+		}
 	}
 	
 	function setPieceDivs(pieceDivs) {
