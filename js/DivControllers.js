@@ -945,10 +945,9 @@ function RecoverFileController(div) {
 	
 	function setWarning(str, img) {
 		warningDiv.empty();
-		if (img) {
-			warningDiv.append(img);
-			img.addClass("recover_warning_div_icon");
-		}
+		if (!img) img = $("<img src='img/warning.png'>");
+		warningDiv.append(img);
+		img.addClass("recover_warning_div_icon");
 		warningDiv.append(str);
 		str === "" ? warningDiv.hide() : warningDiv.show();
 	}
@@ -1280,10 +1279,9 @@ function RecoverTextController(div, plugins) {
 	
 	function setWarning(str, img) {
 		warningDiv.empty();
-		if (img) {
-			warningDiv.append(img);
-			img.addClass("recover_warning_div_icon");
-		}
+		if (!img) img = $("<img src='img/warning.png'>");
+		warningDiv.append(img);
+		img.addClass("recover_warning_div_icon");
 		warningDiv.append(str);
 		str === "" ? warningDiv.hide() : warningDiv.show();
 	}
@@ -1343,8 +1341,8 @@ function RecoverTextController(div, plugins) {
 		
 		// interanl warning setter to track if warning is set
 		let warningSet = false;
-		function setWarningAux(str) {
-			setWarning(str);
+		function setWarningAux(str, icon) {
+			setWarning(str, icon);
 			warningSet = true;
 		}
 		
@@ -1396,7 +1394,7 @@ function RecoverTextController(div, plugins) {
 			try {
 				key = selectedPlugin.combine(importedPieces);
 			} catch (err) {
-				if (!warningSet) setWarning("Need additional pieces to recover private keys");
+				if (!warningSet) setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
 			}
 		}
 		
