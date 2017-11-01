@@ -940,7 +940,7 @@ function RecoverFileController(div) {
 		let pieces = CryptoUtils.keysToPieces(keys);
 		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
-		new ExportController(body, window, null, pieces, null).render();
+		new ExportController(body, window, null, keys, pieces).render();
 	}
 	
 	function setWarning(str, img) {
@@ -1264,7 +1264,7 @@ function RecoverTextController(div, plugins) {
 		let pieces = CryptoUtils.keysToPieces(keys);
 		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
-		new ExportController(body, window, null, pieces, null).render();
+		new ExportController(body, window, null, keys, pieces).render();
 	}
 	
 	function setSelectedCurrency(name) {
@@ -1437,12 +1437,16 @@ inheritsFrom(RecoverTextController, DivController);
 /**
  * Export page.
  * 
+ * At least one of keyGenConfig, keys, pieces, and pieceDivs are required.
+ * 
  * @param div is the div to render to
- * @param keyGenConfig is a configuration to generate new storage 
- * @param pieces are the pieces to export
- * @param pieceDivs are pre-rendered piece divs for display
+ * @param window is a reference to the window for printing
+ * @param keyGenConfig is a configuration to generate new storage
+ * @param keys are keys to generate pieces from
+ * @param pieces are pieces to export and generate pieceDivs from
+ * @param pieceDivs are pre-generated piece divs ready for display
  */
-function ExportController(div, window, keyGenConfig, pieces, pieceDivs) {
+function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	DivController.call(this, div);
 	
 	// global variables
@@ -1475,7 +1479,7 @@ function ExportController(div, window, keyGenConfig, pieces, pieceDivs) {
 		printButton.click(function() { printAll(); });
 		let exportButton = $("<div class='export_button'>").appendTo(exportButtons);
 		exportButton.html("Export All");
-		exportButton.click(function() { exportAll(); });
+		exportButton.click(function() { exportAll(pieces); });
 		let savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
 		savePublicButton.click(function() { savePublicAddresses(); });
@@ -1539,7 +1543,8 @@ function ExportController(div, window, keyGenConfig, pieces, pieceDivs) {
 		window.print();
 	}
 	
-	function exportAll() {
+	function exportAll(pieces) {
+		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
 		if (pieces.length === 1) {
 			let jsonStr = CryptoUtils.pieceToJson(pieces[0]);
@@ -1552,6 +1557,7 @@ function ExportController(div, window, keyGenConfig, pieces, pieceDivs) {
 	}
 	
 	function savePublicAddresses() {
+		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
 		let publicAddressesStr = CryptoUtils.pieceToAddresses(pieces[0]);
 		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + CryptoUtils.getCommonTicker(pieces[0]).toLowerCase() + "_public_addresses.txt");
@@ -1597,9 +1603,16 @@ function ExportController(div, window, keyGenConfig, pieces, pieceDivs) {
 				});
 			}
 			
-			// 
+			// generate pieces from keys if given
+			else if (keys) {
+				pieces = CryptoUtils.keysToPieces(keys);
+				update();
+			}
+			
+			// otherwise generate keys from config
 			else {
-				throw new Error("Not yet implemented");
+				assertInitialized(keyGenConfig);
+				throw Error("Key generation from config not implemented");
 			}
 		}
 	}
