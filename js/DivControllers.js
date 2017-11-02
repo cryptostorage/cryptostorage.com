@@ -1183,6 +1183,22 @@ function RecoverTextController(div, plugins) {
 inheritsFrom(RecoverTextController, DivController);
 
 /**
+ * Controls password input and key decryption on import.
+ * 
+ * @param div is the div to render to
+ * @param original pieces is an array of the original imported pieces
+ * @param encrypted keys is an array of CryptoKeys
+ */
+function KeyDecryptionController(div, originalPieces, encryptedKeys) {
+	KeyDecryptionController.call(this, div);
+	
+	this.render = function(onDone) {
+		div.append("Password input goes here");
+	}
+}
+inheritsFrom(KeyDecryptionController, DivController);
+
+/**
  * Export page.
  * 
  * At least one of keyGenConfig, keys, pieces, and pieceDivs are required.

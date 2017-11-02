@@ -774,7 +774,8 @@ input[type='number'] {
 		padding:0;
 	}
 	.piece_page_div {
-		margin-bottom:0px;
+		margin:0px;
+		padding:0px;
 	}
 	.piece_div {
 		display:block !important
