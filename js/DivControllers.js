@@ -1214,6 +1214,8 @@ inheritsFrom(RecoverTextController, DivController);
 function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypted, onViewDecrypted) {
 	DivController.call(this, div);
 	
+	let passphraseInput;
+	
 	this.render = function(onDone) {
 		
 		// warning div
@@ -1223,8 +1225,7 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 		// password input
 		let passwordLabel = $("<div class='recover_passphrase_label'>").appendTo(div);
 		passwordLabel.append("Password");
-		
-		let passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(div)
+		passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(div)
 		
 		// submit button
 		let submit = $("<div class='recover_submit'>").appendTo(div);
@@ -1241,7 +1242,13 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 	}
 	
 	function onSubmit() {
-		console.log("submit");
+		let passphrase = passphraseInput.val();
+		passphraseInput.val('');
+		CryptoUtils.decryptKeys(encryptedKeys, passphrase, function(done, total) {
+			console.log(done + " / " + total);
+		}, function(err, decryptedKeys) {
+			console.log("done decrypting");
+		});
 	}
 }
 inheritsFrom(KeyDecryptionController, DivController);

@@ -790,6 +790,58 @@ let CryptoUtils = {
 		});
 	},
 	
+	/**
+	 * Decrypts the given keys.
+	 * 
+	 * @param keys are the encrypted keys to decrypt
+	 * @param phassphrase is the phassphrase to decrypt the keys
+	 * @param onProgress(done, total) is called as progress is made
+	 * @param onDone(err) is called when decryption is complete
+	 */
+	decryptKeys: function(keys, passphrase, onProgress, onDone) {
+		
+		let decommissioned = false;	// TODO: remove altogether?
+		
+		// validate input
+		assertInitialized(keys);
+		assertTrue(keys.length > 0);
+		assertInitialized(passphrase);
+		assertInitialized(onDone);
+		
+		// compute weight
+		let totalWeight = 0;
+		for (let key of keys) {
+			totalWeight += CryptoUtils.getDecryptWeight(key.getEncryptionScheme());
+		}
+		
+		// decrypt keys
+		let funcs = [];
+		for (let key of keys) funcs.push(decryptFunc(key, passphrase));
+		let doneWeight = 0;
+		if (onProgress) onProgress(doneWeight, totalWeight);
+		async.series(funcs, function(err, result) {
+			if (decommissioned) return;
+			else if (err) onDone(err);
+			else onDone(null, keys);
+		});
+		
+		// decrypts one key
+		function decryptFunc(key, password) {
+			return function(callback) {
+				if (decommissioned) return;
+				let scheme = key.getEncryptionScheme();
+				key.decrypt(passphrase, function(err, key) {
+					if (err) onDone(err);
+					else {
+						doneWeight += CryptoUtils.getDecryptWeight(scheme);
+						onProgress(doneWeight, totalWeight);
+						setImmediate(function() { callback(err, key); });	// let UI breath
+					}
+				});
+			}
+		}
+	},
+	
 	// --- relative weights of key generation derived from experimentation and used for representative progress bar ---
 	
 	getCreateKeyWeight: function() { return 63; },
