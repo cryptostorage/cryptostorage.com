@@ -604,9 +604,9 @@ let CryptoUtils = {
 			for (let currency of config.currencies) {
 				numKeys += currency.numKeys;
 				totalWeight += currency.numKeys * CryptoUtils.getCreateKeyWeight();
-				if (currency.encryption) totalWeight += currency.numKeys * (CryptoUtils.getEncryptWeight(currency.encryption) + (VERIFY_ENCRYPTION ? CryptoUtils.getDecryptWeight(currency.encryption) : 0));
+				if (currency.encryption) totalWeight += currency.numKeys * (CryptoUtils.getEncryptSchemeWeight(currency.encryption) + (VERIFY_ENCRYPTION ? CryptoUtils.getDecryptSchemeWeight(currency.encryption) : 0));
 			}
-			let piecesRendererWeight = PieceRenderer.getPieceWeight(numKeys, config.numPieces, null);
+			let piecesRendererWeight = PieceRenderer.getRenderWeight(numKeys, config.numPieces, null);
 			totalWeight += piecesRendererWeight;
 			
 			// collect key creation functions
@@ -760,7 +760,7 @@ let CryptoUtils = {
 						return;
 					}
 					key.encrypt(scheme, password, function(err, key) {
-						progressWeight += CryptoUtils.getEncryptWeight(scheme);
+						progressWeight += CryptoUtils.getEncryptSchemeWeight(scheme);
 						if (onProgress) onProgress(progressWeight, totalWeight, "Encrypting");
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					});
@@ -775,7 +775,7 @@ let CryptoUtils = {
 					}
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
-						progressWeight += CryptoUtils.getDecryptWeight(scheme);
+						progressWeight += CryptoUtils.getDecryptSchemeWeight(scheme);
 						if (onProgress) onProgress(progressWeight, totalWeight, "Decrypting");
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					});
@@ -811,7 +811,7 @@ let CryptoUtils = {
 		// compute weight
 		let totalWeight = 0;
 		for (let key of keys) {
-			totalWeight += CryptoUtils.getDecryptWeight(key.getEncryptionScheme());
+			totalWeight += CryptoUtils.getDecryptSchemeWeight(key.getEncryptionScheme());
 		}
 		
 		// decrypt keys
@@ -833,7 +833,7 @@ let CryptoUtils = {
 				key.decrypt(passphrase, function(err, key) {
 					if (err) onDone(err);
 					else {
-						doneWeight += CryptoUtils.getDecryptWeight(scheme);
+						doneWeight += CryptoUtils.getDecryptSchemeWeight(scheme);
 						onProgress(doneWeight, totalWeight);
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					}
@@ -846,7 +846,7 @@ let CryptoUtils = {
 	
 	getCreateKeyWeight: function() { return 63; },
 	
-	getEncryptWeight: function(scheme) {
+	getEncryptSchemeWeight: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4187;
@@ -856,7 +856,7 @@ let CryptoUtils = {
 		}
 	},
 	
-	getDecryptWeight: function(scheme) {
+	getDecryptSchemeWeight: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4581;
@@ -864,6 +864,15 @@ let CryptoUtils = {
 				return 100;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
+	},
+	
+	getDecryptWeight: function(encryptedKeys) {
+		let weight = 0;
+		for (let key of encryptedKeys) {
+			assertTrue(key.isEncrypted());
+			weight += CryptoUtils.getDecryptSchemeWeight(key.getEncryptionScheme());
+		}
+		return weight;
 	},
 	
 	getQrWeight: function() {

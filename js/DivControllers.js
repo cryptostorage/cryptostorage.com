@@ -1279,9 +1279,14 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 		let progressDiv = $("<div>").appendTo(contentDiv);
 		progressBar = UiUtils.getProgressBar(progressDiv);
 		
+		// compute weights for progress bar
+		let decryptWeight = CryptoUtils.getDecryptWeight(encryptedKeys);
+		let renderWeight = PieceRenderer.getRenderWeight(encryptedKeys.length, 1, null);
+		let totalWeight = decryptWeight + renderWeight;
+		
 		// decrypt keys async
 		CryptoUtils.decryptKeys(encryptedKeys, passphrase, function(done, total) {
-			setProgress(done / total, "Decrypting");
+			setProgress(done / total * decryptWeight / totalWeight, "Decrypting");
 		}, function(err, decryptedKeys) {
 			
 			// if error, switch back to input div
@@ -1297,7 +1302,7 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 			
 			// render pieces
 			PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
-				setProgress(percentDone, "Rendering");
+				setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering");
 			}, function(err, pieceDivs) {
 				
 				// button to view decrypted storage

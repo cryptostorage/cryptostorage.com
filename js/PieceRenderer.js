@@ -19,7 +19,7 @@ let PieceRenderer = {
 	/**
 	 * Returns the total weight to render all keys across all pieces.
 	 */
-	getPieceWeight: function(numKeys, numPieces, config) {
+	getRenderWeight: function(numKeys, numPieces, config) {
 		
 		// merge configs
 		config = Object.assign({}, PieceRenderer.defaultConfig, config);

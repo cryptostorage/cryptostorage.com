@@ -85,7 +85,7 @@ let UiUtils = {
 	
 	getCreateKeyWeight: function() { return 63; },
 	
-	getEncryptWeight: function(scheme) {
+	getEncryptSchemeWeight: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4187;
@@ -95,7 +95,7 @@ let UiUtils = {
 		}
 	},
 	
-	getDecryptWeight: function(scheme) {
+	getDecryptSchemeWeight: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4581;
@@ -1057,9 +1057,9 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 			for (let elem of state.mix) {
 				numKeys += elem.numKeys;
 				totalWeight += elem.numKeys * UiUtils.getCreateKeyWeight();
-				if (elem.encryption) totalWeight += elem.numKeys * (UiUtils.getEncryptWeight(elem.encryption) + (VERIFY_ENCRYPTION ? UiUtils.getDecryptWeight(elem.encryption) : 0));
+				if (elem.encryption) totalWeight += elem.numKeys * (UiUtils.getEncryptSchemeWeight(elem.encryption) + (VERIFY_ENCRYPTION ? UiUtils.getDecryptSchemeWeight(elem.encryption) : 0));
 			}
-			let piecesRendererWeight = PieceRenderer.getPieceWeight(numKeys, state.numPieces, null);
+			let piecesRendererWeight = PieceRenderer.getRenderWeight(numKeys, state.numPieces, null);
 			totalWeight += piecesRendererWeight;
 			
 			// collect key creation functions
@@ -1220,7 +1220,7 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 						return;
 					}
 					key.encrypt(scheme, password, function(err, key) {
-						progressWeight += UiUtils.getEncryptWeight(scheme);
+						progressWeight += UiUtils.getEncryptSchemeWeight(scheme);
 						setProgress(progressWeight, totalWeight);
 						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
@@ -1235,7 +1235,7 @@ function PageControllerGenerateKeys(div, appController, onKeysGenerated) {
 					}
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
-						progressWeight += UiUtils.getDecryptWeight(scheme);
+						progressWeight += UiUtils.getDecryptSchemeWeight(scheme);
 						setProgress(progressWeight, totalWeight);
 						setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 					});
@@ -1401,9 +1401,9 @@ function PageControllerDecryptKeys(div, appController, onKeysDecrypted) {
 			// compute total weight for progress bar
 			let totalWeight = 0;
 			for (let key of keys) {
-				totalWeight += UiUtils.getDecryptWeight(key.getEncryptionScheme());
+				totalWeight += UiUtils.getDecryptSchemeWeight(key.getEncryptionScheme());
 			}
-			let piecesRendererWeight = PieceRenderer.getPieceWeight(keys.length, 1, null);
+			let piecesRendererWeight = PieceRenderer.getRenderWeight(keys.length, 1, null);
 			totalWeight += piecesRendererWeight;
 			
 			// decrypt keys
@@ -1450,7 +1450,7 @@ function PageControllerDecryptKeys(div, appController, onKeysDecrypted) {
 					key.decrypt(password, function(err, key) {
 						if (err) callback(err);
 						else {
-							progressWeight += UiUtils.getDecryptWeight(scheme);
+							progressWeight += UiUtils.getDecryptSchemeWeight(scheme);
 							setProgress(progressWeight, totalWeight);
 							setTimeout(function() { callback(err, key); }, 0);	// let UI breath
 						}
