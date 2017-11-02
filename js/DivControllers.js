@@ -627,25 +627,29 @@ inheritsFrom(RecoverController, DivController);
 function RecoverFileController(div) {
 	DivController.call(this, div);
 	
+	let importDiv;						// div for all file input
 	let warningDiv;
 	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
 	let piecesAndControls;		// div for imported files and controls
-	let importedPiecesDiv;
+	let importedPiecesDiv;		// shows imported items
 	let lastKeys;
 	
 	this.render = function(onDone) {
 		
+		// all file importing
+		importDiv = $("<div>").appendTo(div);
+		
 		// warning div
-		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
+		warningDiv = $("<importDiv class='recover_warning_div'>").appendTo(importDiv);
 		warningDiv.hide();
 		
-		// drag and drop div
-		let dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(div);
+		// drag and drop importDiv
+		let dragDropDiv = $("<importDiv class='recover_drag_drop'>").appendTo(importDiv);
 		let dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
-		let dragDropText = $("<div class='drag_drop_text'>").appendTo(dragDropDiv);
-		let dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
+		let dragDropText = $("<importDiv class='drag_drop_text'>").appendTo(dragDropDiv);
+		let dragDropLabel = $("<importDiv class='drag_drop_label'>").appendTo(dragDropText);
 		dragDropLabel.append("Drag and Drop Files To Import");
-		let dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
+		let dragDropBrowse = $("<importDiv class='drag_drop_browse'>").appendTo(dragDropText);
 		dragDropBrowse.append("or click to browse");
 		
 		// register browse link with hidden input
@@ -660,7 +664,7 @@ function RecoverFileController(div) {
 		setupDragAndDrop(dragDropDiv, onFilesImported);
 		
 		// files and controls
-		piecesAndControls = $("<div>").appendTo(div);
+		piecesAndControls = $("<importDiv>").appendTo(importDiv);
 		piecesAndControls.hide();
 		
 		// imported files
@@ -671,24 +675,39 @@ function RecoverFileController(div) {
 		let startOverDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
 		let startOverLink = $("<div class='recover_start_over'>").appendTo(startOverDiv);
 		startOverLink.append("start over");
-		startOverLink.click(function(e) {
-			warningDiv.empty();
-			warningDiv.hide();
-			removePieces();
-			piecesAndControls.hide();
-		});
+		startOverLink.click(function() { startOver(); });
 		
 		// done rendering
 		if (onDone) onDone(div);
 	}
 	
+	function startOver() {
+		div.children().detach();
+		div.append(importDiv);
+		warningDiv.empty();
+		warningDiv.hide();
+		removePieces();
+		piecesAndControls.hide();
+	}
+	
 	function onKeysImported(keys) {
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
-		let pieces = CryptoUtils.keysToPieces(keys);
-		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-		let body = $("body", window.document);
-		new ExportController(body, window, null, keys, pieces).render();
+		if (keys[0].isEncrypted()) {
+			new KeyDecryptionController($("<div>"), keys, startOver, function() {
+				console.log("view encrypted");
+			}, function(decryptedKeys) {
+				console.log("view decrypted");
+			}).render(function(decryptionDiv) {
+				div.children().detach();
+				div.append(decryptionDiv);
+			});
+		} else {
+			let pieces = CryptoUtils.keysToPieces(keys);
+			let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+			let body = $("body", window.document);
+			new ExportController(body, window, null, keys, pieces).render();
+		}
 	}
 	
 	function setWarning(str, img) {
@@ -1188,12 +1207,16 @@ inheritsFrom(RecoverTextController, DivController);
  * @param div is the div to render to
  * @param original pieces is an array of the original imported pieces
  * @param encrypted keys is an array of CryptoKeys
+ * @param onViewEncrypted is called when view encrypted is clicked
+ * @param onStartOver is called when start over is clicked
+ * @param onViewDecrypted is called when view decrypted is clicked
  */
-function KeyDecryptionController(div, originalPieces, encryptedKeys) {
-	KeyDecryptionController.call(this, div);
+function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypted, onViewDecrypted) {
+	DivController.call(this, div);
 	
 	this.render = function(onDone) {
 		div.append("Password input goes here");
+		if (onDone) onDone(div);
 	}
 }
 inheritsFrom(KeyDecryptionController, DivController);
