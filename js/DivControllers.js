@@ -640,16 +640,16 @@ function RecoverFileController(div) {
 		importDiv = $("<div>").appendTo(div);
 		
 		// warning div
-		warningDiv = $("<importDiv class='recover_warning_div'>").appendTo(importDiv);
+		warningDiv = $("<div class='recover_warning_div'>").appendTo(importDiv);
 		warningDiv.hide();
 		
 		// drag and drop importDiv
-		let dragDropDiv = $("<importDiv class='recover_drag_drop'>").appendTo(importDiv);
+		let dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(importDiv);
 		let dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
-		let dragDropText = $("<importDiv class='drag_drop_text'>").appendTo(dragDropDiv);
-		let dragDropLabel = $("<importDiv class='drag_drop_label'>").appendTo(dragDropText);
+		let dragDropText = $("<div class='drag_drop_text'>").appendTo(dragDropDiv);
+		let dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
 		dragDropLabel.append("Drag and Drop Files To Import");
-		let dragDropBrowse = $("<importDiv class='drag_drop_browse'>").appendTo(dragDropText);
+		let dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
 		dragDropBrowse.append("or click to browse");
 		
 		// register browse link with hidden input
@@ -671,9 +671,9 @@ function RecoverFileController(div) {
 		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(piecesAndControls);
 		importedPiecesDiv.hide();
 		
-		// start over
-		let startOverDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
-		let startOverLink = $("<div class='recover_start_over'>").appendTo(startOverDiv);
+		// controls
+		let controlsDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
+		let startOverLink = $("<div class='recover_start_over'>").appendTo(controlsDiv);
 		startOverLink.append("start over");
 		startOverLink.click(function() { startOver(); });
 		
@@ -1001,8 +1001,8 @@ function RecoverTextController(div, plugins) {
 		importedPiecesDiv.hide();
 		
 		// start over
-		let startOverDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
-		let startOverLink = $("<div class='recover_start_over'>").appendTo(startOverDiv);
+		let controlsDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
+		let startOverLink = $("<div class='recover_start_over'>").appendTo(controlsDiv);
 		startOverLink.append("start over");
 		startOverLink.click(function(e) {
 			warningDiv.empty();
@@ -1215,8 +1215,33 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 	DivController.call(this, div);
 	
 	this.render = function(onDone) {
-		div.append("Password input goes here");
+		
+		// warning div
+		let warningDiv = $("<div class='warning_div'>").appendTo(div);
+		warningDiv.hide();
+		
+		// password input
+		let passwordLabel = $("<div class='recover_passphrase_label'>").appendTo(div);
+		passwordLabel.append("Password");
+		
+		let passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(div)
+		
+		// submit button
+		let submit = $("<div class='recover_submit'>").appendTo(div);
+		submit.html("Submit");
+		submit.click(function() { onSubmit(); });
+		
+		// controls
+		let controlsDiv = $("<div class='recover_decrypt_controls'>").appendTo(div);
+		let startOverLink = $("<div class='recover_start_over'>").appendTo(controlsDiv);
+		startOverLink.append("start over");
+		startOverLink.click(function() { if (onStartOver) onStartOver(); });
+		
 		if (onDone) onDone(div);
+	}
+	
+	function onSubmit() {
+		console.log("submit");
 	}
 }
 inheritsFrom(KeyDecryptionController, DivController);
