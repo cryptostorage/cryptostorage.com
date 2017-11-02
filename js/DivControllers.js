@@ -712,11 +712,15 @@ function RecoverFileController(div) {
 	
 	function setWarning(str, img) {
 		warningDiv.empty();
-		if (!img) img = $("<img src='img/warning.png'>");
-		warningDiv.append(img);
-		img.addClass("recover_warning_div_icon");
-		warningDiv.append(str);
-		str === "" ? warningDiv.hide() : warningDiv.show();
+		if (str) {
+			if (!img) img = $("<img src='img/warning.png'>");
+			warningDiv.append(img);
+			img.addClass("recover_warning_div_icon");
+			warningDiv.append(str);
+			warningDiv.show();
+		} else {
+			warningDiv.hide();
+		}
 	}
 	
 	// handle imported files
@@ -1046,11 +1050,15 @@ function RecoverTextController(div, plugins) {
 	
 	function setWarning(str, img) {
 		warningDiv.empty();
-		if (!img) img = $("<img src='img/warning.png'>");
-		warningDiv.append(img);
-		img.addClass("recover_warning_div_icon");
-		warningDiv.append(str);
-		str === "" ? warningDiv.hide() : warningDiv.show();
+		if (str) {
+			if (!img) img = $("<img src='img/warning.png'>");
+			warningDiv.append(img);
+			img.addClass("recover_warning_div_icon");
+			warningDiv.append(str);
+			warningDiv.show();
+		} else {
+			warningDiv.hide();
+		}
 	}
 	
 	function submitPieces() {
@@ -1207,30 +1215,40 @@ inheritsFrom(RecoverTextController, DivController);
  * @param div is the div to render to
  * @param original pieces is an array of the original imported pieces
  * @param encrypted keys is an array of CryptoKeys
- * @param onViewEncrypted is called when view encrypted is clicked
  * @param onStartOver is called when start over is clicked
+ * @param onViewEncrypted is called when view encrypted is clicked
  * @param onViewDecrypted is called when view decrypted is clicked
  */
 function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypted, onViewDecrypted) {
 	DivController.call(this, div);
 	
+	let contentDiv;
+	let inputDiv;
+	let warningDiv;
 	let passphraseInput;
+	let submitButton;
 	
 	this.render = function(onDone) {
 		
+		// div to contain main content
+		contentDiv = $("<div>").appendTo(div);
+		
+		// div to collect passphrase input
+		inputDiv = $("<div>").appendTo(contentDiv);
+		
 		// warning div
-		let warningDiv = $("<div class='warning_div'>").appendTo(div);
+		warningDiv = $("<div class='recover_warning_div'>").appendTo(inputDiv);
 		warningDiv.hide();
 		
 		// password input
-		let passwordLabel = $("<div class='recover_passphrase_label'>").appendTo(div);
+		let passwordLabel = $("<div class='recover_passphrase_label'>").appendTo(inputDiv);
 		passwordLabel.append("Password");
-		passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(div)
+		passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(inputDiv)
 		
 		// submit button
-		let submit = $("<div class='recover_submit'>").appendTo(div);
-		submit.html("Submit");
-		submit.click(function() { onSubmit(); });
+		submitButton = $("<div class='recover_submit'>").appendTo(inputDiv);
+		submitButton.html("Submit");
+		submitButton.click(function() { onSubmit(); });
 		
 		// controls
 		let controlsDiv = $("<div class='recover_decrypt_controls'>").appendTo(div);
@@ -1242,13 +1260,78 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 	}
 	
 	function onSubmit() {
+		
+		// clear warning
+		setWarning("");
+		
+		// get passphrase
 		let passphrase = passphraseInput.val();
 		passphraseInput.val('');
+		
+		// validate passphrase
+		if (!passphrase || passphrase.trim() === "") {
+			setWarning("Enter a passphrase to decrypt private keys");
+			return;
+		}
+		
+		// switch content div to progress bar
+		contentDiv.children().detach();
+		let progressDiv = $("<div>").appendTo(contentDiv);
+		progressBar = UiUtils.getProgressBar(progressDiv);
+		
+		// decrypt keys async
 		CryptoUtils.decryptKeys(encryptedKeys, passphrase, function(done, total) {
-			console.log(done + " / " + total);
+			setProgress(done / total, "Decrypting");
 		}, function(err, decryptedKeys) {
-			console.log("done decrypting");
+			
+			// if error, switch back to input div
+			if (err) {
+				setWarning(err.message);
+				contentDiv.empty();
+				contentDiv.append(inputDiv);
+				return;
+			}
+			
+			// convert keys to pieces
+			let pieces = CryptoUtils.keysToPieces(decryptedKeys);
+			
+			// render pieces
+			PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
+				setProgress(percentDone, "Rendering");
+			}, function(err, pieceDivs) {
+				
+				// button to view decrypted storage
+				contentDiv.empty();
+				let viewDecrypted = $("<div class='recover_submit'>").appendTo(contentDiv);	// TODO: rename class to 'recover_button'
+				viewDecrypted.append("View Decrypted Storage");
+				viewDecrypted.click(function() {
+					
+					// open in new tab
+					let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+					let body = $("body", window.document);
+					new ExportController(body, window, null, decryptedKeys, pieces, pieceDivs).render();
+				});
+			});
 		});
+	}
+	
+	function setWarning(str, img) {
+		warningDiv.empty();
+		if (str) {
+			if (!img) img = $("<img src='img/warning.png'>");
+			warningDiv.append(img);
+			img.addClass("recover_warning_div_icon");
+			warningDiv.append(str);
+			warningDiv.show();
+		} else {
+			warningDiv.hide();
+		}
+	}
+	
+	function setProgress(percent, label) {
+		progressBar.set(percent);
+		progressBar.setText(Math.round(percent * 100) + "%");
+		//if (label) progressBar.setText(label);
 	}
 }
 inheritsFrom(KeyDecryptionController, DivController);
