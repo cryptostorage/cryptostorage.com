@@ -1309,9 +1309,9 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 				contentDiv.empty();
 				let viewDecrypted = $("<div class='recover_submit'>").appendTo(contentDiv);	// TODO: rename class to 'recover_button'
 				viewDecrypted.append("View Decrypted Storage");
+				
+				// open in new tab on click
 				viewDecrypted.click(function() {
-					
-					// open in new tab
 					let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
 					let body = $("body", window.document);
 					new ExportController(body, window, null, decryptedKeys, pieces, pieceDivs).render();
