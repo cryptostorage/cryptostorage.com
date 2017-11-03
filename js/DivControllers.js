@@ -1244,6 +1244,8 @@ function RecoverTextController(div, plugins) {
 	
 	function submitPieces() {
 		
+		resetControls();
+		
 		// get and clear text
 		let val = textArea.val();
 		textArea.val("");
