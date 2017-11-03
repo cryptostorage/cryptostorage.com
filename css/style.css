@@ -6,15 +6,12 @@
 	font-size:22px;
 }
 
-body {
+.app_body {
 	display:flex;
 	flex-direction:column;
 	align-items:center;
 	min-width:971px;
 	-webkit-text-size-adjust: 100%;
-}
-
-.app_body {
 	background-color:rgb(235, 242, 254);
 }
 
@@ -691,6 +688,14 @@ input[type='number'] {
 	align-items:center;
 	justify-content:center;
 	margin-top:20px;
+}
+
+.export_div {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	min-width:971px;
+	-webkit-text-size-adjust: 100%;
 }
 
 .export_progress_div {

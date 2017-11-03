@@ -433,9 +433,17 @@ function FormController(div) {
 	function onGenerate(onDone) {
 		let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
-		new ExportController(body, window, getConfig()).render(function(div) {
-			if (onDone) onDone();
+		new ExportController($("<div class='export_div'>"), window, getConfig()).render(function(div) {
+			new TwoTabController(body, "Tab 1", div, "Tab 2", $("<div>Hello</div>")).render(function() {
+				if (onDone) onDone();
+			});
 		});
+		
+//		new ExportController(body, window, getConfig()).render(function(div) {
+////		new TwoTabController(body, null, div).render(function() {
+////			if (onDone) onDone();
+////		});
+//		});
 	}
 	
 	// get current form configuration
