@@ -803,6 +803,9 @@ input[type='number'] {
 	.export_tabs {
 		display:none;
 	}
+	.export_div {
+		display:unset;
+	}
 	.export_progress_div {
 		display:none;
 	}
