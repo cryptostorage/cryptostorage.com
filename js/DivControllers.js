@@ -54,6 +54,23 @@ let UiUtils = {
 			tabController.getTabsDiv().addClass("export_tabs");
 			if (onDone) onDone(div);
 		});
+	},
+	
+	openImportedStorage: function(importedPieces, keys, pieces, pieceDivs) {
+		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+		let body = $("body", window.document);
+		if (importedPieces && importedPieces.length > 1) {
+			new ExportController($("<div>"), window, null, null, importedPieces).render(function(tab1) {
+				let tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
+				new ExportController($("<div>"), window, null, keys, pieces, pieceDivs).render(function(tab2) {
+					UiUtils.renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
+				});
+			});
+		} else {
+			new ExportController($("<div>"), window, null, keys, pieces, pieceDivs).render(function(tab1) {
+				UiUtils.renderExportTabs(body, null, tab1);
+			});
+		}
 	}
 }
 
@@ -785,7 +802,7 @@ function RecoverFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					openImportedStorage(keys);
+					UiUtils.openImportedStorage(getImportedPieces(), keys);
 				});
 			});
 		} else {
@@ -799,26 +816,8 @@ function RecoverFileController(div) {
 		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Keys");
 		viewDecrypted.click(function() {
-			openImportedStorage(keys, pieces, pieceDivs);
+			UiUtils.openImportedStorage(getImportedPieces(), keys, pieces, pieceDivs);
 		});
-	}
-	
-	function openImportedStorage(keys, pieces, pieceDivs) {
-		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-		let body = $("body", window.document);
-		let importedPieces = getImportedPieces();
-		if (importedPieces.length > 1) {
-			new ExportController($("<div>"), window, null, null, importedPieces).render(function(tab1) {
-				let tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
-				new ExportController($("<div>"), window, null, keys, pieces, pieceDivs).render(function(tab2) {
-					UiUtils.renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
-				});
-			});
-		} else {
-			new ExportController($("<div>"), window, null, keys, pieces, pieceDivs).render(function(tab1) {
-				UiUtils.renderExportTabs(body, null, tab1);
-			});
-		}
 	}
 	
 	function setWarning(str, img) {
@@ -1066,14 +1065,17 @@ function RecoverTextController(div, plugins) {
 	assertTrue(plugins.length > 0);
 	
 	const MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
+	
 	let warningDiv;
+	let contentDiv;
+	let passphraseInputDiv;
 	let selector;
 	let selectorDisabler;
 	let selectedPlugin;
 	let textArea;
 	let importedPieces = [];	// string[]
-	let piecesAndControls;		// div for imported pieces and controls
 	let importedPiecesDiv;		// div for imported pieces
+	let controlsDiv;
 	let lastKeys;
 	
 	this.render = function(onDone) {
@@ -1086,6 +1088,12 @@ function RecoverTextController(div, plugins) {
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
 		warningDiv.hide();
 		
+		// set up content div
+		contentDiv = $("<div>").appendTo(div);
+		
+		// all passphrase input
+		passphraseInputDiv = $("<div>").appendTo(contentDiv);
+		
 		// currency selector data
 		selectorData = [];
 		for (let plugin of plugins) {
@@ -1096,7 +1104,7 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		// currency selector
-		let selectorContainer = $("<div class='recover_selector_container'>").appendTo(div);
+		let selectorContainer = $("<div class='recover_selector_container'>").appendTo(passphraseInputDiv);
 		selector = $("<div id='recover_selector'>").appendTo(selectorContainer);
 		loader.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
 			selector.ddslick({
@@ -1112,44 +1120,56 @@ function RecoverTextController(div, plugins) {
 				},
 			});
 			selector = $("#recover_selector");	// ddslick requires id reference
-			setSelectedCurrency("Bitcoin");			// default value
 			selectorDisabler = $("<div class='recover_selector_disabler'>").appendTo(selectorContainer);
-			setSelectorEnabled(true);
+			startOver();
 		});
 		
 		// text area
-		textArea = $("<textarea class='recover_textarea'>").appendTo(div);
+		textArea = $("<textarea class='recover_textarea'>").appendTo(passphraseInputDiv);
 		textArea.attr("placeholder", "Enter a private key or split pieces of a private key");
 		
 		// submit button
-		let submit = $("<div class='recover_button'>").appendTo(div);
+		let submit = $("<div class='recover_button'>").appendTo(passphraseInputDiv);
 		submit.html("Submit");
 		submit.click(function() { submitPieces(); });
 		
-		// pieces and controls
-		piecesAndControls = $("<div>").appendTo(div);
-		piecesAndControls.hide();
-		
 		// imported pieces
-		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(piecesAndControls);
+		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(passphraseInputDiv);
 		importedPiecesDiv.hide();
 		
-		// start over
-		let controlsDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
-		let startOverLink = $("<div class='recover_control_link'>").appendTo(controlsDiv);
-		startOverLink.append("start over");
-		startOverLink.click(function(e) {
-			warningDiv.empty();
-			warningDiv.hide();
-			removePieces();
-			piecesAndControls.hide();
-		});
+		// controls
+		controlsDiv = $("<div class='recover_controls'>").appendTo(div);
+		controlsDiv.hide();
+		resetControls();
 		
 		// done rendering
 		if (onDone) onDone(div);
 	}
 	
+	function resetControls() {
+		controlsDiv.empty();
+		addControl("start over", startOver);
+	}
+	
+	function addControl(text, onClick) {
+		let linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
+		let link = $("<div class='recover_control_link'>").appendTo(linkDiv);
+		link.append(text);
+		link.click(function() { onClick(); });
+	}
+	
+	function startOver() {
+		setWarning("");
+		contentDiv.children().detach();
+		importedPiecesDiv.hide();
+		controlsDiv.hide();
+		contentDiv.append(passphraseInputDiv);
+		removePieces();
+		setSelectedCurrency("Bitcoin");
+	}
+	
 	function setSelectorEnabled(bool) {
+		console.log("setSelectorEnabled(" + bool + ")");
 		if (bool) {
 			$("#recover_selector *").removeClass("disabled_text");
 			selectorDisabler.hide();
@@ -1162,10 +1182,41 @@ function RecoverTextController(div, plugins) {
 	function onKeysImported(keys) {
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
-		let pieces = CryptoUtils.keysToPieces(keys);
-		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-		let body = $("body", window.document);
-		new ExportController(body, window, null, keys, pieces).render();
+		if (keys[0].isEncrypted()) {
+			
+			// create decryption controller and register callbacks
+			let decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+				setWarning(warning);
+			}, function(decryptedKeys, pieces, pieceDivs) {
+				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
+			});
+			
+			// render decryption controller
+			decryptionController.render(function(decryptionDiv) {
+				
+				// replace content div with passphrase input
+				contentDiv.children().detach();
+				contentDiv.append(decryptionDiv);
+				decryptionController.focus();
+				
+				// add control to view encrypted keys
+				addControl("view encrypted key", function() {
+					UiUtils.openImportedStorage(null, keys);
+				});
+			});
+		} else {
+			onKeysDecrypted(keys);
+		}
+	}
+	
+	function onKeysDecrypted(keys, pieces, pieceDivs) {
+		resetControls();
+		contentDiv.children().detach();
+		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
+		viewDecrypted.append("View Decrypted Key");
+		viewDecrypted.click(function() {
+			UiUtils.openImportedStorage(null, keys, pieces, pieceDivs);
+		});
 	}
 	
 	function setSelectedCurrency(name) {
@@ -1316,13 +1367,13 @@ function RecoverTextController(div, plugins) {
 	function renderImportedPieces(pieces) {
 		importedPiecesDiv.empty();
 		if (pieces.length === 0) {
-			piecesAndControls.hide();
 			importedPiecesDiv.hide();
+			controlsDiv.hide();
 			return;
 		}
 		
 		importedPiecesDiv.show();
-		piecesAndControls.show();
+		controlsDiv.show();
 		for (let piece of pieces) {
 			importedPiecesDiv.append(getImportedPieceDiv(piece));
 		}
