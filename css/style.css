@@ -648,6 +648,13 @@ input[type='number'] {
 	justify-content:center;
 }
 
+.recover_control_link_div {
+	width:200px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+
 .recover_control_link {
 	font-size:20px;
 	color:white;

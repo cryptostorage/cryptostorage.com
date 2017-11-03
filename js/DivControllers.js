@@ -674,14 +674,20 @@ function RecoverFileController(div) {
 		// controls
 		controlsDiv = $("<div class='recover_controls'>").appendTo(div);
 		controlsDiv.hide();
-		addControl("start over", startOver);
+		resetControls();
 		
 		// done rendering
 		if (onDone) onDone(div);
 	}
 	
+	function resetControls() {
+		controlsDiv.empty();
+		addControl("start over", startOver);
+	}
+	
 	function addControl(text, onClick) {
-		let link = $("<div class='recover_control_link'>").appendTo(controlsDiv);
+		let linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
+		let link = $("<div class='recover_control_link'>").appendTo(linkDiv);
 		link.append(text);
 		link.click(function() { onClick(); });
 	}
@@ -827,6 +833,13 @@ function RecoverFileController(div) {
 		for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
 		if (!pieces.length) return;
 		
+		// add control to view pieces
+		addControl("view imported pieces", function() {
+			let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+			let body = $("body", window.document);
+			new ExportController(body, window, null, null, pieces).render();
+		});
+		
 		// collect tickers being imported
 		let tickers = new Set();
 		for (let pieceKey of pieces[0].keys) tickers.add(pieceKey.ticker);
@@ -864,19 +877,22 @@ function RecoverFileController(div) {
 	}
 	
 	function renderImportedPieces(namedPieces) {
+		
+		// reset state
+		resetControls();
 		importedPiecesDiv.empty();
+		
+		// hide imported pieces and controls if no pieces
 		if (namedPieces.length === 0) {
 			importedPiecesDiv.hide();
 			controlsDiv.hide();
 			return;
 		}
 		
-		importedPiecesDiv.show();
-		controlsDiv.show();
+		// render imported pieces
 		for (let namedPiece of namedPieces) {
 			importedPiecesDiv.append(getImportedPieceDiv(namedPiece));
 		}
-		
 		function getImportedPieceDiv(namedPiece) {
 			let importedPieceDiv = $("<div class='recover_file_imported_piece'>").appendTo(importedPiecesDiv);
 			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
@@ -885,6 +901,10 @@ function RecoverFileController(div) {
 			trash.click(function() { removePiece(namedPiece.name); });
 			return importedPieceDiv;
 		}
+		
+		// show imported pieces and controls
+		importedPiecesDiv.show();
+		controlsDiv.show();
 	}
 	
 	/**
