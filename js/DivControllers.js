@@ -627,17 +627,21 @@ inheritsFrom(RecoverController, DivController);
 function RecoverFileController(div) {
 	DivController.call(this, div);
 	
+	let contentDiv;						// div for all non control links
 	let importDiv;						// div for all file input
 	let warningDiv;
 	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
-	let piecesAndControls;		// div for imported files and controls
-	let importedPiecesDiv;		// shows imported items
+	let importedPiecesDiv;		// shows imported item;
+	let controlsDiv;					// div for all control links
 	let lastKeys;
 	
 	this.render = function(onDone) {
 		
+		// set up content div
+		contentDiv = $("<div>").appendTo(div);
+		
 		// all file importing
-		importDiv = $("<div>").appendTo(div);
+		importDiv = $("<div>").appendTo(contentDiv);
 		
 		// warning div
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(importDiv);
@@ -663,16 +667,13 @@ function RecoverFileController(div) {
 		// setup drag and drop
 		setupDragAndDrop(dragDropDiv, onFilesImported);
 		
-		// files and controls
-		piecesAndControls = $("<importDiv>").appendTo(importDiv);
-		piecesAndControls.hide();
-		
 		// imported files
-		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(piecesAndControls);
+		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(importDiv);
 		importedPiecesDiv.hide();
 		
 		// controls
-		let controlsDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
+		controlsDiv = $("<div class='recover_controls'>").appendTo(div);
+		controlsDiv.hide();
 		let startOverLink = $("<div class='recover_start_over'>").appendTo(controlsDiv);
 		startOverLink.append("start over");
 		startOverLink.click(function() { startOver(); });
@@ -682,26 +683,23 @@ function RecoverFileController(div) {
 	}
 	
 	function startOver() {
-		div.children().detach();
-		div.append(importDiv);
+		contentDiv.children().detach();
+		contentDiv.append(importDiv);
 		warningDiv.empty();
 		warningDiv.hide();
+		importedPiecesDiv.hide();
+		controlsDiv.hide();
 		removePieces();
-		piecesAndControls.hide();
 	}
 	
 	function onKeysImported(keys) {
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
 		if (keys[0].isEncrypted()) {
-			let decryptionController = new DecryptionController($("<div>"), keys, startOver, function() {
-				console.log("view encrypted");
-			}, function(decryptedKeys) {
-				console.log("view decrypted");
-			});
+			let decryptionController = new DecryptionController($("<div>"), keys);
 			decryptionController.render(function(decryptionDiv) {
-				div.children().detach();
-				div.append(decryptionDiv);
+				contentDiv.children().detach();
+				contentDiv.append(decryptionDiv);
 				decryptionController.focus();
 			});
 		} else {
@@ -864,13 +862,13 @@ function RecoverFileController(div) {
 	function renderImportedPieces(namedPieces) {
 		importedPiecesDiv.empty();
 		if (namedPieces.length === 0) {
-			piecesAndControls.hide();
 			importedPiecesDiv.hide();
+			controlsDiv.hide();
 			return;
 		}
 		
 		importedPiecesDiv.show();
-		piecesAndControls.show();
+		controlsDiv.show();
 		for (let namedPiece of namedPieces) {
 			importedPiecesDiv.append(getImportedPieceDiv(namedPiece));
 		}
