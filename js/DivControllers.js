@@ -1226,6 +1226,10 @@ function DecryptionController(div, encryptedKeys) {
 	
 	this.render = function(onDone) {
 		
+		// set up div
+		div.empty();
+		div.addClass("recover_decryption_div");
+		
 		// div to collect passphrase input
 		inputDiv = $("<div>").appendTo(div);
 		

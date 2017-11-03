@@ -658,6 +658,10 @@ input[type='number'] {
 	text-decoration:underline;
 }
 
+.recover_decryption_div {
+	margin-bottom:15px;
+}
+
 .recover_passphrase_label {
 	font-size:30px;
 	color:white;
