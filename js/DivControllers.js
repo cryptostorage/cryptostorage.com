@@ -706,8 +706,16 @@ function RecoverFileController(div) {
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
 		if (keys[0].isEncrypted()) {
-			let decryptionController = new DecryptionController($("<div>"), keys);
+			
+			// create decryption controller and register callback
+			let decryptionController = new DecryptionController($("<div>"), keys, function(decryptedKeys, pieces, pieceDivs) {
+				setViewDecrypted(decryptedKeys, pieces, pieceDivs);
+			});
+			
+			// render decryption controller
 			decryptionController.render(function(decryptionDiv) {
+				
+				// replace content div with passphrase input
 				contentDiv.children().detach();
 				contentDiv.append(decryptionDiv);
 				decryptionController.focus();
@@ -720,11 +728,20 @@ function RecoverFileController(div) {
 				});
 			});
 		} else {
-			let pieces = CryptoUtils.keysToPieces(keys);
+			setViewDecrypted(keys);
+		}
+	}
+	
+	function setViewDecrypted(keys, pieces, pieceDivs) {
+		resetControls();
+		contentDiv.children().detach();
+		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
+		viewDecrypted.append("View Decrypted Keys");
+		viewDecrypted.click(function() {
 			let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
 			let body = $("body", window.document);
-			new ExportController(body, window, null, keys, pieces).render();
-		}
+			new ExportController(body, window, null, keys, pieces, pieceDivs).render();
+		});
 	}
 	
 	function setWarning(str, img) {
@@ -1024,7 +1041,7 @@ function RecoverTextController(div, plugins) {
 		textArea.attr("placeholder", "Enter a private key or split pieces of a private key");
 		
 		// submit button
-		let submit = $("<div class='recover_submit'>").appendTo(div);
+		let submit = $("<div class='recover_button'>").appendTo(div);
 		submit.html("Submit");
 		submit.click(function() { submitPieces(); });
 		
@@ -1246,8 +1263,9 @@ inheritsFrom(RecoverTextController, DivController);
  * 
  * @param div is the div to render to
  * @param encrypted keys is an array of encrypted CryptoKeys
+ * @param onKeysDecrypted(keys, pieces, pieceDivs) is invoked on successful decryption
  */
-function DecryptionController(div, encryptedKeys) {
+function DecryptionController(div, encryptedKeys, onKeysDecrypted) {
 	DivController.call(this, div);
 	
 	let that = this;
@@ -1275,7 +1293,7 @@ function DecryptionController(div, encryptedKeys) {
 		passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(inputDiv)
 		
 		// submit button
-		submitButton = $("<div class='recover_submit'>").appendTo(inputDiv);
+		submitButton = $("<div class='recover_button'>").appendTo(inputDiv);
 		submitButton.html("Submit");
 		submitButton.click(function() { onSubmit(); });
 		
@@ -1341,18 +1359,8 @@ function DecryptionController(div, encryptedKeys) {
 			PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
 				setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering");
 			}, function(err, pieceDivs) {
-				
-				// button to view decrypted storage
-				div.empty();
-				let viewDecrypted = $("<div class='recover_submit'>").appendTo(div);	// TODO: rename class to 'recover_button'
-				viewDecrypted.append("View Decrypted Keys");
-				
-				// open in new tab on click
-				viewDecrypted.click(function() {
-					let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-					let body = $("body", window.document);
-					new ExportController(body, window, null, decryptedKeys, pieces, pieceDivs).render();
-				});
+				if (err) throw err;
+				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
 			});
 		});
 	}

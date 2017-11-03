@@ -585,7 +585,7 @@ input[type='number'] {
 	border:2.5px solid black;
 }
 
-.recover_submit {
+.recover_button, .recover_view_button {
 	display:flex;
 	align-items:center;
 	justify-content:center;
@@ -596,13 +596,17 @@ input[type='number'] {
 	border:2.5px solid black;
 }
 
-.recover_submit:hover {
+.recover_button:hover, .recover_view_button:hover {
 	cursor:pointer;
 	background-color:rgb(60, 240, 60);
 }
 
-.recover_submit:active {
+.recover_button:active, .recover_view_button:active {
 	background-color:rgb(40, 200, 40);
+}
+
+.recover_view_button {
+	margin-bottom:15px;
 }
 
 .recover_imported_pieces {
