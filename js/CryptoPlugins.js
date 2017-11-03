@@ -336,7 +336,7 @@ function DashPlugin() {
 	this.getTicker = function() { return "DASH" };
 	this.getLogo = function() { return $("<img src='img/dash.png'>"); }
 	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/dashcore.js"]; }
-	this.getDonationAddress = function() { return "Not yet implemented"; }
+	this.getDonationAddress = function() { return "XjgcAdK2sivWs8nTUunbWSy1VwxgqtW3WM"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
