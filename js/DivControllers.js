@@ -562,6 +562,71 @@ function FormController(div) {
 inheritsFrom(FormController, DivController);
 
 /**
+ * Manages up to two tabs of content.  Hides tabs if only one content given.
+ * 
+ * @param div is the div to render all tab content to
+ * @param tabName1 is the name of the first tab
+ * @param contentDiv1 is the content tab of the first tab
+ * @param tabName2 is the name of the second tab (optional)
+ * @param contentDiv2 is the content tab of the second tab (optional)
+ */
+function TwoTabController(div, tabName1, contentDiv1, tabName2, contentDiv2) {
+	DivController.call(this, div);
+	
+	let tab1;
+	let tab2;
+	let contentDiv;
+	
+	this.render = function(onDone) {
+		
+		// no tabs if one content div
+		if (!contentDiv2) {
+			div.append(contentDiv1);
+			return;
+		}
+		
+		// TODO: rename classes
+		// set up tabs
+		let tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
+		tab1 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tab1.html(tabName1);
+		tab1.click(function() { selectTab(0); });
+		tab2 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tab2.html(tabName2);
+		tab2.click(function() { selectTab(1); });
+		
+		// add content div
+		contentDiv = $("<div>").appendTo(div);
+		
+		// start on first tab by default
+		selectTab(0);
+		
+		// done rendering
+		if (onDone) onDone(div);
+	}
+	
+	function selectTab(idx) {
+		switch(idx) {
+		case 0:
+			tab1.addClass("active_tab");
+			tab2.removeClass("active_tab");
+			contentDiv.children().detach();
+			contentDiv.append(contentDiv1);
+			break;
+		case 1:
+			tab1.removeClass("active_tab");
+			tab2.addClass("active_tab");
+			contentDiv.children().detach();
+			contentDiv.append(contentDiv2);
+			break;
+		default:
+			throw Error("Tab index must be 0 or 1 but was " + idx);
+		}
+	}
+}
+inheritsFrom(TwoTabController, DivController);
+
+/**
  * Recover page.
  */
 function RecoverController(div) {
@@ -1348,71 +1413,6 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	}
 }
 inheritsFrom(DecryptionController, DivController);
-
-/**
- * Manages up to two tabs of content.  Hides tabs if only one content given.
- * 
- * @param div is the div to render all tab content to
- * @param tabName1 is the name of the first tab
- * @param contentDiv1 is the content tab of the first tab
- * @param tabName2 is the name of the second tab (optional)
- * @param contentDiv2 is the content tab of the second tab (optional)
- */
-function TwoTabController(div, tabName1, contentDiv1, tabName2, contentDiv2) {
-	DivController.call(this, div);
-	
-	let tab1;
-	let tab2;
-	let contentDiv;
-	
-	this.render = function(onDone) {
-		
-		// no tabs if one content div
-		if (!contentDiv2) {
-			div.append(contentDiv1);
-			return;
-		}
-		
-		// TODO: rename classes
-		// set up tabs
-		let tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
-		tab1 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
-		tab1.html(tabName1);
-		tab1.click(function() { selectTab(0); });
-		tab2 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
-		tab2.html(tabName2);
-		tab2.click(function() { selectTab(1); });
-		
-		// add content div
-		contentDiv = $("<div>").appendTo(div);
-		
-		// start on first tab by default
-		selectTab(0);
-		
-		// done rendering
-		if (onDone) onDone(div);
-	}
-	
-	function selectTab(idx) {
-		switch(idx) {
-		case 0:
-			tab1.addClass("active_tab");
-			tab2.removeClass("active_tab");
-			contentDiv.children().detach();
-			contentDiv.append(contentDiv1);
-			break;
-		case 1:
-			tab1.removeClass("active_tab");
-			tab2.addClass("active_tab");
-			contentDiv.children().detach();
-			contentDiv.append(contentDiv2);
-			break;
-		default:
-			throw Error("Tab index must be 0 or 1 but was " + idx);
-		}
-	}
-}
-inheritsFrom(TwoTabController, DivController);
 
 /**
  * Export page.
