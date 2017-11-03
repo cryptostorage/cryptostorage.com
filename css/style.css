@@ -648,12 +648,12 @@ input[type='number'] {
 	justify-content:center;
 }
 
-.recover_start_over {
+.recover_control_link {
 	font-size:20px;
 	color:white;
 }
 
-.recover_start_over:hover {
+.recover_control_link:hover {
 	cursor:pointer;
 	text-decoration:underline;
 }

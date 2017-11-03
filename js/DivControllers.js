@@ -674,12 +674,16 @@ function RecoverFileController(div) {
 		// controls
 		controlsDiv = $("<div class='recover_controls'>").appendTo(div);
 		controlsDiv.hide();
-		let startOverLink = $("<div class='recover_start_over'>").appendTo(controlsDiv);
-		startOverLink.append("start over");
-		startOverLink.click(function() { startOver(); });
+		addControl("start over", startOver);
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	function addControl(text, onClick) {
+		let link = $("<div class='recover_control_link'>").appendTo(controlsDiv);
+		link.append(text);
+		link.click(function() { onClick(); });
 	}
 	
 	function startOver() {
@@ -1005,7 +1009,7 @@ function RecoverTextController(div, plugins) {
 		
 		// start over
 		let controlsDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
-		let startOverLink = $("<div class='recover_start_over'>").appendTo(controlsDiv);
+		let startOverLink = $("<div class='recover_control_link'>").appendTo(controlsDiv);
 		startOverLink.append("start over");
 		startOverLink.click(function(e) {
 			warningDiv.empty();
