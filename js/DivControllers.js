@@ -572,49 +572,20 @@ function RecoverController(div) {
 		
 		// filler to push recover div down
 		$("<div class='recover_filler'>").appendTo(div);
-		let recoverDiv = $("<div class='recover_div'>").appendTo(div);
 		
-		// set up recover div
-		let tabsDiv = $("<div class='recover_tabs_div'>").appendTo(recoverDiv);
-		let recoverFileTab = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
-		recoverFileTab.html("Recover From File");
-		recoverFileTab.click(function() { selectTab("file"); });
-		let recoverTextTab = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
-		recoverTextTab.html("Recover From Text");
-		recoverTextTab.click(function() { selectTab("text"); });
-		let recoverContentDiv = $("<div class='recover_content_div'>").appendTo(recoverDiv);
+		// all recover content including tabs
+		let recoverDiv = $("<div class='recover_div'>").appendTo(div);
 		
 		// render recover file and text divs
 		let recoverFileDiv = $("<div>");
 		let recoverTextDiv = $("<div>");
 		new RecoverFileController(recoverFileDiv).render(function() {
 			new RecoverTextController(recoverTextDiv, CryptoUtils.getCryptoPlugins()).render(function() {
-				
-				// start on file tab by default
-				selectTab("file");
-				
-				// done rendering
-				if (onDone) onDone(div);
+				new TwoTabController(recoverDiv, "Recover From File", recoverFileDiv, "Recover From Text", recoverTextDiv).render(function() {
+					if (onDone) onDone(div);
+				});
 			});
 		});
-		
-		function selectTab(selected) {
-			switch (selected) {
-			case "file":
-				recoverFileTab.addClass("active_tab");
-				recoverTextTab.removeClass("active_tab");
-				recoverContentDiv.children().detach();
-				recoverContentDiv.append(recoverFileDiv);
-				break;
-			case "text":
-				recoverFileTab.removeClass("active_tab");
-				recoverTextTab.addClass("active_tab");
-				recoverContentDiv.children().detach();
-				recoverContentDiv.append(recoverTextDiv);
-				break;
-			default: throw new Error("Unrecognized selection: " + selected);
-			}
-		}
 	}
 }
 inheritsFrom(RecoverController, DivController);
@@ -636,6 +607,10 @@ function RecoverFileController(div) {
 	let lastKeys;
 	
 	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("recover_content_div");
 		
 		// warning div
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
@@ -1001,6 +976,10 @@ function RecoverTextController(div, plugins) {
 	let lastKeys;
 	
 	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("recover_content_div");
 		
 		// warning div
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
@@ -1369,6 +1348,71 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	}
 }
 inheritsFrom(DecryptionController, DivController);
+
+/**
+ * Manages up to two tabs of content.  Hides tabs if only one content given.
+ * 
+ * @param div is the div to render all tab content to
+ * @param tabName1 is the name of the first tab
+ * @param contentDiv1 is the content tab of the first tab
+ * @param tabName2 is the name of the second tab (optional)
+ * @param contentDiv2 is the content tab of the second tab (optional)
+ */
+function TwoTabController(div, tabName1, contentDiv1, tabName2, contentDiv2) {
+	DivController.call(this, div);
+	
+	let tab1;
+	let tab2;
+	let contentDiv;
+	
+	this.render = function(onDone) {
+		
+		// no tabs if one content div
+		if (!contentDiv2) {
+			div.append(contentDiv1);
+			return;
+		}
+		
+		// TODO: rename classes
+		// set up tabs
+		let tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
+		tab1 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tab1.html(tabName1);
+		tab1.click(function() { selectTab(0); });
+		tab2 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tab2.html(tabName2);
+		tab2.click(function() { selectTab(1); });
+		
+		// add content div
+		contentDiv = $("<div>").appendTo(div);
+		
+		// start on first tab by default
+		selectTab(0);
+		
+		// done rendering
+		if (onDone) onDone(div);
+	}
+	
+	function selectTab(idx) {
+		switch(idx) {
+		case 0:
+			tab1.addClass("active_tab");
+			tab2.removeClass("active_tab");
+			contentDiv.children().detach();
+			contentDiv.append(contentDiv1);
+			break;
+		case 1:
+			tab1.removeClass("active_tab");
+			tab2.addClass("active_tab");
+			contentDiv.children().detach();
+			contentDiv.append(contentDiv2);
+			break;
+		default:
+			throw Error("Tab index must be 0 or 1 but was " + idx);
+		}
+	}
+}
+inheritsFrom(TwoTabController, DivController);
 
 /**
  * Export page.
