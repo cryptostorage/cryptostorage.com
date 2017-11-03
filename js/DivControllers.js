@@ -1219,6 +1219,7 @@ function RecoverTextController(div, plugins) {
 	}
 	
 	function setSelectedCurrency(name) {
+		selector = $("#recover_selector");
 		for (let i = 0; i < selectorData.length; i++) {
 			if (selectorData[i].text === name) {
 				selector.ddslick('select', {index: i});
@@ -1239,6 +1240,23 @@ function RecoverTextController(div, plugins) {
 		} else {
 			warningDiv.hide();
 		}
+	}
+	
+	function removePieces() {
+		importedPieces = [];
+		lastKeys = undefined;
+		updatePieces();
+	}
+	
+	function removePiece(piece) {
+		for (let i = 0; i < importedPieces.length; i++) {
+			if (importedPieces[i] === piece) {
+				importedPieces.splice(i, 1);
+				updatePieces();
+				return;
+			}
+		}
+		throw new Error("No piece imported: " + piece);
 	}
 	
 	function submitPieces() {
@@ -1274,23 +1292,6 @@ function RecoverTextController(div, plugins) {
 		});
 	}
 	
-	function removePieces() {
-		importedPieces = [];
-		lastKeys = undefined;
-		updatePieces();
-	}
-	
-	function removePiece(piece) {
-		for (let i = 0; i < importedPieces.length; i++) {
-			if (importedPieces[i] === piece) {
-				importedPieces.splice(i, 1);
-				updatePieces();
-				return;
-			}
-		}
-		throw new Error("No piece imported: " + piece);
-	}
-	
 	function updatePieces(newPieces) {
 		
 		// reset warning
@@ -1313,6 +1314,7 @@ function RecoverTextController(div, plugins) {
 		let key;
 		if (importedPieces.length === 1) {
 			try {
+				console.log(selectedPlugin);
 				key = selectedPlugin.newKey(importedPieces[0]);
 			} catch (err) {
 				// nothing to do
