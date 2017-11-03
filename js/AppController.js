@@ -93,16 +93,15 @@ $(document).ready(function() {
 	loader.load(COMMON_DEPENDENCIES, function() {
 		
 		// get data url of logo
-//		let plugin = CryptoUtils.getCryptoPlugin("BCH");
-//		console.log(imgToDataUrl($("<img src='img/cryptostorage.png'>").get(0)));
-//		function imgToDataUrl(img, format) {
-//			let canvas = document.createElement('canvas');
-//		    canvas.height = img.naturalHeight;
-//		    canvas.width = img.naturalWidth;
-//		    let context = canvas.getContext('2d');
-//		    context.drawImage(img, 0, 0);
-//		    return canvas.toDataURL(format);
-//		}
+		console.log(imgToDataUrl($("<img src='img/dash.png'>").get(0)));
+		function imgToDataUrl(img, format) {
+			let canvas = document.createElement('canvas');
+		    canvas.height = img.naturalHeight;
+		    canvas.width = img.naturalWidth;
+		    let context = canvas.getContext('2d');
+		    context.drawImage(img, 0, 0);
+		    return canvas.toDataURL(format);
+		}
 	});
 	
 	// run tests

@@ -329,6 +329,58 @@ function LitecoinPlugin() {
 inheritsFrom(LitecoinPlugin, CryptoPlugin);
 
 /**
+ * Dash plugin.
+ */
+function DashPlugin() {
+	this.getName = function() { return "Dash"; }
+	this.getTicker = function() { return "DASH" };
+	this.getLogo = function() { return $("<img src='img/dash.png'>"); }
+	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/dashcore.js"]; }
+	this.getDonationAddress = function() { return "Not yet implemented"; }
+	this.newKey = function(str) {
+		
+		// create key if not given
+		if (!str) str = new dashcore.PrivateKey().toString();		
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		let state = {};
+		
+		// unencrypted
+		if (str.length >= 52 && dashcore.PrivateKey.isValid(str)) {	// TODO: dashcore says 'ab' is valid ... ?
+			let key = new dashcore.PrivateKey(str);
+			state.hex = key.toString();
+			state.wif = key.toWIF();
+			state.address = key.toAddress().toString();
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// hex cryptojs
+		else if (isHex(str) && str.length > 100) {
+			state.hex = str;
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// wif cryptojs
+		else if (CryptoUtils.isWifCryptoJs(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// otherwise key is not recognized
+		throw new Error("Unrecognized private key: " + str);
+	}
+	this.isAddress = function(str) {
+		return dashcore.Address.isValid(str);
+	}
+}
+inheritsFrom(DashPlugin, CryptoPlugin);
+
+/**
  * Monero plugin.
  */
 function MoneroPlugin() {
