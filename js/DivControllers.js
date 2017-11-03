@@ -711,6 +711,13 @@ function RecoverFileController(div) {
 				contentDiv.children().detach();
 				contentDiv.append(decryptionDiv);
 				decryptionController.focus();
+				
+				// add control to view encrypted keys
+				addControl("view encrypted keys", function() {
+					let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+					let body = $("body", window.document);
+					new ExportController(body, window, null, keys, null).render();
+				});
 			});
 		} else {
 			let pieces = CryptoUtils.keysToPieces(keys);
