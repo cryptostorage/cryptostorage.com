@@ -1065,7 +1065,7 @@ function RecoverTextController(div, plugins) {
 	DivController.call(this, div);
 	assertTrue(plugins.length > 0);
 	
-	const MAX_PIECE_LENGTH = 58;					// max length of piece strings to render
+	const MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
 	let warningDiv;
 	let selector;
 	let selectorDisabler;
