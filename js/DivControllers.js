@@ -1169,7 +1169,6 @@ function RecoverTextController(div, plugins) {
 	}
 	
 	function setSelectorEnabled(bool) {
-		console.log("setSelectorEnabled(" + bool + ")");
 		if (bool) {
 			$("#recover_selector *").removeClass("disabled_text");
 			selectorDisabler.hide();
