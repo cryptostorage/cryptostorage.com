@@ -710,7 +710,7 @@ function RecoverFileController(div) {
 			let decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
 				setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
-				setViewDecrypted(decryptedKeys, pieces, pieceDivs);
+				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
 			});
 			
 			// render decryption controller
@@ -729,11 +729,11 @@ function RecoverFileController(div) {
 				});
 			});
 		} else {
-			setViewDecrypted(keys);
+			onKeysDecrypted(keys);
 		}
 	}
 	
-	function setViewDecrypted(keys, pieces, pieceDivs) {
+	function onKeysDecrypted(keys, pieces, pieceDivs) {
 		resetControls();
 		contentDiv.children().detach();
 		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
