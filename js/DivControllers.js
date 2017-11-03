@@ -1220,6 +1220,7 @@ inheritsFrom(RecoverTextController, DivController);
 function DecryptionController(div, encryptedKeys) {
 	DivController.call(this, div);
 	
+	let that = this;
 	let inputDiv;
 	let warningDiv;
 	let passphraseInput;
@@ -1243,6 +1244,15 @@ function DecryptionController(div, encryptedKeys) {
 		submitButton = $("<div class='recover_submit'>").appendTo(inputDiv);
 		submitButton.html("Submit");
 		submitButton.click(function() { onSubmit(); });
+		
+		// register passphrase enter key
+		passphraseInput.keyup(function(e) {
+			let code = e.which;
+	    if (code == 13) {
+	    	e.preventDefault();
+	      submitButton.click();
+	    }
+		});
 		
 		if (onDone) onDone(div);
 	}
@@ -1286,6 +1296,7 @@ function DecryptionController(div, encryptedKeys) {
 				setWarning(err.message);
 				div.empty();
 				div.append(inputDiv);
+				that.focus();
 				return;
 			}
 			
@@ -1300,7 +1311,7 @@ function DecryptionController(div, encryptedKeys) {
 				// button to view decrypted storage
 				div.empty();
 				let viewDecrypted = $("<div class='recover_submit'>").appendTo(div);	// TODO: rename class to 'recover_button'
-				viewDecrypted.append("View Decrypted Storage");
+				viewDecrypted.append("View Decrypted Keys");
 				
 				// open in new tab on click
 				viewDecrypted.click(function() {
