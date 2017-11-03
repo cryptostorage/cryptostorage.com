@@ -627,9 +627,9 @@ inheritsFrom(RecoverController, DivController);
 function RecoverFileController(div) {
 	DivController.call(this, div);
 	
-	let contentDiv;						// div for all non control links
-	let importDiv;						// div for all file input
 	let warningDiv;
+	let contentDiv;						// div for all non control links
+	let importDiv;						// div for all file import
 	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
 	let importedPiecesDiv;		// shows imported item;
 	let controlsDiv;					// div for all control links
@@ -637,15 +637,15 @@ function RecoverFileController(div) {
 	
 	this.render = function(onDone) {
 		
+		// warning div
+		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
+		warningDiv.hide();
+		
 		// set up content div
 		contentDiv = $("<div>").appendTo(div);
 		
 		// all file importing
 		importDiv = $("<div>").appendTo(contentDiv);
-		
-		// warning div
-		warningDiv = $("<div class='recover_warning_div'>").appendTo(importDiv);
-		warningDiv.hide();
 		
 		// drag and drop importDiv
 		let dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(importDiv);
@@ -693,13 +693,12 @@ function RecoverFileController(div) {
 	}
 	
 	function startOver() {
+		setWarning("");
 		contentDiv.children().detach();
-		contentDiv.append(importDiv);
-		warningDiv.empty();
-		warningDiv.hide();
 		importedPiecesDiv.hide();
 		controlsDiv.hide();
 		removePieces();
+		contentDiv.append(importDiv);
 	}
 	
 	function onKeysImported(keys) {
@@ -707,8 +706,10 @@ function RecoverFileController(div) {
 		assertTrue(keys.length > 0);
 		if (keys[0].isEncrypted()) {
 			
-			// create decryption controller and register callback
-			let decryptionController = new DecryptionController($("<div>"), keys, function(decryptedKeys, pieces, pieceDivs) {
+			// create decryption controller and register callbacks
+			let decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+				setWarning(warning);
+			}, function(decryptedKeys, pieces, pieceDivs) {
 				setViewDecrypted(decryptedKeys, pieces, pieceDivs);
 			});
 			
@@ -1263,14 +1264,14 @@ inheritsFrom(RecoverTextController, DivController);
  * 
  * @param div is the div to render to
  * @param encrypted keys is an array of encrypted CryptoKeys
+ * @param onWarning(msg) is called when this controller reports a warning
  * @param onKeysDecrypted(keys, pieces, pieceDivs) is invoked on successful decryption
  */
-function DecryptionController(div, encryptedKeys, onKeysDecrypted) {
+function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	DivController.call(this, div);
 	
 	let that = this;
 	let inputDiv;
-	let warningDiv;
 	let passphraseInput;
 	let submitButton;
 	
@@ -1282,10 +1283,6 @@ function DecryptionController(div, encryptedKeys, onKeysDecrypted) {
 		
 		// div to collect passphrase input
 		inputDiv = $("<div>").appendTo(div);
-		
-		// warning div
-		warningDiv = $("<div class='recover_warning_div'>").appendTo(inputDiv);
-		warningDiv.hide();
 		
 		// password input
 		let passwordLabel = $("<div class='recover_passphrase_label'>").appendTo(inputDiv);
@@ -1316,7 +1313,7 @@ function DecryptionController(div, encryptedKeys, onKeysDecrypted) {
 	function onSubmit() {
 		
 		// clear warning
-		setWarning("");
+		onWarning("");
 		
 		// get passphrase
 		let passphrase = passphraseInput.val();
@@ -1324,7 +1321,7 @@ function DecryptionController(div, encryptedKeys, onKeysDecrypted) {
 		
 		// validate passphrase
 		if (!passphrase || passphrase.trim() === "") {
-			setWarning("Enter a passphrase to decrypt private keys");
+			onWarning("Enter a passphrase to decrypt private keys");
 			return;
 		}
 		
@@ -1345,7 +1342,7 @@ function DecryptionController(div, encryptedKeys, onKeysDecrypted) {
 			
 			// if error, switch back to input div
 			if (err) {
-				setWarning(err.message);
+				onWarning(err.message);
 				div.empty();
 				div.append(inputDiv);
 				that.focus();
@@ -1363,19 +1360,6 @@ function DecryptionController(div, encryptedKeys, onKeysDecrypted) {
 				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
 			});
 		});
-	}
-	
-	function setWarning(str, img) {
-		warningDiv.empty();
-		if (str) {
-			if (!img) img = $("<img src='img/warning.png'>");
-			warningDiv.append(img);
-			img.addClass("recover_warning_div_icon");
-			warningDiv.append(str);
-			warningDiv.show();
-		} else {
-			warningDiv.hide();
-		}
 	}
 	
 	function setProgress(percent, label) {
