@@ -833,13 +833,6 @@ function RecoverFileController(div) {
 		for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
 		if (!pieces.length) return;
 		
-		// add control to view pieces
-		addControl("view imported pieces", function() {
-			let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-			let body = $("body", window.document);
-			new ExportController(body, window, null, null, pieces).render();
-		});
-		
 		// collect tickers being imported
 		let tickers = new Set();
 		for (let pieceKey of pieces[0].keys) tickers.add(pieceKey.ticker);
@@ -858,7 +851,16 @@ function RecoverFileController(div) {
 			try {
 				let keys = CryptoUtils.piecesToKeys(pieces);
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
-				if (!keys.length) setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
+				if (!keys.length) {
+					setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
+					
+					// add control to view pieces
+					addControl("view imported pieces", function() {
+						let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+						let body = $("body", window.document);
+						new ExportController(body, window, null, null, pieces).render();
+					});
+				}
 				lastKeys = keys;
 			} catch (err) {
 				setWarning(err.message);
