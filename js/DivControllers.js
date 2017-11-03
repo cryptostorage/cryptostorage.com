@@ -939,7 +939,6 @@ function RecoverTextController(div, plugins) {
 	assertTrue(plugins.length > 0);
 	
 	const MAX_PIECE_LENGTH = 58;					// max length of piece strings to render
-	const MAX_INVALID_PIECE_LENGTH = 25;	// max length of invalid piece string to display in warning
 	let warningDiv;
 	let selector;
 	let selectorDisabler;
@@ -1157,7 +1156,7 @@ function RecoverTextController(div, plugins) {
 							}
 						} catch (err) {
 							if (CryptoUtils.isPossibleSplitPiece(piece)) importedPieces.push(piece);
-							else setWarningAux("Invalid private key or piece: " + CryptoUtils.getShortenedString(piece, MAX_INVALID_PIECE_LENGTH));
+							else setWarningAux("Invalid private key or piece");
 						}
 					}
 				}
