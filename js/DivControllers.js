@@ -694,13 +694,15 @@ function RecoverFileController(div) {
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
 		if (keys[0].isEncrypted()) {
-			new KeyDecryptionController($("<div>"), keys, startOver, function() {
+			let decryptionController = new DecryptionController($("<div>"), keys, startOver, function() {
 				console.log("view encrypted");
 			}, function(decryptedKeys) {
 				console.log("view decrypted");
-			}).render(function(decryptionDiv) {
+			});
+			decryptionController.render(function(decryptionDiv) {
 				div.children().detach();
 				div.append(decryptionDiv);
+				decryptionController.focus();
 			});
 		} else {
 			let pieces = CryptoUtils.keysToPieces(keys);
@@ -1213,16 +1215,11 @@ inheritsFrom(RecoverTextController, DivController);
  * Controls password input and key decryption on import.
  * 
  * @param div is the div to render to
- * @param original pieces is an array of the original imported pieces
- * @param encrypted keys is an array of CryptoKeys
- * @param onStartOver is called when start over is clicked
- * @param onViewEncrypted is called when view encrypted is clicked
- * @param onViewDecrypted is called when view decrypted is clicked
+ * @param encrypted keys is an array of encrypted CryptoKeys
  */
-function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypted, onViewDecrypted) {
+function DecryptionController(div, encryptedKeys) {
 	DivController.call(this, div);
 	
-	let contentDiv;
 	let inputDiv;
 	let warningDiv;
 	let passphraseInput;
@@ -1230,11 +1227,8 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 	
 	this.render = function(onDone) {
 		
-		// div to contain main content
-		contentDiv = $("<div>").appendTo(div);
-		
 		// div to collect passphrase input
-		inputDiv = $("<div>").appendTo(contentDiv);
+		inputDiv = $("<div>").appendTo(div);
 		
 		// warning div
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(inputDiv);
@@ -1250,13 +1244,11 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 		submitButton.html("Submit");
 		submitButton.click(function() { onSubmit(); });
 		
-		// controls
-		let controlsDiv = $("<div class='recover_decrypt_controls'>").appendTo(div);
-		let startOverLink = $("<div class='recover_start_over'>").appendTo(controlsDiv);
-		startOverLink.append("start over");
-		startOverLink.click(function() { if (onStartOver) onStartOver(); });
-		
 		if (onDone) onDone(div);
+	}
+	
+	this.focus = function() {
+		passphraseInput.focus();
 	}
 	
 	function onSubmit() {
@@ -1275,8 +1267,8 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 		}
 		
 		// switch content div to progress bar
-		contentDiv.children().detach();
-		let progressDiv = $("<div>").appendTo(contentDiv);
+		div.children().detach();
+		let progressDiv = $("<div>").appendTo(div);
 		progressBar = UiUtils.getProgressBar(progressDiv);
 		
 		// compute weights for progress bar
@@ -1292,8 +1284,8 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 			// if error, switch back to input div
 			if (err) {
 				setWarning(err.message);
-				contentDiv.empty();
-				contentDiv.append(inputDiv);
+				div.empty();
+				div.append(inputDiv);
 				return;
 			}
 			
@@ -1306,8 +1298,8 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 			}, function(err, pieceDivs) {
 				
 				// button to view decrypted storage
-				contentDiv.empty();
-				let viewDecrypted = $("<div class='recover_submit'>").appendTo(contentDiv);	// TODO: rename class to 'recover_button'
+				div.empty();
+				let viewDecrypted = $("<div class='recover_submit'>").appendTo(div);	// TODO: rename class to 'recover_button'
 				viewDecrypted.append("View Decrypted Storage");
 				
 				// open in new tab on click
@@ -1339,7 +1331,7 @@ function KeyDecryptionController(div, encryptedKeys, onStartOver, onViewEncrypte
 		//if (label) progressBar.setText(label);
 	}
 }
-inheritsFrom(KeyDecryptionController, DivController);
+inheritsFrom(DecryptionController, DivController);
 
 /**
  * Export page.
