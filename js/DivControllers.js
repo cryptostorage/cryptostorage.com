@@ -46,6 +46,14 @@ let UiUtils = {
 			label.html(plugin.getName());
 		}
 		return row;
+	},
+	
+	renderExportTabs: function(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx, onDone) {
+		let tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
+		tabController.render(function(div) {
+			tabController.getTabsDiv().addClass("export_tabs");
+			if (onDone) onDone(div);
+		});
 	}
 }
 
@@ -433,17 +441,11 @@ function FormController(div) {
 	function onGenerate(onDone) {
 		let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
-		new ExportController($("<div class='export_div'>"), window, getConfig()).render(function(div) {
-			new TwoTabController(body, "Tab 1", div, "Tab 2", $("<div>Hello</div>")).render(function() {
+		new ExportController($("<div>"), window, getConfig()).render(function(div) {
+			UiUtils.renderExportTabs(body, null, div, function() {
 				if (onDone) onDone();
 			});
 		});
-		
-//		new ExportController(body, window, getConfig()).render(function(div) {
-////		new TwoTabController(body, null, div).render(function() {
-////			if (onDone) onDone();
-////		});
-//		});
 	}
 	
 	// get current form configuration
@@ -574,13 +576,15 @@ inheritsFrom(FormController, DivController);
  * 
  * @param div is the div to render all tab content to
  * @param tabName1 is the name of the first tab
- * @param contentDiv1 is the content tab of the first tab
+ * @param tabContent1 is the content tab of the first tab
  * @param tabName2 is the name of the second tab (optional)
- * @param contentDiv2 is the content tab of the second tab (optional)
+ * @param tabContent2 is the content tab of the second tab (optional)
+ * @param defaultTabIdx is the default tab index (optional)
  */
-function TwoTabController(div, tabName1, contentDiv1, tabName2, contentDiv2) {
+function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx) {
 	DivController.call(this, div);
 	
+	let tabsDiv;
 	let tab1;
 	let tab2;
 	let contentDiv;
@@ -588,14 +592,14 @@ function TwoTabController(div, tabName1, contentDiv1, tabName2, contentDiv2) {
 	this.render = function(onDone) {
 		
 		// no tabs if one content div
-		if (!contentDiv2) {
-			div.append(contentDiv1);
+		if (!tabContent2) {
+			div.append(tabContent1);
 			return;
 		}
 		
 		// TODO: rename classes
 		// set up tabs
-		let tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
+		tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
 		tab1 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
 		tab1.html(tabName1);
 		tab1.click(function() { selectTab(0); });
@@ -607,10 +611,14 @@ function TwoTabController(div, tabName1, contentDiv1, tabName2, contentDiv2) {
 		contentDiv = $("<div>").appendTo(div);
 		
 		// start on first tab by default
-		selectTab(0);
+		selectTab(defaultTabIdx ? defaultTabIdx : 0);
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	this.getTabsDiv = function() {
+		return tabsDiv;
 	}
 	
 	function selectTab(idx) {
@@ -619,13 +627,13 @@ function TwoTabController(div, tabName1, contentDiv1, tabName2, contentDiv2) {
 			tab1.addClass("active_tab");
 			tab2.removeClass("active_tab");
 			contentDiv.children().detach();
-			contentDiv.append(contentDiv1);
+			contentDiv.append(tabContent1);
 			break;
 		case 1:
 			tab1.removeClass("active_tab");
 			tab2.addClass("active_tab");
 			contentDiv.children().detach();
-			contentDiv.append(contentDiv2);
+			contentDiv.append(tabContent2);
 			break;
 		default:
 			throw Error("Tab index must be 0 or 1 but was " + idx);
@@ -672,11 +680,11 @@ function RecoverFileController(div) {
 	DivController.call(this, div);
 	
 	let warningDiv;
-	let contentDiv;						// div for all non control links
-	let importDiv;						// div for all file import
-	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
-	let importedPiecesDiv;		// shows imported item;
-	let controlsDiv;					// div for all control links
+	let contentDiv;								// div for all non control links
+	let importDiv;								// div for all file import
+	let importedNamedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
+	let importedPiecesDiv;				// shows imported item;
+	let controlsDiv;							// div for all control links
 	let lastKeys;
 	
 	this.render = function(onDone) {
@@ -749,6 +757,12 @@ function RecoverFileController(div) {
 		contentDiv.append(importDiv);
 	}
 	
+	function getImportedPieces() {
+		let pieces = [];
+		for (let importedNamedPiece of importedNamedPieces) pieces.push(importedNamedPiece.piece);
+		return pieces;
+	}
+	
 	function onKeysImported(keys) {
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
@@ -771,9 +785,7 @@ function RecoverFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-					let body = $("body", window.document);
-					new ExportController(body, window, null, keys, null).render();
+					openImportedStorage(keys);
 				});
 			});
 		} else {
@@ -787,10 +799,26 @@ function RecoverFileController(div) {
 		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Keys");
 		viewDecrypted.click(function() {
-			let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-			let body = $("body", window.document);
-			new ExportController(body, window, null, keys, pieces, pieceDivs).render();
+			openImportedStorage(keys, pieces, pieceDivs);
 		});
+	}
+	
+	function openImportedStorage(keys, pieces, pieceDivs) {
+		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+		let body = $("body", window.document);
+		let importedPieces = getImportedPieces();
+		if (importedPieces.length > 1) {
+			new ExportController($("<div>"), window, null, null, importedPieces).render(function(tab1) {
+				let tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
+				new ExportController($("<div>"), window, null, keys, pieces, pieceDivs).render(function(tab2) {
+					UiUtils.renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
+				});
+			});
+		} else {
+			new ExportController($("<div>"), window, null, keys, pieces, pieceDivs).render(function(tab1) {
+				UiUtils.renderExportTabs(body, null, tab1);
+			});
+		}
 	}
 	
 	function setWarning(str, img) {
@@ -866,28 +894,28 @@ function RecoverFileController(div) {
 	
 	function addNamedPieces(namedPieces) {
 		for (let namedPiece of namedPieces) {
-			if (!isPieceImported(namedPiece.name)) importedPieces.push(namedPiece);
+			if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
 		}
 		updatePieces();
 	}
 	
 	function isPieceImported(name) {
-		for (let importedPiece of importedPieces) {
+		for (let importedPiece of importedNamedPieces) {
 			if (importedPiece.name === name) return true;
 		}
 		return false;
 	}
 	
 	function removePieces() {
-		importedPieces = [];
+		importedNamedPieces = [];
 		lastKeys = undefined;
 		updatePieces();
 	}
 	
 	function removePiece(name) {
-		for (let i = 0; i < importedPieces.length; i++) {
-			if (importedPieces[i].name === name) {
-				importedPieces.splice(i, 1);
+		for (let i = 0; i < importedNamedPieces.length; i++) {
+			if (importedNamedPieces[i].name === name) {
+				importedNamedPieces.splice(i, 1);
 				updatePieces();
 				return;
 			}
@@ -899,11 +927,11 @@ function RecoverFileController(div) {
 		
 		// update UI
 		setWarning("");
-		renderImportedPieces(importedPieces);
+		renderImportedPieces(importedNamedPieces);
 		
 		// collect all pieces
 		let pieces = [];
-		for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
+		for (let importedPiece of importedNamedPieces) pieces.push(importedPiece.piece);
 		if (!pieces.length) return;
 		
 		// collect tickers being imported
@@ -1450,6 +1478,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	this.render = function(onDone) {
 		div.empty();
+		div.addClass("export_div");
 		
 		// key generation
 		progressDiv = $("<div class='export_progress_div'>").appendTo(div);

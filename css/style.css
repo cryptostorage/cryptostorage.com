@@ -800,6 +800,9 @@ input[type='number'] {
 	body * {
 	  visibility: hidden;
 	}
+	.export_tabs {
+		display:none;
+	}
 	.export_progress_div {
 		display:none;
 	}
