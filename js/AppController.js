@@ -22,7 +22,6 @@
 
 // slider:
 // prevent scroll revealing some of next picture
-// sometimes scroll timer doesn't start for like 8 seconds - new slider?
 
 // use @media to dynamically space piece pages
 // todos throughout code

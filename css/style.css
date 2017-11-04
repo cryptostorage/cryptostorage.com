@@ -56,7 +56,7 @@ ol {
 }
 
 .link_div {
-	padding:10px 10px 10px 10px;
+	padding:10px 0 10px 20px;
 }
 
 .link_div:hover {
@@ -132,6 +132,10 @@ ol {
 
 .btn_recover {
 	color:white;
+}
+
+.btn_recover:hover {
+	text-decoration:underline;
 }
 
 .btn:hover {
