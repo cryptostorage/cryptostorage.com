@@ -10,12 +10,10 @@
 // piece export: print, download, select pieces
 // faster load time
 
-// slider hover should continue
 // generate export tab, then in source change to import, export tab no longer works
 // public address "decrypt private key to view"
 // ddslick pulldown loading before homepage loads, dependency management
 // load all of home page when all images loaded
-// no padding on slider
 // plugin.newKey() returns null for unrecognized strs instead of throws error
 // ios print spans more than one page
 // was able to print missing pair divs with large number of keys (200)
