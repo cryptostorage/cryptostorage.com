@@ -18,9 +18,7 @@
 // ios print spans more than one page
 // was able to print missing pair divs with large number of keys (200)
 // low priority: try all imported file / key combinations to recover
-// scale too big on small screens, carousel doesn't slide when hovered but can't see when scroll down
-
-// slider:
+// homepage scale too big on small screens
 // prevent scroll revealing some of next picture
 
 // use @media to dynamically space piece pages
