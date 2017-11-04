@@ -1,5 +1,4 @@
 // TODO
-// async operations in new tab
 // all the error messages
 // memory bug in bip38 encryption
 // num keys input flashes on first load
@@ -19,7 +18,6 @@
 // no padding on slider
 // plugin.newKey() returns null for unrecognized strs instead of throws error
 // ios print spans more than one page
-// why does print all take time to enable if progress complete (lots of keys)
 // was able to print missing pair divs with large number of keys (200)
 // low priority: try all imported file / key combinations to recover
 // scale too big on small screens, carousel doesn't slide when hovered but can't see when scroll down

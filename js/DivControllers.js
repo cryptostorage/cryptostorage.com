@@ -1685,7 +1685,6 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			else {
 				assertInitialized(keyGenConfig);
 				CryptoUtils.generateKeys(keyGenConfig, function(done, total, label) {
-					console.log(done + " / " + total + " " + label);
 					progressBar.set(done / total);
 					if (label) progressBar.setText(label);
 					progressDiv.show();
@@ -1693,7 +1692,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 					keys = _keys;
 					pieces = _pieces;
 					pieceDivs = _pieceDivs;
-					update(onDone);
+					update(pieceDivs, onDone);
 				});
 			}
 		}
