@@ -48,27 +48,27 @@ let UiUtils = {
 		return row;
 	},
 	
-	renderExportTabs: function(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx, onDone) {
-		let tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
-		tabController.render(function(div) {
-			tabController.getTabsDiv().addClass("export_tabs");
-			if (onDone) onDone(div);
-		});
-	},
-	
-	openImportedStorage: function(importedPieces, keys, pieces, pieceDivs) {
-		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
+	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+		let window = newWindow(null, browserTabName, null, "css/style.css", getInternalStyleSheetText());
 		let body = $("body", window.document);
 		if (importedPieces && importedPieces.length > 1) {
 			new ExportController($("<div>"), window, null, null, importedPieces).render(function(tab1) {
 				let tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
-				new ExportController($("<div>"), window, null, keys, pieces, pieceDivs).render(function(tab2) {
-					UiUtils.renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
+				new ExportController($("<div>"), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
+					renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
 				});
 			});
 		} else {
-			new ExportController($("<div>"), window, null, keys, pieces, pieceDivs).render(function(tab1) {
-				UiUtils.renderExportTabs(body, null, tab1);
+			new ExportController($("<div>"), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab1) {
+				renderExportTabs(body, null, tab1);
+			});
+		}
+		
+		function renderExportTabs(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx, onDone) {
+			let tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
+			tabController.render(function(div) {
+				tabController.getTabsDiv().addClass("export_tabs");
+				if (onDone) onDone(div);
 			});
 		}
 	}
@@ -139,9 +139,8 @@ inheritsFrom(SliderController, DivController);
  * Home page content.
  * 
  * @param div is the div to render to
- * @param onCurrencyClicked(plugin) is called when the user clicks a currency
  */
-function HomeController(div, onCurrencyClicked) {
+function HomeController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		div.empty();
@@ -153,6 +152,25 @@ function HomeController(div, onCurrencyClicked) {
 		div.append(UiUtils.getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 		for (let i = 3; i < plugins.length; i += 4) {
 			div.append(UiUtils.getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked));
+		}
+		
+		function onCurrencyClicked(plugin) {
+			UiUtils.openStorage(plugin.getName() + " Storage", null, getKeyGenConfig(plugin)); 
+		}
+		
+		function getKeyGenConfig(plugin) {
+			let config = {};
+			config.passphraseChecked = false;
+			config.splitChecked = false;
+			config.numPieces = 1;
+			config.minPieces = null;
+			config.currencies = [];
+			config.currencies.push({
+				plugin: plugin,
+				numKeys: 1,
+				encryption: null
+			});
+			return config;
 		}
 		
 		if (onDone) onDone(div);
@@ -456,13 +474,8 @@ function FormController(div) {
 	
 	// handle when generate button clicked
 	function onGenerate(onDone) {
-		let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
-		let body = $("body", window.document);
-		new ExportController($("<div>"), window, getConfig()).render(function(div) {
-			UiUtils.renderExportTabs(body, null, div, function() {
-				if (onDone) onDone();
-			});
-		});
+		UiUtils.openStorage("Export Storage", null, getConfig());
+		if (onDone) onDone();
 	}
 	
 	// get current form configuration
@@ -802,7 +815,7 @@ function RecoverFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openImportedStorage(getImportedPieces(), keys);
+					UiUtils.openStorage("Imported Storage", getImportedPieces(), null, keys);
 				});
 			});
 		} else {
@@ -816,7 +829,7 @@ function RecoverFileController(div) {
 		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Keys");
 		viewDecrypted.click(function() {
-			UiUtils.openImportedStorage(getImportedPieces(), keys, pieces, pieceDivs);
+			UiUtils.openStorage("Imported Storage", getImportedPieces(), null, keys, pieces, pieceDivs);
 		});
 	}
 	
@@ -1201,7 +1214,7 @@ function RecoverTextController(div, plugins) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted key", function() {
-					UiUtils.openImportedStorage(null, keys);
+					UiUtils.openStorage("Imported Storage", null, null, keys);
 				});
 			});
 		} else {
@@ -1215,7 +1228,7 @@ function RecoverTextController(div, plugins) {
 		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Key");
 		viewDecrypted.click(function() {
-			UiUtils.openImportedStorage(null, keys, pieces, pieceDivs);
+			UiUtils.openStorage("Imported Storage", null, null, keys, pieces, pieceDivs);
 		});
 	}
 	

@@ -190,7 +190,7 @@ function AppController(div) {
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		homeController = new HomeController($("<div>"), onCurrencyClicked);
+		homeController = new HomeController($("<div>"));
 		formController = new FormController($("<div>"));
 		recoverController = new RecoverController($("<div>"));
 		faqController = new FaqController($("<div>"));
@@ -274,10 +274,6 @@ function AppController(div) {
 	
 	function onSelectRecover() {
 		that.showRecover();
-	}
-	
-	function onCurrencyClicked(plugin) {
-		if (DEBUG) console.log("onCurrencyClicked(" + plugin.getName() + ")");
 	}
 }
 inheritsFrom(AppController, DivController);
