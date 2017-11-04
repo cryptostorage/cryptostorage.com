@@ -11,6 +11,8 @@
 // piece export: print, download, select pieces
 // faster load time
 
+// slider hover should continue
+// generate export tab, then in source change to import, export tab no longer works
 // public address "decrypt private key to view"
 // ddslick pulldown loading before homepage loads, dependency management
 // load all of home page when all images loaded

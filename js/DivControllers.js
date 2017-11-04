@@ -1160,6 +1160,7 @@ function RecoverTextController(div, plugins) {
 	
 	function startOver() {
 		setWarning("");
+		textArea.val("");
 		contentDiv.children().detach();
 		importedPiecesDiv.hide();
 		controlsDiv.hide();
