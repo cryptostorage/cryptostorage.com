@@ -19,7 +19,7 @@
 // test alert if key creation fails for any reason
 // verify no name collisions
 // file import zip with invalid json shouldn't prevent others from importing
-// condense files to single files as much as possible
+// minimize initial dependencies: condense files to single files, lazy load css
 // warning if live and/or online
 // test on IE
 // note of how b64-images.js is created
@@ -58,7 +58,7 @@ const RUN_TESTS = false;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;
-const COMMON_DEPENDENCIES = ["lib/b64-images.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js"];
+const COMMON_DEPENDENCIES = ["lib/b64-images.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/pagination.js"];
 var loader;
 
 /**

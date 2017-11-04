@@ -49,17 +49,17 @@ let UiUtils = {
 	},
 	
 	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
-		let window = newWindow(null, browserTabName, null, "css/style.css", getInternalStyleSheetText());
+		let window = newWindow(null, browserTabName, null, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText());
 		let body = $("body", window.document);
 		if (importedPieces && importedPieces.length > 1) {
-			new ExportController($("<div>"), window, null, null, importedPieces).render(function(tab1) {
+			new ExportController($("<div>").appendTo($("body")), window, null, null, importedPieces).render(function(tab1) {
 				let tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
-				new ExportController($("<div>"), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
+				new ExportController($("<div>").appendTo($("body")), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
 					renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
 				});
 			});
 		} else {
-			new ExportController($("<div>"), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab1) {
+			new ExportController($("<div>").appendTo($("body")), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab1) {
 				renderExportTabs(body, null, tab1);
 			});
 		}
@@ -1589,6 +1589,17 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		showPublicCheckbox.prop('checked', true);
 		showPrivateCheckbox.prop('checked', true);
 		showLogosCheckbox.prop('checked', true);
+		
+		// piece selection
+		// TODO: is paginator loaded?
+		let paginator = $("<div id='paginator'>").appendTo(exportHeader);
+		$("#paginator").pagination({
+			dataSource: [1, 2, 3, 4, 5],
+			callback: function(data, pagination) {
+				console.log(data);
+				console.log(pagination);
+			}
+		});
 		
 		// piece selection
 		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
