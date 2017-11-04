@@ -1,6 +1,7 @@
 // TODO
 // pagination
 // homepage
+// light blue little bit ligher / brighter
 // faq
 // tab stops working if source closed
 // export controller progress design, initial and re-render
@@ -42,7 +43,6 @@
 
 // consult designers
 // opinion on donate page + ui designer tip address - link to open user's wallet
-// color of 'c' within cs logo - little bit lighter
 // error messages on key generation page - let them click button once, outline with red, deactivate until they fix.  Constrain split input and keep in sync
 // disable generate button until input valid? - let them click once then disable until error corrected
 // color of generate buttons / pulsing? - form button same as home page, maybe shift to darker
