@@ -711,6 +711,9 @@ input[type='number'] {
 	background-color:rgb(17, 119, 184);
 	width:100%;
 	padding:10px;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
 }
 
 .export_buttons {
@@ -782,7 +785,11 @@ input[type='number'] {
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	margin:15px;
+	margin:15px 0 10px 0;
+}
+
+.export_piece_selection_label {
+	color:white;
 }
 
 .export_current_piece {

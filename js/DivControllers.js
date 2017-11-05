@@ -1592,15 +1592,18 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		
 		// piece selection
 		// TODO: is paginator loaded?
+		let dataSource = [];
+		for (let i = 0; i < 100; i++) dataSource.push(i + 1);
 		let paginator = $("<div id='paginator'>").appendTo(exportHeader);
 		$("#paginator").pagination({
-			dataSource: [1, 2, 3, 4, 5],
+			dataSource: dataSource,
 			pageSize:1,
 			callback: function(data, pagination) {
-				console.log(data);
-				console.log(pagination);
+				console.log(pagination.pageNumber);
+				if (pieceDivs) setVisible(pieceDivs, pagination.pageNumber);
 			}
 		});
+		$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
 		
 		// piece selection
 		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
