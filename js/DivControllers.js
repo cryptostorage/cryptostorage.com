@@ -1595,6 +1595,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		let paginator = $("<div id='paginator'>").appendTo(exportHeader);
 		$("#paginator").pagination({
 			dataSource: [1, 2, 3, 4, 5],
+			pageSize:1,
 			callback: function(data, pagination) {
 				console.log(data);
 				console.log(pagination);
