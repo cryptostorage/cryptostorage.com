@@ -625,10 +625,12 @@ function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
 /**
  * Opens the given div in a new window.
  * 
- * @param div is the jquery div to render
- * @param css are css rules to add (optional)
- * @param title title is the title of the new window (optional)
- * @returns a reference to the opened window
+ * @param div is the jquery div to render to (optional)
+ * @param title is the title of the new tab (optional)
+ * @param jsPaths are javascript paths to import (optional)
+ * @param cssPaths are css paths to import (optional)
+ * @param internalCss is css to embed in the html document (optional)
+ * @return a reference to the opened window
  */
 function newWindow(div, title, jsPaths, cssPaths, internalCss) {
 	let w = window.open();

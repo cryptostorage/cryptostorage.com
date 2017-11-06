@@ -56,6 +56,7 @@ let UiUtils = {
 		
 		// open tab
 		let window = newWindow(null, browserTabName, null, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText());
+		window.focus();
 		let body = $("body", window.document);
 		
 		// handle two tabs with split and reconstituted pieces
