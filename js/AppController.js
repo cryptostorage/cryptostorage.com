@@ -1,13 +1,12 @@
 // TODO
-// pagination
+// tab stops working if source closed
+// bip38
 // homepage
 // light blue little bit ligher / brighter
 // faq
-// tab stops working if source closed
 // export controller progress design, initial and re-render
 // input errors
 // piece numbering in data
-// bip38
 // wait for images before loading homepage
 // don't wait for recover / ddslick before homepage
 // harden inputs: >0, must have first currency, etc
