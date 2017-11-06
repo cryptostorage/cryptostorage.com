@@ -36,11 +36,11 @@ let Tests = {
 		let plugins = Tests.getTestCryptoPlugins();
 		
 		// load dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
+		let dependencies = new Set(APP_DEPENDENCIES);
 		for (let plugin of plugins) {
 			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
 		}
-		loader.load(Array.from(dependencies), function() {
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// verify each plugin has logo data
 			for (let plugin of CryptoUtils.getCryptoPlugins()) {

@@ -630,11 +630,13 @@ function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
  * @param jsPaths are javascript paths to import (optional)
  * @param cssPaths are css paths to import (optional)
  * @param internalCss is css to embed in the html document (optional)
- * @return a reference to the opened window
+ * @param onLoad is invoked with a reference to the window when available
  */
-function newWindow(div, title, jsPaths, cssPaths, internalCss) {
+function newWindow(div, title, jsPaths, cssPaths, internalCss, onLoad) {
 	let w = window.open();
 	w.document.write(buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss));
+	w.addEventListener('load', function() {
+		if (onLoad) onLoad(w);
+	});
 	w.document.close();
-	return w;
 }

@@ -53,13 +53,6 @@
 // title bar should not scroll?
 // warnings to test before using - add FAQ
 
-const RUN_TESTS = false;
-const DEBUG = true;
-const DELETE_WINDOW_CRYPTO = false;
-const VERIFY_ENCRYPTION = false;
-const COMMON_DEPENDENCIES = ["lib/b64-images.js", "lib/jquery-csv.js", "lib/qrcode.js", "lib/jszip.js", "lib/FileSaver.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/pagination.js"];
-var loader;
-
 /**
  * Invoked when document initialized.
  */
@@ -69,8 +62,7 @@ $(document).ready(function() {
 	if (DELETE_WINDOW_CRYPTO) delete window.crypto;
 	
 	// start loading common dependencies
-	loader = new DependencyLoader();
-	loader.load(COMMON_DEPENDENCIES, function() {
+	LOADER.load(APP_DEPENDENCIES, function() {
 		
 		// get data url of logo
 //		let plugin = CryptoUtils.getCryptoPlugin("BCH");
@@ -99,7 +91,7 @@ $(document).ready(function() {
 	appController.render();
 	
 	// preload donation page
-	loader.load("lib/qrcode.js", function() {
+	LOADER.load("lib/qrcode.js", function() {
 		appController.loadDonationPage();
 	});
 });

@@ -1,5 +1,5 @@
-function test(importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
-
+function renderExport(importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+	
 	// pagination requires div attached to dom
 	let container = $("<div>").appendTo($("body"));
 	container.hide();

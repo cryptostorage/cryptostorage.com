@@ -590,13 +590,14 @@ let CryptoUtils = {
 		let decommissioned = false;	// TODO: remove altogether?
 
 		// load dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
+		let dependencies = new Set();
 		for (let currency of config.currencies) {
-			for (let dependency of currency.plugin.getDependencies()) {
+			for (let dependency of CryptoUtils.getCryptoPlugin(currency.ticker).getDependencies()) {
 				dependencies.add(dependency);
 			}
 		}
-		loader.load(Array.from(dependencies), function() {
+		
+		LOADER.load(Array.from(dependencies), function() {			
 			
 			// compute total weight for progress bar
 			let totalWeight = 0;
@@ -613,7 +614,7 @@ let CryptoUtils = {
 			let funcs = [];
 			for (let currency of config.currencies) {
 				for (let i = 0; i < currency.numKeys; i++) {
-					funcs.push(newKeyFunc(currency.plugin));
+					funcs.push(newKeyFunc(CryptoUtils.getCryptoPlugin(currency.ticker)));
 				}
 			}
 			

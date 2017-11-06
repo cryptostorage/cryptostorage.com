@@ -50,43 +50,37 @@ let UiUtils = {
 	
 	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
 		
-		// pagination requires div attached to dom
-		let container = $("<div>").appendTo($("body"));
-		container.hide();
+		let dependencies = [
+			"lib/jquery-3.2.1.min.js",
+			"lib/jquery-ui.js",
+			"lib/loadjs.js",
+			"lib/async.js",
+			"lib/setImmediate.js",
+			"js/test.js",
+			"js/GenUtils.js",
+			"js/DivControllers.js",
+			"js/AppConstants.js",
+			"js/PieceRenderer.js",
+			"js/CryptoUtils.js",
+			"js/CryptoPlugins.js",
+			"js/CryptoKey.js",
+			"js/DependencyLoader.js",
+			"lib/b64-images.js",
+			"lib/jquery-csv.js",
+			"lib/qrcode.js",
+			"lib/jszip.js",
+			"lib/FileSaver.js",
+			"lib/crypto-js.js",
+			"lib/progressbar.js",
+			"lib/pagination.js",
+			"lib/bitaddress.js"
+		];
 		
 		// open tab
-		let window = newWindow(null, browserTabName, null, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText());
-		window.focus();
-		let body = $("body", window.document);
-		
-		// handle two tabs with split and reconstituted pieces
-		if (importedPieces && importedPieces.length > 1) {
-			new ExportController($("<div>").appendTo(container), window, null, null, importedPieces).render(function(tab1) {
-				let tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
-				new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
-					container.detach();
-					container.children().detach();
-					renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
-				});
-			});
-		}
-		
-		// handle one tab
-		else {
-			new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab1) {
-				container.detach();
-				container.children().detach();
-				renderExportTabs(body, null, tab1);
-			});
-		}
-		
-		function renderExportTabs(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx, onDone) {
-			let tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
-			tabController.render(function(div) {
-				tabController.getTabsDiv().addClass("export_tabs");
-				if (onDone) onDone(div);
-			});
-		}
+		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
+		  window.renderExport(importedPieces, keyGenConfig, keys, pieces, pieceDivs);
+			window.focus();
+		});
 	}
 }
 
@@ -182,7 +176,7 @@ function HomeController(div) {
 			config.minPieces = null;
 			config.currencies = [];
 			config.currencies.push({
-				plugin: plugin,
+				ticker: plugin.getTicker(),
 				numKeys: 1,
 				encryption: null
 			});
@@ -234,7 +228,7 @@ function DonateController(div, appController) {
 		UiUtils.setupContentDiv(div);
 		
 		// load qr code dependency
-		loader.load("lib/qrcode.js", function() {
+		LOADER.load("lib/qrcode.js", function() {
 			
 			// build donate section
 			let titleDiv = $("<div class='title'>").appendTo(div);
@@ -505,7 +499,7 @@ function FormController(div) {
 		config.currencies = [];
 		for (let currencyInput of currencyInputs) {
 			config.currencies.push({
-				plugin: currencyInput.getSelectedPlugin(),
+				ticker: currencyInput.getSelectedPlugin().getTicker(),
 				numKeys: currencyInput.getNumKeys(),
 				encryption: config.passphraseChecked ? CryptoUtils.EncryptionScheme.CRYPTOJS : null	// TODO: collect encryption scheme from UI
 			});
@@ -597,7 +591,7 @@ function FormController(div) {
 				defaultSelectedIndex: 0,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
-					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
+					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
 			});
 			selector = $("#currency_selector_" + idx);	// ddslick requires id reference
@@ -616,77 +610,6 @@ function FormController(div) {
 	}
 }
 inheritsFrom(FormController, DivController);
-
-/**
- * Manages up to two tabs of content.  Hides tabs if only one content given.
- * 
- * @param div is the div to render all tab content to
- * @param tabName1 is the name of the first tab
- * @param tabContent1 is the content tab of the first tab
- * @param tabName2 is the name of the second tab (optional)
- * @param tabContent2 is the content tab of the second tab (optional)
- * @param defaultTabIdx is the default tab index (optional)
- */
-function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx) {
-	DivController.call(this, div);
-	
-	let tabsDiv;
-	let tab1;
-	let tab2;
-	let contentDiv;
-	
-	this.render = function(onDone) {
-		
-		// no tabs if one content div
-		if (!tabContent2) {
-			div.append(tabContent1);
-			return;
-		}
-		
-		// TODO: rename classes
-		// set up tabs
-		tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
-		tab1 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
-		tab1.html(tabName1);
-		tab1.click(function() { selectTab(0); });
-		tab2 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
-		tab2.html(tabName2);
-		tab2.click(function() { selectTab(1); });
-		
-		// add content div
-		contentDiv = $("<div>").appendTo(div);
-		
-		// start on first tab by default
-		selectTab(defaultTabIdx ? defaultTabIdx : 0);
-		
-		// done rendering
-		if (onDone) onDone(div);
-	}
-	
-	this.getTabsDiv = function() {
-		return tabsDiv;
-	}
-	
-	function selectTab(idx) {
-		switch(idx) {
-		case 0:
-			tab1.addClass("active_tab");
-			tab2.removeClass("active_tab");
-			contentDiv.children().detach();
-			contentDiv.append(tabContent1);
-			break;
-		case 1:
-			tab1.removeClass("active_tab");
-			tab2.addClass("active_tab");
-			contentDiv.children().detach();
-			contentDiv.append(tabContent2);
-			break;
-		default:
-			throw Error("Tab index must be 0 or 1 but was " + idx);
-		}
-	}
-}
-inheritsFrom(TwoTabController, DivController);
 
 /**
  * Recover page.
@@ -967,14 +890,14 @@ function RecoverFileController(div) {
 		for (let pieceKey of pieces[0].keys) tickers.add(pieceKey.ticker);
 		
 		// collect dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
+		let dependencies = new Set(APP_DEPENDENCIES);
 		for (let ticker of tickers) {
 			let plugin = CryptoUtils.getCryptoPlugin(ticker);
 			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
 		}
 		
 		// load dependencies
-		loader.load(Array.from(dependencies), function() {
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// create keys
 			try {
@@ -1133,7 +1056,7 @@ function RecoverTextController(div, plugins) {
 		// currency selector
 		let selectorContainer = $("<div class='recover_selector_container'>").appendTo(passphraseInputDiv);
 		selector = $("<div id='recover_selector'>").appendTo(selectorContainer);
-		loader.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
+		LOADER.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
 			selector.ddslick({
 				data:selectorData,
 				background: "white",
@@ -1143,7 +1066,7 @@ function RecoverTextController(div, plugins) {
 				defaultSelectedIndex: 0,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
-					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
+					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
 			});
 			selector = $("#recover_selector");	// ddslick requires id reference
@@ -1311,9 +1234,9 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		// load dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
+		let dependencies = new Set(APP_DEPENDENCIES);
 		for (let dependency of selectedPlugin.getDependencies()) dependencies.add(dependency);
-		loader.load(Array.from(dependencies), function() {
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// add pieces
 			updatePieces(contentLines);
@@ -1531,6 +1454,130 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	}
 }
 inheritsFrom(DecryptionController, DivController);
+
+/**
+ * Manages exporting original and reconstituted storage.
+ * 
+ * NOTE: pagination requires div to be attached to dom
+ * 
+ * @param div is the div to render to
+ * @param importedPieces are the original imported pieces (optional)
+ * @param keyGenConfig is a configuration to generate new keys (optional)
+ * @param keys are keys to export (optional)
+ * @param pieces are pieces to export (optional)
+ * @param pieceDivs are rendered piece divs to export (optional)
+ */
+function TwoTabExportController(div, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+	DivController.call(this, div);
+	this.render = function(div) {
+		
+		// pagination requires div attached to dom
+		let container = $("<div>").appendTo($("body"));
+		container.hide();
+		let body = $("body");
+		
+		//handle two tabs with split and reconstituted pieces
+		if (importedPieces && importedPieces.length > 1) {
+			new ExportController($("<div>").appendTo(div), window, null, null, importedPieces).render(function(tab1) {
+				let tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
+				new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
+					container.detach();
+					container.children().detach();
+					renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
+				});
+			});
+		}
+		
+		// handle one tab
+		else {
+			new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab1) {
+				container.detach();
+				container.children().detach();
+				renderExportTabs(body, null, tab1);
+			});
+		}
+		
+		function renderExportTabs(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx, onDone) {
+			let tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
+			tabController.render(function(div) {
+				tabController.getTabsDiv().addClass("export_tabs");
+				if (onDone) onDone(div);
+			});
+		}
+	}
+}
+inheritsFrom(TwoTabExportController, DivController);
+
+/**
+ * Manages up to two tabs of content.  Hides tabs if only one content given.
+ * 
+ * @param div is the div to render all tab content to
+ * @param tabName1 is the name of the first tab
+ * @param tabContent1 is the content tab of the first tab
+ * @param tabName2 is the name of the second tab (optional)
+ * @param tabContent2 is the content tab of the second tab (optional)
+ * @param defaultTabIdx is the default tab index (optional)
+ */
+function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx) {
+	DivController.call(this, div);
+	
+	let tabsDiv;
+	let tab1;
+	let tab2;
+	let contentDiv;
+	
+	this.render = function(onDone) {
+		
+		// no tabs if one content div
+		if (!tabContent2) {
+			div.append(tabContent1);
+			return;
+		}
+		
+		// TODO: rename classes
+		// set up tabs
+		tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
+		tab1 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tab1.html(tabName1);
+		tab1.click(function() { selectTab(0); });
+		tab2 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tab2.html(tabName2);
+		tab2.click(function() { selectTab(1); });
+		
+		// add content div
+		contentDiv = $("<div>").appendTo(div);
+		
+		// start on first tab by default
+		selectTab(defaultTabIdx ? defaultTabIdx : 0);
+		
+		// done rendering
+		if (onDone) onDone(div);
+	}
+	
+	this.getTabsDiv = function() {
+		return tabsDiv;
+	}
+	
+	function selectTab(idx) {
+		switch(idx) {
+		case 0:
+			tab1.addClass("active_tab");
+			tab2.removeClass("active_tab");
+			contentDiv.children().detach();
+			contentDiv.append(tabContent1);
+			break;
+		case 1:
+			tab1.removeClass("active_tab");
+			tab2.addClass("active_tab");
+			contentDiv.children().detach();
+			contentDiv.append(tabContent2);
+			break;
+		default:
+			throw Error("Tab index must be 0 or 1 but was " + idx);
+		}
+	}
+}
+inheritsFrom(TwoTabController, DivController);
 
 /**
  * Export page.
