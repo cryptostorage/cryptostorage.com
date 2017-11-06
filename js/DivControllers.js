@@ -969,9 +969,7 @@ function RecoverFileController(div) {
 					
 					// add control to view pieces
 					addControl("view imported pieces", function() {
-						let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-						let body = $("body", window.document);
-						new ExportController(body, window, null, null, pieces).render();
+						UiUtils.openStorage("Imported Storage", null, null, null, pieces);
 					});
 				}
 				lastKeys = keys;
@@ -1541,7 +1539,6 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	let showPrivateCheckbox;
 	let showLogosCheckbox;
 	let currentPiece;
-	let pieceSelector;
 	let printEnabled;
 	
 	this.render = function(onDone) {
@@ -1592,22 +1589,20 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		
 		// piece selection
 		// TODO: is paginator loaded?
+		let numPieces = getNumPieces(keyGenConfig, pieces, pieceDivs);
 		let dataSource = [];
-		for (let i = 0; i < 100; i++) dataSource.push(i + 1);
-		let paginator = $("<div id='paginator'>").appendTo(exportHeader);
-		$("#paginator").pagination({
-			dataSource: dataSource,
-			pageSize:1,
-			callback: function(data, pagination) {
-				console.log(pagination.pageNumber);
-				if (pieceDivs) setVisible(pieceDivs, pagination.pageNumber);
-			}
-		});
-		$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
-		
-		// piece selection
-		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
-		pieceSelector = $("<select class='piece_selector'>").appendTo(exportPieceSelection);
+		if (numPieces > 1) {
+			for (let i = 0; i < numPieces; i++) dataSource.push(i + 1);
+			let paginator = $("<div id='paginator'>").appendTo(exportHeader);
+			$("#paginator").pagination({
+				dataSource: dataSource,
+				pageSize:1,
+				callback: function(data, pagination) {
+					if (pieceDivs) setVisible(pieceDivs, pagination.pageNumber - 1);
+				}
+			});
+			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
+		}
 		
 		// currently showing piece
 		currentPiece = $("<div class='export_current_piece'>").appendTo(div);
@@ -1616,9 +1611,6 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		showPublicCheckbox.click(function() { update(); });
 		showPrivateCheckbox.click(function() { update(); });
 		showLogosCheckbox.click(function() { update(); });
-		pieceSelector.change(function() {
-			setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
-		});
 		
 		// build ui based on keyGenConfig, pieces, and pieceDivs
 		update(pieceDivs);
@@ -1628,6 +1620,12 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
+	
+	function getNumPieces(keyGenConfig, pieces, pieceDivs) {
+		if (keyGenConfig) return keyGenConfig.numPieces;
+		if (pieces) return pieces.length;
+		if (pieceDivs) return pieceDivs.length;
+	}
 	
 	function getPieceRendererConfig() {
 		return {
@@ -1679,8 +1677,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		
 		// add piece divs if given
 		if (pieceDivs) {
-			updateSelector(pieceSelector, pieces.length);
-			setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
+			setVisible(pieceDivs, 0);
 			setPieceDivs(pieceDivs);
 			setPrintEnabled(true);
 			if (onDone) onDone();
@@ -1693,8 +1690,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			// render pieces if given
 			if (pieces) {
 				for (piece of pieces) pieceDivs.push($("<div>"));
-				updateSelector(pieceSelector, pieces.length);
-				setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
+				setVisible(pieceDivs, 0);
 				setPieceDivs(pieceDivs);
 				setPrintEnabled(false);
 				PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
@@ -1723,14 +1719,6 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 					update(pieceDivs, onDone);
 				});
 			}
-		}
-	}
-	
-	function updateSelector(pieceSelector, numPieces) {
-		pieceSelector.empty();
-		for (let i = 0; i < numPieces; i++) {
-			let option = $("<option value='" + i + "'>").appendTo(pieceSelector);
-			option.html("Piece " + (i + 1));
 		}
 	}
 	

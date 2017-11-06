@@ -720,7 +720,7 @@ input[type='number'] {
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	margin:15px;
+	margin:10px;
 }
 
 .export_button {
@@ -729,7 +729,8 @@ input[type='number'] {
 	margin:0 10px 0 10px;
 	padding:5px 20px 5px 20px;
 	border:2px solid black;
-	font-size:26px;
+	font-size:28px;
+	font-weight:bold;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
 	-ms-user-select: none;      
@@ -751,7 +752,8 @@ input[type='number'] {
 	margin:0 10px 0 10px;
 	padding:5px 20px 5px 20px;
 	border:2px solid black;
-	font-size:26px;
+	font-size:28px;
+	font-weight:bold;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
 	-ms-user-select: none;      
@@ -762,7 +764,7 @@ input[type='number'] {
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	margin:15px;
+	margin:10px;
 }
 
 .export_checkbox {
@@ -774,18 +776,18 @@ input[type='number'] {
 .export_checkbox_label {
 	color:white;
 	cursor:pointer;
-	font-size:21px;
+	font-size:24px;
 	-webkit-user-select: none;  
 	-moz-user-select: none;    
 	-ms-user-select: none;      
 	user-select: none;
 }
 
-#paginator, .export_piece_selection {
+#paginator {
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	margin:15px 0 10px 0;
+	margin:10px 0 5px 0;
 }
 
 .export_piece_selection_label {
@@ -795,12 +797,6 @@ input[type='number'] {
 .export_current_piece {
 	background-color:white;
 	padding:25px;
-}
-
-.piece_selector {
-	padding:5px;
-	font-size:18px;
-	width:125px;
 }
 
 @media print {

@@ -103,7 +103,7 @@
 	box-shadow: none;
 	color: white;
 	cursor: pointer;
-	vertical-align: middle\9
+	vertical-align: middle;
 }
 
 .paginationjs.paginationjs-theme-blue .paginationjs-go-input>input[type=text],
@@ -122,7 +122,7 @@
 
 .paginationjs .paginationjs-go-button, .paginationjs .paginationjs-go-input
 	{
-	margin-left: 5px\9
+	margin-left: 5px;
 }
 
 .paginationjs.paginationjs-small {
@@ -356,15 +356,15 @@
 }
 
 .paginationjs .paginationjs-go-input>input[type=text] {
-	line-height: 28px\9;
-	vertical-align: middle\9
+	line-height: 28px;
+	vertical-align: middle;
 }
 
 .paginationjs.paginationjs-big .paginationjs-pages li>a {
-	line-height: 36px\9
+	line-height: 36px;
 }
 
 .paginationjs.paginationjs-big .paginationjs-go-input>input[type=text] {
-	height: 36px\9;
-	line-height: 36px\9
+	height: 36px;
+	line-height: 36px;
 }
