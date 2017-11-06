@@ -49,17 +49,32 @@ let UiUtils = {
 	},
 	
 	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+		
+		// pagination requires div attached to dom
+		let container = $("<div>").appendTo($("body"));
+		container.hide();
+		
+		// open tab
 		let window = newWindow(null, browserTabName, null, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText());
 		let body = $("body", window.document);
+		
+		// handle two tabs with split and reconstituted pieces
 		if (importedPieces && importedPieces.length > 1) {
-			new ExportController($("<div>").appendTo($("body")), window, null, null, importedPieces).render(function(tab1) {
+			new ExportController($("<div>").appendTo(container), window, null, null, importedPieces).render(function(tab1) {
 				let tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
-				new ExportController($("<div>").appendTo($("body")), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
+				new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
+					container.detach();
+					container.children().detach();
 					renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
 				});
 			});
-		} else {
-			new ExportController($("<div>").appendTo($("body")), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab1) {
+		}
+		
+		// handle one tab
+		else {
+			new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab1) {
+				container.detach();
+				container.children().detach();
 				renderExportTabs(body, null, tab1);
 			});
 		}
@@ -802,7 +817,7 @@ function RecoverFileController(div) {
 			let decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
 				setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
-				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
+				onKeysDecrypted(getImportedPieces(), decryptedKeys, pieces, pieceDivs);
 			});
 			
 			// render decryption controller
@@ -819,17 +834,17 @@ function RecoverFileController(div) {
 				});
 			});
 		} else {
-			onKeysDecrypted(keys);
+			onKeysDecrypted(getImportedPieces(), keys);
 		}
 	}
 	
-	function onKeysDecrypted(keys, pieces, pieceDivs) {
+	function onKeysDecrypted(importedPieces, keys, pieces, pieceDivs) {
 		resetControls();
 		contentDiv.children().detach();
 		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Keys");
 		viewDecrypted.click(function() {
-			UiUtils.openStorage("Imported Storage", getImportedPieces(), null, keys, pieces, pieceDivs);
+			UiUtils.openStorage("Imported Storage", importedPieces, null, keys, pieces, pieceDivs);
 		});
 	}
 	
