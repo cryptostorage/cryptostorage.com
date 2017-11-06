@@ -1538,6 +1538,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	let showPublicCheckbox;
 	let showPrivateCheckbox;
 	let showLogosCheckbox;
+	let paginator;
 	let currentPiece;
 	let printEnabled;
 	
@@ -1593,7 +1594,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		let dataSource = [];
 		if (numPieces > 1) {
 			for (let i = 0; i < numPieces; i++) dataSource.push(i + 1);
-			let paginator = $("<div id='paginator'>").appendTo(exportHeader);
+			paginator = $("<div id='paginator'>").appendTo(exportHeader);
 			$("#paginator").pagination({
 				dataSource: dataSource,
 				pageSize:1,
@@ -1677,7 +1678,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		
 		// add piece divs if given
 		if (pieceDivs) {
-			setVisible(pieceDivs, 0);
+			setVisible(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(pieceDivs);
 			setPrintEnabled(true);
 			if (onDone) onDone();
@@ -1690,7 +1691,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			// render pieces if given
 			if (pieces) {
 				for (piece of pieces) pieceDivs.push($("<div>"));
-				setVisible(pieceDivs, 0);
+				setVisible(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(pieceDivs);
 				setPrintEnabled(false);
 				PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
