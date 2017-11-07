@@ -1,4 +1,4 @@
-function renderExport(importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+function exportToBody(importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	// pagination requires div attached to dom
 	let container = $("<div>").appendTo($("body"));
