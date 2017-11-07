@@ -668,7 +668,7 @@ let CryptoUtils = {
 					
 					// encrypt keys
 					onProgress(progressWeight, totalWeight, "Encrypting keys");
-					async.series(funcs, function(err, encryptedKeys) {
+					async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, encryptedKeys) {
 						if (decommissioned) {
 							if (onDone) onDone();
 							return;
@@ -696,7 +696,7 @@ let CryptoUtils = {
 							
 							// decrypt keys
 							onProgress(progressWeight, totalWeight, "Verifying encryption");
-							async.series(funcs, function(err, decryptedKeys) {
+							async.paralleLimit(funcs, ENCRYPTION_THREADS, function(err, decryptedKeys) {
 								if (decommissioned) {
 									if (onDone) onDone();
 									return;
@@ -817,7 +817,7 @@ let CryptoUtils = {
 		for (let key of keys) funcs.push(decryptFunc(key, passphrase));
 		let doneWeight = 0;
 		if (onProgress) onProgress(doneWeight, totalWeight);
-		async.series(funcs, function(err, result) {
+		async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, result) {
 			if (decommissioned) return;
 			else if (err) onDone(err);
 			else onDone(null, keys);

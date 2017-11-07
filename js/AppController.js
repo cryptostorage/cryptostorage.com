@@ -1,5 +1,6 @@
 // TODO
 // bip38
+// encryption libraries not part of CryptoPlugin dependencies; lazy loaded
 // homepage
 // light blue little bit ligher / brighter
 // faq
