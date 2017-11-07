@@ -1,3 +1,14 @@
+/**
+ * Renders an export page to the current tab's body.
+ * 
+ * Used to run export code in child tab which is unaffected if parent tab is closed.
+ * 
+ * @param importedPieces are original exported pieces
+ * @param keyGenConfig is a configuration to generate new storage
+ * @param keys are keys to generate pieces from
+ * @param pieces are pieces to export and generate pieceDivs from
+ * @param pieceDivs are pre-generated piece divs ready for display
+ */
 function exportToBody(importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	// pagination requires div attached to dom

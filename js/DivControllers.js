@@ -56,7 +56,7 @@ let UiUtils = {
 			"lib/loadjs.js",
 			"lib/async.js",
 			"lib/setImmediate.js",
-			"js/BodyStorageExporter.js",
+			"js/BodyExporter.js",
 			"js/GenUtils.js",
 			"js/DivControllers.js",
 			"js/AppConstants.js",
