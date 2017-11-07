@@ -1,5 +1,4 @@
 // TODO
-// tab stops working if source closed
 // bip38
 // homepage
 // light blue little bit ligher / brighter
