@@ -57,6 +57,7 @@ let UiUtils = {
 			"lib/async.js",
 			"lib/setImmediate.js",
 			"lib/bip38.js",
+			"lib/wif.js",
 			"js/BodyExporter.js",
 			"js/GenUtils.js",
 			"js/DivControllers.js",

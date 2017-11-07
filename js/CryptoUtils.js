@@ -82,11 +82,8 @@ let CryptoUtils = {
 				callback(null, key);
 				break;
 			case CryptoUtils.EncryptionScheme.BIP38:
-				console.log(key.getWif());
-				console.log(key.getHex());
 				let decoded = wif.decode(key.getWif());
-				console.log(decoded);
-				let encryptedWif = bip38.encrypt(atob(key.getHex()), true, passphrase);
+				let encryptedWif = bip38.encrypt(decoded.privateKey, true, passphrase);
 				console.log(encryptedWif);
 				key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
 				callback(null, key);
