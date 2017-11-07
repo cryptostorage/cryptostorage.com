@@ -56,6 +56,7 @@ let UiUtils = {
 			"lib/loadjs.js",
 			"lib/async.js",
 			"lib/setImmediate.js",
+			"lib/bip38.js",
 			"js/BodyExporter.js",
 			"js/GenUtils.js",
 			"js/DivControllers.js",
@@ -501,7 +502,7 @@ function FormController(div) {
 			config.currencies.push({
 				ticker: currencyInput.getSelectedPlugin().getTicker(),
 				numKeys: currencyInput.getNumKeys(),
-				encryption: config.passphraseChecked ? CryptoUtils.EncryptionScheme.CRYPTOJS : null	// TODO: collect encryption scheme from UI
+				encryption: config.passphraseChecked ? (currencyInput.getSelectedPlugin().getTicker() === "BTC" ? CryptoUtils.EncryptionScheme.BIP38 : CryptoUtils.EncryptionScheme.CRYPTOJS) : null	// TODO: collect encryption scheme from UI
 			});
 		}
 		return config;
