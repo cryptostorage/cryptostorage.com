@@ -4,7 +4,7 @@
 let Tests = {
 	
 	// constants
-	REPEAT_LONG: 25,
+	REPEAT_LONG: 5,
 	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
@@ -137,13 +137,13 @@ let Tests = {
 			}
 		}
 
-		function testCryptoKeys(plugins, callback) {
+		function testCryptoKeys(plugins, onDone) {
 			let funcs = [];
 			for (let plugin of plugins) funcs.push(function(callback) { testCryptoKey(plugin, callback); });
-			async.series(funcs, callback);
+			async.series(funcs, onDone);
 		}
 
-		function testCryptoKey(plugin, callback) {
+		function testCryptoKey(plugin, onDone) {
 			console.log("testCryptoKey(" + plugin.getTicker() + ")");
 			
 			// test plugin
@@ -219,67 +219,51 @@ let Tests = {
 				if (max < 1) continue;
 				let keys = [];
 				for (let i = 0; i < max; i++) keys.push(plugin.newKey());
-				funcs.push(function(callback) { testEncryptKeys(keys, scheme, Tests.PASSPHRASE, callback); });
+				funcs.push(function(onDone) { testEncryptKeys(keys, scheme, Tests.PASSPHRASE, onDone); });
 			}
 			
 			// execute encryption tests
 			async.parallel(funcs, function(err) {
-				if (err) callback(err);
+				if (err) {
+					onDone(err);
+					return;
+				}
 				
 				// test wrong passphrase decryption
-				testDecryptWrongPassphrase(plugin, callback);
+				testDecryptWrongPassphrase(plugin, onDone);
 			});
 		}
-
-		function testEncryptKeys(keys, scheme, passphrase, callback) {
+		
+		function testEncryptKeys(keys, scheme, passphrase, onDone) {
 			assertTrue(keys.length > 0);
 			
 			// keep originals for later validation
 			let originals = copyKeys(keys);
 			
-			// test encryption of all keys
-			let funcs = [];
-			for (let key of keys) funcs.push(function(callback) { testEncryptKey(key, scheme, passphrase, callback); });
-			async.parallel(funcs, function(err, result) {
-				if (err) throw err;
+			// collect schemes
+			let schemes = [];
+			for (let i = 0; i < keys.length; i++) schemes.push(scheme);
+			
+			// encrypt keys
+			CryptoUtils.encryptKeys(keys, schemes, passphrase, false, null, function(err, encryptedKeys) {
+				if (err) {
+					onDone(err);
+					return;
+				}
 				
-				// test key exclusion
-				testKeyExclusion(keys);
-				
-				// test piece conversion
-				testKeysToPieces([keys[0]], 1);
-				for (let key of keys) testKeysToPieces([key], Tests.NUM_PIECES, Tests.MIN_PIECES);
-				testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
-				
-				// test decryption with wrong passphrase
-				testDecryptKeys([keys[0]], "wrongPassphrase123", function(err) {
-					assertEquals("Incorrect passphrase", err.message);
-					
-					// test decryption
-					testDecryptKeys(keys, passphrase, function(err, result) {
-						if (err) throw err;
-						assertEquals(originals.length, keys.length);
-						for (let i = 0; i < originals.length; i++) assertTrue(originals[i].equals(keys[i]));
-						callback();
-					});
-				});
-			});
-		}
-
-		function testEncryptKey(key, scheme, passphrase, callback) {
-			assertObject(key, 'CryptoKey');
-			let original = key.copy();
-			key.encrypt(scheme, passphrase, function(err, encrypted) {
-				if (err) callback(err);
-				else {
+				// test state of each key
+				assertEquals(keys.length, encryptedKeys.length);
+				for (let i = 0; i < keys.length; i++) {
+					let key = keys[i];
 					
 					// test basic initialization
+					assertObject(key, 'CryptoKey');
 					assertTrue(key.isEncrypted());
-					assertTrue(key.equals(encrypted));
+					assertTrue(key.equals(encryptedKeys[i]));
+					assertFalse(key.equals(originals[i]));
 					assertInitialized(key.getHex());
 					assertInitialized(key.getWif());
 					assertEquals(scheme, key.getEncryptionScheme());
-					assertFalse(key.equals(original));
 					assertTrue(key.equals(key.copy()));
 					
 					// test address
@@ -310,32 +294,58 @@ let Tests = {
 					assertEquals(key.getHex(), parsed.getHex());
 					assertEquals(key.getWif(), parsed.getWif());
 					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-					callback();
 				}
+				
+				// test key exclusion
+				testKeyExclusion(keys);
+				
+				// test piece conversion
+				testKeysToPieces([keys[0]], 1);
+				for (let key of keys) testKeysToPieces([key], Tests.NUM_PIECES, Tests.MIN_PIECES);
+				testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
+				
+				// test decryption with wrong passphrase
+				testDecryptKeys([keys[0]], "wrongPassphrase123", function(err) {
+					assertEquals("Incorrect passphrase", err.message);
+					
+					// test decryption
+					testDecryptKeys(keys, passphrase, function(err, result) {
+						if (err) throw err;
+						assertEquals(originals.length, keys.length);
+						for (let i = 0; i < originals.length; i++) assertTrue(originals[i].equals(keys[i]));
+						onDone();
+					});
+				});
 			});
 		}
-
-		function testDecryptKeys(keys, passphrase, callback) {
+		
+		function testDecryptKeys(keys, passphrase, onDone) {
 			assertTrue(keys.length > 0);
-			let funcs = [];
-			for (let key of keys) funcs.push(function(callback) { testDecryptKey(key, passphrase, callback); });
-			async.parallel(funcs, callback);
-		}
-
-		function testDecryptKey(key, passphrase, callback) {
-			assertObject(key, 'CryptoKey');
-			let original = key.copy();
-			key.decrypt(passphrase, function(err, decrypted) {
-				if (err) callback(err);
-				else {
+			
+			// save originals for later
+			let originals = [];
+			for (let key of keys) originals.push(key.copy());
+			
+			// decrypt keys
+			CryptoUtils.decryptKeys(keys, passphrase, null, function(err, decryptedKeys) {
+				if (err) {
+					onDone(err);
+					return;
+				}
+				
+				// test state of each key
+				assertEquals(keys.length, decryptedKeys.length);
+				for (let i = 0; i < keys.length; i++) {
+					let key = keys[i];
 					
 					// test basic initialization
-					assertTrue(key.equals(decrypted));
+					assertObject(key, 'CryptoKey');
+					assertTrue(key.equals(decryptedKeys[i]));
+					assertFalse(key.equals(originals[i]));
 					assertInitialized(key.getHex());
 					assertInitialized(key.getWif());
 					assertInitialized(key.getAddress());
 					assertNull(key.getEncryptionScheme());
-					assertFalse(key.equals(original));
 					assertTrue(key.equals(key.copy()));
 					
 					// test consistency
@@ -347,8 +357,10 @@ let Tests = {
 					assertEquals(key.getHex(), parsed.getHex());
 					assertEquals(key.getWif(), parsed.getWif());
 					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-					callback();
 				}
+				
+				// done
+				onDone();
 			});
 		}
 		

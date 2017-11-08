@@ -795,11 +795,11 @@ let CryptoUtils = {
 			return function(callback) {
 				if (decommissioned) return;
 				let scheme = key.getEncryptionScheme();
-				key.decrypt(passphrase, function(err, key) {
+				CryptoUtils.decryptKey(key, passphrase, function(err, key) {
 					if (err) onDone(err);
 					else {
 						doneWeight += CryptoUtils.getWeightDecryptKey(scheme);
-						onProgress(doneWeight, totalWeight);
+						if (onProgress) onProgress(doneWeight, totalWeight);
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					}
 				});
