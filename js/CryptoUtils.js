@@ -651,17 +651,19 @@ let CryptoUtils = {
 			for (let key of keys) originals.push(key.copy());
 		}
 		
-		// track done and total weight for progress
+		// track weights for progress
 		let doneWeight = 0;
+		let verifyWeight = 0;
 		let totalWeight = 0;
 		
-		// collect encryption functions and total weight
+		// collect encryption functions and weights
 		let funcs = [];
 		for (let i = 0; i < keys.length; i++) {
 			totalWeight += CryptoUtils.getWeightEncryptKey(encryptionSchemes[i]);
-			if (verifyEncryption) totalWeight += CryptoUtils.getWeightDecryptKey(encryptionSchemes[i]);
+			if (verifyEncryption) verifyWeight += CryptoUtils.getWeightDecryptKey(encryptionSchemes[i]);
 			funcs.push(encryptFunc(keys[i], encryptionSchemes[i], passphrase));
 		}
+		totalWeight += verifyWeight;
 		
 		// encrypt async
 		if (onProgress) onProgress(0, "Encrypting");
@@ -670,14 +672,16 @@ let CryptoUtils = {
 			// verify encryption
 			if (verifyEncryption) {
 				
-				// collect decryption functions
-				funcs = [];
-				for (let encryptedKey of encryptedKeys) {
-					funcs.push(decryptFunc(encryptedKey.copy(), passphrase));
-				}
+				// copy encrypted keys
+				let encryptedCopies = [];
+				for (let encryptedKey of encryptedKeys) encryptedCopies.push(encrytpedKey.copy());
 				
-				// decrypt async
-				async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, decryptedKeys) {
+				// decrypt keys
+				if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
+				CryptoUtils.decryptKeys(encryptedCopies, passphrase, function(percent) {
+					if (onProgress) onProgress((doneWeight + percent * verifyWeight) / totalWeight);
+				}, function(err, decryptedKeys) {
+					doneWeight += verifyWeight;
 					
 					// assert originals match decrypted keys
 					assertEquals(originals.length, decryptedKeys.length);
@@ -687,7 +691,7 @@ let CryptoUtils = {
 					
 					// done
 					if (onDone) onDone(err, encryptedKeys);
-				});
+				})
 			}
 			
 			// don't verify encryption
@@ -705,21 +709,6 @@ let CryptoUtils = {
 				CryptoUtils.encryptKey(scheme, key, passphrase, function(err, key) {
 					doneWeight += CryptoUtils.getWeightEncryptKey(scheme);
 					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
-					setImmediate(function() { callback(err, key); });	// let UI breath
-				});
-			}
-		}
-		
-		function decryptFunc(key, passphrase) {
-			return function(callback) {
-				if (decommissioned) {
-					callback();
-					return;
-				}
-				let scheme = key.getEncryptionScheme();
-				CryptoUtils.decryptKey(key, passphrase, function(err, key) {
-					doneWeight += CryptoUtils.getWeightDecryptKey(scheme);
-					if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
 					setImmediate(function() { callback(err, key); });	// let UI breath
 				});
 			}
