@@ -54,7 +54,7 @@
 // BIP38 vs CryptoJS encryption option for BTC/BCH - checkbox on same line as "Show passphrase", "Use BIP38 for Bitcoin and Bitcoin Cash"
 // live site warning to stop and download from github - orange bar on form page encouraging users to download
 // mobile static frame?
-// password confirmation - re-enter or show
+// passphrase confirmation - re-enter or show
 // title bar should not scroll?
 // warnings to test before using - add FAQ
 

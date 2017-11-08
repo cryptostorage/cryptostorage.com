@@ -265,7 +265,7 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
 		getSlide($("<img src='img/mix.png'>"), "Generate secure storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 		getSlide($("<img src='img/security.png'>"), "Keys are generated in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-		getSlide($("<img src='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
+		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces.").appendTo(sliderDiv);
 		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats for long term storage.").appendTo(sliderDiv);
 		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:3000});
@@ -1561,7 +1561,7 @@ function RecoverTextController(div, plugins) {
 inheritsFrom(RecoverTextController, DivController);
 
 /**
- * Controls password input and key decryption on import.
+ * Controls passphrase input and key decryption on import.
  * 
  * @param div is the div to render to
  * @param encrypted keys is an array of encrypted CryptoKeys
@@ -1585,9 +1585,9 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		// div to collect passphrase input
 		inputDiv = $("<div>").appendTo(div);
 		
-		// password input
-		let passwordLabel = $("<div class='recover_passphrase_label'>").appendTo(inputDiv);
-		passwordLabel.append("Password");
+		// passphrase input
+		let passphraseLabel = $("<div class='recover_passphrase_label'>").appendTo(inputDiv);
+		passphraseLabel.append("Passphrase");
 		passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(inputDiv)
 		
 		// submit button

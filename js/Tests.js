@@ -8,7 +8,7 @@ let Tests = {
 	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
-	PASSWORD: "MySuperSecretPasswordAbcTesting123",
+	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
 	
 	/**
 	 * Returns crypto plugins to test.
@@ -219,19 +219,19 @@ let Tests = {
 				if (max < 1) continue;
 				let keys = [];
 				for (let i = 0; i < max; i++) keys.push(plugin.newKey());
-				funcs.push(function(callback) { testEncryptKeys(keys, scheme, Tests.PASSWORD, callback); });
+				funcs.push(function(callback) { testEncryptKeys(keys, scheme, Tests.PASSPHRASE, callback); });
 			}
 			
 			// execute encryption tests
 			async.parallel(funcs, function(err) {
 				if (err) callback(err);
 				
-				// test wrong password decryption
-				testDecryptWrongPassword(plugin, callback);
+				// test wrong passphrase decryption
+				testDecryptWrongPassphrase(plugin, callback);
 			});
 		}
 
-		function testEncryptKeys(keys, scheme, password, callback) {
+		function testEncryptKeys(keys, scheme, passphrase, callback) {
 			assertTrue(keys.length > 0);
 			
 			// keep originals for later validation
@@ -239,7 +239,7 @@ let Tests = {
 			
 			// test encryption of all keys
 			let funcs = [];
-			for (let key of keys) funcs.push(function(callback) { testEncryptKey(key, scheme, password, callback); });
+			for (let key of keys) funcs.push(function(callback) { testEncryptKey(key, scheme, passphrase, callback); });
 			async.parallel(funcs, function(err, result) {
 				if (err) throw err;
 				
@@ -251,12 +251,12 @@ let Tests = {
 				for (let key of keys) testKeysToPieces([key], Tests.NUM_PIECES, Tests.MIN_PIECES);
 				testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
 				
-				// test decryption with wrong password
-				testDecryptKeys([keys[0]], "wrongPassword123", function(err) {
-					assertEquals("Incorrect password", err.message);
+				// test decryption with wrong passphrase
+				testDecryptKeys([keys[0]], "wrongPassphrase123", function(err) {
+					assertEquals("Incorrect passphrase", err.message);
 					
 					// test decryption
-					testDecryptKeys(keys, password, function(err, result) {
+					testDecryptKeys(keys, passphrase, function(err, result) {
 						if (err) throw err;
 						assertEquals(originals.length, keys.length);
 						for (let i = 0; i < originals.length; i++) assertTrue(originals[i].equals(keys[i]));
@@ -266,10 +266,10 @@ let Tests = {
 			});
 		}
 
-		function testEncryptKey(key, scheme, password, callback) {
+		function testEncryptKey(key, scheme, passphrase, callback) {
 			assertObject(key, 'CryptoKey');
 			let original = key.copy();
-			key.encrypt(scheme, password, function(err, encrypted) {
+			key.encrypt(scheme, passphrase, function(err, encrypted) {
 				if (err) callback(err);
 				else {
 					
@@ -315,17 +315,17 @@ let Tests = {
 			});
 		}
 
-		function testDecryptKeys(keys, password, callback) {
+		function testDecryptKeys(keys, passphrase, callback) {
 			assertTrue(keys.length > 0);
 			let funcs = [];
-			for (let key of keys) funcs.push(function(callback) { testDecryptKey(key, password, callback); });
+			for (let key of keys) funcs.push(function(callback) { testDecryptKey(key, passphrase, callback); });
 			async.parallel(funcs, callback);
 		}
 
-		function testDecryptKey(key, password, callback) {
+		function testDecryptKey(key, passphrase, callback) {
 			assertObject(key, 'CryptoKey');
 			let original = key.copy();
-			key.decrypt(password, function(err, decrypted) {
+			key.decrypt(passphrase, function(err, decrypted) {
 				if (err) callback(err);
 				else {
 					
@@ -352,11 +352,11 @@ let Tests = {
 			});
 		}
 		
-		function testDecryptWrongPassword(plugin, onDone) {
+		function testDecryptWrongPassphrase(plugin, onDone) {
 			let privateKey = "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdGfEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy";
 			let key = plugin.newKey(privateKey);
 			key.decrypt("abctesting123", function(err, decryptedKey) {
-				assertEquals("Incorrect password", err.message);
+				assertEquals("Incorrect passphrase", err.message);
 				onDone();
 			});
 		}
