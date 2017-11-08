@@ -1,11 +1,12 @@
 // TODO
-// bip38
+// encryption libraries not part of CryptoPlugin dependencies; lazy loaded
+// refactor genererateKeys(), encryptKeys(), decryptKeys(), getGenerateWeight(), getEncryptWeight(), getDecryptWeight()
+// don't wait for recover / ddslick before homepage
 // label doesn't update when encryption starts
 // decryption progress design
 // homepage
 // light blue little bit ligher / brighter
 // faq
-// export controller progress design, initial and re-render
 // input errors
 // piece numbering in data
 // wait for images before loading homepage
@@ -29,8 +30,10 @@
 // restrict file types for file picker
 
 // design:
+// export controller progress design, initial and re-render
 // homepage scale too big on small screens
 // start over button on form
+// bip38 checkboxes
 
 // low priority:
 // try all imported file / key combinations to recover

@@ -353,21 +353,21 @@ function FormController(div) {
 	DivController.call(this, div);
 	
 	let passphraseCheckbox;
+	let btcBip38CheckboxDiv;
+	let btcBip38Checkbox;
+	let bchBip38CheckboxDiv;
+	let bchBip38Checkbox;
 	let passphraseInput;
 	let splitCheckbox;
 	let numPiecesInput;
 	let minPiecesInput;
 	let currencyInputsDiv;	// container for each currency input
 	let currencyInputs;			// tracks each currency input
-	let decommissioned;
-	let progressDiv;
-	let progressBar;
 	
 	this.render = function(onDone) {
 		
 		// initial state
 		UiUtils.setupContentDiv(div);
-		decommissioned = false;
 		
 		// currency inputs
 		currencyInputs = [];
@@ -381,9 +381,6 @@ function FormController(div) {
 		addCurrencySpan.click(function() {
 			addCurrency();
 		});
-		
-		// add first currency input
-		addCurrency();
 		
 		// passphrase checkbox
 		let passphraseDiv = $("<div class='form_section_div'>").appendTo(div);
@@ -417,6 +414,14 @@ function FormController(div) {
 			}
 			passphraseInput.focus();
 		});
+		btcBip38CheckboxDiv = $("<div>").appendTo(passphraseInputDiv);
+		btcBip38Checkbox = $("<input type='checkbox' id='btc_bip38_checkbox'>").appendTo(btcBip38CheckboxDiv);
+		let btcBip38CheckboxLabel = $("<label for='btc_bip38_checkbox'>").appendTo(btcBip38CheckboxDiv);
+		btcBip38CheckboxLabel.html("&nbsp;Use BIP38 encryption for Bitcoin");
+		bchBip38CheckboxDiv = $("<div>").appendTo(passphraseInputDiv);
+		bchBip38Checkbox = $("<input type='checkbox' id='bch_bip38_checkbox'>").appendTo(bchBip38CheckboxDiv);
+		let bchBip38CheckboxLabel = $("<label for='bch_bip38_checkbox'>").appendTo(bchBip38CheckboxDiv);
+		bchBip38CheckboxLabel.html("&nbsp;Use BIP38 encryption for Bitcoin Cash");
 		
 		// split checkbox
 		let splitDiv = $("<div class='form_section_div'>").appendTo(div);
@@ -455,6 +460,9 @@ function FormController(div) {
 		showPassphraseCheckbox.prop('checked', false);
 		splitCheckbox.prop('checked', false);
 		splitInputDiv.hide();
+		
+		// add first currency
+		addCurrency();
 		
 		// add generate button
 		let generateDiv = $("<div class='generate_div'>").appendTo(div);
@@ -501,23 +509,39 @@ function FormController(div) {
 			config.currencies.push({
 				ticker: currencyInput.getSelectedPlugin().getTicker(),
 				numKeys: currencyInput.getNumKeys(),
-				encryption: config.passphraseChecked ? CryptoUtils.EncryptionScheme.CRYPTOJS : null	// TODO: collect encryption scheme from UI
+				encryption: config.passphraseChecked ? getEncryptionScheme(currencyInput) : null
 			});
 		}
+		verifyConfig(config);
 		return config;
+		
+		function getEncryptionScheme(currencyInput) {
+			if (currencyInput.getSelectedPlugin().getTicker() === "BTC" && btcBip38Checkbox.prop('checked')) return CryptoUtils.EncryptionScheme.BIP38;
+			if (currencyInput.getSelectedPlugin().getTicker() === "BCH" && bchBip38Checkbox.prop('checked')) return CryptoUtils.EncryptionScheme.BIP38;
+			return CryptoUtils.EncryptionScheme.CRYPTOJS;
+		}
+		
+		function verifyConfig(config) {
+			for (let currency of config.currencies) {
+				assertDefined(currency.ticker);
+				assertDefined(currency.numKeys);
+				assertDefined(currency.encryption);
+			}
+		}
 	}
 	
 	function addCurrency() {
 		if (DEBUG) console.log("addCurrency()");
 		
 		// create input
-		let currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, CryptoUtils.getCryptoPlugins(), function() {
+		let currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, CryptoUtils.getCryptoPlugins(), updateForm, function() {
 			removeCurrency(currencyInput);
 		});
 		
 		// add to page and track
 		currencyInputs.push(currencyInput);
 		currencyInput.getDiv().appendTo(currencyInputsDiv);
+		updateForm();
 	}
 	
 	function removeCurrency(currencyInput) {
@@ -525,6 +549,32 @@ function FormController(div) {
 		if (idx < 0) throw new Error("Could not find currency input");
 		currencyInputs.splice(idx, 1);
 		currencyInput.getDiv().remove();
+		updateForm();
+	}
+	
+	function updateForm() {
+		
+		// determine if BTC is selected
+		let btcFound = false;
+		for (let currencyInput of currencyInputs) {
+			if (currencyInput.getSelectedPlugin().getTicker() === "BTC") {
+				btcFound = true;
+				break;
+			}
+		}
+		
+		// determine if BCH is selected
+		let bchFound = false;
+		for (let currencyInput of currencyInputs) {
+			if (currencyInput.getSelectedPlugin().getTicker() === "BCH") {
+				bchFound = true;
+				break;
+			}
+		}
+		
+		// show or hide bip38 checkbox options
+		btcFound ? btcBip38CheckboxDiv.show() : btcBip38CheckboxDiv.hide();
+		bchFound ? bchBip38CheckboxDiv.show() : bchBip38CheckboxDiv.hide();
 	}
 	
 	/**
@@ -532,9 +582,10 @@ function FormController(div) {
 	 * 
 	 * @param div is the div to render to
 	 * @param idx is the index of this input relative to the other inputs to accomodate ddslick's id requirement
+	 * @param onCurrencyChanged(ticker) is invoked when the user changes the currency selection
 	 * @param onDelete is invoked when the user delets this input
 	 */
-	function CurrencyInput(div, idx, plugins, onDelete) {
+	function CurrencyInput(div, idx, plugins, onCurrencyChanged, onDelete) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
@@ -543,6 +594,7 @@ function FormController(div) {
 		let numKeysInput;
 		let selector;
 		let selectorData;
+		let initializing = true;
 		
 		this.getDiv = function() {
 			return div;
@@ -557,6 +609,8 @@ function FormController(div) {
 				if (selectorData[i].text === name) {
 					selector.ddslick('select', {index: i});
 					selectedPlugin = plugins[i];
+					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
+					if (!initializing) onCurrencyChanged(selectedPlugin.getTicker());
 					break;
 				}
 			}
@@ -592,6 +646,7 @@ function FormController(div) {
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
 					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
+					onCurrencyChanged(selectedPlugin.getTicker());
 				},
 			});
 			selector = $("#currency_selector_" + idx);	// ddslick requires id reference
@@ -606,6 +661,9 @@ function FormController(div) {
 			let trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 			trashDiv.click(function() { onDelete(); });
 			let trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
+			
+			// no longer initializing
+			initializing = false;
 		}
 	}
 }

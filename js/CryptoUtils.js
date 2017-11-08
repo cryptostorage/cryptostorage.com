@@ -71,24 +71,21 @@ let CryptoUtils = {
 	 * 
 	 * Invokes callback(err, encryptedKey) when done.
 	 */
-	encrypt: function(scheme, key, password, callback) {
+	encrypt: function(scheme, key, passphrase, callback) {
 		if (!scheme) throw new Error("Scheme must be initialized");
 		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-		if (!password) throw new Error("Password must be initialized");
+		if (!passphrase) throw new Error("Passphrase must be initialized");
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.CRYPTOJS:
-				let b64 = CryptoJS.AES.encrypt(key.getHex(), password).toString();
+				let b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
 				key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
 				callback(null, key);
 				break;
 			case CryptoUtils.EncryptionScheme.BIP38:
-				ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.getHex(), password, true, function(resp) {
-					if (resp.message) callback(resp);	// TODO: confirm error handling, isError()
-					else {
-						key.setState(Object.assign(key.getPlugin().newKey(resp).getState(), {address: key.getAddress()}));
-						callback(null, key);
-					}
-				});
+				let decoded = bitcoinjs.decode(key.getWif());
+				let encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
+				key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
+				callback(null, key);
 				break;
 			default:
 				callback(new Error("Encryption scheme '" + scheme + "' not supported"));
@@ -96,33 +93,33 @@ let CryptoUtils = {
 	},
 
 	/**
-	 * Decrypts the given key with the given password.
+	 * Decrypts the given key with the given passphrase.
 	 * 
 	 * Invokes callback(err, decryptedKey) when done.
 	 */
-	decrypt: function(key, password, callback) {
+	decrypt: function(key, passphrase, callback) {
 		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-		if (!password) throw new Error("Password must be initialized");
+		if (!passphrase) throw new Error("Passphrase must be initialized");
 		assertTrue(key.isEncrypted());
 		switch (key.getEncryptionScheme()) {
 			case CryptoUtils.EncryptionScheme.CRYPTOJS:
 				let hex;
 				try {
-					hex = CryptoJS.AES.decrypt(key.getWif(), password).toString(CryptoJS.enc.Utf8);
+					hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
 				} catch (err) { }
-				if (!hex) callback(new Error("Incorrect password"));
+				if (!hex) callback(new Error("Incorrect passphrase"));
 				else {
 					try {
 						key.setPrivateKey(hex);
 						callback(null, key);
 					} catch (err) {
-						callback(new Error("Incorrect password"));
+						callback(new Error("Incorrect passphrase"));
 					}
 				}
 				break;
 			case CryptoUtils.EncryptionScheme.BIP38:
-				ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), password, function(resp) {
-					if (resp.message) callback(new Error("Incorrect password"));
+				ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), passphrase, function(resp) {
+					if (resp.message) callback(new Error("Incorrect passphrase"));
 					else {
 						let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
 						key.setPrivateKey(wif);
@@ -671,7 +668,7 @@ let CryptoUtils = {
 					
 					// encrypt keys
 					onProgress(progressWeight, totalWeight, "Encrypting keys");
-					async.series(funcs, function(err, encryptedKeys) {
+					async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, encryptedKeys) {
 						if (decommissioned) {
 							if (onDone) onDone();
 							return;
@@ -699,7 +696,7 @@ let CryptoUtils = {
 							
 							// decrypt keys
 							onProgress(progressWeight, totalWeight, "Verifying encryption");
-							async.series(funcs, function(err, decryptedKeys) {
+							async.paralleLimit(funcs, ENCRYPTION_THREADS, function(err, decryptedKeys) {
 								if (decommissioned) {
 									if (onDone) onDone();
 									return;
@@ -820,7 +817,7 @@ let CryptoUtils = {
 		for (let key of keys) funcs.push(decryptFunc(key, passphrase));
 		let doneWeight = 0;
 		if (onProgress) onProgress(doneWeight, totalWeight);
-		async.series(funcs, function(err, result) {
+		async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, result) {
 			if (decommissioned) return;
 			else if (err) onDone(err);
 			else onDone(null, keys);
