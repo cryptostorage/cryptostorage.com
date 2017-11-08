@@ -1,5 +1,4 @@
 // TODO
-// label doesn't update when encryption starts
 // piece numbering in data
 // decryption progress design
 // homepage
