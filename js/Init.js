@@ -1,11 +1,11 @@
 // TODO
 // piece numbering in data
+// harden inputs: >0, must have first currency, etc
+// input errors
 // decryption progress design
 // homepage
 // light blue little bit ligher / brighter
 // faq
-// input errors
-// harden inputs: >0, must have first currency, etc
 // wait for images before loading homepage
 // public address (decrypt to view) instead of (omitted)
 // plugin.newKey() returns null for unrecognized strs instead of throws error
