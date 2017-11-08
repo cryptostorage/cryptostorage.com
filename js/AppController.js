@@ -1,5 +1,4 @@
 // TODO
-// bip38
 // encryption libraries not part of CryptoPlugin dependencies; lazy loaded
 // refactor genererateKeys(), encryptKeys(), decryptKeys(), getGenerateWeight(), getEncryptWeight(), getDecryptWeight()
 // don't wait for recover / ddslick before homepage
