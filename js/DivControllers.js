@@ -1637,7 +1637,9 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		let totalWeight = decryptWeight + renderWeight;
 		
 		// decrypt keys async
-		CryptoUtils.decryptKeys(encryptedKeys, passphrase, function(done, total) {
+		let copies = [];
+		for (let encryptedKey of encryptedKeys) copies.push(encryptedKey.copy());
+		CryptoUtils.decryptKeys(copies, passphrase, function(done, total) {
 			setProgress(done / total * decryptWeight / totalWeight, "Decrypting");
 		}, function(err, decryptedKeys) {
 			

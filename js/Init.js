@@ -1,6 +1,4 @@
 // TODO
-// encryption libraries not part of CryptoPlugin dependencies; lazy loaded
-// bug when decrypting, can click view encrypted, which has keys that have been encrypted
 // don't wait for recover / ddslick before homepage
 // label doesn't update when encryption starts
 // decryption progress design
