@@ -82,8 +82,8 @@ let CryptoUtils = {
 				callback(null, key);
 				break;
 			case CryptoUtils.EncryptionScheme.BIP38:
-				let decoded = bip38.decode(key.getWif());
-				let encryptedWif = bip38.encrypt(decoded.privateKey, true, passphrase);
+				let decoded = bitcoinjs.decode(key.getWif());
+				let encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
 				key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
 				callback(null, key);
 				break;

@@ -87,7 +87,7 @@ function BitcoinPlugin() {
 	this.getName = function() { return "Bitcoin"; }
 	this.getTicker = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/bip38.js"]; }
+	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/bitcoinjs.js"]; }
 	this.getDonationAddress = function() { return "1EU82y3CS2gUm41DyyRzKvWii8BbiRZDuf"; }
 	this.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS, CryptoUtils.EncryptionScheme.BIP38]; }
 	this.newKey = function(str) {
