@@ -1,5 +1,4 @@
 // TODO
-// don't wait for recover / ddslick before homepage
 // label doesn't update when encryption starts
 // decryption progress design
 // homepage
@@ -90,11 +89,5 @@ $(document).ready(function() {
 	}
 	
 	// render application to html body
-	var appController = new AppController($("body"));
-	appController.render();
-	
-	// preload donation page
-	LOADER.load("lib/qrcode.js", function() {
-		appController.loadDonationPage();
-	});
+	new AppController($("body")).render();
 });

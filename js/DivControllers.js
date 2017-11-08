@@ -170,6 +170,7 @@ function AppController(div) {
 		donateController = new DonateController($("<div>"));
 		recoverController.render();
 		faqController.render();
+		donateController.render();
 		
 		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
 		setImmediate(function() {
@@ -226,10 +227,6 @@ function AppController(div) {
 		if (DEBUG) console.log("showRecover()");
 		sliderDiv.hide();
 		setContentDiv(recoverController.getDiv());
-	}
-	
-	this.loadDonationPage = function() {
-		donateController.render();
 	}
 	
 	// ---------------------------------- PRIVATE -------------------------------
@@ -384,7 +381,7 @@ function DonateController(div, appController) {
 		UiUtils.setupContentDiv(div);
 		
 		// load qr code dependency
-		LOADER.load("lib/qrcode.js", function() {
+		LOADER.load(["lib/qrcode.js", "lib/async.js"], function() {
 			
 			// build donate section
 			let titleDiv = $("<div class='title'>").appendTo(div);
