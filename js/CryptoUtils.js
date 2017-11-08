@@ -629,6 +629,39 @@ let CryptoUtils = {
 	},
 	
 	/**
+	 * Encrypts the given key with the given scheme and passphrase.
+	 * 
+	 * @param key is an unencrypted key to encrypt
+	 * @param scheme is the scheme to encrypt the key
+	 * @param passphrase is the passphrase to encrypt with
+	 * @param onDone(err, encryptedKey) is invoked when done
+	 */
+	encryptKey: function(key, scheme, passphrase, onDone) {
+		if (!scheme) throw new Error("Scheme must be initialized");
+		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!passphrase) throw new Error("Passphrase must be initialized");
+		switch (scheme) {
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
+				LOADER.load("lib/crypto-js.js", function() {
+					let b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
+					key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
+					onDone(null, key);
+				})
+				break;
+			case CryptoUtils.EncryptionScheme.BIP38:
+				LOADER.load("lib/bitcoinjs.js", function() {
+					let decoded = bitcoinjs.decode(key.getWif());
+					let encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
+					key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
+					onDone(null, key);
+				});
+				break;
+			default:
+				onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+		}
+	},
+	
+	/**
 	 * Encrypts the given keys with the given encryption schemes.
 	 * 
 	 * @param keys are the keys to encrypt
@@ -706,41 +739,58 @@ let CryptoUtils = {
 					callback();
 					return;
 				}
-				encryptKey(scheme, key, passphrase, function(err, key) {
+				key.encrypt(scheme, passphrase, function(err, key) {
 					doneWeight += CryptoUtils.getWeightEncryptKey(scheme);
 					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
 					setImmediate(function() { callback(err, key); });	// let UI breath
 				});
 			}
 		}
-		
-		/**
-		 * Encrypts the given key with the given scheme and passphrase.
-		 * 
-		 * @param scheme is the scheme to encrypt the key
-		 * @param key is an unencrypted key to encrypt
-		 * @param passphrase is the passphrase to encrypt with
-		 * @param onDone(err, encryptedKey) is invoked when done
-		 */
-		function encryptKey(scheme, key, passphrase, onDone) {
-			if (!scheme) throw new Error("Scheme must be initialized");
-			if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-			if (!passphrase) throw new Error("Passphrase must be initialized");
-			switch (scheme) {
-				case CryptoUtils.EncryptionScheme.CRYPTOJS:
-					let b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
-					key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
-					onDone(null, key);
-					break;
-				case CryptoUtils.EncryptionScheme.BIP38:
-					let decoded = bitcoinjs.decode(key.getWif());
-					let encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
-					key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
-					onDone(null, key);
-					break;
-				default:
-					onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
-			}
+	},
+	
+	/**
+	 * Decrypts the given key with the given passphrase.
+	 * 
+	 * @param key is the key to decrypt
+	 * @param passphrase is the passphrase to decrypt the key
+	 * @param onDone(err, decryptedKey) is invoked when done
+	 */
+	decryptKey: function(key, passphrase, onDone) {
+		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!passphrase) throw new Error("Passphrase must be initialized");
+		assertTrue(key.isEncrypted());
+		switch (key.getEncryptionScheme()) {
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
+				LOADER.load("lib/crypto-js.js", function() {
+					let hex;
+					try {
+						hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
+					} catch (err) { }
+					if (!hex) onDone(new Error("Incorrect passphrase"));
+					else {
+						try {
+							key.setPrivateKey(hex);
+							onDone(null, key);
+						} catch (err) {
+							onDone(new Error("Incorrect passphrase"));
+						}
+					}
+				});
+				break;
+			case CryptoUtils.EncryptionScheme.BIP38:
+				LOADER.load("lib/bitaddress.js", function() {
+					ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), passphrase, function(resp) {
+						if (resp.message) onDone(new Error("Incorrect passphrase"));
+						else {
+							let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
+							key.setPrivateKey(wif);
+							onDone(null, key);
+						}
+					});
+				});
+				break;
+			default:
+				onDone(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
 		}
 	},
 	
@@ -784,7 +834,7 @@ let CryptoUtils = {
 			return function(callback) {
 				if (decommissioned) return;
 				let scheme = key.getEncryptionScheme();
-				decryptKey(key, passphrase, function(err, key) {
+				key.decrypt(passphrase, function(err, key) {
 					if (err) onDone(err);
 					else {
 						doneWeight += CryptoUtils.getWeightDecryptKey(scheme);
@@ -792,48 +842,6 @@ let CryptoUtils = {
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					}
 				});
-			}
-		}
-		
-		/**
-		 * Decrypts the given key with the given passphrase.
-		 * 
-		 * @param key is the key to decrypt
-		 * @param passphrase is the passphrase to decrypt the key
-		 * @param onDone(err, decryptedKey) is invoked when done
-		 */
-		function decryptKey(key, passphrase, onDone) {
-			if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-			if (!passphrase) throw new Error("Passphrase must be initialized");
-			assertTrue(key.isEncrypted());
-			switch (key.getEncryptionScheme()) {
-				case CryptoUtils.EncryptionScheme.CRYPTOJS:
-					let hex;
-					try {
-						hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
-					} catch (err) { }
-					if (!hex) onDone(new Error("Incorrect passphrase"));
-					else {
-						try {
-							key.setPrivateKey(hex);
-							onDone(null, key);
-						} catch (err) {
-							onDone(new Error("Incorrect passphrase"));
-						}
-					}
-					break;
-				case CryptoUtils.EncryptionScheme.BIP38:
-					ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), passphrase, function(resp) {
-						if (resp.message) onDone(new Error("Incorrect passphrase"));
-						else {
-							let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
-							key.setPrivateKey(wif);
-							onDone(null, key);
-						}
-					});
-					break;
-				default:
-					onDone(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
 			}
 		}
 	},

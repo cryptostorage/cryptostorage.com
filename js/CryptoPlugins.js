@@ -37,20 +37,20 @@ CryptoPlugin.prototype.getEncryptionSchemes = function() { return [CryptoUtils.E
  * Encrypts the given key with the given scheme and passphrase.  Invokes onDone(err, key) when done.
  */
 CryptoPlugin.prototype.encrypt = function(scheme, key, passphrase, onDone) {
-	CryptoUtils.encryptKeys([key], [scheme], passphrase, VERIFY_ENCRYPTION, null, function(err, encryptedKeys) {
+	CryptoUtils.encryptKey(key, scheme, passphrase, function(err, encryptedKey) {
 		if (err) onDone(err);
-		else onDone(null, encryptedKeys[0]);
-	});	
+		else onDone(null, encryptedKey);
+	});
 }
 
 /**
  * Decrypts the given key with the given passphrase.  Invokes onDone(err, key) when done.
  */
 CryptoPlugin.prototype.decrypt = function(key, passphrase, onDone) {
-	CryptoUtils.decryptKeys([key], passphrase, null, function(err, decryptedKeys) {
+	CryptoUtils.decryptKey(key, passphrase, function(err, decryptedKey) {
 		if (err) onDone(err);
-		else onDone(null, decryptedKeys[0]);
-	});	
+		else onDone(null, decryptedKey);
+	});
 }
 
 /**
@@ -97,7 +97,7 @@ function BitcoinPlugin() {
 	this.getName = function() { return "Bitcoin"; }
 	this.getTicker = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/bitcoinjs.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js"]; }
 	this.getDonationAddress = function() { return "1EU82y3CS2gUm41DyyRzKvWii8BbiRZDuf"; }
 	this.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS, CryptoUtils.EncryptionScheme.BIP38]; }
 	this.newKey = function(str) {
@@ -188,7 +188,7 @@ function EthereumPlugin() {
 	this.getName = function() { return "Ethereum"; }
 	this.getTicker = function() { return "ETH" };
 	this.getLogo = function() { return $("<img src='img/ethereum.png'>"); }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/keythereum.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/keythereum.js"]; }
 	this.getDonationAddress = function() { return "0x154cbabfa4f26a2582bfe18335e652bc57d1bfe0"; }
 	this.newKey = function(str) {
 		
@@ -293,7 +293,7 @@ function LitecoinPlugin() {
 	this.getName = function() { return "Litecoin"; }
 	this.getTicker = function() { return "LTC" };
 	this.getLogo = function() { return $("<img src='img/litecoin.png'>"); }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/litecore.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/litecore.js"]; }
 	this.getDonationAddress = function() { return "LSreRDfwXtbWmmpm6ZxR7twYUenf5Lw2Hh"; }
 	this.newKey = function(str) {
 		
@@ -345,7 +345,7 @@ function MoneroPlugin() {
 	this.getName = function() { return "Monero"; }
 	this.getTicker = function() { return "XMR" };
 	this.getLogo = function() { return $("<img src='img/monero.png'>"); }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/moneroaddress.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/moneroaddress.js"]; }
 	this.getDonationAddress = function() { return "42WH62SCBC7MpNdb1ABgUUeSZaETtX5hujJgjJ8LEimC9m13XyyiwCb47nA17VbwGBiYuU6Jo1fCbET5FNpqv49ySNubKMf"; }
 	this.newKey = function(str) {
 		
