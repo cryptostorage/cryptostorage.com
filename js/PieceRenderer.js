@@ -28,7 +28,7 @@ let PieceRenderer = {
 		let numQrs = numKeys * numPieces * 2;
 		
 		// get number of logos
-		let numLogos = config.showLogos ? numKeys * numPieces : 0;
+		let numLogos = config.showCurrencyLogos ? numKeys * numPieces : 0;
 		
 		// return total weight
 		return numQrs * getWeightQr() + numLogos * getWeightLogo();

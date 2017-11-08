@@ -747,8 +747,7 @@ let CryptoUtils = {
 			}
 			
 			// generate keys
-			let progressWeight = 0;
-			if (onProgress) onProgress(progressWeight / totalWeight, "Generating keys");
+			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
 			async.series(funcs, function(err, keys) {
 				if (decommissioned) {
 					if (onDone) onDone();
@@ -768,11 +767,17 @@ let CryptoUtils = {
 				// encrypt keys
 				if (encryptionSchemes.length > 0) {
 					assertEquals(keys.length, encryptionSchemes.length);
+					
+					// compute encryption + verification weight
 					let encryptWeight = 0;
-					for (let i = 0; i < encryptionSchemes.length; i++) encryptWeight += CryptoUtils.getWeightEncryptKey(encryptionSchemes[i]);
+					for (let i = 0; i < encryptionSchemes.length; i++) {
+						encryptWeight += CryptoUtils.getWeightEncryptKey(encryptionSchemes[i]) + (config.verifyEncryption ? CryptoUtils.getWeightDecryptKey(encryptionSchemes[i]) : 0);
+					}
+					
+					// start encryption
 					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
-					CryptoUtils.encryptKeys(keys, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent) {
-						onProgress((doneWeight + percent * encryptWeight) / totalWeight);
+					CryptoUtils.encryptKeys(keys, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent, label) {
+						onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
 					}, function(err, encryptedKeys) {
 						doneWeight += encryptWeight;
 						generatePieces(encryptedKeys, config);
@@ -834,7 +839,7 @@ let CryptoUtils = {
 	 * @param encryptionSchemes are the schemes to encrypt the keys
 	 * @param passphrase is the passphrase to encrypt the keys with
 	 * @param verifyEncryption specifies if encryption should be verified by decrypting
-	 * @param onProgress(percent) is invoked as progress is made
+	 * @param onProgress(percent, label) is invoked as progress is made
 	 * @param onDone(err, encryptedKeys) is invoked when encryption is done
 	 */
 	encryptKeys: function(keys, encryptionSchemes, passphrase, verifyEncryption, onProgress, onDone) {
@@ -843,21 +848,56 @@ let CryptoUtils = {
 		
 		let decommissioned = false;	// TODO: remove altogether?
 		
+		// collect originals if verifying encryption
+		let originals;
+		if (verifyEncryption) {
+			originals = [];
+			for (let key of keys) originals.push(key.copy());
+		}
+		
 		// track done and total weight for progress
 		let doneWeight = 0;
 		let totalWeight = 0;
 		
-		// collect encryption functions
+		// collect encryption functions and total weight
 		let funcs = [];
 		for (let i = 0; i < keys.length; i++) {
 			totalWeight += CryptoUtils.getWeightEncryptKey(encryptionSchemes[i]);
+			if (verifyEncryption) totalWeight += CryptoUtils.getWeightDecryptKey(encryptionSchemes[i]);
 			funcs.push(encryptFunc(keys[i], encryptionSchemes[i], passphrase));
 		}
 		
 		// encrypt async
-		if (onProgress) onProgress(0);
+		if (onProgress) onProgress(0, "Encrypting");
 		async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, encryptedKeys) {
-			if (onDone) onDone(err, encryptedKeys);
+			
+			// verify encryption
+			if (verifyEncryption) {
+				
+				// collect decryption functions
+				funcs = [];
+				for (let encryptedKey of encryptedKeys) {
+					funcs.push(decryptFunc(encryptedKey.copy(), passphrase));
+				}
+				
+				// decrypt async
+				async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, decryptedKeys) {
+					
+					// assert originals match decrypted keys
+					assertEquals(originals.length, decryptedKeys.length);
+					for (let i = 0; i < originals.length; i++) {
+						assertTrue(originals[i].equals(decryptedKeys[i]));
+					}
+					
+					// done
+					if (onDone) onDone(err, encryptedKeys);
+				});
+			}
+			
+			// don't verify encryption
+			else {
+				if (onDone) onDone(err, encryptedKeys);
+			}
 		});
 		
 		function encryptFunc(key, scheme, passphrase) {
@@ -869,6 +909,21 @@ let CryptoUtils = {
 				CryptoUtils.encryptKey(scheme, key, passphrase, function(err, key) {
 					doneWeight += CryptoUtils.getWeightEncryptKey(scheme);
 					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
+					setImmediate(function() { callback(err, key); });	// let UI breath
+				});
+			}
+		}
+		
+		function decryptFunc(key, passphrase) {
+			return function(callback) {
+				if (decommissioned) {
+					callback();
+					return;
+				}
+				let scheme = key.getEncryptionScheme();
+				CryptoUtils.decryptKey(key, passphrase, function(err, key) {
+					doneWeight += CryptoUtils.getWeightDecryptKey(scheme);
+					if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
 					setImmediate(function() { callback(err, key); });	// let UI breath
 				});
 			}
