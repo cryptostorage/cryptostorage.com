@@ -96,6 +96,162 @@ DivController.prototype.onShow = function() { }
 DivController.prototype.onHide = function() { }
 
 /**
+ * Controls the entire application.
+ * 
+ * @param div is the div to render the application to
+ */
+function AppController(div) {
+	
+	let that = this;
+	let sliderController;
+	let sliderDiv;
+	let contentDiv;
+	let homeController;
+	let formController;
+	let recoverController;
+	let faqController;
+	let donateController;
+	
+	this.render = function(onDone) {
+		div.empty();
+		
+		// header
+		let headerDiv = $("<div class='app_header'>").appendTo(div);
+		
+		// header logo
+		let headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
+		let logo = $("<img class='app_header_logo_img' src='img/cryptostorage.png'>").appendTo(headerTopDiv);
+		logo.click(function() {
+			that.showHome();
+		});
+		
+		// header links
+		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
+		let homeLink = getLinkDiv("Home");
+		homeLink.click(function() {
+			window.location.href = "#";
+			that.showHome();
+		});
+		let gitHubLink = getLinkDiv("GitHub");
+		gitHubLink.click(function() { window.open("https://github.com/cryptostorage/cryptostorage.com", "_blank"); });
+		let faqLink = getLinkDiv("FAQ");
+		faqLink.click(function() {
+			window.location.href = "#faq";
+			that.showFaq();
+		});
+		let donateLink = getLinkDiv("Donate");
+		donateLink.click(function() {
+			window.location.href = "#donate";
+			that.showDonate();
+		});
+		linksDiv.append(homeLink);
+		linksDiv.append(gitHubLink);
+		linksDiv.append(faqLink);
+		linksDiv.append(donateLink);
+		
+		function getLinkDiv(label) {
+			let div = $("<div class='link_div'>");
+			div.html(label);
+			return div;
+		}
+		
+		// slider
+		sliderDiv = $("<div>").appendTo(headerDiv);
+		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectRecover);
+		
+		// main content
+		contentDiv = $("<div class='app_content'>").appendTo(div);
+		
+		// initialize controllers
+		homeController = new HomeController($("<div>"));
+		formController = new FormController($("<div>"));
+		recoverController = new RecoverController($("<div>"));
+		faqController = new FaqController($("<div>"));
+		donateController = new DonateController($("<div>"));
+		recoverController.render();
+		faqController.render();
+		
+		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
+		setImmediate(function() {
+			
+			// render body and start on home
+			homeController.render(function() {
+				
+				// get identifier
+				let href = window.location.href;
+				let lastIdx = href.lastIndexOf("#");
+				let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+				
+				// show page based on identifier
+				if (identifier === "faq") that.showFaq();
+				else if (identifier === "donate") that.showDonate();
+				else that.showHome();
+				
+				// done rendering
+				if (onDone) onDone(div);
+			});
+		});
+	}
+	
+	this.showHome = function() {
+		if (DEBUG) console.log("showHome()");
+		sliderDiv.show();
+		sliderController.render(function(div) {
+			setContentDiv(homeController.getDiv());
+		});
+	}
+	
+	this.showForm = function(onDone) {
+		if (DEBUG) console.log("showForm()");
+		formController.render(function(div) {
+			setContentDiv(div);
+			sliderDiv.hide();
+			if (onDone) onDone();
+		});
+	}
+	
+	this.showFaq = function() {
+		if (DEBUG) console.log("showFaq()");
+		setContentDiv(faqController.getDiv());
+		sliderDiv.hide();
+	}
+	
+	this.showDonate = function() {
+		if (DEBUG) console.log("showDonate()");
+		sliderDiv.hide();
+		setContentDiv(donateController.getDiv());
+	}
+	
+	this.showRecover = function() {
+		if (DEBUG) console.log("showRecover()");
+		sliderDiv.hide();
+		setContentDiv(recoverController.getDiv());
+	}
+	
+	this.loadDonationPage = function() {
+		donateController.render();
+	}
+	
+	// ---------------------------------- PRIVATE -------------------------------
+	
+	function setContentDiv(div) {
+		while (contentDiv.get(0).hasChildNodes()) {
+			contentDiv.get(0).removeChild(contentDiv.get(0).lastChild);
+		}
+		contentDiv.append(div);
+	}
+	
+	function onSelectGenerate() {
+		that.showForm();
+	}
+	
+	function onSelectRecover() {
+		that.showRecover();
+	}
+}
+inheritsFrom(AppController, DivController);
+
+/**
  * Slider main features.
  */
 function SliderController(div, onSelectGenerate, onSelectRecover) {
