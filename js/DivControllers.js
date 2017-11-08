@@ -1632,7 +1632,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		progressBar = UiUtils.getProgressBar(progressDiv);
 		
 		// compute weights for progress bar
-		let decryptWeight = CryptoUtils.getDecryptWeight(encryptedKeys);
+		let decryptWeight = CryptoUtils.getWeightDecryptKeys(encryptedKeys);
 		let renderWeight = PieceRenderer.getRenderWeight(encryptedKeys.length, 1, null);
 		let totalWeight = decryptWeight + renderWeight;
 		

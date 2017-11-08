@@ -874,6 +874,21 @@ let CryptoUtils = {
 	},
 	
 	/**
+	 * Returns the weight to decrypt the given keys.
+	 * 
+	 * @param encryptedKeys are encrypted keys to determine the weight of to decrypt
+	 * @returns the weight to decrypt the given keys
+	 */
+	getWeightDecryptKeys: function(encryptedKeys) {
+		let weight = 0;
+		for (let key of encryptedKeys) {
+			assertTrue(key.isEncrypted());
+			weight += CryptoUtils.getWeightDecryptKey(key.getEncryptionScheme());
+		}
+		return weight;
+	},
+
+	/**
 	 * Returns the weight to decrypt a key with the given scheme.
 	 * 
 	 * @param scheme is the scheme to decrypt a key with
