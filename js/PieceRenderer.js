@@ -31,7 +31,10 @@ let PieceRenderer = {
 		let numLogos = config.showLogos ? numKeys * numPieces : 0;
 		
 		// return total weight
-		return numQrs * CryptoUtils.getQrWeight() + numLogos * CryptoUtils.getLogoWeight();
+		return numQrs * getWeightQr() + numLogos * getWeightLogo();
+		
+		function getWeightQr() { return 15; }
+		function getWeightLogo() { return 15; }
 	},
 	
 	/**

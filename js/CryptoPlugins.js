@@ -34,14 +34,24 @@ CryptoPlugin.prototype.getDonationAddress = function() { throw new Error("Subcla
 CryptoPlugin.prototype.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS]; }
 
 /**
- * Encrypts the given key with the given scheme and password.  Invokes callback(err, key) when done.
+ * Encrypts the given key with the given scheme and passphrase.  Invokes onDone(err, key) when done.
  */
-CryptoPlugin.prototype.encrypt = function(scheme, key, password, callback) { CryptoUtils.encrypt(scheme, key, password, callback); }
+CryptoPlugin.prototype.encrypt = function(scheme, key, passphrase, onDone) {
+	CryptoUtils.encryptKeys([key], [scheme], passphrase, VERIFY_ENCRYPTION, null, function(err, encryptedKeys) {
+		if (err) onDone(err);
+		else onDone(null, encryptedKeys[0]);
+	});	
+}
 
 /**
- * Decrypts the given key with the given password.  Invokes callback(err, key) when done.
+ * Decrypts the given key with the given passphrase.  Invokes onDone(err, key) when done.
  */
-CryptoPlugin.prototype.decrypt = function(key, password, callback) { return CryptoUtils.decrypt(key, password, callback); }
+CryptoPlugin.prototype.decrypt = function(key, passphrase, onDone) {
+	CryptoUtils.decryptKeys([key], passphrase, null, function(err, decryptedKeys) {
+		if (err) onDone(err);
+		else onDone(null, decryptedKeys[0]);
+	});	
+}
 
 /**
  * Returns the given key's private key split into pieces.

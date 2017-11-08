@@ -65,72 +65,6 @@ let CryptoUtils = {
 	isPossibleSplitPiece: function(str) {
 		return str.length >= 47 && CryptoUtils.isBase58(str);
 	},
-	
-	/**
-	 * Encrypts the given key with the given scheme and password.
-	 * 
-	 * Invokes callback(err, encryptedKey) when done.
-	 */
-	encrypt: function(scheme, key, passphrase, callback) {
-		if (!scheme) throw new Error("Scheme must be initialized");
-		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-		if (!passphrase) throw new Error("Passphrase must be initialized");
-		switch (scheme) {
-			case CryptoUtils.EncryptionScheme.CRYPTOJS:
-				let b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
-				key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
-				callback(null, key);
-				break;
-			case CryptoUtils.EncryptionScheme.BIP38:
-				let decoded = bitcoinjs.decode(key.getWif());
-				let encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
-				key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
-				callback(null, key);
-				break;
-			default:
-				callback(new Error("Encryption scheme '" + scheme + "' not supported"));
-		}
-	},
-
-	/**
-	 * Decrypts the given key with the given passphrase.
-	 * 
-	 * Invokes callback(err, decryptedKey) when done.
-	 */
-	decrypt: function(key, passphrase, callback) {
-		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-		if (!passphrase) throw new Error("Passphrase must be initialized");
-		assertTrue(key.isEncrypted());
-		switch (key.getEncryptionScheme()) {
-			case CryptoUtils.EncryptionScheme.CRYPTOJS:
-				let hex;
-				try {
-					hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
-				} catch (err) { }
-				if (!hex) callback(new Error("Incorrect passphrase"));
-				else {
-					try {
-						key.setPrivateKey(hex);
-						callback(null, key);
-					} catch (err) {
-						callback(new Error("Incorrect passphrase"));
-					}
-				}
-				break;
-			case CryptoUtils.EncryptionScheme.BIP38:
-				ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), passphrase, function(resp) {
-					if (resp.message) callback(new Error("Incorrect passphrase"));
-					else {
-						let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
-						key.setPrivateKey(wif);
-						callback(null, key);
-					}
-				});
-				break;
-			default:
-				callback(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
-		}
-	},
 
 	/**
 	 * Splits the given string.  First converts the string to hex.
@@ -578,11 +512,11 @@ let CryptoUtils = {
 	/**
 	 * Generates keys, pieces, rendered pieces.
 	 * 
-	 * @param config is the generation configuration
+	 * @param config is the key generation configuration
 	 * @param onProgress(done, total, label) is invoked as progress is made
 	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
 	 */
-	generateKeys: function(config, onProgress, onDone) {
+	generateKeysOld: function(config, onProgress, onDone) {
 		
 		let decommissioned = false;	// TODO: remove altogether?
 
@@ -593,19 +527,10 @@ let CryptoUtils = {
 				dependencies.add(dependency);
 			}
 		}
-		
-		LOADER.load(Array.from(dependencies), function() {			
+		LOADER.load(Array.from(dependencies), function() {
 			
-			// compute total weight for progress bar
-			let totalWeight = 0;
-			let numKeys = 0;
-			for (let currency of config.currencies) {
-				numKeys += currency.numKeys;
-				totalWeight += currency.numKeys * CryptoUtils.getCreateKeyWeight();
-				if (currency.encryption) totalWeight += currency.numKeys * (CryptoUtils.getEncryptSchemeWeight(currency.encryption) + (VERIFY_ENCRYPTION ? CryptoUtils.getDecryptSchemeWeight(currency.encryption) : 0));
-			}
-			let piecesRendererWeight = PieceRenderer.getRenderWeight(numKeys, config.numPieces, null);
-			totalWeight += piecesRendererWeight;
+			// get total weight of key generation
+			let totalWeight = CryptoUtils.getGenerateKeysWeight(config);
 			
 			// collect key creation functions
 			let funcs = [];
@@ -744,7 +669,7 @@ let CryptoUtils = {
 					}
 					setImmediate(function() {
 						let key = plugin.newKey();
-						progressWeight += CryptoUtils.getCreateKeyWeight();
+						progressWeight += CryptoUtils.getWeightCreateKey();
 						if (onProgress) onProgress(progressWeight, totalWeight, "Generating keys");
 						callback(null, key);
 					});	// let UI breath
@@ -758,7 +683,7 @@ let CryptoUtils = {
 						return;
 					}
 					key.encrypt(scheme, password, function(err, key) {
-						progressWeight += CryptoUtils.getEncryptSchemeWeight(scheme);
+						progressWeight += CryptoUtils.getWeightEncrypt(scheme);
 						if (onProgress) onProgress(progressWeight, totalWeight, "Encrypting");
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					});
@@ -773,7 +698,7 @@ let CryptoUtils = {
 					}
 					let scheme = key.getEncryptionScheme();
 					key.decrypt(password, function(err, key) {
-						progressWeight += CryptoUtils.getDecryptSchemeWeight(scheme);
+						progressWeight += CryptoUtils.getWeightDecrypt(scheme);
 						if (onProgress) onProgress(progressWeight, totalWeight, "Decrypting");
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					});
@@ -789,12 +714,163 @@ let CryptoUtils = {
 	},
 	
 	/**
+	 * Generates keys, pieces, rendered pieces.
+	 * 
+	 * @param config is the key generation configuration
+	 * @param onProgress(percent, label) is invoked as progress is made
+	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
+	 */
+	generateKeys: function(config, onProgress, onDone) {
+		
+		let decommissioned = false;	// TODO: remove altogether?
+		
+		// track done and total weight for progress
+		let doneWeight = 0;
+		let totalWeight = CryptoUtils.getWeightGenerateKeys(config);
+
+		// load dependencies
+		let dependencies = new Set();
+		for (let currency of config.currencies) {
+			for (let dependency of CryptoUtils.getCryptoPlugin(currency.ticker).getDependencies()) {
+				dependencies.add(dependency);
+			}
+		}
+		LOADER.load(Array.from(dependencies), function() {
+			
+			// collect key creation functions
+			let funcs = [];
+			for (let currency of config.currencies) {
+				for (let i = 0; i < currency.numKeys; i++) {
+					funcs.push(newKeyFunc(CryptoUtils.getCryptoPlugin(currency.ticker)));
+				}
+			}
+			
+			// generate keys
+			let progressWeight = 0;
+			if (onProgress) onProgress(progressWeight / totalWeight, "Generating keys");
+			async.series(funcs, function(err, keys) {
+				if (decommissioned) {
+					if (onDone) onDone();
+					return;
+				}
+				if (err) throw err;
+				let originals = keys;
+				
+				// collect encryption schemes
+				let encryptionSchemes = [];
+				for (let currency of config.currencies) {
+					for (let i = 0; i < currency.numKeys; i++) {
+						if (currency.encryption) encryptionSchemes.push(currency.encryption);
+					}
+				}
+				
+				// encrypt keys
+				if (encryptionSchemes.length > 1) {
+					assertEquals(keys.length, encryptionSchemes.length);
+					CryptoUtils.encryptKeys(keys, encryptionSchemes, config.verifyEncryption, function(done, total) {
+						throw Error("Not implemented");
+					}, function(err, encryptedKeys) {
+						generatePieces(encryptedKeys, config);
+					});
+				}
+				
+				// no encryption
+				else {
+					generatePieces(keys, config);
+				}
+			});
+		});
+		
+		function newKeyFunc(plugin, callback) {
+			return function(callback) {
+				if (decommissioned) {
+					callback();
+					return;
+				}
+				setImmediate(function() {
+					let key = plugin.newKey();
+					doneWeight += CryptoUtils.getWeightCreateKey();
+					if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
+					callback(null, key);
+				});	// let UI breath
+			}
+		}
+		
+		function generatePieces(keys, config) {
+			
+			// convert keys to pieces
+			let pieces = CryptoUtils.keysToPieces(keys, config.numPieces, config.minPieces);
+			
+			// verify pieces recreate keys
+			let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
+			assertEquals(keys.length, keysFromPieces.length);
+			for (let i = 0; i < keys.length; i++) {
+				assertTrue(keys[i].equals(keysFromPieces[i]));
+			}
+			
+			// render pieces to divs
+			let renderWeight = PieceRenderer.getRenderWeight(keys.length, config.numPieces, null);
+			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
+			PieceRenderer.renderPieces(pieces, null, null, function(percent) {
+				if (onProgress) onProgress((doneWeight + (percent * renderWeight)) / totalWeight, "Rendering");
+			}, function(err, pieceDivs) {
+				if (err) throw err;
+				assertEquals(pieces.length, pieceDivs.length);
+				if (onProgress) onProgress(1, "Complete");
+				if (onDone) onDone(keys, pieces, pieceDivs);
+			});
+		}
+	},
+	
+	/**
+	 * Encrypts the given keys with the given encryption schemes.
+	 * 
+	 * @param keys are the keys to encrypt
+	 * @param encryptionSchemes are the schemes to encrypt the keys
+	 * @param verifyEncryption specifies if encryption should be verified by decrypting
+	 * @param onProgress(done, total) is invoked as progress is made
+	 * @param onDone(err, encryptedKeys) is invoked when encryption is done
+	 */
+	encryptKeys: function(keys, encryptionSchemes, verifyEncryption, onProgress, onDone) {
+		throw Error("Not implemented");
+	},
+	
+	/**
+	 * Encrypts the given key with the given scheme and password.
+	 * 
+	 * @param scheme is the scheme to encrypt the key
+	 * @param key is an unencrypted key to encrypt
+	 * @param passphrase is the passphrase to encrypt with
+	 * @param onDone(err, encryptedKey) is invoked when done
+	 */
+	encryptKey: function(scheme, key, passphrase, onDone) {
+		if (!scheme) throw new Error("Scheme must be initialized");
+		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!passphrase) throw new Error("Passphrase must be initialized");
+		switch (scheme) {
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
+				let b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
+				key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
+				onDone(null, key);
+				break;
+			case CryptoUtils.EncryptionScheme.BIP38:
+				let decoded = bitcoinjs.decode(key.getWif());
+				let encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
+				key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
+				onDone(null, key);
+				break;
+			default:
+				onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+		}
+	},
+	
+	/**
 	 * Decrypts the given keys.
 	 * 
 	 * @param keys are the encrypted keys to decrypt
 	 * @param phassphrase is the phassphrase to decrypt the keys
 	 * @param onProgress(done, total) is called as progress is made
-	 * @param onDone(err) is called when decryption is complete
+	 * @param onDone(err, decryptedKeys) is called when decryption is complete
 	 */
 	decryptKeys: function(keys, passphrase, onProgress, onDone) {
 		
@@ -809,7 +885,7 @@ let CryptoUtils = {
 		// compute weight
 		let totalWeight = 0;
 		for (let key of keys) {
-			totalWeight += CryptoUtils.getDecryptSchemeWeight(key.getEncryptionScheme());
+			totalWeight += CryptoUtils.getWeightDecrypt(key.getEncryptionScheme());
 		}
 		
 		// decrypt keys
@@ -831,7 +907,7 @@ let CryptoUtils = {
 				key.decrypt(passphrase, function(err, key) {
 					if (err) onDone(err);
 					else {
-						doneWeight += CryptoUtils.getDecryptSchemeWeight(scheme);
+						doneWeight += CryptoUtils.getWeightDecrypt(scheme);
 						onProgress(doneWeight, totalWeight);
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					}
@@ -840,11 +916,75 @@ let CryptoUtils = {
 		}
 	},
 	
-	// --- relative weights of key generation derived from experimentation and used for representative progress bar ---
+	/**
+	 * Decrypts the given key with the given passphrase.
+	 * 
+	 * @param key is the key to decrypt
+	 * @param passphrase is the passphrase to decrypt the key
+	 * @param onDone(err, decryptedKey) is invoked when done
+	 */
+	decryptKey: function(key, passphrase, onDone) {
+		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!passphrase) throw new Error("Passphrase must be initialized");
+		assertTrue(key.isEncrypted());
+		switch (key.getEncryptionScheme()) {
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
+				let hex;
+				try {
+					hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
+				} catch (err) { }
+				if (!hex) onDone(new Error("Incorrect passphrase"));
+				else {
+					try {
+						key.setPrivateKey(hex);
+						onDone(null, key);
+					} catch (err) {
+						onDone(new Error("Incorrect passphrase"));
+					}
+				}
+				break;
+			case CryptoUtils.EncryptionScheme.BIP38:
+				ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), passphrase, function(resp) {
+					if (resp.message) onDone(new Error("Incorrect passphrase"));
+					else {
+						let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
+						key.setPrivateKey(wif);
+						onDone(null, key);
+					}
+				});
+				break;
+			default:
+				onDone(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
+		}
+	},
 	
-	getCreateKeyWeight: function() { return 63; },
+	// Relative weights of key generation derived from experimentation and used for representative progress bars
 	
-	getEncryptSchemeWeight: function(scheme) {
+	/**
+	 * Computes the total weight for the given key generation configuration.
+	 * 
+	 * @param keyGenConfig is the key generation configuration to get the weight of
+	 * @return the weight of the given key genereation configuration
+	 */
+	getWeightGenerateKeys: function(keyGenConfig) {
+		let genWeight = 0;
+		let numKeys = 0;
+		for (let currency of keyGenConfig.currencies) {
+			numKeys += currency.numKeys;
+			genWeight += currency.numKeys * CryptoUtils.getWeightCreateKey();
+			if (currency.encryption) genWeight += currency.numKeys * (CryptoUtils.getWeightEncrypt(currency.encryption) + (keyGenConfig.verifyEncryption ? CryptoUtils.getWeightDecrypt(currency.encryption) : 0));
+		}
+		let renderWeight = PieceRenderer.getRenderWeight(numKeys, keyGenConfig.numPieces, null);
+		return genWeight + renderWeight;
+	},
+	
+	/**
+	 * Returns the weight to encrypt a key with the given scheme.
+	 * 
+	 * @param scheme is the scheme to encrypt a key with
+	 * @returns weight is the weight to encrypt a key with the given scheme
+	 */
+	getWeightEncrypt: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4187;
@@ -854,7 +994,13 @@ let CryptoUtils = {
 		}
 	},
 	
-	getDecryptSchemeWeight: function(scheme) {
+	/**
+	 * Returns the weight to decrypt a key with the given scheme.
+	 * 
+	 * @param scheme is the scheme to decrypt a key with
+	 * @returns weight is the weigh tto decrypt a key with the given scheme
+	 */
+	getWeightDecrypt: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4581;
@@ -864,20 +1010,33 @@ let CryptoUtils = {
 		}
 	},
 	
-	getDecryptWeight: function(encryptedKeys) {
-		let weight = 0;
-		for (let key of encryptedKeys) {
-			assertTrue(key.isEncrypted());
-			weight += CryptoUtils.getDecryptSchemeWeight(key.getEncryptionScheme());
-		}
-		return weight;
-	},
+///**
+//* Returns the total weight to encrypt keys with the given schemes.
+//* 
+//* @param schemes is an array of schemes representing keys to encrypt
+//* @returns the total weight to encrypt keys with the given schemes
+//*/
+//getEncryptSchemesWeight: function(schemes) {
+//	let weight = 0;
+//	for (let scheme of schemes) weight += getWeightEncrypt(scheme);
+//	return weight;
+//	
+//	function getWeightEncrypt(scheme) {
+//
+//	}
+//},
 	
-	getQrWeight: function() {
-		return 15;
-	},
+///**
+//* Returns the total weight to decrypt keys with the given schemes.
+//* 
+//* @param schemes is an array of schemes representing keys to decrypt
+//* @returns the total weight to decrypt keys with the given schemes
+//*/
+//getDecryptSchemesWeight: function(schemes) {
+//	let weight = 0;
+//	for (let scheme of schemes) weight += getWeightDecrypt(scheme);
+//	return weight;
+//},
 	
-	getLogoWeight: function() {
-		return 15;
-	}
+	getWeightCreateKey: function() { return 63; },
 }

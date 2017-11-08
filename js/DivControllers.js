@@ -660,6 +660,7 @@ function FormController(div) {
 		config.splitChecked = splitCheckbox.prop('checked');
 		config.numPieces = config.splitChecked ? parseFloat(numPiecesInput.val()) : 1;
 		config.minPieces = config.splitChecked ? parseFloat(minPiecesInput.val()) : null;
+		config.verifyEncryption = VERIFY_ENCRYPTION;
 		config.currencies = [];
 		for (let currencyInput of currencyInputs) {
 			config.currencies.push({
@@ -678,6 +679,7 @@ function FormController(div) {
 		}
 		
 		function verifyConfig(config) {
+			assertDefined(config.verifyEncryption);
 			for (let currency of config.currencies) {
 				assertDefined(currency.ticker);
 				assertDefined(currency.numKeys);
@@ -1933,8 +1935,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			// otherwise generate keys from config
 			else {
 				assertInitialized(keyGenConfig);
-				CryptoUtils.generateKeys(keyGenConfig, function(done, total, label) {
-					progressBar.set(done / total);
+				CryptoUtils.generateKeys(keyGenConfig, function(percent, label) {
+					progressBar.set(percent);
 					if (label) progressBar.setText(label);
 					progressDiv.show();
 				}, function(_keys, _pieces, _pieceDivs) {
