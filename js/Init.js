@@ -1,14 +1,13 @@
 // TODO
 // label doesn't update when encryption starts
+// piece numbering in data
 // decryption progress design
 // homepage
 // light blue little bit ligher / brighter
 // faq
 // input errors
-// piece numbering in data
-// wait for images before loading homepage
-// don't wait for recover / ddslick before homepage
 // harden inputs: >0, must have first currency, etc
+// wait for images before loading homepage
 // public address (decrypt to view) instead of (omitted)
 // plugin.newKey() returns null for unrecognized strs instead of throws error
 // ios print spans more than one page
