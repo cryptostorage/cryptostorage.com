@@ -1,5 +1,7 @@
 // TODO
 // bip38
+// label doesn't update when encryption starts
+// decryption progress design
 // homepage
 // light blue little bit ligher / brighter
 // faq
@@ -28,6 +30,7 @@
 
 // design:
 // homepage scale too big on small screens
+// start over button on form
 
 // low priority:
 // try all imported file / key combinations to recover
