@@ -511,15 +511,21 @@ function FormController(div) {
 				numKeys: currencyInput.getNumKeys(),
 				encryption: config.passphraseChecked ? getEncryptionScheme(currencyInput) : null
 			});
-		}		
+		}
+		verifyConfig(config);
 		return config;
 		
 		function getEncryptionScheme(currencyInput) {
-			if (currencyInput.getSelectedPlugin().getTicker() === "BTC") {
-				return btcBip38Checkbox.prop('checked') ? CryptoUtils.EncryptionScheme.BIP38 : CryptoUtils.EncryptionScheme.CRYPTOJS;
-			}
-			if (currencyInput.getSelectedPlugin().getTicker() === "BCH") {
-				return bchBip38Checkbox.prop('checked') ? CryptoUtils.EncryptionScheme.BIP38 : CryptoUtils.EncryptionScheme.CRYPTOJS;
+			if (currencyInput.getSelectedPlugin().getTicker() === "BTC" && btcBip38Checkbox.prop('checked')) return CryptoUtils.EncryptionScheme.BIP38;
+			if (currencyInput.getSelectedPlugin().getTicker() === "BCH" && bchBip38Checkbox.prop('checked')) return CryptoUtils.EncryptionScheme.BIP38;
+			return CryptoUtils.EncryptionScheme.CRYPTOJS;
+		}
+		
+		function verifyConfig(config) {
+			for (let currency of config.currencies) {
+				assertDefined(currency.ticker);
+				assertDefined(currency.numKeys);
+				assertDefined(currency.encryption);
 			}
 		}
 	}
