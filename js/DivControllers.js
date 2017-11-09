@@ -627,11 +627,6 @@ function FormController(div) {
 		let warningDiv = $("<div class='app_header_warning'>").appendTo(div);
 		warningDiv.append("Under Development: Not Ready for Use");
 		
-		// add progress bar and div
-		progressDiv = $("<div>").appendTo(div);
-		progressDiv.hide();
-		progressBar = UiUtils.getProgressBar(progressDiv);
-		
 		// done rendering
 		if (onDone) onDone(div);
 	}
@@ -1050,8 +1045,10 @@ function RecoverFileController(div) {
 			onNamedPieces([namedPiece]);
 		}
 		else if (file.type === 'application/zip') {
-			CryptoUtils.zipToPieces(data, function(namedPieces) {
-				onNamedPieces(namedPieces);
+			LOADER.load("lib/jszip.js", function() {
+				CryptoUtils.zipToPieces(data, function(namedPieces) {
+					onNamedPieces(namedPieces);
+				});
 			});
 		}
 	}
@@ -1478,7 +1475,6 @@ function RecoverTextController(div, plugins) {
 		let key;
 		if (importedPieces.length === 1) {
 			try {
-				console.log(selectedPlugin);
 				key = selectedPlugin.newKey(importedPieces[0]);
 			} catch (err) {
 				// nothing to do
