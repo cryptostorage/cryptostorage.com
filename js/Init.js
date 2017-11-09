@@ -23,6 +23,7 @@
 // warning to discard storage if not saved or printed
 // double click keys should select all
 // restrict file types for file picker
+// recover should reset on navigate to different page
 
 // design:
 // export controller progress design, initial and re-render
