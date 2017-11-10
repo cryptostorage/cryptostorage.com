@@ -61,7 +61,7 @@ let PieceRenderer = {
 		// collect functions to render
 		let funcs = [];
 		for (let i = 0; i < pieces.length; i++) {
-			funcs.push(function(onDone) { PieceRenderer.renderPiece(pieceDivs[i], pieces[i], pieces.length > 1 ? (i + 1) : null, config, onPieceProgress, onDone); });
+			funcs.push(function(onDone) { PieceRenderer.renderPiece(pieceDivs[i], pieces[i], config, onPieceProgress, onDone); });
 		}
 		
 		// handle progress
@@ -83,12 +83,11 @@ let PieceRenderer = {
 	 * 
 	 * @param pieceDiv is the div to render to
 	 * @param piece is the piece to render
-	 * @param pieceNum specifies the piece number (optional)
 	 * @param config is the configuration to render
 	 * @param onProgress(percent) is invoked as progress is made
 	 * @param onDone(err, pieceDiv) is invoked when done
 	 */
-	renderPiece: function(pieceDiv, piece, pieceNum, config, onProgress, onDone) {
+	renderPiece: function(pieceDiv, piece, config, onProgress, onDone) {
 		assertInitialized(pieceDiv);
 		
 		// div setup
@@ -107,12 +106,12 @@ let PieceRenderer = {
 			if (i % config.pairsPerPage === 0) {
 				if (i > 0) pieceDiv.append($("<div class='piece_page_spacer'>"));
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
-				if (pieceNum || config.showCryptostorageLogos) {
+				if (piece.pieceNum || config.showCryptostorageLogos) {
 					let headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
 					if (config.showCryptostorageLogos) headerDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("cryptostorage") + "'>"));
 					let pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-					if (pieceNum) pieceNumDiv.append("Piece " + pieceNum);
+					if (piece.pieceNum) pieceNumDiv.append("Piece " + piece.pieceNum);
 				}
 			}
 			

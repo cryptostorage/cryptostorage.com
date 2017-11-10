@@ -241,6 +241,7 @@ let CryptoUtils = {
 		let pieces = [];
 		for (let i = 0; i < numPieces; i++) {
 			let piece = {};
+			if (numPieces > 1) piece.pieceNum = i + 1;
 			piece.version = "1.0";
 			piece.keys = [];
 			pieces.push(piece);

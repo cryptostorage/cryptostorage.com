@@ -1810,17 +1810,17 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		showLogosCheckbox.prop('checked', true);
 		
 		// piece selection
-		// TODO: is paginator loaded?
-		let numPieces = getNumPieces(keyGenConfig, pieces, pieceDivs);
-		let dataSource = [];
-		if (numPieces > 1) {
-			for (let i = 0; i < numPieces; i++) dataSource.push(i + 1);
+		if (pieceDivs) assertInitialized(pieces);
+		let paginatorSource = getPaginatorSource(keyGenConfig, pieces);
+		if (paginatorSource) {
+			console.log(paginatorSource);
 			paginator = $("<div id='paginator'>").appendTo(exportHeader);
 			$("#paginator").pagination({
-				dataSource: dataSource,
-				pageSize:1,
+				dataSource: paginatorSource,
+				pageSize: 1,
 				callback: function(data, pagination) {
-					if (pieceDivs) setVisible(pieceDivs, pagination.pageNumber - 1);
+					console.log(pagination);
+					if (pieceDivs) setVisiblePiece(pieces, pieceDivs, pagination.pageNumber);
 				}
 			});
 			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
@@ -1843,10 +1843,20 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	// --------------------------------- PRIVATE --------------------------------
 	
-	function getNumPieces(keyGenConfig, pieces, pieceDivs) {
-		if (keyGenConfig) return keyGenConfig.numPieces;
-		if (pieces) return pieces.length;
-		if (pieceDivs) return pieceDivs.length;
+	function getPaginatorSource(keyGenConfig, pieces) {
+		if (keyGenConfig) {
+			let pieceNums = [];
+			for (let i = 0; i < keyGenConfig.numPieces; i++) pieceNums.push(i + 1);
+			return pieceNums;
+		}
+		if (pieces) {
+			assertTrue(pieces.length >= 1);
+			if (pieces.length === 1) return null;
+			let pieceNums = [];
+			for (let piece of pieces) pieceNums.push(piece.pieceNum);
+			return pieceNums;
+		}
+		return null;
 	}
 	
 	function getPieceRendererConfig() {
@@ -1899,7 +1909,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		
 		// add piece divs if given
 		if (pieceDivs) {
-			setVisible(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
+			assertInitialized(pieces);
+			setVisiblePiece(pieces, pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') : null);
 			setPieceDivs(pieceDivs);
 			setPrintEnabled(true);
 			if (onDone) onDone();
@@ -1912,7 +1923,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			// render pieces if given
 			if (pieces) {
 				for (piece of pieces) pieceDivs.push($("<div>"));
-				setVisible(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
+				setVisiblePiece(pieces, pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') : null);
 				setPieceDivs(pieceDivs);
 				setPrintEnabled(false);
 				PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
@@ -1950,12 +1961,22 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	}
 	
 	/**
-	 * Adds the hidden class to each of the given divs except at the given idx.
+	 * Sets the visible piece by adding/removing the hidden class.
+	 * 
+	 * @param pieces are the pieces with piece numbers
+	 * @param pieceDivs are the piece divs to show/hide
+	 * @param pieceNum is the piece number to show (optional)
 	 */
-	function setVisible(divs, idx) {
-		for (let i = 0; i < divs.length; i++) {
-			if (i === idx) divs[i].removeClass("hidden");
-			else divs[i].addClass("hidden");
+	function setVisiblePiece(pieces, pieceDivs, pieceNum) {
+		console.log("setVisiblePiece(" + pieces.length + ", " + pieceNum + ")");
+		for (let i = 0; i < pieces.length; i++) {
+			if (pieceNum) {
+				if (pieces[i].pieceNum === pieceNum) pieceDivs[i].removeClass("hidden");
+				else pieceDivs[i].addClass("hidden");
+			} else {
+				if (i === 0) pieceDivs[i].removeClass("hidden");
+				else pieceDivs[i].addClass("hidden");
+			}
 		}
 	}
 	

@@ -398,6 +398,7 @@ let Tests = {
 					}
 					else assertUndefined(piece.keys[i].encryption);
 					if (numPieces > 1) {
+						assertNumber(piece.pieceNum);
 						assertTrue(piece.keys[i].split);
 						assertFalse(keys[i].getWif() === piece.keys[i].wif);
 					} else {
