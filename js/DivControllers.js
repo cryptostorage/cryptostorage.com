@@ -1812,13 +1812,11 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		// piece selection
 		let paginatorSource = getPaginatorSource(keyGenConfig, pieces);
 		if (paginatorSource) {
-			console.log(paginatorSource);
 			paginator = $("<div id='paginator'>").appendTo(exportHeader);
 			$("#paginator").pagination({
 				dataSource: paginatorSource,
 				pageSize: 1,
 				callback: function(data, pagination) {
-					console.log(pagination);
 					if (pieceDivs) setVisiblePiece(pieceDivs, pagination.pageNumber - 1);
 				}
 			});

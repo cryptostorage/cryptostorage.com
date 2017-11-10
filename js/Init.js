@@ -1,5 +1,4 @@
 // TODO
-// piece numbering in data
 // decryption progress design
 // homepage
 // wait for images before loading homepage
