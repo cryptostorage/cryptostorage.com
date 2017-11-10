@@ -318,7 +318,7 @@ function HomeController(div) {
 		}
 		
 		$("<div style='height:100px'>").appendTo(div);
-		div.append("Export to printable and digital format for long term storage")
+		div.append("Export to printable and digital format for long term storage");
 		$("<div style='height:40px'>").appendTo(div);
 		div.append($("<img width=750px src='img/print_sample.png'>"));
 		
