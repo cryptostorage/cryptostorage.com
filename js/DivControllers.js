@@ -1875,6 +1875,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	function getPaginatorSource(keyGenConfig, pieces) {
 		if (keyGenConfig) {
+			if (keyGenConfig.numPieces === 1) return null;
 			let pieceNums = [];
 			for (let i = 0; i < keyGenConfig.numPieces; i++) pieceNums.push(i + 1);
 			return pieceNums;
