@@ -1810,7 +1810,6 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		showLogosCheckbox.prop('checked', true);
 		
 		// piece selection
-		if (pieceDivs) assertInitialized(pieces);
 		let paginatorSource = getPaginatorSource(keyGenConfig, pieces);
 		if (paginatorSource) {
 			console.log(paginatorSource);
@@ -1820,7 +1819,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 				pageSize: 1,
 				callback: function(data, pagination) {
 					console.log(pagination);
-					if (pieceDivs) setVisiblePiece(pieces, pieceDivs, pagination.pageNumber);
+					if (pieceDivs) setVisiblePiece(pieceDivs, pagination.pageNumber - 1);
 				}
 			});
 			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
@@ -1910,7 +1909,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		// add piece divs if given
 		if (pieceDivs) {
 			assertInitialized(pieces);
-			setVisiblePiece(pieces, pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') : null);
+			setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(pieceDivs);
 			setPrintEnabled(true);
 			if (onDone) onDone();
@@ -1923,7 +1922,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			// render pieces if given
 			if (pieces) {
 				for (piece of pieces) pieceDivs.push($("<div>"));
-				setVisiblePiece(pieces, pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') : null);
+				setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(pieceDivs);
 				setPrintEnabled(false);
 				PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
@@ -1963,20 +1962,13 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	/**
 	 * Sets the visible piece by adding/removing the hidden class.
 	 * 
-	 * @param pieces are the pieces with piece numbers
 	 * @param pieceDivs are the piece divs to show/hide
-	 * @param pieceNum is the piece number to show (optional)
+	 * @param pieceIdx is the piece number to show
 	 */
-	function setVisiblePiece(pieces, pieceDivs, pieceNum) {
-		console.log("setVisiblePiece(" + pieces.length + ", " + pieceNum + ")");
+	function setVisiblePiece(pieceDivs, pieceIdx) {
 		for (let i = 0; i < pieces.length; i++) {
-			if (pieceNum) {
-				if (pieces[i].pieceNum === pieceNum) pieceDivs[i].removeClass("hidden");
-				else pieceDivs[i].addClass("hidden");
-			} else {
-				if (i === 0) pieceDivs[i].removeClass("hidden");
-				else pieceDivs[i].addClass("hidden");
-			}
+			if (i === pieceIdx) pieceDivs[i].removeClass("hidden");
+			else pieceDivs[i].addClass("hidden");
 		}
 	}
 	
