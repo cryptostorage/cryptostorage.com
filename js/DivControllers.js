@@ -317,6 +317,11 @@ function HomeController(div) {
 			div.append(UiUtils.getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked));
 		}
 		
+		$("<div style='height:100px'>").appendTo(div);
+		div.append("Export to printable and digital format for long term storage")
+		$("<div style='height:40px'>").appendTo(div);
+		div.append($("<img width=750px src='img/print_sample.png'>"));
+		
 		function onCurrencyClicked(plugin) {
 			UiUtils.openStorage(plugin.getName() + " Storage", null, getKeyGenConfig(plugin)); 
 		}
