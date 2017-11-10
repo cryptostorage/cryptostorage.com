@@ -1,12 +1,12 @@
 // TODO
 // piece numbering in data
-// harden inputs: >0, must have first currency, etc
-// input errors
 // decryption progress design
 // homepage
-// light blue little bit ligher / brighter
-// faq
 // wait for images before loading homepage
+// light blue little bit ligher / brighter
+// harden inputs: >0, must have first currency, etc
+// input errors
+// faq
 // public address (decrypt to view) instead of (omitted)
 // plugin.newKey() returns null for unrecognized strs instead of throws error
 // ios print spans more than one page
