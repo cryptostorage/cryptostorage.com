@@ -4,8 +4,8 @@
 let Tests = {
 	
 	// constants
-	REPEAT_LONG: 5,
-	REPEAT_SHORT: 1,
+	REPEAT_LONG: 2,
+	REPEAT_SHORT: 0,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
