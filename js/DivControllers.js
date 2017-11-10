@@ -1977,6 +1977,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 					if (label) progressBar.setText(label);
 					progressDiv.show();
 				}, function(_keys, _pieces, _pieceDivs) {
+					progressDiv.hide();
 					keys = _keys;
 					pieces = _pieces;
 					pieceDivs = _pieceDivs;
