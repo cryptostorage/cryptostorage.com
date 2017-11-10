@@ -1,5 +1,6 @@
 // TODO
-// decryption progress design
+// generate progress design
+// decrypt progress design
 // insufficient pieces reconstitute wrong key
 // decrypt bip38 with wrong password crashes mobile safari
 // homepage
