@@ -1,5 +1,7 @@
 // TODO
 // decryption progress design
+// insufficient pieces reconstitute wrong key
+// decrypt bip38 with wrong password crashes mobile safari
 // homepage
 // wait for images before loading homepage
 // light blue little bit ligher / brighter

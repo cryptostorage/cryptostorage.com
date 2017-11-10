@@ -1809,6 +1809,9 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		showPrivateCheckbox.prop('checked', true);
 		showLogosCheckbox.prop('checked', true);
 		
+		// sort pieces and pieceDivs by piece number
+		sortPieces();
+		
 		// piece selection
 		let paginatorSource = getPaginatorSource(keyGenConfig, pieces);
 		if (paginatorSource) {
@@ -1839,6 +1842,36 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
+	
+	function sortPieces() {
+		if (!pieces) return;
+		
+		// bind pieces and pieceDivs
+		let elems = [];
+		for (let i = 0; i < pieces.length; i++) {
+			elems.push({
+				piece: pieces[i],
+				pieceDiv: pieceDivs ? pieceDivs[i] : null
+			});
+		}
+		
+		// sort elems
+		elems.sort(function(elem1, elem2) {
+			let num1 = elem1.piece.pieceNum;
+			let num2 = elem2.piece.pieceNum;
+			assertNumber(num1);
+			assertNumber(num2);
+			return num1 - num2;
+		});
+		
+		// re-assign global pieces
+		pieces = [];
+		if (pieceDivs) pieceDivs = [];
+		for (let elem of elems) {
+			pieces.push(elem.piece);
+			if (pieceDivs) pieceDivs.push(elem.pieceDivs);
+		}
+	}
 	
 	function getPaginatorSource(keyGenConfig, pieces) {
 		if (keyGenConfig) {
