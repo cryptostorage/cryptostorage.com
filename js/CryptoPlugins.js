@@ -65,7 +65,8 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	assertTrue(isObject(key, 'CryptoKey'));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
-	return secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
+	let prefix = minPieces + 'c';	// prefix minimum pieces so insufficient pieces can't create wrong key
+	return prefix + secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
 }
 
 /**
@@ -77,6 +78,9 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 CryptoPlugin.prototype.combine = function(shares) {
 	assertArray(shares);
 	assertTrue(shares.length > 1);
+	
+	// strip min pieces prefix from shares
+	
 	return this.newKey(secrets.combine(shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
 }
 
