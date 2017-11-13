@@ -694,6 +694,10 @@ input[type='number'] {
 	margin-top:20px;
 }
 
+.recover_progress_div {
+	height:50px;
+}
+
 .export_div {
 	display:flex;
 	flex-direction:column;

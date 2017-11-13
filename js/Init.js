@@ -1,6 +1,5 @@
 // TODO
 // test decrypt bip38 mobile safari
-// decrypt progress design
 // insufficient pieces reconstitute wrong key
 // homepage
 // wait for images before loading homepage

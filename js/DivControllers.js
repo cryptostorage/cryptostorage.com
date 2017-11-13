@@ -1570,9 +1570,10 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	DivController.call(this, div);
 	
 	let that = this;
-	let inputDiv;
 	let labelDiv;
+	let inputDiv;
 	let passphraseInput;
+	let progressDiv;
 	let submitButton;
 	
 	this.render = function(onDone) {
@@ -1581,20 +1582,21 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		div.empty();
 		div.addClass("recover_decryption_div");
 		
-		// decrypt label
+		// label
 		labelDiv = $("<div class='recover_decrypt_label'>").appendTo(div);
-		labelDiv.append("Passphrase");
-		
-		// div to collect passphrase input
-		inputDiv = $("<div>").appendTo(div);
 		
 		// passphrase input
+		inputDiv = $("<div>").appendTo(div);
 		passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(inputDiv)
-		
-		// submit button
 		submitButton = $("<div class='recover_button'>").appendTo(inputDiv);
 		submitButton.html("Submit");
 		submitButton.click(function() { onSubmit(); });
+		
+		// progress bar
+		progressDiv = $("<div class='recover_progress_div'>").appendTo(div);
+		
+		// initial state
+		init();
 		
 		// register passphrase enter key
 		passphraseInput.keyup(function(e) {
@@ -1610,6 +1612,14 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	
 	this.focus = function() {
 		passphraseInput.focus();
+	}
+	
+	function init() {
+		progressDiv.hide();
+		labelDiv.html("Passphrase");
+		labelDiv.show();
+		inputDiv.show();
+		that.focus();
 	}
 	
 	function onSubmit() {
@@ -1628,8 +1638,9 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		}
 		
 		// switch content div to progress bar
-		div.children().detach();
-		let progressDiv = $("<div>").appendTo(div);
+		inputDiv.hide();
+		progressDiv.show();
+		progressDiv.empty();
 		progressBar = UiUtils.getProgressBar(progressDiv);
 		
 		// compute weights for progress bar
@@ -1641,16 +1652,13 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		let copies = [];
 		for (let encryptedKey of encryptedKeys) copies.push(encryptedKey.copy());
 		CryptoUtils.decryptKeys(copies, passphrase, function(done, total) {
-			setProgress(done / total * decryptWeight / totalWeight, "Decrypting");
+			setProgress(done / total * decryptWeight / totalWeight, "Decrypting...");
 		}, function(err, decryptedKeys) {
 			
 			// if error, switch back to input div
 			if (err) {
 				onWarning(err.message);
-				labelDiv.html("Passphrase");	// TODO: you're here, common init() function
-				inputDiv.show();
-				div.append(inputDiv);
-				that.focus();
+				init();
 				return;
 			}
 			
@@ -1659,7 +1667,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 			
 			// render pieces
 			PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
-				setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering");
+				setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering...");
 			}, function(err, pieceDivs) {
 				if (err) throw err;
 				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
