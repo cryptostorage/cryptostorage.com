@@ -1571,6 +1571,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	
 	let that = this;
 	let inputDiv;
+	let labelDiv;
 	let passphraseInput;
 	let submitButton;
 	
@@ -1580,12 +1581,14 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		div.empty();
 		div.addClass("recover_decryption_div");
 		
+		// decrypt label
+		labelDiv = $("<div class='recover_decrypt_label'>").appendTo(div);
+		labelDiv.append("Passphrase");
+		
 		// div to collect passphrase input
 		inputDiv = $("<div>").appendTo(div);
 		
 		// passphrase input
-		let passphraseLabel = $("<div class='recover_passphrase_label'>").appendTo(inputDiv);
-		passphraseLabel.append("Passphrase");
 		passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(inputDiv)
 		
 		// submit button
@@ -1644,7 +1647,8 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 			// if error, switch back to input div
 			if (err) {
 				onWarning(err.message);
-				div.empty();
+				labelDiv.html("Passphrase");	// TODO: you're here, common init() function
+				inputDiv.show();
 				div.append(inputDiv);
 				that.focus();
 				return;
@@ -1666,7 +1670,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	function setProgress(percent, label) {
 		progressBar.set(percent);
 		progressBar.setText(Math.round(percent * 100) + "%");
-		//if (label) progressBar.setText(label);
+		if (label) labelDiv.html(label);
 	}
 }
 inheritsFrom(DecryptionController, DivController);
