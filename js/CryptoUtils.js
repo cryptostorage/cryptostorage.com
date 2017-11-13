@@ -489,11 +489,11 @@ let CryptoUtils = {
 	},
 
 	validatePiece: function(piece) {
-		assertTrue(piece.keys.length > 0);
-		for (let key of piece.keys) {
-			assertDefined(key.ticker, "piece.ticker is not defined");
-			assertDefined(key.split, "piece.split is not defined");
-			//assertDefined(key.wif, "piece.wif is not defined");
+		assertDefined(piece.keys, "piece.keys is not defined");
+		assertTrue(piece.keys.length > 0, "piece.keys is empty");
+		for (let i = 0; i < piece.keys.length; i++) {
+			assertDefined(piece.keys.ticker[i], "piece.keys.ticker[" + i + "] is not defined");
+			assertDefined(piece.keys.split[i], "piece.keys.split[" + i + "] is not defined");
 		}
 	},
 	

@@ -861,7 +861,9 @@ inheritsFrom(RecoverController, DivController);
 function RecoverFileController(div) {
 	DivController.call(this, div);
 	
+	let that = this;
 	let warningDiv;
+	let warningMsg;
 	let contentDiv;								// div for all non control links
 	let importDiv;								// div for all file import
 	let importedNamedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
@@ -918,6 +920,38 @@ function RecoverFileController(div) {
 		if (onDone) onDone(div);
 	}
 	
+	this.getWarning = function() {
+		return warningMsg;
+	}
+	
+	this.setWarning = function(str, img) {
+		that.warningMsg = str;
+		warningDiv.hide();
+		if (str) {
+			if (!img) img = $("<img src='img/warning.png'>");
+			warningDiv.append(img);
+			img.addClass("recover_warning_div_icon");
+			warningDiv.append(str);
+			warningDiv.show();
+		} else {
+			warningDiv.hide();
+		}
+	}
+	
+	this.addNamedPieces = function(namedPieces) {
+		for (let namedPiece of namedPieces) {
+			try {
+				CryptoUtils.validatePiece(namedPiece.piece);
+				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
+			} catch (err) {
+				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.msg);
+			}
+		}
+		updatePieces();
+	}
+	
+	// ------------------------ PRIVATE ------------------
+	
 	function resetControls() {
 		controlsDiv.empty();
 		addControl("start over", startOver);
@@ -931,7 +965,7 @@ function RecoverFileController(div) {
 	}
 	
 	function startOver() {
-		setWarning("");
+		that.setWarning("");
 		contentDiv.children().detach();
 		importedPiecesDiv.hide();
 		controlsDiv.hide();
@@ -952,7 +986,7 @@ function RecoverFileController(div) {
 			
 			// create decryption controller and register callbacks
 			let decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
-				setWarning(warning);
+				that.setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
 				onKeysDecrypted(getImportedPieces(), decryptedKeys, pieces, pieceDivs);
 			});
@@ -985,19 +1019,6 @@ function RecoverFileController(div) {
 		});
 	}
 	
-	function setWarning(str, img) {
-		warningDiv.empty();
-		if (str) {
-			if (!img) img = $("<img src='img/warning.png'>");
-			warningDiv.append(img);
-			img.addClass("recover_warning_div_icon");
-			warningDiv.append(str);
-			warningDiv.show();
-		} else {
-			warningDiv.hide();
-		}
-	}
-	
 	// handle imported files
 	function onFilesImported(files) {
 		
@@ -1019,7 +1040,7 @@ function RecoverFileController(div) {
 			}
 			
 			// add all named pieces
-			addNamedPieces(namedPieces);
+			that.addNamedPieces(namedPieces);
 		});
 		
 		// reads the given file and calls onNamedPieces(err, namedPieces) when done
@@ -1028,8 +1049,8 @@ function RecoverFileController(div) {
 			reader.onload = function() {
 				getNamedPiecesFromFile(file, reader.result, function(namedPieces) {
 					if (namedPieces.length === 0) {
-						if (file.type === "application/json") setWarning("File '" + file.name + "' is not a valid json piece");
-						else if (file.type === "application/zip") setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
+						if (file.type === "application/json") that.setWarning("File '" + file.name + "' is not a valid json piece");
+						else if (file.type === "application/zip") that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
 						onNamedPieces(null, namedPieces);
@@ -1038,14 +1059,14 @@ function RecoverFileController(div) {
 			}
 			if (file.type === 'application/json') reader.readAsText(file);
 			else if (file.type === 'application/zip') reader.readAsArrayBuffer(file);
-			else setWarning("'" + file.name + "' is not a zip or json file");
+			else that.setWarning("'" + file.name + "' is not a zip or json file");
 		}
 	}
 	
 	function getNamedPiecesFromFile(file, data, onNamedPieces) {
 		if (file.type === 'application/json') {
 			let piece = JSON.parse(data);
-			CryptoUtils.validatePiece(piece);
+			CryptoUtils.validatePiece(piece);	// TODO: validation should happen in here?  refactor reading
 			let namedPiece = {name: file.name, piece: piece};
 			onNamedPieces([namedPiece]);
 		}
@@ -1056,13 +1077,6 @@ function RecoverFileController(div) {
 				});
 			});
 		}
-	}
-	
-	function addNamedPieces(namedPieces) {
-		for (let namedPiece of namedPieces) {
-			if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
-		}
-		updatePieces();
 	}
 	
 	function isPieceImported(name) {
@@ -1092,7 +1106,7 @@ function RecoverFileController(div) {
 	function updatePieces() {
 		
 		// update UI
-		setWarning("");
+		that.setWarning("");
 		renderImportedPieces(importedNamedPieces);
 		
 		// collect all pieces
@@ -1119,7 +1133,7 @@ function RecoverFileController(div) {
 				let keys = CryptoUtils.piecesToKeys(pieces);
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
 				if (!keys.length) {
-					setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
+					that.setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
 					
 					// add control to view pieces
 					addControl("view imported pieces", function() {
@@ -1128,7 +1142,7 @@ function RecoverFileController(div) {
 				}
 				lastKeys = keys;
 			} catch (err) {
-				setWarning(err.message);
+				that.setWarning(err.message);
 			}
 		});
 		
