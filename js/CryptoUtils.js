@@ -63,7 +63,22 @@ let CryptoUtils = {
 	 * @returns true if the given string meets the minimum requirements to be a split piece
 	 */
 	isPossibleSplitPiece: function(str) {
-		return str.length >= 47 && CryptoUtils.isBase58(str);
+		return isString(str) && str.length >= 47 && CryptoUtils.isBase58(str) && isInitialized(CryptoUtils.getMinPieces(splitPiece));
+	},
+	
+	/**
+	 * Determines the minimum pieces to reconstitute based on a possible split piece string.
+	 * 
+	 * Looks for 'XXXc' prefix in the given split piece where XXX is the minimum to reconstitute.
+	 * 
+	 * @param splitPiece is a string which may be prefixed with 'XXXc...'
+	 * @return the minimum pieces to reconstitute if prefixed, null otherwise
+	 */
+	getMinPieces: function(splitPiece) {
+		assertString(splitPiece);
+		let idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
+		if (idx <= 0) return null;
+		return parseInt(splitPiece.substring(0, idx));	// parse preceding numbers to int
 	},
 
 	/**

@@ -65,8 +65,16 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	assertTrue(isObject(key, 'CryptoKey'));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
-	let prefix = minPieces + 'c';	// prefix minimum pieces so insufficient pieces can't create wrong key
-	return prefix + secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
+
+	// split key into shares
+	let shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
+
+	// append minimum pieces prefix so insufficient pieces cannot create wrong key (cryptostorage convention)
+	let prefix = minPieces + 'c';
+	for (let i = 0; i < shares.length; i++) {
+		shares[i] = prefix + shares[i];
+	}
+	return shares;
 }
 
 /**
@@ -79,9 +87,22 @@ CryptoPlugin.prototype.combine = function(shares) {
 	assertArray(shares);
 	assertTrue(shares.length > 1);
 	
-	// strip min pieces prefix from shares
+	// get minimum shares and shares without 'XXXc' prefix
+	let minShares;
+	let nonPrefixedShares = [];
+	for (let share of shares) {
+		let min = CryptoUtils.getMinPieces(share);
+		if (!min) throw Error("Share is not prefixed with minimum pieces: " + share);
+		if (!isInitialized(minShares)) minShares = min;
+		else if (min !== minShares) throw Error("Share prefixes disagree: " + min + " vs " + minShares);
+		nonPrefixedShares.push(share.substring(share.indexOf('c') + 1));
+	}
 	
-	return this.newKey(secrets.combine(shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
+	// ensure sufficient shares are provided
+	if (shares.length < minShares) throw Error(minShares + " shares required but only given " + shares.length);
+	
+	// combine shares and create key
+	return this.newKey(secrets.combine(nonPrefixedShares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
 }
 
 /**
