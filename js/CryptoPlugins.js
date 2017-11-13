@@ -91,6 +91,7 @@ CryptoPlugin.prototype.combine = function(shares) {
 	let minShares;
 	let nonPrefixedShares = [];
 	for (let share of shares) {
+		if (!CryptoUtils.isPossibleSplitPiece(share)) throw Error("Invalid split piece: " + share);
 		let min = CryptoUtils.getMinPieces(share);
 		if (!min) throw Error("Share is not prefixed with minimum pieces: " + share);
 		if (!isInitialized(minShares)) minShares = min;

@@ -78,7 +78,7 @@ let CryptoUtils = {
 		assertString(splitPiece);
 		let idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
 		if (idx <= 0) return null;
-		return parseInt(splitPiece.substring(0, idx));	// parse preceding numbers to int
+		return Number(splitPiece.substring(0, idx)); // parse preceding numbers to int
 	},
 
 	/**
