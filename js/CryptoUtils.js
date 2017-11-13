@@ -782,8 +782,8 @@ let CryptoUtils = {
 				LOADER.load("lib/bitcoinjs.js", function() {
 					try {
 						let decrypted = bitcoinjs.decrypt(key.getWif(), passphrase);
-						throw Error("Not implemented");
-						key.setPrivateKey(bitcoinjs.encode(decrypted));
+						let privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
+						key.setPrivateKey(privateKey);
 						onDone(null, key);
 					} catch (err) {
 						onDone(new Error("Incorrect passphrase"));
