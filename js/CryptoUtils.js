@@ -779,15 +779,15 @@ let CryptoUtils = {
 				});
 				break;
 			case CryptoUtils.EncryptionScheme.BIP38:
-				LOADER.load("lib/bitaddress.js", function() {
-					ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), passphrase, function(resp) {
-						if (resp.message) onDone(new Error("Incorrect passphrase"));
-						else {
-							let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
-							key.setPrivateKey(wif);
-							onDone(null, key);
-						}
-					});
+				LOADER.load("lib/bitcoinjs.js", function() {
+					try {
+						let decrypted = bitcoinjs.decrypt(key.getWif(), passphrase);
+						let privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
+						key.setPrivateKey(privateKey);
+						onDone(null, key);
+					} catch (err) {
+						onDone(new Error("Incorrect passphrase"));
+					}
 				});
 				break;
 			default:
