@@ -265,7 +265,7 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces.").appendTo(sliderDiv);
 		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats for long term storage.").appendTo(sliderDiv);
 		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-		sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:3000});
+		sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:3500});
 		
 		function getSlide(img, text) {
 			let slide = $("<div class='slide'>");
