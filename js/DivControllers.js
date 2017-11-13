@@ -1765,7 +1765,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	let showPrivateCheckbox;
 	let showLogosCheckbox;
 	let paginator;
-	let currentPiece;
+	let piecesDiv;
 	let printEnabled;
 	
 	this.render = function(onDone) {
@@ -1832,7 +1832,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		}
 		
 		// currently showing piece
-		currentPiece = $("<div class='export_current_piece'>").appendTo(div);
+		piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
 		
 		// register events
 		showPublicCheckbox.click(function() { update(); });
@@ -1874,7 +1874,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		if (pieceDivs) pieceDivs = [];
 		for (let elem of elems) {
 			pieces.push(elem.piece);
-			if (pieceDivs) pieceDivs.push(elem.pieceDivs);
+			if (pieceDivs) pieceDivs.push(elem.pieceDiv);
 		}
 	}
 	
@@ -1993,8 +1993,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	}
 	
 	function setPieceDivs(pieceDivs) {
-		currentPiece.empty();
-		for (let pieceDiv of pieceDivs) currentPiece.append(pieceDiv);
+		piecesDiv.empty();
+		for (let pieceDiv of pieceDivs) piecesDiv.append(pieceDiv);
 	}
 	
 	/**

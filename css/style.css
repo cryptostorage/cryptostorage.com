@@ -794,7 +794,7 @@ input[type='number'] {
 	color:white;
 }
 
-.export_current_piece {
+.export_pieces_div {
 	background-color:white;
 	padding:25px;
 }
@@ -819,10 +819,10 @@ input[type='number'] {
 	.export_header {
 		display:none;
 	}
-	.export_current_piece, .export_current_piece * {
+	.export_pieces_div, .export_pieces_div * {
 		visibility: visible;
 	}
-	.export_current_piece {
+	.export_pieces_div {
 		margin:0;
 		padding:0;
 	}
