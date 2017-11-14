@@ -497,12 +497,14 @@ let Tests = {
 			let controller = new RecoverFileController($("<div>"));
 			controller.render(function() {
 				
-				
+				// test invalid piece
+				let piece = {};
+				let namedPieces = [];
+				namedPieces.push({name: 'piece.json', piece: piece});
+				controller.addNamedPieces(namedPieces, function() {
+					console.log(controller.getWarning());
+				});
 			});
-			
-			function getPiece() {
-				
-			}
 		}
 	}
 }

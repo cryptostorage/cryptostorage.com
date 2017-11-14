@@ -921,7 +921,7 @@ function RecoverFileController(div) {
 	}
 	
 	this.getWarning = function() {
-		return warningMsg;
+		return that.warningMsg;
 	}
 	
 	this.setWarning = function(str, img) {
@@ -939,7 +939,7 @@ function RecoverFileController(div) {
 		}
 	}
 	
-	this.addNamedPieces = function(namedPieces) {
+	this.addNamedPieces = function(namedPieces, onDone) {
 		for (let namedPiece of namedPieces) {
 			try {
 				CryptoUtils.validatePiece(namedPiece.piece);
@@ -948,14 +948,23 @@ function RecoverFileController(div) {
 				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.message);
 			}
 		}
-		updatePieces();
+		updatePieces(onDone);
+	}
+	
+	this.startOver = function() {
+		that.setWarning("");
+		contentDiv.children().detach();
+		importedPiecesDiv.hide();
+		controlsDiv.hide();
+		removePieces();
+		contentDiv.append(importDiv);
 	}
 	
 	// ------------------------ PRIVATE ------------------
 	
 	function resetControls() {
 		controlsDiv.empty();
-		addControl("start over", startOver);
+		addControl("start over", that.startOver);
 	}
 	
 	function addControl(text, onClick) {
@@ -963,15 +972,6 @@ function RecoverFileController(div) {
 		let link = $("<div class='recover_control_link'>").appendTo(linkDiv);
 		link.append(text);
 		link.click(function() { onClick(); });
-	}
-	
-	function startOver() {
-		that.setWarning("");
-		contentDiv.children().detach();
-		importedPiecesDiv.hide();
-		controlsDiv.hide();
-		removePieces();
-		contentDiv.append(importDiv);
 	}
 	
 	function getImportedPieces() {
@@ -1110,7 +1110,7 @@ function RecoverFileController(div) {
 		throw new Error("No piece with name '" + name + "' imported");
 	}
 	
-	function updatePieces() {
+	function updatePieces(onDone) {
 		
 		// update UI
 		renderImportedPieces(importedNamedPieces);
@@ -1118,7 +1118,10 @@ function RecoverFileController(div) {
 		// collect all pieces
 		let pieces = [];
 		for (let importedPiece of importedNamedPieces) pieces.push(importedPiece.piece);
-		if (!pieces.length) return;
+		if (!pieces.length) {
+			if (onDone) onDone();
+			return;
+		}
 		
 		// collect tickers being imported
 		let tickers = new Set();
@@ -1150,6 +1153,7 @@ function RecoverFileController(div) {
 			} catch (err) {
 				that.setWarning(err.message);
 			}
+			if (onDone) onDone();
 		});
 		
 		function keysDifferent(keys1, keys2) {
