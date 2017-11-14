@@ -981,6 +981,7 @@ function RecoverFileController(div) {
 	}
 	
 	function onKeysImported(keys) {
+		that.setWarning("");
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
 		if (keys[0].isEncrypted()) {
@@ -1136,10 +1137,7 @@ function RecoverFileController(div) {
 			// create keys
 			try {
 				let keys = CryptoUtils.piecesToKeys(pieces);
-				if (keysDifferent(lastKeys, keys) && keys.length) {
-					that.setWarning("");
-					onKeysImported(keys);
-				}
+				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
 				if (!keys.length) {
 					that.setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
 					
