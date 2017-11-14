@@ -926,6 +926,7 @@ function RecoverFileController(div) {
 	
 	this.setWarning = function(str, img) {
 		console.log("setWarning(" + str + ")");
+		throw Error("setWarning error for tracking");
 		that.warningMsg = str;
 		warningDiv.hide();
 		if (str) {
@@ -1032,13 +1033,14 @@ function RecoverFileController(div) {
 		// collect functions to read files
 		let funcs = [];
 		for (let i = 0; i < files.length; i++) {
-			funcs.push(function(callback) {
-				readFile(files[i], callback);
+			funcs.push(function(onDone) {
+				readFile(files[i], onDone);
 			});
 		};
 		
 		// read files asynchronously
 		async.parallel(funcs, function(err, results) {
+			if (err) throw err;
 			
 			// collect named pieces from results
 			let namedPieces = [];
@@ -1055,12 +1057,13 @@ function RecoverFileController(div) {
 			let reader = new FileReader();
 			reader.onload = function() {
 				getNamedPiecesFromFile(file, reader.result, function(namedPieces) {
+					console.log("getNamedPiecesFromFile() done");
 					if (namedPieces.length === 0) {
+						console.log("No Named pieces extracted");
 						if (file.type === "application/json") that.setWarning("File '" + file.name + "' is not a valid json piece");
 						else if (file.type === "application/zip") that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
-						console.log("onNamedPieces()");
 						console.log(namedPieces);
 						onNamedPieces(null, namedPieces);
 					}
