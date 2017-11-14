@@ -925,20 +925,16 @@ function RecoverFileController(div) {
 	}
 	
 	this.setWarning = function(str, img) {
-		console.log("setWarning(" + str + ")");
-		throw Error("setWarning error for tracking");
 		that.warningMsg = str;
 		warningDiv.hide();
+		warningDiv.empty();
 		if (str) {
-			console.log("Setting warnign div with str " + str);
 			if (!img) img = $("<img src='img/warning.png'>");
 			warningDiv.append(img);
 			img.addClass("recover_warning_div_icon");
 			warningDiv.append(str);
-			console.log("showing");
 			warningDiv.show();
 		} else {
-			console.log("hidding" + str);
 			warningDiv.hide();
 		}
 	}
@@ -949,12 +945,9 @@ function RecoverFileController(div) {
 				CryptoUtils.validatePiece(namedPiece.piece);
 				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
 			} catch (err) {
-				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.msg);
+				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.message);
 			}
 		}
-		console.log("Adding named pieces");
-		console.log(namedPieces);
-		console.log(importedNamedPieces);
 		updatePieces();
 	}
 	
@@ -1057,14 +1050,11 @@ function RecoverFileController(div) {
 			let reader = new FileReader();
 			reader.onload = function() {
 				getNamedPiecesFromFile(file, reader.result, function(namedPieces) {
-					console.log("getNamedPiecesFromFile() done");
 					if (namedPieces.length === 0) {
-						console.log("No Named pieces extracted");
 						if (file.type === "application/json") that.setWarning("File '" + file.name + "' is not a valid json piece");
 						else if (file.type === "application/zip") that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
-						console.log(namedPieces);
 						onNamedPieces(null, namedPieces);
 					}
 				});
@@ -1076,13 +1066,14 @@ function RecoverFileController(div) {
 		
 		function getNamedPiecesFromFile(file, data, onNamedPieces) {
 			if (file.type === 'application/json') {
+				let piece;
 				try {
-					let piece = JSON.parse(data);
-					let namedPiece = {name: file.name, piece: piece};
-					onNamedPieces([namedPiece]);
+					piece = JSON.parse(data);
 				} catch (err) {
 					throw Error("Unable to parse JSON content from '" + file.name + "'");
 				}
+				let namedPiece = {name: file.name, piece: piece};
+				onNamedPieces([namedPiece]);
 			}
 			else if (file.type === 'application/zip') {
 				LOADER.load("lib/jszip.js", function() {
@@ -1121,7 +1112,6 @@ function RecoverFileController(div) {
 	function updatePieces() {
 		
 		// update UI
-		that.setWarning("");
 		renderImportedPieces(importedNamedPieces);
 		
 		// collect all pieces
@@ -1146,7 +1136,10 @@ function RecoverFileController(div) {
 			// create keys
 			try {
 				let keys = CryptoUtils.piecesToKeys(pieces);
-				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
+				if (keysDifferent(lastKeys, keys) && keys.length) {
+					that.setWarning("");
+					onKeysImported(keys);
+				}
 				if (!keys.length) {
 					that.setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
 					
