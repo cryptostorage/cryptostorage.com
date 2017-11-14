@@ -501,9 +501,8 @@ let Tests = {
 				let piece = {};
 				let namedPieces = [];
 				namedPieces.push({name: 'piece.json', piece: piece});
-				controller.addNamedPieces(namedPieces, function() {
-					console.log(controller.getWarning());
-				});
+				controller.addNamedPieces(namedPieces);
+				console.log(controller.getWarning());
 			});
 		}
 	}
