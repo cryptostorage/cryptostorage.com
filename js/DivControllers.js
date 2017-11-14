@@ -925,15 +925,19 @@ function RecoverFileController(div) {
 	}
 	
 	this.setWarning = function(str, img) {
+		console.log("setWarning(" + str + ")");
 		that.warningMsg = str;
 		warningDiv.hide();
 		if (str) {
+			console.log("Setting warnign div with str " + str);
 			if (!img) img = $("<img src='img/warning.png'>");
 			warningDiv.append(img);
 			img.addClass("recover_warning_div_icon");
 			warningDiv.append(str);
+			console.log("showing");
 			warningDiv.show();
 		} else {
+			console.log("hidding" + str);
 			warningDiv.hide();
 		}
 	}
@@ -947,6 +951,9 @@ function RecoverFileController(div) {
 				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.msg);
 			}
 		}
+		console.log("Adding named pieces");
+		console.log(namedPieces);
+		console.log(importedNamedPieces);
 		updatePieces();
 	}
 	
@@ -1053,6 +1060,8 @@ function RecoverFileController(div) {
 						else if (file.type === "application/zip") that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
+						console.log("onNamedPieces()");
+						console.log(namedPieces);
 						onNamedPieces(null, namedPieces);
 					}
 				});
@@ -1061,21 +1070,24 @@ function RecoverFileController(div) {
 			else if (file.type === 'application/zip') reader.readAsArrayBuffer(file);
 			else that.setWarning("'" + file.name + "' is not a zip or json file");
 		}
-	}
-	
-	function getNamedPiecesFromFile(file, data, onNamedPieces) {
-		if (file.type === 'application/json') {
-			let piece = JSON.parse(data);
-			CryptoUtils.validatePiece(piece);	// TODO: validation should happen in here?  refactor reading
-			let namedPiece = {name: file.name, piece: piece};
-			onNamedPieces([namedPiece]);
-		}
-		else if (file.type === 'application/zip') {
-			LOADER.load("lib/jszip.js", function() {
-				CryptoUtils.zipToPieces(data, function(namedPieces) {
-					onNamedPieces(namedPieces);
+		
+		function getNamedPiecesFromFile(file, data, onNamedPieces) {
+			if (file.type === 'application/json') {
+				try {
+					let piece = JSON.parse(data);
+					let namedPiece = {name: file.name, piece: piece};
+					onNamedPieces([namedPiece]);
+				} catch (err) {
+					throw Error("Unable to parse JSON content from '" + file.name + "'");
+				}
+			}
+			else if (file.type === 'application/zip') {
+				LOADER.load("lib/jszip.js", function() {
+					CryptoUtils.zipToPieces(data, function(namedPieces) {
+						onNamedPieces(namedPieces);
+					});
 				});
-			});
+			}
 		}
 	}
 	
