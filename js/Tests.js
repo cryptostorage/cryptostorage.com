@@ -9,6 +9,7 @@ let Tests = {
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
+	TEST_PLUGINS: false,
 	
 	/**
 	 * Returns crypto plugins to test.
@@ -49,12 +50,17 @@ let Tests = {
 			
 			// run tests
 			testUtils();
+			testFileImport();
 			testParseKey(plugins);
 			for (plugin of plugins) testSplitAndCombine(plugin);
 			if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
-			testCryptoKeys(plugins, function(error) {
-				if (callback) callback(error);
-			});
+			if (Tests.TEST_PLUGINS) {
+				testCryptoPlugins(plugins, function(error) {
+					if (callback) callback(error);
+				});
+			} else {
+				if (callback) callback();
+			}
 		});
 		
 		function testUtils() {
@@ -137,14 +143,14 @@ let Tests = {
 			}
 		}
 
-		function testCryptoKeys(plugins, onDone) {
+		function testCryptoPlugins(plugins, onDone) {
 			let funcs = [];
-			for (let plugin of plugins) funcs.push(function(callback) { testCryptoKey(plugin, callback); });
+			for (let plugin of plugins) funcs.push(function(callback) { testCryptoPlugin(plugin, callback); });
 			async.series(funcs, onDone);
 		}
 
-		function testCryptoKey(plugin, onDone) {
-			console.log("testCryptoKey(" + plugin.getTicker() + ")");
+		function testCryptoPlugin(plugin, onDone) {
+			console.log("testCryptoPlugin(" + plugin.getTicker() + ")");
 			
 			// test plugin
 			assertInitialized(plugin.getName());
@@ -481,6 +487,21 @@ let Tests = {
 					let combined = plugin.combine(combination);
 					assertTrue(key.equals(combined));
 				}
+			}
+		}
+		
+		function testFileImport(plugins) {
+			console.log("testFileImport()");
+			
+			// initialize controller
+			let controller = new RecoverFileController($("<div>"));
+			controller.render(function() {
+				
+				
+			});
+			
+			function getPiece() {
+				
 			}
 		}
 	}
