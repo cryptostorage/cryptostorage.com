@@ -1103,6 +1103,7 @@ function RecoverFileController(div) {
 		for (let i = 0; i < importedNamedPieces.length; i++) {
 			if (importedNamedPieces[i].name === name) {
 				importedNamedPieces.splice(i, 1);
+				that.setWarning("");
 				updatePieces();
 				return;
 			}
