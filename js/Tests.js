@@ -666,15 +666,6 @@ let Tests = {
 						pieces1[1].keys[1].ticker = oldValue;
 						controller.startOver();
 						
-						let pieces3 = getPieces(plugins, 1, 3, 2);
-						pieces3[1].keys[0].wif = "2c3XwEinQ18uP3gmSwtRRRRvhMdoYzpxRHyyyydUTzge6HpFG";
-						namedPieces = [];
-						namedPieces.push({name: "piece1.json", piece: pieces3[0]});
-						namedPieces.push({name: "piece2.json", piece: pieces3[1]});
-						controller.addNamedPieces(namedPieces);
-						assertEquals("Could not recover private keys from the given pieces.  Verify the pieces are correct.", controller.getWarning());
-						controller.startOver();
-						
 						oldValue = pieces1[1].keys[1].wif;
 						for (let i = 0; i < pieces1[1].keys.length; i++) {
 							pieces1[1].keys[i].wif = oldValue.replaceAt(0, "3");
