@@ -2,6 +2,7 @@
 // insufficient pieces reconstitute wrong key
 // test decrypt bip38 mobile safari
 // public address (decrypt to view) instead of (omitted)
+// file import zip with invalid json shouldn't prevent others from importing
 // homepage
 // wait for images before loading homepage
 // light blue little bit ligher / brighter
@@ -14,7 +15,6 @@
 // run minimum tests when site accessed
 // test alert if key creation fails for any reason
 // verify no name collisions
-// file import zip with invalid json shouldn't prevent others from importing
 // minimize initial dependencies: condense files to single files, lazy load css
 // warning if live and/or online
 // test on IE
