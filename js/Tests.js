@@ -50,17 +50,18 @@ let Tests = {
 			
 			// run tests
 			testUtils();
-			testFileImport();
-			testParseKey(plugins);
-			for (plugin of plugins) testSplitAndCombine(plugin);
-			if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
-			if (Tests.TEST_PLUGINS) {
-				testCryptoPlugins(plugins, function(error) {
-					if (callback) callback(error);
-				});
-			} else {
-				if (callback) callback();
-			}
+			testFileImport(plugins, function() {
+				testParseKey(plugins);
+				for (plugin of plugins) testSplitAndCombine(plugin);
+				if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
+				if (Tests.TEST_PLUGINS) {
+					testCryptoPlugins(plugins, function(error) {
+						if (callback) callback(error);
+					});
+				} else {
+					if (callback) callback();
+				}
+			});
 		});
 		
 		function testUtils() {
@@ -405,10 +406,11 @@ let Tests = {
 					else assertUndefined(piece.keys[i].encryption);
 					if (numPieces > 1) {
 						assertNumber(piece.pieceNum);
-						assertTrue(piece.keys[i].split);
+						assertInt(piece.pieceNum);
+						assertTrue(piece.pieceNum > 0);
 						assertFalse(keys[i].getWif() === piece.keys[i].wif);
 					} else {
-						assertFalse(piece.keys[i].split);
+						assertUndefined(piece.pieceNum);
 						assertTrue(keys[i].getWif() === piece.keys[i].wif);
 					}
 				}
@@ -490,19 +492,84 @@ let Tests = {
 			}
 		}
 		
-		function testFileImport(plugins) {
+		function testFileImport(plugins, onDone) {
 			console.log("testFileImport()");
 			
 			// initialize controller
 			let controller = new RecoverFileController($("<div>"));
 			controller.render(function() {
 				
-				// test invalid piece
-				let piece = {};
-				let namedPieces = [];
-				namedPieces.push({name: 'piece.json', piece: piece});
-				controller.addNamedPieces(namedPieces);
-				console.log(controller.getWarning());
+				// collect test functions
+				let funcs = [];
+				funcs.push(testInvalidPieces());
+				
+				// run test functions
+				async.series(funcs, function(err) {
+					if (err) throw err;
+					onDone();
+				});
+				
+				function testInvalidPieces() {
+					return function(onDone) {
+						let piece = {};
+						let namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.version is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: "asdf" };
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.version is not a number", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, pieceNum: "asdf" };
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.pieceNum is not an integer", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, pieceNum: 0 };
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.pieceNum is not greater than 0", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0 };
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: "asdf"};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys is not an array", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: []};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys is empty", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: [{}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[0].ticker is not defined", controller.getWarning());
+						controller.startOver();
+						
+						onDone();
+					}
+				}
 			});
 		}
 	}

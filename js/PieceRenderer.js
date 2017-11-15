@@ -124,7 +124,7 @@ let PieceRenderer = {
 			let leftValue = config.showPublic ? piece.keys[i].address : null;
 			let logo = $("<img width=100% height=100% src='" + getImageData(piece.keys[i].ticker) + "'>");
 			let logoLabel = plugin.getName();
-			let rightLabel = "Private Key" + (piece.keys[i].split ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
+			let rightLabel = "Private Key" + (piece.pieceNum ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = config.showPrivate ? piece.keys[i].wif : null;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config,
 				function() {

@@ -271,7 +271,6 @@ let CryptoUtils = {
 				pieceKey.ticker = key.getPlugin().getTicker();
 				pieceKey.address = key.getAddress();
 				pieceKey.wif = keyPieces[i];
-				pieceKey.split = numPieces > 1;
 				if (pieceKey.wif) pieceKey.encryption = key.getEncryptionScheme();
 				pieces[i].keys.push(pieceKey);
 			}
@@ -321,14 +320,11 @@ let CryptoUtils = {
 			// validate consistent keys across pieces
 			for (let i = 0; i < pieces[0].keys.length; i++) {
 				let crypto;
-				let split;
 				let address;
 				let encryption;
 				for (let piece of pieces) {
 					if (!crypto) crypto = piece.keys[i].ticker;
 					else if (crypto !== piece.keys[i].ticker) throw new Error("Pieces are for different cryptocurrencies");
-					if (!split) split = piece.keys[i].split;
-					else if (split !== piece.keys[i].split) throw new Error("Pieces have different split states");
 					if (!address) address = piece.keys[i].address;
 					else if (address !== piece.keys[i].address) throw new Error("Pieces have different addresses");
 					if (!encryption) encryption = piece.keys[i].encryption;
@@ -474,7 +470,7 @@ let CryptoUtils = {
 		for (let i = 0; i < piece.keys.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
 			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n\n";
-			if (piece.keys[i].wif) str += "Private Key " + (piece.keys[i].split ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
+			if (piece.keys[i].wif) str += "Private Key " + (piece.pieceNum ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
 		}
 		return str.trim();
 	},
@@ -489,11 +485,17 @@ let CryptoUtils = {
 	},
 
 	validatePiece: function(piece) {
+		assertDefined(piece.version, "piece.version is not defined");
+		assertNumber(piece.version, "piece.version is not a number");
+		if (isDefined(piece.pieceNum)) {
+			assertInt(piece.pieceNum, "piece.pieceNum is not an integer");
+			assertTrue(piece.pieceNum > 0, "piece.pieceNum is not greater than 0");
+		}
 		assertDefined(piece.keys, "piece.keys is not defined");
+		assertArray(piece.keys, "piece.keys is not an array");
 		assertTrue(piece.keys.length > 0, "piece.keys is empty");
 		for (let i = 0; i < piece.keys.length; i++) {
 			assertDefined(piece.keys[i].ticker, "piece.keys[" + i + "].ticker is not defined");
-			assertDefined(piece.keys[i].split, "piece.keys[" + i + "].split is not defined");
 		}
 	},
 	
