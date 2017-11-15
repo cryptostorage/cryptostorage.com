@@ -1,8 +1,6 @@
 // TODO
-// insufficient pieces reconstitute wrong key
 // test decrypt bip38 mobile safari
 // public address (decrypt to view) instead of (omitted)
-// file import zip with invalid json shouldn't prevent others from importing
 // homepage
 // wait for images before loading homepage
 // light blue little bit ligher / brighter
