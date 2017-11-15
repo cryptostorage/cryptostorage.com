@@ -85,7 +85,7 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
  */
 CryptoPlugin.prototype.combine = function(shares) {
 	assertArray(shares);
-	assertTrue(shares.length > 1);
+	assertTrue(shares.length > 0);
 	
 	// get minimum shares and shares without 'XXXc' prefix
 	let minShares;
@@ -100,7 +100,10 @@ CryptoPlugin.prototype.combine = function(shares) {
 	}
 	
 	// ensure sufficient shares are provided
-	if (shares.length < minShares) throw Error(minShares + " shares required but only given " + shares.length);
+	if (shares.length < minShares) {
+		let additional = minShares - shares.length;
+		throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private key");
+	}
 	
 	// combine shares and create key
 	return this.newKey(secrets.combine(nonPrefixedShares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));

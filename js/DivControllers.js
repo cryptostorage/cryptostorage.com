@@ -1543,7 +1543,7 @@ function RecoverTextController(div, plugins) {
 			try {
 				key = selectedPlugin.combine(importedPieces);
 			} catch (err) {
-				if (!warningSet) setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
+				if (!warningSet) setWarning(err.message);
 			}
 		}
 		
