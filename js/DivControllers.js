@@ -981,6 +981,7 @@ function RecoverFileController(div) {
 	}
 	
 	function onKeysImported(keys) {
+		resetControls();
 		that.setWarning("");
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
