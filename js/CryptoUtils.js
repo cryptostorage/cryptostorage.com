@@ -344,12 +344,16 @@ let CryptoUtils = {
 			}
 			
 			// combine keys across pieces
-			for (let i = 0; i < pieces[0].keys.length; i++) {
-				let shares = [];
-				for (let piece of pieces) shares.push(piece.keys[i].wif);
-				let key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
-				if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
-				keys.push(key);
+			try {
+				for (let i = 0; i < pieces[0].keys.length; i++) {
+					let shares = [];
+					for (let piece of pieces) shares.push(piece.keys[i].wif);
+					let key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
+					if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
+					keys.push(key);
+				}
+			} catch (err) {
+				throw Error("Could not recover private keys from the given pieces.  Verify the pieces are correct.");
 			}
 		}
 
