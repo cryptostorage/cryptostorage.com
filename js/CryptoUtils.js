@@ -496,6 +496,9 @@ let CryptoUtils = {
 		assertTrue(piece.keys.length > 0, "piece.keys is empty");
 		for (let i = 0; i < piece.keys.length; i++) {
 			assertDefined(piece.keys[i].ticker, "piece.keys[" + i + "].ticker is not defined");
+			assertDefined(piece.keys[i].address, "piece.keys[" + i + "].address is not defined");
+			assertDefined(piece.keys[i].wif, "piece.keys[" + i + "].wif is not defined");
+			assertDefined(piece.keys[i].encryption, "piece.keys[" + i + "].encryption is not defined");
 		}
 	},
 	

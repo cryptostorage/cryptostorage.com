@@ -501,7 +501,9 @@ let Tests = {
 				
 				// collect test functions
 				let funcs = [];
-				funcs.push(testInvalidPieces());
+				funcs.push(testOnePieceValidity());
+//				funcs.push(testIncompatiblePieces());
+//				funcs.push(testAdditionalPiecesNeeded());
 				
 				// run test functions
 				async.series(funcs, function(err) {
@@ -509,7 +511,7 @@ let Tests = {
 					onDone();
 				});
 				
-				function testInvalidPieces() {
+				function testOnePieceValidity() {
 					return function(onDone) {
 						let piece = {};
 						let namedPieces = [];
@@ -565,6 +567,52 @@ let Tests = {
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.keys[0].ticker is not defined", controller.getWarning());
+						controller.startOver();
+
+						piece = { version: 1.0, keys: [{
+							ticker: "BTC",
+							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",
+							encryption: null
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[0].address is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: [{
+							ticker: "BTC",
+							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
+							encryption: null
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[0].wif is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: [{
+							ticker: "BTC",
+							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
+							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[0].encryption is not defined", controller.getWarning());
+						controller.startOver();
+						
+						// valid piece
+						piece = { version: 1.0, keys: [{
+							ticker: "BTC",
+							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
+							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",
+							encryption: null
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("", controller.getWarning());
 						controller.startOver();
 						
 						onDone();
