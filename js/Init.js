@@ -1,13 +1,13 @@
 // TODO
-// test decrypt bip38 mobile safari
 // insufficient pieces reconstitute wrong key
+// test decrypt bip38 mobile safari
+// public address (decrypt to view) instead of (omitted)
 // homepage
 // wait for images before loading homepage
 // light blue little bit ligher / brighter
 // harden inputs: >0, must have first currency, etc
 // input errors
 // faq
-// public address (decrypt to view) instead of (omitted)
 // plugin.newKey() returns null for unrecognized strs instead of throws error
 // ios print spans more than one page
 // todos throughout code
