@@ -9,7 +9,7 @@ let Tests = {
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
-	TEST_PLUGINS: false,
+	TEST_PLUGINS: true,
 	
 	/**
 	 * Returns crypto plugins to test.
