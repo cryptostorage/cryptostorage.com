@@ -95,7 +95,7 @@ CryptoPlugin.prototype.combine = function(shares) {
 		let min = CryptoUtils.getMinPieces(share);
 		if (!min) throw Error("Share is not prefixed with minimum pieces: " + share);
 		if (!isInitialized(minShares)) minShares = min;
-		else if (min !== minShares) throw Error("Share prefixes disagree: " + min + " vs " + minShares);
+		else if (min !== minShares) throw Error("Shares have different minimum threshold prefixes: " + min + " vs " + minShares);
 		nonPrefixedShares.push(share.substring(share.indexOf('c') + 1));
 	}
 	

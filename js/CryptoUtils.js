@@ -291,18 +291,20 @@ let CryptoUtils = {
 		
 		// handle one piece
 		if (pieces.length === 1) {
+			assertTrue(pieces[0].keys.length > 0);
+			if (pieces[0].pieceNum) {
+				let minPieces = CryptoUtils.getMinPieces(pieces[0].keys[0].wif);
+				let additional = minPieces - 1;
+				throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
+			}
 			for (let pieceKey of pieces[0].keys) {
-				try {
-					let state = {};
-					state.address = pieceKey.address;
-					state.wif = pieceKey.wif;
-					state.encryption = pieceKey.encryption;
-					let key = new CryptoKey(CryptoUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
-					if (key.getHex() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// check that address derived from private keys
-					keys.push(key);
-				} catch (err) {
-					return [];
-				}
+				let state = {};
+				state.address = pieceKey.address;
+				state.wif = pieceKey.wif;
+				state.encryption = pieceKey.encryption;
+				let key = new CryptoKey(CryptoUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
+				if (key.getHex() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// check that address derived from private keys
+				keys.push(key);
 			}
 		}
 		
@@ -318,6 +320,7 @@ let CryptoUtils = {
 			}
 			
 			// validate consistent keys across pieces
+			let minPieces;
 			for (let i = 0; i < pieces[0].keys.length; i++) {
 				let crypto;
 				let address;
@@ -329,20 +332,24 @@ let CryptoUtils = {
 					else if (address !== piece.keys[i].address) throw new Error("Pieces have different addresses");
 					if (!encryption) encryption = piece.keys[i].encryption;
 					else if (encryption !== piece.keys[i].encryption) throw new Error("Pieces have different encryption states");
+					if (!minPieces) minPieces = CryptoUtils.getMinPieces(piece.keys[i].wif);
+					else if (minPieces !== CryptoUtils.getMinPieces(piece.keys[i].wif)) throw new Error("Pieces have different minimum threshold prefixes");
 				}
+			}
+			
+			// check if minimum threshold met
+			if (pieces.length < minPieces) {
+				let additional = minPieces - pieces.length;
+				throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
 			}
 			
 			// combine keys across pieces
 			for (let i = 0; i < pieces[0].keys.length; i++) {
 				let shares = [];
 				for (let piece of pieces) shares.push(piece.keys[i].wif);
-				try {
-					let key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
-					if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
-					keys.push(key);
-				} catch (err) {
-					return [];
-				}
+				let key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
+				if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
+				keys.push(key);
 			}
 		}
 
@@ -494,7 +501,12 @@ let CryptoUtils = {
 		assertDefined(piece.keys, "piece.keys is not defined");
 		assertArray(piece.keys, "piece.keys is not an array");
 		assertTrue(piece.keys.length > 0, "piece.keys is empty");
+		let minPieces;
 		for (let i = 0; i < piece.keys.length; i++) {
+			if (piece.pieceNum) {
+				if (!minPieces) minPieces = CryptoUtils.getMinPieces(piece.keys[i].wif);
+				else if (minPieces !== CryptoUtils.getMinPieces(piece.keys[i].wif)) throw Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");
+			}
 			assertDefined(piece.keys[i].ticker, "piece.keys[" + i + "].ticker is not defined");
 			assertDefined(piece.keys[i].address, "piece.keys[" + i + "].address is not defined");
 			assertDefined(piece.keys[i].wif, "piece.keys[" + i + "].wif is not defined");

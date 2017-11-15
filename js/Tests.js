@@ -502,8 +502,8 @@ let Tests = {
 				// collect test functions
 				let funcs = [];
 				funcs.push(testOnePieceValidity());
-//				funcs.push(testIncompatiblePieces());
-//				funcs.push(testAdditionalPiecesNeeded());
+				funcs.push(testIncompatiblePieces());
+				funcs.push(testAdditionalPiecesNeeded());
 				
 				// run test functions
 				async.series(funcs, function(err) {
@@ -602,6 +602,23 @@ let Tests = {
 						assertEquals("Invalid piece 'piece.json': piece.keys[0].encryption is not defined", controller.getWarning());
 						controller.startOver();
 						
+						piece = { version: 1.0, pieceNum: 1, keys: [{
+							ticker: "BTC",
+							address: "1PshW4gesSamVeZ5uP2C8AipMgsYeQu34X",
+							wif: "2c3XyNwGVqDqke6tgWd6RcZTHBW77X1SLrUnR2jGLai9e2hpC",
+							encryption: null
+						}, {
+							ticker: "BTC",
+							address: "18Tqw3Mb1MNx7xmh8st7s9zvbEH1NagWWi",
+							wif: "3c3XyEvJZiYJRdzCbDrHLU7pyEKBQdJRC6Mk1fb4A1mR79CbV",
+							encryption: null
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[1].wif has a different minimum threshold prefix", controller.getWarning());
+						controller.startOver();
+						
 						// valid piece
 						piece = { version: 1.0, keys: [{
 							ticker: "BTC",
@@ -617,6 +634,94 @@ let Tests = {
 						
 						onDone();
 					}
+				}
+				
+				function testIncompatiblePieces() {
+					return function(onDone) {
+						
+						let pieces1 = getPieces(plugins, 1, 3, 2);
+						let pieces2 = getPieces(plugins, 2, 3, 2);
+						let namedPieces = [];
+						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
+						namedPieces.push({name: "piece2.json", piece: pieces2[0]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Pieces contain different number of keys", controller.getWarning());
+						controller.startOver();
+						
+						pieces2 = getPieces(plugins, 1, 3, 2);
+						namedPieces = [];
+						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
+						namedPieces.push({name: "piece2.json", piece: pieces2[0]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Pieces have different addresses", controller.getWarning());
+						controller.startOver();
+						
+						let oldValue = pieces1[1].keys[1].ticker;
+						pieces1[1].keys[1].ticker = "ABC";
+						namedPieces = [];
+						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
+						namedPieces.push({name: "piece2.json", piece: pieces1[1]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Pieces are for different cryptocurrencies", controller.getWarning());
+						pieces1[1].keys[1].ticker = oldValue;
+						controller.startOver();
+						
+						oldValue = pieces1[1].keys[1].wif;
+						for (let i = 0; i < pieces1[1].keys.length; i++) {
+							pieces1[1].keys[i].wif = oldValue.replaceAt(0, "3");
+						}
+						namedPieces = [];
+						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
+						namedPieces.push({name: "piece2.json", piece: pieces1[1]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Pieces have different minimum threshold prefixes", controller.getWarning());
+						pieces1[1].keys[1].wif = oldValue;
+						controller.startOver();
+
+						onDone();
+					}
+				}
+				
+				function testAdditionalPiecesNeeded() {
+					return function(onDone) {
+						
+						// get pieces
+						let pieces = getPieces(plugins, 1, 4, 3);
+						
+						let namedPieces = [];
+						namedPieces.push({name: "piece0.json", piece: pieces[0]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Need 2 additional pieces to recover private keys", controller.getWarning());
+						controller.startOver();
+						
+						namedPieces = [];
+						namedPieces.push({name: "piece0.json", piece: pieces[0]});
+						namedPieces.push({name: "piece1.json", piece: pieces[1]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Need 1 additional piece to recover private keys", controller.getWarning());
+						controller.startOver();
+						
+						namedPieces = [];
+						namedPieces.push({name: "piece0.json", piece: pieces[0]});
+						namedPieces.push({name: "piece1.json", piece: pieces[1]});
+						namedPieces.push({name: "piece2.json", piece: pieces[2]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("", controller.getWarning());
+						controller.startOver();
+						
+						onDone();
+					}
+				}
+				
+				function getPieces(plugins, keysPerPlugin, numPieces, minPieces) {
+					let keys = [];
+					numPieces = numPieces || 1;
+					for (let plugin of plugins) {
+						for (let i = 0; i < keysPerPlugin; i++) {
+							keys.push(plugin.newKey());
+						}
+					}
+					return CryptoUtils.keysToPieces(keys, numPieces, minPieces);
 				}
 			});
 		}

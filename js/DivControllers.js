@@ -1139,16 +1139,15 @@ function RecoverFileController(div) {
 			
 			// create keys
 			try {
+				
+				// add control to view pieces
+				addControl("view imported pieces", function() {
+					UiUtils.openStorage("Imported Storage", null, null, null, pieces);
+				});
+				
+				// attempt to get keys
 				let keys = CryptoUtils.piecesToKeys(pieces);
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
-				if (!keys.length) {
-					that.setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
-					
-					// add control to view pieces
-					addControl("view imported pieces", function() {
-						UiUtils.openStorage("Imported Storage", null, null, null, pieces);
-					});
-				}
 				lastKeys = keys;
 			} catch (err) {
 				that.setWarning(err.message);
