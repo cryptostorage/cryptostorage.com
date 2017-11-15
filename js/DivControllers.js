@@ -1152,7 +1152,8 @@ function RecoverFileController(div) {
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
 				lastKeys = keys;
 			} catch (err) {
-				that.setWarning(err.message);
+				let img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
+				that.setWarning(err.message, img);
 			}
 			if (onDone) onDone();
 		});
@@ -1543,7 +1544,10 @@ function RecoverTextController(div, plugins) {
 			try {
 				key = selectedPlugin.combine(importedPieces);
 			} catch (err) {
-				if (!warningSet) setWarning(err.message);
+				if (!warningSet) {
+					let img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
+					setWarning(err.message, img);
+				}
 			}
 		}
 		
