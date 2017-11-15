@@ -420,7 +420,7 @@ let Tests = {
 			if (numPieces > 1) {
 				for (let pieceKey of pieces[0].keys) {
 					if (pieceKey.wif && !pieceKey.encryption && pieceKey.ticker === 'BTC') {
-						assertTrue(pieceKey.wif.startsWith("3X"));
+						assertTrue(pieceKey.wif.startsWith(minPieces + "c3X"));
 					}
 				}
 			}
