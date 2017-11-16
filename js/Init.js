@@ -1,6 +1,5 @@
 // TODO
 // public address (decrypt to view) instead of (omitted)
-// append /home when home clicked so reload works
 // ios print spans more than one page
 // recover should reset on navigate to different page
 // homepage design
