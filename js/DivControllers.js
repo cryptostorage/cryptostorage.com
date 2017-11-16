@@ -1807,7 +1807,17 @@ inheritsFrom(TwoTabController, DivController);
 function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	DivController.call(this, div);
 	
+	// check if storage saved before window closed
+	window.addEventListener("beforeunload", function (e) {
+		if (!saved) {
+		  let confirmationMessage = "Your storage has not been saved or printed.";
+		  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
+		  return confirmationMessage;     												// Webkit, Safari, Chrome
+		}               
+	});
+	
 	// global variables
+	let saved = false;
 	let progressDiv;
 	let progressBar;
 	let printButton;
@@ -1955,12 +1965,14 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	function printAll() {
 		if (!printEnabled) return;
+		saved = true;
 		window.print();
 	}
 	
 	function saveAll(pieces) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
+		saved = true;
 		if (pieces.length === 1) {
 			let jsonStr = CryptoUtils.pieceToJson(pieces[0]);
 			saveAs(new Blob([jsonStr]), "cryptostorage_" + CryptoUtils.getCommonTicker(pieces[0]).toLowerCase() + ".json");
