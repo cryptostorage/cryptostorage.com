@@ -1670,40 +1670,45 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 			return;
 		}
 		
-		// switch content div to progress bar
-		inputDiv.hide();
-		progressDiv.show();
-		progressDiv.empty();
-		progressBar = UiUtils.getProgressBar(progressDiv);
-		
 		// compute weights for progress bar
 		let decryptWeight = CryptoUtils.getWeightDecryptKeys(encryptedKeys);
 		let renderWeight = PieceRenderer.getRenderWeight(encryptedKeys.length, 1, null);
 		let totalWeight = decryptWeight + renderWeight;
 		
-		// decrypt keys async
-		let copies = [];
-		for (let encryptedKey of encryptedKeys) copies.push(encryptedKey.copy());
-		CryptoUtils.decryptKeys(copies, passphrase, function(done, total) {
-			setProgress(done / total * decryptWeight / totalWeight, "Decrypting...");
-		}, function(err, decryptedKeys) {
+		// switch content div to progress bar
+		inputDiv.hide();
+		progressDiv.show();
+		progressDiv.empty();
+		progressBar = UiUtils.getProgressBar(progressDiv);
+		setProgress(0, "Decrypting...");
+		
+		// let UI breath
+		setImmediate(function() {
 			
-			// if error, switch back to input div
-			if (err) {
-				onWarning(err.message);
-				init();
-				return;
-			}
-			
-			// convert keys to pieces
-			let pieces = CryptoUtils.keysToPieces(decryptedKeys);
-			
-			// render pieces
-			PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
-				setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering...");
-			}, function(err, pieceDivs) {
-				if (err) throw err;
-				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
+			// decrypt keys async
+			let copies = [];
+			for (let encryptedKey of encryptedKeys) copies.push(encryptedKey.copy());
+			CryptoUtils.decryptKeys(copies, passphrase, function(done, total) {
+				setProgress(done / total * decryptWeight / totalWeight, "Decrypting...");
+			}, function(err, decryptedKeys) {
+				
+				// if error, switch back to input div
+				if (err) {
+					onWarning(err.message);
+					init();
+					return;
+				}
+				
+				// convert keys to pieces
+				let pieces = CryptoUtils.keysToPieces(decryptedKeys);
+				
+				// render pieces
+				PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
+					setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering...");
+				}, function(err, pieceDivs) {
+					if (err) throw err;
+					onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
+				});
 			});
 		});
 	}

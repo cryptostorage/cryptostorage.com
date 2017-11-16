@@ -1,6 +1,6 @@
 // TODO
-// test decrypt bip38 mobile safari
 // public address (decrypt to view) instead of (omitted)
+// append /home when home clicked so reload works
 // homepage
 // wait for images before loading homepage
 // light blue little bit ligher / brighter
