@@ -1,14 +1,15 @@
 // TODO
 // public address (decrypt to view) instead of (omitted)
 // append /home when home clicked so reload works
-// homepage
+// ios print spans more than one page
+// recover should reset on navigate to different page
+// homepage design
+// faq
 // wait for images before loading homepage
 // light blue little bit ligher / brighter
 // harden inputs: >0, must have first currency, etc
 // input errors
-// faq
 // plugin.newKey() returns null for unrecognized strs instead of throws error
-// ios print spans more than one page
 // todos throughout code
 // run minimum tests when site accessed
 // test alert if key creation fails for any reason
@@ -19,15 +20,15 @@
 // note of how b64-images.js is created
 // how does jaxx generate zcash and bitcoin variations
 // warning to discard storage if not saved or printed
-// double click keys should select all
 // restrict file types for file picker
-// recover should reset on navigate to different page
 
 // design:
 // export controller progress design, initial and re-render
-// homepage scale too big on small screens
+// import / decryption complete - click button to view
 // start over button on form
-// bip38 checkboxes
+// start with all currencies on form
+// bip38 checkboxes on form
+// homepage scale too big on small screens?
 
 // low priority:
 // try all imported file / key combinations to recover
