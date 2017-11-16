@@ -122,6 +122,7 @@ function AppController(div) {
 		let headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
 		let logo = $("<img class='app_header_logo_img' src='img/cryptostorage.png'>").appendTo(headerTopDiv);
 		logo.click(function() {
+			window.location.href = "#home";
 			that.showHome();
 		});
 		
@@ -129,7 +130,7 @@ function AppController(div) {
 		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
 		let homeLink = getLinkDiv("Home");
 		homeLink.click(function() {
-			window.location.href = "#";
+			window.location.href = "#home";
 			that.showHome();
 		});
 		let gitHubLink = getLinkDiv("GitHub");
@@ -184,7 +185,8 @@ function AppController(div) {
 				let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
 				
 				// show page based on identifier
-				if (identifier === "faq") that.showFaq();
+				if (identifier === "home") that.showHome();
+				else if (identifier === "faq") that.showFaq();
 				else if (identifier === "donate") that.showDonate();
 				else that.showHome();
 				
