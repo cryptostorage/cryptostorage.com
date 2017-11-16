@@ -9,13 +9,11 @@
 // light blue little bit ligher / brighter
 // harden inputs: >0, must have first currency, etc
 // input errors
-// plugin.newKey() returns null for unrecognized strs instead of throws error
-// todos throughout code
 // run minimum tests when site accessed
+// todos throughout code
 // test alert if key creation fails for any reason
 // verify no name collisions
 // minimize initial dependencies: condense files to single files, lazy load css
-// warning if live and/or online
 // test on IE
 // note of how b64-images.js is created
 // how does jaxx generate zcash and bitcoin variations
@@ -29,6 +27,8 @@
 // start with all currencies on form
 // bip38 checkboxes on form
 // homepage scale too big on small screens?
+// diagnostic checks: window.crypto, access from domain, live connection, open source browser
+// ability to encrypt / decrypton export page?
 
 // low priority:
 // try all imported file / key combinations to recover
@@ -48,9 +48,6 @@
 // slider points, logos, and supporting content - fill icons with white, multiple locks
 // BIP38 vs CryptoJS encryption option for BTC/BCH - checkbox on same line as "Show passphrase", "Use BIP38 for Bitcoin and Bitcoin Cash"
 // live site warning to stop and download from github - orange bar on form page encouraging users to download
-// mobile static frame?
-// passphrase confirmation - re-enter or show
-// title bar should not scroll?
 // warnings to test before using - add FAQ
 
 /**
