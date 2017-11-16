@@ -1,7 +1,6 @@
 // TODO
 // public address (decrypt to view) instead of (omitted)
 // ios print spans more than one page
-// recover should reset on navigate to different page
 // homepage design
 // faq
 // wait for images before loading homepage

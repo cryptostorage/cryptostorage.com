@@ -228,6 +228,7 @@ function AppController(div) {
 	this.showRecover = function() {
 		if (DEBUG) console.log("showRecover()");
 		sliderDiv.hide();
+		recoverController.render();
 		setContentDiv(recoverController.getDiv());
 	}
 	
@@ -1303,23 +1304,6 @@ function RecoverTextController(div, plugins) {
 		// currency selector
 		let selectorContainer = $("<div class='recover_selector_container'>").appendTo(passphraseInputDiv);
 		selector = $("<div id='recover_selector'>").appendTo(selectorContainer);
-		LOADER.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
-			selector.ddslick({
-				data:selectorData,
-				background: "white",
-				imagePosition: "left",
-				selectText: "Select a Currency",
-				width:'100%',
-				defaultSelectedIndex: 0,
-				onSelected: function(selection) {
-					selectedPlugin = plugins[selection.selectedIndex];
-					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
-				},
-			});
-			selector = $("#recover_selector");	// ddslick requires id reference
-			selectorDisabler = $("<div class='recover_selector_disabler'>").appendTo(selectorContainer);
-			startOver();
-		});
 		
 		// text area
 		textArea = $("<textarea class='recover_textarea'>").appendTo(passphraseInputDiv);
@@ -1339,8 +1323,27 @@ function RecoverTextController(div, plugins) {
 		controlsDiv.hide();
 		resetControls();
 		
-		// done rendering
-		if (onDone) onDone(div);
+		// initialize pull down
+		LOADER.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
+			selector.ddslick({
+				data:selectorData,
+				background: "white",
+				imagePosition: "left",
+				selectText: "Select a Currency",
+				width:'100%',
+				defaultSelectedIndex: 0,
+				onSelected: function(selection) {
+					selectedPlugin = plugins[selection.selectedIndex];
+					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
+				},
+			});
+			selector = $("#recover_selector");	// ddslick requires id reference
+			selectorDisabler = $("<div class='recover_selector_disabler'>").appendTo(selectorContainer);
+			startOver();
+			
+			// done rendering
+			if (onDone) onDone(div);
+		});
 	}
 	
 	function resetControls() {
