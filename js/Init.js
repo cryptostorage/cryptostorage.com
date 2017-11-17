@@ -1,6 +1,7 @@
 // TODO
 // harden inputs: >0, must have first currency, etc
 // input errors
+// diagnostic checks: window.crypto, access from domain, live connection, open source browser
 // homepage design
 // faq
 // wait for images before loading homepage
