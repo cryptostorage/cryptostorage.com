@@ -1,5 +1,6 @@
 // TODO
 // public address (decrypt to view) instead of (omitted)
+// save as txt and csv
 // homepage design
 // faq
 // wait for images before loading homepage
@@ -22,6 +23,7 @@
 // homepage scale too big on small screens?
 // diagnostic checks: window.crypto, access from domain, live connection, open source browser
 // ability to encrypt / decrypton export page?
+// print progress
 
 // low priority:
 // try all imported file / key combinations to recover
