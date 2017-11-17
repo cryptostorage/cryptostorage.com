@@ -1,5 +1,4 @@
 // TODO
-// public address (decrypt to view) instead of (omitted)
 // homepage design
 // faq
 // wait for images before loading homepage

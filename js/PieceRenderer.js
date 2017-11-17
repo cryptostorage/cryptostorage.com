@@ -170,7 +170,7 @@ let PieceRenderer = {
 			keyDivLeftLabel.html(leftLabel);
 			let keyDivLeftValue = $("<div class='key_div_left_value'>").appendTo(keyDivCenter);
 			if (leftValue && !hasWhitespace(leftValue)) keyDivLeftValue.css("word-break", "break-all");
-			keyDivLeftValue.html(leftValue ? leftValue : "(omitted)");
+			keyDivLeftValue.html(config.showPublic ? (leftValue ? leftValue : "(decrypt to view)") : "(omitted)");
 			
 			// center currency
 			let keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
