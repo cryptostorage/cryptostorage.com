@@ -9,7 +9,7 @@ let PieceRenderer = {
 		showPrivate: true,
 		showCurrencyLogos: true,
 		showCryptostorageLogos: true,
-		qrSize: 89,
+		qrSize: 90,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
 		qrScale: 4,
