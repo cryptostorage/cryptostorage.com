@@ -984,15 +984,16 @@ let CryptoUtils = {
 	 * 
 	 * Allows the b64 image data to be verified from source.
 	 */
-	generateB64Images: function() {
-		
+	getB64Images: function() {
 		let js = [];
 		js.push("/**\n * Embeds base64 logo data for dynamic import and HTML export.\n */");
-		js.push("\nfunction getImageData(ticker) {\n\tswitch(ticker) {");
-		js.push("\n\t\tcase \"BTC\": throw new Error(\"yay\")");
-		js.push("\n\t\tdefault: throw new Error(\"Logo data not found for ticker: \" + ticker);\n\n\t}\n}\n");
-		console.log(js.join(""));
-		
-//		console.log(imgToDataUrl($("<img src='img/bitcoin.png'>").get(0)));
+		js.push("\nfunction getImageData(key) {\n\tswitch(key) {");
+		for (let plugin of CryptoUtils.getCryptoPlugins()) {
+			js.push("\n\t\tcase \"" + plugin.getTicker() + "\": \"" + imgToDataUrl(plugin.getLogo().get(0)) + "\";");
+		}
+		js.push("\n\t\tcase \"CRYPTOSTORAGE\": \"" + imgToDataUrl($("<img src='img/cryptostorage.png'>").get(0)) + "\";");
+		js.push("\n\t\tcase \"QUESTION_MARK\": \"" + imgToDataUrl($("<img src='img/question_mark.png'>").get(0)) + "\";");
+		js.push("\n\t\tdefault: throw new Error(\"Image data not found for key: \" + key);\n\t}\n}\n");
+		return js.join("");
 	}
 }

@@ -109,7 +109,7 @@ let PieceRenderer = {
 				if (piece.pieceNum || config.showCryptostorageLogos) {
 					let headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
-					if (config.showCryptostorageLogos) headerDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("cryptostorage") + "'>"));
+					if (config.showCryptostorageLogos) headerDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("CRYPTOSTORAGE") + "'>"));
 					let pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
 					if (piece.pieceNum) pieceNumDiv.append("Piece " + piece.pieceNum);
 				}
