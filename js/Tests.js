@@ -4,8 +4,8 @@
 let Tests = {
 	
 	// constants
-	REPEAT_LONG: 5,
-	REPEAT_SHORT: 1,
+	REPEAT_LONG: 10,
+	REPEAT_SHORT: 3,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
@@ -19,6 +19,7 @@ let Tests = {
 		plugins.push(new BitcoinPlugin());
 		plugins.push(new EthereumPlugin());
 		plugins.push(new MoneroPlugin());
+		plugins.push(new DashPlugin());
 		plugins.push(new LitecoinPlugin());
 		return plugins;
 	},

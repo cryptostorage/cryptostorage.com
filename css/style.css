@@ -349,7 +349,8 @@ input[type='number'] {
 	display:flex;
 	flex-direction:column;
 	align-items:center;
-	padding:20px;
+	padding:15px;
+	width:195px;
 }
 
 .currency_row_item_major:hover {
@@ -361,7 +362,8 @@ input[type='number'] {
 	display:flex;
 	flex-direction:column;
 	align-items:center;
-	padding:20px;
+	padding:15px;
+	width:195px;
 }
 
 .currency_row_item_minor:hover {
@@ -382,7 +384,6 @@ input[type='number'] {
 }
 
 .currency_row_label_major {
-	font-weight:bold;
 	font-size:20px;
 }
 
