@@ -1030,8 +1030,7 @@ let CryptoUtils = {
 	 *	}
 	 */
 	getSecurityChecks: function(onDone) {
-		isOnline(function(isOnline) {
-			console.log("Online: " + isOnline);
+		isImageAccessible(ONLINE_IMAGE_URL, 1500, function(isOnline) {
 			onDone({
 				windowCryptoExists: false,
 				isOnDomain: isOnDomain(),
@@ -1039,15 +1038,6 @@ let CryptoUtils = {
 				isOpenSourceBrowser: false
 			});
 		});
-		
-		function isOnline(onDone) {
-			$.ajax({
-				url: "http://cryptostorage.com",
-				dataType: "jsonp",
-				success: function() { onDone(true); },
-				error: function() { onDone(false); }
-			});
-		}
 		
 		function isOnDomain() {
 			return window.location.href.indexOf("www.cryptostorage.com") > -1;

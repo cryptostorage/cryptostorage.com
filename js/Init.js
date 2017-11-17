@@ -59,6 +59,10 @@ $(document).ready(function() {
 	// start loading common dependencies
 	LOADER.load(APP_DEPENDENCIES, function() {
 		
+		CryptoUtils.getSecurityChecks(function(securityChecks) {
+			console.log(securityChecks);
+		});
+		
 		// generate lib/b64-images.js file
 		if (GENERATE_B64_IMAGES) {
 			CryptoUtils.getB64ImageFile(function(js) {

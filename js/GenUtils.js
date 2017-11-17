@@ -655,3 +655,37 @@ function imgToDataUrl(img, quality) {
   context.drawImage(img, 0, 0);
   return canvas.toDataURL(quality);
 }
+
+/**
+ * Determines if the image at the given URL is accessible.
+ * 
+ * @param url is the url to an image
+ * @param timeout is the maximum time to wait
+ * @param onDone(bool) when the image is determined to be accessible or not
+ */
+function isImageAccessible(url, timeout, onDone) {
+	
+	// track return so it only executes once
+	let returned = false;
+	
+	// attempt to load favicon
+	let img = new Image();
+	img.onload = onResponse;
+  img.onerror = onResponse;
+  img.src = url + "?" + (+new Date()); // trigger image load with cache buster
+	
+	// set timeout
+	setTimeout(function() {
+		if (!returned) {
+			returned = true;
+			onDone(false);
+		}
+	}, timeout);
+	
+  function onResponse(e) {
+  	if (returned) return;
+  	returned = true;
+  	if (typeof e === 'undefined' || e.type === "error") onDone(false);
+  	else onDone(true);
+  }
+}
