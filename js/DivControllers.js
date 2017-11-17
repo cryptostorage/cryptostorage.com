@@ -320,6 +320,7 @@ function HomeController(div) {
 			div.append(UiUtils.getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked));
 		}
 		
+		// sample page
 		$("<div style='height:100px'>").appendTo(div);
 		div.append("Export to printable and digital format for long term storage");
 		$("<div style='height:40px'>").appendTo(div);
