@@ -12,7 +12,6 @@
 // test alert if key creation fails for any reason
 // minimize initial dependencies: condense files to single files, lazy load css
 // test on IE
-// note of how b64-images.js is created
 
 // design:
 // export controller progress design, initial and re-render
