@@ -1,6 +1,5 @@
 // TODO
 // public address (decrypt to view) instead of (omitted)
-// ios print spans more than one page
 // homepage design
 // faq
 // wait for images before loading homepage

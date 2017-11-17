@@ -9,7 +9,7 @@ let PieceRenderer = {
 		showPrivate: true,
 		showCurrencyLogos: true,
 		showCryptostorageLogos: true,
-		qrSize: 90,
+		qrSize: 89,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
 		qrScale: 4,
@@ -193,7 +193,7 @@ let PieceRenderer = {
 				keyDivCurrency.css("margin-top", "-15px");
 			}
 			if (rightValue && rightValue.length > 150) {
-				keyDivCurrency.css("margin-top", "-12px");
+				keyDivCurrency.css("margin-top", "-10px");
 				keyDivRightLabel.css("margin-top", "-15px");
 			}
 			
