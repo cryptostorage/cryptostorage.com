@@ -900,7 +900,7 @@ function RecoverFileController(div) {
 		dragDropBrowse.append("or click to browse");
 		
 		// register browse link with hidden input
-		let inputFiles = $("<input type='file' multiple>").appendTo(dragDropDiv);
+		let inputFiles = $("<input type='file' multiple accept='.json,.zip'>").appendTo(dragDropDiv);
 		inputFiles.change(function() { onFilesImported($(this).get(0).files); });
 		inputFiles.hide();
 		dragDropBrowse.click(function() {

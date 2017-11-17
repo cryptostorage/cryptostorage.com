@@ -10,12 +10,9 @@
 // run minimum tests when site accessed
 // todos throughout code
 // test alert if key creation fails for any reason
-// verify no name collisions
 // minimize initial dependencies: condense files to single files, lazy load css
 // test on IE
 // note of how b64-images.js is created
-// how does jaxx generate zcash and bitcoin variations
-// restrict file types for file picker
 
 // design:
 // export controller progress design, initial and re-render
@@ -36,6 +33,8 @@
 // timeouts in tests so browser doesn't lock
 // csv import to support "bring your own keys"
 // optimize tests by getting one set of keys of repeat_long size
+// verify no name collisions
+// how does jaxx generate zcash and bitcoin variations
 
 // consult designers
 // opinion on donate page + ui designer tip address - link to open user's wallet
