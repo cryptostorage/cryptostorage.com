@@ -625,14 +625,33 @@ function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
 /**
  * Opens the given div in a new window.
  * 
- * @param div is the jquery div to render
- * @param css are css rules to add (optional)
- * @param title title is the title of the new window (optional)
- * @returns a reference to the opened window
+ * @param div is the jquery div to render to (optional)
+ * @param title is the title of the new tab (optional)
+ * @param jsPaths are javascript paths to import (optional)
+ * @param cssPaths are css paths to import (optional)
+ * @param internalCss is css to embed in the html document (optional)
+ * @param onLoad is invoked with a reference to the window when available
  */
-function newWindow(div, title, jsPaths, cssPaths, internalCss) {
+function newWindow(div, title, jsPaths, cssPaths, internalCss, onLoad) {
 	let w = window.open();
 	w.document.write(buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss));
+	w.addEventListener('load', function() {
+		if (onLoad) onLoad(w);
+	});
 	w.document.close();
-	return w;
+}
+
+/**
+ * Converts the given image to a base64 encoded data url.
+ * 
+ * @param img is the image to convert
+ * @param quality is a number between 0 and 1 specifying the image quality
+ */
+function imgToDataUrl(img, quality) {
+	let canvas = document.createElement('canvas');
+  canvas.height = img.naturalHeight;
+  canvas.width = img.naturalWidth;
+  let context = canvas.getContext('2d');
+  context.drawImage(img, 0, 0);
+  return canvas.toDataURL(quality);
 }

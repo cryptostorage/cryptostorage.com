@@ -34,7 +34,7 @@ let CryptoUtils = {
 	},
 		
 	/**
-	 * Enumerates password encryption/decryption schemes.
+	 * Enumerates passphrase encryption/decryption schemes.
 	 */
 	EncryptionScheme: {
 		BIP38: "BIP38",
@@ -64,76 +64,22 @@ let CryptoUtils = {
 	 * @returns true if the given string meets the minimum requirements to be a split piece
 	 */
 	isPossibleSplitPiece: function(str) {
-		return str.length >= 47 && CryptoUtils.isBase58(str);
+		return isString(str) && str.length >= 47 && CryptoUtils.isBase58(str) && isNumber(CryptoUtils.getMinPieces(str));
 	},
 	
 	/**
-	 * Encrypts the given key with the given scheme and password.
+	 * Determines the minimum pieces to reconstitute based on a possible split piece string.
 	 * 
-	 * Invokes callback(err, encryptedKey) when done.
-	 */
-	encrypt: function(scheme, key, password, callback) {
-		if (!scheme) throw new Error("Scheme must be initialized");
-		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-		if (!password) throw new Error("Password must be initialized");
-		switch (scheme) {
-			case CryptoUtils.EncryptionScheme.CRYPTOJS:
-				let b64 = CryptoJS.AES.encrypt(key.getHex(), password).toString();
-				key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
-				callback(null, key);
-				break;
-			case CryptoUtils.EncryptionScheme.BIP38:
-				ninja.privateKey.BIP38PrivateKeyToEncryptedKeyAsync(key.getHex(), password, true, function(resp) {
-					if (resp.message) callback(resp);	// TODO: confirm error handling, isError()
-					else {
-						key.setState(Object.assign(key.getPlugin().newKey(resp).getState(), {address: key.getAddress()}));
-						callback(null, key);
-					}
-				});
-				break;
-			default:
-				callback(new Error("Encryption scheme '" + scheme + "' not supported"));
-		}
-	},
-
-	/**
-	 * Decrypts the given key with the given password.
+	 * Looks for 'XXXc' prefix in the given split piece where XXX is the minimum to reconstitute.
 	 * 
-	 * Invokes callback(err, decryptedKey) when done.
+	 * @param splitPiece is a string which may be prefixed with 'XXXc...'
+	 * @return the minimum pieces to reconstitute if prefixed, null otherwise
 	 */
-	decrypt: function(key, password, callback) {
-		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-		if (!password) throw new Error("Password must be initialized");
-		assertTrue(key.isEncrypted());
-		switch (key.getEncryptionScheme()) {
-			case CryptoUtils.EncryptionScheme.CRYPTOJS:
-				let hex;
-				try {
-					hex = CryptoJS.AES.decrypt(key.getWif(), password).toString(CryptoJS.enc.Utf8);
-				} catch (err) { }
-				if (!hex) callback(new Error("Incorrect password"));
-				else {
-					try {
-						key.setPrivateKey(hex);
-						callback(null, key);
-					} catch (err) {
-						callback(new Error("Incorrect password"));
-					}
-				}
-				break;
-			case CryptoUtils.EncryptionScheme.BIP38:
-				ninja.privateKey.BIP38EncryptedKeyToByteArrayAsync(key.getWif(), password, function(resp) {
-					if (resp.message) callback(new Error("Incorrect password"));
-					else {
-						let wif = new Bitcoin.ECKey(resp).setCompressed(true).getBitcoinWalletImportFormat()
-						key.setPrivateKey(wif);
-						callback(null, key);
-					}
-				});
-				break;
-			default:
-				callback(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
-		}
+	getMinPieces: function(splitPiece) {
+		assertString(splitPiece);
+		let idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
+		if (idx <= 0) return null;
+		return Number(splitPiece.substring(0, idx)); // parse preceding numbers to int
 	},
 
 	/**
@@ -311,6 +257,7 @@ let CryptoUtils = {
 		let pieces = [];
 		for (let i = 0; i < numPieces; i++) {
 			let piece = {};
+			if (numPieces > 1) piece.pieceNum = i + 1;
 			piece.version = "1.0";
 			piece.keys = [];
 			pieces.push(piece);
@@ -325,7 +272,6 @@ let CryptoUtils = {
 				pieceKey.ticker = key.getPlugin().getTicker();
 				pieceKey.address = key.getAddress();
 				pieceKey.wif = keyPieces[i];
-				pieceKey.split = numPieces > 1;
 				if (pieceKey.wif) pieceKey.encryption = key.getEncryptionScheme();
 				pieces[i].keys.push(pieceKey);
 			}
@@ -346,18 +292,20 @@ let CryptoUtils = {
 		
 		// handle one piece
 		if (pieces.length === 1) {
+			assertTrue(pieces[0].keys.length > 0);
+			if (pieces[0].pieceNum) {
+				let minPieces = CryptoUtils.getMinPieces(pieces[0].keys[0].wif);
+				let additional = minPieces - 1;
+				throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
+			}
 			for (let pieceKey of pieces[0].keys) {
-				try {
-					let state = {};
-					state.address = pieceKey.address;
-					state.wif = pieceKey.wif;
-					state.encryption = pieceKey.encryption;
-					let key = new CryptoKey(CryptoUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
-					if (key.getHex() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// check that address derived from private keys
-					keys.push(key);
-				} catch (err) {
-					return [];
-				}
+				let state = {};
+				state.address = pieceKey.address;
+				state.wif = pieceKey.wif;
+				state.encryption = pieceKey.encryption;
+				let key = new CryptoKey(CryptoUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
+				if (key.getHex() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// check that address derived from private keys
+				keys.push(key);
 			}
 		}
 		
@@ -373,34 +321,40 @@ let CryptoUtils = {
 			}
 			
 			// validate consistent keys across pieces
+			let minPieces;
 			for (let i = 0; i < pieces[0].keys.length; i++) {
 				let crypto;
-				let split;
 				let address;
 				let encryption;
 				for (let piece of pieces) {
 					if (!crypto) crypto = piece.keys[i].ticker;
 					else if (crypto !== piece.keys[i].ticker) throw new Error("Pieces are for different cryptocurrencies");
-					if (!split) split = piece.keys[i].split;
-					else if (split !== piece.keys[i].split) throw new Error("Pieces have different split states");
 					if (!address) address = piece.keys[i].address;
 					else if (address !== piece.keys[i].address) throw new Error("Pieces have different addresses");
 					if (!encryption) encryption = piece.keys[i].encryption;
 					else if (encryption !== piece.keys[i].encryption) throw new Error("Pieces have different encryption states");
+					if (!minPieces) minPieces = CryptoUtils.getMinPieces(piece.keys[i].wif);
+					else if (minPieces !== CryptoUtils.getMinPieces(piece.keys[i].wif)) throw new Error("Pieces have different minimum threshold prefixes");
 				}
 			}
 			
+			// check if minimum threshold met
+			if (pieces.length < minPieces) {
+				let additional = minPieces - pieces.length;
+				throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
+			}
+			
 			// combine keys across pieces
-			for (let i = 0; i < pieces[0].keys.length; i++) {
-				let shares = [];
-				for (let piece of pieces) shares.push(piece.keys[i].wif);
-				try {
+			try {
+				for (let i = 0; i < pieces[0].keys.length; i++) {
+					let shares = [];
+					for (let piece of pieces) shares.push(piece.keys[i].wif);
 					let key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
 					if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
 					keys.push(key);
-				} catch (err) {
-					return [];
 				}
+			} catch (err) {
+				throw Error("Could not recover private keys from the given pieces.  Verify the pieces are correct.");
 			}
 		}
 
@@ -528,7 +482,7 @@ let CryptoUtils = {
 		for (let i = 0; i < piece.keys.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
 			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n\n";
-			if (piece.keys[i].wif) str += "Private Key " + (piece.keys[i].split ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
+			if (piece.keys[i].wif) str += "Private Key " + (piece.pieceNum ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
 		}
 		return str.trim();
 	},
@@ -543,11 +497,25 @@ let CryptoUtils = {
 	},
 
 	validatePiece: function(piece) {
-		assertTrue(piece.keys.length > 0);
-		for (let key of piece.keys) {
-			assertDefined(key.ticker, "piece.ticker is not defined");
-			assertDefined(key.split, "piece.split is not defined");
-			//assertDefined(key.wif, "piece.wif is not defined");
+		assertDefined(piece.version, "piece.version is not defined");
+		assertNumber(piece.version, "piece.version is not a number");
+		if (isDefined(piece.pieceNum)) {
+			assertInt(piece.pieceNum, "piece.pieceNum is not an integer");
+			assertTrue(piece.pieceNum > 0, "piece.pieceNum is not greater than 0");
+		}
+		assertDefined(piece.keys, "piece.keys is not defined");
+		assertArray(piece.keys, "piece.keys is not an array");
+		assertTrue(piece.keys.length > 0, "piece.keys is empty");
+		let minPieces;
+		for (let i = 0; i < piece.keys.length; i++) {
+			if (piece.pieceNum) {
+				if (!minPieces) minPieces = CryptoUtils.getMinPieces(piece.keys[i].wif);
+				else if (minPieces !== CryptoUtils.getMinPieces(piece.keys[i].wif)) throw Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");
+			}
+			assertDefined(piece.keys[i].ticker, "piece.keys[" + i + "].ticker is not defined");
+			assertDefined(piece.keys[i].address, "piece.keys[" + i + "].address is not defined");
+			assertDefined(piece.keys[i].wif, "piece.keys[" + i + "].wif is not defined");
+			assertDefined(piece.keys[i].encryption, "piece.keys[" + i + "].encryption is not defined");
 		}
 	},
 	
@@ -582,45 +550,38 @@ let CryptoUtils = {
 	/**
 	 * Generates keys, pieces, rendered pieces.
 	 * 
-	 * @param config is the generation configuration
-	 * @param onProgress(done, total, label) is invoked as progress is made
+	 * @param config is the key generation configuration
+	 * @param onProgress(percent, label) is invoked as progress is made
 	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
 	 */
 	generateKeys: function(config, onProgress, onDone) {
 		
 		let decommissioned = false;	// TODO: remove altogether?
+		
+		// track done and total weight for progress
+		let doneWeight = 0;
+		let totalWeight = CryptoUtils.getWeightGenerateKeys(config);
 
 		// load dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
+		let dependencies = new Set();
 		for (let currency of config.currencies) {
-			for (let dependency of currency.plugin.getDependencies()) {
+			for (let dependency of CryptoUtils.getCryptoPlugin(currency.ticker).getDependencies()) {
 				dependencies.add(dependency);
 			}
 		}
-		loader.load(Array.from(dependencies), function() {
-			
-			// compute total weight for progress bar
-			let totalWeight = 0;
-			let numKeys = 0;
-			for (let currency of config.currencies) {
-				numKeys += currency.numKeys;
-				totalWeight += currency.numKeys * CryptoUtils.getCreateKeyWeight();
-				if (currency.encryption) totalWeight += currency.numKeys * (CryptoUtils.getEncryptSchemeWeight(currency.encryption) + (VERIFY_ENCRYPTION ? CryptoUtils.getDecryptSchemeWeight(currency.encryption) : 0));
-			}
-			let piecesRendererWeight = PieceRenderer.getRenderWeight(numKeys, config.numPieces, null);
-			totalWeight += piecesRendererWeight;
+		if (onProgress) onProgress(0, "Loading dependencies");
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// collect key creation functions
 			let funcs = [];
 			for (let currency of config.currencies) {
 				for (let i = 0; i < currency.numKeys; i++) {
-					funcs.push(newKeyFunc(currency.plugin));
+					funcs.push(newKeyFunc(CryptoUtils.getCryptoPlugin(currency.ticker)));
 				}
 			}
 			
 			// generate keys
-			let progressWeight = 0;
-			if (onProgress) onProgress(progressWeight, totalWeight, "Generating keys");
+			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
 			async.series(funcs, function(err, keys) {
 				if (decommissioned) {
 					if (onDone) onDone();
@@ -629,166 +590,246 @@ let CryptoUtils = {
 				if (err) throw err;
 				let originals = keys;
 				
-				// collect encryption functions
-				funcs = [];
-				let keyIdx = 0;
-				let passphrases = [];
+				// collect encryption schemes
+				let encryptionSchemes = [];
 				for (let currency of config.currencies) {
 					for (let i = 0; i < currency.numKeys; i++) {
-						if (currency.encryption) {
-							funcs.push(encryptFunc(originals[keyIdx].copy(), currency.encryption, config.passphrase));
-							passphrases.push(config.passphrase);
-						}
-						keyIdx++;
+						if (currency.encryption) encryptionSchemes.push(currency.encryption);
 					}
+				}
+				
+				// encrypt keys
+				if (encryptionSchemes.length > 0) {
+					assertEquals(keys.length, encryptionSchemes.length);
+					
+					// compute encryption + verification weight
+					let encryptWeight = 0;
+					for (let i = 0; i < encryptionSchemes.length; i++) {
+						encryptWeight += CryptoUtils.getWeightEncryptKey(encryptionSchemes[i]) + (config.verifyEncryption ? CryptoUtils.getWeightDecryptKey(encryptionSchemes[i]) : 0);
+					}
+					
+					// start encryption
+					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
+					CryptoUtils.encryptKeys(keys, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent, label) {
+						onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
+					}, function(err, encryptedKeys) {
+						doneWeight += encryptWeight;
+						generatePieces(encryptedKeys, config);
+					});
 				}
 				
 				// no encryption
-				if (!funcs.length) {
-					
-					// convert keys to pieces
-					let pieces = CryptoUtils.keysToPieces(originals, config.numPieces, config.minPieces);
-					
-					// validate pieces can recreate originals
-					let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
-					assertEquals(originals.length, keysFromPieces.length);
-					for (let i = 0; i < originals.length; i++) {
-						assertTrue(originals[i].equals(keysFromPieces[i]));
-					}
-					
-					// render pieces to divs
-					if (onProgress) onProgress(progressWeight, totalWeight, "Rendering");
-					renderPieceDivs(pieces, function(err, pieceDivs) {
-						if (err) throw err;
-						assertEquals(pieces.length, pieceDivs.length);
-						if (onProgress) onProgress(1, 1, "Complete");
-						if (onDone) onDone(keys, pieces, pieceDivs);
-					});
-				}
-				
-				// handle encryption
 				else {
-					
-					// encrypt keys
-					onProgress(progressWeight, totalWeight, "Encrypting keys");
-					async.series(funcs, function(err, encryptedKeys) {
-						if (decommissioned) {
-							if (onDone) onDone();
-							return;
-						}
-						if (err) throw err;
-						
-						// convert keys to pieces
-						let pieces = CryptoUtils.keysToPieces(encryptedKeys, config.numPieces, config.minPieces);
-						
-						// validate pieces can recreate originals
-						let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
-						assertEquals(encryptedKeys.length, keysFromPieces.length);
-						for (let i = 0; i < encryptedKeys.length; i++) {
-							assertTrue(encryptedKeys[i].equals(keysFromPieces[i]));
-						}
-						
-						// verify encryption
-						if (VERIFY_ENCRYPTION) {
-							
-							// collect decryption functions
-							funcs = [];
-							for (let i = 0; i < encryptedKeys.length; i++) {
-								funcs.push(decryptFunc(encryptedKeys[i].copy(), passphrases[i]));
-							}
-							
-							// decrypt keys
-							onProgress(progressWeight, totalWeight, "Verifying encryption");
-							async.series(funcs, function(err, decryptedKeys) {
-								if (decommissioned) {
-									if (onDone) onDone();
-									return;
-								}
-								if (err) throw err;
-								
-								// verify equivalence
-								assertEquals(originals.length, decryptedKeys.length);
-								for (let i = 0; i < originals.length; i++) {
-									assertTrue(originals[i].equals(decryptedKeys[i]));
-								}
-								
-								// render pieces to divs
-								onProgress(progressWeight, totalWeight, "Rendering");
-								renderPieceDivs(pieces, function(err, pieceDivs) {
-									if (err) throw err;
-									assertEquals(pieces.length, pieceDivs.length);
-									if (onProgress) onProgress(1, 1, "Complete");
-									if (onDone) onDone(encryptedKeys, pieces, pieceDivs);
-								});
-							});
-						}
-						
-						// don't verify encryption
-						else {
-							
-							// render pieces to divs
-							onProgress(progressWeight, totalWeight, "Rendering");
-							renderPieceDivs(pieces, function(err, pieceDivs) {
-								if (err) throw err;
-								assertEquals(pieces.length, pieceDivs.length);
-								onProgress(1, 1, "Complete");
-								onDone(encryptedKeys, pieces, pieceDivs);
-							});
-						}
-					});
+					generatePieces(keys, config);
 				}
 			});
-			
-			function newKeyFunc(plugin, callback) {
-				return function(callback) {
-					if (decommissioned) {
-						callback();
-						return;
-					}
-					setImmediate(function() {
-						let key = plugin.newKey();
-						progressWeight += CryptoUtils.getCreateKeyWeight();
-						if (onProgress) onProgress(progressWeight, totalWeight, "Generating keys");
-						callback(null, key);
-					});	// let UI breath
+		});
+		
+		function newKeyFunc(plugin, callback) {
+			return function(callback) {
+				if (decommissioned) {
+					callback();
+					return;
 				}
+				setImmediate(function() {
+					let key = plugin.newKey();
+					doneWeight += CryptoUtils.getWeightCreateKey();
+					if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
+					callback(null, key);
+				});	// let UI breath
+			}
+		}
+		
+		function generatePieces(keys, config) {
+			
+			// convert keys to pieces
+			let pieces = CryptoUtils.keysToPieces(keys, config.numPieces, config.minPieces);
+			
+			// verify pieces recreate keys
+			let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
+			assertEquals(keys.length, keysFromPieces.length);
+			for (let i = 0; i < keys.length; i++) {
+				assertTrue(keys[i].equals(keysFromPieces[i]));
 			}
 			
-			function encryptFunc(key, scheme, password) {
-				return function(callback) {
-					if (decommissioned) {
-						callback();
-						return;
+			// render pieces to divs
+			let renderWeight = PieceRenderer.getRenderWeight(keys.length, config.numPieces, null);
+			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
+			PieceRenderer.renderPieces(pieces, null, null, function(percent) {
+				if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
+			}, function(err, pieceDivs) {
+				if (err) throw err;
+				assertEquals(pieces.length, pieceDivs.length);
+				if (onProgress) onProgress(1, "Complete");
+				if (onDone) onDone(keys, pieces, pieceDivs);
+			});
+		}
+	},
+	
+	/**
+	 * Encrypts the given key with the given scheme and passphrase.
+	 * 
+	 * @param key is an unencrypted key to encrypt
+	 * @param scheme is the scheme to encrypt the key
+	 * @param passphrase is the passphrase to encrypt with
+	 * @param onDone(err, encryptedKey) is invoked when done
+	 */
+	encryptKey: function(key, scheme, passphrase, onDone) {
+		if (!scheme) throw new Error("Scheme must be initialized");
+		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!passphrase) throw new Error("Passphrase must be initialized");
+		switch (scheme) {
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
+				LOADER.load("lib/crypto-js.js", function() {
+					let b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
+					key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
+					onDone(null, key);
+				})
+				break;
+			case CryptoUtils.EncryptionScheme.BIP38:
+				LOADER.load("lib/bitcoinjs.js", function() {
+					let decoded = bitcoinjs.decode(key.getWif());
+					let encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
+					key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
+					onDone(null, key);
+				});
+				break;
+			default:
+				onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+		}
+	},
+	
+	/**
+	 * Encrypts the given keys with the given encryption schemes.
+	 * 
+	 * @param keys are the keys to encrypt
+	 * @param encryptionSchemes are the schemes to encrypt the keys
+	 * @param passphrase is the passphrase to encrypt the keys with
+	 * @param verifyEncryption specifies if encryption should be verified by decrypting
+	 * @param onProgress(percent, label) is invoked as progress is made
+	 * @param onDone(err, encryptedKeys) is invoked when encryption is done
+	 */
+	encryptKeys: function(keys, encryptionSchemes, passphrase, verifyEncryption, onProgress, onDone) {
+		assertEquals(keys.length, encryptionSchemes.length);
+		assertInitialized(passphrase);
+		
+		let decommissioned = false;	// TODO: remove altogether?
+		
+		// collect originals if verifying encryption
+		let originals;
+		if (verifyEncryption) {
+			originals = [];
+			for (let key of keys) originals.push(key.copy());
+		}
+		
+		// track weights for progress
+		let doneWeight = 0;
+		let verifyWeight = 0;
+		let totalWeight = 0;
+		
+		// collect encryption functions and weights
+		let funcs = [];
+		for (let i = 0; i < keys.length; i++) {
+			totalWeight += CryptoUtils.getWeightEncryptKey(encryptionSchemes[i]);
+			if (verifyEncryption) verifyWeight += CryptoUtils.getWeightDecryptKey(encryptionSchemes[i]);
+			funcs.push(encryptFunc(keys[i], encryptionSchemes[i], passphrase));
+		}
+		totalWeight += verifyWeight;
+		
+		// encrypt async
+		if (onProgress) onProgress(0, "Encrypting");
+		async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, encryptedKeys) {
+			
+			// verify encryption
+			if (verifyEncryption) {
+				
+				// copy encrypted keys
+				let encryptedCopies = [];
+				for (let encryptedKey of encryptedKeys) encryptedCopies.push(encrytpedKey.copy());
+				
+				// decrypt keys
+				if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
+				CryptoUtils.decryptKeys(encryptedCopies, passphrase, function(percent) {
+					if (onProgress) onProgress((doneWeight + percent * verifyWeight) / totalWeight);
+				}, function(err, decryptedKeys) {
+					doneWeight += verifyWeight;
+					
+					// assert originals match decrypted keys
+					assertEquals(originals.length, decryptedKeys.length);
+					for (let i = 0; i < originals.length; i++) {
+						assertTrue(originals[i].equals(decryptedKeys[i]));
 					}
-					key.encrypt(scheme, password, function(err, key) {
-						progressWeight += CryptoUtils.getEncryptSchemeWeight(scheme);
-						if (onProgress) onProgress(progressWeight, totalWeight, "Encrypting");
-						setImmediate(function() { callback(err, key); });	// let UI breath
-					});
-				}
+					
+					// done
+					if (onDone) onDone(err, encryptedKeys);
+				})
 			}
 			
-			function decryptFunc(key, password) {
-				return function(callback) {
-					if (decommissioned) {
-						callback();
-						return;
-					}
-					let scheme = key.getEncryptionScheme();
-					key.decrypt(password, function(err, key) {
-						progressWeight += CryptoUtils.getDecryptSchemeWeight(scheme);
-						if (onProgress) onProgress(progressWeight, totalWeight, "Decrypting");
-						setImmediate(function() { callback(err, key); });	// let UI breath
-					});
-				}
-			}
-			
-			function renderPieceDivs(pieces, onDone) {
-				PieceRenderer.renderPieces(pieces, null, null, function(percent) {
-					if (onProgress) onProgress(progressWeight + (percent * piecesRendererWeight), totalWeight, "Rendering");
-				}, onDone);
+			// don't verify encryption
+			else {
+				if (onDone) onDone(err, encryptedKeys);
 			}
 		});
+		
+		function encryptFunc(key, scheme, passphrase) {
+			return function(callback) {
+				if (decommissioned) {
+					callback();
+					return;
+				}
+				key.encrypt(scheme, passphrase, function(err, key) {
+					doneWeight += CryptoUtils.getWeightEncryptKey(scheme);
+					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
+					setImmediate(function() { callback(err, key); });	// let UI breath
+				});
+			}
+		}
+	},
+	
+	/**
+	 * Decrypts the given key with the given passphrase.
+	 * 
+	 * @param key is the key to decrypt
+	 * @param passphrase is the passphrase to decrypt the key
+	 * @param onDone(err, decryptedKey) is invoked when done
+	 */
+	decryptKey: function(key, passphrase, onDone) {
+		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!passphrase) throw new Error("Passphrase must be initialized");
+		assertTrue(key.isEncrypted());
+		switch (key.getEncryptionScheme()) {
+			case CryptoUtils.EncryptionScheme.CRYPTOJS:
+				LOADER.load("lib/crypto-js.js", function() {
+					let hex;
+					try {
+						hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
+					} catch (err) { }
+					if (!hex) onDone(new Error("Incorrect passphrase"));
+					else {
+						try {
+							key.setPrivateKey(hex);
+							onDone(null, key);
+						} catch (err) {
+							onDone(new Error("Incorrect passphrase"));
+						}
+					}
+				});
+				break;
+			case CryptoUtils.EncryptionScheme.BIP38:
+				LOADER.load("lib/bitcoinjs.js", function() {
+					try {
+						let decrypted = bitcoinjs.decrypt(key.getWif(), passphrase);
+						let privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
+						key.setPrivateKey(privateKey);
+						onDone(null, key);
+					} catch (err) {
+						onDone(new Error("Incorrect passphrase"));
+					}
+				});
+				break;
+			default:
+				onDone(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
+		}
 	},
 	
 	/**
@@ -797,7 +838,7 @@ let CryptoUtils = {
 	 * @param keys are the encrypted keys to decrypt
 	 * @param phassphrase is the phassphrase to decrypt the keys
 	 * @param onProgress(done, total) is called as progress is made
-	 * @param onDone(err) is called when decryption is complete
+	 * @param onDone(err, decryptedKeys) is called when decryption is complete
 	 */
 	decryptKeys: function(keys, passphrase, onProgress, onDone) {
 		
@@ -812,7 +853,7 @@ let CryptoUtils = {
 		// compute weight
 		let totalWeight = 0;
 		for (let key of keys) {
-			totalWeight += CryptoUtils.getDecryptSchemeWeight(key.getEncryptionScheme());
+			totalWeight += CryptoUtils.getWeightDecryptKey(key.getEncryptionScheme());
 		}
 		
 		// decrypt keys
@@ -820,22 +861,22 @@ let CryptoUtils = {
 		for (let key of keys) funcs.push(decryptFunc(key, passphrase));
 		let doneWeight = 0;
 		if (onProgress) onProgress(doneWeight, totalWeight);
-		async.series(funcs, function(err, result) {
+		async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, result) {
 			if (decommissioned) return;
 			else if (err) onDone(err);
 			else onDone(null, keys);
 		});
 		
 		// decrypts one key
-		function decryptFunc(key, password) {
+		function decryptFunc(key, passphrase) {
 			return function(callback) {
 				if (decommissioned) return;
 				let scheme = key.getEncryptionScheme();
 				key.decrypt(passphrase, function(err, key) {
 					if (err) onDone(err);
 					else {
-						doneWeight += CryptoUtils.getDecryptSchemeWeight(scheme);
-						onProgress(doneWeight, totalWeight);
+						doneWeight += CryptoUtils.getWeightDecryptKey(scheme);
+						if (onProgress) onProgress(doneWeight, totalWeight);
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					}
 				});
@@ -843,11 +884,32 @@ let CryptoUtils = {
 		}
 	},
 	
-	// --- relative weights of key generation derived from experimentation and used for representative progress bar ---
+	// Relative weights of key generation derived from experimentation and used for representative progress bars
 	
-	getCreateKeyWeight: function() { return 63; },
+	/**
+	 * Computes the total weight for the given key generation configuration.
+	 * 
+	 * @param keyGenConfig is the key generation configuration to get the weight of
+	 * @return the weight of the given key genereation configuration
+	 */
+	getWeightGenerateKeys: function(keyGenConfig) {
+		let weight = 0;
+		let numKeys = 0;
+		for (let currency of keyGenConfig.currencies) {
+			numKeys += currency.numKeys;
+			weight += currency.numKeys * CryptoUtils.getWeightCreateKey();
+			if (currency.encryption) weight += currency.numKeys * (CryptoUtils.getWeightEncryptKey(currency.encryption) + (keyGenConfig.verifyEncryption ? CryptoUtils.getWeightDecryptKey(currency.encryption) : 0));
+		}
+		return weight + PieceRenderer.getRenderWeight(numKeys, keyGenConfig.numPieces, null);
+	},
 	
-	getEncryptSchemeWeight: function(scheme) {
+	/**
+	 * Returns the weight to encrypt a key with the given scheme.
+	 * 
+	 * @param scheme is the scheme to encrypt a key with
+	 * @returns weight is the weight to encrypt a key with the given scheme
+	 */
+	getWeightEncryptKey: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4187;
@@ -857,7 +919,28 @@ let CryptoUtils = {
 		}
 	},
 	
-	getDecryptSchemeWeight: function(scheme) {
+	/**
+	 * Returns the weight to decrypt the given keys.
+	 * 
+	 * @param encryptedKeys are encrypted keys to determine the weight of to decrypt
+	 * @returns the weight to decrypt the given keys
+	 */
+	getWeightDecryptKeys: function(encryptedKeys) {
+		let weight = 0;
+		for (let key of encryptedKeys) {
+			assertTrue(key.isEncrypted());
+			weight += CryptoUtils.getWeightDecryptKey(key.getEncryptionScheme());
+		}
+		return weight;
+	},
+
+	/**
+	 * Returns the weight to decrypt a key with the given scheme.
+	 * 
+	 * @param scheme is the scheme to decrypt a key with
+	 * @returns weight is the weigh tto decrypt a key with the given scheme
+	 */
+	getWeightDecryptKey: function(scheme) {
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.BIP38:
 				return 4581;
@@ -867,20 +950,71 @@ let CryptoUtils = {
 		}
 	},
 	
-	getDecryptWeight: function(encryptedKeys) {
-		let weight = 0;
-		for (let key of encryptedKeys) {
-			assertTrue(key.isEncrypted());
-			weight += CryptoUtils.getDecryptSchemeWeight(key.getEncryptionScheme());
+///**
+//* Returns the total weight to encrypt keys with the given schemes.
+//* 
+//* @param schemes is an array of schemes representing keys to encrypt
+//* @returns the total weight to encrypt keys with the given schemes
+//*/
+//getEncryptSchemesWeight: function(schemes) {
+//	let weight = 0;
+//	for (let scheme of schemes) weight += getWeightEncryptKey(scheme);
+//	return weight;
+//	
+//	function getWeightEncryptKey(scheme) {
+//
+//	}
+//},
+	
+///**
+//* Returns the total weight to decrypt keys with the given schemes.
+//* 
+//* @param schemes is an array of schemes representing keys to decrypt
+//* @returns the total weight to decrypt keys with the given schemes
+//*/
+//getDecryptSchemesWeight: function(schemes) {
+//	let weight = 0;
+//	for (let scheme of schemes) weight += getWeightDecryptKey(scheme);
+//	return weight;
+//},
+	
+	getWeightCreateKey: function() { return 63; },
+	
+	/**
+	 * Utility to generate lib/b64-images.js.
+	 * 
+	 * Allows the b64 image data to be verified from source.
+	 * 
+	 * @param onDone(js) is invoked when the js file is generated
+	 */
+	getB64ImageFile: function(onDone) {
+		let js = [];
+		js.push("/**\n * Embeds base64 logo data for dynamic import and HTML export.\n */");
+		js.push("\nfunction getImageData(key) {\n\tswitch(key) {");
+		
+		// add currency logos
+		for (let plugin of CryptoUtils.getCryptoPlugins()) {
+			js.push("\n\t\tcase \"" + plugin.getTicker() + "\": return \"" + imgToDataUrl(plugin.getLogo().get(0)) + "\";");
 		}
-		return weight;
-	},
-	
-	getQrWeight: function() {
-		return 15;
-	},
-	
-	getLogoWeight: function() {
-		return 15;
+		
+		// add cryptostorage logo
+		let imgCsExport = $("<img src='img/cryptostorage_export.png'>");
+		imgCsExport.one("load", function() {
+			js.push("\n\t\tcase \"CRYPTOSTORAGE\": return \"" + imgToDataUrl(imgCsExport.get(0)) + "\";");
+			
+			// add cryptostorage logo
+			let imgQuestionMark = $("<img src='img/question_mark.png'>");
+			imgQuestionMark.one("load", function() {
+				js.push("\n\t\tcase \"QUESTION_MARK\": return \"" + imgToDataUrl(imgQuestionMark.get(0)) + "\";");
+				
+				// finish
+				js.push("\n\t\tdefault: throw new Error(\"Image data not found for key: \" + key);\n\t}\n}\n");
+				onDone(js.join(""));
+			}).each(function() {
+			  if (this.complete) $(this).load();
+			});
+		}).each(function() {
+		  if (this.complete) $(this).load();
+		});
 	}
 }

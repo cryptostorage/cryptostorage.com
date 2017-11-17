@@ -1,3 +1,6 @@
+// global loader instance
+const LOADER = new DependencyLoader();
+
 /**
  * Loads dependencies.
  * 
@@ -29,7 +32,9 @@ function DependencyLoader() {
 		// invokes callback when all paths loaded
 		loadjs.ready(paths, {
 			success: callback,
-			error: callback
+			error: function() {
+				throw Error("Failed to load dependencies: " + paths);
+			}
 		});
 	}
 }

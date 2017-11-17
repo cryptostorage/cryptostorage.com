@@ -34,14 +34,24 @@ CryptoPlugin.prototype.getDonationAddress = function() { throw new Error("Subcla
 CryptoPlugin.prototype.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS]; }
 
 /**
- * Encrypts the given key with the given scheme and password.  Invokes callback(err, key) when done.
+ * Encrypts the given key with the given scheme and passphrase.  Invokes onDone(err, key) when done.
  */
-CryptoPlugin.prototype.encrypt = function(scheme, key, password, callback) { CryptoUtils.encrypt(scheme, key, password, callback); }
+CryptoPlugin.prototype.encrypt = function(scheme, key, passphrase, onDone) {
+	CryptoUtils.encryptKey(key, scheme, passphrase, function(err, encryptedKey) {
+		if (err) onDone(err);
+		else onDone(null, encryptedKey);
+	});
+}
 
 /**
- * Decrypts the given key with the given password.  Invokes callback(err, key) when done.
+ * Decrypts the given key with the given passphrase.  Invokes onDone(err, key) when done.
  */
-CryptoPlugin.prototype.decrypt = function(key, password, callback) { return CryptoUtils.decrypt(key, password, callback); }
+CryptoPlugin.prototype.decrypt = function(key, passphrase, onDone) {
+	CryptoUtils.decryptKey(key, passphrase, function(err, decryptedKey) {
+		if (err) onDone(err);
+		else onDone(null, decryptedKey);
+	});
+}
 
 /**
  * Returns the given key's private key split into pieces.
@@ -55,7 +65,16 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	assertTrue(isObject(key, 'CryptoKey'));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
-	return secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
+
+	// split key into shares
+	let shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
+
+	// append minimum pieces prefix so insufficient pieces cannot create wrong key (cryptostorage convention)
+	let prefix = minPieces + 'c';
+	for (let i = 0; i < shares.length; i++) {
+		shares[i] = prefix + shares[i];
+	}
+	return shares;
 }
 
 /**
@@ -66,8 +85,28 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
  */
 CryptoPlugin.prototype.combine = function(shares) {
 	assertArray(shares);
-	assertTrue(shares.length > 1);
-	return this.newKey(secrets.combine(shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
+	assertTrue(shares.length > 0);
+	
+	// get minimum shares and shares without 'XXXc' prefix
+	let minShares;
+	let nonPrefixedShares = [];
+	for (let share of shares) {
+		if (!CryptoUtils.isPossibleSplitPiece(share)) throw Error("Invalid split piece: " + share);
+		let min = CryptoUtils.getMinPieces(share);
+		if (!min) throw Error("Share is not prefixed with minimum pieces: " + share);
+		if (!isInitialized(minShares)) minShares = min;
+		else if (min !== minShares) throw Error("Shares have different minimum threshold prefixes: " + min + " vs " + minShares);
+		nonPrefixedShares.push(share.substring(share.indexOf('c') + 1));
+	}
+	
+	// ensure sufficient shares are provided
+	if (shares.length < minShares) {
+		let additional = minShares - shares.length;
+		throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private key");
+	}
+	
+	// combine shares and create key
+	return this.newKey(secrets.combine(nonPrefixedShares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
 }
 
 /**
@@ -87,7 +126,7 @@ function BitcoinPlugin() {
 	this.getName = function() { return "Bitcoin"; }
 	this.getTicker = function() { return "BTC" };
 	this.getLogo = function() { return $("<img src='img/bitcoin.png'>"); }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js"]; }
 	this.getDonationAddress = function() { return "1EU82y3CS2gUm41DyyRzKvWii8BbiRZDuf"; }
 	this.getEncryptionSchemes = function() { return [CryptoUtils.EncryptionScheme.CRYPTOJS, CryptoUtils.EncryptionScheme.BIP38]; }
 	this.newKey = function(str) {
@@ -178,7 +217,7 @@ function EthereumPlugin() {
 	this.getName = function() { return "Ethereum"; }
 	this.getTicker = function() { return "ETH" };
 	this.getLogo = function() { return $("<img src='img/ethereum.png'>"); }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/keythereum.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/keythereum.js"]; }
 	this.getDonationAddress = function() { return "0x154cbabfa4f26a2582bfe18335e652bc57d1bfe0"; }
 	this.newKey = function(str) {
 		
@@ -283,7 +322,7 @@ function LitecoinPlugin() {
 	this.getName = function() { return "Litecoin"; }
 	this.getTicker = function() { return "LTC" };
 	this.getLogo = function() { return $("<img src='img/litecoin.png'>"); }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/litecore.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/litecore.js"]; }
 	this.getDonationAddress = function() { return "LSreRDfwXtbWmmpm6ZxR7twYUenf5Lw2Hh"; }
 	this.newKey = function(str) {
 		
@@ -387,7 +426,7 @@ function MoneroPlugin() {
 	this.getName = function() { return "Monero"; }
 	this.getTicker = function() { return "XMR" };
 	this.getLogo = function() { return $("<img src='img/monero.png'>"); }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/moneroaddress.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/moneroaddress.js"]; }
 	this.getDonationAddress = function() { return "42WH62SCBC7MpNdb1ABgUUeSZaETtX5hujJgjJ8LEimC9m13XyyiwCb47nA17VbwGBiYuU6Jo1fCbET5FNpqv49ySNubKMf"; }
 	this.newKey = function(str) {
 		

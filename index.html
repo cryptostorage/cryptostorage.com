@@ -3,37 +3,38 @@
 	<head>
 		<title>cryptostorage.com</title>
 		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+		<meta name="viewport" content="user-scalable=no"/>
 		<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 		<link rel="icon" href="/favicon.ico" type="image/x-icon">
 		<link rel="stylesheet" type="text/css" href="css/style.css"/>
 		<link rel="stylesheet" type="text/css" href="css/slick.css"/>
 		<link rel="stylesheet" type="text/css" href="css/slick-theme.css"/>
-		<script src="lib/jquery-3.2.0.js"></script>
+		<script src="lib/jquery-3.2.1.js"></script>
 		<script src="lib/jquery-ui.js"></script>
 		<script src="lib/loadjs.js"></script>
-		<script src="lib/async.js"></script>
 		<script src="lib/slick.js"></script>
 		<script src="lib/setImmediate.js"></script>
+		<script src="js/AppConstants.js"></script>
 		<script src="js/GenUtils.js"></script>
 		<script src="js/CryptoUtils.js"></script>
 		<script src="js/CryptoPlugins.js"></script>
 		<script src="js/CryptoKey.js"></script>
-		<script src="js/DivControllers.js"></script>
-		<script src="js/AppController.js"></script>
 		<script src="js/DependencyLoader.js"></script>
-		<script src="js/Tests.js"></script>
+		<script src="js/DivControllers.js"></script>
+		<script src="js/Init.js"></script>
 		<script src="js/PieceRenderer.js"></script>
+		<script src="js/Tests.js"></script>
 		
 		<!-- Inline CSS for dynamic HTML generation -->
 		<style>
 			body { margin:0 }
 			.piece_div { width:750px; }
 			.piece_page_div { margin-bottom:25px; page-break-inside:avoid; page-break-after:always; }
-			.piece_page_header_div { padding:0 15px 10px 15px; display:flex; align-items:center; justify-content:center; }
+			.piece_page_header_div { padding:0 15px 5px 15px; display:flex; align-items:center; justify-content:center; }
 			.piece_page_header_left { width:150px; flex:1; }
 			.piece_page_header_logo { width:150px;}
 			.piece_page_header_right { width:150px; flex:1; margin-left:auto; text-align:right; font-weight:bold; font-size:24px; }
-			.key_div { height:129px; box-sizing:border-box; padding:7px 7px 7px 7px; display:flex; border:2px solid; border-color:green; border-top:none; }
+			.key_div { height:128px; box-sizing:border-box; padding:7px 7px 7px 7px; display:flex; border:2px solid; border-color:green; border-top:none; }
 			.key_div_qr { width:90px; height:90px; }
 			.key_div_qr_omitted { width: 90px; height: 90px; border:solid thin; }
 			.key_div_left { display:flex; align-items:flex-start; justify-content:center; }

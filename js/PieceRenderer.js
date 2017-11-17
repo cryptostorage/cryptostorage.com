@@ -28,10 +28,13 @@ let PieceRenderer = {
 		let numQrs = numKeys * numPieces * 2;
 		
 		// get number of logos
-		let numLogos = config.showLogos ? numKeys * numPieces : 0;
+		let numLogos = config.showCurrencyLogos ? numKeys * numPieces : 0;
 		
 		// return total weight
-		return numQrs * CryptoUtils.getQrWeight() + numLogos * CryptoUtils.getLogoWeight();
+		return numQrs * getWeightQr() + numLogos * getWeightLogo();
+		
+		function getWeightQr() { return 15; }
+		function getWeightLogo() { return 15; }
 	},
 	
 	/**
@@ -58,7 +61,7 @@ let PieceRenderer = {
 		// collect functions to render
 		let funcs = [];
 		for (let i = 0; i < pieces.length; i++) {
-			funcs.push(function(onDone) { PieceRenderer.renderPiece(pieceDivs[i], pieces[i], pieces.length > 1 ? (i + 1) : null, config, onPieceProgress, onDone); });
+			funcs.push(function(onDone) { PieceRenderer.renderPiece(pieceDivs[i], pieces[i], config, onPieceProgress, onDone); });
 		}
 		
 		// handle progress
@@ -80,12 +83,11 @@ let PieceRenderer = {
 	 * 
 	 * @param pieceDiv is the div to render to
 	 * @param piece is the piece to render
-	 * @param pieceNum specifies the piece number (optional)
 	 * @param config is the configuration to render
 	 * @param onProgress(percent) is invoked as progress is made
 	 * @param onDone(err, pieceDiv) is invoked when done
 	 */
-	renderPiece: function(pieceDiv, piece, pieceNum, config, onProgress, onDone) {
+	renderPiece: function(pieceDiv, piece, config, onProgress, onDone) {
 		assertInitialized(pieceDiv);
 		
 		// div setup
@@ -104,12 +106,12 @@ let PieceRenderer = {
 			if (i % config.pairsPerPage === 0) {
 				if (i > 0) pieceDiv.append($("<div class='piece_page_spacer'>"));
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
-				if (pieceNum || config.showCryptostorageLogos) {
+				if (piece.pieceNum || config.showCryptostorageLogos) {
 					let headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
-					if (config.showCryptostorageLogos) headerDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("cryptostorage") + "'>"));
+					if (config.showCryptostorageLogos) headerDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("CRYPTOSTORAGE") + "'>"));
 					let pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-					if (pieceNum) pieceNumDiv.append("Piece " + pieceNum);
+					if (piece.pieceNum) pieceNumDiv.append("Piece " + piece.pieceNum);
 				}
 			}
 			
@@ -122,7 +124,7 @@ let PieceRenderer = {
 			let leftValue = config.showPublic ? piece.keys[i].address : null;
 			let logo = $("<img width=100% height=100% src='" + getImageData(piece.keys[i].ticker) + "'>");
 			let logoLabel = plugin.getName();
-			let rightLabel = "Private Key" + (piece.keys[i].split ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
+			let rightLabel = "Private Key" + (piece.pieceNum ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			let rightValue = config.showPrivate ? piece.keys[i].wif : null;
 			funcs.push(function(onDone) { renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config,
 				function() {
@@ -191,7 +193,7 @@ let PieceRenderer = {
 				keyDivCurrency.css("margin-top", "-15px");
 			}
 			if (rightValue && rightValue.length > 150) {
-				keyDivCurrency.css("margin-top", "-12px");
+				keyDivCurrency.css("margin-top", "-10px");
 				keyDivRightLabel.css("margin-top", "-15px");
 			}
 			

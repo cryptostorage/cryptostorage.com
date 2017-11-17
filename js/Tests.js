@@ -4,11 +4,12 @@
 let Tests = {
 	
 	// constants
-	REPEAT_LONG: 25,
+	REPEAT_LONG: 5,
 	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
-	PASSWORD: "MySuperSecretPasswordAbcTesting123",
+	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
+	TEST_PLUGINS: true,
 	
 	/**
 	 * Returns crypto plugins to test.
@@ -36,11 +37,11 @@ let Tests = {
 		let plugins = Tests.getTestCryptoPlugins();
 		
 		// load dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
+		let dependencies = new Set(APP_DEPENDENCIES);
 		for (let plugin of plugins) {
 			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
 		}
-		loader.load(Array.from(dependencies), function() {
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// verify each plugin has logo data
 			for (let plugin of CryptoUtils.getCryptoPlugins()) {
@@ -49,11 +50,17 @@ let Tests = {
 			
 			// run tests
 			testUtils();
-			testParseKey(plugins);
-			for (plugin of plugins) testSplitAndCombine(plugin);
-			if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
-			testCryptoKeys(plugins, function(error) {
-				if (callback) callback(error);
+			testFileImport(plugins, function() {
+				testParseKey(plugins);
+				for (plugin of plugins) testSplitAndCombine(plugin);
+				if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
+				if (Tests.TEST_PLUGINS) {
+					testCryptoPlugins(plugins, function(error) {
+						if (callback) callback(error);
+					});
+				} else {
+					if (callback) callback();
+				}
 			});
 		});
 		
@@ -137,14 +144,14 @@ let Tests = {
 			}
 		}
 
-		function testCryptoKeys(plugins, callback) {
+		function testCryptoPlugins(plugins, onDone) {
 			let funcs = [];
-			for (let plugin of plugins) funcs.push(function(callback) { testCryptoKey(plugin, callback); });
-			async.series(funcs, callback);
+			for (let plugin of plugins) funcs.push(function(callback) { testCryptoPlugin(plugin, callback); });
+			async.series(funcs, onDone);
 		}
 
-		function testCryptoKey(plugin, callback) {
-			console.log("testCryptoKey(" + plugin.getTicker() + ")");
+		function testCryptoPlugin(plugin, onDone) {
+			console.log("testCryptoPlugin(" + plugin.getTicker() + ")");
 			
 			// test plugin
 			assertInitialized(plugin.getName());
@@ -219,67 +226,51 @@ let Tests = {
 				if (max < 1) continue;
 				let keys = [];
 				for (let i = 0; i < max; i++) keys.push(plugin.newKey());
-				funcs.push(function(callback) { testEncryptKeys(keys, scheme, Tests.PASSWORD, callback); });
+				funcs.push(function(onDone) { testEncryptKeys(keys, scheme, Tests.PASSPHRASE, onDone); });
 			}
 			
 			// execute encryption tests
 			async.parallel(funcs, function(err) {
-				if (err) callback(err);
+				if (err) {
+					onDone(err);
+					return;
+				}
 				
-				// test wrong password decryption
-				testDecryptWrongPassword(plugin, callback);
+				// test wrong passphrase decryption
+				testDecryptWrongPassphrase(plugin, onDone);
 			});
 		}
-
-		function testEncryptKeys(keys, scheme, password, callback) {
+		
+		function testEncryptKeys(keys, scheme, passphrase, onDone) {
 			assertTrue(keys.length > 0);
 			
 			// keep originals for later validation
 			let originals = copyKeys(keys);
 			
-			// test encryption of all keys
-			let funcs = [];
-			for (let key of keys) funcs.push(function(callback) { testEncryptKey(key, scheme, password, callback); });
-			async.parallel(funcs, function(err, result) {
-				if (err) throw err;
+			// collect schemes
+			let schemes = [];
+			for (let i = 0; i < keys.length; i++) schemes.push(scheme);
+			
+			// encrypt keys
+			CryptoUtils.encryptKeys(keys, schemes, passphrase, false, null, function(err, encryptedKeys) {
+				if (err) {
+					onDone(err);
+					return;
+				}
 				
-				// test key exclusion
-				testKeyExclusion(keys);
-				
-				// test piece conversion
-				testKeysToPieces([keys[0]], 1);
-				for (let key of keys) testKeysToPieces([key], Tests.NUM_PIECES, Tests.MIN_PIECES);
-				testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
-				
-				// test decryption with wrong password
-				testDecryptKeys([keys[0]], "wrongPassword123", function(err) {
-					assertEquals("Incorrect password", err.message);
-					
-					// test decryption
-					testDecryptKeys(keys, password, function(err, result) {
-						if (err) throw err;
-						assertEquals(originals.length, keys.length);
-						for (let i = 0; i < originals.length; i++) assertTrue(originals[i].equals(keys[i]));
-						callback();
-					});
-				});
-			});
-		}
-
-		function testEncryptKey(key, scheme, password, callback) {
-			assertObject(key, 'CryptoKey');
-			let original = key.copy();
-			key.encrypt(scheme, password, function(err, encrypted) {
-				if (err) callback(err);
-				else {
+				// test state of each key
+				assertEquals(keys.length, encryptedKeys.length);
+				for (let i = 0; i < keys.length; i++) {
+					let key = keys[i];
 					
 					// test basic initialization
+					assertObject(key, 'CryptoKey');
 					assertTrue(key.isEncrypted());
-					assertTrue(key.equals(encrypted));
+					assertTrue(key.equals(encryptedKeys[i]));
+					assertFalse(key.equals(originals[i]));
 					assertInitialized(key.getHex());
 					assertInitialized(key.getWif());
 					assertEquals(scheme, key.getEncryptionScheme());
-					assertFalse(key.equals(original));
 					assertTrue(key.equals(key.copy()));
 					
 					// test address
@@ -310,32 +301,58 @@ let Tests = {
 					assertEquals(key.getHex(), parsed.getHex());
 					assertEquals(key.getWif(), parsed.getWif());
 					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-					callback();
 				}
+				
+				// test key exclusion
+				testKeyExclusion(keys);
+				
+				// test piece conversion
+				testKeysToPieces([keys[0]], 1);
+				for (let key of keys) testKeysToPieces([key], Tests.NUM_PIECES, Tests.MIN_PIECES);
+				testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
+				
+				// test decryption with wrong passphrase
+				testDecryptKeys([keys[0]], "wrongPassphrase123", function(err) {
+					assertEquals("Incorrect passphrase", err.message);
+					
+					// test decryption
+					testDecryptKeys(keys, passphrase, function(err, result) {
+						if (err) throw err;
+						assertEquals(originals.length, keys.length);
+						for (let i = 0; i < originals.length; i++) assertTrue(originals[i].equals(keys[i]));
+						onDone();
+					});
+				});
 			});
 		}
-
-		function testDecryptKeys(keys, password, callback) {
+		
+		function testDecryptKeys(keys, passphrase, onDone) {
 			assertTrue(keys.length > 0);
-			let funcs = [];
-			for (let key of keys) funcs.push(function(callback) { testDecryptKey(key, password, callback); });
-			async.parallel(funcs, callback);
-		}
-
-		function testDecryptKey(key, password, callback) {
-			assertObject(key, 'CryptoKey');
-			let original = key.copy();
-			key.decrypt(password, function(err, decrypted) {
-				if (err) callback(err);
-				else {
+			
+			// save originals for later
+			let originals = [];
+			for (let key of keys) originals.push(key.copy());
+			
+			// decrypt keys
+			CryptoUtils.decryptKeys(keys, passphrase, null, function(err, decryptedKeys) {
+				if (err) {
+					onDone(err);
+					return;
+				}
+				
+				// test state of each key
+				assertEquals(keys.length, decryptedKeys.length);
+				for (let i = 0; i < keys.length; i++) {
+					let key = keys[i];
 					
 					// test basic initialization
-					assertTrue(key.equals(decrypted));
+					assertObject(key, 'CryptoKey');
+					assertTrue(key.equals(decryptedKeys[i]));
+					assertFalse(key.equals(originals[i]));
 					assertInitialized(key.getHex());
 					assertInitialized(key.getWif());
 					assertInitialized(key.getAddress());
 					assertNull(key.getEncryptionScheme());
-					assertFalse(key.equals(original));
 					assertTrue(key.equals(key.copy()));
 					
 					// test consistency
@@ -347,16 +364,18 @@ let Tests = {
 					assertEquals(key.getHex(), parsed.getHex());
 					assertEquals(key.getWif(), parsed.getWif());
 					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-					callback();
 				}
+				
+				// done
+				onDone();
 			});
 		}
 		
-		function testDecryptWrongPassword(plugin, onDone) {
+		function testDecryptWrongPassphrase(plugin, onDone) {
 			let privateKey = "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdGfEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy";
 			let key = plugin.newKey(privateKey);
 			key.decrypt("abctesting123", function(err, decryptedKey) {
-				assertEquals("Incorrect password", err.message);
+				assertEquals("Incorrect passphrase", err.message);
 				onDone();
 			});
 		}
@@ -386,10 +405,12 @@ let Tests = {
 					}
 					else assertUndefined(piece.keys[i].encryption);
 					if (numPieces > 1) {
-						assertTrue(piece.keys[i].split);
+						assertNumber(piece.pieceNum);
+						assertInt(piece.pieceNum);
+						assertTrue(piece.pieceNum > 0);
 						assertFalse(keys[i].getWif() === piece.keys[i].wif);
 					} else {
-						assertFalse(piece.keys[i].split);
+						assertUndefined(piece.pieceNum);
 						assertTrue(keys[i].getWif() === piece.keys[i].wif);
 					}
 				}
@@ -399,7 +420,7 @@ let Tests = {
 			if (numPieces > 1) {
 				for (let pieceKey of pieces[0].keys) {
 					if (pieceKey.wif && !pieceKey.encryption && pieceKey.ticker === 'BTC') {
-						assertTrue(pieceKey.wif.startsWith("3X"));
+						assertTrue(pieceKey.wif.startsWith(minPieces + "c3X"));
 					}
 				}
 			}
@@ -469,6 +490,240 @@ let Tests = {
 					assertTrue(key.equals(combined));
 				}
 			}
+		}
+		
+		function testFileImport(plugins, onDone) {
+			console.log("testFileImport()");
+			
+			// initialize controller
+			let controller = new RecoverFileController($("<div>"));
+			controller.render(function() {
+				
+				// collect test functions
+				let funcs = [];
+				funcs.push(testOnePieceValidity());
+				funcs.push(testIncompatiblePieces());
+				funcs.push(testAdditionalPiecesNeeded());
+				
+				// run test functions
+				async.series(funcs, function(err) {
+					if (err) throw err;
+					onDone();
+				});
+				
+				function testOnePieceValidity() {
+					return function(onDone) {
+						let piece = {};
+						let namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.version is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: "asdf" };
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.version is not a number", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, pieceNum: "asdf" };
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.pieceNum is not an integer", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, pieceNum: 0 };
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.pieceNum is not greater than 0", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0 };
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: "asdf"};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys is not an array", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: []};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys is empty", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: [{}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[0].ticker is not defined", controller.getWarning());
+						controller.startOver();
+
+						piece = { version: 1.0, keys: [{
+							ticker: "BTC",
+							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",
+							encryption: null
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[0].address is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: [{
+							ticker: "BTC",
+							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
+							encryption: null
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[0].wif is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, keys: [{
+							ticker: "BTC",
+							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
+							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[0].encryption is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: 1.0, pieceNum: 1, keys: [{
+							ticker: "BTC",
+							address: "1PshW4gesSamVeZ5uP2C8AipMgsYeQu34X",
+							wif: "2c3XyNwGVqDqke6tgWd6RcZTHBW77X1SLrUnR2jGLai9e2hpC",
+							encryption: null
+						}, {
+							ticker: "BTC",
+							address: "18Tqw3Mb1MNx7xmh8st7s9zvbEH1NagWWi",
+							wif: "3c3XyEvJZiYJRdzCbDrHLU7pyEKBQdJRC6Mk1fb4A1mR79CbV",
+							encryption: null
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[1].wif has a different minimum threshold prefix", controller.getWarning());
+						controller.startOver();
+						
+						// valid piece
+						piece = { version: 1.0, keys: [{
+							ticker: "BTC",
+							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
+							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",
+							encryption: null
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("", controller.getWarning());
+						controller.startOver();
+						
+						onDone();
+					}
+				}
+				
+				function testIncompatiblePieces() {
+					return function(onDone) {
+						
+						let pieces1 = getPieces(plugins, 1, 3, 2);
+						let pieces2 = getPieces(plugins, 2, 3, 2);
+						let namedPieces = [];
+						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
+						namedPieces.push({name: "piece2.json", piece: pieces2[0]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Pieces contain different number of keys", controller.getWarning());
+						controller.startOver();
+						
+						pieces2 = getPieces(plugins, 1, 3, 2);
+						namedPieces = [];
+						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
+						namedPieces.push({name: "piece2.json", piece: pieces2[0]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Pieces have different addresses", controller.getWarning());
+						controller.startOver();
+						
+						let oldValue = pieces1[1].keys[1].ticker;
+						pieces1[1].keys[1].ticker = "ABC";
+						namedPieces = [];
+						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
+						namedPieces.push({name: "piece2.json", piece: pieces1[1]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Pieces are for different cryptocurrencies", controller.getWarning());
+						pieces1[1].keys[1].ticker = oldValue;
+						controller.startOver();
+						
+						oldValue = pieces1[1].keys[1].wif;
+						for (let i = 0; i < pieces1[1].keys.length; i++) {
+							pieces1[1].keys[i].wif = oldValue.replaceAt(0, "3");
+						}
+						namedPieces = [];
+						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
+						namedPieces.push({name: "piece2.json", piece: pieces1[1]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Pieces have different minimum threshold prefixes", controller.getWarning());
+						pieces1[1].keys[1].wif = oldValue;
+						controller.startOver();
+
+						onDone();
+					}
+				}
+				
+				function testAdditionalPiecesNeeded() {
+					return function(onDone) {
+						
+						// get pieces
+						let pieces = getPieces(plugins, 1, 4, 3);
+						
+						let namedPieces = [];
+						namedPieces.push({name: "piece0.json", piece: pieces[0]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Need 2 additional pieces to recover private keys", controller.getWarning());
+						controller.startOver();
+						
+						namedPieces = [];
+						namedPieces.push({name: "piece0.json", piece: pieces[0]});
+						namedPieces.push({name: "piece1.json", piece: pieces[1]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Need 1 additional piece to recover private keys", controller.getWarning());
+						controller.startOver();
+						
+						namedPieces = [];
+						namedPieces.push({name: "piece0.json", piece: pieces[0]});
+						namedPieces.push({name: "piece1.json", piece: pieces[1]});
+						namedPieces.push({name: "piece2.json", piece: pieces[2]});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("", controller.getWarning());
+						controller.startOver();
+						
+						onDone();
+					}
+				}
+				
+				function getPieces(plugins, keysPerPlugin, numPieces, minPieces) {
+					let keys = [];
+					numPieces = numPieces || 1;
+					for (let plugin of plugins) {
+						for (let i = 0; i < keysPerPlugin; i++) {
+							keys.push(plugin.newKey());
+						}
+					}
+					return CryptoUtils.keysToPieces(keys, numPieces, minPieces);
+				}
+			});
 		}
 	}
 }

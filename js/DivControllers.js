@@ -46,6 +46,41 @@ let UiUtils = {
 			label.html(plugin.getName());
 		}
 		return row;
+	},
+	
+	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+		
+		let dependencies = [
+			"lib/jquery-3.2.1.js",
+			"lib/jquery-ui.js",
+			"lib/loadjs.js",
+			"lib/async.js",
+			"lib/setImmediate.js",
+			"js/BodyExporter.js",
+			"js/GenUtils.js",
+			"js/DivControllers.js",
+			"js/AppConstants.js",
+			"js/PieceRenderer.js",
+			"js/CryptoUtils.js",
+			"js/CryptoPlugins.js",
+			"js/CryptoKey.js",
+			"js/DependencyLoader.js",
+			"lib/b64-images.js",
+			"lib/jquery-csv.js",
+			"lib/qrcode.js",
+			"lib/jszip.js",
+			"lib/FileSaver.js",
+			"lib/crypto-js.js",
+			"lib/progressbar.js",
+			"lib/pagination.js",
+			"lib/bitaddress.js"
+		];
+		
+		// open tab
+		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
+		  window.exportToBody(importedPieces, keyGenConfig, keys, pieces, pieceDivs);
+			window.focus();
+		});
 	}
 }
 
@@ -61,6 +96,162 @@ DivController.prototype.onShow = function() { }
 DivController.prototype.onHide = function() { }
 
 /**
+ * Controls the entire application.
+ * 
+ * @param div is the div to render the application to
+ */
+function AppController(div) {
+	
+	let that = this;
+	let sliderController;
+	let sliderDiv;
+	let contentDiv;
+	let homeController;
+	let formController;
+	let recoverController;
+	let faqController;
+	let donateController;
+	
+	this.render = function(onDone) {
+		div.empty();
+		
+		// header
+		let headerDiv = $("<div class='app_header'>").appendTo(div);
+		
+		// header logo
+		let headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
+		let logo = $("<img class='app_header_logo_img' src='img/cryptostorage_white.png'>").appendTo(headerTopDiv);
+		logo.click(function() {
+			window.location.href = "#home";
+			that.showHome();
+		});
+		
+		// header links
+		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
+		let homeLink = getLinkDiv("Home");
+		homeLink.click(function() {
+			window.location.href = "#home";
+			that.showHome();
+		});
+		let gitHubLink = getLinkDiv("GitHub");
+		gitHubLink.click(function() { window.open("https://github.com/cryptostorage/cryptostorage.com", "_blank"); });
+		let faqLink = getLinkDiv("FAQ");
+		faqLink.click(function() {
+			window.location.href = "#faq";
+			that.showFaq();
+		});
+		let donateLink = getLinkDiv("Donate");
+		donateLink.click(function() {
+			window.location.href = "#donate";
+			that.showDonate();
+		});
+		linksDiv.append(homeLink);
+		linksDiv.append(gitHubLink);
+		linksDiv.append(faqLink);
+		linksDiv.append(donateLink);
+		
+		function getLinkDiv(label) {
+			let div = $("<div class='link_div'>");
+			div.html(label);
+			return div;
+		}
+		
+		// slider
+		sliderDiv = $("<div>").appendTo(headerDiv);
+		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectRecover);
+		
+		// main content
+		contentDiv = $("<div class='app_content'>").appendTo(div);
+		
+		// initialize controllers
+		homeController = new HomeController($("<div>"));
+		formController = new FormController($("<div>"));
+		recoverController = new RecoverController($("<div>"));
+		faqController = new FaqController($("<div>"));
+		donateController = new DonateController($("<div>"));
+		recoverController.render();
+		faqController.render();
+		donateController.render();
+		
+		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
+		setImmediate(function() {
+			
+			// render body and start on home
+			homeController.render(function() {
+				
+				// get identifier
+				let href = window.location.href;
+				let lastIdx = href.lastIndexOf("#");
+				let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+				
+				// show page based on identifier
+				if (identifier === "home") that.showHome();
+				else if (identifier === "faq") that.showFaq();
+				else if (identifier === "donate") that.showDonate();
+				else that.showHome();
+				
+				// done rendering
+				if (onDone) onDone(div);
+			});
+		});
+	}
+	
+	this.showHome = function() {
+		if (DEBUG) console.log("showHome()");
+		sliderDiv.show();
+		sliderController.render(function(div) {
+			setContentDiv(homeController.getDiv());
+		});
+	}
+	
+	this.showForm = function(onDone) {
+		if (DEBUG) console.log("showForm()");
+		formController.render(function(div) {
+			setContentDiv(div);
+			sliderDiv.hide();
+			if (onDone) onDone();
+		});
+	}
+	
+	this.showFaq = function() {
+		if (DEBUG) console.log("showFaq()");
+		setContentDiv(faqController.getDiv());
+		sliderDiv.hide();
+	}
+	
+	this.showDonate = function() {
+		if (DEBUG) console.log("showDonate()");
+		sliderDiv.hide();
+		setContentDiv(donateController.getDiv());
+	}
+	
+	this.showRecover = function() {
+		if (DEBUG) console.log("showRecover()");
+		sliderDiv.hide();
+		recoverController.render();
+		setContentDiv(recoverController.getDiv());
+	}
+	
+	// ---------------------------------- PRIVATE -------------------------------
+	
+	function setContentDiv(div) {
+		while (contentDiv.get(0).hasChildNodes()) {
+			contentDiv.get(0).removeChild(contentDiv.get(0).lastChild);
+		}
+		contentDiv.append(div);
+	}
+	
+	function onSelectGenerate() {
+		that.showForm();
+	}
+	
+	function onSelectRecover() {
+		that.showRecover();
+	}
+}
+inheritsFrom(AppController, DivController);
+
+/**
  * Slider main features.
  */
 function SliderController(div, onSelectGenerate, onSelectRecover) {
@@ -74,10 +265,10 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
 		getSlide($("<img src='img/mix.png'>"), "Generate secure storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 		getSlide($("<img src='img/security.png'>"), "Keys are generated in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats for safe storage and easy recovery.").appendTo(sliderDiv);
+		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces.").appendTo(sliderDiv);
+		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats for long term storage.").appendTo(sliderDiv);
 		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-		getSlide($("<img src='img/password_protected.png'>"), "Private keys can be password protected and split into pieces.").appendTo(sliderDiv);
-		sliderDiv.slick({autoplay:true, arrows:false, dots:true, autoplaySpeed:3000});
+		sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:3500});
 		
 		function getSlide(img, text) {
 			let slide = $("<div class='slide'>");
@@ -114,9 +305,8 @@ inheritsFrom(SliderController, DivController);
  * Home page content.
  * 
  * @param div is the div to render to
- * @param onCurrencyClicked(plugin) is called when the user clicks a currency
  */
-function HomeController(div, onCurrencyClicked) {
+function HomeController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		div.empty();
@@ -128,6 +318,31 @@ function HomeController(div, onCurrencyClicked) {
 		div.append(UiUtils.getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 		for (let i = 3; i < plugins.length; i += 4) {
 			div.append(UiUtils.getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked));
+		}
+		
+		// sample page
+		$("<div style='height:100px'>").appendTo(div);
+		div.append("Export to printable and digital format for long term storage");
+		$("<div style='height:40px'>").appendTo(div);
+		div.append($("<img width=750px src='img/print_sample.png'>"));
+		
+		function onCurrencyClicked(plugin) {
+			UiUtils.openStorage(plugin.getName() + " Storage", null, getKeyGenConfig(plugin)); 
+		}
+		
+		function getKeyGenConfig(plugin) {
+			let config = {};
+			config.passphraseChecked = false;
+			config.splitChecked = false;
+			config.numPieces = 1;
+			config.minPieces = null;
+			config.currencies = [];
+			config.currencies.push({
+				ticker: plugin.getTicker(),
+				numKeys: 1,
+				encryption: null
+			});
+			return config;
 		}
 		
 		if (onDone) onDone(div);
@@ -175,7 +390,7 @@ function DonateController(div, appController) {
 		UiUtils.setupContentDiv(div);
 		
 		// load qr code dependency
-		loader.load("lib/qrcode.js", function() {
+		LOADER.load(["lib/qrcode.js", "lib/async.js"], function() {
 			
 			// build donate section
 			let titleDiv = $("<div class='title'>").appendTo(div);
@@ -300,21 +515,21 @@ function FormController(div) {
 	DivController.call(this, div);
 	
 	let passphraseCheckbox;
+	let btcBip38CheckboxDiv;
+	let btcBip38Checkbox;
+	let bchBip38CheckboxDiv;
+	let bchBip38Checkbox;
 	let passphraseInput;
 	let splitCheckbox;
 	let numPiecesInput;
 	let minPiecesInput;
 	let currencyInputsDiv;	// container for each currency input
 	let currencyInputs;			// tracks each currency input
-	let decommissioned;
-	let progressDiv;
-	let progressBar;
 	
 	this.render = function(onDone) {
 		
 		// initial state
 		UiUtils.setupContentDiv(div);
-		decommissioned = false;
 		
 		// currency inputs
 		currencyInputs = [];
@@ -328,9 +543,6 @@ function FormController(div) {
 		addCurrencySpan.click(function() {
 			addCurrency();
 		});
-		
-		// add first currency input
-		addCurrency();
 		
 		// passphrase checkbox
 		let passphraseDiv = $("<div class='form_section_div'>").appendTo(div);
@@ -364,6 +576,14 @@ function FormController(div) {
 			}
 			passphraseInput.focus();
 		});
+		btcBip38CheckboxDiv = $("<div>").appendTo(passphraseInputDiv);
+		btcBip38Checkbox = $("<input type='checkbox' id='btc_bip38_checkbox'>").appendTo(btcBip38CheckboxDiv);
+		let btcBip38CheckboxLabel = $("<label for='btc_bip38_checkbox'>").appendTo(btcBip38CheckboxDiv);
+		btcBip38CheckboxLabel.html("&nbsp;Use BIP38 encryption for Bitcoin");
+		bchBip38CheckboxDiv = $("<div>").appendTo(passphraseInputDiv);
+		bchBip38Checkbox = $("<input type='checkbox' id='bch_bip38_checkbox'>").appendTo(bchBip38CheckboxDiv);
+		let bchBip38CheckboxLabel = $("<label for='bch_bip38_checkbox'>").appendTo(bchBip38CheckboxDiv);
+		bchBip38CheckboxLabel.html("&nbsp;Use BIP38 encryption for Bitcoin Cash");
 		
 		// split checkbox
 		let splitDiv = $("<div class='form_section_div'>").appendTo(div);
@@ -403,6 +623,9 @@ function FormController(div) {
 		splitCheckbox.prop('checked', false);
 		splitInputDiv.hide();
 		
+		// add first currency
+		addCurrency();
+		
 		// add generate button
 		let generateDiv = $("<div class='generate_div'>").appendTo(div);
 		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
@@ -412,11 +635,6 @@ function FormController(div) {
 		// under development warning
 		let warningDiv = $("<div class='app_header_warning'>").appendTo(div);
 		warningDiv.append("Under Development: Not Ready for Use");
-		
-		// add progress bar and div
-		progressDiv = $("<div>").appendTo(div);
-		progressDiv.hide();
-		progressBar = UiUtils.getProgressBar(progressDiv);
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -431,11 +649,8 @@ function FormController(div) {
 	
 	// handle when generate button clicked
 	function onGenerate(onDone) {
-		let window = newWindow(null, "Export Storage", null, "css/style.css", getInternalStyleSheetText());
-		let body = $("body", window.document);
-		new ExportController(body, window, getConfig()).render(function(div) {
-			if (onDone) onDone();
-		});
+		UiUtils.openStorage("Export Storage", null, getConfig());
+		if (onDone) onDone();
 	}
 	
 	// get current form configuration
@@ -446,28 +661,46 @@ function FormController(div) {
 		config.splitChecked = splitCheckbox.prop('checked');
 		config.numPieces = config.splitChecked ? parseFloat(numPiecesInput.val()) : 1;
 		config.minPieces = config.splitChecked ? parseFloat(minPiecesInput.val()) : null;
+		config.verifyEncryption = VERIFY_ENCRYPTION;
 		config.currencies = [];
 		for (let currencyInput of currencyInputs) {
 			config.currencies.push({
-				plugin: currencyInput.getSelectedPlugin(),
+				ticker: currencyInput.getSelectedPlugin().getTicker(),
 				numKeys: currencyInput.getNumKeys(),
-				encryption: config.passphraseChecked ? CryptoUtils.EncryptionScheme.CRYPTOJS : null	// TODO: collect encryption scheme from UI
+				encryption: config.passphraseChecked ? getEncryptionScheme(currencyInput) : null
 			});
 		}
+		verifyConfig(config);
 		return config;
+		
+		function getEncryptionScheme(currencyInput) {
+			if (currencyInput.getSelectedPlugin().getTicker() === "BTC" && btcBip38Checkbox.prop('checked')) return CryptoUtils.EncryptionScheme.BIP38;
+			if (currencyInput.getSelectedPlugin().getTicker() === "BCH" && bchBip38Checkbox.prop('checked')) return CryptoUtils.EncryptionScheme.BIP38;
+			return CryptoUtils.EncryptionScheme.CRYPTOJS;
+		}
+		
+		function verifyConfig(config) {
+			assertDefined(config.verifyEncryption);
+			for (let currency of config.currencies) {
+				assertDefined(currency.ticker);
+				assertDefined(currency.numKeys);
+				assertDefined(currency.encryption);
+			}
+		}
 	}
 	
 	function addCurrency() {
 		if (DEBUG) console.log("addCurrency()");
 		
 		// create input
-		let currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, CryptoUtils.getCryptoPlugins(), function() {
+		let currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, CryptoUtils.getCryptoPlugins(), updateForm, function() {
 			removeCurrency(currencyInput);
 		});
 		
 		// add to page and track
 		currencyInputs.push(currencyInput);
 		currencyInput.getDiv().appendTo(currencyInputsDiv);
+		updateForm();
 	}
 	
 	function removeCurrency(currencyInput) {
@@ -475,6 +708,32 @@ function FormController(div) {
 		if (idx < 0) throw new Error("Could not find currency input");
 		currencyInputs.splice(idx, 1);
 		currencyInput.getDiv().remove();
+		updateForm();
+	}
+	
+	function updateForm() {
+		
+		// determine if BTC is selected
+		let btcFound = false;
+		for (let currencyInput of currencyInputs) {
+			if (currencyInput.getSelectedPlugin().getTicker() === "BTC") {
+				btcFound = true;
+				break;
+			}
+		}
+		
+		// determine if BCH is selected
+		let bchFound = false;
+		for (let currencyInput of currencyInputs) {
+			if (currencyInput.getSelectedPlugin().getTicker() === "BCH") {
+				bchFound = true;
+				break;
+			}
+		}
+		
+		// show or hide bip38 checkbox options
+		btcFound ? btcBip38CheckboxDiv.show() : btcBip38CheckboxDiv.hide();
+		bchFound ? bchBip38CheckboxDiv.show() : bchBip38CheckboxDiv.hide();
 	}
 	
 	/**
@@ -482,9 +741,10 @@ function FormController(div) {
 	 * 
 	 * @param div is the div to render to
 	 * @param idx is the index of this input relative to the other inputs to accomodate ddslick's id requirement
+	 * @param onCurrencyChanged(ticker) is invoked when the user changes the currency selection
 	 * @param onDelete is invoked when the user delets this input
 	 */
-	function CurrencyInput(div, idx, plugins, onDelete) {
+	function CurrencyInput(div, idx, plugins, onCurrencyChanged, onDelete) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
@@ -493,6 +753,7 @@ function FormController(div) {
 		let numKeysInput;
 		let selector;
 		let selectorData;
+		let initializing = true;
 		
 		this.getDiv = function() {
 			return div;
@@ -507,6 +768,8 @@ function FormController(div) {
 				if (selectorData[i].text === name) {
 					selector.ddslick('select', {index: i});
 					selectedPlugin = plugins[i];
+					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
+					if (!initializing) onCurrencyChanged(selectedPlugin.getTicker());
 					break;
 				}
 			}
@@ -541,7 +804,8 @@ function FormController(div) {
 				defaultSelectedIndex: 0,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
-					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
+					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
+					onCurrencyChanged(selectedPlugin.getTicker());
 				},
 			});
 			selector = $("#currency_selector_" + idx);	// ddslick requires id reference
@@ -556,6 +820,9 @@ function FormController(div) {
 			let trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 			trashDiv.click(function() { onDelete(); });
 			let trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
+			
+			// no longer initializing
+			initializing = false;
 		}
 	}
 }
@@ -572,49 +839,20 @@ function RecoverController(div) {
 		
 		// filler to push recover div down
 		$("<div class='recover_filler'>").appendTo(div);
-		let recoverDiv = $("<div class='recover_div'>").appendTo(div);
 		
-		// set up recover div
-		let tabsDiv = $("<div class='recover_tabs_div'>").appendTo(recoverDiv);
-		let recoverFileTab = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
-		recoverFileTab.html("Recover From File");
-		recoverFileTab.click(function() { selectTab("file"); });
-		let recoverTextTab = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
-		recoverTextTab.html("Recover From Text");
-		recoverTextTab.click(function() { selectTab("text"); });
-		let recoverContentDiv = $("<div class='recover_content_div'>").appendTo(recoverDiv);
+		// all recover content including tabs
+		let recoverDiv = $("<div class='recover_div'>").appendTo(div);
 		
 		// render recover file and text divs
 		let recoverFileDiv = $("<div>");
 		let recoverTextDiv = $("<div>");
 		new RecoverFileController(recoverFileDiv).render(function() {
 			new RecoverTextController(recoverTextDiv, CryptoUtils.getCryptoPlugins()).render(function() {
-				
-				// start on file tab by default
-				selectTab("file");
-				
-				// done rendering
-				if (onDone) onDone(div);
+				new TwoTabController(recoverDiv, "Recover From File", recoverFileDiv, "Recover From Text", recoverTextDiv).render(function() {
+					if (onDone) onDone(div);
+				});
 			});
 		});
-		
-		function selectTab(selected) {
-			switch (selected) {
-			case "file":
-				recoverFileTab.addClass("active_tab");
-				recoverTextTab.removeClass("active_tab");
-				recoverContentDiv.children().detach();
-				recoverContentDiv.append(recoverFileDiv);
-				break;
-			case "text":
-				recoverFileTab.removeClass("active_tab");
-				recoverTextTab.addClass("active_tab");
-				recoverContentDiv.children().detach();
-				recoverContentDiv.append(recoverTextDiv);
-				break;
-			default: throw new Error("Unrecognized selection: " + selected);
-			}
-		}
 	}
 }
 inheritsFrom(RecoverController, DivController);
@@ -627,25 +865,31 @@ inheritsFrom(RecoverController, DivController);
 function RecoverFileController(div) {
 	DivController.call(this, div);
 	
-	let contentDiv;						// div for all non control links
-	let importDiv;						// div for all file input
+	let that = this;
 	let warningDiv;
-	let importedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
-	let importedPiecesDiv;		// shows imported item;
-	let controlsDiv;					// div for all control links
+	let warningMsg;
+	let contentDiv;								// div for all non control links
+	let importDiv;								// div for all file import
+	let importedNamedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
+	let importedPiecesDiv;				// shows imported item;
+	let controlsDiv;							// div for all control links
 	let lastKeys;
 	
 	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("recover_content_div");
+		
+		// warning div
+		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
+		warningDiv.hide();
 		
 		// set up content div
 		contentDiv = $("<div>").appendTo(div);
 		
 		// all file importing
 		importDiv = $("<div>").appendTo(contentDiv);
-		
-		// warning div
-		warningDiv = $("<div class='recover_warning_div'>").appendTo(importDiv);
-		warningDiv.hide();
 		
 		// drag and drop importDiv
 		let dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(importDiv);
@@ -657,7 +901,7 @@ function RecoverFileController(div) {
 		dragDropBrowse.append("or click to browse");
 		
 		// register browse link with hidden input
-		let inputFiles = $("<input type='file' multiple>").appendTo(dragDropDiv);
+		let inputFiles = $("<input type='file' multiple accept='.json,.zip'>").appendTo(dragDropDiv);
 		inputFiles.change(function() { onFilesImported($(this).get(0).files); });
 		inputFiles.hide();
 		dragDropBrowse.click(function() {
@@ -674,43 +918,19 @@ function RecoverFileController(div) {
 		// controls
 		controlsDiv = $("<div class='recover_controls'>").appendTo(div);
 		controlsDiv.hide();
-		let startOverLink = $("<div class='recover_start_over'>").appendTo(controlsDiv);
-		startOverLink.append("start over");
-		startOverLink.click(function() { startOver(); });
+		resetControls();
 		
 		// done rendering
 		if (onDone) onDone(div);
 	}
 	
-	function startOver() {
-		contentDiv.children().detach();
-		contentDiv.append(importDiv);
-		warningDiv.empty();
+	this.getWarning = function() {
+		return that.warningMsg;
+	}
+	
+	this.setWarning = function(str, img) {
+		that.warningMsg = str;
 		warningDiv.hide();
-		importedPiecesDiv.hide();
-		controlsDiv.hide();
-		removePieces();
-	}
-	
-	function onKeysImported(keys) {
-		keys = listify(keys);
-		assertTrue(keys.length > 0);
-		if (keys[0].isEncrypted()) {
-			let decryptionController = new DecryptionController($("<div>"), keys);
-			decryptionController.render(function(decryptionDiv) {
-				contentDiv.children().detach();
-				contentDiv.append(decryptionDiv);
-				decryptionController.focus();
-			});
-		} else {
-			let pieces = CryptoUtils.keysToPieces(keys);
-			let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-			let body = $("body", window.document);
-			new ExportController(body, window, null, keys, pieces).render();
-		}
-	}
-	
-	function setWarning(str, img) {
 		warningDiv.empty();
 		if (str) {
 			if (!img) img = $("<img src='img/warning.png'>");
@@ -723,38 +943,126 @@ function RecoverFileController(div) {
 		}
 	}
 	
+	this.addNamedPieces = function(namedPieces, onDone) {
+		for (let namedPiece of namedPieces) {
+			try {
+				CryptoUtils.validatePiece(namedPiece.piece);
+				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
+			} catch (err) {
+				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.message);
+			}
+		}
+		updatePieces(onDone);
+	}
+	
+	this.startOver = function() {
+		that.setWarning("");
+		contentDiv.children().detach();
+		importedPiecesDiv.hide();
+		controlsDiv.hide();
+		removePieces();
+		contentDiv.append(importDiv);
+	}
+	
+	// ------------------------ PRIVATE ------------------
+	
+	function resetControls() {
+		controlsDiv.empty();
+		addControl("start over", that.startOver);
+	}
+	
+	function addControl(text, onClick) {
+		let linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
+		let link = $("<div class='recover_control_link'>").appendTo(linkDiv);
+		link.append(text);
+		link.click(function() { onClick(); });
+	}
+	
+	function getImportedPieces() {
+		let pieces = [];
+		for (let importedNamedPiece of importedNamedPieces) pieces.push(importedNamedPiece.piece);
+		return pieces;
+	}
+	
+	function onKeysImported(keys) {
+		resetControls();
+		that.setWarning("");
+		keys = listify(keys);
+		assertTrue(keys.length > 0);
+		if (keys[0].isEncrypted()) {
+			
+			// create decryption controller and register callbacks
+			let decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+				that.setWarning(warning);
+			}, function(decryptedKeys, pieces, pieceDivs) {
+				onKeysDecrypted(getImportedPieces(), decryptedKeys, pieces, pieceDivs);
+			});
+			
+			// render decryption controller
+			decryptionController.render(function(decryptionDiv) {
+				
+				// replace content div with passphrase input
+				contentDiv.children().detach();
+				contentDiv.append(decryptionDiv);
+				decryptionController.focus();
+				
+				// add control to view encrypted keys
+				addControl("view encrypted keys", function() {
+					UiUtils.openStorage("Imported Storage", getImportedPieces(), null, keys);
+				});
+			});
+		} else {
+			onKeysDecrypted(getImportedPieces(), keys);
+		}
+	}
+	
+	function onKeysDecrypted(importedPieces, keys, pieces, pieceDivs) {
+		resetControls();
+		contentDiv.children().detach();
+		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
+		viewDecrypted.append("View Decrypted Keys");
+		viewDecrypted.click(function() {
+			UiUtils.openStorage("Imported Storage", importedPieces, null, keys, pieces, pieceDivs);
+		});
+	}
+	
 	// handle imported files
 	function onFilesImported(files) {
 		
 		// collect functions to read files
 		let funcs = [];
 		for (let i = 0; i < files.length; i++) {
-			funcs.push(function(callback) {
-				readFile(files[i], callback);
+			funcs.push(function(onDone) {
+				readFile(files[i], onDone);
 			});
 		};
 		
 		// read files asynchronously
 		async.parallel(funcs, function(err, results) {
+			if (err) throw err;
 			
 			// collect named pieces from results
 			let namedPieces = [];
 			for (let result of results) {
-				namedPieces = namedPieces.concat(result);
+				if (result) namedPieces = namedPieces.concat(result);
 			}
 			
 			// add all named pieces
-			addNamedPieces(namedPieces);
+			if (namedPieces.length) that.addNamedPieces(namedPieces);
 		});
 		
 		// reads the given file and calls onNamedPieces(err, namedPieces) when done
 		function readFile(file, onNamedPieces) {
 			let reader = new FileReader();
 			reader.onload = function() {
-				getNamedPiecesFromFile(file, reader.result, function(namedPieces) {
-					if (namedPieces.length === 0) {
-						if (file.type === "application/json") setWarning("File '" + file.name + "' is not a valid json piece");
-						else if (file.type === "application/zip") setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
+				getNamedPiecesFromFile(file, reader.result, function(err, namedPieces) {
+					if (err) {
+						that.setWarning(err.message);
+						onNamedPieces(null, null);
+					}
+					else if (namedPieces.length === 0) {
+						if (file.type === "application/json") that.setWarning("File '" + file.name + "' is not a valid json piece");
+						else if (file.type === "application/zip") that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
 						onNamedPieces(null, namedPieces);
@@ -763,48 +1071,48 @@ function RecoverFileController(div) {
 			}
 			if (file.type === 'application/json') reader.readAsText(file);
 			else if (file.type === 'application/zip') reader.readAsArrayBuffer(file);
-			else setWarning("'" + file.name + "' is not a zip or json file");
+			else that.setWarning("'" + file.name + "' is not a zip or json file");
 		}
-	}
-	
-	function getNamedPiecesFromFile(file, data, onNamedPieces) {
-		if (file.type === 'application/json') {
-			let piece = JSON.parse(data);
-			CryptoUtils.validatePiece(piece);
-			let namedPiece = {name: file.name, piece: piece};
-			onNamedPieces([namedPiece]);
+		
+		function getNamedPiecesFromFile(file, data, onNamedPieces) {
+			if (file.type === 'application/json') {
+				let piece;
+				try {
+					piece = JSON.parse(data);
+				} catch (err) {
+					onNamedPieces(Error("Could not parse JSON content from '" + file.name + "'"));
+				}
+				let namedPiece = {name: file.name, piece: piece};
+				onNamedPieces(null, [namedPiece]);
+			}
+			else if (file.type === 'application/zip') {
+				LOADER.load("lib/jszip.js", function() {
+					CryptoUtils.zipToPieces(data, function(namedPieces) {
+						onNamedPieces(null, namedPieces);
+					});
+				});
+			}
 		}
-		else if (file.type === 'application/zip') {
-			CryptoUtils.zipToPieces(data, function(namedPieces) {
-				onNamedPieces(namedPieces);
-			});
-		}
-	}
-	
-	function addNamedPieces(namedPieces) {
-		for (let namedPiece of namedPieces) {
-			if (!isPieceImported(namedPiece.name)) importedPieces.push(namedPiece);
-		}
-		updatePieces();
 	}
 	
 	function isPieceImported(name) {
-		for (let importedPiece of importedPieces) {
+		for (let importedPiece of importedNamedPieces) {
 			if (importedPiece.name === name) return true;
 		}
 		return false;
 	}
 	
 	function removePieces() {
-		importedPieces = [];
+		importedNamedPieces = [];
 		lastKeys = undefined;
 		updatePieces();
 	}
 	
 	function removePiece(name) {
-		for (let i = 0; i < importedPieces.length; i++) {
-			if (importedPieces[i].name === name) {
-				importedPieces.splice(i, 1);
+		for (let i = 0; i < importedNamedPieces.length; i++) {
+			if (importedNamedPieces[i].name === name) {
+				importedNamedPieces.splice(i, 1);
+				that.setWarning("");
 				updatePieces();
 				return;
 			}
@@ -812,40 +1120,50 @@ function RecoverFileController(div) {
 		throw new Error("No piece with name '" + name + "' imported");
 	}
 	
-	function updatePieces() {
+	function updatePieces(onDone) {
 		
 		// update UI
-		setWarning("");
-		renderImportedPieces(importedPieces);
+		renderImportedPieces(importedNamedPieces);
 		
 		// collect all pieces
 		let pieces = [];
-		for (let importedPiece of importedPieces) pieces.push(importedPiece.piece);
-		if (!pieces.length) return;
+		for (let importedPiece of importedNamedPieces) pieces.push(importedPiece.piece);
+		if (!pieces.length) {
+			if (onDone) onDone();
+			return;
+		}
 		
 		// collect tickers being imported
 		let tickers = new Set();
 		for (let pieceKey of pieces[0].keys) tickers.add(pieceKey.ticker);
 		
 		// collect dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
+		let dependencies = new Set(APP_DEPENDENCIES);
 		for (let ticker of tickers) {
 			let plugin = CryptoUtils.getCryptoPlugin(ticker);
 			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
 		}
 		
 		// load dependencies
-		loader.load(Array.from(dependencies), function() {
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// create keys
 			try {
+				
+				// add control to view pieces
+				addControl("view imported pieces", function() {
+					UiUtils.openStorage("Imported Storage", null, null, null, pieces);
+				});
+				
+				// attempt to get keys
 				let keys = CryptoUtils.piecesToKeys(pieces);
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
-				if (!keys.length) setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
 				lastKeys = keys;
 			} catch (err) {
-				setWarning(err.message);
+				let img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
+				that.setWarning(err.message, img);
 			}
+			if (onDone) onDone();
 		});
 		
 		function keysDifferent(keys1, keys2) {
@@ -860,19 +1178,22 @@ function RecoverFileController(div) {
 	}
 	
 	function renderImportedPieces(namedPieces) {
+		
+		// reset state
+		resetControls();
 		importedPiecesDiv.empty();
+		
+		// hide imported pieces and controls if no pieces
 		if (namedPieces.length === 0) {
 			importedPiecesDiv.hide();
 			controlsDiv.hide();
 			return;
 		}
 		
-		importedPiecesDiv.show();
-		controlsDiv.show();
+		// render imported pieces
 		for (let namedPiece of namedPieces) {
 			importedPiecesDiv.append(getImportedPieceDiv(namedPiece));
 		}
-		
 		function getImportedPieceDiv(namedPiece) {
 			let importedPieceDiv = $("<div class='recover_file_imported_piece'>").appendTo(importedPiecesDiv);
 			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
@@ -881,6 +1202,10 @@ function RecoverFileController(div) {
 			trash.click(function() { removePiece(namedPiece.name); });
 			return importedPieceDiv;
 		}
+		
+		// show imported pieces and controls
+		importedPiecesDiv.show();
+		controlsDiv.show();
 	}
 	
 	/**
@@ -938,22 +1263,35 @@ function RecoverTextController(div, plugins) {
 	DivController.call(this, div);
 	assertTrue(plugins.length > 0);
 	
-	const MAX_PIECE_LENGTH = 58;					// max length of piece strings to render
+	const MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
+	
 	let warningDiv;
+	let contentDiv;
+	let passphraseInputDiv;
 	let selector;
 	let selectorDisabler;
 	let selectedPlugin;
 	let textArea;
 	let importedPieces = [];	// string[]
-	let piecesAndControls;		// div for imported pieces and controls
 	let importedPiecesDiv;		// div for imported pieces
+	let controlsDiv;
 	let lastKeys;
 	
 	this.render = function(onDone) {
 		
+		// div setup
+		div.empty();
+		div.addClass("recover_content_div");
+		
 		// warning div
 		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
 		warningDiv.hide();
+		
+		// set up content div
+		contentDiv = $("<div>").appendTo(div);
+		
+		// all passphrase input
+		passphraseInputDiv = $("<div>").appendTo(contentDiv);
 		
 		// currency selector data
 		selectorData = [];
@@ -965,9 +1303,29 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		// currency selector
-		let selectorContainer = $("<div class='recover_selector_container'>").appendTo(div);
+		let selectorContainer = $("<div class='recover_selector_container'>").appendTo(passphraseInputDiv);
 		selector = $("<div id='recover_selector'>").appendTo(selectorContainer);
-		loader.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
+		
+		// text area
+		textArea = $("<textarea class='recover_textarea'>").appendTo(passphraseInputDiv);
+		textArea.attr("placeholder", "Enter a private key or split pieces of a private key");
+		
+		// submit button
+		let submit = $("<div class='recover_button'>").appendTo(passphraseInputDiv);
+		submit.html("Submit");
+		submit.click(function() { submitPieces(); });
+		
+		// imported pieces
+		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(passphraseInputDiv);
+		importedPiecesDiv.hide();
+		
+		// controls
+		controlsDiv = $("<div class='recover_controls'>").appendTo(div);
+		controlsDiv.hide();
+		resetControls();
+		
+		// initialize pull down
+		LOADER.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
 			selector.ddslick({
 				data:selectorData,
 				background: "white",
@@ -977,45 +1335,39 @@ function RecoverTextController(div, plugins) {
 				defaultSelectedIndex: 0,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
-					loader.load(selectedPlugin.getDependencies());	// start loading dependencies
+					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
 			});
 			selector = $("#recover_selector");	// ddslick requires id reference
-			setSelectedCurrency("Bitcoin");			// default value
 			selectorDisabler = $("<div class='recover_selector_disabler'>").appendTo(selectorContainer);
-			setSelectorEnabled(true);
+			startOver();
+			
+			// done rendering
+			if (onDone) onDone(div);
 		});
-		
-		// text area
-		textArea = $("<textarea class='recover_textarea'>").appendTo(div);
-		textArea.attr("placeholder", "Enter a private key or split pieces of a private key");
-		
-		// submit button
-		let submit = $("<div class='recover_submit'>").appendTo(div);
-		submit.html("Submit");
-		submit.click(function() { submitPieces(); });
-		
-		// pieces and controls
-		piecesAndControls = $("<div>").appendTo(div);
-		piecesAndControls.hide();
-		
-		// imported pieces
-		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(piecesAndControls);
+	}
+	
+	function resetControls() {
+		controlsDiv.empty();
+		addControl("start over", startOver);
+	}
+	
+	function addControl(text, onClick) {
+		let linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
+		let link = $("<div class='recover_control_link'>").appendTo(linkDiv);
+		link.append(text);
+		link.click(function() { onClick(); });
+	}
+	
+	function startOver() {
+		setWarning("");
+		textArea.val("");
+		contentDiv.children().detach();
 		importedPiecesDiv.hide();
-		
-		// start over
-		let controlsDiv = $("<div class='recover_controls'>").appendTo(piecesAndControls);
-		let startOverLink = $("<div class='recover_start_over'>").appendTo(controlsDiv);
-		startOverLink.append("start over");
-		startOverLink.click(function(e) {
-			warningDiv.empty();
-			warningDiv.hide();
-			removePieces();
-			piecesAndControls.hide();
-		});
-		
-		// done rendering
-		if (onDone) onDone(div);
+		controlsDiv.hide();
+		contentDiv.append(passphraseInputDiv);
+		removePieces();
+		setSelectedCurrency("Bitcoin");
 	}
 	
 	function setSelectorEnabled(bool) {
@@ -1031,13 +1383,45 @@ function RecoverTextController(div, plugins) {
 	function onKeysImported(keys) {
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
-		let pieces = CryptoUtils.keysToPieces(keys);
-		let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-		let body = $("body", window.document);
-		new ExportController(body, window, null, keys, pieces).render();
+		if (keys[0].isEncrypted()) {
+			
+			// create decryption controller and register callbacks
+			let decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+				setWarning(warning);
+			}, function(decryptedKeys, pieces, pieceDivs) {
+				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
+			});
+			
+			// render decryption controller
+			decryptionController.render(function(decryptionDiv) {
+				
+				// replace content div with passphrase input
+				contentDiv.children().detach();
+				contentDiv.append(decryptionDiv);
+				decryptionController.focus();
+				
+				// add control to view encrypted keys
+				addControl("view encrypted key", function() {
+					UiUtils.openStorage("Imported Storage", null, null, keys);
+				});
+			});
+		} else {
+			onKeysDecrypted(keys);
+		}
+	}
+	
+	function onKeysDecrypted(keys, pieces, pieceDivs) {
+		resetControls();
+		contentDiv.children().detach();
+		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
+		viewDecrypted.append("View Decrypted Key");
+		viewDecrypted.click(function() {
+			UiUtils.openStorage("Imported Storage", null, null, keys, pieces, pieceDivs);
+		});
 	}
 	
 	function setSelectedCurrency(name) {
+		selector = $("#recover_selector");
 		for (let i = 0; i < selectorData.length; i++) {
 			if (selectorData[i].text === name) {
 				selector.ddslick('select', {index: i});
@@ -1060,7 +1444,26 @@ function RecoverTextController(div, plugins) {
 		}
 	}
 	
+	function removePieces() {
+		importedPieces = [];
+		lastKeys = undefined;
+		updatePieces();
+	}
+	
+	function removePiece(piece) {
+		for (let i = 0; i < importedPieces.length; i++) {
+			if (importedPieces[i] === piece) {
+				importedPieces.splice(i, 1);
+				updatePieces();
+				return;
+			}
+		}
+		throw new Error("No piece imported: " + piece);
+	}
+	
 	function submitPieces() {
+		
+		resetControls();
 		
 		// get and clear text
 		let val = textArea.val();
@@ -1082,30 +1485,13 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		// load dependencies
-		let dependencies = new Set(COMMON_DEPENDENCIES);
+		let dependencies = new Set(APP_DEPENDENCIES);
 		for (let dependency of selectedPlugin.getDependencies()) dependencies.add(dependency);
-		loader.load(Array.from(dependencies), function() {
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// add pieces
 			updatePieces(contentLines);
 		});
-	}
-	
-	function removePieces() {
-		importedPieces = [];
-		lastKeys = undefined;
-		updatePieces();
-	}
-	
-	function removePiece(piece) {
-		for (let i = 0; i < importedPieces.length; i++) {
-			if (importedPieces[i] === piece) {
-				importedPieces.splice(i, 1);
-				updatePieces();
-				return;
-			}
-		}
-		throw new Error("No piece imported: " + piece);
 	}
 	
 	function updatePieces(newPieces) {
@@ -1168,7 +1554,10 @@ function RecoverTextController(div, plugins) {
 			try {
 				key = selectedPlugin.combine(importedPieces);
 			} catch (err) {
-				if (!warningSet) setWarning("Need additional pieces to recover private keys", $("<img src='img/files.png'>"));
+				if (!warningSet) {
+					let img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
+					setWarning(err.message, img);
+				}
 			}
 		}
 		
@@ -1185,13 +1574,13 @@ function RecoverTextController(div, plugins) {
 	function renderImportedPieces(pieces) {
 		importedPiecesDiv.empty();
 		if (pieces.length === 0) {
-			piecesAndControls.hide();
 			importedPiecesDiv.hide();
+			controlsDiv.hide();
 			return;
 		}
 		
 		importedPiecesDiv.show();
-		piecesAndControls.show();
+		controlsDiv.show();
 		for (let piece of pieces) {
 			importedPiecesDiv.append(getImportedPieceDiv(piece));
 		}
@@ -1209,18 +1598,21 @@ function RecoverTextController(div, plugins) {
 inheritsFrom(RecoverTextController, DivController);
 
 /**
- * Controls password input and key decryption on import.
+ * Controls passphrase input and key decryption on import.
  * 
  * @param div is the div to render to
  * @param encrypted keys is an array of encrypted CryptoKeys
+ * @param onWarning(msg) is called when this controller reports a warning
+ * @param onKeysDecrypted(keys, pieces, pieceDivs) is invoked on successful decryption
  */
-function DecryptionController(div, encryptedKeys) {
+function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	DivController.call(this, div);
 	
 	let that = this;
+	let labelDiv;
 	let inputDiv;
-	let warningDiv;
 	let passphraseInput;
+	let progressDiv;
 	let submitButton;
 	
 	this.render = function(onDone) {
@@ -1229,22 +1621,21 @@ function DecryptionController(div, encryptedKeys) {
 		div.empty();
 		div.addClass("recover_decryption_div");
 		
-		// div to collect passphrase input
+		// label
+		labelDiv = $("<div class='recover_decrypt_label'>").appendTo(div);
+		
+		// passphrase input
 		inputDiv = $("<div>").appendTo(div);
-		
-		// warning div
-		warningDiv = $("<div class='recover_warning_div'>").appendTo(inputDiv);
-		warningDiv.hide();
-		
-		// password input
-		let passwordLabel = $("<div class='recover_passphrase_label'>").appendTo(inputDiv);
-		passwordLabel.append("Password");
 		passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(inputDiv)
-		
-		// submit button
-		submitButton = $("<div class='recover_submit'>").appendTo(inputDiv);
+		submitButton = $("<div class='recover_button'>").appendTo(inputDiv);
 		submitButton.html("Submit");
 		submitButton.click(function() { onSubmit(); });
+		
+		// progress bar
+		progressDiv = $("<div class='recover_progress_div'>").appendTo(div);
+		
+		// initial state
+		init();
 		
 		// register passphrase enter key
 		passphraseInput.keyup(function(e) {
@@ -1262,10 +1653,18 @@ function DecryptionController(div, encryptedKeys) {
 		passphraseInput.focus();
 	}
 	
+	function init() {
+		progressDiv.hide();
+		labelDiv.html("Passphrase");
+		labelDiv.show();
+		inputDiv.show();
+		that.focus();
+	}
+	
 	function onSubmit() {
 		
 		// clear warning
-		setWarning("");
+		onWarning("");
 		
 		// get passphrase
 		let passphrase = passphraseInput.val();
@@ -1273,77 +1672,131 @@ function DecryptionController(div, encryptedKeys) {
 		
 		// validate passphrase
 		if (!passphrase || passphrase.trim() === "") {
-			setWarning("Enter a passphrase to decrypt private keys");
+			onWarning("Enter a passphrase to decrypt private keys");
 			return;
 		}
 		
-		// switch content div to progress bar
-		div.children().detach();
-		let progressDiv = $("<div>").appendTo(div);
-		progressBar = UiUtils.getProgressBar(progressDiv);
-		
 		// compute weights for progress bar
-		let decryptWeight = CryptoUtils.getDecryptWeight(encryptedKeys);
+		let decryptWeight = CryptoUtils.getWeightDecryptKeys(encryptedKeys);
 		let renderWeight = PieceRenderer.getRenderWeight(encryptedKeys.length, 1, null);
 		let totalWeight = decryptWeight + renderWeight;
 		
-		// decrypt keys async
-		CryptoUtils.decryptKeys(encryptedKeys, passphrase, function(done, total) {
-			setProgress(done / total * decryptWeight / totalWeight, "Decrypting");
-		}, function(err, decryptedKeys) {
+		// switch content div to progress bar
+		inputDiv.hide();
+		progressDiv.show();
+		progressDiv.empty();
+		progressBar = UiUtils.getProgressBar(progressDiv);
+		setProgress(0, "Decrypting...");
+		
+		// let UI breath
+		setImmediate(function() {
 			
-			// if error, switch back to input div
-			if (err) {
-				setWarning(err.message);
-				div.empty();
-				div.append(inputDiv);
-				that.focus();
-				return;
-			}
-			
-			// convert keys to pieces
-			let pieces = CryptoUtils.keysToPieces(decryptedKeys);
-			
-			// render pieces
-			PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
-				setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering");
-			}, function(err, pieceDivs) {
+			// decrypt keys async
+			let copies = [];
+			for (let encryptedKey of encryptedKeys) copies.push(encryptedKey.copy());
+			CryptoUtils.decryptKeys(copies, passphrase, function(done, total) {
+				setProgress(done / total * decryptWeight / totalWeight, "Decrypting...");
+			}, function(err, decryptedKeys) {
 				
-				// button to view decrypted storage
-				div.empty();
-				let viewDecrypted = $("<div class='recover_submit'>").appendTo(div);	// TODO: rename class to 'recover_button'
-				viewDecrypted.append("View Decrypted Keys");
+				// if error, switch back to input div
+				if (err) {
+					onWarning(err.message);
+					init();
+					return;
+				}
 				
-				// open in new tab on click
-				viewDecrypted.click(function() {
-					let window = newWindow(null, "Imported Storage", null, "css/style.css", getInternalStyleSheetText());
-					let body = $("body", window.document);
-					new ExportController(body, window, null, decryptedKeys, pieces, pieceDivs).render();
+				// convert keys to pieces
+				let pieces = CryptoUtils.keysToPieces(decryptedKeys);
+				
+				// render pieces
+				PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
+					setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering...");
+				}, function(err, pieceDivs) {
+					if (err) throw err;
+					onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
 				});
 			});
 		});
 	}
 	
-	function setWarning(str, img) {
-		warningDiv.empty();
-		if (str) {
-			if (!img) img = $("<img src='img/warning.png'>");
-			warningDiv.append(img);
-			img.addClass("recover_warning_div_icon");
-			warningDiv.append(str);
-			warningDiv.show();
-		} else {
-			warningDiv.hide();
-		}
-	}
-	
 	function setProgress(percent, label) {
 		progressBar.set(percent);
 		progressBar.setText(Math.round(percent * 100) + "%");
-		//if (label) progressBar.setText(label);
+		if (label) labelDiv.html(label);
 	}
 }
 inheritsFrom(DecryptionController, DivController);
+
+/**
+ * Manages up to two tabs of content.  Hides tabs if only one content given.
+ * 
+ * @param div is the div to render all tab content to
+ * @param tabName1 is the name of the first tab
+ * @param tabContent1 is the content tab of the first tab
+ * @param tabName2 is the name of the second tab (optional)
+ * @param tabContent2 is the content tab of the second tab (optional)
+ * @param defaultTabIdx is the default tab index (optional)
+ */
+function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx) {
+	DivController.call(this, div);
+	
+	let tabsDiv;
+	let tab1;
+	let tab2;
+	let contentDiv;
+	
+	this.render = function(onDone) {
+		
+		// no tabs if one content div
+		if (!tabContent2) {
+			div.append(tabContent1);
+			return;
+		}
+		
+		// TODO: rename classes
+		// set up tabs
+		tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
+		tab1 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tab1.html(tabName1);
+		tab1.click(function() { selectTab(0); });
+		tab2 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tab2.html(tabName2);
+		tab2.click(function() { selectTab(1); });
+		
+		// add content div
+		contentDiv = $("<div>").appendTo(div);
+		
+		// start on first tab by default
+		selectTab(defaultTabIdx ? defaultTabIdx : 0);
+		
+		// done rendering
+		if (onDone) onDone(div);
+	}
+	
+	this.getTabsDiv = function() {
+		return tabsDiv;
+	}
+	
+	function selectTab(idx) {
+		switch(idx) {
+		case 0:
+			tab1.addClass("active_tab");
+			tab2.removeClass("active_tab");
+			contentDiv.children().detach();
+			contentDiv.append(tabContent1);
+			break;
+		case 1:
+			tab1.removeClass("active_tab");
+			tab2.addClass("active_tab");
+			contentDiv.children().detach();
+			contentDiv.append(tabContent2);
+			break;
+		default:
+			throw Error("Tab index must be 0 or 1 but was " + idx);
+		}
+	}
+}
+inheritsFrom(TwoTabController, DivController);
 
 /**
  * Export page.
@@ -1360,19 +1813,30 @@ inheritsFrom(DecryptionController, DivController);
 function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	DivController.call(this, div);
 	
+	// check if storage saved before window closed
+	window.addEventListener("beforeunload", function (e) {
+		if (!saved) {
+		  let confirmationMessage = "Your storage has not been saved or printed.";
+		  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
+		  return confirmationMessage;     												// Webkit, Safari, Chrome
+		}               
+	});
+	
 	// global variables
+	let saved = false;
 	let progressDiv;
 	let progressBar;
 	let printButton;
 	let showPublicCheckbox;
 	let showPrivateCheckbox;
 	let showLogosCheckbox;
-	let currentPiece;
-	let pieceSelector;
+	let paginator;
+	let piecesDiv;
 	let printEnabled;
 	
 	this.render = function(onDone) {
 		div.empty();
+		div.addClass("export_div");
 		
 		// key generation
 		progressDiv = $("<div class='export_progress_div'>").appendTo(div);
@@ -1416,20 +1880,30 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		showPrivateCheckbox.prop('checked', true);
 		showLogosCheckbox.prop('checked', true);
 		
+		// sort pieces and pieceDivs by piece number
+		sortPieces();
+		
 		// piece selection
-		let exportPieceSelection = $("<div class='export_piece_selection'>").appendTo(exportHeader);
-		pieceSelector = $("<select class='piece_selector'>").appendTo(exportPieceSelection);
+		let paginatorSource = getPaginatorSource(keyGenConfig, pieces);
+		if (paginatorSource) {
+			paginator = $("<div id='paginator'>").appendTo(exportHeader);
+			$("#paginator").pagination({
+				dataSource: paginatorSource,
+				pageSize: 1,
+				callback: function(data, pagination) {
+					if (pieceDivs) setVisiblePiece(pieceDivs, pagination.pageNumber - 1);
+				}
+			});
+			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
+		}
 		
 		// currently showing piece
-		currentPiece = $("<div class='export_current_piece'>").appendTo(div);
+		piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
 		
 		// register events
 		showPublicCheckbox.click(function() { update(); });
 		showPrivateCheckbox.click(function() { update(); });
 		showLogosCheckbox.click(function() { update(); });
-		pieceSelector.change(function() {
-			setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
-		});
 		
 		// build ui based on keyGenConfig, pieces, and pieceDivs
 		update(pieceDivs);
@@ -1439,6 +1913,53 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
+	
+	function sortPieces() {
+		if (!pieces) return;
+		
+		// bind pieces and pieceDivs
+		let elems = [];
+		for (let i = 0; i < pieces.length; i++) {
+			elems.push({
+				piece: pieces[i],
+				pieceDiv: pieceDivs ? pieceDivs[i] : null
+			});
+		}
+		
+		// sort elems
+		elems.sort(function(elem1, elem2) {
+			let num1 = elem1.piece.pieceNum;
+			let num2 = elem2.piece.pieceNum;
+			assertNumber(num1);
+			assertNumber(num2);
+			return num1 - num2;
+		});
+		
+		// re-assign global pieces
+		pieces = [];
+		if (pieceDivs) pieceDivs = [];
+		for (let elem of elems) {
+			pieces.push(elem.piece);
+			if (pieceDivs) pieceDivs.push(elem.pieceDiv);
+		}
+	}
+	
+	function getPaginatorSource(keyGenConfig, pieces) {
+		if (keyGenConfig) {
+			if (keyGenConfig.numPieces === 1) return null;
+			let pieceNums = [];
+			for (let i = 0; i < keyGenConfig.numPieces; i++) pieceNums.push(i + 1);
+			return pieceNums;
+		}
+		if (pieces) {
+			assertTrue(pieces.length >= 1);
+			if (pieces.length === 1) return null;
+			let pieceNums = [];
+			for (let piece of pieces) pieceNums.push(piece.pieceNum);
+			return pieceNums;
+		}
+		return null;
+	}
 	
 	function getPieceRendererConfig() {
 		return {
@@ -1450,12 +1971,14 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	function printAll() {
 		if (!printEnabled) return;
+		saved = true;
 		window.print();
 	}
 	
 	function saveAll(pieces) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
+		saved = true;
 		if (pieces.length === 1) {
 			let jsonStr = CryptoUtils.pieceToJson(pieces[0]);
 			saveAs(new Blob([jsonStr]), "cryptostorage_" + CryptoUtils.getCommonTicker(pieces[0]).toLowerCase() + ".json");
@@ -1490,8 +2013,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		
 		// add piece divs if given
 		if (pieceDivs) {
-			updateSelector(pieceSelector, pieces.length);
-			setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
+			assertInitialized(pieces);
+			setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(pieceDivs);
 			setPrintEnabled(true);
 			if (onDone) onDone();
@@ -1504,8 +2027,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			// render pieces if given
 			if (pieces) {
 				for (piece of pieces) pieceDivs.push($("<div>"));
-				updateSelector(pieceSelector, pieces.length);
-				setVisible(pieceDivs, parseFloat(pieceSelector.find(":selected").val()));
+				setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(pieceDivs);
 				setPrintEnabled(false);
 				PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
@@ -1523,41 +2045,36 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			// otherwise generate keys from config
 			else {
 				assertInitialized(keyGenConfig);
-				CryptoUtils.generateKeys(keyGenConfig, function(done, total, label) {
-					console.log(done + " / " + total + " " + label);
-					progressBar.set(done / total);
+				CryptoUtils.generateKeys(keyGenConfig, function(percent, label) {
+					progressBar.set(percent);
 					if (label) progressBar.setText(label);
 					progressDiv.show();
 				}, function(_keys, _pieces, _pieceDivs) {
+					progressDiv.hide();
 					keys = _keys;
 					pieces = _pieces;
 					pieceDivs = _pieceDivs;
-					update(onDone);
+					update(pieceDivs, onDone);
 				});
 			}
 		}
 	}
 	
-	function updateSelector(pieceSelector, numPieces) {
-		pieceSelector.empty();
-		for (let i = 0; i < numPieces; i++) {
-			let option = $("<option value='" + i + "'>").appendTo(pieceSelector);
-			option.html("Piece " + (i + 1));
-		}
-	}
-	
 	function setPieceDivs(pieceDivs) {
-		currentPiece.empty();
-		for (let pieceDiv of pieceDivs) currentPiece.append(pieceDiv);
+		piecesDiv.empty();
+		for (let pieceDiv of pieceDivs) piecesDiv.append(pieceDiv);
 	}
 	
 	/**
-	 * Adds the hidden class to each of the given divs except at the given idx.
+	 * Sets the visible piece by adding/removing the hidden class.
+	 * 
+	 * @param pieceDivs are the piece divs to show/hide
+	 * @param pieceIdx is the piece number to show
 	 */
-	function setVisible(divs, idx) {
-		for (let i = 0; i < divs.length; i++) {
-			if (i === idx) divs[i].removeClass("hidden");
-			else divs[i].addClass("hidden");
+	function setVisiblePiece(pieceDivs, pieceIdx) {
+		for (let i = 0; i < pieces.length; i++) {
+			if (i === pieceIdx) pieceDivs[i].removeClass("hidden");
+			else pieceDivs[i].addClass("hidden");
 		}
 	}
 	
