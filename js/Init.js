@@ -1,6 +1,5 @@
 // TODO
 // public address (decrypt to view) instead of (omitted)
-// save as txt and csv
 // homepage design
 // faq
 // wait for images before loading homepage
@@ -26,6 +25,7 @@
 // homepage scale too big on small screens?
 
 // low priority:
+// save as txt and csv
 // try all imported file / key combinations to recover
 // prevent scroll revealing some of next picture
 // copy line break in pdf inserts space

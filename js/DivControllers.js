@@ -1857,9 +1857,9 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		let savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
 		savePublicButton.click(function() { savePublicAddresses(); });
-		let moreButton = $("<div class='export_button'>").appendTo(exportButtons);
-		moreButton.html("...");
-		moreButton.click(function() { console.log("More button clicked"); });
+//		let moreButton = $("<div class='export_button'>").appendTo(exportButtons);
+//		moreButton.html("...");
+//		moreButton.click(function() { console.log("More button clicked"); });
 		
 		// export checkboxes
 		let exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
