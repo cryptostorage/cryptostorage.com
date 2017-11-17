@@ -1040,7 +1040,7 @@ let CryptoUtils = {
 		});
 		
 		function isOnDomain() {
-			return window.location.href.indexOf("www.cryptostorage.com") > -1;
+			return window.location.href.indexOf(CRYPTOSTORAGE_URL) > -1;
 		}
 	}
 }
