@@ -1032,7 +1032,7 @@ let CryptoUtils = {
 	getSecurityChecks: function(onDone) {
 		isImageAccessible(ONLINE_IMAGE_URL, 1500, function(isOnline) {
 			onDone({
-				windowCryptoExists: false,
+				windowCryptoExists: window.crypto ? true : false,
 				isOnDomain: isOnDomain(),
 				isOnline: isOnline,
 				isOpenSourceBrowser: false
