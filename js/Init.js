@@ -58,22 +58,13 @@ $(document).ready(function() {
 	LOADER.load(APP_DEPENDENCIES, function() {
 		
 		// generate lib/b64-images.js file
-		let b64 = CryptoUtils.getB64Images();
-		LOADER.load("lib/FileSaver.js", function() {
-			saveAs(new Blob([b64]), "b64-images.js");
-		});
-		
-//		// get data url of logo
-//		let plugin = CryptoUtils.getCryptoPlugin("BCH");
-//		console.log(imgToDataUrl($("<img src='img/cryptostorage.png'>").get(0)));
-//		function imgToDataUrl(img, format) {
-//			let canvas = document.createElement('canvas');
-//		    canvas.height = img.naturalHeight;
-//		    canvas.width = img.naturalWidth;
-//		    let context = canvas.getContext('2d');
-//		    context.drawImage(img, 0, 0);
-//		    return canvas.toDataURL(format);
-//		}
+		if (GENERATE_B64_IMAGES) {
+			CryptoUtils.getB64ImageFile(function(js) {
+				LOADER.load("lib/FileSaver.js", function() {
+					saveAs(new Blob([js]), "b64-images.js");
+				});
+			});
+		}
 	});
 	
 	// run tests

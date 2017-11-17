@@ -120,7 +120,7 @@ function AppController(div) {
 		
 		// header logo
 		let headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
-		let logo = $("<img class='app_header_logo_img' src='img/cryptostorage.png'>").appendTo(headerTopDiv);
+		let logo = $("<img class='app_header_logo_img' src='img/cryptostorage_white.png'>").appendTo(headerTopDiv);
 		logo.click(function() {
 			window.location.href = "#home";
 			that.showHome();

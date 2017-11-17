@@ -983,17 +983,37 @@ let CryptoUtils = {
 	 * Utility to generate lib/b64-images.js.
 	 * 
 	 * Allows the b64 image data to be verified from source.
+	 * 
+	 * @param onDone(js) is invoked when the js file is generated
 	 */
-	getB64Images: function() {
+	getB64ImageFile: function(onDone) {
 		let js = [];
 		js.push("/**\n * Embeds base64 logo data for dynamic import and HTML export.\n */");
 		js.push("\nfunction getImageData(key) {\n\tswitch(key) {");
+		
+		// add currency logos
 		for (let plugin of CryptoUtils.getCryptoPlugins()) {
-			js.push("\n\t\tcase \"" + plugin.getTicker() + "\": \"" + imgToDataUrl(plugin.getLogo().get(0)) + "\";");
+			js.push("\n\t\tcase \"" + plugin.getTicker() + "\": return \"" + imgToDataUrl(plugin.getLogo().get(0)) + "\";");
 		}
-		js.push("\n\t\tcase \"CRYPTOSTORAGE\": \"" + imgToDataUrl($("<img src='img/cryptostorage.png'>").get(0)) + "\";");
-		js.push("\n\t\tcase \"QUESTION_MARK\": \"" + imgToDataUrl($("<img src='img/question_mark.png'>").get(0)) + "\";");
-		js.push("\n\t\tdefault: throw new Error(\"Image data not found for key: \" + key);\n\t}\n}\n");
-		return js.join("");
+		
+		// add cryptostorage logo
+		let imgCsExport = $("<img src='img/cryptostorage_export.png'>");
+		imgCsExport.one("load", function() {
+			js.push("\n\t\tcase \"CRYPTOSTORAGE\": return \"" + imgToDataUrl(imgCsExport.get(0)) + "\";");
+			
+			// add cryptostorage logo
+			let imgQuestionMark = $("<img src='img/question_mark.png'>");
+			imgQuestionMark.one("load", function() {
+				js.push("\n\t\tcase \"QUESTION_MARK\": return \"" + imgToDataUrl(imgQuestionMark.get(0)) + "\";");
+				
+				// finish
+				js.push("\n\t\tdefault: throw new Error(\"Image data not found for key: \" + key);\n\t}\n}\n");
+				onDone(js.join(""));
+			}).each(function() {
+			  if (this.complete) $(this).load();
+			});
+		}).each(function() {
+		  if (this.complete) $(this).load();
+		});
 	}
 }
