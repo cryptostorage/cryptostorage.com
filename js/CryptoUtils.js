@@ -978,4 +978,20 @@ let CryptoUtils = {
 //},
 	
 	getWeightCreateKey: function() { return 63; },
+	
+	/**
+	 * Utility to generate lib/b64-images.js.
+	 * 
+	 * Allows the b64 image data to be verified from source.
+	 */
+	generateB64Images: function() {
+		
+		let js = [];
+		js.push("/**\n * Embeds base64 logo data for dynamic import and HTML export.\n */\n");
+		js.push("\nfunction getImageData(ticker) {\n\tswitch(ticker) {\n");
+		// HERE
+
+		
+		console.log(imgToDataUrl($("<img src='img/bitcoin.png'>").get(0)));
+	}
 }

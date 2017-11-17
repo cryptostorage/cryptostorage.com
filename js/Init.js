@@ -57,17 +57,19 @@ $(document).ready(function() {
 	// start loading common dependencies
 	LOADER.load(APP_DEPENDENCIES, function() {
 		
+		CryptoUtils.generateB64Images();
+		
 		// get data url of logo
-//		let plugin = CryptoUtils.getCryptoPlugin("BCH");
-//		console.log(imgToDataUrl($("<img src='img/cryptostorage.png'>").get(0)));
-//		function imgToDataUrl(img, format) {
-//			let canvas = document.createElement('canvas');
-//		    canvas.height = img.naturalHeight;
-//		    canvas.width = img.naturalWidth;
-//		    let context = canvas.getContext('2d');
-//		    context.drawImage(img, 0, 0);
-//		    return canvas.toDataURL(format);
-//		}
+		let plugin = CryptoUtils.getCryptoPlugin("BCH");
+		console.log(imgToDataUrl($("<img src='img/cryptostorage.png'>").get(0)));
+		function imgToDataUrl(img, format) {
+			let canvas = document.createElement('canvas');
+		    canvas.height = img.naturalHeight;
+		    canvas.width = img.naturalWidth;
+		    let context = canvas.getContext('2d');
+		    context.drawImage(img, 0, 0);
+		    return canvas.toDataURL(format);
+		}
 	});
 	
 	// run tests

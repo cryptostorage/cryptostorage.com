@@ -640,3 +640,18 @@ function newWindow(div, title, jsPaths, cssPaths, internalCss, onLoad) {
 	});
 	w.document.close();
 }
+
+/**
+ * Converts the given image to a base64 encoded data url.
+ * 
+ * @param img is the image to convert
+ * @param quality is a number between 0 and 1 specifying the image quality
+ */
+function imgToDataUrl(img, quality) {
+	let canvas = document.createElement('canvas');
+  canvas.height = img.naturalHeight;
+  canvas.width = img.naturalWidth;
+  let context = canvas.getContext('2d');
+  context.drawImage(img, 0, 0);
+  return canvas.toDataURL(quality);
+}
