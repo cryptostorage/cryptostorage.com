@@ -1069,12 +1069,57 @@ let CryptoUtils = {
 //	    kMeleon — [gecko]
 			
 			let name = bowser.name;
-			console.log(name);
 			switch (name) {
-				case "Firefox": return true;
-				case "Safari": return false;
-				case "Chrome": return false;
-				default: return null;
+			
+				// open source
+				case "Firefox":
+				case "Tizen":
+				case "Chromium":
+				case "Epiphany":
+				case "K-Meleon":
+				case "SeaMonkey":
+				case "SlimerJS":
+					return true;
+					
+				// chrome needs further check
+				case "Chrome":
+					if (isChrome()) return false;	// chrome
+					else return true;							// assumed to be chromium based
+					
+				// not open source
+				case "Safari":
+				case "Opera":
+				case "Samsung Internet for Android":
+				case "Opera Coast":
+				case "Yandex Browser":
+				case "UC Browser":
+				case "Maxthon":
+				case "Puffin":
+				case "Sleipnir":
+				case "Windows Phone":
+				case "Internet Explorer":
+				case "Microsoft Edge":
+				case "Vivaldi":
+				case "Sailfish":
+				case "Amazon Silk":
+				case "PhantomJS":
+				case "BlackBerry":
+				case "WebOS":
+				case "Bada":
+				case "Android":
+				case "iPhone":
+				case "iPad":
+				case "iPod":
+				case "Googlebot":
+					return false;
+				default: return null;		// don't know
+			}
+			
+			function isChrome() {
+				for (let i = 0; i < navigator.plugins.length; i++) {
+					if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
+				}
+				return false;
 			}
 		}
 	}
