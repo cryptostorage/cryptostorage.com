@@ -349,8 +349,10 @@ input[type='number'] {
 	display:flex;
 	flex-direction:column;
 	align-items:center;
-	padding:15px;
+	justify-content:center;
+	padding:10px;
 	width:195px;
+	height:195px;
 }
 
 .currency_row_item_major:hover {
@@ -362,8 +364,10 @@ input[type='number'] {
 	display:flex;
 	flex-direction:column;
 	align-items:center;
-	padding:15px;
+	justify-content:center;
+	padding:10px;
 	width:195px;
+	height:195px;
 }
 
 .currency_row_item_minor:hover {
@@ -374,13 +378,13 @@ input[type='number'] {
 .currency_row_logo_major {
 	width:110px;
 	height:110px;
-	margin:15px;
+	margin:0 15px 15px 15px;
 }
 
 .currency_row_logo_minor {
 	width:75px;
 	height:75px;
-	margin:15px;
+	margin: 0 15px 15px 15px;
 }
 
 .currency_row_label_major {
