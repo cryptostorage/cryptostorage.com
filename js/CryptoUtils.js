@@ -1035,12 +1035,47 @@ let CryptoUtils = {
 				windowCryptoExists: window.crypto ? true : false,
 				isOnDomain: isOnDomain(),
 				isOnline: isOnline,
-				isOpenSourceBrowser: false
+				isOpenSourceBrowser: isOpenSourceBrowser()
 			});
 		});
 		
 		function isOnDomain() {
 			return window.location.href.indexOf(CRYPTOSTORAGE_URL) > -1;
+		}
+		
+		function isOpenSourceBrowser() {
+
+//	    chrome - [webkit|blink]
+//	    firefox - [gecko]
+//	    msie
+//	    msedge
+//	    safari - [webkit]
+//	    android - native browser - [webkit|blink]
+//	    ios - native browser - [webkit]
+//	    opera - [blink if >=15]
+//	    samsungBrowser - [blink]
+//	    phantom - [webkit]
+//	    blackberry - native browser - [webkit]
+//	    webos - native browser - [webkit]
+//	    silk - Amazon Kindle browser - [webkit]
+//	    bada - [webkit]
+//	    tizen - [webkit]
+//	    seamonkey - [gecko]
+//	    sailfish - [gecko]
+//	    ucbrowser — [webkit]
+//	    qupzilla — [webkit]
+//	    vivaldi — [blink]
+//	    sleipnir — [blink]
+//	    kMeleon — [gecko]
+			
+			let name = bowser.name;
+			console.log(name);
+			switch (name) {
+				case "Firefox": return true;
+				case "Safari": return false;
+				case "Chrome": return false;
+				default: return null;
+			}
 		}
 	}
 }
