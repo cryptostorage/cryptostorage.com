@@ -11,6 +11,7 @@
 // test alert if key creation fails for any reason
 // minimize initial dependencies: condense files to single files, lazy load css
 // test on IE
+// safari export checkboxes move
 
 // design:
 // export controller progress design, initial and re-render
