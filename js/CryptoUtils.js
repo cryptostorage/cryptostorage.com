@@ -987,11 +987,12 @@ let CryptoUtils = {
 	generateB64Images: function() {
 		
 		let js = [];
-		js.push("/**\n * Embeds base64 logo data for dynamic import and HTML export.\n */\n");
-		js.push("\nfunction getImageData(ticker) {\n\tswitch(ticker) {\n");
-		// HERE
-
+		js.push("/**\n * Embeds base64 logo data for dynamic import and HTML export.\n */");
+		js.push("\nfunction getImageData(ticker) {\n\tswitch(ticker) {");
+		js.push("\n\t\tcase \"BTC\": throw new Error(\"yay\")");
+		js.push("\n\t\tdefault: throw new Error(\"Logo data not found for ticker: \" + ticker);\n\n\t}\n}\n");
+		console.log(js.join(""));
 		
-		console.log(imgToDataUrl($("<img src='img/bitcoin.png'>").get(0)));
+//		console.log(imgToDataUrl($("<img src='img/bitcoin.png'>").get(0)));
 	}
 }
