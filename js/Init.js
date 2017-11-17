@@ -20,10 +20,10 @@
 // start over button on form
 // start with all currencies on form
 // bip38 checkboxes on form
-// homepage scale too big on small screens?
 // diagnostic checks: window.crypto, access from domain, live connection, open source browser
 // ability to encrypt / decrypton export page?
 // print progress
+// homepage scale too big on small screens?
 
 // low priority:
 // try all imported file / key combinations to recover
