@@ -22,6 +22,7 @@
 // print progress
 // homepage scale too big on small screens?
 // light blue little bit ligher / brighter
+// homepage design with 8 supported currencies
 
 // low priority:
 // save as txt and csv
