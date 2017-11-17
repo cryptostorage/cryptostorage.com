@@ -115,6 +115,10 @@ function AppController(div) {
 	this.render = function(onDone) {
 		div.empty();
 		
+		CryptoUtils.getSecurityChecks(function(securityChecks) {
+			console.log(securityChecks);
+		});
+		
 		// header
 		let headerDiv = $("<div class='app_header'>").appendTo(div);
 		

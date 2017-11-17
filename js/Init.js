@@ -1,16 +1,16 @@
 // TODO
-// harden inputs: >0, must have first currency, etc
-// input errors
-// diagnostic checks: window.crypto, access from domain, live connection, open source browser
-// homepage design
+// import/export design
+// form validation
+// security checks
+// homepage
 // faq
+// safari export checkboxes move
 // wait for images before loading homepage
 // run minimum tests when site accessed
 // todos throughout code
 // test alert if key creation fails for any reason
 // minimize initial dependencies: condense files to single files, lazy load css
 // test on IE
-// safari export checkboxes move
 
 // design:
 // export controller progress design, initial and re-render

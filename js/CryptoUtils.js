@@ -1024,24 +1024,33 @@ let CryptoUtils = {
 	 * @returns an object:
 	 * 	{
 	 * 		windowCryptoExists: bool,
-	 * 		isOnDomain: bool,
-	 * 		hasInternetConnection: bool,
+	 * 		isOnline: bool,
+	 * 	 	isOnDomain: bool,
 	 * 		isOpenSourceBrowser: bool
-	 * }
+	 *	}
 	 */
-	getHealthChecks: function() {
-		return {
-			windowCryptoExists: false,
-			isOnDomain: false,
-			hasInternetConnection: false,
-			isOpenSourceBrowser: false
-		};
-	},
-	
-	/**
-	 * Indicates if the site is running on the cryptostrage.com domain.
-	 */
-	isFromDomain: function() {
-		console.log(window.href);
+	getSecurityChecks: function(onDone) {
+		isOnline(function(isOnline) {
+			console.log("Online: " + isOnline);
+			onDone({
+				windowCryptoExists: false,
+				isOnDomain: isOnDomain(),
+				isOnline: isOnline,
+				isOpenSourceBrowser: false
+			});
+		});
+		
+		function isOnline(onDone) {
+			$.ajax({
+				url: "http://cryptostorage.com",
+				dataType: "jsonp",
+				success: function() { onDone(true); },
+				error: function() { onDone(false); }
+			});
+		}
+		
+		function isOnDomain() {
+			return window.location.href.indexOf("www.cryptostorage.com") > -1;
+		}
 	}
 }
