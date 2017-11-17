@@ -1016,5 +1016,32 @@ let CryptoUtils = {
 		}).each(function() {
 		  if (this.complete) $(this).load();
 		});
+	},
+	
+	/**
+	 * Performs security health checks.
+	 * 
+	 * @returns an object:
+	 * 	{
+	 * 		windowCryptoExists: bool,
+	 * 		isOnDomain: bool,
+	 * 		hasInternetConnection: bool,
+	 * 		isOpenSourceBrowser: bool
+	 * }
+	 */
+	getHealthChecks: function() {
+		return {
+			windowCryptoExists: false,
+			isOnDomain: false,
+			hasInternetConnection: false,
+			isOpenSourceBrowser: false
+		};
+	},
+	
+	/**
+	 * Indicates if the site is running on the cryptostrage.com domain.
+	 */
+	isFromDomain: function() {
+		console.log(window.href);
 	}
 }
