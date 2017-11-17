@@ -1,10 +1,9 @@
 // TODO
+// harden inputs: >0, must have first currency, etc
+// input errors
 // homepage design
 // faq
 // wait for images before loading homepage
-// light blue little bit ligher / brighter
-// harden inputs: >0, must have first currency, etc
-// input errors
 // run minimum tests when site accessed
 // todos throughout code
 // test alert if key creation fails for any reason
@@ -22,6 +21,7 @@
 // ability to encrypt / decrypton export page?
 // print progress
 // homepage scale too big on small screens?
+// light blue little bit ligher / brighter
 
 // low priority:
 // save as txt and csv
