@@ -24,6 +24,7 @@
 // homepage scale too big on small screens?
 // light blue little bit ligher / brighter
 // homepage design with 8 supported currencies
+// multi-select currencies and quick generate
 
 // low priority:
 // save as txt and csv
