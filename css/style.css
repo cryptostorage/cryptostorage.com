@@ -163,7 +163,7 @@ ol {
 
 .home_label {
 	font-weight:bold;
-	margin-bottom: 15px;
+	margin-bottom: 20px;
 }
 
 .currency_row {
@@ -426,10 +426,16 @@ input[type='checkbox'] {
 	margin-top:-5px;
 }
 
-.value_qr {
+.value_qr_left {
 	width:100px;
 	height:100px;
-	margin:10px
+	margin-right:10px;
+}
+
+.value_qr_right {
+	width:100px;
+	height:100px;
+	margin-left:10px;
 }
 
 .value_label_value {

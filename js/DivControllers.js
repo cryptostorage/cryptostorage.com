@@ -475,7 +475,7 @@ function DonateController(div, appController) {
 			
 			// render qr code
 			CryptoUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "value_qr");
+				img.attr("class", "value_qr_left");
 				qrDiv.append(img);
 				onDone();
 			});
@@ -495,7 +495,7 @@ function DonateController(div, appController) {
 			
 			// render qr code
 			CryptoUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "value_qr");
+				img.attr("class", "value_qr_right");
 				qrDiv.append(img);
 				onDone();
 			});
