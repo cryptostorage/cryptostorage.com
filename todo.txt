@@ -1,9 +1,8 @@
  TODO
- import/export design
  form validation
+ import/export design
  homepage
  faq
- safari export checkboxes move
  wait for images before loading homepage
  run minimum tests when site accessed
  todos throughout code
