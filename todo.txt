@@ -1,4 +1,5 @@
  TODO
+ operating system check
  form validation
  import/export design
  homepage
