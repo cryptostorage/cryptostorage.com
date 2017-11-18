@@ -2132,7 +2132,7 @@ function SecurityCheckController(div) {
 		if (securityChecks.isLocal) {
 			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "running local"));
 		} else {
-			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "running from cryptostorage.com"));
+			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "not running locally"));
 		}
 		
 		// is online
