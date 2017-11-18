@@ -636,6 +636,10 @@ function FormController(div) {
 		let warningDiv = $("<div class='app_header_warning'>").appendTo(div);
 		warningDiv.append("Under Development: Not Ready for Use");
 		
+		// security checks
+		let securityDiv = $("<div>").appendTo(div);
+		new SecurityCheckController(securityDiv).render();
+		
 		// done rendering
 		if (onDone) onDone(div);
 	}
@@ -2085,3 +2089,74 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	}
 }
 inheritsFrom(ExportController, DivController);
+
+/**
+ * Controls security checks.
+ * 
+ * @param div is the div to render to
+ */
+function SecurityCheckController(div) {
+	DivController.call(this, div);
+	
+	const LOOP_TIME = 3000;
+	
+	this.render = function(onDone) {
+		div.empty();
+		div.addClass("security_checks_div");
+		
+		// loading
+		div.append("Loading...");
+		
+		// loop security checks
+		updateSecurityChecks();
+		function updateSecurityChecks() {
+			CryptoUtils.getSecurityChecks(function(securityChecks) {
+				renderSecurityChecks(securityChecks);
+			});
+			setTimeout(updateSecurityChecks, LOOP_TIME);
+		}
+	}
+	
+	//render updated security checks
+	function renderSecurityChecks(securityChecks) {
+		div.empty();
+		
+		// window.crypto
+		if (securityChecks.windowCryptoExists) {
+			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "window.crypto exists"));
+		} else {
+			div.append(getSecurityCheckDiv($("<img src='img/xmark_small.png'>"), "window.crypto does not exist"));
+		}
+		
+		// is on domain
+		if (securityChecks.isLocal) {
+			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "running local"));
+		} else {
+			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "running from cryptostorage.com"));
+		}
+		
+		// is online
+		if (securityChecks.isOnline) {
+			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "active internet connection"));
+		} else {
+			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "no internet connection"));
+		}
+		
+		// is open source browser
+		if (securityChecks.isOpenSourceBrowser) {
+			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "open source browser"));
+		} else {
+			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "not open source browser"));
+		}
+		
+		function getSecurityCheckDiv(img, text) {
+			let div = $("<div class='security_check_div'>");
+			div.append(img);
+			img.css("margin-right", "10px");
+			img.css("width", "32px");
+			div.append(text);
+			return div;
+		}
+	}
+}
+inheritsFrom(SecurityCheckController, DivController);

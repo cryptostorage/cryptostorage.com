@@ -1033,41 +1033,17 @@ let CryptoUtils = {
 		isImageAccessible(ONLINE_IMAGE_URL, 1500, function(isOnline) {
 			onDone({
 				windowCryptoExists: window.crypto ? true : false,
-				isOnDomain: isOnDomain(),
+				isLocal: isLocal(),
 				isOnline: isOnline,
 				isOpenSourceBrowser: isOpenSourceBrowser()
 			});
 		});
 		
-		function isOnDomain() {
-			return window.location.href.indexOf(CRYPTOSTORAGE_URL) > -1;
+		function isLocal() {
+			return window.location.href.indexOf("file://") > -1;
 		}
 		
 		function isOpenSourceBrowser() {
-
-//	    chrome - [webkit|blink]
-//	    firefox - [gecko]
-//	    msie
-//	    msedge
-//	    safari - [webkit]
-//	    android - native browser - [webkit|blink]
-//	    ios - native browser - [webkit]
-//	    opera - [blink if >=15]
-//	    samsungBrowser - [blink]
-//	    phantom - [webkit]
-//	    blackberry - native browser - [webkit]
-//	    webos - native browser - [webkit]
-//	    silk - Amazon Kindle browser - [webkit]
-//	    bada - [webkit]
-//	    tizen - [webkit]
-//	    seamonkey - [gecko]
-//	    sailfish - [gecko]
-//	    ucbrowser — [webkit]
-//	    qupzilla — [webkit]
-//	    vivaldi — [blink]
-//	    sleipnir — [blink]
-//	    kMeleon — [gecko]
-			
 			let name = bowser.name;
 			switch (name) {
 			

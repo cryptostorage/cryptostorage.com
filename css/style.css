@@ -847,3 +847,13 @@ input[type='number'] {
 .hidden {
 	display:none;
 }
+
+.security_checks_div {
+	border:solid;
+}
+
+.security_check_div {
+	display:flex;
+	align-items:center;
+	margin:10px;
+}

@@ -1,7 +1,6 @@
  TODO
  import/export design
  form validation
- security checks
  homepage
  faq
  safari export checkboxes move
@@ -19,7 +18,7 @@
  start over button on form
  start with all currencies on form
  bip38 checkboxes on form
- diagnostic checks: window.crypto, access from domain, live connection, open source browser
+ security checks: window.crypto, local, live connection, open source browser
  ability to encrypt / decrypton export page?
  print progress
  homepage scale too big on small screens?
