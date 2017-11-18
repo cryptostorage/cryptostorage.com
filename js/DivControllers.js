@@ -32,22 +32,6 @@ let UiUtils = {
 		});
 	},
 	
-	getCurrencyRow: function(plugins, isMajor, onCurrencyClicked) {
-		let row = $("<div class='currency_row'>");
-		for (let plugin of plugins) {
-			let item = $("<div>").appendTo(row);
-			item.attr("class", isMajor ? "currency_row_item_major" : "currency_row_item_minor");
-			item.click(function() { onCurrencyClicked(plugin); });
-			let img = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(item);
-			img.attr("class", isMajor ? "currency_row_logo_major" : "currency_row_logo_minor");
-			img.append(plugin.getLogo());
-			let label = $("<div>").appendTo(item);
-			label.attr("class", isMajor ? "currency_row_label_major" : "currency_row_label_minor");
-			label.html(plugin.getName());
-		}
-		return row;
-	},
-	
 	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
 		
 		let dependencies = [
@@ -313,16 +297,16 @@ function HomeController(div) {
 		div.attr("class", "page_div home_div");
 		
 		// supported currencies
-		div.append("Supports these popular cryptocurrencies");
+		div.append("<div class='home_label'>Supports these popular cryptocurrencies</div>");
 		let plugins = CryptoUtils.getCryptoPlugins();
-		div.append(UiUtils.getCurrencyRow(plugins.slice(0, 4), true, onCurrencyClicked));
+		div.append(getCurrencyRow(plugins.slice(0, 4), true, onCurrencyClicked));
 		for (let i = 4; i < plugins.length; i += 4) {
-			div.append(UiUtils.getCurrencyRow(plugins.slice(i, i + 4), true, onCurrencyClicked));
+			div.append(getCurrencyRow(plugins.slice(i, i + 4), true, onCurrencyClicked));
 		}
 		
 		// sample page
 		$("<div style='height:100px'>").appendTo(div);
-		div.append("Export to printable and digital format for long term storage");
+		div.append("<div class='home_label'>Export to printable and digital format for long term storage</div>");
 		$("<div style='height:40px'>").appendTo(div);
 		div.append($("<img width=750px src='img/print_sample.png'>"));
 		
@@ -346,6 +330,22 @@ function HomeController(div) {
 		}
 		
 		if (onDone) onDone(div);
+	}
+	
+	function getCurrencyRow(plugins, isMajor, onCurrencyClicked) {
+		let row = $("<div class='currency_row'>");
+		for (let plugin of plugins) {
+			let item = $("<div>").appendTo(row);
+			item.attr("class", isMajor ? "currency_row_item_major" : "currency_row_item_minor");
+			item.click(function() { onCurrencyClicked(plugin); });
+			let img = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(item);
+			img.attr("class", isMajor ? "currency_row_logo_major" : "currency_row_logo_minor");
+			img.append(plugin.getLogo());
+			let label = $("<div>").appendTo(item);
+			label.attr("class", isMajor ? "currency_row_label_major" : "currency_row_label_minor");
+			label.html(plugin.getName());
+		}
+		return row;
 	}
 }
 inheritsFrom(HomeController, DivController);

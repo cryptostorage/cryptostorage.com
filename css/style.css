@@ -154,6 +154,73 @@ ol {
 	min-height:700px;
 }
 
+.home_div {
+	padding-top:35px;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+}
+
+.home_label {
+	font-weight:bold;
+	margin-bottom: 15px;
+}
+
+.currency_row {
+	display:flex;
+	flex-wrap:wrap;
+	justify-content:center;
+}
+
+.currency_row_item_major {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+	padding:20px;
+	width:195px;
+}
+
+.currency_row_item_major:hover {
+	cursor:pointer;
+	background-color:#EBEDEF;
+}
+
+.currency_row_item_minor {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+	padding:10px;
+	width:195px;
+	height:195px;
+}
+
+.currency_row_item_minor:hover {
+	cursor:pointer;
+	background-color:#EBEDEF;
+}
+
+.currency_row_logo_major {
+	width:100px;
+	height:100px;
+	margin:0 15px 15px 15px;
+}
+
+.currency_row_logo_minor {
+	width:75px;
+	height:75px;
+	margin: 0 15px 15px 15px;
+}
+
+.currency_row_label_major {
+	font-size:20px;
+}
+
+.currency_row_label_minor {
+	font-size:20px;
+}
+
 input[type='number'] {
 	width:70px;
 	text-align:center;
@@ -338,67 +405,6 @@ input[type='checkbox'] {
 
 .btn_generate:active {
 	background-color:#006000;
-}
-
-.home_div {
-	padding-top:25px;
-	display:flex;
-	flex-direction:column;
-	align-items:center;
-}
-
-.currency_row {
-	display:flex;
-}
-
-.currency_row_item_major {
-	display:flex;
-	flex-direction:column;
-	align-items:center;
-	justify-content:center;
-	padding:10px;
-	width:195px;
-	height:195px;
-}
-
-.currency_row_item_major:hover {
-	cursor:pointer;
-	background-color:#EBEDEF;
-}
-
-.currency_row_item_minor {
-	display:flex;
-	flex-direction:column;
-	align-items:center;
-	justify-content:center;
-	padding:10px;
-	width:195px;
-	height:195px;
-}
-
-.currency_row_item_minor:hover {
-	cursor:pointer;
-	background-color:#EBEDEF;
-}
-
-.currency_row_logo_major {
-	width:110px;
-	height:110px;
-	margin:0 15px 15px 15px;
-}
-
-.currency_row_logo_minor {
-	width:75px;
-	height:75px;
-	margin: 0 15px 15px 15px;
-}
-
-.currency_row_label_major {
-	font-size:20px;
-}
-
-.currency_row_label_minor {
-	font-size:20px;
 }
 
 .title {
