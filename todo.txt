@@ -12,6 +12,7 @@
  minimize initial dependencies: condense files to single files, lazy load css
  test on IE
  forward bitcoin cash logo
+ don't confirm close on imported storage
 
  design:
  export controller progress design, initial and re-render
