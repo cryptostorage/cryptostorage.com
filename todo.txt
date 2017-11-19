@@ -13,6 +13,7 @@
  test on IE
  forward bitcoin cash logo
  don't confirm close on imported storage
+ linux: Ethereum Classic wraps, encrypted split wraps by 2 characters
 
  design:
  export controller progress design, initial and re-render
