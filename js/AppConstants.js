@@ -6,4 +6,4 @@ const ENCRYPTION_THREADS = 1;
 const GENERATE_B64_IMAGES = false;	// re-generates lib/b64-images.js for verification
 const CRYPTOSTORAGE_URL = "http://cryptostorage.com";	// TODO: change to https
 const ONLINE_IMAGE_URL = CRYPTOSTORAGE_URL + "/favicon.ico";
-const APP_DEPENDENCIES = ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/b64-images.js", "lib/platform.js"];
+const APP_DEPENDENCIES = ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/b64-images.js", "lib/ua-parser.js"];

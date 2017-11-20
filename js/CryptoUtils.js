@@ -1038,39 +1038,22 @@ let CryptoUtils = {
 		isImageAccessible(ONLINE_IMAGE_URL, 1500, function(isOnline) {
 			
 			// load platform detection library
-			LOADER.load("lib/platform.js", function() {
+			LOADER.load("lib/ua-parser.js", function() {
 				
-				// determine operating system
-				let os = platform.os.family;
-				let osOpenSource = isOpenSourceOs(os);
+				// parse browser user agent
+				let parser = new UAParser();
+				let result = parser.getResult();
 				
-				// determine browser and if open source
-				let browser = platform.name;
-				if (browser === "Chrome" && !isChrome()) browser = "Chromium";	// hack to detect chromium
-				let browserOpenSource = isOpenSourceBrowser(browser);
-				
-				// if open source is known, use it
-				if (browserOpenSource !== null) onDone(getResp());
-				
-				// otherwise load another library to determine browser
-				LOADER.load("lib/bowser.js", function() {
-					browser = bowser.name;
-					if (browser === "Chrome" && !isChrome()) browser = "Chromium";	// hack to detect chromium
-					browserOpenSource = isOpenSourceBrowser(browser);
-					onDone(getResp());
-				})
-				
-				function getResp() {
-					return {
-						windowCryptoExists: window.crypto ? true : false,
-						isLocal: isLocal(),
-						isOnline: isOnline,
-						browser: browser,
-						isOpenSourceBrowser: browserOpenSource,
-						os: os,
-						isOpenSourceOs: osOpenSource
-					};
-				}
+				// build and return response
+				onDone({
+					windowCryptoExists: window.crypto ? true : false,
+					isLocal: isLocal(),
+					isOnline: isOnline,
+					browser: result.browser.name,
+					isOpenSourceBrowser: isOpenSourceBrowser(result.browser.name),
+					os: result.os.name,
+					isOpenSourceOs: isOpenSourceOs(result.os.name)
+				});
 			});
 		});
 		
@@ -1079,6 +1062,15 @@ let CryptoUtils = {
 		}
 		
 		function isOpenSourceBrowser(name) {
+			
+//			Amaya, Android Browser, Arora, Avant, Baidu, Blazer, Bolt, Bowser, Camino, Chimera, 
+//			Chrome [WebView], Chromium, Comodo Dragon, Conkeror, Dillo, Dolphin, Doris, Edge, 
+//			Epiphany, Fennec, Firebird, Firefox, Flock, GoBrowser, iCab, ICE Browser, IceApe, 
+//			IceCat, IceDragon, Iceweasel, IE[Mobile], Iron, Jasmine, K-Meleon, Konqueror, Kindle, 
+//			Links, Lunascape, Lynx, Maemo, Maxthon, Midori, Minimo, MIUI Browser, [Mobile] Safari, 
+//			Mosaic, Mozilla, Netfront, Netscape, NetSurf, Nokia, OmniWeb, Opera [Mini/Mobi/Tablet], 
+//			PhantomJS, Phoenix, Polaris, QQBrowser, RockMelt, Silk, Skyfire, SeaMonkey, Sleipnir, 
+//			SlimBrowser, Swiftfox, Tizen, UCBrowser, Vivaldi, w3m, WeChat, Yandex
 			
 			switch (name) {
 			
@@ -1163,6 +1155,13 @@ let CryptoUtils = {
 		}
 		
 		function isOpenSourceOs(name) {
+			
+//			AIX, Amiga OS, Android, Arch, Bada, BeOS, BlackBerry, CentOS, Chromium OS, Contiki,
+//			Fedora, Firefox OS, FreeBSD, Debian, DragonFly, Gentoo, GNU, Haiku, Hurd, iOS, 
+//			Joli, Linpus, Linux, Mac OS, Mageia, Mandriva, MeeGo, Minix, Mint, Morph OS, NetBSD, 
+//			Nintendo, OpenBSD, OpenVMS, OS/2, Palm, PC-BSD, PCLinuxOS, Plan9, Playstation, QNX, RedHat, 
+//			RIM Tablet OS, RISC OS, Sailfish, Series40, Slackware, Solaris, SUSE, Symbian, Tizen, 
+//			Ubuntu, UNIX, VectorLinux, WebOS, Windows [Phone/Mobile], Zenwalk
 			
 			switch (name) {
 			
