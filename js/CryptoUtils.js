@@ -1153,13 +1153,13 @@ let CryptoUtils = {
 					return false;
 				default: return null;	// don't know
 			}
-			
-			function isChrome() {
-				for (let i = 0; i < navigator.plugins.length; i++) {
-					if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
-				}
-				return false;
+		}
+		
+		function isChrome() {
+			for (let i = 0; i < navigator.plugins.length; i++) {
+				if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
 			}
+			return false;
 		}
 		
 		function isOpenSourceOs(name) {
