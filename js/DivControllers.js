@@ -2142,11 +2142,18 @@ function SecurityCheckController(div) {
 			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "no internet connection"));
 		}
 		
-		// is open source browser
+		// open source browser
 		if (securityChecks.isOpenSourceBrowser) {
-			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "open source browser"));
+			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "browser is open source (" + securityChecks.browser + ")"));
 		} else {
-			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "not open source browser"));
+			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "browser is not open source (" + securityChecks.browser + ")"));
+		}
+		
+		// open source operating system
+		if (securityChecks.isOpenSourceOs) {
+			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "operating system is open source (" + securityChecks.os + ")"));
+		} else {
+			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "operating system is not open source (" + securityChecks.os + ")"));
 		}
 		
 		function getSecurityCheckDiv(img, text) {

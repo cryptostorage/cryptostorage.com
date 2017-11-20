@@ -1019,23 +1019,58 @@ let CryptoUtils = {
 	},
 	
 	/**
-	 * Performs security health checks.
+	 * Performs environment security checks.
 	 * 
 	 * @returns an object:
 	 * 	{
 	 * 		windowCryptoExists: bool,
+	 * 		isLocal: bool
 	 * 		isOnline: bool,
-	 * 	 	isOnDomain: bool,
-	 * 		isOpenSourceBrowser: bool
+	 * 	 	browser: str,
+	 * 		isOpenSourceBrowser: bool,
+	 * 		os: str,
+	 * 		isOpenSourceOs: bool
 	 *	}
 	 */
 	getSecurityChecks: function(onDone) {
+			
+		// attempt to access remote image
 		isImageAccessible(ONLINE_IMAGE_URL, 1500, function(isOnline) {
-			onDone({
-				windowCryptoExists: window.crypto ? true : false,
-				isLocal: isLocal(),
-				isOnline: isOnline,
-				isOpenSourceBrowser: isOpenSourceBrowser()
+			
+			// load platform detection library
+			LOADER.load("lib/platform.js", function() {
+				
+				// determine browser and if open source
+				let browser = platform.name;
+				let browserOpenSource = isOpenSourceBrowser(browser);
+				if (browserOpenSource !== null) readOsAndReturn();
+				else {
+					
+					// load another library to detect browser if cannot be determined
+					LOADER.load("lib/bowser.js", function() {
+						console.log("reading from bowser");
+						browser = bowser.name;
+						browserOpenSource = isOpenSourceBrowser(browser);
+						readOsAndReturn();
+					})
+				}
+				
+				function readOsAndReturn() {
+					
+					// determine operating system and if open source
+					let os = platform.os.family;
+					let osOpenSource = isOpenSourceOs(os);
+					
+					onDone({
+						windowCryptoExists: window.crypto ? true : false,
+						isLocal: isLocal(),
+						isOnline: isOnline,
+						browser: browser,
+						isOpenSourceBrowser: browserOpenSource,
+						os: os,
+						isOpenSourceOs: osOpenSource
+					});
+				}
 			});
 		});
 		
@@ -1043,8 +1078,8 @@ let CryptoUtils = {
 			return window.location.href.indexOf("file://") > -1;
 		}
 		
-		function isOpenSourceBrowser() {
-			let name = bowser.name;
+		function isOpenSourceBrowser(name) {
+			
 			switch (name) {
 			
 				// open source
@@ -1055,6 +1090,18 @@ let CryptoUtils = {
 				case "K-Meleon":
 				case "SeaMonkey":
 				case "SlimerJS":
+				case "Arora":
+				case "Breach":
+				case "Camino":
+				case "Electron":
+				case "Fennec":
+				case "Iceweasel":
+				case "Konqueror":
+				case "Midori":
+				case "PaleMoon":
+				case "Rekonq":
+				case "Sunrise":
+				case "Waterfox":
 					return true;
 					
 				// chrome needs further check
@@ -1065,7 +1112,9 @@ let CryptoUtils = {
 				// not open source
 				case "Safari":
 				case "Opera":
+				case "Opera Mini":
 				case "Samsung Internet for Android":
+				case "Samsung Internet":
 				case "Opera Coast":
 				case "Yandex Browser":
 				case "UC Browser":
@@ -1075,9 +1124,11 @@ let CryptoUtils = {
 				case "Windows Phone":
 				case "Internet Explorer":
 				case "Microsoft Edge":
+				case "IE":
 				case "Vivaldi":
 				case "Sailfish":
 				case "Amazon Silk":
+				case "Silk":
 				case "PhantomJS":
 				case "BlackBerry":
 				case "WebOS":
@@ -1087,8 +1138,24 @@ let CryptoUtils = {
 				case "iPad":
 				case "iPod":
 				case "Googlebot":
+				case "Adobe AIR":
+				case "Avant Browser":
+				case "Flock":
+				case "Galeon":
+				case "GreenBrowser":
+				case "iCab":
+				case "Lunascape":
+				case "Maxthon":
+				case "Nook Browser":
+				case "Raven":
+				case "RockMelt":
+				case "SlimBrowser":
+				case "SRWare Iron":
+				case "Swiftfox":
+				case "WebPositive":
+				case "Chrome Mobile":
 					return false;
-				default: return null;		// don't know
+				default: return null;	// don't know
 			}
 			
 			function isChrome() {
@@ -1096,6 +1163,50 @@ let CryptoUtils = {
 					if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
 				}
 				return false;
+			}
+		}
+		
+		function isOpenSourceOs(name) {
+			
+			switch (name) {
+			
+				// open source
+				case "CentOS":
+				case "Debian":
+				case "Fedora":
+				case "FreeBSD":
+				case "Gentoo":
+				case "Haiku":
+				case "Kubuntu":
+				case "Linux Mint":
+				case "OpenBSD":
+				case "Red Hat":
+				case "SuSE":
+				case "Ubuntu":
+				case "Xubuntu":
+				case "Symbian OS":
+				case "webOS":
+				case "webOS ":
+				case "Tizen":
+				case "Linux":
+					return true;
+			
+				// not open source
+				case "Windows Phone":
+				case "Android":
+				case "Chrome OS":
+				case "Cygwin":
+				case "hpwOS":
+				case "Tablet OS":
+				case "Mac OS X":
+				case "Macintosh":
+				case "Mac":
+				case "Windows 98;":
+				case "Windows 98":
+				case "Windows":
+				case "Windows ":
+					return false;
+				default: return null;	// don't know
 			}
 		}
 	}

@@ -1,5 +1,4 @@
  TODO
- operating system check
  disable generate if not local and no internet connection
  form validation
  import/export design
