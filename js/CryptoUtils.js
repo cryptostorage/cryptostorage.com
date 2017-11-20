@@ -1044,13 +1044,17 @@ let CryptoUtils = {
 				let parser = new UAParser();
 				let result = parser.getResult();
 				
+				// check for chromium
+				let browser = result.browser.name;
+				if (browser === "Chrome" && !isChrome()) browser = "Chromium";
+				
 				// build and return response
 				onDone({
 					windowCryptoExists: window.crypto ? true : false,
 					isLocal: isLocal(),
 					isOnline: isOnline,
-					browser: result.browser.name,
-					isOpenSourceBrowser: isOpenSourceBrowser(result.browser.name),
+					browser: browser,
+					isOpenSourceBrowser: isOpenSourceBrowser(browser),
 					os: result.os.name,
 					isOpenSourceOs: isOpenSourceOs(result.os.name)
 				});
