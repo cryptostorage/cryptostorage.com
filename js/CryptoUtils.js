@@ -1067,88 +1067,26 @@ let CryptoUtils = {
 		
 		function isOpenSourceBrowser(name) {
 			
-//			Amaya, Android Browser, Arora, Avant, Baidu, Blazer, Bolt, Bowser, Camino, Chimera, 
-//			Chrome [WebView], Chromium, Comodo Dragon, Conkeror, Dillo, Dolphin, Doris, Edge, 
-//			Epiphany, Fennec, Firebird, Firefox, Flock, GoBrowser, iCab, ICE Browser, IceApe, 
-//			IceCat, IceDragon, Iceweasel, IE[Mobile], Iron, Jasmine, K-Meleon, Konqueror, Kindle, 
-//			Links, Lunascape, Lynx, Maemo, Maxthon, Midori, Minimo, MIUI Browser, [Mobile] Safari, 
-//			Mosaic, Mozilla, Netfront, Netscape, NetSurf, Nokia, OmniWeb, Opera [Mini/Mobi/Tablet], 
-//			PhantomJS, Phoenix, Polaris, QQBrowser, RockMelt, Silk, Skyfire, SeaMonkey, Sleipnir, 
-//			SlimBrowser, Swiftfox, Tizen, UCBrowser, Vivaldi, w3m, WeChat, Yandex
+			let openSource = [
+				"Firefox", "Chromium", "Tizen", "Epiphany", "K-Meleon", "SeaMonkey", "SlimerJS", "Arora", "Breach", "Camino",
+				"Electron", "Fennec", "Konqueror", "Midori", "PaleMoon", "Rekonq", "Sunrise", "Waterfox", "Amaya", "Bowser",
+				"Camino",
+			];
 			
-			switch (name) {
+			let notOpenSource = [
+				"Chrome", "Chrome WebView", "Chrome Mobile", "Safari", "Opera", "Opera Mini", "Samsung Internet for Android",
+				"Samsung Internet", "Opera Coast", "Yandex Browser", "UC Browser", "Maxthon", "Puffin", "Sleipnir",
+				"Windows Phone", "Internet Explorer", "Microsoft Edge", "IE", "Vivaldi", "Sailfish", "Amazon Silk", "Silk",
+				"PhantomJS", "BlackBerry", "WebOS", "Bada", "Android", "iPhone", "iPad", "iPod", "Googlebot", "Adobe AIR", "Avant",
+				"Avant Browser", "Flock", "Galeon", "GreenBrowser", "iCab", "Lunascape", "Maxthon", "Nook Browser", "Raven",
+				"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
+				"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
+			];
 			
-				// open source
-				case "Firefox":
-				case "Chromium":
-				case "Tizen":
-				case "Epiphany":
-				case "K-Meleon":
-				case "SeaMonkey":
-				case "SlimerJS":
-				case "Arora":
-				case "Breach":
-				case "Camino":
-				case "Electron":
-				case "Fennec":
-				case "Iceweasel":
-				case "Konqueror":
-				case "Midori":
-				case "PaleMoon":
-				case "Rekonq":
-				case "Sunrise":
-				case "Waterfox":
-					return true;
-					
-				// not open source
-				case "Chrome":
-				case "Safari":
-				case "Opera":
-				case "Opera Mini":
-				case "Samsung Internet for Android":
-				case "Samsung Internet":
-				case "Opera Coast":
-				case "Yandex Browser":
-				case "UC Browser":
-				case "Maxthon":
-				case "Puffin":
-				case "Sleipnir":
-				case "Windows Phone":
-				case "Internet Explorer":
-				case "Microsoft Edge":
-				case "IE":
-				case "Vivaldi":
-				case "Sailfish":
-				case "Amazon Silk":
-				case "Silk":
-				case "PhantomJS":
-				case "BlackBerry":
-				case "WebOS":
-				case "Bada":
-				case "Android":
-				case "iPhone":
-				case "iPad":
-				case "iPod":
-				case "Googlebot":
-				case "Adobe AIR":
-				case "Avant Browser":
-				case "Flock":
-				case "Galeon":
-				case "GreenBrowser":
-				case "iCab":
-				case "Lunascape":
-				case "Maxthon":
-				case "Nook Browser":
-				case "Raven":
-				case "RockMelt":
-				case "SlimBrowser":
-				case "SRWare Iron":
-				case "Swiftfox":
-				case "WebPositive":
-				case "Chrome Mobile":
-					return false;
-				default: return null;	// don't know
-			}
+			// determine if open source
+			if (openSource.includes(name)) return true;
+			if (notOpenSource.includes(name)) return false;
+			return null;
 		}
 		
 		function isChrome() {
@@ -1167,46 +1105,20 @@ let CryptoUtils = {
 //			RIM Tablet OS, RISC OS, Sailfish, Series40, Slackware, Solaris, SUSE, Symbian, Tizen, 
 //			Ubuntu, UNIX, VectorLinux, WebOS, Windows [Phone/Mobile], Zenwalk
 			
-			switch (name) {
+			let openSource = [
+				"CentOS",  "Debian",  "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "OpenBSD", "Red Hat", "SuSE", 
+				"Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen", "Linux"
+			];
 			
-				// open source
-				case "CentOS":
-				case "Debian":
-				case "Fedora":
-				case "FreeBSD":
-				case "Gentoo":
-				case "Haiku":
-				case "Kubuntu":
-				case "Linux Mint":
-				case "OpenBSD":
-				case "Red Hat":
-				case "SuSE":
-				case "Ubuntu":
-				case "Xubuntu":
-				case "Symbian OS":
-				case "webOS":
-				case "webOS ":
-				case "Tizen":
-				case "Linux":
-					return true;
+			let notOpenSource = [
+				"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS X", "Macintosh", "Mac", "Windows 98;", 
+				"Windows 98", "Windows", "Windows "
+			];
 			
-				// not open source
-				case "Windows Phone":
-				case "Android":
-				case "Chrome OS":
-				case "Cygwin":
-				case "hpwOS":
-				case "Tablet OS":
-				case "Mac OS X":
-				case "Macintosh":
-				case "Mac":
-				case "Windows 98;":
-				case "Windows 98":
-				case "Windows":
-				case "Windows ":
-					return false;
-				default: return null;	// don't know
-			}
+			// determine if open source
+			if (openSource.includes(name)) return true;
+			if (notOpenSource.includes(name)) return false;
+			return null;
 		}
 	}
 }
