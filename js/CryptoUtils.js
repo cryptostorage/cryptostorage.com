@@ -1106,8 +1106,8 @@ let CryptoUtils = {
 //			Ubuntu, UNIX, VectorLinux, WebOS, Windows [Phone/Mobile], Zenwalk
 			
 			let openSource = [
-				"CentOS",  "Debian",  "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "OpenBSD", "Red Hat", "SuSE", 
-				"Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen", "Linux"
+				"Linux", "CentOS", "Debian", "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "OpenBSD",
+				"Red Hat", "SuSE", "Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen"
 			];
 			
 			let notOpenSource = [
