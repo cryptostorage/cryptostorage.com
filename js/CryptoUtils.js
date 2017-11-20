@@ -1099,6 +1099,13 @@ let CryptoUtils = {
 			return window.location.href.indexOf("file://") > -1;
 		}
 		
+		function isChrome() {
+			for (let i = 0; i < navigator.plugins.length; i++) {
+				if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
+			}
+			return false;
+		}
+		
 		function isOpenSourceBrowser(name) {
 			
 			// convert name to lower case
@@ -1108,13 +1115,6 @@ let CryptoUtils = {
 			if (openSourceBrowsers.includes(name)) return true;
 			if (nonOpenSourceBrowsers.includes(name)) return false;
 			return null;
-		}
-		
-		function isChrome() {
-			for (let i = 0; i < navigator.plugins.length; i++) {
-				if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
-			}
-			return false;
 		}
 		
 		function isOpenSourceOs(name) {
