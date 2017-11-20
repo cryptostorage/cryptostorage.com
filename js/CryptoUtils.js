@@ -1034,34 +1034,34 @@ let CryptoUtils = {
 	 */
 	getSecurityChecks: function(onDone) {
 			
-		// attempt to access remote image
+		// attempt to access remote image to determine if online
 		isImageAccessible(ONLINE_IMAGE_URL, 1500, function(isOnline) {
 			
 			// load platform detection library
 			LOADER.load("lib/platform.js", function() {
 				
+				// determine operating system
+				let os = platform.os.family;
+				let osOpenSource = isOpenSourceOs(os);
+				
 				// determine browser and if open source
 				let browser = platform.name;
+				if (browser === "Chrome" && !isChrome()) browser = "Chromium";	// hack to detect chromium
 				let browserOpenSource = isOpenSourceBrowser(browser);
-				if (browserOpenSource !== null) readOsAndReturn();
-				else {
-					
-					// load another library to detect browser if cannot be determined
-					LOADER.load("lib/bowser.js", function() {
-						console.log("reading from bowser");
-						browser = bowser.name;
-						browserOpenSource = isOpenSourceBrowser(browser);
-						readOsAndReturn();
-					})
-				}
 				
-				function readOsAndReturn() {
-					
-					// determine operating system and if open source
-					let os = platform.os.family;
-					let osOpenSource = isOpenSourceOs(os);
-					
-					onDone({
+				// if open source is known, use it
+				if (browserOpenSource !== null) onDone(getResp());
+				
+				// otherwise load another library to determine browser
+				LOADER.load("lib/bowser.js", function() {
+					browser = bowser.name;
+					if (browser === "Chrome" && !isChrome()) browser = "Chromium";	// hack to detect chromium
+					browserOpenSource = isOpenSourceBrowser(browser);
+					onDone(getResp());
+				})
+				
+				function getResp() {
+					return {
 						windowCryptoExists: window.crypto ? true : false,
 						isLocal: isLocal(),
 						isOnline: isOnline,
@@ -1069,7 +1069,7 @@ let CryptoUtils = {
 						isOpenSourceBrowser: browserOpenSource,
 						os: os,
 						isOpenSourceOs: osOpenSource
-					});
+					};
 				}
 			});
 		});
@@ -1084,8 +1084,8 @@ let CryptoUtils = {
 			
 				// open source
 				case "Firefox":
-				case "Tizen":
 				case "Chromium":
+				case "Tizen":
 				case "Epiphany":
 				case "K-Meleon":
 				case "SeaMonkey":
@@ -1104,12 +1104,8 @@ let CryptoUtils = {
 				case "Waterfox":
 					return true;
 					
-				// chrome needs further check
-				case "Chrome":
-					if (isChrome()) return false;	// chrome
-					else return true;							// assumed to be chromium based
-					
 				// not open source
+				case "Chrome":
 				case "Safari":
 				case "Opera":
 				case "Opera Mini":
