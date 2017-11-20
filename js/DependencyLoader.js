@@ -23,10 +23,9 @@ function DependencyLoader() {
 		}
 		
 		// only load paths that aren't previously defined
-		for (let path of paths) {
-			if (!loadjs.isDefined(path)) {
-				loadjs(path, path);
-			}
+		for (let i = 0; i < paths.length; i++) {
+			let path = paths[i];
+			if (!loadjs.isDefined(path)) loadjs(path, path);
 		}
 		
 		// invokes callback when all paths loaded

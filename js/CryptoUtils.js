@@ -27,7 +27,9 @@ let CryptoUtils = {
 	 */
 	getCryptoPlugin: function(ticker) {
 		assertInitialized(ticker);
-		for (let plugin of CryptoUtils.getCryptoPlugins()) {
+		let plugins = CryptoUtils.getCryptoPlugins();
+		for (let i = 0; i < plugins.length; i++) {
+			let plugin = plugins[i];
 			if (plugin.getTicker() === ticker) return plugin;
 		}
 		throw new Error("No plugin found for crypto '" + ticker + "'");
@@ -157,11 +159,15 @@ let CryptoUtils = {
 		}
 		
 		if (!config.includePublic) {
-			for (let key of keys) delete key.getState().address;
+			for (let i = 0; i < keys.length; i++) {
+				let key = keys[i];
+				delete key.getState().address;
+			}
 		}
 		
 		if (!config.includePrivate) {
-			for (let key of keys) {
+			for (let i = 0; i < keys.length; i++) {
+				let key = keys[i];
 				delete key.getState().hex;
 				delete key.getState().wif;
 				delete key.getState().encryption;
@@ -264,16 +270,17 @@ let CryptoUtils = {
 		}
 		
 		// add keys to each piece
-		for (let key of keys) {
+		for (let i = 0; i < keys.length; i++) {
+			let key = keys[i];
 			if (!key.getWif() && !key.getHex() && numPieces > 1) throw new Error("Cannot split piece without private key");
 			let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getWif()];
-			for (let i = 0; i < numPieces; i++) {
+			for (let j = 0; j < numPieces; j++) {
 				let pieceKey = {};
 				pieceKey.ticker = key.getPlugin().getTicker();
 				pieceKey.address = key.getAddress();
-				pieceKey.wif = keyPieces[i];
+				pieceKey.wif = keyPieces[j];
 				if (pieceKey.wif) pieceKey.encryption = key.getEncryptionScheme();
-				pieces[i].keys.push(pieceKey);
+				pieces[j].keys.push(pieceKey);
 			}
 		}
 		
@@ -298,7 +305,8 @@ let CryptoUtils = {
 				let additional = minPieces - 1;
 				throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
 			}
-			for (let pieceKey of pieces[0].keys) {
+			for (let i = 0; i < pieces[0].keys.length; i++) {
+				let pieceKey = pieces[0].keys[i];
 				let state = {};
 				state.address = pieceKey.address;
 				state.wif = pieceKey.wif;
@@ -326,7 +334,8 @@ let CryptoUtils = {
 				let crypto;
 				let address;
 				let encryption;
-				for (let piece of pieces) {
+				for (let j = 0; j < pieces.length; j++) {
+					let piece = pieces[j];
 					if (!crypto) crypto = piece.keys[i].ticker;
 					else if (crypto !== piece.keys[i].ticker) throw new Error("Pieces are for different cryptocurrencies");
 					if (!address) address = piece.keys[i].address;
@@ -348,7 +357,10 @@ let CryptoUtils = {
 			try {
 				for (let i = 0; i < pieces[0].keys.length; i++) {
 					let shares = [];
-					for (let piece of pieces) shares.push(piece.keys[i].wif);
+					for (let j = 0; j < pieces.length; j++) {
+						let piece = pieces[i];
+						shares.push(piece.keys[i].wif);
+					}
 					let key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
 					if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
 					keys.push(key);
@@ -412,8 +424,11 @@ let CryptoUtils = {
 			async.parallel(funcs, function(err, args) {
 				if (err) throw err;
 				let pieces = [];
-				for (let arg of args) {
-					if (isArray(arg)) for (let piece of arg) pieces.push(piece);
+				for (let i = 0; i < args.length; i++) {
+					let arg = args[i];
+					if (isArray(arg)) {
+						for (let j = 0; j < arg.length; j++) pieces.push(arg[j]);
+					}
 					else pieces.push(arg);
 				}
 				onPieces(pieces);
@@ -461,7 +476,8 @@ let CryptoUtils = {
 		// build csv
 		let csvArr = [];
 		csvArr.push(csvHeader);
-		for (let key of piece.keys) {
+		for (let i = 0; i < piece.keys.length; i++) {
+			let key = piece.keys[i];
 			let csvKey = [];
 			for (let prop in key) {
 				csvKey.push(isInitialized(key[prop]) ? key[prop] : "");
@@ -522,7 +538,8 @@ let CryptoUtils = {
 	getCommonTicker: function(piece) {
 		assertTrue(piece.keys.length > 0);
 		let ticker;
-		for (let pieceKey of piece.keys) {
+		for (let i = 0; i < piece.keys.length; i++) {
+			let pieceKey = piece.keys[i];
 			if (!ticker) ticker = pieceKey.ticker;
 			else if (ticker !== pieceKey.ticker) return "mix";
 		}
@@ -564,9 +581,11 @@ let CryptoUtils = {
 
 		// load dependencies
 		let dependencies = new Set();
-		for (let currency of config.currencies) {
-			for (let dependency of CryptoUtils.getCryptoPlugin(currency.ticker).getDependencies()) {
-				dependencies.add(dependency);
+		for (let i = 0; i < config.currencies.length; i++) {
+			let currency = config.currencies[i];
+			let pluginDependencies = CryptoUtils.getCryptoPlugin(currency.ticker).getDependencies();
+			for (let j = 0; j < pluginDependencies.length; j++) {
+				dependencies.add(pluginDependencies[i]);
 			}
 		}
 		if (onProgress) onProgress(0, "Loading dependencies");
@@ -574,7 +593,8 @@ let CryptoUtils = {
 			
 			// collect key creation functions
 			let funcs = [];
-			for (let currency of config.currencies) {
+			for (let i = 0; i < config.currencies.length; i++) {
+				let currency = config.currencies[i];
 				for (let i = 0; i < currency.numKeys; i++) {
 					funcs.push(newKeyFunc(CryptoUtils.getCryptoPlugin(currency.ticker)));
 				}
@@ -592,8 +612,9 @@ let CryptoUtils = {
 				
 				// collect encryption schemes
 				let encryptionSchemes = [];
-				for (let currency of config.currencies) {
-					for (let i = 0; i < currency.numKeys; i++) {
+				for (let i = 0; i < config.currencies.length; i++) {
+					let currency = config.currencies[i];
+					for (let j = 0; j < currency.numKeys; j++) {
 						if (currency.encryption) encryptionSchemes.push(currency.encryption);
 					}
 				}
@@ -719,7 +740,9 @@ let CryptoUtils = {
 		let originals;
 		if (verifyEncryption) {
 			originals = [];
-			for (let key of keys) originals.push(key.copy());
+			for (let i = 0; i < keys.length; i++) {
+				originals.push(keys[i].copy());
+			}
 		}
 		
 		// track weights for progress
@@ -745,7 +768,9 @@ let CryptoUtils = {
 				
 				// copy encrypted keys
 				let encryptedCopies = [];
-				for (let encryptedKey of encryptedKeys) encryptedCopies.push(encrytpedKey.copy());
+				for (let i = 0; i < encryptedKeys.length; i++) {
+					encryptedCopies.push(encryptedKeys[i].copy());
+				}
 				
 				// decrypt keys
 				if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
@@ -756,8 +781,8 @@ let CryptoUtils = {
 					
 					// assert originals match decrypted keys
 					assertEquals(originals.length, decryptedKeys.length);
-					for (let i = 0; i < originals.length; i++) {
-						assertTrue(originals[i].equals(decryptedKeys[i]));
+					for (let j = 0; j < originals.length; j++) {
+						assertTrue(originals[j].equals(decryptedKeys[j]));
 					}
 					
 					// done
@@ -852,13 +877,13 @@ let CryptoUtils = {
 		
 		// compute weight
 		let totalWeight = 0;
-		for (let key of keys) {
-			totalWeight += CryptoUtils.getWeightDecryptKey(key.getEncryptionScheme());
+		for (let i = 0; i < keys.length; i++) {
+			totalWeight += CryptoUtils.getWeightDecryptKey(keys[i].getEncryptionScheme());
 		}
 		
 		// decrypt keys
 		let funcs = [];
-		for (let key of keys) funcs.push(decryptFunc(key, passphrase));
+		for (let i = 0; i < keys.length; i++) funcs.push(decryptFunc(keys[i], passphrase));
 		let doneWeight = 0;
 		if (onProgress) onProgress(doneWeight, totalWeight);
 		async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, result) {
@@ -895,7 +920,8 @@ let CryptoUtils = {
 	getWeightGenerateKeys: function(keyGenConfig) {
 		let weight = 0;
 		let numKeys = 0;
-		for (let currency of keyGenConfig.currencies) {
+		for (let i = 0; i < keyGenConfig.currencies; i++) {
+			let currency = keyGenConfig.currencies[i];
 			numKeys += currency.numKeys;
 			weight += currency.numKeys * CryptoUtils.getWeightCreateKey();
 			if (currency.encryption) weight += currency.numKeys * (CryptoUtils.getWeightEncryptKey(currency.encryption) + (keyGenConfig.verifyEncryption ? CryptoUtils.getWeightDecryptKey(currency.encryption) : 0));
@@ -927,7 +953,8 @@ let CryptoUtils = {
 	 */
 	getWeightDecryptKeys: function(encryptedKeys) {
 		let weight = 0;
-		for (let key of encryptedKeys) {
+		for (let i = 0; i < encryptedKeys.length; i++) {
+			let key = encryptedKeys[i];
 			assertTrue(key.isEncrypted());
 			weight += CryptoUtils.getWeightDecryptKey(key.getEncryptionScheme());
 		}
@@ -950,34 +977,6 @@ let CryptoUtils = {
 		}
 	},
 	
-///**
-//* Returns the total weight to encrypt keys with the given schemes.
-//* 
-//* @param schemes is an array of schemes representing keys to encrypt
-//* @returns the total weight to encrypt keys with the given schemes
-//*/
-//getEncryptSchemesWeight: function(schemes) {
-//	let weight = 0;
-//	for (let scheme of schemes) weight += getWeightEncryptKey(scheme);
-//	return weight;
-//	
-//	function getWeightEncryptKey(scheme) {
-//
-//	}
-//},
-	
-///**
-//* Returns the total weight to decrypt keys with the given schemes.
-//* 
-//* @param schemes is an array of schemes representing keys to decrypt
-//* @returns the total weight to decrypt keys with the given schemes
-//*/
-//getDecryptSchemesWeight: function(schemes) {
-//	let weight = 0;
-//	for (let scheme of schemes) weight += getWeightDecryptKey(scheme);
-//	return weight;
-//},
-	
 	getWeightCreateKey: function() { return 63; },
 	
 	/**
@@ -993,7 +992,9 @@ let CryptoUtils = {
 		js.push("\nfunction getImageData(key) {\n\tswitch(key) {");
 		
 		// add currency logos
-		for (let plugin of CryptoUtils.getCryptoPlugins()) {
+		let plugins = CryptoUtils.getCryptoPlugins();
+		for (let i = 0; i < plugins.length; i++) {
+			let plugin = plugins[i];
 			js.push("\n\t\tcase \"" + plugin.getTicker() + "\": return \"" + imgToDataUrl(plugin.getLogo().get(0)) + "\";");
 		}
 		

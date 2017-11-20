@@ -334,7 +334,8 @@ function HomeController(div) {
 	
 	function getCurrencyRow(plugins, isMajor, onCurrencyClicked) {
 		let row = $("<div class='currency_row'>");
-		for (let plugin of plugins) {
+		for (let i = 0; i < plugins.length; i++) {
+			let plugin = plugins[i];
 			let item = $("<div>").appendTo(row);
 			item.attr("class", isMajor ? "currency_row_item_major" : "currency_row_item_minor");
 			item.click(function() { onCurrencyClicked(plugin); });
@@ -396,7 +397,9 @@ function DonateController(div, appController) {
 			let titleDiv = $("<div class='title'>").appendTo(div);
 			titleDiv.html("Donate");
 			let values = [];
-			for (let plugin of CryptoUtils.getCryptoPlugins()) {
+			let plugins = CryptoUtils.getCryptoPlugins();
+			for (let i = 0; i < plugins.length; i++) {
+				let plugin = plugins[i];
 				values.push({
 					logo: plugin.getLogo(),
 					label: plugin.getName(),
@@ -444,7 +447,8 @@ function DonateController(div, appController) {
 			// collect functions to render values
 			let left = true;
 			let funcs = [];
-			for (let value of values) {
+			for (let i = 0; i < values.length; i++) {
+				let value = values[i];
 				let valueDiv = $("<div>").appendTo(valuesDiv); 
 				if (left) {
 					funcs.push(function(onDone) { renderLeft(valueDiv, value, onDone); });
@@ -667,7 +671,8 @@ function FormController(div) {
 		config.minPieces = config.splitChecked ? parseFloat(minPiecesInput.val()) : null;
 		config.verifyEncryption = VERIFY_ENCRYPTION;
 		config.currencies = [];
-		for (let currencyInput of currencyInputs) {
+		for (let i = 0; i < currencyInputs.length; i++) {
+			let currencyInput = currencyInputs[i];
 			config.currencies.push({
 				ticker: currencyInput.getSelectedPlugin().getTicker(),
 				numKeys: currencyInput.getNumKeys(),
@@ -685,7 +690,8 @@ function FormController(div) {
 		
 		function verifyConfig(config) {
 			assertDefined(config.verifyEncryption);
-			for (let currency of config.currencies) {
+			for (let i = 0; i < config.currencies.length; i++) {
+				let currency = config.currencies[i];
 				assertDefined(currency.ticker);
 				assertDefined(currency.numKeys);
 				assertDefined(currency.encryption);
@@ -719,7 +725,8 @@ function FormController(div) {
 		
 		// determine if BTC is selected
 		let btcFound = false;
-		for (let currencyInput of currencyInputs) {
+		for (let i = 0; i < currencyInputs.length; i++) {
+			let currencyInput = currencyInputs[i];
 			if (currencyInput.getSelectedPlugin().getTicker() === "BTC") {
 				btcFound = true;
 				break;
@@ -728,7 +735,8 @@ function FormController(div) {
 		
 		// determine if BCH is selected
 		let bchFound = false;
-		for (let currencyInput of currencyInputs) {
+		for (let i = 0; i < currencyInputs.length; i++) {
+			let currencyInput = currencyInputs[i];
 			if (currencyInput.getSelectedPlugin().getTicker() === "BCH") {
 				bchFound = true;
 				break;
@@ -791,7 +799,8 @@ function FormController(div) {
 			
 			// format pull down plugin data
 			selectorData = [];
-			for (let plugin of plugins) {
+			for (let i = 0; i < plugins.length; i++) {
+				let plugin = plugins[i];
 				selectorData.push({
 					text: plugin.getName(),
 					imageSrc: plugin.getLogo().get(0).src
@@ -948,7 +957,8 @@ function RecoverFileController(div) {
 	}
 	
 	this.addNamedPieces = function(namedPieces, onDone) {
-		for (let namedPiece of namedPieces) {
+		for (let i = 0; i < namedPieces.length; i++) {
+			let namedPiece = namedPieces[i];
 			try {
 				CryptoUtils.validatePiece(namedPiece.piece);
 				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
@@ -984,7 +994,9 @@ function RecoverFileController(div) {
 	
 	function getImportedPieces() {
 		let pieces = [];
-		for (let importedNamedPiece of importedNamedPieces) pieces.push(importedNamedPiece.piece);
+		for (let i = 0; i < importedNamedPieces.length; i++) {
+			pieces.push(importedNamedPieces[i].piece);
+		}
 		return pieces;
 	}
 	
@@ -1047,8 +1059,8 @@ function RecoverFileController(div) {
 			
 			// collect named pieces from results
 			let namedPieces = [];
-			for (let result of results) {
-				if (result) namedPieces = namedPieces.concat(result);
+			for (let i = 0; i < results.length; i++) {
+				if (results[i]) namedPieces = namedPieces.concat(results[i]);
 			}
 			
 			// add all named pieces
@@ -1100,8 +1112,8 @@ function RecoverFileController(div) {
 	}
 	
 	function isPieceImported(name) {
-		for (let importedPiece of importedNamedPieces) {
-			if (importedPiece.name === name) return true;
+		for (let i = 0; i < importedNamedPieces.length; i++) {
+			if (importedNamedPieces[i].name === name) return true;
 		}
 		return false;
 	}
@@ -1131,7 +1143,7 @@ function RecoverFileController(div) {
 		
 		// collect all pieces
 		let pieces = [];
-		for (let importedPiece of importedNamedPieces) pieces.push(importedPiece.piece);
+		for (let i = 0; i < importedNamedPieces.length; i++) pieces.push(importedNamedPieces[i].piece);
 		if (!pieces.length) {
 			if (onDone) onDone();
 			return;
@@ -1139,13 +1151,14 @@ function RecoverFileController(div) {
 		
 		// collect tickers being imported
 		let tickers = new Set();
-		for (let pieceKey of pieces[0].keys) tickers.add(pieceKey.ticker);
+		for (let i = 0; i < pieces[0].keys.length; i++) tickers.add(pieces[0].keys[i].ticker);
 		
 		// collect dependencies
 		let dependencies = new Set(APP_DEPENDENCIES);
-		for (let ticker of tickers) {
+		for (let i = 0; i < tickers.length; i++) {
+			let ticker = tickers[i];
 			let plugin = CryptoUtils.getCryptoPlugin(ticker);
-			for (let dependency of plugin.getDependencies()) dependencies.add(dependency);
+			for (let j = 0; j < plugin.getDependencies().length; j++) dependencies.add(plugin.getDependencies()[i]);
 		}
 		
 		// load dependencies
@@ -1195,8 +1208,8 @@ function RecoverFileController(div) {
 		}
 		
 		// render imported pieces
-		for (let namedPiece of namedPieces) {
-			importedPiecesDiv.append(getImportedPieceDiv(namedPiece));
+		for (let i = 0; i < namedPieces.length; i++) {
+			importedPiecesDiv.append(getImportedPieceDiv(namedPieces[i]));
 		}
 		function getImportedPieceDiv(namedPiece) {
 			let importedPieceDiv = $("<div class='recover_file_imported_piece'>").appendTo(importedPiecesDiv);
@@ -1299,7 +1312,8 @@ function RecoverTextController(div, plugins) {
 		
 		// currency selector data
 		selectorData = [];
-		for (let plugin of plugins) {
+		for (let i = 0; i < plugins.length; i++) {
+			let plugin = plugins[i];
 			selectorData.push({
 				text: plugin.getName(),
 				imageSrc: plugin.getLogo().get(0).src
@@ -1484,13 +1498,14 @@ function RecoverTextController(div, plugins) {
 		
 		// get lines with content
 		let contentLines = [];
-		for (let line of lines) {
+		for (let i = 0; i < lines.length; i++) {
+			let line = lines[i];
 			if (line.trim() !== "") contentLines.push(line);
 		}
 		
 		// load dependencies
 		let dependencies = new Set(APP_DEPENDENCIES);
-		for (let dependency of selectedPlugin.getDependencies()) dependencies.add(dependency);
+		for (let i = 0; i < selectedPlugin.getDependencies().length; i++) dependencies.add(selectedPlugin.getDependencies()[i]);
 		LOADER.load(Array.from(dependencies), function() {
 			
 			// add pieces
@@ -1530,7 +1545,8 @@ function RecoverTextController(div, plugins) {
 		if (newPieces) {
 			if (key) setWarningAux("Private key already added");
 			else {
-				for (let piece of newPieces) {
+				for (let i = 0; i < newPieces.length; i++) {
+					let piece = newPieces[i];
 					if (contains(importedPieces, piece)) {
 						setWarningAux("Piece already added");
 						continue;
@@ -1585,8 +1601,8 @@ function RecoverTextController(div, plugins) {
 		
 		importedPiecesDiv.show();
 		controlsDiv.show();
-		for (let piece of pieces) {
-			importedPiecesDiv.append(getImportedPieceDiv(piece));
+		for (let i = 0; i < pieces.length; i++) {
+			importedPiecesDiv.append(getImportedPieceDiv(pieces[i]));
 		}
 		
 		function getImportedPieceDiv(piece) {
@@ -1697,7 +1713,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 			
 			// decrypt keys async
 			let copies = [];
-			for (let encryptedKey of encryptedKeys) copies.push(encryptedKey.copy());
+			for (let i = 0; i < encryptedKeys.length; i++) copies.push(encryptedKeys[i].copy());
 			CryptoUtils.decryptKeys(copies, passphrase, function(done, total) {
 				setProgress(done / total * decryptWeight / totalWeight, "Decrypting...");
 			}, function(err, decryptedKeys) {
@@ -1942,7 +1958,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		// re-assign global pieces
 		pieces = [];
 		if (pieceDivs) pieceDivs = [];
-		for (let elem of elems) {
+		for (let i = 0; i < elems.length; i++) {
+			let elem = elems[i];
 			pieces.push(elem.piece);
 			if (pieceDivs) pieceDivs.push(elem.pieceDiv);
 		}
@@ -1959,7 +1976,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			assertTrue(pieces.length >= 1);
 			if (pieces.length === 1) return null;
 			let pieceNums = [];
-			for (let piece of pieces) pieceNums.push(piece.pieceNum);
+			for (let i = 0; i < pieces.length; i++) pieceNums.push(pieces[i].pieceNum);
 			return pieceNums;
 		}
 		return null;
@@ -2066,7 +2083,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	function setPieceDivs(pieceDivs) {
 		piecesDiv.empty();
-		for (let pieceDiv of pieceDivs) piecesDiv.append(pieceDiv);
+		for (let i = 0; i < pieceDivs.length; i++) piecesDiv.append(pieceDivs[i]);
 	}
 	
 	/**
