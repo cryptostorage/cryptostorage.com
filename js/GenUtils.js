@@ -366,6 +366,17 @@ function contains(arr, obj) {
 }
 
 /**
+ * Converts each string in an array of strings to lowercase.
+ * 
+ * @param arr is the array to convert elements to lower case
+ */
+function arrToLowerCase(arr) {
+	for (let i = 0; i < arr.length; i++) {
+		arr[i] = arr[i].toLowerCase();
+	}
+}
+
+/**
  * Listifies the given argument.
  * 
  * @param arrOrElem is an array or an element in the array

@@ -1033,8 +1033,42 @@ let CryptoUtils = {
 	 *	}
 	 */
 	getSecurityChecks: function(onDone) {
+		
+		// classify known open source and non open source browsers and operating systems
+		let openSourceBrowsers = [
+			"Firefox", "Chromium", "Tizen", "Epiphany", "K-Meleon", "SeaMonkey", "SlimerJS", "Arora", "Breach", "Camino",
+			"Electron", "Fennec", "Konqueror", "Midori", "PaleMoon", "Rekonq", "Sunrise", "Waterfox", "Amaya", "Bowser",
+			"Camino",
+		];
+		let nonOpenSourceBrowsers = [
+			"Chrome", "Chrome WebView", "Chrome Mobile", "Safari", "Opera", "Opera Mini", "Samsung Internet for Android",
+			"Samsung Internet", "Opera Coast", "Yandex Browser", "UC Browser", "Maxthon", "Puffin", "Sleipnir",
+			"Windows Phone", "Internet Explorer", "Microsoft Edge", "IE", "Vivaldi", "Sailfish", "Amazon Silk", "Silk",
+			"PhantomJS", "BlackBerry", "WebOS", "Bada", "Android", "iPhone", "iPad", "iPod", "Googlebot", "Adobe AIR", "Avant",
+			"Avant Browser", "Flock", "Galeon", "GreenBrowser", "iCab", "Lunascape", "Maxthon", "Nook Browser", "Raven",
+			"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
+			"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
+		];
+		let openSourceOperatingSystems = [
+			"Linux", "CentOS", "Debian", "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "Mint",
+			"OpenBSD", "RedHat", "Red Hat", "SuSE", "Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen",
+			"Chromium OS", "Contiki", "DragonFly", "GNU", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "PCLinuxOS",
+			"Plan9", "VectorLinux", "Zenwalk"
+		];
+		let nonOpenSourceOperatingSystems = [
+			"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS X", "Macintosh", "Mac", "iOS",
+			"Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile", "AIX", "Amiga OS", "Bada",
+			"BeOS", "BlackBerry", "Hurd", "Linpus", "Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS",
+			"Sailfish", "Series40", "Solaris", "Symbian", "WebOS"
+		];
+		
+		// convert classifications to lowercase
+		arrToLowerCase(openSourceBrowsers);
+		arrToLowerCase(nonOpenSourceBrowsers);
+		arrToLowerCase(openSourceOperatingSystems);
+		arrToLowerCase(nonOpenSourceOperatingSystems);
 			
-		// attempt to access remote image to determine if online
+		// determine if online by accessing remote image
 		isImageAccessible(ONLINE_IMAGE_URL, 1500, function(isOnline) {
 			
 			// load platform detection library
@@ -1067,25 +1101,12 @@ let CryptoUtils = {
 		
 		function isOpenSourceBrowser(name) {
 			
-			let openSource = [
-				"Firefox", "Chromium", "Tizen", "Epiphany", "K-Meleon", "SeaMonkey", "SlimerJS", "Arora", "Breach", "Camino",
-				"Electron", "Fennec", "Konqueror", "Midori", "PaleMoon", "Rekonq", "Sunrise", "Waterfox", "Amaya", "Bowser",
-				"Camino",
-			];
-			
-			let notOpenSource = [
-				"Chrome", "Chrome WebView", "Chrome Mobile", "Safari", "Opera", "Opera Mini", "Samsung Internet for Android",
-				"Samsung Internet", "Opera Coast", "Yandex Browser", "UC Browser", "Maxthon", "Puffin", "Sleipnir",
-				"Windows Phone", "Internet Explorer", "Microsoft Edge", "IE", "Vivaldi", "Sailfish", "Amazon Silk", "Silk",
-				"PhantomJS", "BlackBerry", "WebOS", "Bada", "Android", "iPhone", "iPad", "iPod", "Googlebot", "Adobe AIR", "Avant",
-				"Avant Browser", "Flock", "Galeon", "GreenBrowser", "iCab", "Lunascape", "Maxthon", "Nook Browser", "Raven",
-				"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
-				"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
-			];
+			// convert name to lower case
+			name = name.toLowerCase();
 			
 			// determine if open source
-			if (openSource.includes(name)) return true;
-			if (notOpenSource.includes(name)) return false;
+			if (openSourceBrowsers.includes(name)) return true;
+			if (nonOpenSourceBrowsers.includes(name)) return false;
 			return null;
 		}
 		
@@ -1098,26 +1119,12 @@ let CryptoUtils = {
 		
 		function isOpenSourceOs(name) {
 			
-//			AIX, Amiga OS, Android, Arch, Bada, BeOS, BlackBerry, CentOS, Chromium OS, Contiki,
-//			Fedora, Firefox OS, FreeBSD, Debian, DragonFly, Gentoo, GNU, Haiku, Hurd, iOS, 
-//			Joli, Linpus, Linux, Mac OS, Mageia, Mandriva, MeeGo, Minix, Mint, Morph OS, NetBSD, 
-//			Nintendo, OpenBSD, OpenVMS, OS/2, Palm, PC-BSD, PCLinuxOS, Plan9, Playstation, QNX, RedHat, 
-//			RIM Tablet OS, RISC OS, Sailfish, Series40, Slackware, Solaris, SUSE, Symbian, Tizen, 
-//			Ubuntu, UNIX, VectorLinux, WebOS, Windows [Phone/Mobile], Zenwalk
-			
-			let openSource = [
-				"Linux", "CentOS", "Debian", "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "OpenBSD",
-				"Red Hat", "SuSE", "Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen"
-			];
-			
-			let notOpenSource = [
-				"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS X", "Macintosh", "Mac", "Windows 98;", 
-				"Windows 98", "Windows", "Windows "
-			];
+			// convert name to lower case
+			name = name.toLowerCase();
 			
 			// determine if open source
-			if (openSource.includes(name)) return true;
-			if (notOpenSource.includes(name)) return false;
+			if (openSourceOperatingSystems.includes(name)) return true;
+			if (nonOpenSourceOperatingSystems.includes(name)) return false;
 			return null;
 		}
 	}
