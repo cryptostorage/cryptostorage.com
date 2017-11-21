@@ -44,7 +44,7 @@ let Tests = {
 				dependencies.add(plugins[i].getDependencies()[j]);
 			}
 		}
-		LOADER.load(Array.from(dependencies), function() {
+		LOADER.load([...dependencies], function() {
 			
 			// verify each plugin has logo data
 			for (let i = 0; i < CryptoUtils.getCryptoPlugins().length; i++) {
