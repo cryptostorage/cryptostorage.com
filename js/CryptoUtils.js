@@ -585,7 +585,7 @@ let CryptoUtils = {
 			let currency = config.currencies[i];
 			let pluginDependencies = CryptoUtils.getCryptoPlugin(currency.ticker).getDependencies();
 			for (let j = 0; j < pluginDependencies.length; j++) {
-				dependencies.add(pluginDependencies[i]);
+				dependencies.add(pluginDependencies[j]);
 			}
 		}
 		if (onProgress) onProgress(0, "Loading dependencies");

@@ -1,4 +1,5 @@
  TODO
+ test CryptoUtils.generateKeys()
  disable generate if not local and no internet connection
  form validation
  import/export design
