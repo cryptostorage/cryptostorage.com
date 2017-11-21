@@ -1113,8 +1113,8 @@ let CryptoUtils = {
 			name = name.toLowerCase();
 			
 			// determine if open source
-			if (openSourceBrowsers.includes(name)) return true;
-			if (nonOpenSourceBrowsers.includes(name)) return false;
+			if (contains(openSourceBrowsers, name)) return true;
+			if (contains(nonOpenSourceBrowsers, name)) return false;
 			return null;
 		}
 		
@@ -1124,8 +1124,8 @@ let CryptoUtils = {
 			name = name.toLowerCase();
 			
 			// determine if open source
-			if (openSourceOperatingSystems.includes(name)) return true;
-			if (nonOpenSourceOperatingSystems.includes(name)) return false;
+			if (contains(openSourceOperatingSystems, name)) return true;
+			if (contains(nonOpenSourceOperatingSystems, name)) return false;
 			return null;
 		}
 	}
