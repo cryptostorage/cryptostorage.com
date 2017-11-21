@@ -124,7 +124,7 @@ let CryptoUtils = {
 	renderQrCode: function(text, config, callback) {
 		
 		// merge configs
-		config = Object.assign({}, CryptoUtils.DefaultQrConfig, config);
+		config = objectAssign({}, CryptoUtils.DefaultQrConfig, config);
 
 		// generate QR code
 		var segments = [{data: text, mode: 'byte'}];	// manually specify mode
@@ -150,7 +150,7 @@ let CryptoUtils = {
 	applyKeyConfig: function(keys, config) {
 		
 		// merge config with default
-		config = Object.assign({}, getDefaultConfig(), config);
+		config = objectAssign({}, getDefaultConfig(), config);
 		function getDefaultConfig() {
 			return {
 				includePublic: true,
@@ -703,7 +703,7 @@ let CryptoUtils = {
 			case CryptoUtils.EncryptionScheme.CRYPTOJS:
 				LOADER.load("lib/crypto-js.js", function() {
 					let b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
-					key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
+					key.setState(objectAssign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
 					onDone(null, key);
 				})
 				break;
@@ -711,7 +711,7 @@ let CryptoUtils = {
 				LOADER.load("lib/bitcoinjs.js", function() {
 					let decoded = bitcoinjs.decode(key.getWif());
 					let encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
-					key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
+					key.setState(objectAssign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
 					onDone(null, key);
 				});
 				break;

@@ -96,6 +96,23 @@ function isObject(arg, constructorName) {
 }
 
 /**
+ * Polyfill for Object.assign([{...}, ...]).
+ * 
+ * @returns the merged object of the given arguments
+ */
+function objectAssign() {
+	let objs = Array.prototype.slice.call(arguments);
+	objs.clean(undefined);
+	objs.clean(null);
+	return objs.reduce(function (r, o) {
+		Object.keys(o).forEach(function (k) {
+			r[k] = o[k];
+		});
+		return r;
+	}, {});
+}
+
+/**
  * Indicates if the given argument is a hexidemal string.
  * 
  * Credit: https://github.com/roryrjb/is-hex/blob/master/is-hex.js.
@@ -430,6 +447,19 @@ function mapsEqual(map1, map2) {
 String.prototype.replaceAt=function(idx, replacement) {
 	return this.substr(0, idx) + replacement + this.substr(idx + replacement.length);
 }
+
+/**
+ * Removes the given value from the array.
+ */
+Array.prototype.clean = function(val) {
+  for (let i = 0; i < this.length; i++) {
+    if (this[i] == val) {         
+      this.splice(i, 1);
+      i--;
+    }
+  }
+  return this;
+};
 
 /**
  * Returns combinations of the given array of the given size.
