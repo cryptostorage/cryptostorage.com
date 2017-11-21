@@ -589,7 +589,7 @@ let CryptoUtils = {
 			}
 		}
 		if (onProgress) onProgress(0, "Loading dependencies");
-		LOADER.load([...dependencies], function() {
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// collect key creation functions
 			let funcs = [];

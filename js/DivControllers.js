@@ -1211,7 +1211,7 @@ function RecoverFileController(div) {
 		}
 		
 		// load dependencies
-		LOADER.load([...dependencies], function() {
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// create keys
 			try {
@@ -1555,7 +1555,7 @@ function RecoverTextController(div, plugins) {
 		// load dependencies
 		let dependencies = new Set(APP_DEPENDENCIES);
 		for (let i = 0; i < selectedPlugin.getDependencies().length; i++) dependencies.add(selectedPlugin.getDependencies()[i]);
-		LOADER.load([...dependencies], function() {
+		LOADER.load(Array.from(dependencies), function() {
 			
 			// add pieces
 			updatePieces(contentLines);
