@@ -274,13 +274,13 @@ let CryptoUtils = {
 			let key = keys[i];
 			if (!key.getWif() && !key.getHex() && numPieces > 1) throw new Error("Cannot split piece without private key");
 			let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getWif()];
-			for (let j = 0; j < numPieces; j++) {
+			for (let i = 0; i < numPieces; i++) {
 				let pieceKey = {};
 				pieceKey.ticker = key.getPlugin().getTicker();
 				pieceKey.address = key.getAddress();
-				pieceKey.wif = keyPieces[j];
+				pieceKey.wif = keyPieces[i];
 				if (pieceKey.wif) pieceKey.encryption = key.getEncryptionScheme();
-				pieces[j].keys.push(pieceKey);
+				pieces[i].keys.push(pieceKey);
 			}
 		}
 		
@@ -358,7 +358,7 @@ let CryptoUtils = {
 				for (let i = 0; i < pieces[0].keys.length; i++) {
 					let shares = [];
 					for (let j = 0; j < pieces.length; j++) {
-						let piece = pieces[i];
+						let piece = pieces[j];
 						shares.push(piece.keys[i].wif);
 					}
 					let key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);

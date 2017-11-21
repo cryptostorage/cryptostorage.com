@@ -484,9 +484,7 @@ let Tests = {
 				let pieces = plugin.split(key, Tests.NUM_PIECES, Tests.MIN_PIECES);
 				
 				// test that single pieces cannot create key
-				console.log("NEED TO SEE THROUGH: " + pieces.length);
 				for (let i = 0; i < pieces.length; i++) {
-					console.log(i);
 					try {
 						plugin.combine([pieces[i]]);
 						throw Error("fail");
@@ -494,8 +492,6 @@ let Tests = {
 						if (err.message === "fail") throw new Error("Cannot combine single pieces");
 					}
 				}
-				
-				console.log("PARENT I: " + i);
 				
 				// test each piece combination
 				let combinations = getCombinations(pieces, Tests.MIN_PIECES);
