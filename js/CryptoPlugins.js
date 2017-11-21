@@ -502,7 +502,7 @@ function ZcashPlugin() {
 	this.getTicker = function() { return "ZEC" };
 	this.getLogo = function() { return $("<img src='img/zcash.png'>"); }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/zcashcore.js"]; }
-	this.getDonationAddress = function() { return "LSreRDfwXtbWmmpm6ZxR7twYUenf5Lw2Hh"; }
+	this.getDonationAddress = function() { return "TODO"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
