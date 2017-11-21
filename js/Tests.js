@@ -55,7 +55,7 @@ let Tests = {
 			testUtils();
 			testFileImport(plugins, function() {
 				testParseKey(plugins);
-				for (plugin of plugins) testSplitAndCombine(plugin);
+				for (let i = 0; i < plugins.length;i ++) testSplitAndCombine(plugins[i]);
 				if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
 				if (Tests.TEST_PLUGINS) {
 					testCryptoPlugins(plugins, function(error) {

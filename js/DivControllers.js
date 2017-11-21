@@ -2047,7 +2047,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			
 			// render pieces if given
 			if (pieces) {
-				for (piece of pieces) pieceDivs.push($("<div>"));
+				for (let i = 0; i < pieces.length; i++) pieceDivs.push($("<div>"));
 				setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(pieceDivs);
 				setPrintEnabled(false);
