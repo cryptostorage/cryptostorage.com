@@ -595,7 +595,7 @@ let CryptoUtils = {
 			let funcs = [];
 			for (let i = 0; i < config.currencies.length; i++) {
 				let currency = config.currencies[i];
-				for (let i = 0; i < currency.numKeys; i++) {
+				for (let j = 0; j < currency.numKeys; j++) {
 					funcs.push(newKeyFunc(CryptoUtils.getCryptoPlugin(currency.ticker)));
 				}
 			}
