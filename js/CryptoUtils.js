@@ -920,7 +920,7 @@ let CryptoUtils = {
 	getWeightGenerateKeys: function(keyGenConfig) {
 		let weight = 0;
 		let numKeys = 0;
-		for (let i = 0; i < keyGenConfig.currencies; i++) {
+		for (let i = 0; i < keyGenConfig.currencies.length; i++) {
 			let currency = keyGenConfig.currencies[i];
 			numKeys += currency.numKeys;
 			weight += currency.numKeys * CryptoUtils.getWeightCreateKey();
