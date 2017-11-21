@@ -493,3 +493,55 @@ function MoneroPlugin() {
 	}
 }
 inheritsFrom(MoneroPlugin, CryptoPlugin);
+
+/**
+ * Zcash plugin.
+ */
+function ZcashPlugin() {
+	this.getName = function() { return "Zcash"; }
+	this.getTicker = function() { return "ZEC" };
+	this.getLogo = function() { return $("<img src='img/zcash.png'>"); }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/zcashcore.js"]; }
+	this.getDonationAddress = function() { return "LSreRDfwXtbWmmpm6ZxR7twYUenf5Lw2Hh"; }
+	this.newKey = function(str) {
+		
+		// create key if not given
+		if (!str) str = new zcashcore.PrivateKey().toString();		
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		let state = {};
+		
+		// unencrypted
+		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// TODO: zcashcore says 'ab' is valid ... ?
+			let key = new zcashcore.PrivateKey(str);
+			state.hex = key.toString();
+			state.wif = key.toWIF();
+			state.address = key.toAddress().toString();
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// hex cryptojs
+		else if (isHex(str) && str.length > 100) {
+			state.hex = str;
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// wif cryptojs
+		else if (CryptoUtils.isWifCryptoJs(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = CryptoUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// otherwise key is not recognized
+		throw new Error("Unrecognized private key: " + str);
+	}
+	this.isAddress = function(str) {
+		return zcashcore.Address.isValid(str);
+	}
+}
+inheritsFrom(ZcashPlugin, CryptoPlugin);

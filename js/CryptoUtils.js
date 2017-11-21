@@ -18,6 +18,7 @@ let CryptoUtils = {
 			CryptoUtils.plugins.push(new LitecoinPlugin());
 			CryptoUtils.plugins.push(new OmiseGoPlugin());
 			CryptoUtils.plugins.push(new EthereumClassicPlugin());
+			CryptoUtils.plugins.push(new ZcashPlugin());
 		}
 		return CryptoUtils.plugins;
 	},
