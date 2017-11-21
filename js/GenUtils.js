@@ -417,7 +417,8 @@ function arraysEqual(arr1, arr2) {
  */
 function mapsEqual(map1, map2) {
 	if (map1.size !== map2.size) return false;
-	for (let key of Object.keys(map1)) {
+	for (let i = 0; i < Object.keys(map1).length; i++) {
+		let key = Object.keys(map1)[i];
 		if (map1[key] !== map2[key]) return false;
 	}
 	return true;
@@ -617,14 +618,14 @@ function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
 	let str = "<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (internalCss ? "<style>" + internalCss + "</style>" : "");
 	if (jsPaths) {
 		jsPaths = listify(jsPaths);
-		for (let jsPath of jsPaths) {
-			str += "<script src='" + jsPath + "'></script>";
+		for (let i = 0; i < jsPaths.length; i++) {
+			str += "<script src='" + jsPaths[i] + "'></script>";
 		}
 	}
 	if (cssPaths) {
 		cssPaths = listify(cssPaths);
-		for (let cssPath of cssPaths) {
-			str += "<link rel='stylesheet' type='text/css' href='" + cssPath + "'/>";
+		for (let i = 0; i < cssPaths.length; i++) {
+			str += "<link rel='stylesheet' type='text/css' href='" + cssPaths[i] + "'/>";
 		}
 	}
 	str += "</head><body>";

@@ -1,4 +1,4 @@
-const RUN_TESTS = false;
+const RUN_TESTS = true;
 const DEBUG = true;
 const DELETE_WINDOW_CRYPTO = false;
 const VERIFY_ENCRYPTION = false;
