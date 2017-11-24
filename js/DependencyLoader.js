@@ -23,8 +23,8 @@ function DependencyLoader() {
 		}
 		
 		// only load paths that aren't previously defined
-		for (let i = 0; i < paths.length; i++) {
-			let path = paths[i];
+		for (var i = 0; i < paths.length; i++) {
+			var path = paths[i];
 			assertDefined(path);
 			if (!loadjs.isDefined(path)) loadjs(path, path);
 		}

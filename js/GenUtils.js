@@ -101,7 +101,7 @@ function isObject(arg, constructorName) {
  * @returns the merged object of the given arguments
  */
 function objectAssign() {
-	let objs = Array.prototype.slice.call(arguments);
+	var objs = Array.prototype.slice.call(arguments);
 	objs.clean(undefined);
 	objs.clean(null);
 	return objs.reduce(function (r, o) {
@@ -343,9 +343,9 @@ function getPowerSetOfLength(arr, size) {
 	assertInitialized(arr);
 	assertInitialized(size);
 	assertTrue(size >= 1);
-	let powerSet = getPowerSet(arr);
-	let powerSetOfLength = [];
-	for (let i = 0; i < powerSet.length; i++) {
+	var powerSet = getPowerSet(arr);
+	var powerSetOfLength = [];
+	for (var i = 0; i < powerSet.length; i++) {
 		if (powerSet[i].length === size) {
 			powerSetOfLength.push(powerSet[i]);
 		}
@@ -388,7 +388,7 @@ function contains(arr, obj) {
  * @param arr is the array to convert elements to lower case
  */
 function arrToLowerCase(arr) {
-	for (let i = 0; i < arr.length; i++) {
+	for (var i = 0; i < arr.length; i++) {
 		arr[i] = arr[i].toLowerCase();
 	}
 }
@@ -419,7 +419,7 @@ function arraysEqual(arr1, arr2) {
 	if (!isArray(arr1)) throw new Error("First argument is not an array");
 	if (!isArray(arr2)) throw new Error("Second argument is not an array");
 	if (arr1.length != arr2.length) return false;
-	for (let i = 0; i < arr1.length; ++i) {
+	for (var i = 0; i < arr1.length; ++i) {
 		if (arr1[i] !== arr2[i]) return false;
 	}
 	return true;
@@ -434,8 +434,8 @@ function arraysEqual(arr1, arr2) {
  */
 function mapsEqual(map1, map2) {
 	if (map1.size !== map2.size) return false;
-	for (let i = 0; i < Object.keys(map1).length; i++) {
-		let key = Object.keys(map1)[i];
+	for (var i = 0; i < Object.keys(map1).length; i++) {
+		var key = Object.keys(map1)[i];
 		if (map1[key] !== map2[key]) return false;
 	}
 	return true;
@@ -452,7 +452,7 @@ String.prototype.replaceAt=function(idx, replacement) {
  * Removes the given value from the array.
  */
 Array.prototype.clean = function(val) {
-  for (let i = 0; i < this.length; i++) {
+  for (var i = 0; i < this.length; i++) {
     if (this[i] == val) {         
       this.splice(i, 1);
       i--;
@@ -475,18 +475,18 @@ function getCombinations(arr, combinationSize) {
 	assertTrue(combinationSize >= 1);
 	
 	// get combinations of array indices of the given size
-	let indexCombinations = getPowerSetOfLength(getIndices(arr.length), combinationSize);
+	var indexCombinations = getPowerSetOfLength(getIndices(arr.length), combinationSize);
 	
 	// collect combinations from each combination of array indices
-	let combinations = [];
-	for (let indexCombinationsIdx = 0; indexCombinationsIdx < indexCombinations.length; indexCombinationsIdx++) {
+	var combinations = [];
+	for (var indexCombinationsIdx = 0; indexCombinationsIdx < indexCombinations.length; indexCombinationsIdx++) {
 		
 		// get combination of array indices
-		let indexCombination = indexCombinations[indexCombinationsIdx];
+		var indexCombination = indexCombinations[indexCombinationsIdx];
 		
 		// build combination from array
-		let combination = [];
-		for (let indexCombinationIdx = 0; indexCombinationIdx < indexCombinations.length; indexCombinationIdx++) {
+		var combination = [];
+		for (var indexCombinationIdx = 0; indexCombinationIdx < indexCombinations.length; indexCombinationIdx++) {
 			combination.push(arr[indexCombinationIdx]);
 		}
 		
@@ -580,8 +580,8 @@ function isWhitespace(char) {
  * @returns int is the number of non-whitespace characters in the given string
  */
 function countNonWhitespaceCharacters(str) {
-	let count = 0;
-	for (let i = 0; i < str.length; i++) {
+	var count = 0;
+	for (var i = 0; i < str.length; i++) {
 		if (!isWhitespace(str.charAt(i))) count++;
 	}
 	return count;
@@ -613,8 +613,8 @@ function getLines(str) {
  * @returns StyleSheet is the internal stylesheet
  */
 function getInternalStyleSheet() {
-	for (let i = 0; i < document.styleSheets.length; i++) {
-		let styleSheet = document.styleSheets[i];
+	for (var i = 0; i < document.styleSheets.length; i++) {
+		var styleSheet = document.styleSheets[i];
 		if (!styleSheet.href) return styleSheet;
 	}
 	return null;
@@ -626,9 +626,9 @@ function getInternalStyleSheet() {
  * @returns str is the document's internal stylesheet
  */
 function getInternalStyleSheetText() {
-	let internalCss = "";
-	let internalStyleSheet = getInternalStyleSheet();
-	for (let i = 0; i < internalStyleSheet.cssRules.length; i++) {
+	var internalCss = "";
+	var internalStyleSheet = getInternalStyleSheet();
+	for (var i = 0; i < internalStyleSheet.cssRules.length; i++) {
 		internalCss += internalStyleSheet.cssRules[i].cssText + "\n";
 	}
 	return internalCss;
@@ -645,16 +645,16 @@ function getInternalStyleSheetText() {
  * @returns str is the document string
  */
 function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
-	let str = "<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (internalCss ? "<style>" + internalCss + "</style>" : "");
+	var str = "<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (internalCss ? "<style>" + internalCss + "</style>" : "");
 	if (jsPaths) {
 		jsPaths = listify(jsPaths);
-		for (let i = 0; i < jsPaths.length; i++) {
+		for (var i = 0; i < jsPaths.length; i++) {
 			str += "<script src='" + jsPaths[i] + "'></script>";
 		}
 	}
 	if (cssPaths) {
 		cssPaths = listify(cssPaths);
-		for (let i = 0; i < cssPaths.length; i++) {
+		for (var i = 0; i < cssPaths.length; i++) {
 			str += "<link rel='stylesheet' type='text/css' href='" + cssPaths[i] + "'/>";
 		}
 	}
@@ -675,7 +675,7 @@ function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
  * @param onLoad is invoked with a reference to the window when available
  */
 function newWindow(div, title, jsPaths, cssPaths, internalCss, onLoad) {
-	let w = window.open();
+	var w = window.open();
 	w.document.write(buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss));
 	w.addEventListener('load', function() {
 		if (onLoad) onLoad(w);
@@ -690,10 +690,10 @@ function newWindow(div, title, jsPaths, cssPaths, internalCss, onLoad) {
  * @param quality is a number between 0 and 1 specifying the image quality
  */
 function imgToDataUrl(img, quality) {
-	let canvas = document.createElement('canvas');
+	var canvas = document.createElement('canvas');
   canvas.height = img.naturalHeight;
   canvas.width = img.naturalWidth;
-  let context = canvas.getContext('2d');
+  var context = canvas.getContext('2d');
   context.drawImage(img, 0, 0);
   return canvas.toDataURL(quality);
 }
@@ -708,10 +708,10 @@ function imgToDataUrl(img, quality) {
 function isImageAccessible(url, timeout, onDone) {
 	
 	// track return so it only executes once
-	let returned = false;
+	var returned = false;
 	
 	// attempt to load favicon
-	let img = new Image();
+	var img = new Image();
 	img.onload = onResponse;
   img.onerror = onResponse;
   img.src = url + "?" + (+new Date()); // trigger image load with cache buster
@@ -778,7 +778,7 @@ if (!Array.from) {
           throw new TypeError('Array.from: when provided, the second argument must be a function');
         }
 
-        // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+        // 5. b. If thisArg was supplied, var T be thisArg; else var T be undefined.
         if (arguments.length > 2) {
           T = arguments[2];
         }
