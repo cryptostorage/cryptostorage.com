@@ -455,11 +455,19 @@ function DonateController(div, appController) {
 				var value = values[i];
 				var valueDiv = $("<div>").appendTo(valuesDiv); 
 				if (left) {
-					funcs.push(function(onDone) { renderLeft(valueDiv, value, onDone); });
+					funcs.push(renderLeftFunc(valueDiv, value));
 				} else {
-					funcs.push(function(onDone) { renderRight(valueDiv, value, onDone); });
+					funcs.push(renderRightFunc(valueDiv, value));
 				}
 				left = !left;
+			}
+			
+			function renderLeftFunc(valueDiv, value) {
+				return function(onDone) { renderLeft(valueDiv, value, onDone); }
+			}
+			
+			function renderRightFunc(valueDiv, value) {
+				return function(onDone) { renderRight(valueDiv, value, onDone); }
 			}
 			
 			// render addresses in parallel
