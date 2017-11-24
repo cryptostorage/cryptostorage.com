@@ -120,7 +120,7 @@ function objectAssign() {
  * @param str is the string to test
  * @returns true if the given string is hexidecimal, false otherwise
  */
-const HEX_REG_EXP = /([0-9]|[a-f])/gim
+var HEX_REG_EXP = /([0-9]|[a-f])/gim
 function isHex(arg) {
 	if (typeof arg !== 'string') return false;
 	return (arg.match(HEX_REG_EXP) || []).length === arg.length;

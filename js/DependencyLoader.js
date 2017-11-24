@@ -1,5 +1,5 @@
 // global loader instance
-const LOADER = new DependencyLoader();
+var LOADER = new DependencyLoader();
 
 /**
  * Loads dependencies.

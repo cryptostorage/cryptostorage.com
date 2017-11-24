@@ -1286,7 +1286,7 @@ function RecoverTextController(div, plugins) {
 	DivController.call(this, div);
 	assertTrue(plugins.length > 0);
 	
-	const MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
+	var MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
 	
 	var warningDiv;
 	var contentDiv;
@@ -2121,7 +2121,7 @@ inheritsFrom(ExportController, DivController);
 function SecurityCheckController(div) {
 	DivController.call(this, div);
 	
-	const LOOP_TIME = 3000;
+	var LOOP_TIME = 3000;
 	
 	this.render = function(onDone) {
 		div.empty();
