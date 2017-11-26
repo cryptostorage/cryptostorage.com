@@ -13,7 +13,7 @@ var PieceRenderer = {
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
 		qrScale: 4,
-		qrPadding: 5,		// spacing in pixels
+		qrPadding: 5		// spacing in pixels
 	},
 	
 	/**
