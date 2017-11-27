@@ -1,4 +1,4 @@
-var RUN_TESTS = true;
+var RUN_TESTS = false;
 var DEBUG = true;
 var DELETE_WINDOW_CRYPTO = false;
 var VERIFY_ENCRYPTION = false;
