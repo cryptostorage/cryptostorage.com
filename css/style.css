@@ -397,17 +397,19 @@ input[type='checkbox'] {
 	-ms-flex-align: center;
 	align-items: center;
 	margin: 10px;
-	width: 115px;
+	max-width: 115px;
 }
 
 .split_num_label_top {
 	text-align: center;
 	padding-bottom: 10px;
+	max-width: 115px;
 }
 
 .split_num_label_bottom {
 	text-align: center;
 	padding-top: 10px;
+	max-width: 115px;
 }
 
 .split_lines_2 {
