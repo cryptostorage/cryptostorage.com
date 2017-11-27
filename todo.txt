@@ -16,6 +16,12 @@
  no need for b64 anymore
  more descriptive .value_left, etc class names in style.css
 
+ ie:
+ 	donate formattings
+ 	bip38 .fill() unsupported method
+ 	qrcode write() unsupported method
+ 	split lines formatting
+
  design:
  export controller progress design, initial and re-render
  import / decryption complete - click button to view
