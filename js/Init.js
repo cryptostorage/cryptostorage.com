@@ -9,22 +9,6 @@ $(document).ready(function() {
 	// start loading common dependencies
 	LOADER.load(APP_DEPENDENCIES, function() {
 		
-//		var funcs = [];
-//		for (var i = 0; i < 5; i++) {
-//			funcs.push(prep(i));
-//		}
-//		
-//		async.series(funcs, function() {
-//			console.log("done");
-//		});
-//		
-//		function prep(i) {
-//			return function(onDone) {
-//				console.log(i);
-//				onDone();
-//			}
-//		}
-		
 		// generate lib/b64-images.js file
 		if (GENERATE_B64_IMAGES) {
 			CryptoUtils.getB64ImageFile(function(js) {
