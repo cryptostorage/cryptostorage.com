@@ -1172,7 +1172,7 @@ function RecoverFileController(div) {
 		for (var i = 0; i < tickers.length; i++) {
 			var ticker = tickers[i];
 			var plugin = CryptoUtils.getCryptoPlugin(ticker);
-			for (var j = 0; j < plugin.getDependencies().length; j++) dependencies.add(plugin.getDependencies()[i]);
+			for (var j = 0; j < plugin.getDependencies().length; j++) dependencies.add(plugin.getDependencies()[j]);
 		}
 		
 		// load dependencies

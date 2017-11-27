@@ -18,9 +18,9 @@ var Tests = {
 		var plugins = [];
 		plugins.push(new BitcoinPlugin());
 		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
-		plugins.push(new DashPlugin());
-		plugins.push(new LitecoinPlugin());
+//		plugins.push(new MoneroPlugin());
+//		plugins.push(new DashPlugin());
+//		plugins.push(new LitecoinPlugin());
 		return plugins;
 	},
 	
@@ -655,7 +655,10 @@ var Tests = {
 				
 				function testIncompatiblePieces() {
 					return function(onDone) {
-						
+
+						// tests assume more than one plugin
+						assertTrue(plugins.length > 1);
+
 						var pieces1 = getPieces(plugins, 1, 3, 2);
 						var pieces2 = getPieces(plugins, 2, 3, 2);
 						var namedPieces = [];
@@ -735,7 +738,7 @@ var Tests = {
 					numPieces = numPieces || 1;
 					for (var i = 0; i < plugins.length; i++) {
 						var plugin = plugins[i];
-						for (var i = 0; i < keysPerPlugin; i++) {
+						for (var j = 0; j < keysPerPlugin; j++) {
 							keys.push(plugin.newKey());
 						}
 					}

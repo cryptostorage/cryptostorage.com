@@ -331,9 +331,9 @@ var CryptoUtils = {
 			// validate consistent keys across pieces
 			var minPieces;
 			for (var i = 0; i < pieces[0].keys.length; i++) {
-				var crypto;
-				var address;
-				var encryption;
+				var crypto = null;
+				var address = null;
+				var encryption = null;
 				for (var j = 0; j < pieces.length; j++) {
 					var piece = pieces[j];
 					if (!crypto) crypto = piece.keys[i].ticker;
