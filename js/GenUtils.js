@@ -85,13 +85,13 @@ function isString(arg) {
  * Indicates if the given argument is an object and optionally if it has the given constructor name.
  * 
  * @param arg is the argument to test
- * @param constructorName is the argument's constructor name (optional)
+ * @param obj is an object to test arg instanceof obj (optional)
  * @returns true if the given argument is an object and optionally has the given constructor name
  */
-function isObject(arg, constructorName) {
+function isObject(arg, obj) {
 	if (!arg) return false;
 	if (typeof arg !== 'object') return false;
-	if (constructorName && arg.constructor.name !== constructorName) return false;
+	if (obj && !(arg instanceof obj)) return false;
 	return true;
 }
 
@@ -285,10 +285,10 @@ function assertArray(arg, msg) {
  * Asserts that the given argument is an object with the given name.
  * 
  * @param arg is the argument to test
- * @param name is the name of the expected object
+ * @param obj is an object to assert arg instanceof obj (optional)
  * @param msg is the message to throw if the argument is not the specified object
  */
-function assertObject(arg, name, msg) {
+function assertObject(arg, obj, msg) {
 	if (!isObject(arg, name)) {
 		throw new Error(msg ? msg : "Argument asserted as object with name '" + name + "' but was not");
 	}
@@ -657,7 +657,8 @@ function getInternalStyleSheetText() {
  * @returns str is the document string
  */
 function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
-	var str = "<html>" + (title ? "<title>" + title + "</title>" : "") + "<head>" + (internalCss ? "<style>" + internalCss + "</style>" : "");
+	var str = "<!DOCTYPE HTML>";
+	str += "<html><head>" + (title ? "<title>" + title + "</title>" : "") + (internalCss ? "<style>" + internalCss + "</style>" : "");
 	if (jsPaths) {
 		jsPaths = listify(jsPaths);
 		for (var i = 0; i < jsPaths.length; i++) {

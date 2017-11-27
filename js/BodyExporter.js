@@ -13,7 +13,7 @@
 window.exportToBody = function(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	// pagination requires div attached to dom
-	let body = $("body", window.document);
+	var body = $("body", window.document);
 	var container = $("<div>").appendTo(body);
 	container.hide();
 	

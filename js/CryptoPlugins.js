@@ -62,7 +62,7 @@ CryptoPlugin.prototype.decrypt = function(key, passphrase, onDone) {
  * @returns string[] are the split pieces
  */
 CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
-	assertTrue(isObject(key, 'CryptoKey'));
+	assertTrue(isObject(key, CryptoKey));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
 

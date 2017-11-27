@@ -698,7 +698,7 @@ var CryptoUtils = {
 	 */
 	encryptKey: function(key, scheme, passphrase, onDone) {
 		if (!scheme) throw new Error("Scheme must be initialized");
-		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 		if (!passphrase) throw new Error("Passphrase must be initialized");
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.CRYPTOJS:
@@ -820,7 +820,7 @@ var CryptoUtils = {
 	 * @param onDone(err, decryptedKey) is invoked when done
 	 */
 	decryptKey: function(key, passphrase, onDone) {
-		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 		if (!passphrase) throw new Error("Passphrase must be initialized");
 		assertTrue(key.isEncrypted());
 		switch (key.getEncryptionScheme()) {

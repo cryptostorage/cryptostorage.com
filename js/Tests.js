@@ -280,7 +280,7 @@ var Tests = {
 					var key = keys[i];
 					
 					// test basic initialization
-					assertObject(key, 'CryptoKey');
+					assertObject(key, CryptoKey);
 					assertTrue(key.isEncrypted());
 					assertTrue(key.equals(encryptedKeys[i]));
 					assertFalse(key.equals(originals[i]));
@@ -362,7 +362,7 @@ var Tests = {
 					var key = keys[i];
 					
 					// test basic initialization
-					assertObject(key, 'CryptoKey');
+					assertObject(key, CryptoKey);
 					assertTrue(key.equals(decryptedKeys[i]));
 					assertFalse(key.equals(originals[i]));
 					assertInitialized(key.getHex());
