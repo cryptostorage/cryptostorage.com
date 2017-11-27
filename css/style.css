@@ -194,7 +194,6 @@ ol {
 	width: 100%;
 	background-color: white;
 	padding: 25px;
-	min-height: 700px;
 }
 
 .home_div {
@@ -602,7 +601,9 @@ input[type='checkbox'] {
 }
 
 .donate_label_value {
-	
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
 }
 
 .donate_left_logo_label {
