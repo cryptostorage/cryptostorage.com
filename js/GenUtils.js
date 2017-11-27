@@ -102,8 +102,8 @@ function isObject(arg, obj) {
  */
 function objectAssign() {
 	var objs = Array.prototype.slice.call(arguments);
-	objs.clean(undefined);
-	objs.clean(null);
+	objs.removeVal(undefined);
+	objs.removeVal(null);
 	return objs.reduce(function (r, o) {
 		Object.keys(o).forEach(function (k) {
 			r[k] = o[k];
@@ -454,16 +454,23 @@ function mapsEqual(map1, map2) {
 }
 
 /**
- * Implements str.replaceAt(idx, replacement).
+ * Polyfill str.replaceAt(idx, replacement).
  */
 String.prototype.replaceAt=function(idx, replacement) {
 	return this.substr(0, idx) + replacement + this.substr(idx + replacement.length);
 }
 
 /**
+ * Polyfill str.startsWith(searchString, position).
+ */
+String.prototype.startsWith = function(searchString, position) {
+  return this.substr(position || 0, searchString.length) === searchString;
+};
+
+/**
  * Removes the given value from the array.
  */
-Array.prototype.clean = function(val) {
+Array.prototype.removeVal = function(val) {
   for (var i = 0; i < this.length; i++) {
     if (this[i] == val) {         
       this.splice(i, 1);
