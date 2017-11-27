@@ -31,14 +31,6 @@ ol {
 	align-items:center;
 }
 
-.app_header_warning {
-	font-weight:bold;
-	color:#ff3333;
-	padding:20px;
-	text-align:center;
-	flex:1;
-}
-
 .app_header_logo_img {
 	width:275px;
 }
@@ -405,6 +397,14 @@ input[type='checkbox'] {
 
 .btn_generate:active {
 	background-color:#006000;
+}
+
+.red_warning {
+	font-weight:bold;
+	color:#ff3333;
+	padding:20px;
+	text-align:center;
+	flex:1;
 }
 
 .title {

@@ -649,7 +649,7 @@ function FormController(div) {
 		btnGenerate.click(function() { onGenerate() });
 		
 		// under development warning
-		var warningDiv = $("<div class='app_header_warning'>").appendTo(div);
+		var warningDiv = $("<div class='red_warning'>").appendTo(div);
 		warningDiv.append("Under Development: Not Ready for Use");
 		
 		// security checks
