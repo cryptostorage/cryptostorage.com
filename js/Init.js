@@ -3,8 +3,6 @@
  */
 $(document).ready(function() {
 	
-	setupArray();
-	
 	// delete window.crypto for testing
 	if (DELETE_WINDOW_CRYPTO) delete window.crypto;
 	

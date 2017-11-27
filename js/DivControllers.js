@@ -1164,19 +1164,21 @@ function RecoverFileController(div) {
 		}
 		
 		// collect tickers being imported
-		var tickers = new Set();
-		for (var i = 0; i < pieces[0].keys.length; i++) tickers.add(pieces[0].keys[i].ticker);
+		var tickers = [];
+		for (var i = 0; i < pieces[0].keys.length; i++) tickers.push(pieces[0].keys[i].ticker);
+		tickers = arrUnique(tickers);
 		
 		// collect dependencies
-		var dependencies = new Set(APP_DEPENDENCIES);
+		var dependencies = APP_DEPENDENCIES.slice();
 		for (var i = 0; i < tickers.length; i++) {
 			var ticker = tickers[i];
 			var plugin = CryptoUtils.getCryptoPlugin(ticker);
-			for (var j = 0; j < plugin.getDependencies().length; j++) dependencies.add(plugin.getDependencies()[j]);
+			for (var j = 0; j < plugin.getDependencies().length; j++) dependencies.push(plugin.getDependencies()[j]);
 		}
+		dependencies = arrUnique(dependencies);
 		
 		// load dependencies
-		LOADER.load(Array.from(dependencies), function() {
+		LOADER.load(dependencies, function() {
 			
 			// create keys
 			try {
@@ -1518,9 +1520,10 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		// load dependencies
-		var dependencies = new Set(APP_DEPENDENCIES);
-		for (var i = 0; i < selectedPlugin.getDependencies().length; i++) dependencies.add(selectedPlugin.getDependencies()[i]);
-		LOADER.load(Array.from(dependencies), function() {
+		var dependencies = [];
+		for (var i = 0; i < selectedPlugin.getDependencies().length; i++) dependencies.push(selectedPlugin.getDependencies()[i]);
+		dependencies = arrUnique(dependencies);
+		LOADER.load(dependencies, function() {
 			
 			// add pieces
 			updatePieces(contentLines);
@@ -1561,7 +1564,7 @@ function RecoverTextController(div, plugins) {
 			else {
 				for (var i = 0; i < newPieces.length; i++) {
 					var piece = newPieces[i];
-					if (contains(importedPieces, piece)) {
+					if (arrContains(importedPieces, piece)) {
 						setWarningAux("Piece already added");
 						continue;
 					}

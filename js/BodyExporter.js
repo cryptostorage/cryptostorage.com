@@ -17,14 +17,14 @@ window.exportToBody = function(window, importedPieces, keyGenConfig, keys, piece
 	var container = $("<div>").appendTo(body);
 	container.hide();
 	
-	//handle two tabs with split and reconstituted pieces
+	// handle two tabs with split and reconstituted pieces
 	if (importedPieces && importedPieces.length > 1) {
 		new ExportController($("<div>").appendTo(container), window, null, null, importedPieces).render(function(tab1) {
 			var tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
 			new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
 				container.detach();
 				container.children().detach();
-				renderExportTabs(div, "Imported Pieces", tab1, tabName2, tab2, 1);
+				renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
 			});
 		});
 	}

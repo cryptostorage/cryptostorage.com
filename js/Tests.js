@@ -38,13 +38,14 @@ var Tests = {
 		var plugins = Tests.getTestCryptoPlugins();
 		
 		// load dependencies
-		var dependencies = new Set(APP_DEPENDENCIES);
+		var dependencies = APP_DEPENDENCIES.slice();
 		for (var i = 0; i < plugins.length; i++) {
 			for (var j = 0; j < plugins[i].getDependencies().length; j++) {
-				dependencies.add(plugins[i].getDependencies()[j]);
+				dependencies.push(plugins[i].getDependencies()[j]);
 			}
 		}
-		LOADER.load(Array.from(dependencies), function() {
+		dependencies = arrUnique(dependencies);
+		LOADER.load(dependencies, function() {
 			
 			// verify each plugin has logo data
 			for (var i = 0; i < CryptoUtils.getCryptoPlugins().length; i++) {

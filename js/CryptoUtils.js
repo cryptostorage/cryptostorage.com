@@ -580,16 +580,17 @@ var CryptoUtils = {
 		var totalWeight = CryptoUtils.getWeightGenerateKeys(config);
 
 		// load dependencies
-		var dependencies = new Set();
+		var dependencies = [];
 		for (var i = 0; i < config.currencies.length; i++) {
 			var currency = config.currencies[i];
 			var pluginDependencies = CryptoUtils.getCryptoPlugin(currency.ticker).getDependencies();
 			for (var j = 0; j < pluginDependencies.length; j++) {
-				dependencies.add(pluginDependencies[j]);
+				dependencies.push(pluginDependencies[j]);
 			}
 		}
+		dependencies = arrUnique(dependencies);
 		if (onProgress) onProgress(0, "Loading dependencies");
-		LOADER.load(Array.from(dependencies), function() {
+		LOADER.load(dependencies, function() {
 			
 			// collect key creation functions
 			var funcs = [];
@@ -1113,8 +1114,8 @@ var CryptoUtils = {
 			name = name.toLowerCase();
 			
 			// determine if open source
-			if (contains(openSourceBrowsers, name)) return true;
-			if (contains(nonOpenSourceBrowsers, name)) return false;
+			if (arrContains(openSourceBrowsers, name)) return true;
+			if (arrContains(nonOpenSourceBrowsers, name)) return false;
 			return null;
 		}
 		
@@ -1124,8 +1125,8 @@ var CryptoUtils = {
 			name = name.toLowerCase();
 			
 			// determine if open source
-			if (contains(openSourceOperatingSystems, name)) return true;
-			if (contains(nonOpenSourceOperatingSystems, name)) return false;
+			if (arrContains(openSourceOperatingSystems, name)) return true;
+			if (arrContains(nonOpenSourceOperatingSystems, name)) return false;
 			return null;
 		}
 	}
