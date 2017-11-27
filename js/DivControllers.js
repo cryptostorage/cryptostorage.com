@@ -400,60 +400,60 @@ function DonateController(div, appController) {
 			// build donate section
 			var titleDiv = $("<div class='title'>").appendTo(div);
 			titleDiv.html("Donate");
-			var values = [];
+			var donations = [];
 			var plugins = CryptoUtils.getCryptoPlugins();
 			for (var i = 0; i < plugins.length; i++) {
 				var plugin = plugins[i];
-				values.push({
+				donations.push({
 					logo: plugin.getLogo(),
 					label: plugin.getName(),
 					value: plugin.getDonationAddress()
 				});
 			}
-			renderValues(values, null, null, function(valuesDiv) {
-				div.append(valuesDiv);
+			renderDonationAddresses(donations, null, null, function(donationsDiv) {
+				div.append(donationsDiv);
 				
 				// build credits section
 				div.append("<br><br>");
 				titleDiv = $("<div class='title'>").appendTo(div);
 				titleDiv.html("Credits");
-				var values = [];
-				values.push({
+				var credits = [];
+				credits.push({
 					logo: CryptoUtils.getCryptoPlugin("BTC").getLogo(),
 					label: "bitaddress.org",
 					value: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
 				});
-				values.push({
+				credits.push({
 					logo: CryptoUtils.getCryptoPlugin("XMR").getLogo(),
 					label: "moneroaddress.org",
 					value: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
 				});
-				renderValues(values, null, null, function(valuesDiv) {
-					div.append(valuesDiv);
+				renderDonationAddresses(credits, null, null, function(donationsDiv) {
+					div.append(donationsDiv);
 					if (onDone) onDone(div);
 				});
 			});
 		});
 		
 		/**
-		 * Renders the given values.
+		 * Renders the given donations.
 		 * 
-		 * @param values are [{logo: <logo>, label: <label>, value: <value>}, ...].
+		 * @param donations are [{logo: <logo>, label: <label>, value: <value>}, ...].
 		 * @param config is the config to render (TODO)
 		 * @param onProgress(done, total, label) is invoked as progress is made (TODO)
 		 * @param onDone(div) is invoked when done
 		 */
-		function renderValues(values, config, onProgress, onDone) {
+		function renderDonationAddresses(donations, config, onProgress, onDone) {
 			
 			// div to render to
-			var valuesDiv = $("<div>");
+			var donationsDiv = $("<div>");
 			
 			// collect functions to render values
 			var left = true;
 			var funcs = [];
-			for (var i = 0; i < values.length; i++) {
-				var value = values[i];
-				var valueDiv = $("<div>").appendTo(valuesDiv); 
+			for (var i = 0; i < donations.length; i++) {
+				var value = donations[i];
+				var valueDiv = $("<div>").appendTo(donationsDiv); 
 				if (left) {
 					funcs.push(renderLeftFunc(valueDiv, value));
 				} else {
@@ -473,45 +473,45 @@ function DonateController(div, appController) {
 			// render addresses in parallel
 			async.parallel(funcs, function(err, results) {
 				if (err) throw err;
-				onDone(valuesDiv);
+				onDone(donationsDiv);
 			});
 		}
 		
 		function renderLeft(div, value, onDone) {
-			div.attr("class", "value_left");
+			div.attr("class", "donate_left");
 			var qrDiv = $("<div>").appendTo(div);
-			var labelValueDiv = $("<div class='value_label_value'>").appendTo(div);
-			var logoLabelDiv = $("<div class='value_left_logo_label'>").appendTo(labelValueDiv);
+			var labelValueDiv = $("<div class='donate_label_value'>").appendTo(div);
+			var logoLabelDiv = $("<div class='donate_left_logo_label'>").appendTo(labelValueDiv);
 			var logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-			logo.attr("class", "value_logo");
-			var valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
+			logo.attr("class", "donate_logo");
+			var valueLabelDiv = $("<div class='donate_label'>").appendTo(logoLabelDiv);
 			valueLabelDiv.append(value.label);
-			var valueDiv = $("<div class='value_left_value'>").appendTo(labelValueDiv);
+			var valueDiv = $("<div class='donate_left_value'>").appendTo(labelValueDiv);
 			valueDiv.append(value.value);
 			
 			// render qr code
 			CryptoUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "value_qr_left");
+				img.attr("class", "donate_left_qr");
 				qrDiv.append(img);
 				onDone();
 			});
 		}
 		
 		function renderRight(div, value, onDone) {
-			div.attr("class", "value_right");
-			var labelValueDiv = $("<div class='value_label_value'>").appendTo(div);
-			var logoLabelDiv = $("<div class='value_right_logo_label'>").appendTo(labelValueDiv);
+			div.attr("class", "donate_right");
+			var labelValueDiv = $("<div class='donate_label_value'>").appendTo(div);
+			var logoLabelDiv = $("<div class='donate_right_logo_label'>").appendTo(labelValueDiv);
 			var logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-			logo.attr("class", "value_logo");
-			var valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
+			logo.attr("class", "donate_logo");
+			var valueLabelDiv = $("<div class='donate_label'>").appendTo(logoLabelDiv);
 			valueLabelDiv.append(value.label);
-			var valueDiv = $("<div class='value_right_value'>").appendTo(labelValueDiv);
+			var valueDiv = $("<div class='donate_right_value'>").appendTo(labelValueDiv);
 			valueDiv.append(value.value);
 			var qrDiv = $("<div>").appendTo(div);
 			
 			// render qr code
 			CryptoUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "value_qr_right");
+				img.attr("class", "donate_right_qr");
 				qrDiv.append(img);
 				onDone();
 			});
