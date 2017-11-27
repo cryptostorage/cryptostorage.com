@@ -18,9 +18,9 @@ var Tests = {
 		var plugins = [];
 		plugins.push(new BitcoinPlugin());
 		plugins.push(new EthereumPlugin());
-//		plugins.push(new MoneroPlugin());
-//		plugins.push(new DashPlugin());
-//		plugins.push(new LitecoinPlugin());
+		plugins.push(new MoneroPlugin());
+		plugins.push(new DashPlugin());
+		plugins.push(new LitecoinPlugin());
 		return plugins;
 	},
 	
@@ -116,7 +116,7 @@ var Tests = {
 		}
 		
 		function testKeyExclusion(keys) {
-			
+		
 			// test exclude public
 			var copies = [];
 			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
@@ -130,7 +130,7 @@ var Tests = {
 			}
 			testKeysToPieces(copies, 1);
 			testKeysToPieces(copies, Tests.NUM_PIECES, Tests.MIN_PIECES);
-			
+
 			// test exclude private
 			copies = [];
 			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
@@ -230,7 +230,7 @@ var Tests = {
 			try {
 				plugin.newKey(undefined);
 				fail("Should have thrown an error");
-			} catch (error) { }	
+			} catch (error) { }
 			
 			// collect functions to test each encryption scheme
 			assertTrue(plugin.getEncryptionSchemes().length >= 1);
@@ -412,22 +412,22 @@ var Tests = {
 			// test each share in each piece
 			for (var i = 0; i < pieces.length; i++) {
 				var piece = pieces[i];
-				for (var i = 0; i < keys.length; i++) {
-					assertEquals(keys[i].getPlugin().getTicker(), piece.keys[i].ticker);
-					assertEquals(keys[i].getAddress(), piece.keys[i].address);
-					if (piece.keys[i].wif) {
-						assertDefined(piece.keys[i].encryption);
-						assertEquals(keys[i].getEncryptionScheme(), piece.keys[i].encryption);
+				for (var j = 0; j < keys.length; j++) {
+					assertEquals(keys[j].getPlugin().getTicker(), piece.keys[j].ticker);
+					assertEquals(keys[j].getAddress(), piece.keys[j].address);
+					if (piece.keys[j].wif) {
+						assertDefined(piece.keys[j].encryption);
+						assertEquals(keys[j].getEncryptionScheme(), piece.keys[j].encryption);
 					}
-					else assertUndefined(piece.keys[i].encryption);
+					else assertUndefined(piece.keys[j].encryption);
 					if (numPieces > 1) {
 						assertNumber(piece.pieceNum);
 						assertInt(piece.pieceNum);
 						assertTrue(piece.pieceNum > 0);
-						assertFalse(keys[i].getWif() === piece.keys[i].wif);
+						assertFalse(keys[j].getWif() === piece.keys[j].wif);
 					} else {
 						assertUndefined(piece.pieceNum);
-						assertTrue(keys[i].getWif() === piece.keys[i].wif);
+						assertTrue(keys[j].getWif() === piece.keys[j].wif);
 					}
 				}
 			}
@@ -448,8 +448,8 @@ var Tests = {
 				var combination = combinations[i];
 				var keysFromPieces = CryptoUtils.piecesToKeys(pieces);
 				assertEquals(keys.length, keysFromPieces.length);
-				for (var i = 0; i < keys.length; i++) {
-					assertTrue(keys[i].equals(keysFromPieces[i]));
+				for (var j = 0; j < keys.length; j++) {
+					assertTrue(keys[j].equals(keysFromPieces[j]));
 				}
 			}
 		}
@@ -490,9 +490,9 @@ var Tests = {
 				var pieces = plugin.split(key, Tests.NUM_PIECES, Tests.MIN_PIECES);
 				
 				// test that single pieces cannot create key
-				for (var i = 0; i < pieces.length; i++) {
+				for (var j = 0; j < pieces.length; j++) {
 					try {
-						plugin.combine([pieces[i]]);
+						plugin.combine([pieces[j]]);
 						throw Error("fail");
 					} catch (err) {
 						if (err.message === "fail") throw new Error("Cannot combine single pieces");
@@ -501,8 +501,8 @@ var Tests = {
 				
 				// test each piece combination
 				var combinations = getCombinations(pieces, Tests.MIN_PIECES);
-				for (var i = 0; i < combinations.length; i++) {
-					var combination = combinations[i];
+				for (var j = 0; j < combinations.length; j++) {
+					var combination = combinations[j];
 					var combined = plugin.combine(combination);
 					assertTrue(key.equals(combined));
 				}
