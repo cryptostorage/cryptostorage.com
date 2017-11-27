@@ -184,9 +184,9 @@ ol {
 }
 
 .app_content {
-	-webkit-flex: 1 0 auto;
-	-ms-flex: 1 0 auto;
-	flex: 1 0 auto;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
 	width: 875px;
 }
 
@@ -549,9 +549,9 @@ input[type='checkbox'] {
 }
 
 .red_warning {
-	-webkit-flex: 1 0 auto;
-	-ms-flex: 1 0 auto;
-	flex: 1 0 auto;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
 	font-weight: bold;
 	color: #ff3333;
 	padding: 20px;
@@ -676,9 +676,9 @@ input[type='checkbox'] {
 }
 
 .recover_tab_div {
-	-webkit-flex: 1 0 auto;
-	-ms-flex: 1 0 auto;
-	flex: 1 0 auto;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
 	text-align: center;
 	padding: 20px;
 	color: white;
@@ -1138,9 +1138,9 @@ input[type='checkbox'] {
 
 .piece_page_header_left {
 	width: 150px;
-	-webkit-flex: 1 0 auto;
-	-ms-flex: 1 0 auto;
-	flex: 1 0 auto;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
 }
 
 .piece_page_header_logo {
@@ -1148,9 +1148,9 @@ input[type='checkbox'] {
 }
 
 .piece_page_header_right {
-	-webkit-flex: 1 0 auto;
-	-ms-flex: 1 0 auto;
-	flex: 1 0 auto;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
 	width: 150px;
 	margin-left: auto;
 	text-align: right;
@@ -1196,9 +1196,9 @@ input[type='checkbox'] {
 }
 
 .key_div_center {
-	-webkit-flex: 1 0 auto;
-	-ms-flex: 1 0 auto;
-	flex: 1 0 auto;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -1232,9 +1232,9 @@ input[type='checkbox'] {
 }
 
 .key_div_currency {
-	-webkit-flex: 1 0 auto;
-	-ms-flex: 1 0 auto;
-	flex: 1 0 auto;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
