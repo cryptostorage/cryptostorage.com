@@ -14,7 +14,7 @@
  no need for b64 anymore
 
  ie:
- 	donate formattings
+ 	donate formatting
  	bip38 .fill() unsupported method
  	qrcode write() unsupported method
  	split lines formatting
