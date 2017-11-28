@@ -436,7 +436,7 @@ function DonateController(div, appController) {
 				var credits = [];
 				credits.push({
 					logo: CryptoUtils.getCryptoPlugin("ETH").getLogo(),
-					label: "website designer",
+					label: "UI designer",
 					value: "0x5735bb7cec965e58d03dddd167d1f27321878c51"
 				});
 				credits.push({
