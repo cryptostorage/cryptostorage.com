@@ -12,6 +12,9 @@
  */
 window.exportToBody = function(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
 	
+	// assign window.crypto (supports IE11)
+	window.crypto = window.crypto || window.msCrypto;
+	
 	// pagination requires div attached to dom
 	var body = $("body", window.document);
 	var container = $("<div>").appendTo(body);

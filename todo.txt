@@ -13,11 +13,9 @@
  don't confirm close on imported storage
  no need for b64 anymore
  split lines less steep
- IE cryptostorage.mix is not a zip or json file
-
- ie:
- 	bip38 .fill() unsupported method
- 	qrcode write() unsupported method
+ IE11 cryptostorage.mix is not a zip or json file
+handle unsupported browsers missing methods: bip38 .fill(), qrcode UInt8Array.write()
+ 
 
  design:
  export controller progress design, initial and re-render
@@ -34,6 +32,7 @@
  multi-select currencies and quick generate
 
  low priority:
+ <ie11 unsupported methods: bip38 .fill(), qrcode UInt8Array.write()
  save as txt and csv
  try all imported file / key combinations to recover
  prevent scroll revealing some of next picture
