@@ -1,7 +1,7 @@
 /**
  * Collection of utilities for cryptostorage.com.
  */
-let CryptoUtils = {
+var CryptoUtils = {
 	
 	/**
 	 * Returns all crypto plugins.
@@ -28,9 +28,9 @@ let CryptoUtils = {
 	 */
 	getCryptoPlugin: function(ticker) {
 		assertInitialized(ticker);
-		let plugins = CryptoUtils.getCryptoPlugins();
-		for (let i = 0; i < plugins.length; i++) {
-			let plugin = plugins[i];
+		var plugins = CryptoUtils.getCryptoPlugins();
+		for (var i = 0; i < plugins.length; i++) {
+			var plugin = plugins[i];
 			if (plugin.getTicker() === ticker) return plugin;
 		}
 		throw new Error("No plugin found for crypto '" + ticker + "'");
@@ -80,7 +80,7 @@ let CryptoUtils = {
 	 */
 	getMinPieces: function(splitPiece) {
 		assertString(splitPiece);
-		let idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
+		var idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
 		if (idx <= 0) return null;
 		return Number(splitPiece.substring(0, idx)); // parse preceding numbers to int
 	},
@@ -131,7 +131,7 @@ let CryptoUtils = {
 		var segments = [{data: text, mode: 'byte'}];	// manually specify mode
 		qrcodelib.toDataURL(segments, config, function(err, url) {
 			if (err) throw err;
-			let img = $("<img>");
+			var img = $("<img>");
 			if (config.size) img.css("width", config.size + "px");
 			if (config.size) img.css("height", config.size + "px");
 			img[0].onload = function() {
@@ -160,15 +160,15 @@ let CryptoUtils = {
 		}
 		
 		if (!config.includePublic) {
-			for (let i = 0; i < keys.length; i++) {
-				let key = keys[i];
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys[i];
 				delete key.getState().address;
 			}
 		}
 		
 		if (!config.includePrivate) {
-			for (let i = 0; i < keys.length; i++) {
-				let key = keys[i];
+			for (var i = 0; i < keys.length; i++) {
+				var key = keys[i];
 				delete key.getState().hex;
 				delete key.getState().wif;
 				delete key.getState().encryption;
@@ -197,7 +197,7 @@ let CryptoUtils = {
 		} catch (err) {
 
 			// try tokenizing and combining
-			let tokens = getTokens(str);
+			var tokens = getTokens(str);
 			if (tokens.length === 0) return null;
 			try {
 				return plugin.combine(tokens);
@@ -261,9 +261,9 @@ let CryptoUtils = {
 		}
 		
 		// initialize pieces
-		let pieces = [];
-		for (let i = 0; i < numPieces; i++) {
-			let piece = {};
+		var pieces = [];
+		for (var i = 0; i < numPieces; i++) {
+			var piece = {};
 			if (numPieces > 1) piece.pieceNum = i + 1;
 			piece.version = "1.0";
 			piece.keys = [];
@@ -271,17 +271,17 @@ let CryptoUtils = {
 		}
 		
 		// add keys to each piece
-		for (let i = 0; i < keys.length; i++) {
-			let key = keys[i];
+		for (var i = 0; i < keys.length; i++) {
+			var key = keys[i];
 			if (!key.getWif() && !key.getHex() && numPieces > 1) throw new Error("Cannot split piece without private key");
-			let keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getWif()];
-			for (let i = 0; i < numPieces; i++) {
-				let pieceKey = {};
+			var keyPieces = numPieces > 1 ? key.getPlugin().split(key, numPieces, minPieces) : [key.getWif()];
+			for (var j = 0; j < numPieces; j++) {
+				var pieceKey = {};
 				pieceKey.ticker = key.getPlugin().getTicker();
 				pieceKey.address = key.getAddress();
-				pieceKey.wif = keyPieces[i];
+				pieceKey.wif = keyPieces[j];
 				if (pieceKey.wif) pieceKey.encryption = key.getEncryptionScheme();
-				pieces[i].keys.push(pieceKey);
+				pieces[j].keys.push(pieceKey);
 			}
 		}
 		
@@ -296,23 +296,23 @@ let CryptoUtils = {
 	 */
 	piecesToKeys: function(pieces) {
 		assertTrue(pieces.length > 0);
-		let keys = [];
+		var keys = [];
 		
 		// handle one piece
 		if (pieces.length === 1) {
 			assertTrue(pieces[0].keys.length > 0);
 			if (pieces[0].pieceNum) {
-				let minPieces = CryptoUtils.getMinPieces(pieces[0].keys[0].wif);
-				let additional = minPieces - 1;
+				var minPieces = CryptoUtils.getMinPieces(pieces[0].keys[0].wif);
+				var additional = minPieces - 1;
 				throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
 			}
-			for (let i = 0; i < pieces[0].keys.length; i++) {
-				let pieceKey = pieces[0].keys[i];
-				let state = {};
+			for (var i = 0; i < pieces[0].keys.length; i++) {
+				var pieceKey = pieces[0].keys[i];
+				var state = {};
 				state.address = pieceKey.address;
 				state.wif = pieceKey.wif;
 				state.encryption = pieceKey.encryption;
-				let key = new CryptoKey(CryptoUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
+				var key = new CryptoKey(CryptoUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
 				if (key.getHex() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// check that address derived from private keys
 				keys.push(key);
 			}
@@ -322,21 +322,21 @@ let CryptoUtils = {
 		else {
 			
 			// validate pieces contain same number of keys
-			let numKeys;
-			for (let i = 0; i < pieces.length; i++) {
-				let piece = pieces[i];
+			var numKeys;
+			for (var i = 0; i < pieces.length; i++) {
+				var piece = pieces[i];
 				if (!numKeys) numKeys = piece.keys.length;
 				else if (numKeys !== piece.keys.length) throw new Error("Pieces contain different number of keys");
 			}
 			
 			// validate consistent keys across pieces
-			let minPieces;
-			for (let i = 0; i < pieces[0].keys.length; i++) {
-				let crypto;
-				let address;
-				let encryption;
-				for (let j = 0; j < pieces.length; j++) {
-					let piece = pieces[j];
+			var minPieces;
+			for (var i = 0; i < pieces[0].keys.length; i++) {
+				var crypto = null;
+				var address = null;
+				var encryption = null;
+				for (var j = 0; j < pieces.length; j++) {
+					var piece = pieces[j];
 					if (!crypto) crypto = piece.keys[i].ticker;
 					else if (crypto !== piece.keys[i].ticker) throw new Error("Pieces are for different cryptocurrencies");
 					if (!address) address = piece.keys[i].address;
@@ -350,19 +350,19 @@ let CryptoUtils = {
 			
 			// check if minimum threshold met
 			if (pieces.length < minPieces) {
-				let additional = minPieces - pieces.length;
+				var additional = minPieces - pieces.length;
 				throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
 			}
 			
 			// combine keys across pieces
 			try {
-				for (let i = 0; i < pieces[0].keys.length; i++) {
-					let shares = [];
-					for (let j = 0; j < pieces.length; j++) {
-						let piece = pieces[j];
+				for (var i = 0; i < pieces[0].keys.length; i++) {
+					var shares = [];
+					for (var j = 0; j < pieces.length; j++) {
+						var piece = pieces[j];
 						shares.push(piece.keys[i].wif);
 					}
-					let key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
+					var key = CryptoUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
 					if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
 					keys.push(key);
 				}
@@ -384,12 +384,12 @@ let CryptoUtils = {
 		assertTrue(pieces.length > 0, "Pieces cannot be empty");
 		
 		// get common ticker
-		let ticker = CryptoUtils.getCommonTicker(pieces[0]).toLowerCase();
+		var ticker = CryptoUtils.getCommonTicker(pieces[0]).toLowerCase();
 		
 		// prepare zip
-		let zip = JSZip();
-		for (let i = 0; i < pieces.length; i++) {
-			let name = ticker + (pieces.length > 1 ? "_" + (i + 1) : "");
+		var zip = JSZip();
+		for (var i = 0; i < pieces.length; i++) {
+			var name = ticker + (pieces.length > 1 ? "_" + (i + 1) : "");
 			zip.file(name + ".json", CryptoUtils.pieceToJson(pieces[i]));
 		}
 		
@@ -411,7 +411,7 @@ let CryptoUtils = {
 		JSZip.loadAsync(blob).then(function(zip) {
 			
 			// collect callback functions to get pieces
-			let funcs = [];
+			var funcs = [];
 			zip.forEach(function(path, zipObject) {
 				if (path.startsWith("_")) return;
 				if (path.endsWith(".json")) {
@@ -424,11 +424,11 @@ let CryptoUtils = {
 			// invoke callback functions to get pieces
 			async.parallel(funcs, function(err, args) {
 				if (err) throw err;
-				let pieces = [];
-				for (let i = 0; i < args.length; i++) {
-					let arg = args[i];
+				var pieces = [];
+				for (var i = 0; i < args.length; i++) {
+					var arg = args[i];
 					if (isArray(arg)) {
-						for (let j = 0; j < arg.length; j++) pieces.push(arg[j]);
+						for (var j = 0; j < arg.length; j++) pieces.push(arg[j]);
 					}
 					else pieces.push(arg);
 				}
@@ -439,7 +439,7 @@ let CryptoUtils = {
 		function getPieceCallbackFunction(zipObject) {
 			return function(onPiece) {
 				zipObject.async("string").then(function(str) {
-					let piece;
+					var piece;
 					try {
 						piece = JSON.parse(str);
 						CryptoUtils.validatePiece(piece);
@@ -467,20 +467,20 @@ let CryptoUtils = {
 		assertTrue(piece.keys.length > 0);
 		
 		// build csv header
-		let csvHeader = [];
-		for (let prop in piece.keys[0]) {
+		var csvHeader = [];
+		for (var prop in piece.keys[0]) {
 	    if (piece.keys[0].hasOwnProperty(prop)) {
 	    	csvHeader.push(prop.toString().toUpperCase());
 	    }
 		}
 		
 		// build csv
-		let csvArr = [];
+		var csvArr = [];
 		csvArr.push(csvHeader);
-		for (let i = 0; i < piece.keys.length; i++) {
-			let key = piece.keys[i];
-			let csvKey = [];
-			for (let prop in key) {
+		for (var i = 0; i < piece.keys.length; i++) {
+			var key = piece.keys[i];
+			var csvKey = [];
+			for (var prop in key) {
 				csvKey.push(isInitialized(key[prop]) ? key[prop] : "");
 			}
 			csvArr.push(csvKey);
@@ -495,8 +495,8 @@ let CryptoUtils = {
 	},
 
 	pieceToStr: function(piece) {
-		let str = "";
-		for (let i = 0; i < piece.keys.length; i++) {
+		var str = "";
+		for (var i = 0; i < piece.keys.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
 			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n\n";
 			if (piece.keys[i].wif) str += "Private Key " + (piece.pieceNum ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
@@ -505,8 +505,8 @@ let CryptoUtils = {
 	},
 	
 	pieceToAddresses: function(piece) {
-		let str = "";
-		for (let i = 0; i < piece.keys.length; i++) {
+		var str = "";
+		for (var i = 0; i < piece.keys.length; i++) {
 			str += "===== #" + (i + 1) + " " + CryptoUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
 			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n" + piece.keys[i].address + "\n\n";
 		}
@@ -523,8 +523,8 @@ let CryptoUtils = {
 		assertDefined(piece.keys, "piece.keys is not defined");
 		assertArray(piece.keys, "piece.keys is not an array");
 		assertTrue(piece.keys.length > 0, "piece.keys is empty");
-		let minPieces;
-		for (let i = 0; i < piece.keys.length; i++) {
+		var minPieces;
+		for (var i = 0; i < piece.keys.length; i++) {
 			if (piece.pieceNum) {
 				if (!minPieces) minPieces = CryptoUtils.getMinPieces(piece.keys[i].wif);
 				else if (minPieces !== CryptoUtils.getMinPieces(piece.keys[i].wif)) throw Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");
@@ -538,9 +538,9 @@ let CryptoUtils = {
 	
 	getCommonTicker: function(piece) {
 		assertTrue(piece.keys.length > 0);
-		let ticker;
-		for (let i = 0; i < piece.keys.length; i++) {
-			let pieceKey = piece.keys[i];
+		var ticker;
+		for (var i = 0; i < piece.keys.length; i++) {
+			var pieceKey = piece.keys[i];
 			if (!ticker) ticker = pieceKey.ticker;
 			else if (ticker !== pieceKey.ticker) return "mix";
 		}
@@ -559,8 +559,8 @@ let CryptoUtils = {
 	getShortenedString: function(str, maxLength) {
 		assertString(str);
 		if (str.length <= maxLength) return str;
-		let insert = '...';
-		let sideLength = Math.floor((maxLength - insert.length) / 2);
+		var insert = '...';
+		var sideLength = Math.floor((maxLength - insert.length) / 2);
 		if (sideLength === 0) throw new Error("Cannot create string of length " + maxLength + " from string '" + str + "'");
 		return str.substring(0, sideLength) + insert + str.substring(str.length - sideLength);
 	},
@@ -574,29 +574,30 @@ let CryptoUtils = {
 	 */
 	generateKeys: function(config, onProgress, onDone) {
 		
-		let decommissioned = false;	// TODO: remove altogether?
+		var decommissioned = false;	// TODO: remove altogether?
 		
 		// track done and total weight for progress
-		let doneWeight = 0;
-		let totalWeight = CryptoUtils.getWeightGenerateKeys(config);
+		var doneWeight = 0;
+		var totalWeight = CryptoUtils.getWeightGenerateKeys(config);
 
 		// load dependencies
-		let dependencies = new Set();
-		for (let i = 0; i < config.currencies.length; i++) {
-			let currency = config.currencies[i];
-			let pluginDependencies = CryptoUtils.getCryptoPlugin(currency.ticker).getDependencies();
-			for (let j = 0; j < pluginDependencies.length; j++) {
-				dependencies.add(pluginDependencies[j]);
+		var dependencies = [];
+		for (var i = 0; i < config.currencies.length; i++) {
+			var currency = config.currencies[i];
+			var pluginDependencies = CryptoUtils.getCryptoPlugin(currency.ticker).getDependencies();
+			for (var j = 0; j < pluginDependencies.length; j++) {
+				dependencies.push(pluginDependencies[j]);
 			}
 		}
+		dependencies = arrUnique(dependencies);
 		if (onProgress) onProgress(0, "Loading dependencies");
-		LOADER.load(Array.from(dependencies), function() {
+		LOADER.load(dependencies, function() {
 			
 			// collect key creation functions
-			let funcs = [];
-			for (let i = 0; i < config.currencies.length; i++) {
-				let currency = config.currencies[i];
-				for (let j = 0; j < currency.numKeys; j++) {
+			var funcs = [];
+			for (var i = 0; i < config.currencies.length; i++) {
+				var currency = config.currencies[i];
+				for (var j = 0; j < currency.numKeys; j++) {
 					funcs.push(newKeyFunc(CryptoUtils.getCryptoPlugin(currency.ticker)));
 				}
 			}
@@ -609,13 +610,13 @@ let CryptoUtils = {
 					return;
 				}
 				if (err) throw err;
-				let originals = keys;
+				var originals = keys;
 				
 				// collect encryption schemes
-				let encryptionSchemes = [];
-				for (let i = 0; i < config.currencies.length; i++) {
-					let currency = config.currencies[i];
-					for (let j = 0; j < currency.numKeys; j++) {
+				var encryptionSchemes = [];
+				for (var i = 0; i < config.currencies.length; i++) {
+					var currency = config.currencies[i];
+					for (var j = 0; j < currency.numKeys; j++) {
 						if (currency.encryption) encryptionSchemes.push(currency.encryption);
 					}
 				}
@@ -625,8 +626,8 @@ let CryptoUtils = {
 					assertEquals(keys.length, encryptionSchemes.length);
 					
 					// compute encryption + verification weight
-					let encryptWeight = 0;
-					for (let i = 0; i < encryptionSchemes.length; i++) {
+					var encryptWeight = 0;
+					for (var i = 0; i < encryptionSchemes.length; i++) {
 						encryptWeight += CryptoUtils.getWeightEncryptKey(encryptionSchemes[i]) + (config.verifyEncryption ? CryptoUtils.getWeightDecryptKey(encryptionSchemes[i]) : 0);
 					}
 					
@@ -654,7 +655,7 @@ let CryptoUtils = {
 					return;
 				}
 				setImmediate(function() {
-					let key = plugin.newKey();
+					var key = plugin.newKey();
 					doneWeight += CryptoUtils.getWeightCreateKey();
 					if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
 					callback(null, key);
@@ -665,17 +666,17 @@ let CryptoUtils = {
 		function generatePieces(keys, config) {
 			
 			// convert keys to pieces
-			let pieces = CryptoUtils.keysToPieces(keys, config.numPieces, config.minPieces);
+			var pieces = CryptoUtils.keysToPieces(keys, config.numPieces, config.minPieces);
 			
 			// verify pieces recreate keys
-			let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
+			var keysFromPieces = CryptoUtils.piecesToKeys(pieces);
 			assertEquals(keys.length, keysFromPieces.length);
-			for (let i = 0; i < keys.length; i++) {
+			for (var i = 0; i < keys.length; i++) {
 				assertTrue(keys[i].equals(keysFromPieces[i]));
 			}
 			
 			// render pieces to divs
-			let renderWeight = PieceRenderer.getRenderWeight(keys.length, config.numPieces, null);
+			var renderWeight = PieceRenderer.getRenderWeight(keys.length, config.numPieces, null);
 			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
 			PieceRenderer.renderPieces(pieces, null, null, function(percent) {
 				if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
@@ -698,20 +699,20 @@ let CryptoUtils = {
 	 */
 	encryptKey: function(key, scheme, passphrase, onDone) {
 		if (!scheme) throw new Error("Scheme must be initialized");
-		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 		if (!passphrase) throw new Error("Passphrase must be initialized");
 		switch (scheme) {
 			case CryptoUtils.EncryptionScheme.CRYPTOJS:
 				LOADER.load("lib/crypto-js.js", function() {
-					let b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
+					var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
 					key.setState(objectAssign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
 					onDone(null, key);
 				})
 				break;
 			case CryptoUtils.EncryptionScheme.BIP38:
 				LOADER.load("lib/bitcoinjs.js", function() {
-					let decoded = bitcoinjs.decode(key.getWif());
-					let encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
+					var decoded = bitcoinjs.decode(key.getWif());
+					var encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
 					key.setState(objectAssign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
 					onDone(null, key);
 				});
@@ -735,25 +736,25 @@ let CryptoUtils = {
 		assertEquals(keys.length, encryptionSchemes.length);
 		assertInitialized(passphrase);
 		
-		let decommissioned = false;	// TODO: remove altogether?
+		var decommissioned = false;	// TODO: remove altogether?
 		
 		// collect originals if verifying encryption
-		let originals;
+		var originals;
 		if (verifyEncryption) {
 			originals = [];
-			for (let i = 0; i < keys.length; i++) {
+			for (var i = 0; i < keys.length; i++) {
 				originals.push(keys[i].copy());
 			}
 		}
 		
 		// track weights for progress
-		let doneWeight = 0;
-		let verifyWeight = 0;
-		let totalWeight = 0;
+		var doneWeight = 0;
+		var verifyWeight = 0;
+		var totalWeight = 0;
 		
 		// collect encryption functions and weights
-		let funcs = [];
-		for (let i = 0; i < keys.length; i++) {
+		var funcs = [];
+		for (var i = 0; i < keys.length; i++) {
 			totalWeight += CryptoUtils.getWeightEncryptKey(encryptionSchemes[i]);
 			if (verifyEncryption) verifyWeight += CryptoUtils.getWeightDecryptKey(encryptionSchemes[i]);
 			funcs.push(encryptFunc(keys[i], encryptionSchemes[i], passphrase));
@@ -768,8 +769,8 @@ let CryptoUtils = {
 			if (verifyEncryption) {
 				
 				// copy encrypted keys
-				let encryptedCopies = [];
-				for (let i = 0; i < encryptedKeys.length; i++) {
+				var encryptedCopies = [];
+				for (var i = 0; i < encryptedKeys.length; i++) {
 					encryptedCopies.push(encryptedKeys[i].copy());
 				}
 				
@@ -782,7 +783,7 @@ let CryptoUtils = {
 					
 					// assert originals match decrypted keys
 					assertEquals(originals.length, decryptedKeys.length);
-					for (let j = 0; j < originals.length; j++) {
+					for (var j = 0; j < originals.length; j++) {
 						assertTrue(originals[j].equals(decryptedKeys[j]));
 					}
 					
@@ -820,13 +821,13 @@ let CryptoUtils = {
 	 * @param onDone(err, decryptedKey) is invoked when done
 	 */
 	decryptKey: function(key, passphrase, onDone) {
-		if (!isObject(key, 'CryptoKey')) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+		if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 		if (!passphrase) throw new Error("Passphrase must be initialized");
 		assertTrue(key.isEncrypted());
 		switch (key.getEncryptionScheme()) {
 			case CryptoUtils.EncryptionScheme.CRYPTOJS:
 				LOADER.load("lib/crypto-js.js", function() {
-					let hex;
+					var hex;
 					try {
 						hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
 					} catch (err) { }
@@ -844,8 +845,8 @@ let CryptoUtils = {
 			case CryptoUtils.EncryptionScheme.BIP38:
 				LOADER.load("lib/bitcoinjs.js", function() {
 					try {
-						let decrypted = bitcoinjs.decrypt(key.getWif(), passphrase);
-						let privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
+						var decrypted = bitcoinjs.decrypt(key.getWif(), passphrase);
+						var privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
 						key.setPrivateKey(privateKey);
 						onDone(null, key);
 					} catch (err) {
@@ -868,7 +869,7 @@ let CryptoUtils = {
 	 */
 	decryptKeys: function(keys, passphrase, onProgress, onDone) {
 		
-		let decommissioned = false;	// TODO: remove altogether?
+		var decommissioned = false;	// TODO: remove altogether?
 		
 		// validate input
 		assertInitialized(keys);
@@ -877,15 +878,15 @@ let CryptoUtils = {
 		assertInitialized(onDone);
 		
 		// compute weight
-		let totalWeight = 0;
-		for (let i = 0; i < keys.length; i++) {
+		var totalWeight = 0;
+		for (var i = 0; i < keys.length; i++) {
 			totalWeight += CryptoUtils.getWeightDecryptKey(keys[i].getEncryptionScheme());
 		}
 		
 		// decrypt keys
-		let funcs = [];
-		for (let i = 0; i < keys.length; i++) funcs.push(decryptFunc(keys[i], passphrase));
-		let doneWeight = 0;
+		var funcs = [];
+		for (var i = 0; i < keys.length; i++) funcs.push(decryptFunc(keys[i], passphrase));
+		var doneWeight = 0;
 		if (onProgress) onProgress(doneWeight, totalWeight);
 		async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, result) {
 			if (decommissioned) return;
@@ -897,7 +898,7 @@ let CryptoUtils = {
 		function decryptFunc(key, passphrase) {
 			return function(callback) {
 				if (decommissioned) return;
-				let scheme = key.getEncryptionScheme();
+				var scheme = key.getEncryptionScheme();
 				key.decrypt(passphrase, function(err, key) {
 					if (err) onDone(err);
 					else {
@@ -919,10 +920,10 @@ let CryptoUtils = {
 	 * @return the weight of the given key genereation configuration
 	 */
 	getWeightGenerateKeys: function(keyGenConfig) {
-		let weight = 0;
-		let numKeys = 0;
-		for (let i = 0; i < keyGenConfig.currencies.length; i++) {
-			let currency = keyGenConfig.currencies[i];
+		var weight = 0;
+		var numKeys = 0;
+		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
+			var currency = keyGenConfig.currencies[i];
 			numKeys += currency.numKeys;
 			weight += currency.numKeys * CryptoUtils.getWeightCreateKey();
 			if (currency.encryption) weight += currency.numKeys * (CryptoUtils.getWeightEncryptKey(currency.encryption) + (keyGenConfig.verifyEncryption ? CryptoUtils.getWeightDecryptKey(currency.encryption) : 0));
@@ -953,9 +954,9 @@ let CryptoUtils = {
 	 * @returns the weight to decrypt the given keys
 	 */
 	getWeightDecryptKeys: function(encryptedKeys) {
-		let weight = 0;
-		for (let i = 0; i < encryptedKeys.length; i++) {
-			let key = encryptedKeys[i];
+		var weight = 0;
+		for (var i = 0; i < encryptedKeys.length; i++) {
+			var key = encryptedKeys[i];
 			assertTrue(key.isEncrypted());
 			weight += CryptoUtils.getWeightDecryptKey(key.getEncryptionScheme());
 		}
@@ -988,24 +989,24 @@ let CryptoUtils = {
 	 * @param onDone(js) is invoked when the js file is generated
 	 */
 	getB64ImageFile: function(onDone) {
-		let js = [];
+		var js = [];
 		js.push("/**\n * Embeds base64 logo data for dynamic import and HTML export.\n */");
 		js.push("\nfunction getImageData(key) {\n\tswitch(key) {");
 		
 		// add currency logos
-		let plugins = CryptoUtils.getCryptoPlugins();
-		for (let i = 0; i < plugins.length; i++) {
-			let plugin = plugins[i];
+		var plugins = CryptoUtils.getCryptoPlugins();
+		for (var i = 0; i < plugins.length; i++) {
+			var plugin = plugins[i];
 			js.push("\n\t\tcase \"" + plugin.getTicker() + "\": return \"" + imgToDataUrl(plugin.getLogo().get(0)) + "\";");
 		}
 		
 		// add cryptostorage logo
-		let imgCsExport = $("<img src='img/cryptostorage_export.png'>");
+		var imgCsExport = $("<img src='img/cryptostorage_export.png'>");
 		imgCsExport.one("load", function() {
 			js.push("\n\t\tcase \"CRYPTOSTORAGE\": return \"" + imgToDataUrl(imgCsExport.get(0)) + "\";");
 			
 			// add cryptostorage logo
-			let imgQuestionMark = $("<img src='img/question_mark.png'>");
+			var imgQuestionMark = $("<img src='img/question_mark.png'>");
 			imgQuestionMark.one("load", function() {
 				js.push("\n\t\tcase \"QUESTION_MARK\": return \"" + imgToDataUrl(imgQuestionMark.get(0)) + "\";");
 				
@@ -1037,12 +1038,12 @@ let CryptoUtils = {
 	getSecurityChecks: function(onDone) {
 		
 		// classify known open source and non open source browsers and operating systems
-		let openSourceBrowsers = [
+		var openSourceBrowsers = [
 			"Firefox", "Chromium", "Tizen", "Epiphany", "K-Meleon", "SeaMonkey", "SlimerJS", "Arora", "Breach", "Camino",
 			"Electron", "Fennec", "Konqueror", "Midori", "PaleMoon", "Rekonq", "Sunrise", "Waterfox", "Amaya", "Bowser",
 			"Camino",
 		];
-		let nonOpenSourceBrowsers = [
+		var nonOpenSourceBrowsers = [
 			"Chrome", "Chrome WebView", "Chrome Mobile", "Safari", "Opera", "Opera Mini", "Samsung Internet for Android",
 			"Samsung Internet", "Opera Coast", "Yandex Browser", "UC Browser", "Maxthon", "Puffin", "Sleipnir",
 			"Windows Phone", "Internet Explorer", "Microsoft Edge", "IE", "Vivaldi", "Sailfish", "Amazon Silk", "Silk",
@@ -1051,13 +1052,13 @@ let CryptoUtils = {
 			"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
 			"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
 		];
-		let openSourceOperatingSystems = [
+		var openSourceOperatingSystems = [
 			"Linux", "CentOS", "Debian", "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "Mint",
 			"OpenBSD", "RedHat", "Red Hat", "SuSE", "Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen",
 			"Chromium OS", "Contiki", "DragonFly", "GNU", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "PCLinuxOS",
 			"Plan9", "VectorLinux", "Zenwalk"
 		];
-		let nonOpenSourceOperatingSystems = [
+		var nonOpenSourceOperatingSystems = [
 			"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS X", "Macintosh", "Mac", "iOS",
 			"Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile", "AIX", "Amiga OS", "Bada",
 			"BeOS", "BlackBerry", "Hurd", "Linpus", "Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS",
@@ -1077,11 +1078,11 @@ let CryptoUtils = {
 			LOADER.load("lib/ua-parser.js", function() {
 				
 				// parse browser user agent
-				let parser = new UAParser();
-				let result = parser.getResult();
+				var parser = new UAParser();
+				var result = parser.getResult();
 				
 				// check for chromium
-				let browser = result.browser.name;
+				var browser = result.browser.name;
 				if (browser === "Chrome" && !isChrome()) browser = "Chromium";
 				
 				// build and return response
@@ -1102,7 +1103,7 @@ let CryptoUtils = {
 		}
 		
 		function isChrome() {
-			for (let i = 0; i < navigator.plugins.length; i++) {
+			for (var i = 0; i < navigator.plugins.length; i++) {
 				if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
 			}
 			return false;
@@ -1114,8 +1115,8 @@ let CryptoUtils = {
 			name = name.toLowerCase();
 			
 			// determine if open source
-			if (openSourceBrowsers.includes(name)) return true;
-			if (nonOpenSourceBrowsers.includes(name)) return false;
+			if (arrContains(openSourceBrowsers, name)) return true;
+			if (arrContains(nonOpenSourceBrowsers, name)) return false;
 			return null;
 		}
 		
@@ -1125,8 +1126,8 @@ let CryptoUtils = {
 			name = name.toLowerCase();
 			
 			// determine if open source
-			if (openSourceOperatingSystems.includes(name)) return true;
-			if (nonOpenSourceOperatingSystems.includes(name)) return false;
+			if (arrContains(openSourceOperatingSystems, name)) return true;
+			if (arrContains(nonOpenSourceOperatingSystems, name)) return false;
 			return null;
 		}
 	}

@@ -1,7 +1,7 @@
 /**
  * Tests the cryptostorage application.
  */
-let Tests = {
+var Tests = {
 	
 	// constants
 	REPEAT_LONG: 10,
@@ -15,7 +15,7 @@ let Tests = {
 	 * Returns crypto plugins to test.
 	 */
 	getTestCryptoPlugins: function() {
-		let plugins = [];
+		var plugins = [];
 		plugins.push(new BitcoinPlugin());
 		plugins.push(new EthereumPlugin());
 		plugins.push(new MoneroPlugin());
@@ -36,19 +36,20 @@ let Tests = {
 		if (!window.crypto) throw new Error("Cannot run tests without window.crypto");
 		
 		// get test plugins
-		let plugins = Tests.getTestCryptoPlugins();
+		var plugins = Tests.getTestCryptoPlugins();
 		
 		// load dependencies
-		let dependencies = new Set(APP_DEPENDENCIES);
-		for (let i = 0; i < plugins.length; i++) {
-			for (let j = 0; j < plugins[i].getDependencies().length; j++) {
-				dependencies.add(plugins[i].getDependencies()[j]);
+		var dependencies = APP_DEPENDENCIES.slice();
+		for (var i = 0; i < plugins.length; i++) {
+			for (var j = 0; j < plugins[i].getDependencies().length; j++) {
+				dependencies.push(plugins[i].getDependencies()[j]);
 			}
 		}
-		LOADER.load(Array.from(dependencies), function() {
+		dependencies = arrUnique(dependencies);
+		LOADER.load(dependencies, function() {
 			
 			// verify each plugin has logo data
-			for (let i = 0; i < CryptoUtils.getCryptoPlugins().length; i++) {
+			for (var i = 0; i < CryptoUtils.getCryptoPlugins().length; i++) {
 				getImageData(CryptoUtils.getCryptoPlugins()[i].getTicker());	// throws exception if not found
 			}
 			
@@ -56,7 +57,7 @@ let Tests = {
 			testUtils();
 			testFileImport(plugins, function() {
 				testParseKey(plugins);
-				for (let i = 0; i < plugins.length;i ++) testSplitAndCombine(plugins[i]);
+				for (var i = 0; i < plugins.length;i ++) testSplitAndCombine(plugins[i]);
 				if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
 				if (Tests.TEST_PLUGINS) {
 					testCryptoPlugins(plugins, function(error) {
@@ -83,23 +84,23 @@ let Tests = {
 			assertFalse(CryptoUtils.isBase58("abcd0"))
 			
 			// test isBase58()
-			for (let i = 0; i < Tests.getTestCryptoPlugins().length; i++) {
-				let plugin = Tests.getTestCryptoPlugins()[i];
-				let key = plugin.newKey()
-				let pieces = plugin.split(key, 3, 2);
-				for (let j = 0; j < pieces.length; j++) {
+			for (var i = 0; i < Tests.getTestCryptoPlugins().length; i++) {
+				var plugin = Tests.getTestCryptoPlugins()[i];
+				var key = plugin.newKey()
+				var pieces = plugin.split(key, 3, 2);
+				for (var j = 0; j < pieces.length; j++) {
 					assertTrue(CryptoUtils.isBase58(pieces[j]));
 				}
 			}
 		}
 		
 		function testParseKey(plugins) {
-			for (let i = 0; i < plugins.length; i++) {
-				let plugin = plugins[i];
+			for (var i = 0; i < plugins.length; i++) {
+				var plugin = plugins[i];
 				
 				// parse unencrypted key
-				let wif = plugin.newKey().getWif();
-				let key = CryptoUtils.parseKey(plugin, wif);
+				var wif = plugin.newKey().getWif();
+				var key = CryptoUtils.parseKey(plugin, wif);
 				assertEquals(key.getWif(), wif);
 				
 				// parse empty key
@@ -117,13 +118,13 @@ let Tests = {
 		}
 		
 		function testKeyExclusion(keys) {
-			
+		
 			// test exclude public
-			let copies = [];
-			for (let i = 0; i < keys.length; i++) copies.push(keys[i].copy());
+			var copies = [];
+			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
 			CryptoUtils.applyKeyConfig(copies, { includePublic: false});
-			for (let i = 0; i < copies.length; i++) {
-				let key = copies[i];
+			for (var i = 0; i < copies.length; i++) {
+				var key = copies[i];
 				assertUninitialized(key.getState().address);
 				assertInitialized(key.getState().wif);
 				assertInitialized(key.getState().hex);
@@ -131,13 +132,13 @@ let Tests = {
 			}
 			testKeysToPieces(copies, 1);
 			testKeysToPieces(copies, Tests.NUM_PIECES, Tests.MIN_PIECES);
-			
+
 			// test exclude private
 			copies = [];
-			for (let i = 0; i < keys.length; i++) copies.push(keys[i].copy());
+			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
 			CryptoUtils.applyKeyConfig(copies,  { includePrivate: false});
-			for (let i = 0; i < copies.length; i++) {
-				let key = copies[i];
+			for (var i = 0; i < copies.length; i++) {
+				var key = copies[i];
 				assertInitialized(key.getState().address);
 				assertUndefined(key.getState().wif);
 				assertUndefined(key.getState().hex);
@@ -153,9 +154,15 @@ let Tests = {
 		}
 
 		function testCryptoPlugins(plugins, onDone) {
-			let funcs = [];
-			for (let i = 0; i < plugins.length; i++) funcs.push(function(callback) { testCryptoPlugin(plugins[i], callback); });
+			var funcs = [];
+			for (var i = 0; i < plugins.length; i++) funcs.push(testPluginFunc(plugins[i]));
 			async.series(funcs, onDone);
+			
+			function testPluginFunc(plugin) {
+				return function(callback) {
+					testCryptoPlugin(plugin, callback);
+				}
+			}
 		}
 
 		function testCryptoPlugin(plugin, onDone) {
@@ -171,16 +178,16 @@ let Tests = {
 			assertFalse(plugin.isAddress([]));
 			
 			// test unencrypted keys
-			let keys = [];
-			for (let i = 0; i < Tests.REPEAT_LONG; i++) {
+			var keys = [];
+			for (var i = 0; i < Tests.REPEAT_LONG; i++) {
 				
 				// create new key
-				let key = plugin.newKey();
+				var key = plugin.newKey();
 				keys.push(key);
 				assertInitialized(key.getHex());
 				assertInitialized(key.getWif());
 				assertNull(key.getEncryptionScheme());
-				let copy = key.copy();
+				var copy = key.copy();
 				assertTrue(key.equals(copy));
 				
 				// test address
@@ -195,7 +202,7 @@ let Tests = {
 				}
 				
 				// test new key from unencrypted hex and wif
-				let key2 = new CryptoKey(plugin, key.getHex());
+				var key2 = new CryptoKey(plugin, key.getHex());
 				assertTrue(key.equals(key2));
 				key2 = new CryptoKey(plugin, key.getWif());
 				assertTrue(key.equals(key2));
@@ -206,15 +213,15 @@ let Tests = {
 			
 			// test piece conversion with and without splitting
 			testKeysToPieces([keys[0]], 1);
-			for (let i = 0; i < keys.length; i++) testKeysToPieces([keys[i]], Tests.NUM_PIECES, Tests.MIN_PIECES);
+			for (var i = 0; i < keys.length; i++) testKeysToPieces([keys[i]], Tests.NUM_PIECES, Tests.MIN_PIECES);
 			testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
 			
 			// test invalid private keys
-			let invalids = [" ", "ab", "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress(), "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "1ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a"];
-			for (let i = 0; i < invalids.length; i++) {
-				let invalid = invalids[i];
+			var invalids = [" ", "ab", "abctesting123", "abc testing 123", 12345, plugin.newKey().getAddress(), "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "1ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a"];
+			for (var i = 0; i < invalids.length; i++) {
+				var invalid = invalids[i];
 				try {
-					let key = plugin.newKey(invalid);
+					var key = plugin.newKey(invalid);
 					fail("fail");
 				} catch (err) {
 					if (err.message === "fail") throw new Error("Should not create key from invalid input: " + plugin.getTicker() + "(" + invalid + ")");
@@ -225,17 +232,17 @@ let Tests = {
 			try {
 				plugin.newKey(undefined);
 				fail("Should have thrown an error");
-			} catch (error) { }	
+			} catch (error) { }
 			
 			// collect functions to test each encryption scheme
 			assertTrue(plugin.getEncryptionSchemes().length >= 1);
-			let funcs = [];
-			for (let i = 0; i < plugin.getEncryptionSchemes().length; i++) {
-				let scheme = plugin.getEncryptionSchemes()[i];
-				let max = scheme === CryptoUtils.EncryptionScheme.BIP38 ? Tests.REPEAT_SHORT : Tests.REPEAT_LONG;
+			var funcs = [];
+			for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
+				var scheme = plugin.getEncryptionSchemes()[i];
+				var max = scheme === CryptoUtils.EncryptionScheme.BIP38 ? Tests.REPEAT_SHORT : Tests.REPEAT_LONG;
 				if (max < 1) continue;
-				let keys = [];
-				for (let i = 0; i < max; i++) keys.push(plugin.newKey());
+				var keys = [];
+				for (var i = 0; i < max; i++) keys.push(plugin.newKey());
 				funcs.push(function(onDone) { testEncryptKeys(keys, scheme, Tests.PASSPHRASE, onDone); });
 			}
 			
@@ -255,11 +262,11 @@ let Tests = {
 			assertTrue(keys.length > 0);
 			
 			// keep originals for later validation
-			let originals = copyKeys(keys);
+			var originals = copyKeys(keys);
 			
 			// collect schemes
-			let schemes = [];
-			for (let i = 0; i < keys.length; i++) schemes.push(scheme);
+			var schemes = [];
+			for (var i = 0; i < keys.length; i++) schemes.push(scheme);
 			
 			// encrypt keys
 			CryptoUtils.encryptKeys(keys, schemes, passphrase, false, null, function(err, encryptedKeys) {
@@ -270,11 +277,11 @@ let Tests = {
 				
 				// test state of each key
 				assertEquals(keys.length, encryptedKeys.length);
-				for (let i = 0; i < keys.length; i++) {
-					let key = keys[i];
+				for (var i = 0; i < keys.length; i++) {
+					var key = keys[i];
 					
 					// test basic initialization
-					assertObject(key, 'CryptoKey');
+					assertObject(key, CryptoKey);
 					assertTrue(key.isEncrypted());
 					assertTrue(key.equals(encryptedKeys[i]));
 					assertFalse(key.equals(originals[i]));
@@ -293,7 +300,7 @@ let Tests = {
 					}
 					
 					// test new key from encrypted hex and wif
-					let key2 = new CryptoKey(key.getPlugin(), key.getHex());
+					var key2 = new CryptoKey(key.getPlugin(), key.getHex());
 					assertUndefined(key2.getAddress());
 					key2.setAddress(key.getAddress());
 					assertTrue(key.equals(key2));
@@ -303,7 +310,7 @@ let Tests = {
 					assertTrue(key.equals(key2));
 					
 					// test consistency
-					let parsed = new CryptoKey(key.getPlugin(), key.getHex());
+					var parsed = new CryptoKey(key.getPlugin(), key.getHex());
 					assertEquals(key.getHex(), parsed.getHex());
 					assertEquals(key.getWif(), parsed.getWif());
 					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
@@ -318,7 +325,7 @@ let Tests = {
 				
 				// test piece conversion
 				testKeysToPieces([keys[0]], 1);
-				for (let i = 0; i < keys.length; i++) testKeysToPieces([keys[i]], Tests.NUM_PIECES, Tests.MIN_PIECES);
+				for (var i = 0; i < keys.length; i++) testKeysToPieces([keys[i]], Tests.NUM_PIECES, Tests.MIN_PIECES);
 				testKeysToPieces(keys, Tests.NUM_PIECES, Tests.MIN_PIECES);
 				
 				// test decryption with wrong passphrase
@@ -329,7 +336,7 @@ let Tests = {
 					testDecryptKeys(keys, passphrase, function(err, result) {
 						if (err) throw err;
 						assertEquals(originals.length, keys.length);
-						for (let i = 0; i < originals.length; i++) assertTrue(originals[i].equals(keys[i]));
+						for (var i = 0; i < originals.length; i++) assertTrue(originals[i].equals(keys[i]));
 						onDone();
 					});
 				});
@@ -340,8 +347,8 @@ let Tests = {
 			assertTrue(keys.length > 0);
 			
 			// save originals for later
-			let originals = [];
-			for (let i = 0; i < keys.length; i++) originals.push(keys[i].copy());
+			var originals = [];
+			for (var i = 0; i < keys.length; i++) originals.push(keys[i].copy());
 			
 			// decrypt keys
 			CryptoUtils.decryptKeys(keys, passphrase, null, function(err, decryptedKeys) {
@@ -352,11 +359,11 @@ let Tests = {
 				
 				// test state of each key
 				assertEquals(keys.length, decryptedKeys.length);
-				for (let i = 0; i < keys.length; i++) {
-					let key = keys[i];
+				for (var i = 0; i < keys.length; i++) {
+					var key = keys[i];
 					
 					// test basic initialization
-					assertObject(key, 'CryptoKey');
+					assertObject(key, CryptoKey);
 					assertTrue(key.equals(decryptedKeys[i]));
 					assertFalse(key.equals(originals[i]));
 					assertInitialized(key.getHex());
@@ -366,7 +373,7 @@ let Tests = {
 					assertTrue(key.equals(key.copy()));
 					
 					// test consistency
-					let parsed = new CryptoKey(key.getPlugin(), key.getHex());
+					var parsed = new CryptoKey(key.getPlugin(), key.getHex());
 					assertEquals(key.getHex(), parsed.getHex());
 					assertEquals(key.getWif(), parsed.getWif());
 					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
@@ -382,8 +389,8 @@ let Tests = {
 		}
 		
 		function testDecryptWrongPassphrase(plugin, onDone) {
-			let privateKey = "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdGfEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy";
-			let key = plugin.newKey(privateKey);
+			var privateKey = "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdGfEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy";
+			var key = plugin.newKey(privateKey);
 			key.decrypt("abctesting123", function(err, decryptedKey) {
 				assertEquals("Incorrect passphrase", err.message);
 				onDone();
@@ -402,35 +409,35 @@ let Tests = {
 			}
 			
 			// convert keys to pieces
-			let pieces = CryptoUtils.keysToPieces(keys, numPieces, minPieces);
+			var pieces = CryptoUtils.keysToPieces(keys, numPieces, minPieces);
 			
 			// test each share in each piece
-			for (let i = 0; i < pieces.length; i++) {
-				let piece = pieces[i];
-				for (let i = 0; i < keys.length; i++) {
-					assertEquals(keys[i].getPlugin().getTicker(), piece.keys[i].ticker);
-					assertEquals(keys[i].getAddress(), piece.keys[i].address);
-					if (piece.keys[i].wif) {
-						assertDefined(piece.keys[i].encryption);
-						assertEquals(keys[i].getEncryptionScheme(), piece.keys[i].encryption);
+			for (var i = 0; i < pieces.length; i++) {
+				var piece = pieces[i];
+				for (var j = 0; j < keys.length; j++) {
+					assertEquals(keys[j].getPlugin().getTicker(), piece.keys[j].ticker);
+					assertEquals(keys[j].getAddress(), piece.keys[j].address);
+					if (piece.keys[j].wif) {
+						assertDefined(piece.keys[j].encryption);
+						assertEquals(keys[j].getEncryptionScheme(), piece.keys[j].encryption);
 					}
-					else assertUndefined(piece.keys[i].encryption);
+					else assertUndefined(piece.keys[j].encryption);
 					if (numPieces > 1) {
 						assertNumber(piece.pieceNum);
 						assertInt(piece.pieceNum);
 						assertTrue(piece.pieceNum > 0);
-						assertFalse(keys[i].getWif() === piece.keys[i].wif);
+						assertFalse(keys[j].getWif() === piece.keys[j].wif);
 					} else {
 						assertUndefined(piece.pieceNum);
-						assertTrue(keys[i].getWif() === piece.keys[i].wif);
+						assertTrue(keys[j].getWif() === piece.keys[j].wif);
 					}
 				}
 			}
 			
 			// verify secrets is initialized with 7 bits
 			if (numPieces > 1) {
-				for (let i = 0; i < pieces[0].keys.length; i++) {
-					let pieceKey = pieces[0].keys[i];
+				for (var i = 0; i < pieces[0].keys.length; i++) {
+					var pieceKey = pieces[0].keys[i];
 					if (pieceKey.wif && !pieceKey.encryption && pieceKey.ticker === 'BTC') {
 						assertTrue(pieceKey.wif.startsWith(minPieces + "c3X"));
 					}
@@ -438,13 +445,13 @@ let Tests = {
 			}
 			
 			// test each piece combination
-			let combinations = getCombinations(pieces, minPieces ? minPieces : 1);
-			for (let i = 0; i < combinations.length; i++) {
-				let combination = combinations[i];
-				let keysFromPieces = CryptoUtils.piecesToKeys(pieces);
+			var combinations = getCombinations(pieces, minPieces ? minPieces : 1);
+			for (var i = 0; i < combinations.length; i++) {
+				var combination = combinations[i];
+				var keysFromPieces = CryptoUtils.piecesToKeys(pieces);
 				assertEquals(keys.length, keysFromPieces.length);
-				for (let i = 0; i < keys.length; i++) {
-					assertTrue(keys[i].equals(keysFromPieces[i]));
+				for (var j = 0; j < keys.length; j++) {
+					assertTrue(keys[j].equals(keysFromPieces[j]));
 				}
 			}
 		}
@@ -453,16 +460,16 @@ let Tests = {
 			assertTrue(plugins.length >= 2);
 			
 			// collect keys for different currencies
-			let keys1 = [];
-			let keys2 = [];
-			for (let i = 0; i < 10; i++) {
+			var keys1 = [];
+			var keys2 = [];
+			for (var i = 0; i < 10; i++) {
 				keys1.push(plugins[0].newKey());
 				keys2.push(plugins[1].newKey());
 			}
 			
 			// convert to pieces
-			let pieces1 = CryptoUtils.keysToPieces(keys1);
-			let pieces2 = CryptoUtils.keysToPieces(keys2);
+			var pieces1 = CryptoUtils.keysToPieces(keys1);
+			var pieces2 = CryptoUtils.keysToPieces(keys2);
 			
 			// try to combine pieces
 			try {
@@ -474,20 +481,20 @@ let Tests = {
 		}
 
 		function copyKeys(keys) {
-			let copies = [];
-			for (let i = 0; i < keys.length; i++) copies.push(keys[i].copy());
+			var copies = [];
+			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
 			return copies;
 		}
 		
 		function testSplitAndCombine(plugin) {
-			for (let i = 0; i < Tests.REPEAT_LONG; i++) {
-				let key = plugin.newKey();
-				let pieces = plugin.split(key, Tests.NUM_PIECES, Tests.MIN_PIECES);
+			for (var i = 0; i < Tests.REPEAT_LONG; i++) {
+				var key = plugin.newKey();
+				var pieces = plugin.split(key, Tests.NUM_PIECES, Tests.MIN_PIECES);
 				
 				// test that single pieces cannot create key
-				for (let i = 0; i < pieces.length; i++) {
+				for (var j = 0; j < pieces.length; j++) {
 					try {
-						plugin.combine([pieces[i]]);
+						plugin.combine([pieces[j]]);
 						throw Error("fail");
 					} catch (err) {
 						if (err.message === "fail") throw new Error("Cannot combine single pieces");
@@ -495,10 +502,10 @@ let Tests = {
 				}
 				
 				// test each piece combination
-				let combinations = getCombinations(pieces, Tests.MIN_PIECES);
-				for (let i = 0; i < combinations.length; i++) {
-					let combination = combinations[i];
-					let combined = plugin.combine(combination);
+				var combinations = getCombinations(pieces, Tests.MIN_PIECES);
+				for (var j = 0; j < combinations.length; j++) {
+					var combination = combinations[j];
+					var combined = plugin.combine(combination);
 					assertTrue(key.equals(combined));
 				}
 			}
@@ -508,11 +515,11 @@ let Tests = {
 			console.log("testFileImport()");
 			
 			// initialize controller
-			let controller = new RecoverFileController($("<div>"));
+			var controller = new RecoverFileController($("<div>"));
 			controller.render(function() {
 				
 				// collect test functions
-				let funcs = [];
+				var funcs = [];
 				funcs.push(testOnePieceValidity());
 				funcs.push(testIncompatiblePieces());
 				funcs.push(testAdditionalPiecesNeeded());
@@ -525,8 +532,8 @@ let Tests = {
 				
 				function testOnePieceValidity() {
 					return function(onDone) {
-						let piece = {};
-						let namedPieces = [];
+						var piece = {};
+						var namedPieces = [];
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.version is not defined", controller.getWarning());
@@ -650,10 +657,13 @@ let Tests = {
 				
 				function testIncompatiblePieces() {
 					return function(onDone) {
-						
-						let pieces1 = getPieces(plugins, 1, 3, 2);
-						let pieces2 = getPieces(plugins, 2, 3, 2);
-						let namedPieces = [];
+
+						// tests assume more than one plugin
+						assertTrue(plugins.length > 1);
+
+						var pieces1 = getPieces(plugins, 1, 3, 2);
+						var pieces2 = getPieces(plugins, 2, 3, 2);
+						var namedPieces = [];
 						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
 						namedPieces.push({name: "piece2.json", piece: pieces2[0]});
 						controller.addNamedPieces(namedPieces);
@@ -668,7 +678,7 @@ let Tests = {
 						assertEquals("Pieces have different addresses", controller.getWarning());
 						controller.startOver();
 						
-						let oldValue = pieces1[1].keys[1].ticker;
+						var oldValue = pieces1[1].keys[1].ticker;
 						pieces1[1].keys[1].ticker = "ABC";
 						namedPieces = [];
 						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
@@ -679,7 +689,7 @@ let Tests = {
 						controller.startOver();
 						
 						oldValue = pieces1[1].keys[1].wif;
-						for (let i = 0; i < pieces1[1].keys.length; i++) {
+						for (var i = 0; i < pieces1[1].keys.length; i++) {
 							pieces1[1].keys[i].wif = oldValue.replaceAt(0, "3");
 						}
 						namedPieces = [];
@@ -698,9 +708,9 @@ let Tests = {
 					return function(onDone) {
 						
 						// get pieces
-						let pieces = getPieces(plugins, 1, 4, 3);
+						var pieces = getPieces(plugins, 1, 4, 3);
 						
-						let namedPieces = [];
+						var namedPieces = [];
 						namedPieces.push({name: "piece0.json", piece: pieces[0]});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Need 2 additional pieces to recover private keys", controller.getWarning());
@@ -726,11 +736,11 @@ let Tests = {
 				}
 				
 				function getPieces(plugins, keysPerPlugin, numPieces, minPieces) {
-					let keys = [];
+					var keys = [];
 					numPieces = numPieces || 1;
-					for (let i = 0; i < plugins.length; i++) {
-						let plugin = plugins[i];
-						for (let i = 0; i < keysPerPlugin; i++) {
+					for (var i = 0; i < plugins.length; i++) {
+						var plugin = plugins[i];
+						for (var j = 0; j < keysPerPlugin; j++) {
 							keys.push(plugin.newKey());
 						}
 					}

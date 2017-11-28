@@ -11,7 +11,7 @@ function CryptoKey(plugin, state) {
 	}
 	
 	this.equals = function(key) {
-		if (!isObject(plugin, 'CryptoPlugin')) throw new Error("Given argument must be a CryptoKey");
+		if (!isObject(plugin, CryptoPlugin)) throw new Error("Given argument must be a CryptoKey");
 		return mapsEqual(this.getState(), key.getState());
 	}
 	
@@ -79,7 +79,7 @@ function CryptoKey(plugin, state) {
 	}
 	
 	// initialize
-	if (!isObject(plugin, 'CryptoPlugin')) throw new Error("Must provide crypto plugin");
+	if (!isObject(plugin, CryptoPlugin)) throw new Error("Must provide crypto plugin");
 	this.plugin = plugin;
 	var that = this;
 	this.state = {};

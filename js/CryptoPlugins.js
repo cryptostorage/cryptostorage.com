@@ -62,16 +62,16 @@ CryptoPlugin.prototype.decrypt = function(key, passphrase, onDone) {
  * @returns string[] are the split pieces
  */
 CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
-	assertTrue(isObject(key, 'CryptoKey'));
+	assertTrue(isObject(key, CryptoKey));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
 
 	// split key into shares
-	let shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
+	var shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
 
 	// append minimum pieces prefix so insufficient pieces cannot create wrong key (cryptostorage convention)
-	let prefix = minPieces + 'c';
-	for (let i = 0; i < shares.length; i++) {
+	var prefix = minPieces + 'c';
+	for (var i = 0; i < shares.length; i++) {
 		shares[i] = prefix + shares[i];
 	}
 	return shares;
@@ -88,12 +88,12 @@ CryptoPlugin.prototype.combine = function(shares) {
 	assertTrue(shares.length > 0);
 	
 	// get minimum shares and shares without 'XXXc' prefix
-	let minShares;
-	let nonPrefixedShares = [];
-	for (let i = 0; i < shares.length; i++) {
-		let share = shares[i];
+	var minShares;
+	var nonPrefixedShares = [];
+	for (var i = 0; i < shares.length; i++) {
+		var share = shares[i];
 		if (!CryptoUtils.isPossibleSplitPiece(share)) throw Error("Invalid split piece: " + share);
-		let min = CryptoUtils.getMinPieces(share);
+		var min = CryptoUtils.getMinPieces(share);
 		if (!min) throw Error("Share is not prefixed with minimum pieces: " + share);
 		if (!isInitialized(minShares)) minShares = min;
 		else if (min !== minShares) throw Error("Shares have different minimum threshold prefixes: " + min + " vs " + minShares);
@@ -102,7 +102,7 @@ CryptoPlugin.prototype.combine = function(shares) {
 	
 	// ensure sufficient shares are provided
 	if (shares.length < minShares) {
-		let additional = minShares - shares.length;
+		var additional = minShares - shares.length;
 		throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private key");
 	}
 	
@@ -135,11 +135,11 @@ function BitcoinPlugin() {
 		// create key if not given
 		if (!str) str = new Bitcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		let state = {};
+		var state = {};
 		
 		// unencrypted private key
 		if (ninja.privateKey.isPrivateKey(str)) {
-			let key = new Bitcoin.ECKey(str);
+			var key = new Bitcoin.ECKey(str);
 			key.setCompressed(true);
 			state.hex = key.getBitcoinHexFormat();
 			state.wif = key.getBitcoinWalletImportFormat();
@@ -225,7 +225,7 @@ function EthereumPlugin() {
 		// create key if not given
 		if (!str) str = keythereum.create().privateKey.toString("hex");
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		let state = {};
+		var state = {};
 		
 		// handle hex
 		if (isHex(str)) {
@@ -330,11 +330,11 @@ function LitecoinPlugin() {
 		// create key if not given
 		if (!str) str = new litecore.PrivateKey().toString();		
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		let state = {};
+		var state = {};
 		
 		// unencrypted
 		if (str.length >= 52 && litecore.PrivateKey.isValid(str)) {	// TODO: litecore says 'ab' is valid ... ?
-			let key = new litecore.PrivateKey(str);
+			var key = new litecore.PrivateKey(str);
 			state.hex = key.toString();
 			state.wif = key.toWIF();
 			state.address = key.toAddress().toString();
@@ -382,11 +382,11 @@ function DashPlugin() {
 		// create key if not given
 		if (!str) str = new dashcore.PrivateKey().toString();		
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		let state = {};
+		var state = {};
 		
 		// unencrypted
 		if (str.length >= 52 && dashcore.PrivateKey.isValid(str)) {	// TODO: dashcore says 'ab' is valid ... ?
-			let key = new dashcore.PrivateKey(str);
+			var key = new dashcore.PrivateKey(str);
 			state.hex = key.toString();
 			state.wif = key.toWIF();
 			state.address = key.toAddress().toString();
@@ -434,14 +434,14 @@ function MoneroPlugin() {
 		// create key if not given
 		if (!str) str = cnUtil.sc_reduce32(cnUtil.rand_32());
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		let state = {};
+		var state = {};
 		
 		// handle hex
 		if (isHex(str)) {
 			
 			// unencrypted
 			if (str.length >= 63 && str.length <= 65) {
-				let address = cnUtil.create_address(str);
+				var address = cnUtil.create_address(str);
 				if (!cnUtil.valid_keys(address.view.pub, address.view.sec, address.spend.pub, address.spend.sec)) {
 					throw new Error("Invalid address keys derived from hex key");
 				}

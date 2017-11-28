@@ -3,6 +3,9 @@
  */
 $(document).ready(function() {
 	
+	// assign window.crypto (supports IE11)
+	window.crypto = window.crypto || window.msCrypto;
+		
 	// delete window.crypto for testing
 	if (DELETE_WINDOW_CRYPTO) delete window.crypto;
 	

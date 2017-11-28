@@ -3,23 +3,27 @@
  * 
  * Used to run export code in child tab which is unaffected if parent tab is closed.
  * 
+ * @param window is the window to export to
  * @param importedPieces are original exported pieces
  * @param keyGenConfig is a configuration to generate new storage
  * @param keys are keys to generate pieces from
  * @param pieces are pieces to export and generate pieceDivs from
  * @param pieceDivs are pre-generated piece divs ready for display
  */
-function exportToBody(importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+window.exportToBody = function(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+	
+	// assign window.crypto (supports IE11)
+	window.crypto = window.crypto || window.msCrypto;
 	
 	// pagination requires div attached to dom
-	let container = $("<div>").appendTo($("body"));
+	var body = $("body", window.document);
+	var container = $("<div>").appendTo(body);
 	container.hide();
-	let body = $("body");
 	
-	//handle two tabs with split and reconstituted pieces
+	// handle two tabs with split and reconstituted pieces
 	if (importedPieces && importedPieces.length > 1) {
 		new ExportController($("<div>").appendTo(container), window, null, null, importedPieces).render(function(tab1) {
-			let tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
+			var tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
 			new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
 				container.detach();
 				container.children().detach();
@@ -38,7 +42,7 @@ function exportToBody(importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
 	}
 	
 	function renderExportTabs(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx, onDone) {
-		let tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
+		var tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
 		tabController.render(function(div) {
 			tabController.getTabsDiv().addClass("export_tabs");
 			if (onDone) onDone(div);

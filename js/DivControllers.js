@@ -1,7 +1,7 @@
 /**
  * UI utilities.
  */
-let UiUtils = {
+var UiUtils = {
 		
 	setupContentDiv: function(div) {
 		div.empty();
@@ -34,7 +34,7 @@ let UiUtils = {
 	
 	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
 		
-		let dependencies = [
+		var dependencies = [
 			"lib/jquery-3.2.1.js",
 			"lib/jquery-ui.js",
 			"lib/loadjs.js",
@@ -62,7 +62,7 @@ let UiUtils = {
 		
 		// open tab
 		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
-		  window.exportToBody(importedPieces, keyGenConfig, keys, pieces, pieceDivs);
+		  window.exportToBody(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs);
 			window.focus();
 		});
 	}
@@ -86,45 +86,45 @@ DivController.prototype.onHide = function() { }
  */
 function AppController(div) {
 	
-	let that = this;
-	let sliderController;
-	let sliderDiv;
-	let contentDiv;
-	let homeController;
-	let formController;
-	let recoverController;
-	let faqController;
-	let donateController;
+	var that = this;
+	var sliderController;
+	var sliderDiv;
+	var contentDiv;
+	var homeController;
+	var formController;
+	var recoverController;
+	var faqController;
+	var donateController;
 	
 	this.render = function(onDone) {
 		div.empty();
 		
 		// header
-		let headerDiv = $("<div class='app_header'>").appendTo(div);
+		var headerDiv = $("<div class='app_header'>").appendTo(div);
 		
 		// header logo
-		let headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
-		let logo = $("<img class='app_header_logo_img' src='img/cryptostorage_white.png'>").appendTo(headerTopDiv);
+		var headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
+		var logo = $("<img class='app_header_logo_img' src='img/cryptostorage_white.png'>").appendTo(headerTopDiv);
 		logo.click(function() {
 			window.location.href = "#home";
 			that.showHome();
 		});
 		
 		// header links
-		let linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
-		let homeLink = getLinkDiv("Home");
+		var linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
+		var homeLink = getLinkDiv("Home");
 		homeLink.click(function() {
 			window.location.href = "#home";
 			that.showHome();
 		});
-		let gitHubLink = getLinkDiv("GitHub");
+		var gitHubLink = getLinkDiv("GitHub");
 		gitHubLink.click(function() { window.open("https://github.com/cryptostorage/cryptostorage.com", "_blank"); });
-		let faqLink = getLinkDiv("FAQ");
+		var faqLink = getLinkDiv("FAQ");
 		faqLink.click(function() {
 			window.location.href = "#faq";
 			that.showFaq();
 		});
-		let donateLink = getLinkDiv("Donate");
+		var donateLink = getLinkDiv("Donate");
 		donateLink.click(function() {
 			window.location.href = "#donate";
 			that.showDonate();
@@ -135,7 +135,7 @@ function AppController(div) {
 		linksDiv.append(donateLink);
 		
 		function getLinkDiv(label) {
-			let div = $("<div class='link_div'>");
+			var div = $("<div class='link_div'>");
 			div.html(label);
 			return div;
 		}
@@ -164,9 +164,9 @@ function AppController(div) {
 			homeController.render(function() {
 				
 				// get identifier
-				let href = window.location.href;
-				let lastIdx = href.lastIndexOf("#");
-				let identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+				var href = window.location.href;
+				var lastIdx = href.lastIndexOf("#");
+				var identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
 				
 				// show page based on identifier
 				if (identifier === "home") that.showHome();
@@ -245,8 +245,8 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		div.attr("class", "intro_div");
 		
 		// intro slider
-		let sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
-		let sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
+		var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
+		var sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
 		getSlide($("<img src='img/mix.png'>"), "Generate secure storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 		getSlide($("<img src='img/security.png'>"), "Keys are generated in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces.").appendTo(sliderDiv);
@@ -255,28 +255,28 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:3500});
 		
 		function getSlide(img, text) {
-			let slide = $("<div class='slide'>");
-			let slideContent = $("<div class='slide_content'>").appendTo(slide);
+			var slide = $("<div class='slide'>");
+			var slideContent = $("<div class='slide_content'>").appendTo(slide);
 			if (img) {
-				let imgDiv = $("<div>").appendTo(slideContent);
+				var imgDiv = $("<div>").appendTo(slideContent);
 				img.appendTo(imgDiv);
 				img.attr("class", "slide_img");
 			}
-			let labelDiv = $("<div class='slide_label'>").appendTo(slideContent);
+			var labelDiv = $("<div class='slide_label'>").appendTo(slideContent);
 			labelDiv.html(text);
 			return slide;
 		}
 		
 		// call to action is overlaid
-		let ctaDiv = $("<div class='cta_div'>").appendTo(div);
+		var ctaDiv = $("<div class='cta_div'>").appendTo(div);
 		
 		// button to generate keys
-		let btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(ctaDiv);
+		var btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(ctaDiv);
 		btnGenerate.append("Generate New Keys");
 		btnGenerate.click(function() { onSelectGenerate(); });
 		
 		// button to recover keys
-		let btnRecover = $("<div class='btn btn_recover'>").appendTo(ctaDiv);
+		var btnRecover = $("<div class='btn btn_recover'>").appendTo(ctaDiv);
 		btnRecover.append("or Recover Existing Keys");
 		btnRecover.click(function() { onSelectRecover(); });
 		
@@ -298,9 +298,9 @@ function HomeController(div) {
 		
 		// supported currencies
 		div.append("<div class='home_label'>Supports these popular cryptocurrencies</div>");
-		let plugins = CryptoUtils.getCryptoPlugins();
+		var plugins = CryptoUtils.getCryptoPlugins();
 		div.append(getCurrencyRow(plugins.slice(0, 4), true, onCurrencyClicked));
-		for (let i = 4; i < plugins.length; i += 4) {
+		for (var i = 4; i < plugins.length; i += 4) {
 			div.append(getCurrencyRow(plugins.slice(i, i + 4), true, onCurrencyClicked));
 		}
 		
@@ -315,7 +315,7 @@ function HomeController(div) {
 		}
 		
 		function getKeyGenConfig(plugin) {
-			let config = {};
+			var config = {};
 			config.passphraseChecked = false;
 			config.splitChecked = false;
 			config.numPieces = 1;
@@ -333,20 +333,24 @@ function HomeController(div) {
 	}
 	
 	function getCurrencyRow(plugins, isMajor, onCurrencyClicked) {
-		let row = $("<div class='currency_row'>");
-		for (let i = 0; i < plugins.length; i++) {
-			let plugin = plugins[i];
-			let item = $("<div>").appendTo(row);
+		var row = $("<div class='currency_row'>");
+		for (var i = 0; i < plugins.length; i++) {
+			var plugin = plugins[i];
+			var item = $("<div>").appendTo(row);
 			item.attr("class", isMajor ? "currency_row_item_major" : "currency_row_item_minor");
-			item.click(function() { onCurrencyClicked(plugin); });
-			let img = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(item);
+			item.click(currencyClickFunc(plugin));
+			var img = $("<img src='" + plugin.getLogo().get(0).src + "'>").appendTo(item);
 			img.attr("class", isMajor ? "currency_row_logo_major" : "currency_row_logo_minor");
 			img.append(plugin.getLogo());
-			let label = $("<div>").appendTo(item);
+			var label = $("<div>").appendTo(item);
 			label.attr("class", isMajor ? "currency_row_label_major" : "currency_row_label_minor");
 			label.html(plugin.getName());
 		}
 		return row;
+		
+		function currencyClickFunc(plugin) {
+			return function() { onCurrencyClicked(plugin); }
+		}
 	}
 }
 inheritsFrom(HomeController, DivController);
@@ -359,7 +363,7 @@ function FaqController(div) {
 	this.render = function(onDone) {
 		UiUtils.setupContentDiv(div);
 		
-		let titleDiv = $("<div class='title'>").appendTo(div);
+		var titleDiv = $("<div class='title'>").appendTo(div);
 		titleDiv.html("Frequently Asked Questions");
 		
 		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(div);
@@ -394,112 +398,120 @@ function DonateController(div, appController) {
 		LOADER.load(["lib/qrcode.js", "lib/async.js"], function() {
 			
 			// build donate section
-			let titleDiv = $("<div class='title'>").appendTo(div);
+			var titleDiv = $("<div class='title'>").appendTo(div);
 			titleDiv.html("Donate");
-			let values = [];
-			let plugins = CryptoUtils.getCryptoPlugins();
-			for (let i = 0; i < plugins.length; i++) {
-				let plugin = plugins[i];
-				values.push({
+			var donations = [];
+			var plugins = CryptoUtils.getCryptoPlugins();
+			for (var i = 0; i < plugins.length; i++) {
+				var plugin = plugins[i];
+				donations.push({
 					logo: plugin.getLogo(),
 					label: plugin.getName(),
 					value: plugin.getDonationAddress()
 				});
 			}
-			renderValues(values, null, null, function(valuesDiv) {
-				div.append(valuesDiv);
+			renderDonationAddresses(donations, null, null, function(donationsDiv) {
+				div.append(donationsDiv);
 				
 				// build credits section
 				div.append("<br><br>");
 				titleDiv = $("<div class='title'>").appendTo(div);
 				titleDiv.html("Credits");
-				let values = [];
-				values.push({
+				var credits = [];
+				credits.push({
 					logo: CryptoUtils.getCryptoPlugin("BTC").getLogo(),
 					label: "bitaddress.org",
 					value: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
 				});
-				values.push({
+				credits.push({
 					logo: CryptoUtils.getCryptoPlugin("XMR").getLogo(),
 					label: "moneroaddress.org",
 					value: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
 				});
-				renderValues(values, null, null, function(valuesDiv) {
-					div.append(valuesDiv);
+				renderDonationAddresses(credits, null, null, function(donationsDiv) {
+					div.append(donationsDiv);
 					if (onDone) onDone(div);
 				});
 			});
 		});
 		
 		/**
-		 * Renders the given values.
+		 * Renders the given donations.
 		 * 
-		 * @param values are [{logo: <logo>, label: <label>, value: <value>}, ...].
+		 * @param donations are [{logo: <logo>, label: <label>, value: <value>}, ...].
 		 * @param config is the config to render (TODO)
 		 * @param onProgress(done, total, label) is invoked as progress is made (TODO)
 		 * @param onDone(div) is invoked when done
 		 */
-		function renderValues(values, config, onProgress, onDone) {
+		function renderDonationAddresses(donations, config, onProgress, onDone) {
 			
 			// div to render to
-			let valuesDiv = $("<div>");
+			var donationsDiv = $("<div>");
 			
 			// collect functions to render values
-			let left = true;
-			let funcs = [];
-			for (let i = 0; i < values.length; i++) {
-				let value = values[i];
-				let valueDiv = $("<div>").appendTo(valuesDiv); 
+			var left = true;
+			var funcs = [];
+			for (var i = 0; i < donations.length; i++) {
+				var value = donations[i];
+				var valueDiv = $("<div>").appendTo(donationsDiv); 
 				if (left) {
-					funcs.push(function(onDone) { renderLeft(valueDiv, value, onDone); });
+					funcs.push(renderLeftFunc(valueDiv, value));
 				} else {
-					funcs.push(function(onDone) { renderRight(valueDiv, value, onDone); });
+					funcs.push(renderRightFunc(valueDiv, value));
 				}
 				left = !left;
+			}
+			
+			function renderLeftFunc(valueDiv, value) {
+				return function(onDone) { renderLeft(valueDiv, value, onDone); }
+			}
+			
+			function renderRightFunc(valueDiv, value) {
+				return function(onDone) { renderRight(valueDiv, value, onDone); }
 			}
 			
 			// render addresses in parallel
 			async.parallel(funcs, function(err, results) {
 				if (err) throw err;
-				onDone(valuesDiv);
+				onDone(donationsDiv);
 			});
 		}
 		
 		function renderLeft(div, value, onDone) {
-			div.attr("class", "value_left");
-			let qrDiv = $("<div>").appendTo(div);
-			let labelValueDiv = $("<div class='value_label_value'>").appendTo(div);
-			let logoLabelDiv = $("<div class='value_left_logo_label'>").appendTo(labelValueDiv);
-			let logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-			logo.attr("class", "value_logo");
-			let valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
+			div.attr("class", "donate_left");
+			var qrDiv = $("<div>").appendTo(div);
+			var labelValueDiv = $("<div class='donate_label_value'>").appendTo(div);
+			var logoLabelDiv = $("<div class='donate_left_logo_label'>").appendTo(labelValueDiv);
+			var logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
+			logo.attr("class", "donate_logo");
+			var valueLabelDiv = $("<div class='donate_label'>").appendTo(logoLabelDiv);
 			valueLabelDiv.append(value.label);
-			let valueDiv = $("<div class='value_left_value'>").appendTo(labelValueDiv);
+			var valueDiv = $("<div class='donate_left_value'>").appendTo(labelValueDiv);
 			valueDiv.append(value.value);
 			
 			// render qr code
 			CryptoUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "value_qr_left");
+				img.attr("class", "donate_left_qr");
 				qrDiv.append(img);
 				onDone();
 			});
 		}
 		
 		function renderRight(div, value, onDone) {
-			div.attr("class", "value_right");
-			let labelValueDiv = $("<div class='value_label_value'>").appendTo(div);
-			let logoLabelDiv = $("<div class='value_right_logo_label'>").appendTo(labelValueDiv);
-			let logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-			logo.attr("class", "value_logo");
-			let valueLabelDiv = $("<div class='value_label'>").appendTo(logoLabelDiv);
+			div.attr("class", "donate_right");
+			var labelValueDiv = $("<div class='donate_label_value'>").appendTo(div);
+			var logoLabelDiv = $("<div class='donate_right_logo_label'>").appendTo(labelValueDiv);
+			var logo = $("<img src='" + value.logo.get(0).src + "'>").appendTo(logoLabelDiv);
+			logo.attr("class", "donate_logo");
+			var valueLabelDiv = $("<div class='donate_label'>").appendTo(logoLabelDiv);
 			valueLabelDiv.append(value.label);
-			let valueDiv = $("<div class='value_right_value'>").appendTo(labelValueDiv);
+			var valueDiv = $("<div class='donate_right_value'>").appendTo(labelValueDiv);
 			valueDiv.append(value.value);
-			let qrDiv = $("<div>").appendTo(div);
+			var qrDiv = $("<div>").appendTo(div);
 			
 			// render qr code
 			CryptoUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "value_qr_right");
+				img.attr("class", "donate_right_qr");
 				qrDiv.append(img);
 				onDone();
 			});
@@ -518,17 +530,17 @@ inheritsFrom(DonateController, DivController);
 function FormController(div) {
 	DivController.call(this, div);
 	
-	let passphraseCheckbox;
-	let btcBip38CheckboxDiv;
-	let btcBip38Checkbox;
-	let bchBip38CheckboxDiv;
-	let bchBip38Checkbox;
-	let passphraseInput;
-	let splitCheckbox;
-	let numPiecesInput;
-	let minPiecesInput;
-	let currencyInputsDiv;	// container for each currency input
-	let currencyInputs;			// tracks each currency input
+	var passphraseCheckbox;
+	var btcBip38CheckboxDiv;
+	var btcBip38Checkbox;
+	var bchBip38CheckboxDiv;
+	var bchBip38Checkbox;
+	var passphraseInput;
+	var splitCheckbox;
+	var numPiecesInput;
+	var minPiecesInput;
+	var currencyInputsDiv;	// container for each currency input
+	var currencyInputs;			// tracks each currency input
 	
 	this.render = function(onDone) {
 		
@@ -537,21 +549,21 @@ function FormController(div) {
 		
 		// currency inputs
 		currencyInputs = [];
-		let currencyDiv = $("<div class='form_section_div'>").appendTo(div);
+		var currencyDiv = $("<div class='form_section_div'>").appendTo(div);
 		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(currencyDiv);
 		
 		// link to add currency
-		let addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
-		let addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
+		var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
+		var addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
 		addCurrencySpan.html("+ Add another currency");
 		addCurrencySpan.click(function() {
 			addCurrency();
 		});
 		
 		// passphrase checkbox
-		let passphraseDiv = $("<div class='form_section_div'>").appendTo(div);
+		var passphraseDiv = $("<div class='form_section_div'>").appendTo(div);
 		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
-		let passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
+		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
 		passphraseCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
 		passphraseCheckbox.click(function() {
 			if (passphraseCheckbox.prop('checked')) {
@@ -563,14 +575,14 @@ function FormController(div) {
 		});
 		
 		// passphrase input
-		let passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
-		let passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
+		var passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
+		var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
 		passphraseWarnDiv.append("This passphrase is required to access funds later on.  Don’t lose it!");
 		passphraseInputDiv.append("Passphrase");
 		passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
-		let showPassphraseCheckboxDiv = $("<div class='passphrase_checkbox_div'>").appendTo(passphraseInputDiv);
-		let showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
-		let showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
+		var showPassphraseCheckboxDiv = $("<div class='passphrase_checkbox_div'>").appendTo(passphraseInputDiv);
+		var showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
+		var showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 		showPassphraseCheckboxLabel.html("&nbsp;Show passphrase");
 		showPassphraseCheckbox.click(function() {
 			if (showPassphraseCheckbox.prop('checked')) {
@@ -582,17 +594,17 @@ function FormController(div) {
 		});
 		btcBip38CheckboxDiv = $("<div>").appendTo(passphraseInputDiv);
 		btcBip38Checkbox = $("<input type='checkbox' id='btc_bip38_checkbox'>").appendTo(btcBip38CheckboxDiv);
-		let btcBip38CheckboxLabel = $("<label for='btc_bip38_checkbox'>").appendTo(btcBip38CheckboxDiv);
+		var btcBip38CheckboxLabel = $("<label for='btc_bip38_checkbox'>").appendTo(btcBip38CheckboxDiv);
 		btcBip38CheckboxLabel.html("&nbsp;Use BIP38 encryption for Bitcoin");
 		bchBip38CheckboxDiv = $("<div>").appendTo(passphraseInputDiv);
 		bchBip38Checkbox = $("<input type='checkbox' id='bch_bip38_checkbox'>").appendTo(bchBip38CheckboxDiv);
-		let bchBip38CheckboxLabel = $("<label for='bch_bip38_checkbox'>").appendTo(bchBip38CheckboxDiv);
+		var bchBip38CheckboxLabel = $("<label for='bch_bip38_checkbox'>").appendTo(bchBip38CheckboxDiv);
 		bchBip38CheckboxLabel.html("&nbsp;Use BIP38 encryption for Bitcoin Cash");
 		
 		// split checkbox
-		let splitDiv = $("<div class='form_section_div'>").appendTo(div);
+		var splitDiv = $("<div class='form_section_div'>").appendTo(div);
 		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
-		let splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitDiv);
+		var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.html("&nbsp;Do you want to split your private keys into separate pieces?");
 		splitCheckbox.click(function() {
 			if (splitCheckbox.prop('checked')) {
@@ -603,21 +615,21 @@ function FormController(div) {
 		});
 		
 		// split input
-		let splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
-		let splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitInputDiv);
-		let splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
-		let splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
-		let splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
+		var splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
+		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitInputDiv);
+		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
+		var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
+		var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
 		splitNumLabelTop.html("Split Each Key Into");
 		numPiecesInput = $("<input type='number' value='3'>").appendTo(splitNumDiv);
-		let splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
+		var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
 		splitNumLabelBottom.html("Pieces");
-		let splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitInputDiv);
-		let splitMinDiv = $("<div class='split_min_div'>").appendTo(splitInputDiv);
-		let splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
+		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitInputDiv);
+		var splitMinDiv = $("<div class='split_min_div'>").appendTo(splitInputDiv);
+		var splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
 		splitMinLabelTop.html("Require");
 		minPiecesInput = $("<input type='number' value='2'>").appendTo(splitMinDiv);
-		let splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
+		var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
 		splitMinLabelBottom.html("To Recover");		
 		
 		// apply default configuration
@@ -631,17 +643,17 @@ function FormController(div) {
 		addCurrency();
 		
 		// add generate button
-		let generateDiv = $("<div class='generate_div'>").appendTo(div);
-		let btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
+		var generateDiv = $("<div class='generate_div'>").appendTo(div);
+		var btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
 		btnGenerate.append("Generate keys");
 		btnGenerate.click(function() { onGenerate() });
 		
 		// under development warning
-		let warningDiv = $("<div class='app_header_warning'>").appendTo(div);
+		var warningDiv = $("<div class='red_warning'>").appendTo(div);
 		warningDiv.append("Under Development: Not Ready for Use");
 		
 		// security checks
-		let securityDiv = $("<div>").appendTo(div);
+		var securityDiv = $("<div>").appendTo(div);
 		new SecurityCheckController(securityDiv).render();
 		
 		// done rendering
@@ -663,7 +675,7 @@ function FormController(div) {
 	
 	// get current form configuration
 	function getConfig() {
-		let config = {};
+		var config = {};
 		config.passphraseChecked = passphraseCheckbox.prop('checked');
 		config.passphrase = passphraseInput.val();
 		config.splitChecked = splitCheckbox.prop('checked');
@@ -671,8 +683,8 @@ function FormController(div) {
 		config.minPieces = config.splitChecked ? parseFloat(minPiecesInput.val()) : null;
 		config.verifyEncryption = VERIFY_ENCRYPTION;
 		config.currencies = [];
-		for (let i = 0; i < currencyInputs.length; i++) {
-			let currencyInput = currencyInputs[i];
+		for (var i = 0; i < currencyInputs.length; i++) {
+			var currencyInput = currencyInputs[i];
 			config.currencies.push({
 				ticker: currencyInput.getSelectedPlugin().getTicker(),
 				numKeys: currencyInput.getNumKeys(),
@@ -690,8 +702,8 @@ function FormController(div) {
 		
 		function verifyConfig(config) {
 			assertDefined(config.verifyEncryption);
-			for (let i = 0; i < config.currencies.length; i++) {
-				let currency = config.currencies[i];
+			for (var i = 0; i < config.currencies.length; i++) {
+				var currency = config.currencies[i];
 				assertDefined(currency.ticker);
 				assertDefined(currency.numKeys);
 				assertDefined(currency.encryption);
@@ -703,7 +715,7 @@ function FormController(div) {
 		if (DEBUG) console.log("addCurrency()");
 		
 		// create input
-		let currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, CryptoUtils.getCryptoPlugins(), updateForm, function() {
+		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, CryptoUtils.getCryptoPlugins(), updateForm, function() {
 			removeCurrency(currencyInput);
 		});
 		
@@ -714,7 +726,7 @@ function FormController(div) {
 	}
 	
 	function removeCurrency(currencyInput) {
-		let idx = currencyInputs.indexOf(currencyInput);
+		var idx = currencyInputs.indexOf(currencyInput);
 		if (idx < 0) throw new Error("Could not find currency input");
 		currencyInputs.splice(idx, 1);
 		currencyInput.getDiv().remove();
@@ -724,9 +736,9 @@ function FormController(div) {
 	function updateForm() {
 		
 		// determine if BTC is selected
-		let btcFound = false;
-		for (let i = 0; i < currencyInputs.length; i++) {
-			let currencyInput = currencyInputs[i];
+		var btcFound = false;
+		for (var i = 0; i < currencyInputs.length; i++) {
+			var currencyInput = currencyInputs[i];
 			if (currencyInput.getSelectedPlugin().getTicker() === "BTC") {
 				btcFound = true;
 				break;
@@ -734,9 +746,9 @@ function FormController(div) {
 		}
 		
 		// determine if BCH is selected
-		let bchFound = false;
-		for (let i = 0; i < currencyInputs.length; i++) {
-			let currencyInput = currencyInputs[i];
+		var bchFound = false;
+		for (var i = 0; i < currencyInputs.length; i++) {
+			var currencyInput = currencyInputs[i];
 			if (currencyInput.getSelectedPlugin().getTicker() === "BCH") {
 				bchFound = true;
 				break;
@@ -760,12 +772,12 @@ function FormController(div) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
-		let that = this;
-		let selectedPlugin;
-		let numKeysInput;
-		let selector;
-		let selectorData;
-		let initializing = true;
+		var that = this;
+		var selectedPlugin;
+		var numKeysInput;
+		var selector;
+		var selectorData;
+		var initializing = true;
 		
 		this.getDiv = function() {
 			return div;
@@ -776,7 +788,7 @@ function FormController(div) {
 		}
 		
 		this.setSelectedCurrency = function(name) {
-			for (let i = 0; i < selectorData.length; i++) {
+			for (var i = 0; i < selectorData.length; i++) {
 				if (selectorData[i].text === name) {
 					selector.ddslick('select', {index: i});
 					selectedPlugin = plugins[i];
@@ -799,8 +811,8 @@ function FormController(div) {
 			
 			// format pull down plugin data
 			selectorData = [];
-			for (let i = 0; i < plugins.length; i++) {
-				let plugin = plugins[i];
+			for (var i = 0; i < plugins.length; i++) {
+				var plugin = plugins[i];
 				selectorData.push({
 					text: plugin.getName(),
 					imageSrc: plugin.getLogo().get(0).src
@@ -825,14 +837,14 @@ function FormController(div) {
 			that.setSelectedCurrency("Bitcoin");	// default value
 			
 			// create right div
-			let rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
+			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 			rightDiv.append("Number of keys&nbsp;&nbsp;");
 			numKeysInput = $("<input type='number'>").appendTo(rightDiv);
 			numKeysInput.attr("value", 1);
 			rightDiv.append("&nbsp;&nbsp;");
-			let trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
+			var trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 			trashDiv.click(function() { onDelete(); });
-			let trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
+			var trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
 			
 			// no longer initializing
 			initializing = false;
@@ -854,11 +866,11 @@ function RecoverController(div) {
 		$("<div class='recover_filler'>").appendTo(div);
 		
 		// all recover content including tabs
-		let recoverDiv = $("<div class='recover_div'>").appendTo(div);
+		var recoverDiv = $("<div class='recover_div'>").appendTo(div);
 		
 		// render recover file and text divs
-		let recoverFileDiv = $("<div>");
-		let recoverTextDiv = $("<div>");
+		var recoverFileDiv = $("<div>");
+		var recoverTextDiv = $("<div>");
 		new RecoverFileController(recoverFileDiv).render(function() {
 			new RecoverTextController(recoverTextDiv, CryptoUtils.getCryptoPlugins()).render(function() {
 				new TwoTabController(recoverDiv, "Recover From File", recoverFileDiv, "Recover From Text", recoverTextDiv).render(function() {
@@ -878,15 +890,15 @@ inheritsFrom(RecoverController, DivController);
 function RecoverFileController(div) {
 	DivController.call(this, div);
 	
-	let that = this;
-	let warningDiv;
-	let warningMsg;
-	let contentDiv;								// div for all non control links
-	let importDiv;								// div for all file import
-	let importedNamedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
-	let importedPiecesDiv;				// shows imported item;
-	let controlsDiv;							// div for all control links
-	let lastKeys;
+	var that = this;
+	var warningDiv;
+	var warningMsg;
+	var contentDiv;								// div for all non control links
+	var importDiv;								// div for all file import
+	var importedNamedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
+	var importedPiecesDiv;				// shows imported item;
+	var controlsDiv;							// div for all control links
+	var lastKeys;
 	
 	this.render = function(onDone) {
 		
@@ -905,16 +917,16 @@ function RecoverFileController(div) {
 		importDiv = $("<div>").appendTo(contentDiv);
 		
 		// drag and drop importDiv
-		let dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(importDiv);
-		let dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
-		let dragDropText = $("<div class='drag_drop_text'>").appendTo(dragDropDiv);
-		let dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
+		var dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(importDiv);
+		var dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
+		var dragDropText = $("<div class='drag_drop_text'>").appendTo(dragDropDiv);
+		var dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
 		dragDropLabel.append("Drag and Drop Files To Import");
-		let dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
+		var dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
 		dragDropBrowse.append("or click to browse");
 		
 		// register browse link with hidden input
-		let inputFiles = $("<input type='file' multiple accept='.json,.zip'>").appendTo(dragDropDiv);
+		var inputFiles = $("<input type='file' multiple accept='.json,.zip'>").appendTo(dragDropDiv);
 		inputFiles.change(function() { onFilesImported($(this).get(0).files); });
 		inputFiles.hide();
 		dragDropBrowse.click(function() {
@@ -957,8 +969,8 @@ function RecoverFileController(div) {
 	}
 	
 	this.addNamedPieces = function(namedPieces, onDone) {
-		for (let i = 0; i < namedPieces.length; i++) {
-			let namedPiece = namedPieces[i];
+		for (var i = 0; i < namedPieces.length; i++) {
+			var namedPiece = namedPieces[i];
 			try {
 				CryptoUtils.validatePiece(namedPiece.piece);
 				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
@@ -986,15 +998,15 @@ function RecoverFileController(div) {
 	}
 	
 	function addControl(text, onClick) {
-		let linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
-		let link = $("<div class='recover_control_link'>").appendTo(linkDiv);
+		var linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
+		var link = $("<div class='recover_control_link'>").appendTo(linkDiv);
 		link.append(text);
 		link.click(function() { onClick(); });
 	}
 	
 	function getImportedPieces() {
-		let pieces = [];
-		for (let i = 0; i < importedNamedPieces.length; i++) {
+		var pieces = [];
+		for (var i = 0; i < importedNamedPieces.length; i++) {
 			pieces.push(importedNamedPieces[i].piece);
 		}
 		return pieces;
@@ -1008,7 +1020,7 @@ function RecoverFileController(div) {
 		if (keys[0].isEncrypted()) {
 			
 			// create decryption controller and register callbacks
-			let decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+			var decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
 				that.setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
 				onKeysDecrypted(getImportedPieces(), decryptedKeys, pieces, pieceDivs);
@@ -1035,7 +1047,7 @@ function RecoverFileController(div) {
 	function onKeysDecrypted(importedPieces, keys, pieces, pieceDivs) {
 		resetControls();
 		contentDiv.children().detach();
-		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
+		var viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Keys");
 		viewDecrypted.click(function() {
 			UiUtils.openStorage("Imported Storage", importedPieces, null, keys, pieces, pieceDivs);
@@ -1046,20 +1058,22 @@ function RecoverFileController(div) {
 	function onFilesImported(files) {
 		
 		// collect functions to read files
-		let funcs = [];
-		for (let i = 0; i < files.length; i++) {
-			funcs.push(function(onDone) {
-				readFile(files[i], onDone);
-			});
+		var funcs = [];
+		for (var i = 0; i < files.length; i++) {
+			funcs.push(readFileFunc(files[i]));
 		};
+		
+		function readFileFunc(file) {
+			return function(onDone) { readFile(file, onDone); }
+		}
 		
 		// read files asynchronously
 		async.parallel(funcs, function(err, results) {
 			if (err) throw err;
 			
 			// collect named pieces from results
-			let namedPieces = [];
-			for (let i = 0; i < results.length; i++) {
+			var namedPieces = [];
+			for (var i = 0; i < results.length; i++) {
 				if (results[i]) namedPieces = namedPieces.concat(results[i]);
 			}
 			
@@ -1069,7 +1083,7 @@ function RecoverFileController(div) {
 		
 		// reads the given file and calls onNamedPieces(err, namedPieces) when done
 		function readFile(file, onNamedPieces) {
-			let reader = new FileReader();
+			var reader = new FileReader();
 			reader.onload = function() {
 				getNamedPiecesFromFile(file, reader.result, function(err, namedPieces) {
 					if (err) {
@@ -1092,13 +1106,13 @@ function RecoverFileController(div) {
 		
 		function getNamedPiecesFromFile(file, data, onNamedPieces) {
 			if (file.type === 'application/json') {
-				let piece;
+				var piece;
 				try {
 					piece = JSON.parse(data);
 				} catch (err) {
 					onNamedPieces(Error("Could not parse JSON content from '" + file.name + "'"));
 				}
-				let namedPiece = {name: file.name, piece: piece};
+				var namedPiece = {name: file.name, piece: piece};
 				onNamedPieces(null, [namedPiece]);
 			}
 			else if (file.type === 'application/zip') {
@@ -1112,7 +1126,7 @@ function RecoverFileController(div) {
 	}
 	
 	function isPieceImported(name) {
-		for (let i = 0; i < importedNamedPieces.length; i++) {
+		for (var i = 0; i < importedNamedPieces.length; i++) {
 			if (importedNamedPieces[i].name === name) return true;
 		}
 		return false;
@@ -1125,7 +1139,7 @@ function RecoverFileController(div) {
 	}
 	
 	function removePiece(name) {
-		for (let i = 0; i < importedNamedPieces.length; i++) {
+		for (var i = 0; i < importedNamedPieces.length; i++) {
 			if (importedNamedPieces[i].name === name) {
 				importedNamedPieces.splice(i, 1);
 				that.setWarning("");
@@ -1142,27 +1156,29 @@ function RecoverFileController(div) {
 		renderImportedPieces(importedNamedPieces);
 		
 		// collect all pieces
-		let pieces = [];
-		for (let i = 0; i < importedNamedPieces.length; i++) pieces.push(importedNamedPieces[i].piece);
+		var pieces = [];
+		for (var i = 0; i < importedNamedPieces.length; i++) pieces.push(importedNamedPieces[i].piece);
 		if (!pieces.length) {
 			if (onDone) onDone();
 			return;
 		}
 		
 		// collect tickers being imported
-		let tickers = new Set();
-		for (let i = 0; i < pieces[0].keys.length; i++) tickers.add(pieces[0].keys[i].ticker);
+		var tickers = [];
+		for (var i = 0; i < pieces[0].keys.length; i++) tickers.push(pieces[0].keys[i].ticker);
+		tickers = arrUnique(tickers);
 		
 		// collect dependencies
-		let dependencies = new Set(APP_DEPENDENCIES);
-		for (let i = 0; i < tickers.length; i++) {
-			let ticker = tickers[i];
-			let plugin = CryptoUtils.getCryptoPlugin(ticker);
-			for (let j = 0; j < plugin.getDependencies().length; j++) dependencies.add(plugin.getDependencies()[i]);
+		var dependencies = APP_DEPENDENCIES.slice();
+		for (var i = 0; i < tickers.length; i++) {
+			var ticker = tickers[i];
+			var plugin = CryptoUtils.getCryptoPlugin(ticker);
+			for (var j = 0; j < plugin.getDependencies().length; j++) dependencies.push(plugin.getDependencies()[j]);
 		}
+		dependencies = arrUnique(dependencies);
 		
 		// load dependencies
-		LOADER.load(Array.from(dependencies), function() {
+		LOADER.load(dependencies, function() {
 			
 			// create keys
 			try {
@@ -1173,11 +1189,11 @@ function RecoverFileController(div) {
 				});
 				
 				// attempt to get keys
-				let keys = CryptoUtils.piecesToKeys(pieces);
+				var keys = CryptoUtils.piecesToKeys(pieces);
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
 				lastKeys = keys;
 			} catch (err) {
-				let img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
+				var img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
 				that.setWarning(err.message, img);
 			}
 			if (onDone) onDone();
@@ -1187,7 +1203,7 @@ function RecoverFileController(div) {
 			if (!keys1 && keys2) return true;
 			if (keys1 && !keys2) return true;
 			if (keys1.length !== keys2.length) return true;
-			for (let i = 0; i < keys1.length; i++) {
+			for (var i = 0; i < keys1.length; i++) {
 				if (!keys1[i].equals(keys2[i])) return true;
 			}
 			return false;
@@ -1208,14 +1224,14 @@ function RecoverFileController(div) {
 		}
 		
 		// render imported pieces
-		for (let i = 0; i < namedPieces.length; i++) {
+		for (var i = 0; i < namedPieces.length; i++) {
 			importedPiecesDiv.append(getImportedPieceDiv(namedPieces[i]));
 		}
 		function getImportedPieceDiv(namedPiece) {
-			let importedPieceDiv = $("<div class='recover_file_imported_piece'>").appendTo(importedPiecesDiv);
-			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
+			var importedPieceDiv = $("<div class='recover_file_imported_piece'>").appendTo(importedPiecesDiv);
+			var icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
 			importedPieceDiv.append(namedPiece.name);
-			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
+			var trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(namedPiece.name); });
 			return importedPieceDiv;
 		}
@@ -1238,12 +1254,12 @@ function RecoverFileController(div) {
 			event.preventDefault();  
 	    event.stopPropagation();
 			div.removeClass("inner_outline");
-			let dt = event.dataTransfer;
+			var dt = event.dataTransfer;
 			
 			// use DataTransferItemList interface to access file(s)
 			if (dt.items) {
-				let files = [];
-				for (let i = 0; i < dt.items.length; i++) {
+				var files = [];
+				for (var i = 0; i < dt.items.length; i++) {
 					if (dt.items[i].kind == 'file') {
 						files.push(dt.items[i].getAsFile());
 					}
@@ -1280,19 +1296,19 @@ function RecoverTextController(div, plugins) {
 	DivController.call(this, div);
 	assertTrue(plugins.length > 0);
 	
-	const MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
+	var MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
 	
-	let warningDiv;
-	let contentDiv;
-	let passphraseInputDiv;
-	let selector;
-	let selectorDisabler;
-	let selectedPlugin;
-	let textArea;
-	let importedPieces = [];	// string[]
-	let importedPiecesDiv;		// div for imported pieces
-	let controlsDiv;
-	let lastKeys;
+	var warningDiv;
+	var contentDiv;
+	var passphraseInputDiv;
+	var selector;
+	var selectorDisabler;
+	var selectedPlugin;
+	var textArea;
+	var importedPieces = [];	// string[]
+	var importedPiecesDiv;		// div for imported pieces
+	var controlsDiv;
+	var lastKeys;
 	
 	this.render = function(onDone) {
 		
@@ -1312,8 +1328,8 @@ function RecoverTextController(div, plugins) {
 		
 		// currency selector data
 		selectorData = [];
-		for (let i = 0; i < plugins.length; i++) {
-			let plugin = plugins[i];
+		for (var i = 0; i < plugins.length; i++) {
+			var plugin = plugins[i];
 			selectorData.push({
 				text: plugin.getName(),
 				imageSrc: plugin.getLogo().get(0).src
@@ -1321,7 +1337,7 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		// currency selector
-		let selectorContainer = $("<div class='recover_selector_container'>").appendTo(passphraseInputDiv);
+		var selectorContainer = $("<div class='recover_selector_container'>").appendTo(passphraseInputDiv);
 		selector = $("<div id='recover_selector'>").appendTo(selectorContainer);
 		
 		// text area
@@ -1329,7 +1345,7 @@ function RecoverTextController(div, plugins) {
 		textArea.attr("placeholder", "Enter a private key or split pieces of a private key");
 		
 		// submit button
-		let submit = $("<div class='recover_button'>").appendTo(passphraseInputDiv);
+		var submit = $("<div class='recover_button'>").appendTo(passphraseInputDiv);
 		submit.html("Submit");
 		submit.click(function() { submitPieces(); });
 		
@@ -1371,8 +1387,8 @@ function RecoverTextController(div, plugins) {
 	}
 	
 	function addControl(text, onClick) {
-		let linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
-		let link = $("<div class='recover_control_link'>").appendTo(linkDiv);
+		var linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
+		var link = $("<div class='recover_control_link'>").appendTo(linkDiv);
 		link.append(text);
 		link.click(function() { onClick(); });
 	}
@@ -1404,7 +1420,7 @@ function RecoverTextController(div, plugins) {
 		if (keys[0].isEncrypted()) {
 			
 			// create decryption controller and register callbacks
-			let decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+			var decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
 				setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
 				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
@@ -1431,7 +1447,7 @@ function RecoverTextController(div, plugins) {
 	function onKeysDecrypted(keys, pieces, pieceDivs) {
 		resetControls();
 		contentDiv.children().detach();
-		let viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
+		var viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Key");
 		viewDecrypted.click(function() {
 			UiUtils.openStorage("Imported Storage", null, null, keys, pieces, pieceDivs);
@@ -1440,7 +1456,7 @@ function RecoverTextController(div, plugins) {
 	
 	function setSelectedCurrency(name) {
 		selector = $("#recover_selector");
-		for (let i = 0; i < selectorData.length; i++) {
+		for (var i = 0; i < selectorData.length; i++) {
 			if (selectorData[i].text === name) {
 				selector.ddslick('select', {index: i});
 				selectedPlugin = plugins[i];
@@ -1469,7 +1485,7 @@ function RecoverTextController(div, plugins) {
 	}
 	
 	function removePiece(piece) {
-		for (let i = 0; i < importedPieces.length; i++) {
+		for (var i = 0; i < importedPieces.length; i++) {
 			if (importedPieces[i] === piece) {
 				importedPieces.splice(i, 1);
 				updatePieces();
@@ -1484,7 +1500,7 @@ function RecoverTextController(div, plugins) {
 		resetControls();
 		
 		// get and clear text
-		let val = textArea.val();
+		var val = textArea.val();
 		textArea.val("");
 		
 		// check for empty text
@@ -1494,19 +1510,20 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		// get lines
-		let lines = getLines(val);
+		var lines = getLines(val);
 		
 		// get lines with content
-		let contentLines = [];
-		for (let i = 0; i < lines.length; i++) {
-			let line = lines[i];
+		var contentLines = [];
+		for (var i = 0; i < lines.length; i++) {
+			var line = lines[i];
 			if (line.trim() !== "") contentLines.push(line);
 		}
 		
 		// load dependencies
-		let dependencies = new Set(APP_DEPENDENCIES);
-		for (let i = 0; i < selectedPlugin.getDependencies().length; i++) dependencies.add(selectedPlugin.getDependencies()[i]);
-		LOADER.load(Array.from(dependencies), function() {
+		var dependencies = [];
+		for (var i = 0; i < selectedPlugin.getDependencies().length; i++) dependencies.push(selectedPlugin.getDependencies()[i]);
+		dependencies = arrUnique(dependencies);
+		LOADER.load(dependencies, function() {
 			
 			// add pieces
 			updatePieces(contentLines);
@@ -1519,7 +1536,7 @@ function RecoverTextController(div, plugins) {
 		setWarning("");
 		
 		// interanl warning setter to track if warning is set
-		let warningSet = false;
+		var warningSet = false;
 		function setWarningAux(str, icon) {
 			setWarning(str, icon);
 			warningSet = true;
@@ -1532,7 +1549,7 @@ function RecoverTextController(div, plugins) {
 		// add pieces, check if key created, allow pieces, don't allow private key
 		
 		// check for existing private key
-		let key;
+		var key;
 		if (importedPieces.length === 1) {
 			try {
 				key = selectedPlugin.newKey(importedPieces[0]);
@@ -1545,16 +1562,16 @@ function RecoverTextController(div, plugins) {
 		if (newPieces) {
 			if (key) setWarningAux("Private key already added");
 			else {
-				for (let i = 0; i < newPieces.length; i++) {
-					let piece = newPieces[i];
-					if (contains(importedPieces, piece)) {
+				for (var i = 0; i < newPieces.length; i++) {
+					var piece = newPieces[i];
+					if (arrContains(importedPieces, piece)) {
 						setWarningAux("Piece already added");
 						continue;
 					}
 					if (key) setWarningAux("Private key alread added");
 					else {
 						try {
-							let thisKey = selectedPlugin.newKey(piece);
+							var thisKey = selectedPlugin.newKey(piece);
 							if (importedPieces.length > 0) setWarningAux("Cannot add private key to existing pieces");
 							else {
 								key = thisKey;
@@ -1575,7 +1592,7 @@ function RecoverTextController(div, plugins) {
 				key = selectedPlugin.combine(importedPieces);
 			} catch (err) {
 				if (!warningSet) {
-					let img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
+					var img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
 					setWarning(err.message, img);
 				}
 			}
@@ -1601,15 +1618,15 @@ function RecoverTextController(div, plugins) {
 		
 		importedPiecesDiv.show();
 		controlsDiv.show();
-		for (let i = 0; i < pieces.length; i++) {
+		for (var i = 0; i < pieces.length; i++) {
 			importedPiecesDiv.append(getImportedPieceDiv(pieces[i]));
 		}
 		
 		function getImportedPieceDiv(piece) {
-			let importedPieceDiv = $("<div class='recover_text_imported_piece'>").appendTo(importedPiecesDiv);
-			let icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
+			var importedPieceDiv = $("<div class='recover_text_imported_piece'>").appendTo(importedPiecesDiv);
+			var icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
 			importedPieceDiv.append(CryptoUtils.getShortenedString(piece, MAX_PIECE_LENGTH));
-			let trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
+			var trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
 			return importedPieceDiv;
 		}
@@ -1628,12 +1645,12 @@ inheritsFrom(RecoverTextController, DivController);
 function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	DivController.call(this, div);
 	
-	let that = this;
-	let labelDiv;
-	let inputDiv;
-	let passphraseInput;
-	let progressDiv;
-	let submitButton;
+	var that = this;
+	var labelDiv;
+	var inputDiv;
+	var passphraseInput;
+	var progressDiv;
+	var submitButton;
 	
 	this.render = function(onDone) {
 		
@@ -1659,7 +1676,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		
 		// register passphrase enter key
 		passphraseInput.keyup(function(e) {
-			let code = e.which;
+			var code = e.which;
 	    if (code == 13) {
 	    	e.preventDefault();
 	      submitButton.click();
@@ -1687,7 +1704,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		onWarning("");
 		
 		// get passphrase
-		let passphrase = passphraseInput.val();
+		var passphrase = passphraseInput.val();
 		passphraseInput.val('');
 		
 		// validate passphrase
@@ -1697,9 +1714,9 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		}
 		
 		// compute weights for progress bar
-		let decryptWeight = CryptoUtils.getWeightDecryptKeys(encryptedKeys);
-		let renderWeight = PieceRenderer.getRenderWeight(encryptedKeys.length, 1, null);
-		let totalWeight = decryptWeight + renderWeight;
+		var decryptWeight = CryptoUtils.getWeightDecryptKeys(encryptedKeys);
+		var renderWeight = PieceRenderer.getRenderWeight(encryptedKeys.length, 1, null);
+		var totalWeight = decryptWeight + renderWeight;
 		
 		// switch content div to progress bar
 		inputDiv.hide();
@@ -1712,8 +1729,8 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		setImmediate(function() {
 			
 			// decrypt keys async
-			let copies = [];
-			for (let i = 0; i < encryptedKeys.length; i++) copies.push(encryptedKeys[i].copy());
+			var copies = [];
+			for (var i = 0; i < encryptedKeys.length; i++) copies.push(encryptedKeys[i].copy());
 			CryptoUtils.decryptKeys(copies, passphrase, function(done, total) {
 				setProgress(done / total * decryptWeight / totalWeight, "Decrypting...");
 			}, function(err, decryptedKeys) {
@@ -1726,7 +1743,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 				}
 				
 				// convert keys to pieces
-				let pieces = CryptoUtils.keysToPieces(decryptedKeys);
+				var pieces = CryptoUtils.keysToPieces(decryptedKeys);
 				
 				// render pieces
 				PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
@@ -1760,10 +1777,10 @@ inheritsFrom(DecryptionController, DivController);
 function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx) {
 	DivController.call(this, div);
 	
-	let tabsDiv;
-	let tab1;
-	let tab2;
-	let contentDiv;
+	var tabsDiv;
+	var tab1;
+	var tab2;
+	var contentDiv;
 	
 	this.render = function(onDone) {
 		
@@ -1836,23 +1853,23 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	// check if storage saved before window closed
 	window.addEventListener("beforeunload", function (e) {
 		if (!saved) {
-		  let confirmationMessage = "Your storage has not been saved or printed.";
+		  var confirmationMessage = "Your storage has not been saved or printed.";
 		  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
 		  return confirmationMessage;     												// Webkit, Safari, Chrome
 		}               
 	});
 	
 	// global variables
-	let saved = false;
-	let progressDiv;
-	let progressBar;
-	let printButton;
-	let showPublicCheckbox;
-	let showPrivateCheckbox;
-	let showLogosCheckbox;
-	let paginator;
-	let piecesDiv;
-	let printEnabled;
+	var saved = false;
+	var progressDiv;
+	var progressBar;
+	var printButton;
+	var showPublicCheckbox;
+	var showPrivateCheckbox;
+	var showLogosCheckbox;
+	var paginator;
+	var piecesDiv;
+	var printEnabled;
 	
 	this.render = function(onDone) {
 		div.empty();
@@ -1864,35 +1881,35 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		progressBar = UiUtils.getProgressBar(progressDiv);
 		
 		// export header
-		let exportHeader = $("<div class='export_header'>").appendTo(div);
+		var exportHeader = $("<div class='export_header'>").appendTo(div);
 		
 		// export buttons
-		let exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
-		let saveButton = $("<div class='export_button'>").appendTo(exportButtons);
+		var exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
+		var saveButton = $("<div class='export_button'>").appendTo(exportButtons);
 		saveButton.html("Save All");
 		saveButton.click(function() { saveAll(pieces); });
 		printButton = $("<div class='export_button'>").appendTo(exportButtons);
 		printButton.html("Print All");
 		printButton.click(function() { printAll(); });
-		let savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
+		var savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
 		savePublicButton.click(function() { savePublicAddresses(); });
-//		let moreButton = $("<div class='export_button'>").appendTo(exportButtons);
+//		var moreButton = $("<div class='export_button'>").appendTo(exportButtons);
 //		moreButton.html("...");
 //		moreButton.click(function() { console.log("More button clicked"); });
 		
 		// export checkboxes
-		let exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
+		var exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
 		showPublicCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
-		let showPublicCheckboxLabel = $("<label class='export_checkbox_label' for='showPublicCheckbox'>").appendTo(exportCheckboxes);
+		var showPublicCheckboxLabel = $("<label class='export_checkbox_label' for='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		showPublicCheckboxLabel.html("Show public addresses");
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
 		showPrivateCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
-		let showPrivateCheckboxLabel = $("<label class='export_checkbox_label' for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
+		var showPrivateCheckboxLabel = $("<label class='export_checkbox_label' for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
 		showPrivateCheckboxLabel.html("Show private keys");
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
 		showLogosCheckbox = $("<input type='checkbox' class='export_checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
-		let showLogosCheckboxLabel = $("<label class='export_checkbox_label' for='showLogosCheckbox'>").appendTo(exportCheckboxes);
+		var showLogosCheckboxLabel = $("<label class='export_checkbox_label' for='showLogosCheckbox'>").appendTo(exportCheckboxes);
 		showLogosCheckboxLabel.html("Show currency logos");
 		
 		// apply default state
@@ -1904,7 +1921,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		sortPieces();
 		
 		// piece selection
-		let paginatorSource = getPaginatorSource(keyGenConfig, pieces);
+		var paginatorSource = getPaginatorSource(keyGenConfig, pieces);
 		if (paginatorSource) {
 			paginator = $("<div id='paginator'>").appendTo(exportHeader);
 			$("#paginator").pagination({
@@ -1938,8 +1955,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		if (!pieces) return;
 		
 		// bind pieces and pieceDivs
-		let elems = [];
-		for (let i = 0; i < pieces.length; i++) {
+		var elems = [];
+		for (var i = 0; i < pieces.length; i++) {
 			elems.push({
 				piece: pieces[i],
 				pieceDiv: pieceDivs ? pieceDivs[i] : null
@@ -1948,8 +1965,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		
 		// sort elems
 		elems.sort(function(elem1, elem2) {
-			let num1 = elem1.piece.pieceNum;
-			let num2 = elem2.piece.pieceNum;
+			var num1 = elem1.piece.pieceNum;
+			var num2 = elem2.piece.pieceNum;
 			assertNumber(num1);
 			assertNumber(num2);
 			return num1 - num2;
@@ -1958,8 +1975,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		// re-assign global pieces
 		pieces = [];
 		if (pieceDivs) pieceDivs = [];
-		for (let i = 0; i < elems.length; i++) {
-			let elem = elems[i];
+		for (var i = 0; i < elems.length; i++) {
+			var elem = elems[i];
 			pieces.push(elem.piece);
 			if (pieceDivs) pieceDivs.push(elem.pieceDiv);
 		}
@@ -1968,15 +1985,15 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	function getPaginatorSource(keyGenConfig, pieces) {
 		if (keyGenConfig) {
 			if (keyGenConfig.numPieces === 1) return null;
-			let pieceNums = [];
-			for (let i = 0; i < keyGenConfig.numPieces; i++) pieceNums.push(i + 1);
+			var pieceNums = [];
+			for (var i = 0; i < keyGenConfig.numPieces; i++) pieceNums.push(i + 1);
 			return pieceNums;
 		}
 		if (pieces) {
 			assertTrue(pieces.length >= 1);
 			if (pieces.length === 1) return null;
-			let pieceNums = [];
-			for (let i = 0; i < pieces.length; i++) pieceNums.push(pieces[i].pieceNum);
+			var pieceNums = [];
+			for (var i = 0; i < pieces.length; i++) pieceNums.push(pieces[i].pieceNum);
 			return pieceNums;
 		}
 		return null;
@@ -2001,7 +2018,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 		assertTrue(pieces.length > 0);
 		saved = true;
 		if (pieces.length === 1) {
-			let jsonStr = CryptoUtils.pieceToJson(pieces[0]);
+			var jsonStr = CryptoUtils.pieceToJson(pieces[0]);
 			saveAs(new Blob([jsonStr]), "cryptostorage_" + CryptoUtils.getCommonTicker(pieces[0]).toLowerCase() + ".json");
 		} else {
 			CryptoUtils.piecesToZip(pieces, function(name, blob) {
@@ -2013,7 +2030,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	function savePublicAddresses() {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
-		let publicAddressesStr = CryptoUtils.pieceToAddresses(pieces[0]);
+		var publicAddressesStr = CryptoUtils.pieceToAddresses(pieces[0]);
 		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + CryptoUtils.getCommonTicker(pieces[0]).toLowerCase() + "_public_addresses.txt");
 	}
 	
@@ -2047,7 +2064,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 			
 			// render pieces if given
 			if (pieces) {
-				for (let i = 0; i < pieces.length; i++) pieceDivs.push($("<div>"));
+				for (var i = 0; i < pieces.length; i++) pieceDivs.push($("<div>"));
 				setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(pieceDivs);
 				setPrintEnabled(false);
@@ -2083,7 +2100,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	
 	function setPieceDivs(pieceDivs) {
 		piecesDiv.empty();
-		for (let i = 0; i < pieceDivs.length; i++) piecesDiv.append(pieceDivs[i]);
+		for (var i = 0; i < pieceDivs.length; i++) piecesDiv.append(pieceDivs[i]);
 	}
 	
 	/**
@@ -2093,7 +2110,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	 * @param pieceIdx is the piece number to show
 	 */
 	function setVisiblePiece(pieceDivs, pieceIdx) {
-		for (let i = 0; i < pieces.length; i++) {
+		for (var i = 0; i < pieces.length; i++) {
 			if (i === pieceIdx) pieceDivs[i].removeClass("hidden");
 			else pieceDivs[i].addClass("hidden");
 		}
@@ -2115,7 +2132,7 @@ inheritsFrom(ExportController, DivController);
 function SecurityCheckController(div) {
 	DivController.call(this, div);
 	
-	const LOOP_TIME = 3000;
+	var LOOP_TIME = 3000;
 	
 	this.render = function(onDone) {
 		div.empty();
@@ -2174,7 +2191,7 @@ function SecurityCheckController(div) {
 		}
 		
 		function getSecurityCheckDiv(img, text) {
-			let div = $("<div class='security_check_div'>");
+			var div = $("<div class='security_check_div'>");
 			div.append(img);
 			img.css("margin-right", "10px");
 			img.css("width", "32px");
