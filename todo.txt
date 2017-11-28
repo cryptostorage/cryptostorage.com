@@ -26,6 +26,7 @@ homepage design with 8 supported currencies
 multi-select currencies and quick generate
 split lines less steep
 forward bitcoin cash logo
+show passphrase left aligned on some browsers
 
 low priority:
 wait for images before loading homepage
