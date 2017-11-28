@@ -1,16 +1,14 @@
 TODO
-test CryptoUtils.generateKeys() including without window.crypto to test error
-disable generate if not local and no internet connection
+don't confirm close on imported storage
+if critical error (unsupported browser, remote + no internet, etc): disable recover, disable generate, don't render qr
+test CryptoUtils.generateKeys() + test if error happens
 form validation
 import/export design
 homepage
 faq
-wait for images before loading homepage
 run minimum tests when site accessed
 todos throughout code
 minimize initial dependencies: condense files to single files, lazy load css
-don't confirm close on imported storage
-handle unsupported browsers missing methods: bip38 .fill(), qrcode UInt8Array.write()
 
 design:
 export controller progress design, initial and re-render
@@ -29,6 +27,7 @@ split lines less steep
 forward bitcoin cash logo
 
 low priority:
+wait for images before loading homepage
 <ie11 unsupported methods: bip38 .fill(), qrcode UInt8Array.write()
 save as txt and csv
 try all imported file / key combinations to recover
