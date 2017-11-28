@@ -32,7 +32,7 @@ var UiUtils = {
 		});
 	},
 	
-	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit) {
 		
 		var dependencies = [
 			"lib/jquery-3.2.1.js",
@@ -61,7 +61,7 @@ var UiUtils = {
 		
 		// open tab
 		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
-		  window.exportToBody(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs);
+		  window.exportToBody(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit);
 			window.focus();
 		});
 	}
@@ -327,7 +327,7 @@ function HomeController(div) {
 		div.append($("<img width=750px src='img/print_sample.png'>"));
 		
 		function onCurrencyClicked(plugin) {
-			UiUtils.openStorage(plugin.getName() + " Storage", null, getKeyGenConfig(plugin)); 
+			UiUtils.openStorage(plugin.getName() + " Storage", null, getKeyGenConfig(plugin), null, null, null, true); 
 		}
 		
 		function getKeyGenConfig(plugin) {
@@ -690,7 +690,7 @@ function FormController(div) {
 	
 	// handle when generate button clicked
 	function onGenerate(onDone) {
-		UiUtils.openStorage("Export Storage", null, getConfig());
+		UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
 		if (onDone) onDone();
 	}
 	
@@ -1057,7 +1057,7 @@ function RecoverFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openStorage("Imported Storage", getImportedPieces(), null, keys);
+					UiUtils.openStorage("Imported Storage", getImportedPieces(), null, keys, null, null, false);
 				});
 			});
 		} else {
@@ -1071,7 +1071,7 @@ function RecoverFileController(div) {
 		var viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Keys");
 		viewDecrypted.click(function() {
-			UiUtils.openStorage("Imported Storage", importedPieces, null, keys, pieces, pieceDivs);
+			UiUtils.openStorage("Imported Storage", importedPieces, null, keys, pieces, pieceDivs, false);
 		});
 	}
 	
@@ -1206,7 +1206,7 @@ function RecoverFileController(div) {
 				
 				// add control to view pieces
 				addControl("view imported pieces", function() {
-					UiUtils.openStorage("Imported Storage", null, null, null, pieces);
+					UiUtils.openStorage("Imported Storage", null, null, null, pieces, null, false);
 				});
 				
 				// attempt to get keys
@@ -1457,7 +1457,7 @@ function RecoverTextController(div, plugins) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted key", function() {
-					UiUtils.openStorage("Imported Storage", null, null, keys);
+					UiUtils.openStorage("Imported Storage", null, null, keys, null, null, false);
 				});
 			});
 		} else {
@@ -1471,7 +1471,7 @@ function RecoverTextController(div, plugins) {
 		var viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Key");
 		viewDecrypted.click(function() {
-			UiUtils.openStorage("Imported Storage", null, null, keys, pieces, pieceDivs);
+			UiUtils.openStorage("Imported Storage", null, null, keys, pieces, pieceDivs, false);
 		});
 	}
 	
@@ -1867,19 +1867,10 @@ inheritsFrom(TwoTabController, DivController);
  * @param keys are keys to generate pieces from
  * @param pieces are pieces to export and generate pieceDivs from
  * @param pieceDivs are pre-generated piece divs ready for display
+ * @param confirmExit specifies if the window should confirm exit if not saved or printed
  */
-function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
+function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, confirmExit) {
 	DivController.call(this, div);
-	
-	// TODO: re-enable confirm to close
-//	// check if storage saved before window closed
-//	window.addEventListener("beforeunload", function (e) {
-//		if (!saved) {
-//		  var confirmationMessage = "Your storage has not been saved or printed.";
-//		  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
-//		  return confirmationMessage;     												// Webkit, Safari, Chrome
-//		}               
-//	});
 	
 	// global variables
 	var saved = false;
@@ -1892,6 +1883,17 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	var paginator;
 	var piecesDiv;
 	var printEnabled;
+	
+	// confirm exit if storage not saved or printed
+	if (confirmExit) {
+		window.addEventListener("beforeunload", function (e) {
+			if (!saved) {
+			  var confirmationMessage = "Your storage has not been saved or printed.";
+			  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
+			  return confirmationMessage;     												// Webkit, Safari, Chrome
+			}               
+		});
+	}
 	
 	this.render = function(onDone) {
 		div.empty();

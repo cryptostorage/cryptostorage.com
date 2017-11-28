@@ -9,8 +9,9 @@
  * @param keys are keys to generate pieces from
  * @param pieces are pieces to export and generate pieceDivs from
  * @param pieceDivs are pre-generated piece divs ready for display
+ * @param confirmExit specifies if the window should confirm exit if not saved or printed
  */
-window.exportToBody = function(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs) {
+window.exportToBody = function(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit) {
 	
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;
@@ -33,9 +34,9 @@ window.exportToBody = function(window, importedPieces, keyGenConfig, keys, piece
 	
 	// handle two tabs with split and reconstituted pieces
 	if (importedPieces && importedPieces.length > 1) {
-		new ExportController($("<div>").appendTo(container), window, null, null, importedPieces).render(function(tab1) {
+		new ExportController($("<div>").appendTo(container), window, null, null, importedPieces, null, confirmExit).render(function(tab1) {
 			var tabName2 = keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
-			new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab2) {
+			new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs, confirmExit).render(function(tab2) {
 				container.detach();
 				container.children().detach();
 				renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
@@ -45,7 +46,7 @@ window.exportToBody = function(window, importedPieces, keyGenConfig, keys, piece
 	
 	// handle one tab
 	else {
-		new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs).render(function(tab1) {
+		new ExportController($("<div>").appendTo(container), window, keyGenConfig, keys, pieces, pieceDivs, confirmExit).render(function(tab1) {
 			container.detach();
 			container.children().detach();
 			renderExportTabs(body, null, tab1);
