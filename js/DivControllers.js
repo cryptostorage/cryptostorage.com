@@ -182,8 +182,10 @@ function AppController(div) {
 	this.showHome = function() {
 		if (DEBUG) console.log("showHome()");
 		sliderDiv.show();
-		sliderController.render(function(div) {
-			setContentDiv(homeController.getDiv());
+		sliderController.render(function() {
+			homeController.render(function(div) {
+				setContentDiv(div);
+			});
 		});
 	}
 	

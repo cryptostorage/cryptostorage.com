@@ -269,8 +269,6 @@ ol {
 	justify-content : center;
 	padding: 20px 0px 20px 0px;
 	width: 200px;
-	-ms-flex-pack: center;
-	justify-content: center;
 }
 
 .currency_row_item_minor:hover {
