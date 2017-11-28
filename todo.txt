@@ -1,5 +1,4 @@
 TODO
-re-order currencies
 don't confirm close on imported storage
 if critical error (unsupported browser, remote + no internet, etc): disable recover, disable generate, don't render qr
 test CryptoUtils.generateKeys() + test if error happens
@@ -28,6 +27,7 @@ split lines less steep
 forward bitcoin cash logo
 show passphrase left aligned on some browsers
 tip address
+ability to re-hide more currencies on home?
 
 low priority:
 wait for images before loading homepage
