@@ -20,6 +20,17 @@ window.exportToBody = function(window, importedPieces, keyGenConfig, keys, piece
 	var container = $("<div>").appendTo(body);
 	container.hide();
 	
+	// clone piece divs because IE cannot transfer elements across windows
+	if (pieceDivs) {
+		var clonedDivs = [];
+		for (var i = 0; i < pieceDivs.length; i++) {
+			var clonedDiv = $("<div>", window.document);
+			clonedDiv[0].innerHTML = pieceDivs[i][0].outerHTML;
+			clonedDivs.push(clonedDiv);
+		}
+		pieceDivs = clonedDivs;
+	}
+	
 	// handle two tabs with split and reconstituted pieces
 	if (importedPieces && importedPieces.length > 1) {
 		new ExportController($("<div>").appendTo(container), window, null, null, importedPieces).render(function(tab1) {

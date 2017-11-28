@@ -49,7 +49,6 @@ var UiUtils = {
 			"js/CryptoPlugins.js",
 			"js/CryptoKey.js",
 			"js/DependencyLoader.js",
-			"lib/b64-images.js",
 			"lib/jquery-csv.js",
 			"lib/qrcode.js",
 			"lib/jszip.js",
@@ -248,10 +247,10 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
 		var sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
 		getSlide($("<img src='img/mix.png'>"), "Generate secure storage for multiple cryptocurrencies.").appendTo(sliderDiv);
-		getSlide($("<img src='img/security.png'>"), "Keys are generated in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces.").appendTo(sliderDiv);
-		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats for long term storage.").appendTo(sliderDiv);
 		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
+		getSlide($("<img src='img/security.png'>"), "Keys are generated in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
+		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats for long term storage.").appendTo(sliderDiv);
+		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:3500});
 		
 		function getSlide(img, text) {
@@ -1091,21 +1090,21 @@ function RecoverFileController(div) {
 						onNamedPieces(null, null);
 					}
 					else if (namedPieces.length === 0) {
-						if (file.type === "application/json") that.setWarning("File '" + file.name + "' is not a valid json piece");
-						else if (file.type === "application/zip") that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
+						if (isJsonFile(file)) that.setWarning("File '" + file.name + "' is not a valid json piece");
+						else if (isZipFile(file)) that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
 						onNamedPieces(null, namedPieces);
 					}
 				});
 			}
-			if (file.type === 'application/json') reader.readAsText(file);
-			else if (file.type === 'application/zip') reader.readAsArrayBuffer(file);
+			if (isJsonFile(file)) reader.readAsText(file);
+			else if (isZipFile(file)) reader.readAsArrayBuffer(file);
 			else that.setWarning("'" + file.name + "' is not a zip or json file");
 		}
 		
 		function getNamedPiecesFromFile(file, data, onNamedPieces) {
-			if (file.type === 'application/json') {
+			if (isJsonFile(file)) {
 				var piece;
 				try {
 					piece = JSON.parse(data);
@@ -1115,7 +1114,7 @@ function RecoverFileController(div) {
 				var namedPiece = {name: file.name, piece: piece};
 				onNamedPieces(null, [namedPiece]);
 			}
-			else if (file.type === 'application/zip') {
+			else if (isZipFile(file)) {
 				LOADER.load("lib/jszip.js", function() {
 					CryptoUtils.zipToPieces(data, function(namedPieces) {
 						onNamedPieces(null, namedPieces);
@@ -1850,14 +1849,15 @@ inheritsFrom(TwoTabController, DivController);
 function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	DivController.call(this, div);
 	
-	// check if storage saved before window closed
-	window.addEventListener("beforeunload", function (e) {
-		if (!saved) {
-		  var confirmationMessage = "Your storage has not been saved or printed.";
-		  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
-		  return confirmationMessage;     												// Webkit, Safari, Chrome
-		}               
-	});
+	// TODO: re-enable confirm to close
+//	// check if storage saved before window closed
+//	window.addEventListener("beforeunload", function (e) {
+//		if (!saved) {
+//		  var confirmationMessage = "Your storage has not been saved or printed.";
+//		  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
+//		  return confirmationMessage;     												// Webkit, Safari, Chrome
+//		}               
+//	});
 	
 	// global variables
 	var saved = false;

@@ -115,7 +115,7 @@ var PieceRenderer = {
 				if (piece.pieceNum || config.showCryptostorageLogos) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
-					if (config.showCryptostorageLogos) headerDiv.append($("<img class='piece_page_header_logo' src='" + getImageData("CRYPTOSTORAGE") + "'>"));
+					if (config.showCryptostorageLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
 					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
 					if (piece.pieceNum) pieceNumDiv.append("Piece " + piece.pieceNum);
 				}
@@ -128,7 +128,9 @@ var PieceRenderer = {
 			var title = "#" + (i + 1);
 			var leftLabel = "\u25C4 Public Address";
 			var leftValue = config.showPublic ? piece.keys[i].address : null;
-			var logo = $("<img width=100% height=100% src='" + getImageData(piece.keys[i].ticker) + "'>");
+			var logo = plugin.getLogo();
+			logo.attr("width", "100%");
+			logo.attr("height", "100%");
 			var logoLabel = plugin.getName();
 			var rightLabel = "Private Key" + (piece.pieceNum ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			var rightValue = config.showPrivate ? piece.keys[i].wif : null;
@@ -217,7 +219,7 @@ var PieceRenderer = {
 					addPrivateQr();
 				});
 			} else {
-				keyDivLeft.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>"));
+				keyDivLeft.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>"));
 				addPrivateQr();
 			}
 			function addPrivateQr() {
@@ -228,7 +230,7 @@ var PieceRenderer = {
 						onDone();
 					});
 				} else {
-					keyDivRight.append($("<img src='" + getImageData("QUESTION_MARK") + "' class='key_div_qr_omitted'>"));
+					keyDivRight.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>"));
 					onDone();
 				}
 			}

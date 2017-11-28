@@ -48,11 +48,6 @@ var Tests = {
 		dependencies = arrUnique(dependencies);
 		LOADER.load(dependencies, function() {
 			
-			// verify each plugin has logo data
-			for (var i = 0; i < CryptoUtils.getCryptoPlugins().length; i++) {
-				getImageData(CryptoUtils.getCryptoPlugins()[i].getTicker());	// throws exception if not found
-			}
-			
 			// run tests
 			testUtils();
 			testFileImport(plugins, function() {
