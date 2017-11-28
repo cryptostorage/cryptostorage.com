@@ -302,9 +302,22 @@ function HomeController(div) {
 		var moreDiv = null;
 		for (var i = 3; i < plugins.length; i += 4) {
 			var row = getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked);
-			if (i >= 7 && !moreDiv) moreDiv = $("<div>").appendTo(div);
+			if (i >= 7 && !moreDiv) {
+				moreDiv = $("<div>").appendTo(div);
+				moreDiv.hide();
+			}
 			if (moreDiv) moreDiv.append(row);
 			else div.append(row);
+		}
+		
+		// add more div
+		if (moreDiv) {
+			var moreLabel = $("<div class='home_more_label'>").appendTo(div);
+			moreLabel.append("and " + (plugins.length - 7) + " more...");
+			moreLabel.click(function() {
+				moreLabel.hide();
+				moreDiv.show();
+			});
 		}
 		
 		// sample page

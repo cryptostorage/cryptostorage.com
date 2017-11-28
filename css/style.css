@@ -208,10 +208,11 @@ ol {
 	-webkit-align-items: center;
 	-ms-flex-align: center;
 	align-items: center;
-	padding-top: 35px;
+	padding-top: 40px;
 }
 
 .home_label {
+	font-size:24px;
 	font-weight: bold;
 	margin-bottom: 20px;
 }
@@ -295,6 +296,16 @@ ol {
 
 .currency_row_label_minor {
 	font-size: 20px;
+}
+
+.home_more_label {
+	margin-top:10px;
+	color:blue;
+}
+
+.home_more_label:hover {
+	cursor: pointer;
+	text-decoration:underline;
 }
 
 input[type='number'] {
@@ -502,6 +513,7 @@ input[type='checkbox'] {
 
 .add_currency_span:hover {
 	cursor: pointer;
+	text-decoration:underline;
 }
 
 .generate_div {
