@@ -299,8 +299,12 @@ function HomeController(div) {
 		div.append("<div class='home_label'>Supports these popular cryptocurrencies</div>");
 		var plugins = CryptoUtils.getCryptoPlugins();
 		div.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
+		var moreDiv = null;
 		for (var i = 3; i < plugins.length; i += 4) {
-			div.append(getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked));
+			var row = getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked);
+			if (i >= 7 && !moreDiv) moreDiv = $("<div>").appendTo(div);
+			if (moreDiv) moreDiv.append(row);
+			else div.append(row);
 		}
 		
 		// sample page

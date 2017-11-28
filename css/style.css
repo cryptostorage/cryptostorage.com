@@ -266,8 +266,8 @@ ol {
 	align-items: center;
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
-	padding: 20px;
-	width: 195px;
+	padding: 20px 0px 20px 0px;
+	width: 200px;
 	-ms-flex-pack: center;
 	justify-content: center;
 }
