@@ -1850,14 +1850,15 @@ inheritsFrom(TwoTabController, DivController);
 function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs) {
 	DivController.call(this, div);
 	
-	// check if storage saved before window closed
-	window.addEventListener("beforeunload", function (e) {
-		if (!saved) {
-		  var confirmationMessage = "Your storage has not been saved or printed.";
-		  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
-		  return confirmationMessage;     												// Webkit, Safari, Chrome
-		}               
-	});
+	// TODO: re-enable confirm to close
+//	// check if storage saved before window closed
+//	window.addEventListener("beforeunload", function (e) {
+//		if (!saved) {
+//		  var confirmationMessage = "Your storage has not been saved or printed.";
+//		  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
+//		  return confirmationMessage;     												// Webkit, Safari, Chrome
+//		}               
+//	});
 	
 	// global variables
 	var saved = false;
