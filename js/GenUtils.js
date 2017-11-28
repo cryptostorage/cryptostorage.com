@@ -462,10 +462,23 @@ String.prototype.replaceAt=function(idx, replacement) {
 
 /**
  * Polyfill str.startsWith(searchString, position).
+ * 
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith#Polyfill
  */
 String.prototype.startsWith = function(searchString, position) {
   return this.substr(position || 0, searchString.length) === searchString;
 };
+
+/**
+ * Polyfill str.endsWith(searchString, position).
+ * 
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith#Polyfill
+ */
+String.prototype.endsWith = function(searchStr, position) {
+	if (!(position < this.length)) position = this.length;	// works better than >= because it compensates for NaN
+	else position |= 0;	// round position
+	return this.substr(position - searchStr.length, searchStr.length) === searchStr;
+}
 
 /**
  * Removes the given value from the array.
@@ -750,4 +763,24 @@ function isImageAccessible(url, timeout, onDone) {
   	if (typeof e === 'undefined' || e.type === "error") onDone(false);
   	else onDone(true);
   }
+}
+
+/**
+ * Determines if the given file is a zip file.
+ * 
+ * @param file is a file
+ * @returns true if the given file is a zip file, false otherwise
+ */
+function isZipFile(file) {
+	return file.name.endsWith(".zip") || file.type === 'application/zip';
+}
+
+/**
+ * Determines if the given file is a json file.
+ * 
+ * @param file is a file
+ * @returns true if the given file is a json file, false otherwise
+ */
+function isJsonFile(file) {
+	return file.name.endsWith(".json") || file.type === 'application/json';
 }

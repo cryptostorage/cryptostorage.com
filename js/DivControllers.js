@@ -1091,21 +1091,21 @@ function RecoverFileController(div) {
 						onNamedPieces(null, null);
 					}
 					else if (namedPieces.length === 0) {
-						if (file.type === "application/json") that.setWarning("File '" + file.name + "' is not a valid json piece");
-						else if (file.type === "application/zip") that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
+						if (isJsonFile(file)) that.setWarning("File '" + file.name + "' is not a valid json piece");
+						else if (isZipFile(file)) that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
 						onNamedPieces(null, namedPieces);
 					}
 				});
 			}
-			if (file.type === 'application/json') reader.readAsText(file);
-			else if (file.type === 'application/zip') reader.readAsArrayBuffer(file);
+			if (isJsonFile(file)) reader.readAsText(file);
+			else if (isZipFile(file)) reader.readAsArrayBuffer(file);
 			else that.setWarning("'" + file.name + "' is not a zip or json file");
 		}
 		
 		function getNamedPiecesFromFile(file, data, onNamedPieces) {
-			if (file.type === 'application/json') {
+			if (isJsonFile(file)) {
 				var piece;
 				try {
 					piece = JSON.parse(data);
@@ -1115,7 +1115,7 @@ function RecoverFileController(div) {
 				var namedPiece = {name: file.name, piece: piece};
 				onNamedPieces(null, [namedPiece]);
 			}
-			else if (file.type === 'application/zip') {
+			else if (isZipFile(file)) {
 				LOADER.load("lib/jszip.js", function() {
 					CryptoUtils.zipToPieces(data, function(namedPieces) {
 						onNamedPieces(null, namedPieces);
