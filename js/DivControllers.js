@@ -49,7 +49,6 @@ var UiUtils = {
 			"js/CryptoPlugins.js",
 			"js/CryptoKey.js",
 			"js/DependencyLoader.js",
-			"lib/b64-images.js",
 			"lib/jquery-csv.js",
 			"lib/qrcode.js",
 			"lib/jszip.js",
