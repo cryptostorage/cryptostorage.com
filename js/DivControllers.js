@@ -298,9 +298,9 @@ function HomeController(div) {
 		// supported currencies
 		div.append("<div class='home_label'>Supports these popular cryptocurrencies</div>");
 		var plugins = CryptoUtils.getCryptoPlugins();
-		div.append(getCurrencyRow(plugins.slice(0, 4), true, onCurrencyClicked));
-		for (var i = 4; i < plugins.length; i += 4) {
-			div.append(getCurrencyRow(plugins.slice(i, i + 4), true, onCurrencyClicked));
+		div.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
+		for (var i = 3; i < plugins.length; i += 4) {
+			div.append(getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked));
 		}
 		
 		// sample page

@@ -244,8 +244,7 @@ ol {
 	justify-content : center;
 	padding: 20px;
 	width: 200px;
-	-ms-flex-pack: center;
-	justify-content: center;
+	font-weight:bold;
 }
 
 .currency_row_item_major:hover {
@@ -267,9 +266,8 @@ ol {
 	align-items: center;
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
-	padding: 10px;
+	padding: 20px;
 	width: 195px;
-	height: 195px;
 	-ms-flex-pack: center;
 	justify-content: center;
 }
@@ -280,8 +278,8 @@ ol {
 }
 
 .currency_row_logo_major {
-	width: 100px;
-	height: 100px;
+	width: 125px;
+	height: 125px;
 	margin: 0 15px 15px 15px;
 }
 
