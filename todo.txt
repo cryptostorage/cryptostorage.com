@@ -16,7 +16,7 @@ start over button on form
 start with all currencies on form
 bip38 checkboxes on form
 security checks: window.crypto, local, live connection, open source browser
-ability to encrypt / decrypton export page?
+ability to encrypt / decrypt on export page?
 print progress
 homepage scale too big on small screens?
 light blue little bit ligher / brighter
