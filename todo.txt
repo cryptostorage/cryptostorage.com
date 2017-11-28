@@ -27,6 +27,7 @@ multi-select currencies and quick generate
 split lines less steep
 forward bitcoin cash logo
 show passphrase left aligned on some browsers
+tip address
 
 low priority:
 wait for images before loading homepage

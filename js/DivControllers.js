@@ -435,6 +435,11 @@ function DonateController(div, appController) {
 				titleDiv.html("Credits");
 				var credits = [];
 				credits.push({
+					logo: CryptoUtils.getCryptoPlugin("ETH").getLogo(),
+					label: "website designer",
+					value: "0x5735bb7cec965e58d03dddd167d1f27321878c51"
+				});
+				credits.push({
 					logo: CryptoUtils.getCryptoPlugin("BTC").getLogo(),
 					label: "bitaddress.org",
 					value: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
