@@ -1048,7 +1048,7 @@ var AppUtils = {
 			
 			// determine if open source
 			if (arrContains(OPEN_SOURCE_BROWSERS, browserName)) return true;
-			if (arrContains(CLOSED_SOURCE_BROWSERES, browserName)) return false;
+			if (arrContains(CLOSED_SOURCE_BROWSERS, browserName)) return false;
 			return null;
 		}
 		
