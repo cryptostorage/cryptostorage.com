@@ -1146,7 +1146,7 @@ var AppUtils = {
 		
 		// check if remote and not online
 		if (!info.isLocal && !info.isOnline) {
-			checks.push({state: "fail", message: "Internet required because application is not running locally"});
+			checks.push({state: "fail", message: "Internet is required because application is not running locally"});
 		}
 		
 		// check open source browser
@@ -1159,17 +1159,13 @@ var AppUtils = {
 		if (info.os.isOpenSource) checks.push({state: "pass", message: "Operating system is open source (" + info.os.name + ")"});
 		else checks.push({state: "warn", message: "Operating system is not open source (" + info.os.name + ")"});
 		
-		// check online and local separately
-		if (!(!info.isLocal && !info.isOnline)) {
-			
-			// check if online
-			if (!info.isOnline) checks.push({state: "pass", message: "No internet connection"});
-			else checks.push({state: "warn", message: "Internet connection is active"});
-			
-			// check if local
-			if (info.isLocal) checks.push({state: "pass", message: "Application is running locally"});
-			else checks.push({state: "warn", message: "Application is not running locally"});
-		}
+		// check if local
+		if (info.isLocal) checks.push({state: "pass", message: "Application is running locally"});
+		else checks.push({state: "warn", message: "Application is not running locally"});
+		
+		// check if online
+		if (!info.isOnline) checks.push({state: "pass", message: "No internet connection"});
+		else checks.push({state: "warn", message: "Internet connection is active"});
 		
 		return checks;
 	}

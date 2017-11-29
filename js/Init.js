@@ -9,6 +9,9 @@ $(document).ready(function() {
 	// delete window.crypto for testing
 	if (DELETE_WINDOW_CRYPTO) delete window.crypto;
 	
+	// render application to html body
+	new AppController($("body")).render();
+	
 	// start loading common dependencies
 	LOADER.load(APP_DEPENDENCIES);
 	
@@ -21,6 +24,9 @@ $(document).ready(function() {
 		});
 	}
 	
-	// render application to html body
-	new AppController($("body")).render();
+	// pre-load some images
+	$("<img src='img/xmark_small.png'>");
+	$("<img src='img/warning_orange.png>");
+	$("<img src='img/checkmark_small.png>");
+	$("<img src='img/trash.png>");
 });
