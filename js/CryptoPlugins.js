@@ -508,11 +508,11 @@ function ZcashPlugin() {
 		// create key if not given
 		if (!str) str = new zcashcore.PrivateKey().toString();		
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		let state = {};
+		var state = {};
 		
 		// unencrypted
 		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// TODO: zcashcore says 'ab' is valid ... ?
-			let key = new zcashcore.PrivateKey(str);
+			var key = new zcashcore.PrivateKey(str);
 			state.hex = key.toString();
 			state.wif = key.toWIF();
 			state.address = key.toAddress().toString();

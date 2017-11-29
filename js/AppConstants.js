@@ -29,7 +29,7 @@ var OPEN_SOURCE_OPERATING_SYSTEMS = [
 	"Plan9", "VectorLinux", "Zenwalk"
 ];
 var CLOSED_SOURCE_OPERATING_SYSTEMS = [
-	"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS X", "Macintosh", "Mac", "iOS",
+	"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS", "Mac OS X", "Macintosh", "Mac", "iOS",
 	"Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile", "AIX", "Amiga OS", "Bada",
 	"BeOS", "BlackBerry", "Hurd", "Linpus", "Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS",
 	"Sailfish", "Series40", "Solaris", "Symbian", "WebOS"

@@ -1021,15 +1021,14 @@ var AppUtils = {
 		var parser = new UAParser();
 		var result = parser.getResult();
 		
-		// check for chromium
-		var browserName = result.browser.name;
-		if (browserName === "Chrome" && !isChrome()) browserName = "Chromium";
-		
 		// build info and return
 		var info = {};
-		info.name = browserName;
-		info.version = null;	// TODO;
-		info.windowCryptoExists = window.crytpo ? true : false;
+		info.name = result.browser.name;
+		if (info.name === "Chrome" && !isChrome()) info.name = "Chromium";	// check for chromium
+		info.version = result.browser.version;
+		info.major = Number(result.browser.major);
+		info.isOpenSource = isOpenSourceBrowser(info.name);
+		info.windowCryptoExists = window.crypto ? true : false;
 		info.isSupported = isSupportedBrowser(info);
 		return info;
 		
@@ -1054,9 +1053,10 @@ var AppUtils = {
 		}
 		
 		// determines if the browser is supported
-		function isBrowserSupported(browserInfo) {
+		function isSupportedBrowser(browserInfo) {
 			if (!browserInfo.windowCryptoExists) return false;
-			throw Error("Not implemented");
+			if (browserInfo.name === "IE" && browserInfo.major < 11) return false;
+			return true;
 		}
 	},
 	
@@ -1081,7 +1081,7 @@ var AppUtils = {
 		// build and return response
 		var info = {};
 		info.name = result.os.name;
-		info.version = null;	// TODO;
+		info.version = result.os.version;
 		info.isOpenSource = isOpenSourceOs(info);
 		return info;
 		
@@ -1122,19 +1122,55 @@ var AppUtils = {
 	 * Requires lib/ua-parser.js to be loaded.
 	 */
 	getEnvironmentInfo: function(onDone) {
-		var environment = {};
-		environment.browser = AppUtils.getBrowserInfo();
-		environment.os = AppUtils.getOperatingSystemInfo();
-		environment.isLocal = AppUtils.isLocal();
+		var info = {};
+		info.browser = AppUtils.getBrowserInfo();
+		info.os = AppUtils.getOsInfo();
+		info.isLocal = AppUtils.isLocal();
 		AppUtils.isOnline(function(online) {
-			environment.isOnline = online;
-			environment.checks = getEnvironmentChecks(environment);
+			info.isOnline = online;
+			onDone(info);
 		});
+	},
+	
+	/**
+	 * Interprets the given environment info and returns pass/fail/warn checks.
+	 * 
+	 * @param info is output from getEnvironmentInfo()
+	 * @returns [{state: "pass|fail|warn", message: "..."}, ...]
+	 */
+	getEnvironmentChecks: function(info) {
+		var checks = [];
 		
-		function getEnvironmentChecks(info) {
-			var checks = [];
-			
-			// 	TODO: compose pass, fail, warn with messages here.
+		// check if browser supported
+		if (!info.browser.isSupported) checks.push({state: "fail", message: "Browser is not supported (" + info.browser.name + " " + info.browser.version + ")"});
+		
+		// check if remote and not online
+		if (!info.isLocal && !info.isOnline) {
+			checks.push({state: "fail", message: "Internet required because application is not running locally"});
 		}
+		
+		// check open source browser
+		if (info.browser.isSupported) {
+			if (info.browser.isOpenSource) checks.push({state: "pass", message: "Browser is open source (" + info.browser.name + ")"});
+			else checks.push({state: "warn", message: "Browser is not open source (" + info.browser.name + ")"});
+		}
+		
+		// check open source os
+		if (info.os.isOpenSource) checks.push({state: "pass", message: "Operating system is open source (" + info.os.name + ")"});
+		else checks.push({state: "warn", message: "Operating system is not open source (" + info.os.name + ")"});
+		
+		// check online and local separately
+		if (!(!info.isLocal && !info.isOnline)) {
+			
+			// check if online
+			if (!info.isOnline) checks.push({state: "pass", message: "No internet connection"});
+			else checks.push({state: "warn", message: "Internet connection is active"});
+			
+			// check if local
+			if (info.isLocal) checks.push({state: "pass", message: "Application is running locally"});
+			else checks.push({state: "warn", message: "Application is not running locally"});
+		}
+		
+		return checks;
 	}
 }

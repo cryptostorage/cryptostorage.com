@@ -675,9 +675,9 @@ function FormController(div) {
 		var warningDiv = $("<div class='red_warning'>").appendTo(div);
 		warningDiv.append("Under Development: Not Ready for Use");
 		
-		// security checks
-		var securityDiv = $("<div>").appendTo(div);
-		new SecurityCheckController(securityDiv).render();
+		// environment checks
+		var environmentDiv = $("<div>").appendTo(div);
+		new EnvironmentCheckController(environmentDiv).render();
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -2151,73 +2151,43 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 inheritsFrom(ExportController, DivController);
 
 /**
- * Controls security checks.
+ * Controls environment checks.
  * 
  * @param div is the div to render to
  */
-function SecurityCheckController(div) {
+function EnvironmentCheckController(div) {
 	DivController.call(this, div);
 	
 	var LOOP_TIME = 3000;
 	
 	this.render = function(onDone) {
 		div.empty();
-		div.addClass("security_checks_div");
+		div.addClass("environment_checks_div");
 		
 		// loading
 		div.append("Loading...");
 		
-		// loop security checks
-		updateSecurityChecks();
-		function updateSecurityChecks() {
-			AppUtils.getSecurityChecks(function(securityChecks) {
-				renderSecurityChecks(securityChecks);
+		// loop environment checks
+		updateEnvironmentChecks();
+		function updateEnvironmentChecks() {
+			AppUtils.getEnvironmentInfo(function(info) {
+				renderEnvironmentChecks(AppUtils.getEnvironmentChecks(info));
 			});
-			setTimeout(updateSecurityChecks, LOOP_TIME);
+			setTimeout(updateEnvironmentChecks, LOOP_TIME);
 		}
 	}
 	
-	//render updated security checks
-	function renderSecurityChecks(securityChecks) {
+	// render updated environment checks
+	function renderEnvironmentChecks(checks) {
 		div.empty();
-		
-		// window.crypto
-		if (securityChecks.windowCryptoExists) {
-			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "window.crypto exists"));
-		} else {
-			div.append(getSecurityCheckDiv($("<img src='img/xmark_small.png'>"), "window.crypto does not exist"));
+		for (var i = 0; i < checks.length; i++) {
+			var check = checks[i];
+			var img = check.state === "pass" ? $("<img src='img/checkmark_small.png'>") : check.state === "warn" ? $("<img src='img/warning_orange.png'>") : $("<img src='img/xmark_small.png'>");
+			div.append(getEnvironmentCheckDiv(img, check.message));
 		}
 		
-		// is on domain
-		if (securityChecks.isLocal) {
-			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "running local"));
-		} else {
-			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "not running locally"));
-		}
-		
-		// is online
-		if (securityChecks.isOnline) {
-			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "active internet connection"));
-		} else {
-			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "no internet connection"));
-		}
-		
-		// open source browser
-		if (securityChecks.isOpenSourceBrowser) {
-			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "browser is open source (" + securityChecks.browser + ")"));
-		} else {
-			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "browser is not open source (" + securityChecks.browser + ")"));
-		}
-		
-		// open source operating system
-		if (securityChecks.isOpenSourceOs) {
-			div.append(getSecurityCheckDiv($("<img src='img/checkmark_small.png'>"), "operating system is open source (" + securityChecks.os + ")"));
-		} else {
-			div.append(getSecurityCheckDiv($("<img src='img/warning_orange.png'>"), "operating system is not open source (" + securityChecks.os + ")"));
-		}
-		
-		function getSecurityCheckDiv(img, text) {
-			var div = $("<div class='security_check_div'>");
+		function getEnvironmentCheckDiv(img, text) {
+			var div = $("<div class='environment_check_div'>");
 			div.append(img);
 			img.css("margin-right", "10px");
 			img.css("width", "32px");
@@ -2226,4 +2196,4 @@ function SecurityCheckController(div) {
 		}
 	}
 }
-inheritsFrom(SecurityCheckController, DivController);
+inheritsFrom(EnvironmentCheckController, DivController);

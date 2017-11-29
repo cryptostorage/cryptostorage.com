@@ -1338,11 +1338,11 @@ input[type='checkbox'] {
 	display: none;
 }
 
-.security_checks_div {
+.environment_checks_div {
 	border: solid;
 }
 
-.security_check_div {
+.environment_check_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
