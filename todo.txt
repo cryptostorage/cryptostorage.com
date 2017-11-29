@@ -1,6 +1,5 @@
 TODO
 if critical error (unsupported browser, remote + no internet, etc): disable recover, disable generate, don't render qr
-test CryptoUtils.generateKeys() + test if error happens
 form validation
 import/export design
 homepage
