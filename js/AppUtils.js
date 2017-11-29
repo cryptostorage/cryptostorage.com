@@ -1010,6 +1010,7 @@ var AppUtils = {
 	 * 	{
 	 * 		name: "...",
 	 * 		version: "...",
+	 * 		major: e.g. 57
 	 * 	 	windowCryptoExists: true|false,
 	 * 		isOpenSource: true|false,
 	 * 	  isSupported: true|false
