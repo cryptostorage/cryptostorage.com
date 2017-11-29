@@ -1118,6 +1118,8 @@ var AppUtils = {
 	
 	/**
 	 * Gets all environment info.
+	 * 
+	 * Requires lib/ua-parser.js to be loaded.
 	 */
 	getEnvironmentInfo: function(onDone) {
 		var environment = {};
@@ -1133,7 +1135,6 @@ var AppUtils = {
 			var checks = [];
 			
 			// 	TODO: compose pass, fail, warn with messages here.
-			
 		}
 	}
 }
