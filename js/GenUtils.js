@@ -395,14 +395,17 @@ function arrUnique(arr) {
 }
 
 /**
- * Converts each string in an array of strings to lowercase.
+ * Returns a copy of the given array where each element is lowercase.
  * 
- * @param arr is the array to convert elements to lower case
+ * @param arr is the array to convert to lowercase
+ * @returns a copy of the given array where each element is lowercase
  */
 function arrToLowerCase(arr) {
+	var arr2 = [];
 	for (var i = 0; i < arr.length; i++) {
-		arr[i] = arr[i].toLowerCase();
+		arr2.push(arr[i].toLowerCase());
 	}
+	return arr2;
 }
 
 /**

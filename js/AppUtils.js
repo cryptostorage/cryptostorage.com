@@ -1002,86 +1002,38 @@ var AppUtils = {
 	getWeightCreateKey: function() { return 63; },
 	
 	/**
-	 * Performs environment security checks.
+	 * Returns browser info.
 	 * 
-	 * @returns an object:
+	 * Requires lib/ua-parser.js to be loaded.
+	 * 
+	 * @returns
 	 * 	{
-	 * 		windowCryptoExists: bool,
-	 * 		isLocal: bool
-	 * 		isOnline: bool,
-	 * 	 	browser: str,
-	 * 		isOpenSourceBrowser: bool,
-	 * 		os: str,
-	 * 		isOpenSourceOs: bool
-	 *	}
+	 * 		name: "...",
+	 * 		version: "...",
+	 * 	 	windowCryptoExists: true|false,
+	 * 		isOpenSource: true|false,
+	 * 	  isSupported: true|false
+	 * 	}
 	 */
-	getSecurityChecks: function(onDone) {
+	getBrowserInfo: function() {
 		
-		// classify known open source and non open source browsers and operating systems
-		var openSourceBrowsers = [
-			"Firefox", "Chromium", "Tizen", "Epiphany", "K-Meleon", "SeaMonkey", "SlimerJS", "Arora", "Breach", "Camino",
-			"Electron", "Fennec", "Konqueror", "Midori", "PaleMoon", "Rekonq", "Sunrise", "Waterfox", "Amaya", "Bowser",
-			"Camino",
-		];
-		var nonOpenSourceBrowsers = [
-			"Chrome", "Chrome WebView", "Chrome Mobile", "Safari", "Opera", "Opera Mini", "Samsung Internet for Android",
-			"Samsung Internet", "Opera Coast", "Yandex Browser", "UC Browser", "Maxthon", "Puffin", "Sleipnir",
-			"Windows Phone", "Internet Explorer", "Microsoft Edge", "IE", "Vivaldi", "Sailfish", "Amazon Silk", "Silk",
-			"PhantomJS", "BlackBerry", "WebOS", "Bada", "Android", "iPhone", "iPad", "iPod", "Googlebot", "Adobe AIR", "Avant",
-			"Avant Browser", "Flock", "Galeon", "GreenBrowser", "iCab", "Lunascape", "Maxthon", "Nook Browser", "Raven",
-			"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
-			"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
-		];
-		var openSourceOperatingSystems = [
-			"Linux", "CentOS", "Debian", "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "Mint",
-			"OpenBSD", "RedHat", "Red Hat", "SuSE", "Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen",
-			"Chromium OS", "Contiki", "DragonFly", "GNU", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "PCLinuxOS",
-			"Plan9", "VectorLinux", "Zenwalk"
-		];
-		var nonOpenSourceOperatingSystems = [
-			"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS X", "Macintosh", "Mac", "iOS",
-			"Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile", "AIX", "Amiga OS", "Bada",
-			"BeOS", "BlackBerry", "Hurd", "Linpus", "Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS",
-			"Sailfish", "Series40", "Solaris", "Symbian", "WebOS"
-		];
+		// parse browser user agent
+		var parser = new UAParser();
+		var result = parser.getResult();
 		
-		// convert classifications to lowercase
-		arrToLowerCase(openSourceBrowsers);
-		arrToLowerCase(nonOpenSourceBrowsers);
-		arrToLowerCase(openSourceOperatingSystems);
-		arrToLowerCase(nonOpenSourceOperatingSystems);
-			
-		// determine if online by accessing remote image
-		isImageAccessible(ONLINE_IMAGE_URL, 1500, function(isOnline) {
-			
-			// load platform detection library
-			LOADER.load("lib/ua-parser.js", function() {
-				
-				// parse browser user agent
-				var parser = new UAParser();
-				var result = parser.getResult();
-				
-				// check for chromium
-				var browser = result.browser.name;
-				if (browser === "Chrome" && !isChrome()) browser = "Chromium";
-				
-				// build and return response
-				onDone({
-					windowCryptoExists: window.crypto ? true : false,
-					isLocal: isLocal(),
-					isOnline: isOnline,
-					browser: browser,
-					isOpenSourceBrowser: isOpenSourceBrowser(browser),
-					os: result.os.name,
-					isOpenSourceOs: isOpenSourceOs(result.os.name)
-				});
-			});
-		});
+		// check for chromium
+		var browserName = result.browser.name;
+		if (browserName === "Chrome" && !isChrome()) browserName = "Chromium";
 		
-		function isLocal() {
-			return window.location.href.indexOf("file://") > -1;
-		}
+		// build info and return
+		var info = {};
+		info.name = browserName;
+		info.version = null;	// TODO;
+		info.windowCryptoExists = window.crytpo ? true : false;
+		info.isSupported = isSupportedBrowser(info);
+		return info;
 		
+		// determines if chrome by checking for in-built PDF viewer
 		function isChrome() {
 			for (var i = 0; i < navigator.plugins.length; i++) {
 				if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
@@ -1089,26 +1041,99 @@ var AppUtils = {
 			return false;
 		}
 		
-		function isOpenSourceBrowser(name) {
+		// determines if browser is open source
+		function isOpenSourceBrowser(browserName) {
 			
-			// convert name to lower case
-			name = name.toLowerCase();
+			// get lowercase name
+			browserName = browserName.toLowerCase();
 			
 			// determine if open source
-			if (arrContains(openSourceBrowsers, name)) return true;
-			if (arrContains(nonOpenSourceBrowsers, name)) return false;
+			if (arrContains(OPEN_SOURCE_BROWSERS, browserName)) return true;
+			if (arrContains(CLOSED_SOURCE_BROWSERES, browserName)) return false;
 			return null;
 		}
 		
-		function isOpenSourceOs(name) {
+		// determines if the browser is supported
+		function isBrowserSupported(browserInfo) {
+			if (!browserInfo.windowCryptoExists) return false;
+			throw Error("Not implemented");
+		}
+	},
+	
+	/**
+	 * Returns operating system info.
+	 * 
+	 * Requires lib/ua-parser.js to be loaded.
+	 * 
+	 * @returns
+	 * 	{
+	 * 		name: "...",
+	 * 		version: "...",
+	 * 		isOpenSource: true|false
+	 * 	}
+	 */
+	getOsInfo: function() {
+		
+		// parse browser user agent
+		var parser = new UAParser();
+		var result = parser.getResult();
+		
+		// build and return response
+		var info = {};
+		info.name = result.os.name;
+		info.version = null;	// TODO;
+		info.isOpenSource = isOpenSourceOs(info);
+		return info;
+		
+		function isOpenSourceOs(osInfo) {
 			
-			// convert name to lower case
-			name = name.toLowerCase();
+			// get lowercase name
+			var name = osInfo.name.toLowerCase();
 			
 			// determine if open source
-			if (arrContains(openSourceOperatingSystems, name)) return true;
-			if (arrContains(nonOpenSourceOperatingSystems, name)) return false;
+			if (arrContains(OPEN_SOURCE_OPERATING_SYSTEMS, name)) return true;
+			if (arrContains(CLOSED_SOURCE_OPERATING_SYSTEMS, name)) return false;
 			return null;
+		}
+	},
+
+	/**
+	 * Determines if this app is running locally or from a remote domain.
+	 * 
+	 * @returns true if running local, false otherwise
+	 */
+	isLocal: function() {
+		return window.location.href.indexOf("file://") > -1;
+	},
+	
+	/**
+	 * Determines if this app has an internet connection.
+	 * 
+	 * @param isOnline(true|false) is invoked when connectivity is determined
+	 * @returns true if this app is online, false otherwise
+	 */
+	isOnline: function(isOnline) {
+		isImageAccessible(ONLINE_IMAGE_URL, 1500, isOnline);
+	},
+	
+	/**
+	 * Gets all environment info.
+	 */
+	getEnvironmentInfo: function(onDone) {
+		var environment = {};
+		environment.browser = AppUtils.getBrowserInfo();
+		environment.os = AppUtils.getOperatingSystemInfo();
+		environment.isLocal = AppUtils.isLocal();
+		AppUtils.isOnline(function(online) {
+			environment.isOnline = online;
+			environment.checks = getEnvironmentChecks(environment);
+		});
+		
+		function getEnvironmentChecks(info) {
+			var checks = [];
+			
+			// 	TODO: compose pass, fail, warn with messages here.
+			
 		}
 	}
 }
