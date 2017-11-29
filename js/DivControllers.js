@@ -334,8 +334,8 @@ function HomeController(div) {
 		
 		function getKeyGenConfig(plugin) {
 			var config = {};
-			config.passphraseChecked = false;
-			config.splitChecked = false;
+			config.passphraseEnabled = false;
+			config.splitEnabled = false;
 			config.numPieces = 1;
 			config.minPieces = null;
 			config.currencies = [];
@@ -699,11 +699,11 @@ function FormController(div) {
 	// get current form configuration
 	function getConfig() {
 		var config = {};
-		config.passphraseChecked = passphraseCheckbox.prop('checked');
+		config.passphraseEnabled = passphraseCheckbox.prop('checked');
 		config.passphrase = passphraseInput.val();
-		config.splitChecked = splitCheckbox.prop('checked');
-		config.numPieces = config.splitChecked ? parseFloat(numPiecesInput.val()) : 1;
-		config.minPieces = config.splitChecked ? parseFloat(minPiecesInput.val()) : null;
+		config.splitEnabled = splitCheckbox.prop('checked');
+		config.numPieces = config.splitEnabled ? parseFloat(numPiecesInput.val()) : 1;
+		config.minPieces = config.splitEnabled ? parseFloat(minPiecesInput.val()) : null;
 		config.verifyEncryption = VERIFY_ENCRYPTION;
 		config.currencies = [];
 		for (var i = 0; i < currencyInputs.length; i++) {
@@ -711,7 +711,7 @@ function FormController(div) {
 			config.currencies.push({
 				ticker: currencyInput.getSelectedPlugin().getTicker(),
 				numKeys: currencyInput.getNumKeys(),
-				encryption: config.passphraseChecked ? getEncryptionScheme(currencyInput) : null
+				encryption: config.passphraseEnabled ? getEncryptionScheme(currencyInput) : null
 			});
 		}
 		verifyConfig(config);

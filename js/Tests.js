@@ -4,8 +4,8 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 10,
-	REPEAT_SHORT: 3,
+	REPEAT_LONG: 3,
+	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
@@ -48,19 +48,34 @@ var Tests = {
 		dependencies = arrUnique(dependencies);
 		LOADER.load(dependencies, function() {
 			
-			// run tests
+			// test utilities
 			testUtils();
+			
+			// test file import
 			testFileImport(plugins, function() {
+				
+				// test key parsing
 				testParseKey(plugins);
+				
+				// test split and combine
 				for (var i = 0; i < plugins.length;i ++) testSplitAndCombine(plugins[i]);
+				
+				// test invalid pieces
 				if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
-				if (Tests.TEST_PLUGINS) {
-					testCryptoPlugins(plugins, function(error) {
-						if (callback) callback(error);
-					});
-				} else {
-					if (callback) callback();
-				}
+				
+				// test key generation
+				testGenerateKeys(plugins, function(err) {
+					if (err) throw err;
+					
+					// test individual plugins
+					if (Tests.TEST_PLUGINS) {
+						testCryptoPlugins(plugins, function(error) {
+							if (callback) callback(error);
+						});
+					} else {
+						if (callback) callback();
+					}
+				});
 			});
 		});
 		
@@ -112,39 +127,81 @@ var Tests = {
 			}
 		}
 		
-		function testKeyExclusion(keys) {
-		
-			// test exclude public
-			var copies = [];
-			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
-			CryptoUtils.applyKeyConfig(copies, { includePublic: false});
-			for (var i = 0; i < copies.length; i++) {
-				var key = copies[i];
-				assertUninitialized(key.getState().address);
-				assertInitialized(key.getState().wif);
-				assertInitialized(key.getState().hex);
-				assertDefined(key.getState().encryption);
+		function testGenerateKeys(plugins, onDone) {
+			
+			// number of keys to generate per plugin
+			var numKeys = 2;
+			
+			// generate keys without encryption
+			var progressReported = false;
+			CryptoUtils.generateKeys(getNoEncryptionConfig(), function(percent, label) {
+				assertTrue(percent >= 0 && percent <= 1);
+				progressReported = true;
+			}, function(keys, pieces, pieceDivs) {
+				assertTrue(progressReported);
+				assertEquals(2 * plugins.length, keys.length);
+				assertEquals(1, pieces.length);
+				assertEquals(1, pieceDivs.length);
+				
+				// generate keys with encryption and splitting
+				progressReported = false;
+				CryptoUtils.generateKeys(getEncryptionAndSplitConfig(), function(percent, label) {
+					assertTrue(percent >= 0 && percent <= 1);
+					progressReported = true;
+				}, function(keys, pieces, pieceDivs) {
+					assertTrue(progressReported);
+					assertEquals(2 * plugins.length, keys.length);
+					assertEquals(3, pieces.length);
+					assertEquals(3, pieceDivs.length);
+					
+					// test keys are encrypted
+					for (var i = 0; i < keys.length; i++) {
+						assertTrue(keys[i].isEncrypted());
+						assertEquals(CryptoUtils.EncryptionScheme.CRYPTOJS, keys[i].getEncryptionScheme());
+					}
+					
+					// test pieces recreate keys
+					var combinedKeys = CryptoUtils.piecesToKeys(pieces);
+					assertEquals(keys.length, combinedKeys.length);
+					for (var i = 0; i < keys.length; i++) {
+						assertTrue(keys[i].equals(combinedKeys[i]));
+					}
+					
+					// done testing key generation
+					if (onDone) onDone();
+				});
+			});
+			
+			function getNoEncryptionConfig() {
+				var config = {};
+				config.numPieces = 1;
+				config.currencies = [];
+				for (var i = 0; i < plugins.length; i++) {
+					var plugin = plugins[i];
+					config.currencies.push({
+						ticker: plugin.getTicker(),
+						numKeys: numKeys,
+						encryption: null,
+					});
+				}
+				return config;
 			}
-			testKeysToPieces(copies, 1);
-			testKeysToPieces(copies, Tests.NUM_PIECES, Tests.MIN_PIECES);
-
-			// test exclude private
-			copies = [];
-			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
-			CryptoUtils.applyKeyConfig(copies,  { includePrivate: false});
-			for (var i = 0; i < copies.length; i++) {
-				var key = copies[i];
-				assertInitialized(key.getState().address);
-				assertUndefined(key.getState().wif);
-				assertUndefined(key.getState().hex);
-				assertUndefined(key.getState().encryption);
-			}
-			testKeysToPieces(copies, 1, null);
-			try {
-				testKeysToPieces(copies, Tests.NUM_PIECES, Tests.MIN_PIECES);
-				fail("fail");
-			} catch (err) {
-				if (err.message === "fail") throw new Error("Should not have been able to split keys without private components")
+			
+			function getEncryptionAndSplitConfig() {
+				var config = {};
+				config.numPieces = 3;
+				config.minPieces = 2;
+				config.currencies = [];
+				config.passphrase = Tests.PASSPHRASE;
+				for (var i = 0; i < plugins.length; i++) {
+					var plugin = plugins[i];
+					config.currencies.push({
+						ticker: plugin.getTicker(),
+						numKeys: numKeys,
+						encryption: CryptoUtils.EncryptionScheme.CRYPTOJS,
+					});
+				}
+				return config;
 			}
 		}
 
@@ -251,6 +308,42 @@ var Tests = {
 				// test wrong passphrase decryption
 				testDecryptWrongPassphrase(plugin, onDone);
 			});
+		}
+		
+		function testKeyExclusion(keys) {
+			
+			// test exclude public
+			var copies = [];
+			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
+			CryptoUtils.applyKeyConfig(copies, { includePublic: false});
+			for (var i = 0; i < copies.length; i++) {
+				var key = copies[i];
+				assertUninitialized(key.getState().address);
+				assertInitialized(key.getState().wif);
+				assertInitialized(key.getState().hex);
+				assertDefined(key.getState().encryption);
+			}
+			testKeysToPieces(copies, 1);
+			testKeysToPieces(copies, Tests.NUM_PIECES, Tests.MIN_PIECES);
+
+			// test exclude private
+			copies = [];
+			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
+			CryptoUtils.applyKeyConfig(copies,  { includePrivate: false});
+			for (var i = 0; i < copies.length; i++) {
+				var key = copies[i];
+				assertInitialized(key.getState().address);
+				assertUndefined(key.getState().wif);
+				assertUndefined(key.getState().hex);
+				assertUndefined(key.getState().encryption);
+			}
+			testKeysToPieces(copies, 1, null);
+			try {
+				testKeysToPieces(copies, Tests.NUM_PIECES, Tests.MIN_PIECES);
+				fail("fail");
+			} catch (err) {
+				if (err.message === "fail") throw new Error("Should not have been able to split keys without private components")
+			}
 		}
 		
 		function testEncryptKeys(keys, scheme, passphrase, onDone) {

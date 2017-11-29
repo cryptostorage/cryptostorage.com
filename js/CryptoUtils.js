@@ -566,13 +566,33 @@ var CryptoUtils = {
 	},
 	
 	/**
-	 * Generates keys, pieces, rendered pieces.
+	 * Generates keys, pieces, rendered pieces according to a configuration.
 	 * 
-	 * @param config is the key generation configuration
+	 * @param config is the key generation configuration:
+	 * 	{
+	 * 		currencies: [{ticker: _, numKeys: _, encryption: _}, ...],
+	 * 		numPieces: _,
+	 * 		minPieces: _,
+	 * 		verifyEnryption: true|false	
+	 * 		passphrase: _,	// only needed if currency encryption initialized
+	 * 	}
 	 * @param onProgress(percent, label) is invoked as progress is made
 	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
 	 */
 	generateKeys: function(config, onProgress, onDone) {
+		
+		// verify config
+		assertInitialized(config.currencies);
+		assertTrue(config.currencies.length > 0);
+		var encryptionInitialized = false;
+		for (var i = 0; i < config.currencies.length; i++) {
+			assertInitialized(config.currencies[i].ticker);
+			assertInitialized(config.currencies[i].numKeys);
+			assertDefined(config.currencies[i].encryption);
+			if (isInitialized(config.currencies[i].encryption)) encryptionInitialized = true;
+		}
+		assertInitialized(config.numPieces);
+		if (encryptionInitialized) assertInitialized(config.passphrase);
 		
 		var decommissioned = false;	// TODO: remove altogether?
 		
