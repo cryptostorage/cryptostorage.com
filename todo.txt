@@ -14,7 +14,7 @@ import / decryption complete - click button to view
 start over button on form
 start with all currencies on form
 bip38 checkboxes on form
-environment checks: critical error on homepage, "2 warnings" with more info, generate button color, etc
+environment checks: critical error on homepage, "2 warnings" with more info, generate button color, all checks pass, etc
 ability to encrypt / decrypt on export page?
 print progress
 homepage scale too big on small screens?
