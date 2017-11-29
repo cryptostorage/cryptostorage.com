@@ -1,5 +1,5 @@
 TODO
-if critical error (unsupported browser, remote + no internet, etc): disable recover, disable generate, don't render qr
+disable recover and generate if failed environment check
 form validation
 import/export design
 homepage
