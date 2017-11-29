@@ -155,8 +155,9 @@ ol {
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
 	height: 70px;
-	width: 225px;
+	width: 250px;
 	color: white;
+	font-size:24px;
 	margin-bottom: 10px;
 	background-color: rgb(55, 218, 44);
 	-ms-flex-pack: center;
@@ -539,10 +540,11 @@ input[type='checkbox'] {
 	align-items: center;
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
-	height: 65px;
-	width: 220px;
+	height: 70px;
+	width: 225px;
 	background-color: #007500;
 	color: white;
+	font-size:24px;
 	margin-bottom: 25px;
 	-ms-flex-pack: center;
 	justify-content: center;
