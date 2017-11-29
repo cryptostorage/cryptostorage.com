@@ -29,6 +29,7 @@ tip address
 ability to re-hide more currencies on home?
 
 low priority:
+double click cryptostorage.html opens page in browser
 wait for images before loading homepage
 <ie11 unsupported methods: bip38 .fill(), qrcode UInt8Array.write()
 save as txt and csv
