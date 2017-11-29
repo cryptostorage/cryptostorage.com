@@ -513,11 +513,16 @@ function DonateController(div, appController) {
 			valueDiv.append(value.value);
 			
 			// render qr code
-			AppUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "donate_left_qr");
-				qrDiv.append(img);
+			try {
+				AppUtils.renderQrCode(value.value, null, function(img) {
+					img.attr("class", "donate_left_qr");
+					qrDiv.append(img);
+					onDone();
+				});
+			} catch (err) {
+				console.log("Could not render QR code");
 				onDone();
-			});
+			}
 		}
 		
 		function renderRight(div, value, onDone) {
@@ -533,11 +538,16 @@ function DonateController(div, appController) {
 			var qrDiv = $("<div>").appendTo(div);
 			
 			// render qr code
-			AppUtils.renderQrCode(value.value, null, function(img) {
-				img.attr("class", "donate_right_qr");
-				qrDiv.append(img);
+			try {
+				AppUtils.renderQrCode(value.value, null, function(img) {
+					img.attr("class", "donate_right_qr");
+					qrDiv.append(img);
+					onDone();
+				});
+			} catch (err) {
+				console.log("Could not render QR code");
 				onDone();
-			});
+			}
 		}
 		
 		function renderValuePairs(values, config, onProgress, onDone) {
