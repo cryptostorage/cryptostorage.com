@@ -45,7 +45,7 @@ var UiUtils = {
 			"js/DivControllers.js",
 			"js/AppConstants.js",
 			"js/PieceRenderer.js",
-			"js/CryptoUtils.js",
+			"js/AppUtils.js",
 			"js/CryptoPlugins.js",
 			"js/CryptoKey.js",
 			"js/DependencyLoader.js",
@@ -299,7 +299,7 @@ function HomeController(div) {
 		
 		// supported currencies
 		div.append("<div class='home_label'>Supports these popular cryptocurrencies</div>");
-		var plugins = CryptoUtils.getCryptoPlugins();
+		var plugins = AppUtils.getCryptoPlugins();
 		div.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 		var moreDiv = null;
 		for (var i = 3; i < plugins.length; i += 4) {
@@ -419,7 +419,7 @@ function DonateController(div, appController) {
 			var titleDiv = $("<div class='title'>").appendTo(div);
 			titleDiv.html("Donate");
 			var donations = [];
-			var plugins = CryptoUtils.getCryptoPlugins();
+			var plugins = AppUtils.getCryptoPlugins();
 			for (var i = 0; i < plugins.length; i++) {
 				var plugin = plugins[i];
 				donations.push({
@@ -437,17 +437,17 @@ function DonateController(div, appController) {
 				titleDiv.html("Credits");
 				var credits = [];
 				credits.push({
-					logo: CryptoUtils.getCryptoPlugin("ETH").getLogo(),
+					logo: AppUtils.getCryptoPlugin("ETH").getLogo(),
 					label: "UI designer",
 					value: "0x5735bb7cec965e58d03dddd167d1f27321878c51"
 				});
 				credits.push({
-					logo: CryptoUtils.getCryptoPlugin("BTC").getLogo(),
+					logo: AppUtils.getCryptoPlugin("BTC").getLogo(),
 					label: "bitaddress.org",
 					value: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
 				});
 				credits.push({
-					logo: CryptoUtils.getCryptoPlugin("XMR").getLogo(),
+					logo: AppUtils.getCryptoPlugin("XMR").getLogo(),
 					label: "moneroaddress.org",
 					value: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
 				});
@@ -513,7 +513,7 @@ function DonateController(div, appController) {
 			valueDiv.append(value.value);
 			
 			// render qr code
-			CryptoUtils.renderQrCode(value.value, null, function(img) {
+			AppUtils.renderQrCode(value.value, null, function(img) {
 				img.attr("class", "donate_left_qr");
 				qrDiv.append(img);
 				onDone();
@@ -533,7 +533,7 @@ function DonateController(div, appController) {
 			var qrDiv = $("<div>").appendTo(div);
 			
 			// render qr code
-			CryptoUtils.renderQrCode(value.value, null, function(img) {
+			AppUtils.renderQrCode(value.value, null, function(img) {
 				img.attr("class", "donate_right_qr");
 				qrDiv.append(img);
 				onDone();
@@ -718,9 +718,9 @@ function FormController(div) {
 		return config;
 		
 		function getEncryptionScheme(currencyInput) {
-			if (currencyInput.getSelectedPlugin().getTicker() === "BTC" && btcBip38Checkbox.prop('checked')) return CryptoUtils.EncryptionScheme.BIP38;
-			if (currencyInput.getSelectedPlugin().getTicker() === "BCH" && bchBip38Checkbox.prop('checked')) return CryptoUtils.EncryptionScheme.BIP38;
-			return CryptoUtils.EncryptionScheme.CRYPTOJS;
+			if (currencyInput.getSelectedPlugin().getTicker() === "BTC" && btcBip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
+			if (currencyInput.getSelectedPlugin().getTicker() === "BCH" && bchBip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
+			return AppUtils.EncryptionScheme.CRYPTOJS;
 		}
 		
 		function verifyConfig(config) {
@@ -738,7 +738,7 @@ function FormController(div) {
 		if (DEBUG) console.log("addCurrency()");
 		
 		// create input
-		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, CryptoUtils.getCryptoPlugins(), updateForm, function() {
+		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, AppUtils.getCryptoPlugins(), updateForm, function() {
 			removeCurrency(currencyInput);
 		});
 		
@@ -895,7 +895,7 @@ function RecoverController(div) {
 		var recoverFileDiv = $("<div>");
 		var recoverTextDiv = $("<div>");
 		new RecoverFileController(recoverFileDiv).render(function() {
-			new RecoverTextController(recoverTextDiv, CryptoUtils.getCryptoPlugins()).render(function() {
+			new RecoverTextController(recoverTextDiv, AppUtils.getCryptoPlugins()).render(function() {
 				new TwoTabController(recoverDiv, "Recover From File", recoverFileDiv, "Recover From Text", recoverTextDiv).render(function() {
 					if (onDone) onDone(div);
 				});
@@ -995,7 +995,7 @@ function RecoverFileController(div) {
 		for (var i = 0; i < namedPieces.length; i++) {
 			var namedPiece = namedPieces[i];
 			try {
-				CryptoUtils.validatePiece(namedPiece.piece);
+				AppUtils.validatePiece(namedPiece.piece);
 				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
 			} catch (err) {
 				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.message);
@@ -1140,7 +1140,7 @@ function RecoverFileController(div) {
 			}
 			else if (isZipFile(file)) {
 				LOADER.load("lib/jszip.js", function() {
-					CryptoUtils.zipToPieces(data, function(namedPieces) {
+					AppUtils.zipToPieces(data, function(namedPieces) {
 						onNamedPieces(null, namedPieces);
 					});
 				});
@@ -1195,7 +1195,7 @@ function RecoverFileController(div) {
 		var dependencies = APP_DEPENDENCIES.slice();
 		for (var i = 0; i < tickers.length; i++) {
 			var ticker = tickers[i];
-			var plugin = CryptoUtils.getCryptoPlugin(ticker);
+			var plugin = AppUtils.getCryptoPlugin(ticker);
 			for (var j = 0; j < plugin.getDependencies().length; j++) dependencies.push(plugin.getDependencies()[j]);
 		}
 		dependencies = arrUnique(dependencies);
@@ -1212,7 +1212,7 @@ function RecoverFileController(div) {
 				});
 				
 				// attempt to get keys
-				var keys = CryptoUtils.piecesToKeys(pieces);
+				var keys = AppUtils.piecesToKeys(pieces);
 				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
 				lastKeys = keys;
 			} catch (err) {
@@ -1601,7 +1601,7 @@ function RecoverTextController(div, plugins) {
 								importedPieces.push(piece);
 							}
 						} catch (err) {
-							if (CryptoUtils.isPossibleSplitPiece(piece)) importedPieces.push(piece);
+							if (AppUtils.isPossibleSplitPiece(piece)) importedPieces.push(piece);
 							else setWarningAux("Invalid private key or piece");
 						}
 					}
@@ -1648,7 +1648,7 @@ function RecoverTextController(div, plugins) {
 		function getImportedPieceDiv(piece) {
 			var importedPieceDiv = $("<div class='recover_text_imported_piece'>").appendTo(importedPiecesDiv);
 			var icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
-			importedPieceDiv.append(CryptoUtils.getShortenedString(piece, MAX_PIECE_LENGTH));
+			importedPieceDiv.append(AppUtils.getShortenedString(piece, MAX_PIECE_LENGTH));
 			var trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
 			return importedPieceDiv;
@@ -1737,7 +1737,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		}
 		
 		// compute weights for progress bar
-		var decryptWeight = CryptoUtils.getWeightDecryptKeys(encryptedKeys);
+		var decryptWeight = AppUtils.getWeightDecryptKeys(encryptedKeys);
 		var renderWeight = PieceRenderer.getRenderWeight(encryptedKeys.length, 1, null);
 		var totalWeight = decryptWeight + renderWeight;
 		
@@ -1754,7 +1754,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 			// decrypt keys async
 			var copies = [];
 			for (var i = 0; i < encryptedKeys.length; i++) copies.push(encryptedKeys[i].copy());
-			CryptoUtils.decryptKeys(copies, passphrase, function(done, total) {
+			AppUtils.decryptKeys(copies, passphrase, function(done, total) {
 				setProgress(done / total * decryptWeight / totalWeight, "Decrypting...");
 			}, function(err, decryptedKeys) {
 				
@@ -1766,7 +1766,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 				}
 				
 				// convert keys to pieces
-				var pieces = CryptoUtils.keysToPieces(decryptedKeys);
+				var pieces = AppUtils.keysToPieces(decryptedKeys);
 				
 				// render pieces
 				PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
@@ -2044,10 +2044,10 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		assertTrue(pieces.length > 0);
 		saved = true;
 		if (pieces.length === 1) {
-			var jsonStr = CryptoUtils.pieceToJson(pieces[0]);
-			saveAs(new Blob([jsonStr]), "cryptostorage_" + CryptoUtils.getCommonTicker(pieces[0]).toLowerCase() + ".json");
+			var jsonStr = AppUtils.pieceToJson(pieces[0]);
+			saveAs(new Blob([jsonStr]), "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + ".json");
 		} else {
-			CryptoUtils.piecesToZip(pieces, function(name, blob) {
+			AppUtils.piecesToZip(pieces, function(name, blob) {
 				saveAs(blob, name);
 			});
 		}
@@ -2056,8 +2056,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 	function savePublicAddresses() {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
-		var publicAddressesStr = CryptoUtils.pieceToAddresses(pieces[0]);
-		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + CryptoUtils.getCommonTicker(pieces[0]).toLowerCase() + "_public_addresses.txt");
+		var publicAddressesStr = AppUtils.pieceToAddresses(pieces[0]);
+		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_public_addresses.txt");
 	}
 	
 	function setPrintEnabled(bool) {
@@ -2102,14 +2102,14 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 			
 			// generate pieces from keys if given
 			else if (keys) {
-				pieces = CryptoUtils.keysToPieces(keys);
+				pieces = AppUtils.keysToPieces(keys);
 				update();
 			}
 			
 			// otherwise generate keys from config
 			else {
 				assertInitialized(keyGenConfig);
-				CryptoUtils.generateKeys(keyGenConfig, function(percent, label) {
+				AppUtils.generateKeys(keyGenConfig, function(percent, label) {
 					progressBar.set(percent);
 					if (label) progressBar.setText(label);
 					progressDiv.show();
@@ -2170,7 +2170,7 @@ function SecurityCheckController(div) {
 		// loop security checks
 		updateSecurityChecks();
 		function updateSecurityChecks() {
-			CryptoUtils.getSecurityChecks(function(securityChecks) {
+			AppUtils.getSecurityChecks(function(securityChecks) {
 				renderSecurityChecks(securityChecks);
 			});
 			setTimeout(updateSecurityChecks, LOOP_TIME);

@@ -124,7 +124,7 @@ var PieceRenderer = {
 			// collect functions to render key pair
 			var keyDiv = $("<div class='key_div'>").appendTo(pageDiv);
 			if (i % config.pairsPerPage === 0) keyDiv.css("border-top", "2px solid green");
-			var plugin = CryptoUtils.getCryptoPlugin(piece.keys[i].ticker);
+			var plugin = AppUtils.getCryptoPlugin(piece.keys[i].ticker);
 			var title = "#" + (i + 1);
 			var leftLabel = "\u25C4 Public Address";
 			var leftValue = config.showPublic ? piece.keys[i].address : null;
@@ -213,7 +213,7 @@ var PieceRenderer = {
 			
 			// add qr codes
 			if (leftValue) {
-				CryptoUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
+				AppUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
 					img.attr("class", "key_div_qr");
 					keyDivLeft.append(img);
 					addPrivateQr();
@@ -224,7 +224,7 @@ var PieceRenderer = {
 			}
 			function addPrivateQr() {
 				if (rightValue) {
-					CryptoUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
+					AppUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
 						img.attr("class", "key_div_qr");
 						keyDivRight.append(img);
 						onDone();

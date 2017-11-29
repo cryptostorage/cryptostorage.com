@@ -90,8 +90,8 @@ var Tests = {
 			assertFalse(isString(null));
 			assertFalse(isString(undefined));
 			assertFalse(isString(123));
-			assertTrue(CryptoUtils.isBase58("abcd"))
-			assertFalse(CryptoUtils.isBase58("abcd0"))
+			assertTrue(AppUtils.isBase58("abcd"))
+			assertFalse(AppUtils.isBase58("abcd0"))
 			
 			// test isBase58()
 			for (var i = 0; i < Tests.getTestCryptoPlugins().length; i++) {
@@ -99,7 +99,7 @@ var Tests = {
 				var key = plugin.newKey()
 				var pieces = plugin.split(key, 3, 2);
 				for (var j = 0; j < pieces.length; j++) {
-					assertTrue(CryptoUtils.isBase58(pieces[j]));
+					assertTrue(AppUtils.isBase58(pieces[j]));
 				}
 			}
 		}
@@ -110,19 +110,19 @@ var Tests = {
 				
 				// parse unencrypted key
 				var wif = plugin.newKey().getWif();
-				var key = CryptoUtils.parseKey(plugin, wif);
+				var key = AppUtils.parseKey(plugin, wif);
 				assertEquals(key.getWif(), wif);
 				
 				// parse empty key
 				try {
-					CryptoUtils.parseKey(plugin, "");
+					AppUtils.parseKey(plugin, "");
 					fail("fail");
 				} catch (err) {
 					if (err.message === "fail") throw new Error("Should not have parsed key from empty string");
 				}
 				
 				// parse whitespace key
-				key = CryptoUtils.parseKey(plugin, " ");
+				key = AppUtils.parseKey(plugin, " ");
 				assertNull(key, "Should not have parsed key from whitespace string");
 			}
 		}
@@ -134,7 +134,7 @@ var Tests = {
 			
 			// generate keys without encryption
 			var progressReported = false;
-			CryptoUtils.generateKeys(getNoEncryptionConfig(), function(percent, label) {
+			AppUtils.generateKeys(getNoEncryptionConfig(), function(percent, label) {
 				assertTrue(percent >= 0 && percent <= 1);
 				progressReported = true;
 			}, function(keys, pieces, pieceDivs) {
@@ -145,7 +145,7 @@ var Tests = {
 				
 				// generate keys with encryption and splitting
 				progressReported = false;
-				CryptoUtils.generateKeys(getEncryptionAndSplitConfig(), function(percent, label) {
+				AppUtils.generateKeys(getEncryptionAndSplitConfig(), function(percent, label) {
 					assertTrue(percent >= 0 && percent <= 1);
 					progressReported = true;
 				}, function(keys, pieces, pieceDivs) {
@@ -157,11 +157,11 @@ var Tests = {
 					// test keys are encrypted
 					for (var i = 0; i < keys.length; i++) {
 						assertTrue(keys[i].isEncrypted());
-						assertEquals(CryptoUtils.EncryptionScheme.CRYPTOJS, keys[i].getEncryptionScheme());
+						assertEquals(AppUtils.EncryptionScheme.CRYPTOJS, keys[i].getEncryptionScheme());
 					}
 					
 					// test pieces recreate keys
-					var combinedKeys = CryptoUtils.piecesToKeys(pieces);
+					var combinedKeys = AppUtils.piecesToKeys(pieces);
 					assertEquals(keys.length, combinedKeys.length);
 					for (var i = 0; i < keys.length; i++) {
 						assertTrue(keys[i].equals(combinedKeys[i]));
@@ -198,7 +198,7 @@ var Tests = {
 					config.currencies.push({
 						ticker: plugin.getTicker(),
 						numKeys: numKeys,
-						encryption: CryptoUtils.EncryptionScheme.CRYPTOJS,
+						encryption: AppUtils.EncryptionScheme.CRYPTOJS,
 					});
 				}
 				return config;
@@ -291,7 +291,7 @@ var Tests = {
 			var funcs = [];
 			for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
 				var scheme = plugin.getEncryptionSchemes()[i];
-				var max = scheme === CryptoUtils.EncryptionScheme.BIP38 ? Tests.REPEAT_SHORT : Tests.REPEAT_LONG;
+				var max = scheme === AppUtils.EncryptionScheme.BIP38 ? Tests.REPEAT_SHORT : Tests.REPEAT_LONG;
 				if (max < 1) continue;
 				var keys = [];
 				for (var i = 0; i < max; i++) keys.push(plugin.newKey());
@@ -315,7 +315,7 @@ var Tests = {
 			// test exclude public
 			var copies = [];
 			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
-			CryptoUtils.applyKeyConfig(copies, { includePublic: false});
+			AppUtils.applyKeyConfig(copies, { includePublic: false});
 			for (var i = 0; i < copies.length; i++) {
 				var key = copies[i];
 				assertUninitialized(key.getState().address);
@@ -329,7 +329,7 @@ var Tests = {
 			// test exclude private
 			copies = [];
 			for (var i = 0; i < keys.length; i++) copies.push(keys[i].copy());
-			CryptoUtils.applyKeyConfig(copies,  { includePrivate: false});
+			AppUtils.applyKeyConfig(copies,  { includePrivate: false});
 			for (var i = 0; i < copies.length; i++) {
 				var key = copies[i];
 				assertInitialized(key.getState().address);
@@ -357,7 +357,7 @@ var Tests = {
 			for (var i = 0; i < keys.length; i++) schemes.push(scheme);
 			
 			// encrypt keys
-			CryptoUtils.encryptKeys(keys, schemes, passphrase, false, null, function(err, encryptedKeys) {
+			AppUtils.encryptKeys(keys, schemes, passphrase, false, null, function(err, encryptedKeys) {
 				if (err) {
 					onDone(err);
 					return;
@@ -439,7 +439,7 @@ var Tests = {
 			for (var i = 0; i < keys.length; i++) originals.push(keys[i].copy());
 			
 			// decrypt keys
-			CryptoUtils.decryptKeys(keys, passphrase, null, function(err, decryptedKeys) {
+			AppUtils.decryptKeys(keys, passphrase, null, function(err, decryptedKeys) {
 				if (err) {
 					onDone(err);
 					return;
@@ -497,7 +497,7 @@ var Tests = {
 			}
 			
 			// convert keys to pieces
-			var pieces = CryptoUtils.keysToPieces(keys, numPieces, minPieces);
+			var pieces = AppUtils.keysToPieces(keys, numPieces, minPieces);
 			
 			// test each share in each piece
 			for (var i = 0; i < pieces.length; i++) {
@@ -536,7 +536,7 @@ var Tests = {
 			var combinations = getCombinations(pieces, minPieces ? minPieces : 1);
 			for (var i = 0; i < combinations.length; i++) {
 				var combination = combinations[i];
-				var keysFromPieces = CryptoUtils.piecesToKeys(pieces);
+				var keysFromPieces = AppUtils.piecesToKeys(pieces);
 				assertEquals(keys.length, keysFromPieces.length);
 				for (var j = 0; j < keys.length; j++) {
 					assertTrue(keys[j].equals(keysFromPieces[j]));
@@ -556,12 +556,12 @@ var Tests = {
 			}
 			
 			// convert to pieces
-			var pieces1 = CryptoUtils.keysToPieces(keys1);
-			var pieces2 = CryptoUtils.keysToPieces(keys2);
+			var pieces1 = AppUtils.keysToPieces(keys1);
+			var pieces2 = AppUtils.keysToPieces(keys2);
 			
 			// try to combine pieces
 			try {
-				CryptoUtils.piecesToKeys([pieces1[0], pieces2[0]]);
+				AppUtils.piecesToKeys([pieces1[0], pieces2[0]]);
 				fail("fail");
 			} catch(err) {
 				if (err.message === "fail") throw new Error("Cannot get keys from incompatible pieces");
@@ -832,7 +832,7 @@ var Tests = {
 							keys.push(plugin.newKey());
 						}
 					}
-					return CryptoUtils.keysToPieces(keys, numPieces, minPieces);
+					return AppUtils.keysToPieces(keys, numPieces, minPieces);
 				}
 			});
 		}
