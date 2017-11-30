@@ -1156,8 +1156,10 @@ var AppUtils = {
 		if (!info.browser.isSupported) checks.push({state: "fail", message: "Browser is not supported (" + info.browser.name + " " + info.browser.version + ")"});
 		
 		// check if remote and not online
+		var internetRequiredError = false;
 		if (isInitialized(info.isOnline)) {
 			if (!info.isLocal && !info.isOnline) {
+				internetRequiredError = true;
 				checks.push({state: "fail", message: "Internet is required because application is not running locally"});
 			}
 		}
@@ -1176,8 +1178,8 @@ var AppUtils = {
 		if (info.isLocal) checks.push({state: "pass", message: "Application is running locally"});
 		else checks.push({state: "warn", message: "Application is not running locally"});
 		
-		// check if online
-		if (isInitialized(info.isOnline)) {
+		// check if online only if no "internet required" error
+		if (isInitialized(info.isOnline) && !internetRequiredError) {
 			if (!info.isOnline) checks.push({state: "pass", message: "No internet connection"});
 			else checks.push({state: "warn", message: "Internet connection is active"});
 		}
