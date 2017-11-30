@@ -275,10 +275,10 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		// intro slider
 		var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
 		var sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		getSlide($("<img src='img/mix.png'>"), "Generate secure storage for multiple cryptocurrencies.").appendTo(sliderDiv);
+		getSlide($("<img src='img/mix.png'>"), "Generate public/private key pairs for multiple cryptocurrencies.").appendTo(sliderDiv);
+		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats for long term storage.").appendTo(sliderDiv);
 		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
 		getSlide($("<img src='img/security.png'>"), "Keys are generated in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-		getSlide($("<img src='img/printer.png'>"), "Export to digital and printable formats for long term storage.").appendTo(sliderDiv);
 		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:3500});
 		
@@ -692,14 +692,14 @@ function FormController(div) {
 		var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
 		var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
 		splitNumLabelTop.html("Split Each Key Into");
-		numPiecesInput = $("<input type='number' value='3'>").appendTo(splitNumDiv);
+		numPiecesInput = $("<input type='number' value='3' min='2'>").appendTo(splitNumDiv);
 		var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
 		splitNumLabelBottom.html("Pieces");
 		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitInputDiv);
 		var splitMinDiv = $("<div class='split_min_div'>").appendTo(splitInputDiv);
 		var splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
 		splitMinLabelTop.html("Require");
-		minPiecesInput = $("<input type='number' value='2'>").appendTo(splitMinDiv);
+		minPiecesInput = $("<input type='number' value='2' min='2'>").appendTo(splitMinDiv);
 		var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
 		splitMinLabelBottom.html("To Recover");		
 		
@@ -914,7 +914,7 @@ function FormController(div) {
 			
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
-			rightDiv.append("Number of keys&nbsp;&nbsp;");
+			rightDiv.append("Number of key pairs&nbsp;&nbsp;");
 			numKeysInput = $("<input type='number'>").appendTo(rightDiv);
 			numKeysInput.attr("value", 1);
 			rightDiv.append("&nbsp;&nbsp;");
