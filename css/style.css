@@ -166,6 +166,10 @@ ol {
 	background-color: rgb(55, 218, 44);
 	-ms-flex-pack: center;
 	justify-content: center;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .btn_start_generate:hover {
@@ -575,6 +579,10 @@ input[type='checkbox'] {
 	margin-bottom: 25px;
 	-ms-flex-pack: center;
 	justify-content: center;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .btn_generate:hover {
@@ -724,6 +732,10 @@ input[type='checkbox'] {
 	color: white;
 	font-size: 24px;
 	background-color: rgb(93, 159, 252);
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .recover_tab_div:hover {
@@ -869,6 +881,10 @@ input[type='checkbox'] {
 	border: 2.25px solid black;
 	-ms-flex-pack: center;
 	justify-content: center;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .recover_button:hover, .recover_view_button:hover {

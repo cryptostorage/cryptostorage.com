@@ -1,5 +1,4 @@
 TODO
-prevent text selection on buttons
 form validation
 import/export design
 homepage
