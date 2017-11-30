@@ -1121,17 +1121,27 @@ var AppUtils = {
 	 * Gets all environment info.
 	 * 
 	 * Requires lib/ua-parser.js to be loaded.
+	 * 
+	 * @param onDone(info) is asynchronously invoked when all info is retrieved
+	 * @returns info that can acquired synchronously until async info is available
 	 */
 	getEnvironmentInfo: function(onDone) {
 		var info = {};
 		info.browser = AppUtils.getBrowserInfo();
 		info.os = AppUtils.getOsInfo();
 		info.isLocal = AppUtils.isLocal();
+		
+		// determine if online
 		AppUtils.isOnline(function(online) {
 			info.isOnline = online;
 			info.checks = AppUtils.getEnvironmentChecks(info);
-			onDone(info);
+			if (onDone) onDone(info);
 		});
+		
+		// return synchronously
+		info.isOnline = true;
+		info.checks = AppUtils.getEnvironmentChecks(info);
+		return info;
 	},
 	
 	/**
@@ -1173,16 +1183,24 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Returns cached environment info.
+	 * Registers an environment listener to be notified when environment info is updated.
+	 * 
+	 * @param listener(info) will be invoked when environment info is updated
 	 */
-	getCachedEnvironmentInfo: function() {
-		return AppUtils.cachedEnvironmentInfo;
+	addEnvironmentListener: function(listener) {
+		if (!AppUtils.environmentListeners) AppUtils.environmentListeners = [];
+		AppUtils.environmentListeners.push(listener);
 	},
 	
 	/**
-	 * Sets cached environment info.
+	 * Notifies all registered environment listeners of updated environment info.
+	 * 
+	 * @param info is the environment info to notify listeners of
 	 */
-	setCachedEnvironmentInfo: function(info) {
-		AppUtils.cachedEnvironmentInfo = info;
+	notifyEnvironmentListeners: function(info) {
+		for (var i = 0; i < AppUtils.environmentListeners.length; i++) {
+			var listener = AppUtils.environmentListeners[i];
+			if (listener) listener(info);
+		}
 	}
 }
