@@ -19,6 +19,7 @@ environment checks: app header, disable recover, disable generate, show info bar
 print progress
 light blue little bit ligher / brighter
 tip address
+select a currency or default to first?
 homepage scale too big on small screens?
 ability to re-hide more currencies on home?
 ability to encrypt / decrypt on export page?
