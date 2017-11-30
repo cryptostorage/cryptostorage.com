@@ -19,10 +19,7 @@ ability to encrypt / decrypt on export page?
 print progress
 homepage scale too big on small screens?
 light blue little bit ligher / brighter
-homepage design with 8 supported currencies
-multi-select currencies and quick generate
 split lines less steep
-forward bitcoin cash logo
 show passphrase left aligned on some browsers
 tip address
 ability to re-hide more currencies on home?
