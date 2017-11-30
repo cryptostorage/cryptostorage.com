@@ -115,6 +115,7 @@ function AppController(div) {
 			errorDiv.html("");
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state === "fail") errorDiv.html(info.checks[i].message);
+				break;
 			}
 		});
 		
