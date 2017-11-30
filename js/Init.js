@@ -24,9 +24,13 @@ $(document).ready(function() {
 		});
 	}
 	
-	// pre-load some images
-	$("<img src='img/xmark_small.png'>");
-	$("<img src='img/warning_orange.png>");
-	$("<img src='img/checkmark_small.png>");
-	$("<img src='img/trash.png>");
+	// pre-load images
+	preloadImage("img/xmark_small.png");
+	preloadImage("img/warning_orange.png");
+	preloadImage("img/checkmark_small.png");
+	preloadImage("img/trash.png");
+	function preloadImage(src) {
+		var img = new Image();
+		img.src = src;
+	}
 });
