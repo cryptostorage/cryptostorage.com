@@ -310,7 +310,7 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		
 		// disable recover keys if failed environment check
 		AppUtils.addEnvironmentListener(function(info) {
-			if (AppUtils.hasEnvironmentFailure(info)) btnRecover.click(function() {});
+			if (AppUtils.hasEnvironmentFailure(info)) btnRecover.unbind("click");
 			else btnRecover.click(function() { onSelectRecover(); });
 		});
 		
@@ -721,7 +721,7 @@ function FormController(div) {
 		
 		// disable generate button if environment failure
 		AppUtils.addEnvironmentListener(function(info) {
-			if (AppUtils.hasEnvironmentFailure(info)) btnGenerate.click(function() {});
+			if (AppUtils.hasEnvironmentFailure(info)) btnGenerate.unbind("click");
 			else btnGenerate.click(function() { onGenerate() });
 		});
 		
