@@ -1139,7 +1139,6 @@ var AppUtils = {
 		});
 		
 		// return synchronously
-		info.isOnline = true;
 		info.checks = AppUtils.getEnvironmentChecks(info);
 		return info;
 	},
@@ -1157,8 +1156,10 @@ var AppUtils = {
 		if (!info.browser.isSupported) checks.push({state: "fail", message: "Browser is not supported (" + info.browser.name + " " + info.browser.version + ")"});
 		
 		// check if remote and not online
-		if (!info.isLocal && !info.isOnline) {
-			checks.push({state: "fail", message: "Internet is required because application is not running locally"});
+		if (isInitialized(info.isOnline)) {
+			if (!info.isLocal && !info.isOnline) {
+				checks.push({state: "fail", message: "Internet is required because application is not running locally"});
+			}
 		}
 		
 		// check open source browser
@@ -1176,8 +1177,10 @@ var AppUtils = {
 		else checks.push({state: "warn", message: "Application is not running locally"});
 		
 		// check if online
-		if (!info.isOnline) checks.push({state: "pass", message: "No internet connection"});
-		else checks.push({state: "warn", message: "Internet connection is active"});
+		if (isInitialized(info.isOnline)) {
+			if (!info.isOnline) checks.push({state: "pass", message: "No internet connection"});
+			else checks.push({state: "warn", message: "Internet connection is active"});
+		}
 		
 		return checks;
 	},
@@ -1185,11 +1188,14 @@ var AppUtils = {
 	/**
 	 * Registers an environment listener to be notified when environment info is updated.
 	 * 
-	 * @param listener(info) will be invoked when environment info is updated
+	 * Synchronously calls the listener with the last known environment info.
+	 * 
+	 * @param listener(info) will be invoked as environment info is updated
 	 */
 	addEnvironmentListener: function(listener) {
 		if (!AppUtils.environmentListeners) AppUtils.environmentListeners = [];
 		AppUtils.environmentListeners.push(listener);
+		if (AppUtils.lastEnvironmentInfo) listener(AppUtils.lastEnvironmentInfo);
 	},
 	
 	/**
@@ -1198,6 +1204,7 @@ var AppUtils = {
 	 * @param info is the environment info to notify listeners of
 	 */
 	notifyEnvironmentListeners: function(info) {
+		AppUtils.lastEnvironmentInfo = info;
 		for (var i = 0; i < AppUtils.environmentListeners.length; i++) {
 			var listener = AppUtils.environmentListeners[i];
 			if (listener) listener(info);

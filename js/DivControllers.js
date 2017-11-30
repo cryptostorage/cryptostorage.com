@@ -112,22 +112,26 @@ function AppController(div) {
 		// header critical error
 		var errorDiv = $("<div class='red_warning'>").appendTo(headerTopDiv);
 		AppUtils.addEnvironmentListener(function(info) {
-			console.log("environment updated");
-			if (info) {
-				for (var i = 0; i < info.checks.length; i++) {
-					if (info.checks[i].state === "fail") errorDiv.html(info.checks[i].message);
-				}
+			errorDiv.html("");
+			for (var i = 0; i < info.checks.length; i++) {
+				if (info.checks[i].state === "fail") errorDiv.html(info.checks[i].message);
 			}
 		});
 		
 		// refresh environment info on loop
 		LOADER.load("lib/ua-parser.js", function() {
-			AppUtils.notifyEnvironmentListeners(AppUtils.getEnvironmentInfo());
+			var first = true;
 			refreshEnvironmentInfo();
 			function refreshEnvironmentInfo() {
-				AppUtils.getEnvironmentInfo(function(info) {
+				var info = AppUtils.getEnvironmentInfo(function(info) {
 					AppUtils.notifyEnvironmentListeners(info);
 				});
+				
+				// if first load, notify listeners synchronously
+				if (first) {
+					first = false;
+					AppUtils.notifyEnvironmentListeners(info);
+				}
 				setTimeout(refreshEnvironmentInfo, ENVIRONMENT_REFRESH_RATE);
 			}
 		});
@@ -2191,8 +2195,6 @@ inheritsFrom(ExportController, DivController);
 function EnvironmentCheckController(div) {
 	DivController.call(this, div);
 	
-	var LOOP_TIME = 3000;
-	
 	this.render = function(onDone) {
 		div.empty();
 		div.addClass("environment_checks_div");
@@ -2200,14 +2202,10 @@ function EnvironmentCheckController(div) {
 		// loading
 		div.append("Loading...");
 		
-		// loop environment checks
-		updateEnvironmentChecks();
-		function updateEnvironmentChecks() {
-			AppUtils.getEnvironmentInfo(function(info) {
-				renderEnvironmentChecks(AppUtils.getEnvironmentChecks(info));
-			});
-			setTimeout(updateEnvironmentChecks, LOOP_TIME);
-		}
+		// listen for environment
+		AppUtils.addEnvironmentListener(function(info) {
+			renderEnvironmentChecks(info.checks);
+		});
 	}
 	
 	// render updated environment checks
