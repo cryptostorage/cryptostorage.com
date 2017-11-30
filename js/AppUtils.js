@@ -1,7 +1,46 @@
 /**
- * Collection of utilities for cryptostorage.com.
+ * Collection of utilities and constants for cryptostorage.com.
  */
 var AppUtils = {
+		
+	// app constants
+	RUN_TESTS: false,
+	DEBUG: true,
+	DELETE_WINDOW_CRYPTO: false,
+	VERIFY_ENCRYPTION: false,
+	ENCRYPTION_THREADS: 1,
+	CRYPTOSTORAGE_URL: "http://cryptostorage.com",	// TODO: change these to https
+	ONLINE_IMAGE_URL: "http://cryptostorage.com/favicon.ico",
+	APP_DEPENDENCIES: ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/ua-parser.js"],
+	ENVIRONMENT_REFRESH_RATE: 3000,	// environment refresh rate in milliseconds
+	
+	//classify operating systems and browsers as open or closed source
+	OPEN_SOURCE_BROWSERS: arrToLowerCase([
+		"Firefox", "Chromium", "Tizen", "Epiphany", "K-Meleon", "SeaMonkey", "SlimerJS", "Arora", "Breach", "Camino",
+		"Electron", "Fennec", "Konqueror", "Midori", "PaleMoon", "Rekonq", "Sunrise", "Waterfox", "Amaya", "Bowser",
+		"Camino"
+	]),
+	CLOSED_SOURCE_BROWSERS: arrToLowerCase([
+		"Chrome", "Chrome WebView", "Chrome Mobile", "Safari", "Opera", "Opera Mini", "Samsung Internet for Android",
+		"Samsung Internet", "Opera Coast", "Yandex Browser", "UC Browser", "Maxthon", "Puffin", "Sleipnir",
+		"Windows Phone", "Internet Explorer", "Microsoft Edge", "IE", "Vivaldi", "Sailfish", "Amazon Silk", "Silk",
+		"PhantomJS", "BlackBerry", "WebOS", "Bada", "Android", "iPhone", "iPad", "iPod", "Googlebot", "Adobe AIR", "Avant",
+		"Avant Browser", "Flock", "Galeon", "GreenBrowser", "iCab", "Lunascape", "Maxthon", "Nook Browser", "Raven",
+		"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
+		"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
+	]),
+	OPEN_SOURCE_OPERATING_SYSTEMS: arrToLowerCase([
+		"Linux", "CentOS", "Debian", "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "Mint",
+		"OpenBSD", "RedHat", "Red Hat", "SuSE", "Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen",
+		"Chromium OS", "Contiki", "DragonFly", "GNU", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "PCLinuxOS",
+		"Plan9", "VectorLinux", "Zenwalk"
+	]),
+	CLOSED_SOURCE_OPERATING_SYSTEMS: arrToLowerCase([
+		"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS", "Mac OS X", "Macintosh", "Mac", "iOS",
+		"Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile", "AIX", "Amiga OS", "Bada",
+		"BeOS", "BlackBerry", "Hurd", "Linpus", "Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS",
+		"Sailfish", "Series40", "Solaris", "Symbian", "WebOS"
+	]),
 	
 	/**
 	 * Returns all crypto plugins.
@@ -783,7 +822,7 @@ var AppUtils = {
 		
 		// encrypt async
 		if (onProgress) onProgress(0, "Encrypting");
-		async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, encryptedKeys) {
+		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeys) {
 			
 			// verify encryption
 			if (verifyEncryption) {
@@ -908,7 +947,7 @@ var AppUtils = {
 		for (var i = 0; i < keys.length; i++) funcs.push(decryptFunc(keys[i], passphrase));
 		var doneWeight = 0;
 		if (onProgress) onProgress(doneWeight, totalWeight);
-		async.parallelLimit(funcs, ENCRYPTION_THREADS, function(err, result) {
+		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, result) {
 			if (decommissioned) return;
 			else if (err) onDone(err);
 			else onDone(null, keys);
@@ -1048,8 +1087,8 @@ var AppUtils = {
 			browserName = browserName.toLowerCase();
 			
 			// determine if open source
-			if (arrContains(OPEN_SOURCE_BROWSERS, browserName)) return true;
-			if (arrContains(CLOSED_SOURCE_BROWSERS, browserName)) return false;
+			if (arrContains(AppUtils.OPEN_SOURCE_BROWSERS, browserName)) return true;
+			if (arrContains(AppUtils.CLOSED_SOURCE_BROWSERS, browserName)) return false;
 			return null;
 		}
 		
@@ -1092,8 +1131,8 @@ var AppUtils = {
 			var name = osInfo.name.toLowerCase();
 			
 			// determine if open source
-			if (arrContains(OPEN_SOURCE_OPERATING_SYSTEMS, name)) return true;
-			if (arrContains(CLOSED_SOURCE_OPERATING_SYSTEMS, name)) return false;
+			if (arrContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, name)) return true;
+			if (arrContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, name)) return false;
 			return null;
 		}
 	},
@@ -1114,7 +1153,7 @@ var AppUtils = {
 	 * @returns true if this app is online, false otherwise
 	 */
 	isOnline: function(isOnline) {
-		isImageAccessible(ONLINE_IMAGE_URL, 1500, isOnline);
+		isImageAccessible(AppUtils.ONLINE_IMAGE_URL, 1500, isOnline);
 	},
 	
 	/**

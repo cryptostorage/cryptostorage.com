@@ -7,16 +7,16 @@ $(document).ready(function() {
 	window.crypto = window.crypto || window.msCrypto;
 		
 	// delete window.crypto for testing
-	if (DELETE_WINDOW_CRYPTO) delete window.crypto;
+	if (AppUtils.DELETE_WINDOW_CRYPTO) delete window.crypto;
 	
 	// render application to html body
 	new AppController($("body")).render();
 	
 	// start loading common dependencies
-	LOADER.load(APP_DEPENDENCIES);
+	LOADER.load(AppUtils.APP_DEPENDENCIES);
 	
 	// run tests
-	if (RUN_TESTS) {
+	if (AppUtils.RUN_TESTS) {
 		console.log("Running tests...");
 		Tests.runTests(function(error) {
 			if (error) throw error;

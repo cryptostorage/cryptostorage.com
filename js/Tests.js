@@ -39,7 +39,7 @@ var Tests = {
 		var plugins = Tests.getTestCryptoPlugins();
 		
 		// load dependencies
-		var dependencies = APP_DEPENDENCIES.slice();
+		var dependencies = AppUtils.APP_DEPENDENCIES.slice();
 		for (var i = 0; i < plugins.length; i++) {
 			for (var j = 0; j < plugins[i].getDependencies().length; j++) {
 				dependencies.push(plugins[i].getDependencies()[j]);

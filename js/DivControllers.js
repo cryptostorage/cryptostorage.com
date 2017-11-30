@@ -43,7 +43,6 @@ var UiUtils = {
 			"js/BodyExporter.js",
 			"js/GenUtils.js",
 			"js/DivControllers.js",
-			"js/AppConstants.js",
 			"js/PieceRenderer.js",
 			"js/AppUtils.js",
 			"js/CryptoPlugins.js",
@@ -133,7 +132,7 @@ function AppController(div) {
 					first = false;
 					AppUtils.notifyEnvironmentListeners(info);
 				}
-				setTimeout(refreshEnvironmentInfo, ENVIRONMENT_REFRESH_RATE);
+				setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
 			}
 		});
 		
@@ -208,7 +207,7 @@ function AppController(div) {
 	}
 	
 	this.showHome = function() {
-		if (DEBUG) console.log("showHome()");
+		if (AppUtils.DEBUG) console.log("showHome()");
 		sliderDiv.show();
 		sliderController.render(function() {
 			homeController.render(function(div) {
@@ -218,7 +217,7 @@ function AppController(div) {
 	}
 	
 	this.showForm = function(onDone) {
-		if (DEBUG) console.log("showForm()");
+		if (AppUtils.DEBUG) console.log("showForm()");
 		formController.render(function(div) {
 			setContentDiv(div);
 			sliderDiv.hide();
@@ -227,19 +226,19 @@ function AppController(div) {
 	}
 	
 	this.showFaq = function() {
-		if (DEBUG) console.log("showFaq()");
+		if (AppUtils.DEBUG) console.log("showFaq()");
 		setContentDiv(faqController.getDiv());
 		sliderDiv.hide();
 	}
 	
 	this.showDonate = function() {
-		if (DEBUG) console.log("showDonate()");
+		if (AppUtils.DEBUG) console.log("showDonate()");
 		sliderDiv.hide();
 		setContentDiv(donateController.getDiv());
 	}
 	
 	this.showRecover = function() {
-		if (DEBUG) console.log("showRecover()");
+		if (AppUtils.DEBUG) console.log("showRecover()");
 		sliderDiv.hide();
 		recoverController.render();
 		setContentDiv(recoverController.getDiv());
@@ -758,7 +757,7 @@ function FormController(div) {
 		config.splitEnabled = splitCheckbox.prop('checked');
 		config.numPieces = config.splitEnabled ? parseFloat(numPiecesInput.val()) : 1;
 		config.minPieces = config.splitEnabled ? parseFloat(minPiecesInput.val()) : null;
-		config.verifyEncryption = VERIFY_ENCRYPTION;
+		config.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
 		config.currencies = [];
 		for (var i = 0; i < currencyInputs.length; i++) {
 			var currencyInput = currencyInputs[i];
@@ -789,7 +788,7 @@ function FormController(div) {
 	}
 	
 	function addCurrency() {
-		if (DEBUG) console.log("addCurrency()");
+		if (AppUtils.DEBUG) console.log("addCurrency()");
 		
 		// create input
 		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, AppUtils.getCryptoPlugins(), updateForm, function() {
@@ -1246,7 +1245,7 @@ function RecoverFileController(div) {
 		tickers = arrUnique(tickers);
 		
 		// collect dependencies
-		var dependencies = APP_DEPENDENCIES.slice();
+		var dependencies = AppUtils.APP_DEPENDENCIES.slice();
 		for (var i = 0; i < tickers.length; i++) {
 			var ticker = tickers[i];
 			var plugin = AppUtils.getCryptoPlugin(ticker);
