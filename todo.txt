@@ -1,6 +1,7 @@
 TODO
 split lines less steep
 show passphrase left aligned on some browsers
+prevent text selection on buttons
 form validation
 import/export design
 homepage
