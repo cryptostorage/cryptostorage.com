@@ -1,5 +1,4 @@
 TODO
-disable recover and generate if failed environment check
 form validation
 import/export design
 homepage

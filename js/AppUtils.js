@@ -1209,5 +1209,18 @@ var AppUtils = {
 			var listener = AppUtils.environmentListeners[i];
 			if (listener) listener(info);
 		}
+	},
+	
+	/**
+	 * Determines if the given environment info has a failure.
+	 * 
+	 * @param info is environment info which may indicate a failure
+	 * @returns true if the environment has a failure, false otherwise
+	 */
+	hasEnvironmentFailure: function(info) {
+		for (var i = 0; i < info.checks.length; i++) {
+			if (info.checks[i].state === "fail") return true;
+		}
+		return false;
 	}
 }

@@ -307,7 +307,12 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		// button to recover keys
 		var btnRecover = $("<div class='btn btn_recover'>").appendTo(ctaDiv);
 		btnRecover.append("or Recover Existing Keys");
-		btnRecover.click(function() { onSelectRecover(); });
+		
+		// disable recover keys if failed environment check
+		AppUtils.addEnvironmentListener(function(info) {
+			if (AppUtils.hasEnvironmentFailure(info)) btnRecover.click(function() {});
+			else btnRecover.click(function() { onSelectRecover(); });
+		});
 		
 		if (onDone) onDone(div);
 	}
@@ -356,8 +361,14 @@ function HomeController(div) {
 		$("<div style='height:40px'>").appendTo(div);
 		div.append($("<img width=750px src='img/print_sample.png'>"));
 		
+		// track environment failure to disable clicking currency
+		var environmentFailure = false;
+		AppUtils.addEnvironmentListener(function(info) {
+			environmentFailure = AppUtils.hasEnvironmentFailure(info);
+		});
+		
 		function onCurrencyClicked(plugin) {
-			UiUtils.openStorage(plugin.getName() + " Storage", null, getKeyGenConfig(plugin), null, null, null, true); 
+			if (!environmentFailure) UiUtils.openStorage(plugin.getName() + " Storage", null, getKeyGenConfig(plugin), null, null, null, true); 
 		}
 		
 		function getKeyGenConfig(plugin) {
@@ -707,7 +718,12 @@ function FormController(div) {
 		var generateDiv = $("<div class='generate_div'>").appendTo(div);
 		var btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
 		btnGenerate.append("Generate keys");
-		btnGenerate.click(function() { onGenerate() });
+		
+		// disable generate button if environment failure
+		AppUtils.addEnvironmentListener(function(info) {
+			if (AppUtils.hasEnvironmentFailure(info)) btnGenerate.click(function() {});
+			else btnGenerate.click(function() { onGenerate() });
+		});
 		
 		// under development warning
 		var warningDiv = $("<div class='red_warning'>").appendTo(div);
