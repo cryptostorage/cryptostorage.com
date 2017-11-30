@@ -6,6 +6,7 @@ faq
 run minimum tests when site accessed
 todos throughout code
 minimize initial dependencies: condense files to single files, lazy load css
+internet explorer doesn't refresh with bip38
 
 design:
 export controller progress design, initial and re-render
