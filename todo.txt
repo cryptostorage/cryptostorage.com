@@ -27,18 +27,16 @@ ability to re-hide more currencies on home?
 low priority:
 double click cryptostorage.html opens page in browser
 wait for images before loading homepage
-<ie11 unsupported methods: bip38 .fill(), qrcode UInt8Array.write()
 save as txt and csv
 try all imported file / key combinations to recover
 prevent scroll revealing some of next picture
 copy line break in pdf inserts space
-code scan
 console warning "unexpected end of file" in firefox caused by ddslick
 timeouts in tests so browser doesn't lock
 csv import to support "bring your own keys"
 optimize tests by getting one set of keys of repeat_long size
 verify no name collisions
-how does jaxx generate zcash and bitcoin variations
+code scan
 
 consult designers
 opinion on donate page + ui designer tip address - link to open user's wallet
