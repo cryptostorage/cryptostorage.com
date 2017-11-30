@@ -23,6 +23,7 @@ split lines less steep
 show passphrase left aligned on some browsers
 tip address
 ability to re-hide more currencies on home?
+environment checks on export page
 
 low priority:
 double click cryptostorage.html opens page in browser
