@@ -1954,7 +1954,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		div.empty();
 		div.addClass("export_div");
 		
-		// key generation
+		// progress bar
 		progressDiv = $("<div class='export_progress_div'>").appendTo(div);
 		progressDiv.hide();
 		progressBar = UiUtils.getProgressBar(progressDiv);
@@ -2164,7 +2164,8 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 				assertInitialized(keyGenConfig);
 				AppUtils.generateKeys(keyGenConfig, function(percent, label) {
 					progressBar.set(percent);
-					if (label) progressBar.setText(label);
+					if (label) progressBar.setText(label + " ... " + Math.round(percent * 100) + "%");
+					else progressBar.setText(progressBar.getText() + " ... " + Math.round(percent * 100) + "%");
 					progressDiv.show();
 				}, function(_keys, _pieces, _pieceDivs) {
 					progressDiv.hide();

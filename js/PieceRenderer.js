@@ -34,7 +34,7 @@ var PieceRenderer = {
 		return numQrs * getWeightQr() + numLogos * getWeightLogo();
 		
 		function getWeightQr() { return 15; }
-		function getWeightLogo() { return 15; }
+		function getWeightLogo() { return 0; }
 	},
 	
 	/**
