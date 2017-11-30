@@ -69,6 +69,10 @@ ol {
 	text-decoration: none;
 }
 
+.link_div:first-child {
+	padding-left:0px;
+}
+
 .link_div {
 	padding: 10px 0 10px 20px;
 }

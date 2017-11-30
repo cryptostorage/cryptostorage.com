@@ -98,6 +98,17 @@ function AppController(div) {
 	this.render = function(onDone) {
 		div.empty();
 		
+		// refresh and cache environment info on loop
+		LOADER.load("lib/ua-parser.js", function() {
+			refreshEnvironmentInfo();
+			function refreshEnvironmentInfo() {
+				AppUtils.getEnvironmentInfo(function(info) {
+					AppUtils.setCachedEnvironmentInfo(info);
+				});
+				setTimeout(refreshEnvironmentInfo, ENVIRONMENT_REFRESH_RATE);
+			}
+		});
+		
 		// header
 		var headerDiv = $("<div class='app_header'>").appendTo(div);
 		
@@ -108,6 +119,19 @@ function AppController(div) {
 			window.location.href = "#home";
 			that.showHome();
 		});
+		
+		// header critical error
+		var errorDiv = $("<div class='red_warning'>").appendTo(headerTopDiv);
+		refreshHeaderError();
+		function refreshHeaderError() {
+			var info = AppUtils.getCachedEnvironmentInfo();
+			if (info) {
+				for (var i = 0; i < info.checks.length; i++) {
+					if (info.checks[i].state === "fail") errorDiv.html(info.checks[i].message);
+				}
+			}
+			setTimeout(refreshHeaderError, ENVIRONMENT_REFRESH_RATE);
+		}
 		
 		// header links
 		var linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);

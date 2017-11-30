@@ -6,6 +6,7 @@ var ENCRYPTION_THREADS = 1;
 var CRYPTOSTORAGE_URL = "http://cryptostorage.com";	// TODO: change to https
 var ONLINE_IMAGE_URL = CRYPTOSTORAGE_URL + "/favicon.ico";
 var APP_DEPENDENCIES = ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/ua-parser.js"];
+var ENVIRONMENT_REFRESH_RATE = 3000;	// environment refresh rate in milliseconds
 
 // classify operating systems and browsers as open or closed source
 var OPEN_SOURCE_BROWSERS = [

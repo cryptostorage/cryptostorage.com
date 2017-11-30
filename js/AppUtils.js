@@ -1129,6 +1129,7 @@ var AppUtils = {
 		info.isLocal = AppUtils.isLocal();
 		AppUtils.isOnline(function(online) {
 			info.isOnline = online;
+			info.checks = AppUtils.getEnvironmentChecks(info);
 			onDone(info);
 		});
 	},
@@ -1169,5 +1170,19 @@ var AppUtils = {
 		else checks.push({state: "warn", message: "Internet connection is active"});
 		
 		return checks;
+	},
+	
+	/**
+	 * Returns cached environment info.
+	 */
+	getCachedEnvironmentInfo: function() {
+		return AppUtils.cachedEnvironmentInfo;
+	},
+	
+	/**
+	 * Sets cached environment info.
+	 */
+	setCachedEnvironmentInfo: function(info) {
+		AppUtils.cachedEnvironmentInfo = info;
 	}
 }
