@@ -1,4 +1,6 @@
 TODO
+split lines less steep
+show passphrase left aligned on some browsers
 form validation
 import/export design
 homepage
@@ -11,24 +13,20 @@ internet explorer doesn't refresh with bip38
 design:
 export controller progress design, initial and re-render
 import / decryption complete - click button to view
+add all button on form
 start over button on form
-start with all currencies on form
-bip38 checkboxes on form
-environment checks: critical error on homepage, "2 warnings" with more info, generate button color, all checks pass, etc
-ability to encrypt / decrypt on export page?
+environment checks: app header, disable recover, disable generate, show info bar on form and export
 print progress
-homepage scale too big on small screens?
 light blue little bit ligher / brighter
-split lines less steep
-show passphrase left aligned on some browsers
 tip address
+homepage scale too big on small screens?
 ability to re-hide more currencies on home?
-environment checks on export page
+ability to encrypt / decrypt on export page?
 
 low priority:
+save as txt and csv
 double click cryptostorage.html opens page in browser
 wait for images before loading homepage
-save as txt and csv
 try all imported file / key combinations to recover
 prevent scroll revealing some of next picture
 copy line break in pdf inserts space
@@ -46,5 +44,3 @@ disable generate button until input valid? - let them click once then disable un
 color of generate buttons / pulsing? - form button same as home page, maybe shift to darker
 slider points, logos, and supporting content - fill icons with white, multiple locks
 BIP38 vs CryptoJS encryption option for BTC/BCH - checkbox on same line as "Show passphrase", "Use BIP38 for Bitcoin and Bitcoin Cash"
-live site warning to stop and download from github - orange bar on form page encouraging users to download
-warnings to test before using - add FAQ
