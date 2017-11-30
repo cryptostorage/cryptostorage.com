@@ -362,7 +362,16 @@ input[type='checkbox'] {
 }
 
 .passphrase_checkbox_div {
-	margin-left: auto;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: flex;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-ms-flex-pack: end;
+	-webkit-justify-content: flex-end;
+	justify-content: flex-end;
 }
 
 .passphrase_input {
@@ -598,9 +607,9 @@ input[type='checkbox'] {
 	-webkit-align-items: center;
 	-ms-flex-align: center;
 	align-items: center;
-	justify-content: flex-end;
 	-ms-flex-pack: end;
 	-webkit-justify-content: flex-end;
+	justify-content: flex-end;
 	margin-top: -5px;
 }
 
@@ -640,9 +649,9 @@ input[type='checkbox'] {
 	-webkit-align-items: center;
 	-ms-flex-align: center;
 	align-items: center;
-	justify-content: flex-end;
 	-ms-flex-pack: end;
 	-webkit-justify-content: flex-end;
+	justify-content: flex-end;
 }
 
 .donate_logo {
