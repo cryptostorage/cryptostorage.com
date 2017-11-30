@@ -1,5 +1,4 @@
 TODO
-split lines less steep
 prevent text selection on buttons
 form validation
 import/export design
