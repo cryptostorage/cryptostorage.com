@@ -504,13 +504,23 @@ input[type='checkbox'] {
 	-webkit-justify-content: center;
 	-ms-flex-pack: center;
 	justify-content: center;
+	width: 25px;
 }
 
 .trash_div:hover {
 	cursor: pointer;
 }
 
+.trash_div_disabled {
+	opacity: 0.25;
+}
+
+.trash_div_disabled:hover {
+	cursor: auto;
+}
+
 .trash_img {
+	width: 25px;
 	height: 25px;
 }
 

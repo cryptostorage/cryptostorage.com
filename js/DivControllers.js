@@ -795,8 +795,9 @@ function FormController(div) {
 			removeCurrency(currencyInput);
 		});
 		
-		// add to page and track
+		// update currency inputs and add to page
 		currencyInputs.push(currencyInput);
+		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().appendTo(currencyInputsDiv);
 		updateForm();
 	}
@@ -805,6 +806,7 @@ function FormController(div) {
 		var idx = currencyInputs.indexOf(currencyInput);
 		if (idx < 0) throw new Error("Could not find currency input");
 		currencyInputs.splice(idx, 1);
+		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().remove();
 		updateForm();
 	}
@@ -853,6 +855,8 @@ function FormController(div) {
 		var numKeysInput;
 		var selector;
 		var selectorData;
+		var trashDiv;
+		var trashImg;
 		var initializing = true;
 		
 		this.getDiv = function() {
@@ -877,6 +881,16 @@ function FormController(div) {
 		
 		this.getNumKeys = function() {
 			return parseFloat(numKeysInput.val());
+		}
+		
+		this.setTrashEnabled = function(enabled) {
+			trashDiv.unbind("click");
+			if (enabled) {
+				trashDiv.click(function() { onDelete(); });
+				trashImg.removeClass("trash_div_disabled");
+			} else {
+				trashImg.addClass("trash_div_disabled");
+			}
 		}
 		
 		// render input
@@ -915,12 +929,11 @@ function FormController(div) {
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 			rightDiv.append("Number of key pairs&nbsp;&nbsp;");
-			numKeysInput = $("<input type='number'>").appendTo(rightDiv);
-			numKeysInput.attr("value", 1);
+			numKeysInput = $("<input type='number' value='1' min='1'>").appendTo(rightDiv);
 			rightDiv.append("&nbsp;&nbsp;");
-			var trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
+			trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 			trashDiv.click(function() { onDelete(); });
-			var trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
+			trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
 			
 			// no longer initializing
 			initializing = false;
