@@ -2,11 +2,6 @@
  * UI utilities.
  */
 var UiUtils = {
-		
-	setupContentDiv: function(div) {
-		div.empty();
-		div.attr("class", "page_div");
-	},
 	
 	getProgressBar: function(div) {
 		return new ProgressBar.Line(div.get(0), {
@@ -112,16 +107,6 @@ function AppController(div) {
 			that.showHome();
 		});
 		
-		// header critical error
-		var errorDiv = $("<div class='red_warning'>").appendTo(headerTopDiv);
-		AppUtils.addEnvironmentListener(function(info) {
-			errorDiv.html("");
-			for (var i = 0; i < info.checks.length; i++) {
-				if (info.checks[i].state === "fail") errorDiv.html(info.checks[i].message);
-				break;
-			}
-		});
-		
 		// header links
 		var linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
 		var homeLink = getLinkDiv("Home");
@@ -156,17 +141,10 @@ function AppController(div) {
 		sliderDiv = $("<div>").appendTo(headerDiv);
 		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectRecover);
 		
-		// notice div
-		noticeDivContainer = $("<div>").appendTo(headerDiv);
-		noticeDivContainer.hide();
-		var noticeDiv = $("<div>").appendTo(noticeDivContainer);
-		
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		noticeController = new NoticeController(noticeDiv);
-		noticeController.render();
 		homeController = new HomeController($("<div>"));
 		formController = new FormController($("<div>"));
 		recoverController = new RecoverController($("<div>"));
@@ -202,7 +180,6 @@ function AppController(div) {
 	this.showHome = function() {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
 		sliderDiv.show();
-		noticeDivContainer.hide();
 		sliderController.render(function() {
 			homeController.render(function(div) {
 				setContentDiv(div);
@@ -215,7 +192,6 @@ function AppController(div) {
 		formController.render(function(div) {
 			setContentDiv(div);
 			sliderDiv.hide();
-			noticeDivContainer.show();
 			if (onDone) onDone();
 		});
 	}
@@ -223,21 +199,18 @@ function AppController(div) {
 	this.showFaq = function() {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
 		sliderDiv.hide();
-		noticeDivContainer.hide();
 		setContentDiv(faqController.getDiv());
 	}
 	
 	this.showDonate = function() {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
 		sliderDiv.hide();
-		noticeDivContainer.hide();
 		setContentDiv(donateController.getDiv());
 	}
 	
 	this.showRecover = function() {
 		if (AppUtils.DEV_MODE) console.log("showRecover()");
 		sliderDiv.hide();
-		noticeDivContainer.hide();
 		recoverController.render();
 		setContentDiv(recoverController.getDiv());
 	}
@@ -324,27 +297,37 @@ inheritsFrom(SliderController, DivController);
 function HomeController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
+		
+		// div setup
 		div.empty();
-		div.attr("class", "page_div home_div");
+		div.attr("class", "content_div");
+		
+		// notice div
+		var noticeDiv = $("<div>").appendTo(div);
+		noticeDiv.hide();
+		new NoticeController(noticeDiv, {showOnWarnings: false, showOnPasses: false}).render();
+		
+		// home content
+		var pageDiv = $("<div class='page_div home_div'>").appendTo(div);
 		
 		// supported currencies
-		div.append("<div class='home_label'>Supports these popular cryptocurrencies</div>");
+		pageDiv.append("<div class='home_label'>Supports these popular cryptocurrencies</pageDiv>");
 		var plugins = AppUtils.getCryptoPlugins();
-		div.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
+		pageDiv.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 		var moreDiv = null;
 		for (var i = 3; i < plugins.length; i += 4) {
 			var row = getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked);
 			if (i >= 7 && !moreDiv) {
-				moreDiv = $("<div>").appendTo(div);
+				moreDiv = $("<div>").appendTo(pageDiv);
 				moreDiv.hide();
 			}
 			if (moreDiv) moreDiv.append(row);
-			else div.append(row);
+			else pageDiv.append(row);
 		}
 		
 		// add more div
 		if (moreDiv) {
-			var moreLabel = $("<div class='home_more_label'>").appendTo(div);
+			var moreLabel = $("<div class='home_more_label'>").appendTo(pageDiv);
 			moreLabel.append("and " + (plugins.length - 7) + " more...");
 			moreLabel.click(function() {
 				moreLabel.hide();
@@ -353,10 +336,10 @@ function HomeController(div) {
 		}
 		
 		// sample page
-		$("<div style='height:100px'>").appendTo(div);
-		div.append("<div class='home_label'>Export to printable and digital format for long term storage</div>");
-		$("<div style='height:40px'>").appendTo(div);
-		div.append($("<img width=750px src='img/print_sample.png'>"));
+		$("<div style='height:100px'>").appendTo(pageDiv);
+		pageDiv.append("<div class='home_label'>Export to printable and digital format for long term storage</pageDiv>");
+		$("<div style='height:40px'>").appendTo(pageDiv);
+		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 		
 		// track environment failure to disable clicking currency
 		var environmentFailure = false;
@@ -415,23 +398,29 @@ inheritsFrom(HomeController, DivController);
 function FaqController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
-		UiUtils.setupContentDiv(div);
 		
-		var titleDiv = $("<div class='title'>").appendTo(div);
+		// div setup
+		div.empty();
+		div.attr("class", "content_div");
+		var pageDiv = $("<div class='page_div'>").appendTo(div);
+		
+		// title
+		var titleDiv = $("<div class='title'>").appendTo(pageDiv);
 		titleDiv.html("Frequently Asked Questions");
 		
-		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(div);
-		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(div);
-		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(div);
-		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(div);
-		$("<div class='question'>").html("How can I trust this service?").appendTo(div);
-		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is publicly audited.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(div);
-		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(div);
-		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(div);
-		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(div);
-		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future.").appendTo(div);
-		$("<div class='question'>").html("What formats can I export to?").appendTo(div);
-		$("<div class='answer'>").html("TODO").appendTo(div);
+		// questions and answers
+		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(pageDiv);
+		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(pageDiv);
+		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(pageDiv);
+		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(pageDiv);
+		$("<div class='question'>").html("How can I trust this service?").appendTo(pageDiv);
+		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is publicly audited.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(pageDiv);
+		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(pageDiv);
+		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(pageDiv);
+		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(pageDiv);
+		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future.").appendTo(pageDiv);
+		$("<div class='question'>").html("What formats can I export to?").appendTo(pageDiv);
+		$("<div class='answer'>").html("TODO").appendTo(pageDiv);
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -446,13 +435,17 @@ function DonateController(div, appController) {
 	DivController.call(this, div);
 	
 	this.render = function(onDone) {
-		UiUtils.setupContentDiv(div);
+		
+		// div setup
+		div.empty();
+		div.attr("class", "content_div");
+		var pageDiv = $("<div class='page_div'>").appendTo(div);
 		
 		// load qr code dependency
 		LOADER.load(["lib/qrcode.js", "lib/async.js"], function() {
 			
 			// build donate section
-			var titleDiv = $("<div class='title'>").appendTo(div);
+			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
 			titleDiv.html("Donate");
 			var donations = [];
 			var plugins = AppUtils.getCryptoPlugins();
@@ -465,11 +458,11 @@ function DonateController(div, appController) {
 				});
 			}
 			renderDonationAddresses(donations, null, null, function(donationsDiv) {
-				div.append(donationsDiv);
+				pageDiv.append(donationsDiv);
 				
 				// build credits section
-				div.append("<br><br>");
-				titleDiv = $("<div class='title'>").appendTo(div);
+				pageDiv.append("<br><br>");
+				titleDiv = $("<div class='title'>").appendTo(pageDiv);
 				titleDiv.html("Credits");
 				var credits = [];
 				credits.push({
@@ -488,7 +481,7 @@ function DonateController(div, appController) {
 					value: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
 				});
 				renderDonationAddresses(credits, null, null, function(donationsDiv) {
-					div.append(donationsDiv);
+					pageDiv.append(donationsDiv);
 					if (onDone) onDone(div);
 				});
 			});
@@ -612,13 +605,19 @@ function FormController(div) {
 	var currencyInputs;			// tracks each currency input
 	
 	this.render = function(onDone) {
+		div.empty();
+		div.attr("class", "content_div");
 		
-		// initial state
-		UiUtils.setupContentDiv(div);
+		// notice div
+		var noticeDiv = $("<div>").appendTo(div);
+		new NoticeController(noticeDiv).render();
+		
+		// page div
+		var pageDiv = $("<div class='page_div'>").appendTo(div);
 		
 		// currency inputs
 		currencyInputs = [];
-		var currencyDiv = $("<div class='form_section_div'>").appendTo(div);
+		var currencyDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
 		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(currencyDiv);
 		
 		// link to add currency
@@ -630,7 +629,7 @@ function FormController(div) {
 		});
 		
 		// passphrase checkbox
-		var passphraseDiv = $("<div class='form_section_div'>").appendTo(div);
+		var passphraseDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
 		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
 		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
 		passphraseCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
@@ -671,7 +670,7 @@ function FormController(div) {
 		bchBip38CheckboxLabel.html("&nbsp;Use BIP38 encryption for Bitcoin Cash");
 		
 		// split checkbox
-		var splitDiv = $("<div class='form_section_div'>").appendTo(div);
+		var splitDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
 		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
 		var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.html("&nbsp;Do you want to split your private keys into separate pieces?");
@@ -712,7 +711,7 @@ function FormController(div) {
 		addCurrency();
 		
 		// add generate button
-		var generateDiv = $("<div class='generate_div'>").appendTo(div);
+		var generateDiv = $("<div class='generate_div'>").appendTo(pageDiv);
 		var btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
 		btnGenerate.append("Generate keys");
 		
@@ -723,11 +722,11 @@ function FormController(div) {
 		});
 		
 		// under development warning
-		var warningDiv = $("<div class='red_warning'>").appendTo(div);
+		var warningDiv = $("<div class='red_warning'>").appendTo(pageDiv);
 		warningDiv.append("Under Development: Not Ready for Use");
 		
 		// environment checks
-		var environmentDiv = $("<div>").appendTo(div);
+		var environmentDiv = $("<div>").appendTo(pageDiv);
 		new EnvironmentCheckController(environmentDiv).render();
 		
 		// done rendering
@@ -946,14 +945,17 @@ inheritsFrom(FormController, DivController);
 function RecoverController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
+		
+		// div setup
 		div.empty();
-		div.attr("class", "recover_page");
+		div.attr("class", "content_div");
+		var pageDiv = $("<div class='page_div recover_page'>").appendTo(div);
 		
 		// filler to push recover div down
-		$("<div class='recover_filler'>").appendTo(div);
+		$("<div class='recover_filler'>").appendTo(pageDiv);
 		
 		// all recover content including tabs
-		var recoverDiv = $("<div class='recover_div'>").appendTo(div);
+		var recoverDiv = $("<div class='recover_div'>").appendTo(pageDiv);
 		
 		// render recover file and text divs
 		var recoverFileDiv = $("<div>");
@@ -2235,6 +2237,9 @@ function NoticeController(div, config) {
 		div.empty();
 		div.addClass("notice_div");
 		
+		// merge configs
+		config = objectAssign({}, getDefaultConfig(), config);
+		
 		// listen for environment
 		AppUtils.addEnvironmentListener(function(info) {
 			var passCount = 0;
@@ -2253,11 +2258,24 @@ function NoticeController(div, config) {
 				}
 				if (warnCount) str += warnCount + " warning" + (warnCount > 1 ? "s" : "");
 				div.html(str);
-				div.show();
+				
+				// show div depending on configuration
+				if (config.showOnFailures && failCount) div.show();
+				else if (config.showOnWarnings && warnCount) div.show();
+				else if (config.showOnPasses && passCount) div.show();
+				else div.hide();
 			} else {
 				div.hide();
 			}
 		});
+	}
+	
+	function getDefaultConfig() {
+		return {
+			showOnFailures: true,
+			showOnWarnings: true,
+			showOnPasses: false
+		};
 	}
 }
 inheritsFrom(NoticeController, DivController);

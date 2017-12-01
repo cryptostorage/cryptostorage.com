@@ -193,14 +193,24 @@ ol {
 }
 
 .app_content {
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
-	width: 875px;
+	width: 100%;
+}
+
+.content_div {
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	-moz-flex-direction: column;
+	-ms-flex-direction: column;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
 }
 
 .page_div {
-	width: 100%;
+	width: 875px;
 	background-color: white;
 	padding: 25px;
 }
@@ -703,8 +713,7 @@ input[type='checkbox'] {
 }
 
 .recover_page {
-	width: 100%;
-	background-color: white;
+	padding: 0;
 	min-height: 700px;
 }
 

@@ -1268,6 +1268,7 @@ var AppUtils = {
 	 */
 	notifyEnvironmentListeners: function(info) {
 		AppUtils.lastEnvironmentInfo = info;
+		if (!AppUtils.environmentListeners) return;
 		for (var i = 0; i < AppUtils.environmentListeners.length; i++) {
 			var listener = AppUtils.environmentListeners[i];
 			if (listener) listener(info);
