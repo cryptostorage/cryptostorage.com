@@ -1,9 +1,9 @@
 TODO
 form validation
+run minimum tests when site accessed
 import/export design
 homepage
 faq
-run minimum tests when site accessed
 todos throughout code
 internet explorer doesn't refresh with bip38
 
