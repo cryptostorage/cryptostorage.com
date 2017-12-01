@@ -202,7 +202,7 @@ function AppController(div) {
 	this.showHome = function() {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
 		sliderDiv.show();
-		noticeDivContainer.show();
+		noticeDivContainer.hide();
 		sliderController.render(function() {
 			homeController.render(function(div) {
 				setContentDiv(div);
