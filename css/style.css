@@ -358,6 +358,16 @@ input[type='checkbox'] {
 	margin-bottom: 20px;
 }
 
+.form_flex {
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: flex;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+
 .passphrase_input_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -377,7 +387,13 @@ input[type='checkbox'] {
 	margin-bottom: 15px;
 }
 
-.passphrase_checkbox_div {
+.passphrase_input {
+	width: 100%;
+	border: 2.25px solid;
+	padding:5px;
+}
+
+.passphrase_config_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -385,15 +401,28 @@ input[type='checkbox'] {
 	-webkit-align-items: center;
 	-ms-flex-align: center;
 	align-items: center;
-	-ms-flex-pack: end;
-	-webkit-justify-content: flex-end;
-	justify-content: flex-end;
+	padding: 7px 0px 7px 0px;
 }
 
-.passphrase_input {
-	width: 100%;
-	border: 2.25px solid;
-	padding:5px;
+.bip38_checkbox_div {
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: flex;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+
+.show_passphrase_checkbox_div {
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: flex;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	margin-left: auto;
 }
 
 .split_input_div {
@@ -497,7 +526,7 @@ input[type='checkbox'] {
 	align-items: center;
 	border-style:solid;
 	border-width: 0 2.25px 2.25px 2.25px;
-	padding: 15px;
+	padding: 20px;
 }
 
 .currency_input_right_div {

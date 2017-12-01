@@ -593,11 +593,9 @@ function FormController(div) {
 	DivController.call(this, div);
 	
 	var passphraseCheckbox;
-	var btcBip38CheckboxDiv;
-	var btcBip38Checkbox;
-	var bchBip38CheckboxDiv;
-	var bchBip38Checkbox;
 	var passphraseInput;
+	var bip38CheckboxDiv;
+	var bip38Checkbox;
 	var splitCheckbox;
 	var numPiecesInput;
 	var minPiecesInput;
@@ -630,9 +628,10 @@ function FormController(div) {
 		
 		// passphrase checkbox
 		var passphraseDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
-		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
-		passphraseCheckboxLabel.html("&nbsp;Do you want to protect your private keys with a passphrase?");
+		var passphraseCheckboxDiv = $("<div class='form_flex'>").appendTo(passphraseDiv);
+		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
+		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
+		passphraseCheckboxLabel.html("Do you want to protect your private keys with a passphrase?");
 		passphraseCheckbox.click(function() {
 			if (passphraseCheckbox.prop('checked')) {
 				passphraseInputDiv.show();
@@ -648,10 +647,17 @@ function FormController(div) {
 		passphraseWarnDiv.append("This passphrase is required to access funds later on.  Don’t lose it!");
 		passphraseInputDiv.append("Passphrase");
 		passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
-		var showPassphraseCheckboxDiv = $("<div class='passphrase_checkbox_div'>").appendTo(passphraseInputDiv);
+		
+		// passphrase config
+		var passphraseConfigDiv = $("<div class='passphrase_config_div'>").appendTo(passphraseInputDiv);
+		bip38CheckboxDiv = $("<div class='bip38_checkbox_div'>").appendTo(passphraseConfigDiv);
+		bip38Checkbox = $("<input type='checkbox' id='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
+		var bip38CheckboxLabel = $("<label for='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
+		bip38CheckboxLabel.html("Use BIP38 for Bitcoin and Bitcoin Cash");
+		var showPassphraseCheckboxDiv = $("<div class='show_passphrase_checkbox_div'>").appendTo(passphraseConfigDiv);
 		var showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 		var showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
-		showPassphraseCheckboxLabel.html("&nbsp;Show passphrase");
+		showPassphraseCheckboxLabel.html("Show passphrase");
 		showPassphraseCheckbox.click(function() {
 			if (showPassphraseCheckbox.prop('checked')) {
 				passphraseInput.attr("type", "text");
@@ -660,20 +666,13 @@ function FormController(div) {
 			}
 			passphraseInput.focus();
 		});
-		btcBip38CheckboxDiv = $("<div>").appendTo(passphraseInputDiv);
-		btcBip38Checkbox = $("<input type='checkbox' id='btc_bip38_checkbox'>").appendTo(btcBip38CheckboxDiv);
-		var btcBip38CheckboxLabel = $("<label for='btc_bip38_checkbox'>").appendTo(btcBip38CheckboxDiv);
-		btcBip38CheckboxLabel.html("&nbsp;Use BIP38 encryption for Bitcoin");
-		bchBip38CheckboxDiv = $("<div>").appendTo(passphraseInputDiv);
-		bchBip38Checkbox = $("<input type='checkbox' id='bch_bip38_checkbox'>").appendTo(bchBip38CheckboxDiv);
-		var bchBip38CheckboxLabel = $("<label for='bch_bip38_checkbox'>").appendTo(bchBip38CheckboxDiv);
-		bchBip38CheckboxLabel.html("&nbsp;Use BIP38 encryption for Bitcoin Cash");
 		
 		// split checkbox
 		var splitDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
-		var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitDiv);
-		splitCheckboxLabel.html("&nbsp;Do you want to split your private keys into separate pieces?");
+		var splitCheckboxDiv = $("<div class='form_flex'>").appendTo(splitDiv);
+		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitCheckboxDiv);
+		var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitCheckboxDiv);
+		splitCheckboxLabel.html("Do you want to split your private keys into separate pieces?");
 		splitCheckbox.click(function() {
 			if (splitCheckbox.prop('checked')) {
 				splitInputDiv.show();
@@ -688,7 +687,7 @@ function FormController(div) {
 		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
 		var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
 		var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
-		splitNumLabelTop.html("Split Each Key Into");
+		splitNumLabelTop.html("Split Each Private Key Into");
 		numPiecesInput = $("<input type='number' value='3' min='2'>").appendTo(splitNumDiv);
 		var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
 		splitNumLabelBottom.html("Pieces");
@@ -768,8 +767,8 @@ function FormController(div) {
 		return config;
 		
 		function getEncryptionScheme(currencyInput) {
-			if (currencyInput.getSelectedPlugin().getTicker() === "BTC" && btcBip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
-			if (currencyInput.getSelectedPlugin().getTicker() === "BCH" && bchBip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
+			if (currencyInput.getSelectedPlugin().getTicker() === "BTC" && bip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
+			if (currencyInput.getSelectedPlugin().getTicker() === "BCH" && bip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
 			return AppUtils.EncryptionScheme.CRYPTOJS;
 		}
 		
@@ -830,9 +829,8 @@ function FormController(div) {
 			}
 		}
 		
-		// show or hide bip38 checkbox options
-		btcFound ? btcBip38CheckboxDiv.show() : btcBip38CheckboxDiv.hide();
-		bchFound ? bchBip38CheckboxDiv.show() : bchBip38CheckboxDiv.hide();
+		// show or hide bip38 checkbox
+		btcFound || bchFound ? bip38CheckboxDiv.show() : bip38CheckboxDiv.hide();
 	}
 	
 	/**
