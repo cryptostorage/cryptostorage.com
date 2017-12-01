@@ -21,6 +21,7 @@ select a currency or default to first?
 homepage scale too big on small screens?
 ability to re-hide more currencies on home?
 ability to encrypt / decrypt on export page?
+use rounded or square qr code for split form?
 
 low priority:
 save as txt and csv

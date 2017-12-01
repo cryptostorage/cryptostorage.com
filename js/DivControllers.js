@@ -207,7 +207,7 @@ function AppController(div) {
 	}
 	
 	this.showHome = function() {
-		if (AppUtils.DEBUG) console.log("showHome()");
+		if (AppUtils.DEV_MODE) console.log("showHome()");
 		sliderDiv.show();
 		sliderController.render(function() {
 			homeController.render(function(div) {
@@ -217,7 +217,7 @@ function AppController(div) {
 	}
 	
 	this.showForm = function(onDone) {
-		if (AppUtils.DEBUG) console.log("showForm()");
+		if (AppUtils.DEV_MODE) console.log("showForm()");
 		formController.render(function(div) {
 			setContentDiv(div);
 			sliderDiv.hide();
@@ -226,19 +226,19 @@ function AppController(div) {
 	}
 	
 	this.showFaq = function() {
-		if (AppUtils.DEBUG) console.log("showFaq()");
+		if (AppUtils.DEV_MODE) console.log("showFaq()");
 		setContentDiv(faqController.getDiv());
 		sliderDiv.hide();
 	}
 	
 	this.showDonate = function() {
-		if (AppUtils.DEBUG) console.log("showDonate()");
+		if (AppUtils.DEV_MODE) console.log("showDonate()");
 		sliderDiv.hide();
 		setContentDiv(donateController.getDiv());
 	}
 	
 	this.showRecover = function() {
-		if (AppUtils.DEBUG) console.log("showRecover()");
+		if (AppUtils.DEV_MODE) console.log("showRecover()");
 		sliderDiv.hide();
 		recoverController.render();
 		setContentDiv(recoverController.getDiv());
@@ -788,7 +788,7 @@ function FormController(div) {
 	}
 	
 	function addCurrency() {
-		if (AppUtils.DEBUG) console.log("addCurrency()");
+		if (AppUtils.DEV_MODE) console.log("addCurrency()");
 		
 		// create input
 		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, AppUtils.getCryptoPlugins(), updateForm, function() {
