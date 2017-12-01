@@ -87,6 +87,7 @@ function AppController(div) {
 	var that = this;
 	var sliderController;
 	var sliderDiv;
+	var noticeDivContainer;
 	var contentDiv;
 	var homeController;
 	var formController;
@@ -96,6 +97,9 @@ function AppController(div) {
 	
 	this.render = function(onDone) {
 		div.empty();
+		
+		// poll environment info on loop
+		AppUtils.pollEnvironment();
 		
 		// header
 		var headerDiv = $("<div class='app_header'>").appendTo(div);
@@ -115,24 +119,6 @@ function AppController(div) {
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state === "fail") errorDiv.html(info.checks[i].message);
 				break;
-			}
-		});
-		
-		// refresh environment info on loop
-		LOADER.load("lib/ua-parser.js", function() {
-			var first = true;
-			refreshEnvironmentInfo();
-			function refreshEnvironmentInfo() {
-				var info = AppUtils.getEnvironmentInfo(function(info) {
-					AppUtils.notifyEnvironmentListeners(info);
-				});
-				
-				// if first load, notify listeners synchronously
-				if (first) {
-					first = false;
-					AppUtils.notifyEnvironmentListeners(info);
-				}
-				setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
 			}
 		});
 		
@@ -170,17 +156,24 @@ function AppController(div) {
 		sliderDiv = $("<div>").appendTo(headerDiv);
 		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectRecover);
 		
+		// notice div
+		noticeDivContainer = $("<div>").appendTo(headerDiv);
+		noticeDivContainer.hide();
+		var noticeDiv = $("<div>").appendTo(noticeDivContainer);
+		
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
+		noticeController = new NoticeController(noticeDiv);
+		noticeController.render();
 		homeController = new HomeController($("<div>"));
 		formController = new FormController($("<div>"));
 		recoverController = new RecoverController($("<div>"));
-		faqController = new FaqController($("<div>"));
-		donateController = new DonateController($("<div>"));
 		recoverController.render();
+		faqController = new FaqController($("<div>"));
 		faqController.render();
+		donateController = new DonateController($("<div>"));
 		donateController.render();
 		
 		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
@@ -209,6 +202,7 @@ function AppController(div) {
 	this.showHome = function() {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
 		sliderDiv.show();
+		noticeDivContainer.show();
 		sliderController.render(function() {
 			homeController.render(function(div) {
 				setContentDiv(div);
@@ -221,25 +215,29 @@ function AppController(div) {
 		formController.render(function(div) {
 			setContentDiv(div);
 			sliderDiv.hide();
+			noticeDivContainer.show();
 			if (onDone) onDone();
 		});
 	}
 	
 	this.showFaq = function() {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
-		setContentDiv(faqController.getDiv());
 		sliderDiv.hide();
+		noticeDivContainer.hide();
+		setContentDiv(faqController.getDiv());
 	}
 	
 	this.showDonate = function() {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
 		sliderDiv.hide();
+		noticeDivContainer.hide();
 		setContentDiv(donateController.getDiv());
 	}
 	
 	this.showRecover = function() {
 		if (AppUtils.DEV_MODE) console.log("showRecover()");
 		sliderDiv.hide();
+		noticeDivContainer.hide();
 		recoverController.render();
 		setContentDiv(recoverController.getDiv());
 	}
@@ -2026,6 +2024,11 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
 		}
 		
+		// notice div
+		var noticeDiv = $("<div>").appendTo(div);
+		noticeDiv.hide();
+		new NoticeController(noticeDiv).render();
+		
 		// currently showing piece
 		piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
 		
@@ -2218,9 +2221,49 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 inheritsFrom(ExportController, DivController);
 
 /**
- * Controls environment checks.
+ * Controls the notice div.
  * 
  * @param div is the div to render to
+ * @param config is the configuration
+ * 	{ showOnFail, showOnPass, showOn
+ */
+function NoticeController(div, config) {
+	DivController.call(this, div);
+	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("notice_div");
+		
+		// listen for environment
+		AppUtils.addEnvironmentListener(function(info) {
+			var passCount = 0;
+			var failCount = 0;
+			var warnCount = 0;
+			for (var i = 0; i < info.checks.length; i++) {
+				if (info.checks[i].state === "pass") passCount++;
+				else if (info.checks[i].state === "fail") failCount++;
+				else if (info.checks[i].state === "warn") warnCount++;
+			}
+			if (failCount || warnCount) {
+				var str = "";
+				if (failCount) {
+					str += failCount + " error" + (failCount > 1 ? "s" : "");
+					if (warnCount) str += ", ";
+				}
+				if (warnCount) str += warnCount + " warning" + (warnCount > 1 ? "s" : "");
+				div.html(str);
+				div.show();
+			} else {
+				div.hide();
+			}
+		});
+	}
+}
+inheritsFrom(NoticeController, DivController);
+
+/**
+ * Controls environment checks.
  */
 function EnvironmentCheckController(div) {
 	DivController.call(this, div);

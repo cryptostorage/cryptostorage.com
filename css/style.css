@@ -1394,3 +1394,19 @@ input[type='checkbox'] {
 	align-items: center;
 	margin: 10px;
 }
+
+.notice_div {
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: flex;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	background-color: rgb(247, 185, 43);
+	height:50px;
+	width:100%;
+}

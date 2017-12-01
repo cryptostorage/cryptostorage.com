@@ -1183,6 +1183,28 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Polls environment info and notifies listeners on loop.
+	 */
+	pollEnvironment: function() {
+		LOADER.load("lib/ua-parser.js", function() {
+			var first = true;
+			refreshEnvironmentInfo();
+			function refreshEnvironmentInfo() {
+				var info = AppUtils.getEnvironmentInfo(function(info) {
+					AppUtils.notifyEnvironmentListeners(info);
+				});
+				
+				// if first load, notify listeners synchronously
+				if (first) {
+					first = false;
+					AppUtils.notifyEnvironmentListeners(info);
+				}
+				setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
+			}
+		});
+	},
+	
+	/**
 	 * Interprets the given environment info and returns pass/fail/warn checks.
 	 * 
 	 * @param info is output from getEnvironmentInfo()

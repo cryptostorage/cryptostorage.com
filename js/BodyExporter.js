@@ -13,6 +13,9 @@
  */
 window.exportToBody = function(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit) {
 	
+	// poll environment info on loop
+	AppUtils.pollEnvironment();
+	
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;
 	
