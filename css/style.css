@@ -1398,6 +1398,9 @@ input[type='checkbox'] {
 	.export_header {
 		display: none;
 	}
+	.notice_div_container {
+		display: none;
+	}
 	.export_pieces_div, .export_pieces_div * {
 		visibility: visible;
 	}
@@ -1431,6 +1434,10 @@ input[type='checkbox'] {
 	-ms-flex-align: center;
 	align-items: center;
 	margin: 10px;
+}
+
+.notice_div_container {
+	width: 100%;
 }
 
 .notice_div {
