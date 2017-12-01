@@ -1,6 +1,4 @@
 TODO
-More than one instance of bitcore-lib found. Please make sure that you are not mixing instances of classes of the different versions of bitcore.
-seeing 1 error flash when generating keys
 https
 form validation
 run minimum tests when site accessed
@@ -9,6 +7,7 @@ homepage
 faq
 todos throughout code
 internet explorer doesn't refresh with bip38
+internet disconnect warning on key generation
 
 design:
 export controller progress design, initial and re-render
