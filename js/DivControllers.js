@@ -687,7 +687,7 @@ function FormController(div) {
 		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
 		var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
 		var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
-		splitNumLabelTop.html("Split Each Private Key Into");
+		splitNumLabelTop.html("Split Each Key Into");
 		numPiecesInput = $("<input type='number' value='3' min='2'>").appendTo(splitNumDiv);
 		var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
 		splitNumLabelBottom.html("Pieces");
