@@ -3,6 +3,7 @@ internet disconnect warning on key generation
 internet explorer doesn't refresh with bip38
 incorporate bip38 progress in progress bar
 chrome pulldown has scrollbar
+warning state changes in export and maybe form
 run minimum tests when site accessed
 check licenses of dependencies
 form validation
