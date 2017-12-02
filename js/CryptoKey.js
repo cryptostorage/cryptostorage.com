@@ -56,8 +56,8 @@ function CryptoKey(plugin, state) {
 		return this.state.wif;
 	}
 	
-	this.encrypt = function(scheme, passphrase, callback) {
-		this.plugin.encrypt(scheme, this, passphrase, callback);
+	this.encrypt = function(scheme, passphrase, onProgress, onDone) {
+		this.plugin.encrypt(scheme, this, passphrase, onProgress, onDone);
 	}
 	
 	this.decrypt = function(passphrase, callback) {

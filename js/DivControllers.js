@@ -2176,8 +2176,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 				assertInitialized(keyGenConfig);
 				AppUtils.generateKeys(keyGenConfig, function(percent, label) {
 					progressBar.set(percent);
-					if (label) progressBar.setText(label + " ... " + Math.round(percent * 100) + "%");
-					else progressBar.setText(progressBar.getText() + " ... " + Math.round(percent * 100) + "%");
+					progressBar.setText((label ? label + " ... " : "") + Math.round(percent * 100)  + "%");	// TODO: separate label and percent
 					progressDiv.show();
 				}, function(_keys, _pieces, _pieceDivs) {
 					progressDiv.hide();

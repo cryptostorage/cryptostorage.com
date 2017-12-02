@@ -615,7 +615,7 @@ var AppUtils = {
 	 * 		verifyEnryption: true|false	
 	 * 		passphrase: _,	// only needed if currency encryption initialized
 	 * 	}
-	 * @param onProgress(percent, label) is invoked as progress is made
+	 * @param onProgress(percent, label) is invoked as progress is made (optional)
 	 * @param onDone(keys, pieces, pieceDivs) is invoked when done
 	 */
 	generateKeys: function(config, onProgress, onDone) {
@@ -665,7 +665,7 @@ var AppUtils = {
 			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
 			async.series(funcs, function(err, keys) {
 				if (decommissioned) {
-					if (onDone) onDone();
+					onDone();
 					return;
 				}
 				if (err) throw err;
@@ -693,7 +693,7 @@ var AppUtils = {
 					// start encryption
 					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
 					AppUtils.encryptKeys(keys, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent, label) {
-						onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
+						if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
 					}, function(err, encryptedKeys) {
 						doneWeight += encryptWeight;
 						generatePieces(encryptedKeys, config);
@@ -743,7 +743,7 @@ var AppUtils = {
 				if (err) throw err;
 				assertEquals(pieces.length, pieceDivs.length);
 				if (onProgress) onProgress(1, "Complete");
-				if (onDone) onDone(keys, pieces, pieceDivs);
+				onDone(keys, pieces, pieceDivs);
 			});
 		}
 	},
@@ -754,9 +754,10 @@ var AppUtils = {
 	 * @param key is an unencrypted key to encrypt
 	 * @param scheme is the scheme to encrypt the key
 	 * @param passphrase is the passphrase to encrypt with
-	 * @param onDone(err, encryptedKey) is invoked when done
+	 * @param onProgress(percent) is invoked as progress as made (optional)
+	 * @param onDone(err, encryptedKey) is invoked when done (optional)
 	 */
-	encryptKey: function(key, scheme, passphrase, onDone) {
+	encryptKey: function(key, scheme, passphrase, onProgress, onDone) {
 		if (!scheme) throw new Error("Scheme must be initialized");
 		if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 		if (!passphrase) throw new Error("Passphrase must be initialized");
@@ -765,19 +766,22 @@ var AppUtils = {
 				LOADER.load("lib/crypto-js.js", function() {
 					var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
 					key.setState(objectAssign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
-					onDone(null, key);
+					if (onProgress) onProgress(1);
+					if (onDone) onDone(null, key);
 				})
 				break;
 			case AppUtils.EncryptionScheme.BIP38:
 				LOADER.load("lib/bitcoinjs.js", function() {
 					var decoded = bitcoinjs.decode(key.getWif());
-					var encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase);
+					var encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
+						if (onProgress) onProgress(progress.percent / 100);
+					});
 					key.setState(objectAssign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
-					onDone(null, key);
+					if (onDone) onDone(null, key);
 				});
 				break;
 			default:
-				onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+				if (onDone) onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
 		}
 	},
 	
@@ -788,8 +792,8 @@ var AppUtils = {
 	 * @param encryptionSchemes are the schemes to encrypt the keys
 	 * @param passphrase is the passphrase to encrypt the keys with
 	 * @param verifyEncryption specifies if encryption should be verified by decrypting
-	 * @param onProgress(percent, label) is invoked as progress is made
-	 * @param onDone(err, encryptedKeys) is invoked when encryption is done
+	 * @param onProgress(percent, label) is invoked as progress is made (optional)
+	 * @param onDone(err, encryptedKeys) is invoked when encryption is done (optional)
 	 */
 	encryptKeys: function(keys, encryptionSchemes, passphrase, verifyEncryption, onProgress, onDone) {
 		assertEquals(keys.length, encryptionSchemes.length);
@@ -863,7 +867,9 @@ var AppUtils = {
 					callback();
 					return;
 				}
-				key.encrypt(scheme, passphrase, function(err, key) {
+				key.encrypt(scheme, passphrase, function(percent) {
+					if (onProgress) onProgress((doneWeight +  AppUtils.getWeightEncryptKey(scheme) * percent) / totalWeight);
+				}, function(err, key) {
 					doneWeight += AppUtils.getWeightEncryptKey(scheme);
 					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
 					setImmediate(function() { callback(err, key); });	// let UI breath

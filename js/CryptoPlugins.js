@@ -34,12 +34,18 @@ CryptoPlugin.prototype.getDonationAddress = function() { throw new Error("Subcla
 CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS]; }
 
 /**
- * Encrypts the given key with the given scheme and passphrase.  Invokes onDone(err, key) when done.
+ * Encrypts the given key with the given scheme and passphrase.
+ * 
+ * @param scheme is the encryption scheme
+ * @param key is the key to encrypt
+ * @param passphrase is the passphrase to encrypt with
+ * @param onProgress(percent) is invoked as progress is made (optional)
+ * @param onDone(err, key) is invoked when done (optional)
  */
-CryptoPlugin.prototype.encrypt = function(scheme, key, passphrase, onDone) {
-	AppUtils.encryptKey(key, scheme, passphrase, function(err, encryptedKey) {
-		if (err) onDone(err);
-		else onDone(null, encryptedKey);
+CryptoPlugin.prototype.encrypt = function(scheme, key, passphrase, onProgress, onDone) {
+	AppUtils.encryptKey(key, scheme, passphrase, onProgress, function(err, encryptedKey) {
+		if (err) { if (onDone) onDone(err); }
+		else if (onDone) onDone(null, encryptedKey);
 	});
 }
 
