@@ -2,8 +2,8 @@ TODO
 internet disconnect warning on key generation
 internet explorer doesn't refresh with bip38
 chrome pulldown has scrollbar
-form validation
 run minimum tests when site accessed
+form validation
 import/export design
 homepage
 faq
