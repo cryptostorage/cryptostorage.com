@@ -1,15 +1,15 @@
 TODO
-https
+internet disconnect warning on key generation
+internet explorer doesn't refresh with bip38
+chrome pulldown has scrollbar
 form validation
 run minimum tests when site accessed
 import/export design
 homepage
 faq
 todos throughout code
-internet explorer doesn't refresh with bip38
-internet disconnect warning on key generation
 check licenses of dependencies
-chrome pulldown has scrollbar
+https
 
 design:
 export controller progress design, initial and re-render
