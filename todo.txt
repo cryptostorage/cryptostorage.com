@@ -1,15 +1,15 @@
 TODO
 internet disconnect warning on key generation
 internet explorer doesn't refresh with bip38
+incorporate bip38 progress in progress bar
 chrome pulldown has scrollbar
 run minimum tests when site accessed
-incorporate bip38 progress in progress bar
+check licenses of dependencies
 form validation
 import/export design
 homepage
 faq
 todos throughout code
-check licenses of dependencies
 https
 
 design:
