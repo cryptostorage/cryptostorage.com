@@ -8,6 +8,7 @@ faq
 todos throughout code
 internet explorer doesn't refresh with bip38
 internet disconnect warning on key generation
+check licenses of dependencies
 
 design:
 export controller progress design, initial and re-render
