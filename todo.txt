@@ -39,6 +39,7 @@ optimize tests by getting one set of keys of repeat_long size
 verify no name collisions
 code scan
 minimize initial dependencies: condense files to single files, lazy load css
+de-allocate elements on page re-renders
 
 consult designers
 opinion on donate page + ui designer tip address - link to open user's wallet
