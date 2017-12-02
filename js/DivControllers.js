@@ -82,7 +82,6 @@ function AppController(div) {
 	var that = this;
 	var sliderController;
 	var sliderDiv;
-	var noticeDivContainer;
 	var contentDiv;
 	var homeController;
 	var formController;
