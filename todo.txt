@@ -1,5 +1,4 @@
 TODO
-internet disconnect warning on key generation
 warning state changes when online determined in export and maybe form
 chrome pulldown has scrollbar
 run minimum tests when site accessed

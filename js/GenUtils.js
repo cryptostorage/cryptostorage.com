@@ -752,12 +752,18 @@ function isImageAccessible(url, timeout, onDone) {
   img.onerror = onResponse;
   img.src = url + "?" + (+new Date()); // trigger image load with cache buster
 	
-	// set timeout
+	// nest failure timeouts to give response a chance when browser is under load
 	setTimeout(function() {
-		if (!returned) {
-			returned = true;
-			onDone(false);
-		}
+		setImmediate(function() {
+			setImmediate(function() {
+				setImmediate(function() {
+					if (!returned) {
+						returned = true;
+						onDone(false);
+					}
+				});
+			});
+		});
 	}, timeout);
 	
   function onResponse(e) {
