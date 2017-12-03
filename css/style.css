@@ -328,7 +328,7 @@ ol {
 input[type='number'] {
 	width: 70px;
 	text-align: center;
-	border: 2.25px solid;
+	border: 2.5px solid;
 	padding:5px;
 }
 
@@ -389,7 +389,7 @@ input[type='checkbox'] {
 
 .passphrase_input {
 	width: 100%;
-	border: 2.25px solid;
+	border: 2.5px solid;
 	padding:5px;
 }
 
@@ -513,7 +513,7 @@ input[type='checkbox'] {
 }
 
 .currency_inputs_div:first-child {
-	border-top: 2.25px solid;
+	border-top: 2.5px solid;
 }
 
 .currency_input_div {
@@ -525,7 +525,7 @@ input[type='checkbox'] {
 	-ms-flex-align: center;
 	align-items: center;
 	border-style:solid;
-	border-width: 0 2.25px 2.25px 2.25px;
+	border-width: 0 2.5px 2.5px 2.5px;
 	padding: 15px;
 }
 
@@ -802,7 +802,7 @@ input[type='checkbox'] {
 	margin-bottom: 15px;
 	text-align: center;
 	background-color: rgb(247, 185, 43);
-	border: 2.25px solid black;
+	border: 2.5px solid black;
 	font-size: 24px;
 	-ms-flex-pack: center;
 	justify-content: center;
@@ -826,7 +826,7 @@ input[type='checkbox'] {
 	justify-content : center;
 	background-color: white;
 	padding: 30px;
-	border: 2.25px solid black;
+	border: 2.5px solid black;
 	-ms-flex-pack: center;
 	justify-content: center;
 }
@@ -899,7 +899,7 @@ input[type='checkbox'] {
 	margin-bottom: 10px;
 	font-size: 20px;
 	font-family: monospace;
-	border: 2.25px solid black;
+	border: 2.5px solid black;
 }
 
 .recover_button, .recover_view_button {
@@ -916,7 +916,7 @@ input[type='checkbox'] {
 	font-size: 28px;
 	color: white;
 	background-color: rgb(55, 218, 44);
-	border: 2.25px solid black;
+	border: 2.5px solid black;
 	-ms-flex-pack: center;
 	justify-content: center;
 	-webkit-user-select: none;
@@ -1037,7 +1037,7 @@ input[type='checkbox'] {
 	width: 100%;
 	padding: 18px;
 	margin: 0 0 10px 0;
-	border: 2.25px solid black;
+	border: 2.5px solid black;
 }
 
 .recover_decrypt_controls {
@@ -1117,7 +1117,7 @@ input[type='checkbox'] {
 	color: black;
 	margin: 0 10px 0 10px;
 	padding: 5px 20px 5px 20px;
-	border: 2.25px solid black;
+	border: 2.5px solid black;
 	font-size: 28px;
 	font-weight: bold;
 	-webkit-user-select: none;
@@ -1140,7 +1140,7 @@ input[type='checkbox'] {
 	color: grey;
 	margin: 0 10px 0 10px;
 	padding: 5px 20px 5px 20px;
-	border: 2.25px solid black;
+	border: 2.5px solid black;
 	font-size: 28px;
 	font-weight: bold;
 	-webkit-user-select: none;
@@ -1422,7 +1422,7 @@ input[type='checkbox'] {
 }
 
 .environment_checks_div {
-	border: 2.25px solid;
+	border: 2.5px solid;
 }
 
 .environment_check_div {
