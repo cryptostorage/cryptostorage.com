@@ -1,6 +1,5 @@
 TODO
 warning state changes when online determined in export and maybe form
-chrome pulldown has scrollbar
 run minimum tests when site accessed
 decomission encryption / decryption if cancelled
 check licenses of dependencies
