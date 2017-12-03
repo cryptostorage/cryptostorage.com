@@ -1,7 +1,7 @@
 TODO
 warning state changes when online determined in export and maybe form
-run minimum tests when site accessed
 decomission encryption / decryption if cancelled
+run minimum tests when site accessed
 check licenses of dependencies
 form validation
 import/export design
