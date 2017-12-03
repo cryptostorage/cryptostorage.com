@@ -2,6 +2,7 @@ TODO
 warning state changes when online determined in export and maybe form
 decomission encryption / decryption if cancelled
 navigate away from recover while decrypting loses progress
+home notice bar does not reliably paint on safari
 run minimum tests when site accessed
 check licenses of dependencies
 form validation
