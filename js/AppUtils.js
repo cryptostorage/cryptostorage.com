@@ -773,11 +773,15 @@ var AppUtils = {
 			case AppUtils.EncryptionScheme.BIP38:
 				LOADER.load("lib/bitcoinjs.js", function() {
 					var decoded = bitcoinjs.decode(key.getWif());
-					var encryptedWif = bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
+					bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
 						if (onProgress) onProgress(progress.percent / 100);
+					}, null, function(err, encryptedWif) {
+						if (err) { if (onDone) onDone(err); }
+						else {
+							key.setState(objectAssign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
+							if (onDone) onDone(null, key);
+						}
 					});
-					key.setState(objectAssign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
-					if (onDone) onDone(null, key);
 				});
 				break;
 			default:
@@ -883,9 +887,10 @@ var AppUtils = {
 	 * 
 	 * @param key is the key to decrypt
 	 * @param passphrase is the passphrase to decrypt the key
-	 * @param onDone(err, decryptedKey) is invoked when done
+	 * @param onProgress(percent) is invoked as progress is made (optional)
+	 * @param onDone(err, decryptedKey) is invoked when done (optional)
 	 */
-	decryptKey: function(key, passphrase, onDone) {
+	decryptKey: function(key, passphrase, onProgress, onDone) {
 		if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 		if (!passphrase) throw new Error("Passphrase must be initialized");
 		assertTrue(key.isEncrypted());
@@ -896,31 +901,34 @@ var AppUtils = {
 					try {
 						hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
 					} catch (err) { }
-					if (!hex) onDone(new Error("Incorrect passphrase"));
+					if (!hex) { if (onDone) onDone(new Error("Incorrect passphrase")); }
 					else {
 						try {
 							key.setPrivateKey(hex);
-							onDone(null, key);
+							if (onProgress) onProgress(1)
+							if (onDone) onDone(null, key);
 						} catch (err) {
-							onDone(new Error("Incorrect passphrase"));
+							if (onDone) onDone(new Error("Incorrect passphrase"));
 						}
 					}
 				});
 				break;
 			case AppUtils.EncryptionScheme.BIP38:
 				LOADER.load("lib/bitcoinjs.js", function() {
-					try {
-						var decrypted = bitcoinjs.decrypt(key.getWif(), passphrase);
-						var privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
-						key.setPrivateKey(privateKey);
-						onDone(null, key);
-					} catch (err) {
-						onDone(new Error("Incorrect passphrase"));
-					}
+					bitcoinjs.decrypt(key.getWif(), passphrase, function(progress) {
+						if (onProgress) onProgress(progress.percent / 100);
+					}, null, function(err, decrypted) {
+						if (err) { if (onDone) onDone(Error("Incorrect passphrase")); }
+						else {
+							var privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
+							key.setPrivateKey(privateKey);
+							if (onDone) onDone(null, key);
+						}
+					});
 				});
 				break;
 			default:
-				onDone(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
+				if (onDone) onDone(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
 		}
 	},
 	
@@ -964,11 +972,13 @@ var AppUtils = {
 			return function(callback) {
 				if (decommissioned) return;
 				var scheme = key.getEncryptionScheme();
-				key.decrypt(passphrase, function(err, key) {
+				key.decrypt(passphrase, function(percent) {
+					if (onProgress) onProgress((doneWeight + AppUtils.getWeightDecryptKey(scheme) * percent) / totalWeight);
+				}, function(err, key) {
 					if (err) onDone(err);
 					else {
 						doneWeight += AppUtils.getWeightDecryptKey(scheme);
-						if (onProgress) onProgress(doneWeight, totalWeight);
+						if (onProgress) onProgress(doneWeight / totalWeight);
 						setImmediate(function() { callback(err, key); });	// let UI breath
 					}
 				});

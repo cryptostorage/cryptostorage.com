@@ -50,12 +50,17 @@ CryptoPlugin.prototype.encrypt = function(scheme, key, passphrase, onProgress, o
 }
 
 /**
- * Decrypts the given key with the given passphrase.  Invokes onDone(err, key) when done.
+ * Decrypts the given key with the given passphrase.
+ * 
+ * @param key is the key to decrypt
+ * @param passphrase is the passphrase to decrypt the key
+ * @param onProgress(percent) is invoked as progress is made (optional)
+ * @param onDone(err, key) is invoked when done (optional)
  */
-CryptoPlugin.prototype.decrypt = function(key, passphrase, onDone) {
-	AppUtils.decryptKey(key, passphrase, function(err, decryptedKey) {
-		if (err) onDone(err);
-		else onDone(null, decryptedKey);
+CryptoPlugin.prototype.decrypt = function(key, passphrase, onProgress, onDone) {
+	AppUtils.decryptKey(key, passphrase, onProgress, function(err, decryptedKey) {
+		if (err) { if (onDone) onDone(err); }
+		else if (onDone) onDone(null, decryptedKey);
 	});
 }
 

@@ -1813,8 +1813,8 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 			// decrypt keys async
 			var copies = [];
 			for (var i = 0; i < encryptedKeys.length; i++) copies.push(encryptedKeys[i].copy());
-			AppUtils.decryptKeys(copies, passphrase, function(done, total) {
-				setProgress(done / total * decryptWeight / totalWeight, "Decrypting...");
+			AppUtils.decryptKeys(copies, passphrase, function(percent) {
+				setProgress(percent * decryptWeight / totalWeight, "Decrypting...");
 			}, function(err, decryptedKeys) {
 				
 				// if error, switch back to input div
@@ -1839,6 +1839,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	}
 	
 	function setProgress(percent, label) {
+		assertTrue(percent >= 0 && percent <= 1);
 		progressBar.set(percent);
 		progressBar.setText(Math.round(percent * 100) + "%");
 		if (label) labelDiv.html(label);

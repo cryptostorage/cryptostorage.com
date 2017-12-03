@@ -60,8 +60,8 @@ function CryptoKey(plugin, state) {
 		this.plugin.encrypt(scheme, this, passphrase, onProgress, onDone);
 	}
 	
-	this.decrypt = function(passphrase, callback) {
-		this.plugin.decrypt(this, passphrase, callback);
+	this.decrypt = function(passphrase, onProgress, onDone) {
+		this.plugin.decrypt(this, passphrase, onProgress, onDone);
 	}
 	
 	this.isEncrypted = function() {

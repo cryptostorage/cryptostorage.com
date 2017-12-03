@@ -479,7 +479,7 @@ var Tests = {
 		function testDecryptWrongPassphrase(plugin, onDone) {
 			var privateKey = "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdGfEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy";
 			var key = plugin.newKey(privateKey);
-			key.decrypt("abctesting123", function(err, decryptedKey) {
+			key.decrypt("abctesting123", null, function(err, decryptedKey) {
 				assertEquals("Incorrect passphrase", err.message);
 				onDone();
 			});
