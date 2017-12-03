@@ -1455,3 +1455,7 @@ input[type='checkbox'] {
 	height:50px;
 	width:100%;
 }
+
+.notice_error {
+	background-color:red;
+}

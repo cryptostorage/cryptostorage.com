@@ -2235,6 +2235,8 @@ function NoticeController(div, config) {
 		
 		// listen for environment
 		AppUtils.addEnvironmentListener(function(info) {
+			
+			// count number of pass, warn, and fail checks
 			var passCount = 0;
 			var failCount = 0;
 			var warnCount = 0;
@@ -2243,6 +2245,12 @@ function NoticeController(div, config) {
 				else if (info.checks[i].state === "fail") failCount++;
 				else if (info.checks[i].state === "warn") warnCount++;
 			}
+			
+			// style error
+			if (failCount) div.addClass("notice_error");
+			else div.removeClass("notice_error");
+			
+			// set text and show/hide depending on config
 			if (failCount || warnCount) {
 				var str = "";
 				if (failCount) {
