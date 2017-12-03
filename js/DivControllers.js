@@ -1805,7 +1805,6 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		progressDiv.show();
 		progressDiv.empty();
 		progressBar = UiUtils.getProgressBar(progressDiv);
-		setProgress(0, "Decrypting...");
 		
 		// let UI breath
 		setImmediate(function() {
@@ -1813,8 +1812,8 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 			// decrypt keys async
 			var copies = [];
 			for (var i = 0; i < encryptedKeys.length; i++) copies.push(encryptedKeys[i].copy());
-			AppUtils.decryptKeys(copies, passphrase, function(percent) {
-				setProgress(percent * decryptWeight / totalWeight, "Decrypting...");
+			AppUtils.decryptKeys(copies, passphrase, function(percent, label) {
+				setProgress(percent * decryptWeight / totalWeight, label);
 			}, function(err, decryptedKeys) {
 				
 				// if error, switch back to input div

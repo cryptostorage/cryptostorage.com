@@ -844,7 +844,7 @@ var AppUtils = {
 				// decrypt keys
 				if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
 				AppUtils.decryptKeys(encryptedCopies, passphrase, function(percent) {
-					if (onProgress) onProgress((doneWeight + percent * verifyWeight) / totalWeight);
+					if (onProgress) onProgress((doneWeight + percent * verifyWeight) / totalWeight, "Verifying encryption");
 				}, function(err, decryptedKeys) {
 					doneWeight += verifyWeight;
 					
@@ -872,7 +872,7 @@ var AppUtils = {
 					return;
 				}
 				key.encrypt(scheme, passphrase, function(percent) {
-					if (onProgress) onProgress((doneWeight +  AppUtils.getWeightEncryptKey(scheme) * percent) / totalWeight);
+					if (onProgress) onProgress((doneWeight +  AppUtils.getWeightEncryptKey(scheme) * percent) / totalWeight, "Encrypting");
 				}, function(err, key) {
 					doneWeight += AppUtils.getWeightEncryptKey(scheme);
 					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
@@ -960,7 +960,7 @@ var AppUtils = {
 		var funcs = [];
 		for (var i = 0; i < keys.length; i++) funcs.push(decryptFunc(keys[i], passphrase));
 		var doneWeight = 0;
-		if (onProgress) onProgress(doneWeight, totalWeight);
+		if (onProgress) onProgress(0, "Decrypting");
 		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, result) {
 			if (decommissioned) return;
 			else if (err) onDone(err);
@@ -973,7 +973,7 @@ var AppUtils = {
 				if (decommissioned) return;
 				var scheme = key.getEncryptionScheme();
 				key.decrypt(passphrase, function(percent) {
-					if (onProgress) onProgress((doneWeight + AppUtils.getWeightDecryptKey(scheme) * percent) / totalWeight);
+					if (onProgress) onProgress((doneWeight + AppUtils.getWeightDecryptKey(scheme) * percent) / totalWeight, "Decrypting");
 				}, function(err, key) {
 					if (err) onDone(err);
 					else {
