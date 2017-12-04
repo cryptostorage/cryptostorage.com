@@ -2,6 +2,7 @@ TODO
 run minimum tests when site accessed
 one of each button
 decomission encryption / decryption if cancelled
+make multiple currencies logo smaller
 
 check licenses of dependencies
 form validation
@@ -20,7 +21,7 @@ add all button on form
 start over button on form
 environment checks: app header, disable recover, disable generate, show info bar on form and export
 print progress
-light blue little bit ligher / brighter
+light blue slider
 tip address
 select a currency or default to first?
 homepage scale too big on small screens?
