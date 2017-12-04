@@ -209,7 +209,6 @@ function AppController(div) {
 	this.showRecover = function() {
 		if (AppUtils.DEV_MODE) console.log("showRecover()");
 		sliderDiv.hide();
-		recoverController.render();
 		setContentDiv(recoverController.getDiv());
 	}
 	
