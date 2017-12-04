@@ -272,6 +272,17 @@ ol {
 	background-color: #EBEDEF;
 }
 
+.currency_row_logo_major {
+	width: 125px;
+	height: 125px;
+	margin-bottom: 15px;
+}
+
+.currency_row_label_major {
+	font-size: 20px;
+	white-space: nowrap;
+}
+
 .currency_row_item_minor {
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -287,7 +298,7 @@ ol {
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
 	padding: 20px 0px 20px 0px;
-	width: 200px;
+	width: 180px;
 }
 
 .currency_row_item_minor:hover {
@@ -295,24 +306,15 @@ ol {
 	background-color: #EBEDEF;
 }
 
-.currency_row_logo_major {
-	width: 125px;
-	height: 125px;
-	margin: 0 15px 15px 15px;
-}
-
 .currency_row_logo_minor {
-	width: 85px;
-	height: 85px;
-	margin: 0 15px 15px 15px;
-}
-
-.currency_row_label_major {
-	font-size: 20px;
+	width: 80px;
+	height: 80px;
+	margin-bottom: 15px;
 }
 
 .currency_row_label_minor {
 	font-size: 20px;
+	white-space: nowrap;
 }
 
 .home_more_label {
