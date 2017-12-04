@@ -8,6 +8,7 @@ run minimum tests when site accessed
 one of each button
 decomission encryption / decryption if cancelled
 warn if private key not included in print
+could trim etc and still have all squares be the same size
 
 check licenses of dependencies
 form validation
