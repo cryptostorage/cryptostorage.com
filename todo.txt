@@ -1,5 +1,4 @@
 TODO
-option to split the passphrase and include a copy of it on each share
 home notice bar does not reliably paint on safari
 save names have timestamp
 safari scroll is sticky
