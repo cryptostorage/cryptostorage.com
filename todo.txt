@@ -5,6 +5,7 @@ navigate away from recover while decrypting loses progress
 home notice bar does not reliably paint on safari
 safari scroll is sticky
 run minimum tests when site accessed
+one of each button
 check licenses of dependencies
 form validation
 import/export design
