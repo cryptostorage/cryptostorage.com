@@ -1,5 +1,4 @@
 TODO
-home notice bar does not reliably paint on safari
 save names have timestamp
 safari scroll is sticky
 run minimum tests when site accessed

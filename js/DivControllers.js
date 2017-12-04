@@ -2280,6 +2280,9 @@ function NoticeController(div, config) {
 			if (warnCount) str += warnCount + " warning" + (warnCount > 1 ? "s" : "");
 			div.html(str);
 			
+			// hack for safari which requires re-paint
+			if (!div.is(":visible")) div.hide().show(0);
+			
 			// show div depending on configuration
 			if (config.showOnFail && failCount) div.show();
 			else if (config.showOnWarn && warnCount) div.show();
