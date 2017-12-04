@@ -1,12 +1,14 @@
 TODO
 warning state changes when online determined in export and maybe form
-decomission encryption / decryption if cancelled
 navigate away from recover while decrypting loses progress
+option to split the passphrase and include a copy of it on each share
 home notice bar does not reliably paint on safari
 safari scroll is sticky
 run minimum tests when site accessed
 one of each button
 check licenses of dependencies
+decomission encryption / decryption if cancelled
+
 form validation
 import/export design
 homepage
@@ -15,6 +17,7 @@ todos throughout code
 https
 
 design:
+option to split the passphrase and include a copy of it on each share
 export controller progress design, initial and re-render
 import / decryption complete - click button to view
 add all button on form
@@ -31,6 +34,7 @@ use rounded or square qr code for split form?
 
 low priority:
 save as txt and csv
+pieces are blank until rendered, loading screen?
 double click cryptostorage.html opens page in browser
 wait for images before loading homepage
 try all imported file / key combinations to recover
