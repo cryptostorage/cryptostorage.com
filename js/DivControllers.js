@@ -56,7 +56,7 @@ var UiUtils = {
 		
 		// open tab
 		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
-		  window.exportToBody(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit, AppUtils.getLastEnvironmentInfo());
+		  window.exportToBody(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit, AppUtils.getCachedEnvironmentInfo());
 			window.focus();
 		});
 	}
@@ -93,8 +93,10 @@ function AppController(div) {
 	this.render = function(onDone) {
 		div.empty();
 		
-		// poll environment info on loop
-		AppUtils.pollEnvironment();
+		// start polling starting with synchronized environment info
+		LOADER.load("lib/ua-parser.js", function() {
+			AppUtils.pollEnvironment(AppUtils.getEnvironmentInfo());
+		});
 		
 		// header
 		var headerDiv = $("<div class='app_header'>").appendTo(div);
@@ -301,7 +303,7 @@ function HomeController(div) {
 		// notice div
 		var noticeDiv = $("<div>").appendTo(div);
 		noticeDiv.hide();
-		new NoticeController(noticeDiv, {showOnWarnings: false, showOnPasses: false}).render();
+		new NoticeController(noticeDiv, {showOnWarn: false, showOnPass: false}).render();
 		
 		// home content
 		var pageDiv = $("<div class='page_div home_div'>").appendTo(div);
@@ -2220,8 +2222,12 @@ inheritsFrom(ExportController, DivController);
  * Controls the notice div.
  * 
  * @param div is the div to render to
- * @param config is the configuration
- * 	{ showOnFail, showOnPass, showOnPasses }	// TODO: get this config consistent
+ * @param config is the configuration:
+ * 	{
+ * 		showOnPass: bool,
+ * 		showOnFail: bool,
+ * 		showOnWarn: bool,
+ * 	}
  */
 function NoticeController(div, config) {
 	DivController.call(this, div);
@@ -2230,54 +2236,59 @@ function NoticeController(div, config) {
 		// div setup
 		div.empty();
 		div.addClass("notice_div");
+		div.hide();
 		
 		// merge configs
 		config = objectAssign({}, getDefaultConfig(), config);
 		
 		// listen for environment
 		AppUtils.addEnvironmentListener(function(info) {
-			
-			// count number of pass, warn, and fail checks
-			var passCount = 0;
-			var failCount = 0;
-			var warnCount = 0;
-			for (var i = 0; i < info.checks.length; i++) {
-				if (info.checks[i].state === "pass") passCount++;
-				else if (info.checks[i].state === "fail") failCount++;
-				else if (info.checks[i].state === "warn") warnCount++;
-			}
-			
-			// style error
-			if (failCount) div.addClass("notice_error");
-			else div.removeClass("notice_error");
-			
-			// set text and show/hide depending on config
-			if (failCount || warnCount) {
-				var str = "";
-				if (failCount) {
-					str += failCount + " error" + (failCount > 1 ? "s" : "");
-					if (warnCount) str += ", ";
-				}
-				if (warnCount) str += warnCount + " warning" + (warnCount > 1 ? "s" : "");
-				div.html(str);
-				
-				// show div depending on configuration
-				if (config.showOnFailures && failCount) div.show();
-				else if (config.showOnWarnings && warnCount) div.show();
-				else if (config.showOnPasses && passCount) div.show();
-				else div.hide();
-			} else {
-				div.hide();
-			}
+			setEnvironmentInfo(info);
 		});
 	}
 	
 	function getDefaultConfig() {
 		return {
-			showOnFailures: true,
-			showOnWarnings: true,
-			showOnPasses: false
+			showOnFail: true,
+			showOnWarn: true,
+			showOnPass: false
 		};
+	}
+	
+	function setEnvironmentInfo(info) {
+		
+		// count number of pass, warn, and fail checks
+		var passCount = 0;
+		var failCount = 0;
+		var warnCount = 0;
+		for (var i = 0; i < info.checks.length; i++) {
+			if (info.checks[i].state === "pass") passCount++;
+			else if (info.checks[i].state === "fail") failCount++;
+			else if (info.checks[i].state === "warn") warnCount++;
+		}
+		
+		// style error
+		if (failCount) div.addClass("notice_error");
+		else div.removeClass("notice_error");
+		
+		// set text and show/hide depending on config
+		if (failCount || warnCount) {
+			var str = "";
+			if (failCount) {
+				str += failCount + " error" + (failCount > 1 ? "s" : "");
+				if (warnCount) str += ", ";
+			}
+			if (warnCount) str += warnCount + " warning" + (warnCount > 1 ? "s" : "");
+			div.html(str);
+			
+			// show div depending on configuration
+			if (config.showOnFail && failCount) div.show();
+			else if (config.showOnWarn && warnCount) div.show();
+			else if (config.showOnPass && passCount) div.show();
+			else div.hide();
+		} else {
+			div.hide();
+		}
 	}
 }
 inheritsFrom(NoticeController, DivController);

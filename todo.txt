@@ -1,5 +1,4 @@
 TODO
-warning state changes when online determined in export and maybe form
 navigate away from recover while decrypting loses progress
 option to split the passphrase and include a copy of it on each share
 home notice bar does not reliably paint on safari

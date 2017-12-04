@@ -1243,64 +1243,6 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Polls environment info and notifies listeners on loop.
-	 * 
-	 * @param environmentInfo initial environment info to notify listeners (optional)
-	 */
-	pollEnvironment: function(environmentInfo) {
-		LOADER.load("lib/ua-parser.js", function() {
-			var first = true;
-			refreshEnvironmentInfo();
-			function refreshEnvironmentInfo() {
-				var info = AppUtils.getEnvironmentInfo(function(info) {
-					AppUtils.notifyEnvironmentListeners(info);
-				});
-				
-				// if first load, notify listeners synchronously
-				if (first) {
-					first = false;
-					AppUtils.notifyEnvironmentListeners(environmentInfo ? environmentInfo : info);
-				}
-				setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
-			}
-		});
-	},
-	
-	/**
-	 * Gets the last environment info notified to listeners.
-	 */
-	getLastEnvironmentInfo: function() {
-		return AppUtils.lastEnvironmentInfo;
-	},
-	
-	/**
-	 * Registers an environment listener to be notified when environment info is updated.
-	 * 
-	 * Synchronously calls the listener with the last known environment info.
-	 * 
-	 * @param listener(info) will be invoked as environment info is updated
-	 */
-	addEnvironmentListener: function(listener) {
-		if (!AppUtils.environmentListeners) AppUtils.environmentListeners = [];
-		AppUtils.environmentListeners.push(listener);
-		if (AppUtils.lastEnvironmentInfo) listener(AppUtils.lastEnvironmentInfo);
-	},
-	
-	/**
-	 * Notifies all registered environment listeners of updated environment info.
-	 * 
-	 * @param info is the environment info to notify listeners of
-	 */
-	notifyEnvironmentListeners: function(info) {
-		AppUtils.lastEnvironmentInfo = info;
-		if (!AppUtils.environmentListeners) return;
-		for (var i = 0; i < AppUtils.environmentListeners.length; i++) {
-			var listener = AppUtils.environmentListeners[i];
-			if (listener) listener(info);
-		}
-	},
-	
-	/**
 	 * Determines if the given environment info has a failure.
 	 * 
 	 * @param info is environment info which may indicate a failure
@@ -1311,5 +1253,67 @@ var AppUtils = {
 			if (info.checks[i].state === "fail") return true;
 		}
 		return false;
+	},
+	
+	/**
+	 * Returns cached environment info.
+	 */
+	getCachedEnvironmentInfo: function() {
+		return AppUtils.cachedEnvironmentInfo
+	},
+	
+	/**
+	 * Polls environment info and notifies listeners on loop.
+	 * 
+	 * @param initialEnvironmentInfo is initial environment info to notify listeners
+	 */
+	pollEnvironment: function(initialEnvironmentInfo) {
+		
+		// notify listeners of initial environment info
+		if (initialEnvironmentInfo) {
+			AppUtils.cachedEnvironmentInfo = initialEnvironmentInfo;
+			AppUtils.notifyEnvironmentListeners(initialEnvironmentInfo);
+		}
+		
+		// load dependency
+		LOADER.load("lib/ua-parser.js", function() {
+			
+			// refresh environment info on loop
+			refreshEnvironmentInfo();
+			function refreshEnvironmentInfo() {
+				AppUtils.getEnvironmentInfo(function(info) {
+					AppUtils.cachedEnvironmentInfo = info
+					AppUtils.notifyEnvironmentListeners(info);
+				});
+				setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
+			}
+		});
+	},
+	
+	/**
+	 * Registers an environment listener to be notified when environment info is updated.
+	 * 
+	 * Synchronously calls the listener with the last known environment info.
+	 * 
+	 * @param listener(info) will be invoked as environment info is updated
+	 */
+	addEnvironmentListener: function(listener) {
+		assertInitialized(listener);
+		if (!AppUtils.environmentListeners) AppUtils.environmentListeners = [];
+		AppUtils.environmentListeners.push(listener);
+		if (AppUtils.cachedEnvironmentInfo) listener(AppUtils.cachedEnvironmentInfo);
+	},
+	
+	/**
+	 * Notifies all registered environment listeners of updated environment info.
+	 * 
+	 * @param info is the environment info to notify listeners of
+	 */
+	notifyEnvironmentListeners: function(info) {
+		if (!AppUtils.environmentListeners) return;
+		for (var i = 0; i < AppUtils.environmentListeners.length; i++) {
+			var listener = AppUtils.environmentListeners[i];
+			if (listener) listener(info);
+		}
 	}
 }
