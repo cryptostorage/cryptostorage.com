@@ -50,12 +50,13 @@ var UiUtils = {
 			"lib/crypto-js.js",
 			"lib/progressbar.js",
 			"lib/pagination.js",
-			"lib/bitaddress.js"
+			"lib/bitaddress.js",
+			"lib/ua-parser.js"
 		];
 		
 		// open tab
 		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
-		  window.exportToBody(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit);
+		  window.exportToBody(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit, AppUtils.getLastEnvironmentInfo());
 			window.focus();
 		});
 	}

@@ -10,11 +10,12 @@
  * @param pieces are pieces to export and generate pieceDivs from
  * @param pieceDivs are pre-generated piece divs ready for display
  * @param confirmExit specifies if the window should confirm exit if not saved or printed
+ * @param environmentInfo is initial environment info for the export (optional)
  */
-window.exportToBody = function(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit) {
+window.exportToBody = function(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit, environmentInfo) {
 	
 	// poll environment info on loop
-	AppUtils.pollEnvironment();
+	AppUtils.pollEnvironment(environmentInfo);
 	
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;

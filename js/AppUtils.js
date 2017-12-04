@@ -1178,7 +1178,7 @@ var AppUtils = {
 	 * Requires lib/ua-parser.js to be loaded.
 	 * 
 	 * @param onDone(info) is asynchronously invoked when all info is retrieved
-	 * @returns info that can acquired synchronously until async info is available
+	 * @returns info that can be acquired synchronously until async info is available
 	 */
 	getEnvironmentInfo: function(onDone) {
 		var info = {};
@@ -1244,8 +1244,10 @@ var AppUtils = {
 	
 	/**
 	 * Polls environment info and notifies listeners on loop.
+	 * 
+	 * @param environmentInfo initial environment info to notify listeners (optional)
 	 */
-	pollEnvironment: function() {
+	pollEnvironment: function(environmentInfo) {
 		LOADER.load("lib/ua-parser.js", function() {
 			var first = true;
 			refreshEnvironmentInfo();
@@ -1257,11 +1259,18 @@ var AppUtils = {
 				// if first load, notify listeners synchronously
 				if (first) {
 					first = false;
-					AppUtils.notifyEnvironmentListeners(info);
+					AppUtils.notifyEnvironmentListeners(environmentInfo ? environmentInfo : info);
 				}
 				setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
 			}
 		});
+	},
+	
+	/**
+	 * Gets the last environment info notified to listeners.
+	 */
+	getLastEnvironmentInfo: function() {
+		return AppUtils.lastEnvironmentInfo;
 	},
 	
 	/**
