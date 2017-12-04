@@ -1,11 +1,11 @@
 TODO
+form validation
 run minimum tests when site accessed
 one of each button
 decomission encryption / decryption if cancelled
 make multiple currencies logo smaller
 
 check licenses of dependencies
-form validation
 import/export design
 homepage
 faq
