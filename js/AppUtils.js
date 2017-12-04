@@ -417,7 +417,7 @@ var AppUtils = {
 	 * Zips the given pieces.
 	 * 
 	 * @param pieces are the pieces to zip
-	 * @param callback(name, blob) is invoked when zipping is complete
+	 * @param callback(blob) is invoked when zipping is complete
 	 */
 	piecesToZip: function(pieces, callback) {
 		assertTrue(pieces.length > 0, "Pieces cannot be empty");
@@ -434,7 +434,7 @@ var AppUtils = {
 		
 		// create zip
 		zip.generateAsync({type:"blob"}).then(function(blob) {
-			callback("cryptostorage_" + ticker + ".zip", blob);
+			callback(blob);
 		});
 	},
 
@@ -1055,6 +1055,25 @@ var AppUtils = {
 	},
 	
 	getWeightCreateKey: function() { return 63; },
+	
+	/**
+	 * Gets a formatted timestamp.
+	 */
+	getTimestamp: function() {
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth() + 1;
+		if (month < 10) month = "0" + month;
+		var day = date.getDate();
+		if (day < 10) day = "0" + day;
+		var hour = date.getHours();
+		if (hour < 10) hour = "0" + hour;
+		var min = date.getMinutes();
+		if (min < 10) min = "0" + min;
+//		var sec = date.getSeconds();
+//		if (sec < 10) sec = "0" + sec;
+		return "" + year + month + day + hour + min;
+	},
 	
 	/**
 	 * Returns browser info.

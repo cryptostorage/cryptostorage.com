@@ -1,9 +1,7 @@
 TODO
-save names have timestamp
 run minimum tests when site accessed
 one of each button
 decomission encryption / decryption if cancelled
-warn if private key not included in print
 could trim etc and still have all squares be the same size
 
 check licenses of dependencies
@@ -15,6 +13,7 @@ todos throughout code
 https
 
 design:
+warn if private key not included in print - alert when print clicked without show private keys?
 option to split the passphrase and include a copy of it on each share
 export controller progress design, initial and re-render
 import / decryption complete - click button to view

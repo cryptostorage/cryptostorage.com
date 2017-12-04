@@ -2110,12 +2110,13 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
 		saved = true;
+		var name = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
 		if (pieces.length === 1) {
 			var jsonStr = AppUtils.pieceToJson(pieces[0]);
-			saveAs(new Blob([jsonStr]), "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + ".json");
+			saveAs(new Blob([jsonStr]), name + ".json");
 		} else {
-			AppUtils.piecesToZip(pieces, function(name, blob) {
-				saveAs(blob, name);
+			AppUtils.piecesToZip(pieces, function(blob) {
+				saveAs(blob, name + ".zip");
 			});
 		}
 	}
