@@ -2220,7 +2220,7 @@ inheritsFrom(ExportController, DivController);
  * 
  * @param div is the div to render to
  * @param config is the configuration
- * 	{ showOnFail, showOnPass, showOn
+ * 	{ showOnFail, showOnPass, showOnPasses }	// TODO: get this config consistent
  */
 function NoticeController(div, config) {
 	DivController.call(this, div);
