@@ -1,6 +1,5 @@
 TODO
 save names have timestamp
-safari scroll is sticky
 run minimum tests when site accessed
 one of each button
 decomission encryption / decryption if cancelled
