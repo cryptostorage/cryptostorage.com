@@ -1211,7 +1211,7 @@ input[type='checkbox'] {
 }
 
 .piece_page_div {
-	margin-bottom: 25px;
+	margin-bottom: 50px;
 	page-break-inside: avoid;
 	page-break-after: always;
 }
