@@ -599,6 +599,8 @@ function FormController(div) {
 	var numPiecesInput;
 	var minPiecesInput;
 	var	btnGenerate;
+	var environmentErrors;	// TODO: collapse into single data structure
+	var formErrors;
 	
 	this.render = function(onDone) {
 		div.empty();
@@ -713,7 +715,8 @@ function FormController(div) {
 		
 		// disable generate button if environment failure
 		AppUtils.addEnvironmentListener(function(info) {
-			setGenerateEnabled(!AppUtils.hasEnvironmentFailure(info));
+			environmentErrors = AppUtils.hasEnvironmentFailure(AppUtils.getCachedEnvironmentInfo());
+			updateGenerateButton();
 		});
 		
 		// under development warning
@@ -737,7 +740,8 @@ function FormController(div) {
 	
 	// handle when generate button clicked
 	function onGenerate(onDone) {
-		UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
+		validateForm();
+		if (!formErrors) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
 		if (onDone) onDone();
 	}
 	
@@ -829,22 +833,34 @@ function FormController(div) {
 		btcFound || bchFound ? bip38CheckboxDiv.show() : bip38CheckboxDiv.hide();
 	}
 	
+	function updateGenerateButton() {
+		setGenerateEnabled(!environmentErrors && !formErrors);
+	}
+	
 	function validateForm() {
-		validateCurrencyInputs();
-		validatePassphrase();
-		validateSplit();
+		formErrors = false;
+		if (validateCurrencyInputs()) 
+		if (validatePassphrase()) err = true;
+		if (validateSplit()) err = true;
+		formErrors = 
 	}
 	
 	function validateCurrencyInputs() {
-		
+		var err = null;
+		for (var i = 0; i < currencyInputs.length; i++) {
+			if (currencyInputs[i].validate()) err = true;
+		}
+		if (err) formErrors = true;
+		updateGenerateButton();
+		return err;
 	}
 	
 	function validatePassphrase() {
-		
+		updateGenerateButton();
 	}
 	
 	function validateSplit() {
-		
+		updateGenerateButton();
 	}
 	
 	function setGenerateEnabled(generateEnabled) {
@@ -916,6 +932,19 @@ function FormController(div) {
 			}
 		}
 		
+		this.validate = function() {
+			var numKeys = that.getNumKeys();
+			if (!isInt(numKeys) || numKeys < 1) {
+				numKeysInput.addClass("form_input_error_div");
+				return true;
+			} else {
+				numKeysInput.removeClass("form_input_error_div");
+				return false;
+			}
+		}
+		
+		// ---------------------- PRIVATE ------------------------
+		
 		// render input
 		render();
 		function render() {
@@ -953,6 +982,9 @@ function FormController(div) {
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 			rightDiv.append("Number of key pairs to generate&nbsp;&nbsp;");
 			numKeysInput = $("<input type='number' value='1' min='1'>").appendTo(rightDiv);
+			numKeysInput.keyup(function() {
+				validateCurrencyInputs();
+			});
 			rightDiv.append("&nbsp;&nbsp;");
 			trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 			trashDiv.click(function() { onDelete(); });
