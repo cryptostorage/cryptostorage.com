@@ -17,7 +17,6 @@ todos throughout code
 another attempt at debugging bitaddress bip38 memory leak?
 performance of export generating keys to rendering
 unecessary environment request when app starts polling
-increase timeout for image load
 
 import/export design
 homepage
