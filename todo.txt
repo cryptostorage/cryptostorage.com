@@ -7,6 +7,7 @@ make multiple currencies logo smaller
 error/pass/warn logos not loaded if internet disconnects
 internet disconnect is not critical bug after dependencies are loaded in tab
 show passphrase should not focus passphrase input
+recover pulldown disabled styling improvements
 
 check licenses of dependencies
 import/export design
