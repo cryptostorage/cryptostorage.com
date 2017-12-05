@@ -11,7 +11,8 @@ import/export design
 homepage
 faq
 todos throughout code
-https
+ssl/tls
+pgg
 
 design:
 warn if private key not included in print - alert when print clicked without show private keys?
