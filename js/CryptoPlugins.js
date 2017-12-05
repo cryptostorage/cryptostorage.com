@@ -274,7 +274,7 @@ function EthereumPlugin() {
 	this.isAddress = function(str) {
 		return isAddress(str);
 		
-		// Credit: https://ethereum.stackexchange.com/questions/1374/how-can-i-check-if-an-ethereum-address-is-valid
+		// Source: https://ethereum.stackexchange.com/questions/1374/how-can-i-check-if-an-ethereum-address-is-valid
 		function isAddress(address) {
 			if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
 		        // check if it has the basic requirements of an address
