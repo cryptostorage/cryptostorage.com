@@ -599,8 +599,7 @@ function FormController(div) {
 	var numPiecesInput;
 	var minPiecesInput;
 	var	btnGenerate;
-	var environmentErrors;	// TODO: collapse into single data structure
-	var formErrors;
+	var formErrors = {};
 	
 	this.render = function(onDone) {
 		div.empty();
@@ -715,8 +714,8 @@ function FormController(div) {
 		
 		// disable generate button if environment failure
 		AppUtils.addEnvironmentListener(function(info) {
-			environmentErrors = AppUtils.hasEnvironmentFailure(AppUtils.getCachedEnvironmentInfo());
-			updateGenerateButton();
+			formErrors.environment = AppUtils.hasEnvironmentFailure(AppUtils.getCachedEnvironmentInfo());
+			updateForm()
 		});
 		
 		// under development warning
@@ -741,7 +740,7 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm();
-		if (!formErrors) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
+		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);	// TODO: implement hasFormErrors();
 		if (onDone) onDone();
 	}
 	
@@ -831,6 +830,9 @@ function FormController(div) {
 		
 		// show or hide bip38 checkbox
 		btcFound || bchFound ? bip38CheckboxDiv.show() : bip38CheckboxDiv.hide();
+		
+		// update generate button
+		setGenerateEnabled(!formErrors.environment && !formErrors.currencyInputs && !formErrors.passphrase && !formErrors.split);
 	}
 	
 	function updateGenerateButton() {
@@ -838,11 +840,9 @@ function FormController(div) {
 	}
 	
 	function validateForm() {
-		formErrors = false;
-		if (validateCurrencyInputs()) 
-		if (validatePassphrase()) err = true;
-		if (validateSplit()) err = true;
-		formErrors = 
+		validateCurrencyInputs();
+		validatePassphrase();
+		validateSplit();
 	}
 	
 	function validateCurrencyInputs() {
@@ -850,17 +850,16 @@ function FormController(div) {
 		for (var i = 0; i < currencyInputs.length; i++) {
 			if (currencyInputs[i].validate()) err = true;
 		}
-		if (err) formErrors = true;
-		updateGenerateButton();
-		return err;
+		formErrors.currencyInputs = err;
+		updateForm();
 	}
 	
 	function validatePassphrase() {
-		updateGenerateButton();
+		updateForm();
 	}
 	
 	function validateSplit() {
-		updateGenerateButton();
+		updateForm();
 	}
 	
 	function setGenerateEnabled(generateEnabled) {
