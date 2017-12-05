@@ -661,7 +661,6 @@ function FormController(div) {
 			} else {
 				passphraseInput.attr("type", "password");
 			}
-			passphraseInput.focus();
 		});
 		
 		// split checkbox
