@@ -1185,7 +1185,7 @@ function RecoverFileController(div) {
 			}
 			if (isJsonFile(file)) reader.readAsText(file);
 			else if (isZipFile(file)) reader.readAsArrayBuffer(file);
-			else that.setWarning("'" + file.name + "' is not a zip or json file");
+			else that.setWarning("File is not a zip or json file");
 		}
 		
 		function getNamedPiecesFromFile(file, data, onNamedPieces) {
