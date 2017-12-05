@@ -1,8 +1,8 @@
 TODO
 form validation
 run minimum tests when site accessed
-one of each button
 decomission encryption / decryption if cancelled
+one of each button
 make multiple currencies logo smaller
 
 check licenses of dependencies
