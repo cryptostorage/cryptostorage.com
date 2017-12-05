@@ -637,6 +637,8 @@ input[type='checkbox'] {
 
 .form_error_div {
 	border-color: red !important;
+    outline: none;
+    box-shadow: 0 0 10px red;
 }
 
 .red_warning {
