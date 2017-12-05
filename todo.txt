@@ -8,7 +8,6 @@ error/pass/warn logos not loaded if internet disconnects
 internet disconnect is not critical bug after dependencies are loaded in tab
 show passphrase should not focus passphrase input
 recover pulldown disabled styling improvements
-recover warnings closeable
 stress tests
 check licenses of dependencies
 todos throughout code
@@ -40,6 +39,7 @@ ability to encrypt / decrypt on export page?
 use rounded or square qr code for split form?
 code review
 loading screen when file imported
+recover warnings closeable
 
 low priority:
 save as txt and csv
