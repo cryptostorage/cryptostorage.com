@@ -8,6 +8,8 @@ error/pass/warn logos not loaded if internet disconnects
 internet disconnect is not critical bug after dependencies are loaded in tab
 show passphrase should not focus passphrase input
 recover pulldown disabled styling improvements
+recover warnings closeable
+"File is not a zip or json file" reword
 
 check licenses of dependencies
 import/export design
