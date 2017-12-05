@@ -589,6 +589,8 @@ inheritsFrom(DonateController, DivController);
 function FormController(div) {
 	DivController.call(this, div);
 	
+	var currencyInputsDiv;
+	var currencyInputs;			// tracks each currency input
 	var passphraseCheckbox;
 	var passphraseInput;
 	var bip38CheckboxDiv;
@@ -596,8 +598,7 @@ function FormController(div) {
 	var splitCheckbox;
 	var numPiecesInput;
 	var minPiecesInput;
-	var currencyInputsDiv;	// container for each currency input
-	var currencyInputs;			// tracks each currency input
+	var	btnGenerate;
 	
 	this.render = function(onDone) {
 		div.empty();
@@ -706,14 +707,13 @@ function FormController(div) {
 		addCurrency();
 		
 		// add generate button
-		var generateDiv = $("<div class='generate_div'>").appendTo(pageDiv);
-		var btnGenerate = $("<div class='btn_generate'>").appendTo(generateDiv);
+		var generateDiv = $("<div class='form_generate_div'>").appendTo(pageDiv);
+		btnGenerate = $("<div class='form_generate_btn'>").appendTo(generateDiv);
 		btnGenerate.append("Generate keys");
 		
 		// disable generate button if environment failure
 		AppUtils.addEnvironmentListener(function(info) {
-			btnGenerate.unbind("click");
-			if (!AppUtils.hasEnvironmentFailure(info)) btnGenerate.click(function() { onGenerate() });
+			setGenerateEnabled(!AppUtils.hasEnvironmentFailure(info));
 		});
 		
 		// under development warning
@@ -827,6 +827,38 @@ function FormController(div) {
 		
 		// show or hide bip38 checkbox
 		btcFound || bchFound ? bip38CheckboxDiv.show() : bip38CheckboxDiv.hide();
+	}
+	
+	function validateForm() {
+		validateCurrencyInputs();
+		validatePassphrase();
+		validateSplit();
+	}
+	
+	function validateCurrencyInputs() {
+		
+	}
+	
+	function validatePassphrase() {
+		
+	}
+	
+	function validateSplit() {
+		
+	}
+	
+	function setGenerateEnabled(generateEnabled) {
+		btnGenerate.unbind("click");
+		if (generateEnabled) {
+			btnGenerate.removeClass("form_generate_btn_disabled");
+			btnGenerate.click(function() { onGenerate(); });
+		} else {
+			btnGenerate.addClass("form_generate_btn_disabled");
+		}
+	}
+	
+	function isGenerateEnabled() {
+		return !btnGenerate.hasClass("form_generate_btn_disabled");
 	}
 	
 	/**

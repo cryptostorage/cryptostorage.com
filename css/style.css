@@ -587,7 +587,7 @@ input[type='checkbox'] {
 	padding-top: 10px;
 }
 
-.generate_div {
+.form_generate_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -602,7 +602,7 @@ input[type='checkbox'] {
 	justify-content: center;
 }
 
-.btn_generate {
+.form_generate_btn {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -626,16 +626,30 @@ input[type='checkbox'] {
 	user-select: none;
 }
 
-.btn_generate:hover {
+.form_generate_btn:hover {
 	cursor: pointer;
 	background-color: #009100;
 }
 
-.btn_generate:active {
+.form_generate_btn:active {
 	background-color: #006000;
 }
 
-.form_error_div {
+.form_generate_btn_disabled {
+	color: black;
+	background-color: grey;
+}
+
+.form_generate_btn_disabled:hover {
+	background-color: grey;
+	cursor: auto;
+}
+
+.form_generate_btn_disabled:active {
+	background-color: grey;
+}
+
+.form_input_error_div {
 	border-color: red !important;
     outline: none;
     box-shadow: 0 0 10px red;

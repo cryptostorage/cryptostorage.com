@@ -1269,6 +1269,7 @@ var AppUtils = {
 	 * @returns true if the environment has a failure, false otherwise
 	 */
 	hasEnvironmentFailure: function(info) {
+		assertInitialized(info);
 		for (var i = 0; i < info.checks.length; i++) {
 			if (info.checks[i].state === "fail") return true;
 		}
