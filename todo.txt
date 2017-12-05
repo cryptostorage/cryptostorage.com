@@ -10,12 +10,15 @@ show passphrase should not focus passphrase input
 recover pulldown disabled styling improvements
 recover warnings closeable
 "File is not a zip or json file" reword
-
+widen number input
+stress tests
 check licenses of dependencies
+todos throughout code
+another attempt at debugging bitaddress bip38 memory leak?
+
 import/export design
 homepage
 faq
-todos throughout code
 pgp
 
 design:
@@ -34,7 +37,7 @@ select a currency or default to first?
 homepage scale too big on small screens?
 ability to re-hide more currencies on home?
 ability to encrypt / decrypt on export page?
-use rounded or square qr code for split form? 
+use rounded or square qr code for split form?
 code review
 
 low priority:
