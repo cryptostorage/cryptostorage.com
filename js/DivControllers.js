@@ -308,7 +308,7 @@ function HomeController(div) {
 		var pageDiv = $("<div class='page_div home_div'>").appendTo(div);
 		
 		// supported currencies
-		pageDiv.append("<div class='home_label'>Supports these popular cryptocurrencies</div>");
+		pageDiv.append("<div class='home_label'>Supports these cryptocurrencies</div>");
 		var plugins = AppUtils.getCryptoPlugins();
 		pageDiv.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 		var moreDiv = null;
