@@ -4,6 +4,7 @@ run minimum tests when site accessed
 decomission encryption / decryption if cancelled
 one of each button
 make multiple currencies logo smaller
+error/pass/warn logos not loaded if internet disconnects
 
 check licenses of dependencies
 import/export design
