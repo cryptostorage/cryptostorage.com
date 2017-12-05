@@ -1,5 +1,5 @@
 /**
- * Base plugin that specific cryptocurrencies must implement.
+ * Base plugin that each currency must implement.
  */
 function CryptoPlugin() { }
 
