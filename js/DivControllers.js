@@ -919,7 +919,7 @@ function FormController(div) {
 			
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
-			rightDiv.append("Key pairs to generate&nbsp;&nbsp;");
+			rightDiv.append("Number of key pairs to generate&nbsp;&nbsp;");
 			numKeysInput = $("<input type='number' value='1' min='1'>").appendTo(rightDiv);
 			rightDiv.append("&nbsp;&nbsp;");
 			trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
