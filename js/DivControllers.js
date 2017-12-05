@@ -308,7 +308,7 @@ function HomeController(div) {
 		var pageDiv = $("<div class='page_div home_div'>").appendTo(div);
 		
 		// supported currencies
-		pageDiv.append("<div class='home_label'>Supports these popular cryptocurrencies</pageDiv>");
+		pageDiv.append("<div class='home_label'>Supports these popular cryptocurrencies</div>");
 		var plugins = AppUtils.getCryptoPlugins();
 		pageDiv.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 		var moreDiv = null;
@@ -334,7 +334,7 @@ function HomeController(div) {
 		
 		// sample page
 		$("<div style='height:100px'>").appendTo(pageDiv);
-		pageDiv.append("<div class='home_label'>Export to printable and digital format for long term storage</pageDiv>");
+		pageDiv.append("<div class='home_label'>Export to printable and digital format for long term storage</div>");
 		$("<div style='height:40px'>").appendTo(pageDiv);
 		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 		
