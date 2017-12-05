@@ -15,7 +15,7 @@ stress tests
 check licenses of dependencies
 todos throughout code
 another attempt at debugging bitaddress bip38 memory leak?
-performance of export generating keys to rendering
+performance of export generating keys to rendering, also affects file import
 unecessary environment request when app starts polling
 
 import/export design
