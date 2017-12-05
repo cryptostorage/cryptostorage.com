@@ -9,8 +9,8 @@ var AppUtils = {
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
-	CRYPTOSTORAGE_URL: "http://cryptostorage.com",	// TODO: change these to https
-	ONLINE_IMAGE_URL: "http://cryptostorage.com/favicon.ico",
+	CRYPTOSTORAGE_URL: "https://cryptostorage.com",
+	ONLINE_IMAGE_URL: "https://cryptostorage.com/favicon.ico",
 	APP_DEPENDENCIES: ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/ua-parser.js"],
 	ENVIRONMENT_REFRESH_RATE: 3000,	// environment refresh rate in milliseconds
 	
