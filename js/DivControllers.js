@@ -739,8 +739,7 @@ function FormController(div) {
 	
 	// handle when generate button clicked
 	function onGenerate(onDone) {
-		validateForm();
-		updateForm();
+		validateForm(true);
 		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
 		if (onDone) onDone();
 	}
@@ -807,8 +806,7 @@ function FormController(div) {
 		currencyInputs.splice(idx, 1);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().remove();
-		validateCurrencyInputs();
-		updateForm();
+		validateCurrencyInputs(true);
 	}
 	
 	function updateForm() {
@@ -844,26 +842,28 @@ function FormController(div) {
 		return formErrors.environment || formErrors.currencyInputs || formErrors.passphrase || formErrors.split;
 	}
 	
-	function validateForm() {
-		validateCurrencyInputs();
-		validatePassphrase();
-		validateSplit();
+	function validateForm(_updateForm) {
+		validateCurrencyInputs(false);
+		validatePassphrase(false);
+		validateSplit(false);
+		if (_updateForm) updateForm();
 	}
 	
-	function validateCurrencyInputs() {
+	function validateCurrencyInputs(_updateForm) {
 		var err = null;
 		for (var i = 0; i < currencyInputs.length; i++) {
 			if (!currencyInputs[i].isValid()) err = true;
 		}
 		formErrors.currencyInputs = err;
+		if (_updateForm) updateForm();
 	}
 	
-	function validatePassphrase() {
-
+	function validatePassphrase(_updateForm) {
+		if (_updateForm) updateForm();
 	}
 	
-	function validateSplit() {
-
+	function validateSplit(_updateForm) {
+		if (_updateForm) updateForm();
 	}
 	
 	function setGenerateEnabled(generateEnabled) {
