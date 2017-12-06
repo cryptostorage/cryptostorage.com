@@ -704,7 +704,10 @@ function FormController(div) {
 		minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
 		var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
 		splitMinLabelBottom.html("To Recover");	
-		setRealTimeSplitValidation(true);
+		numPiecesInput.on("input", function(e) { validateSplit(true, false); });
+		numPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
+		minPiecesInput.on("input", function(e) { validateSplit(true, false); });
+		minPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
 		
 		// apply default configuration
 		passphraseCheckbox.prop('checked', false);
@@ -944,19 +947,6 @@ function FormController(div) {
 		}
 		
 		if (_updateForm) updateForm();
-	}
-	
-	function setRealTimeSplitValidation(enabled) {
-		numPiecesInput.unbind("input");
-		numPiecesInput.unbind("focusout");
-		minPiecesInput.unbind("input");
-		minPiecesInput.unbind("focusout");
-		if (enabled) {
-			numPiecesInput.on("input", function(e) { validateSplit(true, false); });
-			numPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
-			minPiecesInput.on("input", function(e) { validateSplit(true, false); });
-			minPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
-		}
 	}
 	
 	function setGenerateEnabled(generateEnabled) {
