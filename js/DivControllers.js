@@ -740,6 +740,7 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm();
+		updateForm();
 		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
 		if (onDone) onDone();
 	}
@@ -788,6 +789,9 @@ function FormController(div) {
 		// create input
 		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, AppUtils.getCryptoPlugins(), updateForm, function() {
 			removeCurrency(currencyInput);
+		}, function(isValid) {
+			validateCurrencyInputs();
+			updateForm();
 		});
 		
 		// update currency inputs and add to page
@@ -803,6 +807,7 @@ function FormController(div) {
 		currencyInputs.splice(idx, 1);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().remove();
+		validateCurrencyInputs();
 		updateForm();
 	}
 	
@@ -848,18 +853,17 @@ function FormController(div) {
 	function validateCurrencyInputs() {
 		var err = null;
 		for (var i = 0; i < currencyInputs.length; i++) {
-			if (currencyInputs[i].validate()) err = true;
+			if (!currencyInputs[i].isValid()) err = true;
 		}
 		formErrors.currencyInputs = err;
-		updateForm();
 	}
 	
 	function validatePassphrase() {
-		updateForm();
+
 	}
 	
 	function validateSplit() {
-		updateForm();
+
 	}
 	
 	function setGenerateEnabled(generateEnabled) {
@@ -883,8 +887,9 @@ function FormController(div) {
 	 * @param idx is the index of this input relative to the other inputs to accomodate ddslick's id requirement
 	 * @param onCurrencyChanged(ticker) is invoked when the user changes the currency selection
 	 * @param onDelete is invoked when the user delets this input
+	 * @param onValid(bool) is invoked when the validity state changes
 	 */
-	function CurrencyInput(div, idx, plugins, onCurrencyChanged, onDelete) {
+	function CurrencyInput(div, idx, plugins, onCurrencyChanged, onDelete, onValid) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
@@ -896,7 +901,7 @@ function FormController(div) {
 		var trashDiv;
 		var trashImg;
 		var initializing = true;
-		var isValid = true;
+		var valid = true;
 		
 		this.getDiv = function() {
 			return div;
@@ -934,18 +939,36 @@ function FormController(div) {
 			}
 		}
 		
-		this.validate = function() {
-			var numKeys = that.getNumKeys();
-			if (!isInt(numKeys) || numKeys < 1) {
-				numKeysInput.addClass("form_input_error_div");
-				return true;
-			} else {
-				numKeysInput.removeClass("form_input_error_div");
-				return false;
-			}
+		this.isValid = function() {
+			return valid;
 		}
 		
 		// ---------------------- PRIVATE ------------------------
+		
+		function validate(ignoreBlank) {
+			
+			// check for blank box
+			if (ignoreBlank && !numKeysInput.val()) {
+				numKeysInput.removeClass("form_input_error_div");
+				return;
+			}
+			
+			// validate num keys
+			var numKeys = that.getNumKeys();
+			if (isInt(numKeys) && numKeys >= 1) {
+				numKeysInput.removeClass("form_input_error_div");
+				if (!valid) {
+					valid = true;
+					onValid(valid);
+				}
+			} else {
+				numKeysInput.addClass("form_input_error_div");
+				if (valid) {
+					valid = false;
+					onValid(false);
+				}
+			}
+		}
 		
 		// render input
 		render();
@@ -984,12 +1007,8 @@ function FormController(div) {
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 			rightDiv.append("Number of key pairs to generate&nbsp;&nbsp;");
 			numKeysInput = $("<input type='tel' value='1' min='1'>").appendTo(rightDiv);
-			numKeysInput.on("input", function(e) {
-				if (numKeysInput.val()) validateCurrencyInputs();
-			});
-			numKeysInput.on("change", function(e) {
-				validateCurrencyInputs();
-			});
+			numKeysInput.on("input", function(e) { validate(true); });
+			numKeysInput.on("focusout", function(e) { validate(false); });
 			rightDiv.append("&nbsp;&nbsp;");
 			trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 			trashDiv.click(function() { onDelete(); });
