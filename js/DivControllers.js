@@ -637,7 +637,6 @@ function FormController(div) {
 				passphraseInput.focus();
 			} else {
 				passphraseInputDiv.hide();
-				setRealTimePassphraseValidation(false);
 				validatePassphrase(true);
 			}
 		});
@@ -648,6 +647,11 @@ function FormController(div) {
 		passphraseWarnDiv.append("This passphrase is required to access funds later on.  Don’t lose it!");
 		passphraseInputDiv.append("Passphrase");
 		passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
+		passphraseInput.on("input focusout", function(e) {
+			passphraseInput.removeClass("form_input_error_div");
+			formErrors.passphrase = false;
+			updateForm();
+		});
 		
 		// passphrase config
 		var passphraseConfigDiv = $("<div class='passphrase_config_div'>").appendTo(passphraseInputDiv);
@@ -676,8 +680,10 @@ function FormController(div) {
 		splitCheckbox.click(function() {
 			if (splitCheckbox.prop('checked')) {
 				splitInputDiv.show();
+				validateSplit(true, true);
 			} else {
 				splitInputDiv.hide();
+				validateSplit(true, false);
 			}
 		});
 		
@@ -697,7 +703,8 @@ function FormController(div) {
 		splitMinLabelTop.html("Require");
 		minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
 		var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
-		splitMinLabelBottom.html("To Recover");		
+		splitMinLabelBottom.html("To Recover");	
+		setRealTimeSplitValidation(true);
 		
 		// apply default configuration
 		passphraseCheckbox.prop('checked', false);
@@ -742,7 +749,6 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm(true);
-		setRealTimePassphraseValidation(formErrors.passphrase);
 		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
 		if (onDone) onDone();
 	}
@@ -848,7 +854,7 @@ function FormController(div) {
 	function validateForm(_updateForm) {
 		validateCurrencyInputs(false);
 		validatePassphrase(false);
-		validateSplit(false);
+		validateSplit(false, true);
 		if (_updateForm) updateForm();
 	}
 	
@@ -863,13 +869,13 @@ function FormController(div) {
 	
 	function validatePassphrase(_updateForm) {
 		
-		// handle if passphrase not checked
+		// handle passphrase not checked
 		if (!passphraseCheckbox.is(":checked")) {
 			formErrors.passphrase = false;
 			passphraseInput.removeClass("form_input_error_div");
 		}
 		
-		// passphrase checked
+		// handle passphrase checked
 		else {
 			var passphrase = passphraseInput.val();
 			if (!passphrase || passphrase.length < 6) {
@@ -884,16 +890,73 @@ function FormController(div) {
 		if (_updateForm) updateForm();
 	}
 	
-	function setRealTimePassphraseValidation(enabled) {
-		passphraseInput.unbind("input");
-		passphraseInput.unbind("focusout");
-		if (enabled) {
-			passphraseInput.on("input focusout", function(e) { validatePassphrase(true); });
+	function validateSplit(_updateForm, blankIsError) {
+		
+		// handle split not checked
+		if (!splitCheckbox.is(":checked")) {
+			formErrors.split = false;
+			numPiecesInput.removeClass("form_input_error_div");
+			minPiecesInput.removeClass("form_input_error_div");
 		}
+		
+		// handle if split checked
+		else {
+			formErrors.split = false;
+			
+			// validate num pieces
+			var numPiecesError = false;
+			if (!numPiecesInput.val()) {
+				if (blankIsError) {
+					numPiecesError = true;
+					formErrors.split = true;
+					numPiecesInput.addClass("form_input_error_div");
+				} else {
+					numPiecesInput.removeClass("form_input_error_div");
+				}
+			} else {
+				var numPieces = Number(numPiecesInput.val());
+				if (!isInt(numPieces) || numPieces < 2) {
+					numPiecesError = true;
+					formErrors.split = true;
+					numPiecesInput.addClass("form_input_error_div");
+				} else {
+					numPiecesInput.removeClass("form_input_error_div");
+				}
+			}
+			
+			// validate min pieces
+			if (!minPiecesInput.val()) {
+				if (blankIsError) {
+					formErrors.split = true;
+					minPiecesInput.addClass("form_input_error_div");
+				} else {
+					minPiecesInput.removeClass("form_input_error_div");
+				}
+			} else {
+				var minPieces = Number(minPiecesInput.val());
+				if (!isInt(minPieces) || minPieces < 2 || (!numPiecesError && minPieces > numPieces)) {
+					formErrors.split = true;
+					minPiecesInput.addClass("form_input_error_div");
+				} else {
+					minPiecesInput.removeClass("form_input_error_div");
+				}
+			}
+		}
+		
+		if (_updateForm) updateForm();
 	}
 	
-	function validateSplit(_updateForm) {
-		if (_updateForm) updateForm();
+	function setRealTimeSplitValidation(enabled) {
+		numPiecesInput.unbind("input");
+		numPiecesInput.unbind("focusout");
+		minPiecesInput.unbind("input");
+		minPiecesInput.unbind("focusout");
+		if (enabled) {
+			numPiecesInput.on("input", function(e) { validateSplit(true, false); });
+			numPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
+			minPiecesInput.on("input", function(e) { validateSplit(true, false); });
+			minPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
+		}
 	}
 	
 	function setGenerateEnabled(generateEnabled) {
