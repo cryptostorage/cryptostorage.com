@@ -688,14 +688,14 @@ function FormController(div) {
 		var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
 		var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
 		splitNumLabelTop.html("Split Each Key Into");
-		numPiecesInput = $("<input type='number' value='3' min='2'>").appendTo(splitNumDiv);
+		numPiecesInput = $("<input type='tel' value='3' min='2'>").appendTo(splitNumDiv);
 		var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
 		splitNumLabelBottom.html("Pieces");
 		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitInputDiv);
 		var splitMinDiv = $("<div class='split_min_div'>").appendTo(splitInputDiv);
 		var splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
 		splitMinLabelTop.html("Require");
-		minPiecesInput = $("<input type='number' value='2' min='2'>").appendTo(splitMinDiv);
+		minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
 		var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
 		splitMinLabelBottom.html("To Recover");		
 		
