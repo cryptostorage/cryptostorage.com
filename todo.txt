@@ -1,5 +1,4 @@
 TODO
-form validation
 run minimum tests when site accessed
 decomission encryption / decryption if cancelled
 one of each button
@@ -20,6 +19,7 @@ faq
 pgp
 
 design:
+form validation error messages and descriptions
 copyright (?) and disclaimer
 warn if private key not included in print - alert when print clicked without show private keys?
 option to split the passphrase and include a copy of it on each share
