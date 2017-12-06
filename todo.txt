@@ -1,10 +1,8 @@
 TODO
-performance of export generating keys to rendering, also affects file import
 run minimum tests when site accessed
 decomission encryption / decryption if cancelled
 one of each button
 error/pass/warn logos not loaded if internet disconnects
-stress tests
 another attempt at debugging bitaddress bip38 memory leak?
 check licenses of dependencies
 todos throughout code
@@ -13,6 +11,7 @@ make multiple currencies logo smaller
 unecessary environment request when app starts polling
 internet disconnect is not critical bug after dependencies are loaded in tab
 recover pulldown disabled styling improvements
+loading screen on file import while piecesToKeys()
 
 import/export design
 homepage
