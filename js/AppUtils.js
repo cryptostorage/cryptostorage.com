@@ -354,7 +354,7 @@ var AppUtils = {
 				state.wif = pieceKey.wif;
 				state.encryption = pieceKey.encryption;
 				var key = new CryptoKey(AppUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
-				if (key.getHex() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// check that address derived from private keys
+				if (key.getHex() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// check that address is derived from private keys
 				keys.push(key);
 			}
 		}
