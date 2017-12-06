@@ -1084,7 +1084,7 @@ function FormController(div) {
 			
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
-			rightDiv.append("Number of key pairs to generate&nbsp;&nbsp;");
+			rightDiv.append("Key pairs to generate&nbsp;&nbsp;");
 			numKeysInput = $("<input type='tel' value='1' min='1'>").appendTo(rightDiv);
 			numKeysInput.on("input", function(e) { validate(true); });
 			numKeysInput.on("focusout", function(e) { validate(false); });
