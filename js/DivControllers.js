@@ -637,6 +637,8 @@ function FormController(div) {
 				passphraseInput.focus();
 			} else {
 				passphraseInputDiv.hide();
+				setRealTimePassphraseValidation(false);
+				validatePassphrase(true);
 			}
 		});
 		
@@ -740,6 +742,7 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm(true);
+		setRealTimePassphraseValidation(formErrors.passphrase);
 		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
 		if (onDone) onDone();
 	}
@@ -859,7 +862,34 @@ function FormController(div) {
 	}
 	
 	function validatePassphrase(_updateForm) {
+		
+		// handle if passphrase not checked
+		if (!passphraseCheckbox.is(":checked")) {
+			formErrors.passphrase = false;
+			passphraseInput.removeClass("form_input_error_div");
+		}
+		
+		// passphrase checked
+		else {
+			var passphrase = passphraseInput.val();
+			if (!passphrase || passphrase.length < 6) {
+				formErrors.passphrase = true;
+				passphraseInput.addClass("form_input_error_div");
+			} else {
+				formErrors.passphrase = false;
+				passphraseInput.removeClass("form_input_error_div");
+			}
+		}
+
 		if (_updateForm) updateForm();
+	}
+	
+	function setRealTimePassphraseValidation(enabled) {
+		passphraseInput.unbind("input");
+		passphraseInput.unbind("focusout");
+		if (enabled) {
+			passphraseInput.on("input focusout", function(e) { validatePassphrase(true); });
+		}
 	}
 	
 	function validateSplit(_updateForm) {
@@ -874,10 +904,6 @@ function FormController(div) {
 		} else {
 			btnGenerate.addClass("form_generate_btn_disabled");
 		}
-	}
-	
-	function isGenerateEnabled() {
-		return !btnGenerate.hasClass("form_generate_btn_disabled");
 	}
 	
 	/**
