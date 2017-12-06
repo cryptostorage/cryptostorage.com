@@ -327,7 +327,7 @@ ol {
 	text-decoration:underline;
 }
 
-input[type='number'] {
+input[type='tel'] {
 	width: 85px;
 	text-align: center;
 	border: 2.5px solid;

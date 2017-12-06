@@ -704,9 +704,6 @@ function FormController(div) {
 		splitCheckbox.prop('checked', false);
 		splitInputDiv.hide();
 		
-		// add first currency
-		addCurrency();
-		
 		// add generate button
 		var generateDiv = $("<div class='form_generate_div'>").appendTo(pageDiv);
 		btnGenerate = $("<div class='form_generate_btn'>").appendTo(generateDiv);
@@ -717,6 +714,9 @@ function FormController(div) {
 			formErrors.environment = AppUtils.hasEnvironmentFailure(AppUtils.getCachedEnvironmentInfo());
 			updateForm()
 		});
+		
+		// add first currency
+		addCurrency();
 		
 		// under development warning
 		var warningDiv = $("<div class='red_warning'>").appendTo(pageDiv);
@@ -740,7 +740,7 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm();
-		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);	// TODO: implement hasFormErrors();
+		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
 		if (onDone) onDone();
 	}
 	
@@ -832,11 +832,11 @@ function FormController(div) {
 		btcFound || bchFound ? bip38CheckboxDiv.show() : bip38CheckboxDiv.hide();
 		
 		// update generate button
-		setGenerateEnabled(!formErrors.environment && !formErrors.currencyInputs && !formErrors.passphrase && !formErrors.split);
+		setGenerateEnabled(!hasFormErrors());
 	}
 	
-	function updateGenerateButton() {
-		setGenerateEnabled(!environmentErrors && !formErrors);
+	function hasFormErrors() {
+		return formErrors.environment || formErrors.currencyInputs || formErrors.passphrase || formErrors.split;
 	}
 	
 	function validateForm() {
@@ -896,6 +896,7 @@ function FormController(div) {
 		var trashDiv;
 		var trashImg;
 		var initializing = true;
+		var isValid = true;
 		
 		this.getDiv = function() {
 			return div;
@@ -918,7 +919,9 @@ function FormController(div) {
 		}
 		
 		this.getNumKeys = function() {
-			return parseFloat(numKeysInput.val());
+			var num = Number(numKeysInput.val());
+			if (isInt(num)) return num;
+			return null;
 		}
 		
 		this.setTrashEnabled = function(enabled) {
@@ -980,8 +983,11 @@ function FormController(div) {
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 			rightDiv.append("Number of key pairs to generate&nbsp;&nbsp;");
-			numKeysInput = $("<input type='number' value='1' min='1'>").appendTo(rightDiv);
-			numKeysInput.keyup(function() {
+			numKeysInput = $("<input type='tel' value='1' min='1'>").appendTo(rightDiv);
+			numKeysInput.on("input", function(e) {
+				if (numKeysInput.val()) validateCurrencyInputs();
+			});
+			numKeysInput.on("change", function(e) {
 				validateCurrencyInputs();
 			});
 			rightDiv.append("&nbsp;&nbsp;");
