@@ -148,7 +148,7 @@ ol {
 	right: 30px;
 }
 
-.btn_start_generate {
+.home_generate_btn {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -172,11 +172,11 @@ ol {
 	user-select: none;
 }
 
-.btn_start_generate:hover {
+.home_generate_btn:hover {
 	background-color: rgb(60, 240, 60);
 }
 
-.btn_start_generate:active {
+.home_generate_btn:active {
 	background-color: rgb(40, 200, 40);
 }
 
@@ -615,7 +615,7 @@ input[type='checkbox'] {
 	justify-content : center;
 	height: 70px;
 	width: 225px;
-	background-color: #007500;
+	background-color: rgb(50, 185, 40);
 	color: white;
 	font-size:24px;
 	margin-bottom: 25px;
@@ -629,11 +629,11 @@ input[type='checkbox'] {
 
 .form_generate_btn:hover {
 	cursor: pointer;
-	background-color: #009100;
+	background-color: rgb(55, 218, 44);
 }
 
 .form_generate_btn:active {
-	background-color: #006000;
+	background-color: rgb(35, 160, 30);
 }
 
 .form_generate_btn_disabled {

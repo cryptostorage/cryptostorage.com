@@ -267,7 +267,7 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		var ctaDiv = $("<div class='cta_div'>").appendTo(div);
 		
 		// button to generate keys
-		var btnGenerate = $("<div class='btn btn_start_generate'>").appendTo(ctaDiv);
+		var btnGenerate = $("<div class='btn home_generate_btn'>").appendTo(ctaDiv);
 		btnGenerate.append("Generate New Keys");
 		btnGenerate.click(function() { onSelectGenerate(); });
 		
@@ -716,7 +716,7 @@ function FormController(div) {
 		// add generate button
 		var generateDiv = $("<div class='form_generate_div'>").appendTo(pageDiv);
 		btnGenerate = $("<div class='form_generate_btn'>").appendTo(generateDiv);
-		btnGenerate.append("Generate keys");
+		btnGenerate.append("Generate Keys");
 		
 		// disable generate button if environment failure
 		AppUtils.addEnvironmentListener(function(info) {
