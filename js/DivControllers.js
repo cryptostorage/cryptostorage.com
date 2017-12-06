@@ -878,7 +878,7 @@ function FormController(div) {
 		// handle passphrase checked
 		else {
 			var passphrase = passphraseInput.val();
-			if (!passphrase || passphrase.length < 6) {
+			if (!passphrase || passphrase.length < AppUtils.MIN_PASSWORD_LENGTH) {
 				formErrors.passphrase = true;
 				passphraseInput.addClass("form_input_error_div");
 			} else {
