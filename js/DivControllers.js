@@ -454,7 +454,7 @@ function DonateController(div, appController) {
 					address: plugin.getDonationAddress()
 				});
 			}
-			renderDonationAddresses(donations, null, null, function(donationsDiv) {
+			renderDonationAddresses(donations, function(donationsDiv) {
 				pageDiv.append(donationsDiv);
 				
 				// build credits section
@@ -480,7 +480,7 @@ function DonateController(div, appController) {
 					labelUrl: "https://moneroaddress.org",
 					address: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
 				});
-				renderDonationAddresses(credits, null, null, function(donationsDiv) {
+				renderDonationAddresses(credits, function(donationsDiv) {
 					pageDiv.append(donationsDiv);
 					if (onDone) onDone(div);
 				});
@@ -491,11 +491,9 @@ function DonateController(div, appController) {
 		 * Renders the given donations.
 		 * 
 		 * @param donations are [{logo: <logo>, label: <label>, value: <value>}, ...].
-		 * @param config is the config to render (TODO)
-		 * @param onProgress(done, total, label) is invoked as progress is made (TODO)
 		 * @param onDone(div) is invoked when done
 		 */
-		function renderDonationAddresses(donations, config, onProgress, onDone) {
+		function renderDonationAddresses(donations, onDone) {
 			
 			// div to render to
 			var donationsDiv = $("<div>");
@@ -2047,7 +2045,6 @@ function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, def
 			return;
 		}
 		
-		// TODO: rename classes
 		// set up tabs
 		tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
 		tab1 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
