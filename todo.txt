@@ -1,4 +1,5 @@
 TODO
+monero export logo z-index behind address so it can be copied
 generate button green styling
 run minimum tests when site accessed
 decomission encryption / decryption if cancelled
