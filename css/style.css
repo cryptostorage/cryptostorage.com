@@ -709,7 +709,7 @@ input[type='checkbox'] {
 	margin-left: 10px;
 }
 
-.donate_label_value {
+.donate_label_address {
 	-webkit-flex: 1;
 	-ms-flex: 1;
 	flex: 1;
@@ -749,14 +749,14 @@ input[type='checkbox'] {
 	font-size: 20px;
 }
 
-.donate_left_value {
+.donate_left_address {
 	font-size: 18px;
 	font-family: monospace;
 	word-break: break-all;
 	padding-top: 5px;
 }
 
-.donate_right_value {
+.donate_right_address {
 	font-size: 18px;
 	font-family: monospace;
 	word-break: break-all;

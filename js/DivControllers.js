@@ -465,20 +465,20 @@ function DonateController(div, appController) {
 				credits.push({
 					logo: AppUtils.getCryptoPlugin("ETH").getLogo(),
 					label: "UI design",
-					address: "0x5735bb7cec965e58d03dddd167d1f27321878c51",
-					href: null
+					labelUrl: null,
+					address: "0x5735bb7cec965e58d03dddd167d1f27321878c51"
 				});
 				credits.push({
 					logo: AppUtils.getCryptoPlugin("BTC").getLogo(),
 					label: "bitaddress.org",
-					address: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN",
-					href: null
+					labelUrl: "https://bitaddress.org",
+					address: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
 				});
 				credits.push({
 					logo: AppUtils.getCryptoPlugin("XMR").getLogo(),
 					label: "moneroaddress.org",
-					address: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW",
-					href: null
+					labelUrl: "https://moneroaddress.org",
+					address: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
 				});
 				renderDonationAddresses(credits, null, null, function(donationsDiv) {
 					pageDiv.append(donationsDiv);
@@ -532,13 +532,17 @@ function DonateController(div, appController) {
 		function renderLeft(div, donation, onDone) {
 			div.attr("class", "donate_left");
 			var qrDiv = $("<div>").appendTo(div);
-			var labelAddressDiv = $("<div class='donate_label_value'>").appendTo(div);
+			var labelAddressDiv = $("<div class='donate_label_address'>").appendTo(div);
 			var logoLabelDiv = $("<div class='donate_left_logo_label'>").appendTo(labelAddressDiv);
 			var logo = $("<img src='" + donation.logo.get(0).src + "'>").appendTo(logoLabelDiv);
 			logo.attr("class", "donate_logo");
 			var labelDiv = $("<div class='donate_label'>").appendTo(logoLabelDiv);
-			labelDiv.append(donation.label);
-			var addressDiv = $("<div class='donate_left_value'>").appendTo(labelAddressDiv);
+			if (donation.labelUrl) {
+				labelDiv.append($("<a target='_blank' href='" + donation.labelUrl + "'>" + donation.label + "</a>"));
+			} else {
+				labelDiv.append(donation.label);
+			}
+			var addressDiv = $("<div class='donate_left_address'>").appendTo(labelAddressDiv);
 			addressDiv.append(donation.address);
 			
 			// render qr code
@@ -556,13 +560,17 @@ function DonateController(div, appController) {
 		
 		function renderRight(div, donation, onDone) {
 			div.attr("class", "donate_right");
-			var labelAddressDiv = $("<div class='donate_label_value'>").appendTo(div);
+			var labelAddressDiv = $("<div class='donate_label_address'>").appendTo(div);
 			var logoLabelDiv = $("<div class='donate_right_logo_label'>").appendTo(labelAddressDiv);
 			var logo = $("<img src='" + donation.logo.get(0).src + "'>").appendTo(logoLabelDiv);
 			logo.attr("class", "donate_logo");
 			var labelDiv = $("<div class='donate_label'>").appendTo(logoLabelDiv);
-			labelDiv.append(donation.label);
-			var addressDiv = $("<div class='donate_right_value'>").appendTo(labelAddressDiv);
+			if (donation.labelUrl) {
+				labelDiv.append($("<a target='_blank' href='" + donation.labelUrl + "'>" + donation.label + "</a>"));
+			} else {
+				labelDiv.append(donation.label);
+			}
+			var addressDiv = $("<div class='donate_right_address'>").appendTo(labelAddressDiv);
 			addressDiv.append(donation.address);
 			var qrDiv = $("<div>").appendTo(div);
 			
