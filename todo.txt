@@ -1,5 +1,4 @@
 TODO
-copy export text to clipboard
 todos throughout code
 run minimum tests when site accessed
 decomission encryption / decryption if cancelled
