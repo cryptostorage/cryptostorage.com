@@ -51,7 +51,8 @@ var UiUtils = {
 			"lib/progressbar.js",
 			"lib/pagination.js",
 			"lib/bitaddress.js",
-			"lib/ua-parser.js"
+			"lib/ua-parser.js",
+			"lib/clipboard.js"
 		];
 		
 		// open tab

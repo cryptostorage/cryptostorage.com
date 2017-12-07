@@ -1483,3 +1483,8 @@ input[type='checkbox'] {
 .notice_error {
 	background-color:red;
 }
+
+.copyable:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
