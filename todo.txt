@@ -12,6 +12,8 @@ recover pulldown disabled styling improvements
 make multiple currencies logo smaller
 loading screen on file import while piecesToKeys()
 another attempt at debugging bitaddress bip38 memory leak?
+page selector with 50 pieces shows wrong last page on subset import
+page selector numbers too close together
 
 import/export design
 homepage
