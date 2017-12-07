@@ -2,7 +2,6 @@ TODO
 copy export text to clipboard
 todos throughout code
 run minimum tests when site accessed
-unecessary environment request when app starts polling
 decomission encryption / decryption if cancelled
 one of each button
 error/pass/warn logos not loaded if internet disconnects

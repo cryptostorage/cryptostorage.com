@@ -1194,6 +1194,22 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Gets all environment info that can be determined synchronously.
+	 * 
+	 * Requires lib/ua-parser.js to be loaded.
+	 * 
+	 * @returns info that can be acquired synchronously
+	 */
+	getEnvironmentInfoSync: function() {
+		var info = {};
+		info.browser = AppUtils.getBrowserInfo();
+		info.os = AppUtils.getOsInfo();
+		info.isLocal = AppUtils.isLocal();
+		info.checks = AppUtils.getEnvironmentChecks(info);
+		return info;
+	},
+	
+	/**
 	 * Gets all environment info.
 	 * 
 	 * Requires lib/ua-parser.js to be loaded.
@@ -1202,10 +1218,9 @@ var AppUtils = {
 	 * @returns info that can be acquired synchronously until async info is available
 	 */
 	getEnvironmentInfo: function(onDone) {
-		var info = {};
-		info.browser = AppUtils.getBrowserInfo();
-		info.os = AppUtils.getOsInfo();
-		info.isLocal = AppUtils.isLocal();
+		
+		// get synchronous environment info
+		var info = AppUtils.getEnvironmentInfoSync();
 		
 		// determine if online
 		AppUtils.isOnline(function(online) {
@@ -1215,7 +1230,6 @@ var AppUtils = {
 		});
 		
 		// return synchronously
-		info.checks = AppUtils.getEnvironmentChecks(info);
 		return info;
 	},
 	
@@ -1292,10 +1306,7 @@ var AppUtils = {
 	pollEnvironment: function(initialEnvironmentInfo) {
 		
 		// notify listeners of initial environment info
-		if (initialEnvironmentInfo) {
-			AppUtils.cachedEnvironmentInfo = initialEnvironmentInfo;
-			AppUtils.notifyEnvironmentListeners(initialEnvironmentInfo);
-		}
+		if (initialEnvironmentInfo) setEnvironmentInfo(initialEnvironmentInfo);
 		
 		// load dependency
 		LOADER.load("lib/ua-parser.js", function() {
@@ -1304,12 +1315,16 @@ var AppUtils = {
 			refreshEnvironmentInfo();
 			function refreshEnvironmentInfo() {
 				AppUtils.getEnvironmentInfo(function(info) {
-					AppUtils.cachedEnvironmentInfo = info
-					AppUtils.notifyEnvironmentListeners(info);
+					setEnvironmentInfo(info);
 				});
 				setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
 			}
 		});
+		
+		function setEnvironmentInfo(info) {
+			AppUtils.cachedEnvironmentInfo = info;
+			AppUtils.notifyEnvironmentListeners(info);
+		}
 	},
 	
 	/**

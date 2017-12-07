@@ -95,7 +95,7 @@ function AppController(div) {
 		
 		// start polling starting with synchronized environment info
 		LOADER.load("lib/ua-parser.js", function() {
-			AppUtils.pollEnvironment(AppUtils.getEnvironmentInfo());
+			AppUtils.pollEnvironment(AppUtils.getEnvironmentInfoSync());
 		});
 		
 		// header
