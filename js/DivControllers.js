@@ -117,8 +117,7 @@ function AppController(div) {
 			window.location.href = "#home";
 			that.showHome();
 		});
-		var gitHubLink = getLinkDiv("GitHub");
-		gitHubLink.click(function() { window.open("https://github.com/cryptostorage/cryptostorage.com", "_blank"); });
+		var gitHubLink = $("<a target='_blank' class='link_div' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>");
 		var faqLink = getLinkDiv("FAQ");
 		faqLink.click(function() {
 			window.location.href = "#faq";
