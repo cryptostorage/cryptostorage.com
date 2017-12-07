@@ -23,6 +23,7 @@ faq
 pgp
 
 design:
+copy to clipboard tooltip confirmation
 form validation error messages and descriptions
 copyright (?) and disclaimer
 warn if private key not included in print - alert when print clicked without show private keys?
@@ -43,7 +44,6 @@ use rounded or square qr code for split form?
 code review
 loading screen when file imported
 recover warnings closeable
-copy address or private key to clipboard confirmation
 
 low priority:
 save as txt and csv
