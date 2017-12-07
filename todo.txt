@@ -1,4 +1,5 @@
 TODO
+generate button green styling
 run minimum tests when site accessed
 decomission encryption / decryption if cancelled
 one of each button
