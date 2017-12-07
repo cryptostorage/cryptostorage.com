@@ -2,12 +2,12 @@ TODO
 copy export text to clipboard
 todos throughout code
 run minimum tests when site accessed
+unecessary environment request when app starts polling
 generate button green styling
 decomission encryption / decryption if cancelled
 one of each button
 error/pass/warn logos not loaded if internet disconnects
 check licenses of dependencies
-unecessary environment request when app starts polling
 GitHub hover does not show GitHub link in browser
 internet disconnect is not critical bug after dependencies are loaded in tab
 
