@@ -1345,6 +1345,7 @@ input[type='checkbox'] {
 	font-size: 13px;
 	font-family: monospace;
 	word-break: break-all;
+	z-index: 1000;
 }
 
 .key_div_currency {
