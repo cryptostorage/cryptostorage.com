@@ -440,7 +440,7 @@ function DonateController(div, appController) {
 		var pageDiv = $("<div class='page_div'>").appendTo(div);
 		
 		// load qr code dependency
-		LOADER.load(["lib/qrcode.js", "lib/async.js"], function() {
+		LOADER.load(["lib/qrcode.js", "lib/async.js", "lib/clipboard.js"], function() {
 			
 			// build donate section
 			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
@@ -483,6 +483,14 @@ function DonateController(div, appController) {
 				});
 				renderDonationAddresses(credits, function(donationsDiv) {
 					pageDiv.append(donationsDiv);
+					
+					// make addresses copyable
+					new Clipboard(".copyable", {
+						text: function(trigger) {
+							return $(trigger).html();
+						}
+					});
+					
 					if (onDone) onDone(div);
 				});
 			});
@@ -541,7 +549,7 @@ function DonateController(div, appController) {
 			} else {
 				labelDiv.append(donation.label);
 			}
-			var addressDiv = $("<div class='donate_left_address'>").appendTo(labelAddressDiv);
+			var addressDiv = $("<div class='donate_left_address copyable'>").appendTo(labelAddressDiv);
 			addressDiv.append(donation.address);
 			
 			// render qr code
@@ -569,7 +577,7 @@ function DonateController(div, appController) {
 			} else {
 				labelDiv.append(donation.label);
 			}
-			var addressDiv = $("<div class='donate_right_address'>").appendTo(labelAddressDiv);
+			var addressDiv = $("<div class='donate_right_address copyable'>").appendTo(labelAddressDiv);
 			addressDiv.append(donation.address);
 			var qrDiv = $("<div>").appendTo(div);
 			

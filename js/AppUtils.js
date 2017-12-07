@@ -12,7 +12,7 @@ var AppUtils = {
 	MIN_PASSWORD_LENGTH: 7,
 	CRYPTOSTORAGE_URL: "https://cryptostorage.com",
 	ONLINE_IMAGE_URL: "https://cryptostorage.com/favicon.ico",
-	APP_DEPENDENCIES: ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/ua-parser.js"],
+	APP_DEPENDENCIES: ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/ua-parser.js", "lib/clipboard.js"],
 	ENVIRONMENT_REFRESH_RATE: 3000,	// environment refresh rate in milliseconds
 	ONLINE_DETECTION_TIMEOUT: 3000,	// timeout to detect if online
 	
