@@ -1,13 +1,12 @@
 TODO
-monero export logo z-index behind address so it can be copied
 copy export text to clipboard
+todos throughout code
 generate button green styling
 run minimum tests when site accessed
 decomission encryption / decryption if cancelled
 one of each button
 error/pass/warn logos not loaded if internet disconnects
 check licenses of dependencies
-todos throughout code
 unecessary environment request when app starts polling
 GitHub hover does not show GitHub link in browser
 
