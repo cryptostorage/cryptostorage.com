@@ -1485,6 +1485,5 @@ input[type='checkbox'] {
 }
 
 .copyable:hover {
-	text-decoration: underline;
 	cursor: pointer;
 }
