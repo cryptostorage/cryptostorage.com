@@ -2091,7 +2091,7 @@ function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, def
 			contentDiv.append(tabContent2);
 			break;
 		default:
-			throw Error("Tab index must be 0 or 1 but was " + idx);
+			throw new Error("Tab index must be 0 or 1 but was " + idx);
 		}
 	}
 }
@@ -2359,12 +2359,17 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 					progressBar.set(percent);
 					progressBar.setText((label ? label + " ... " : "") + Math.round(percent * 100)  + "%");	// TODO: separate label and percent
 					progressDiv.show();
-				}, function(_keys, _pieces, _pieceDivs) {
+				}, function(err, _keys, _pieces, _pieceDivs) {
 					progressDiv.hide();
-					keys = _keys;
-					pieces = _pieces;
-					pieceDivs = _pieceDivs;
-					update(pieceDivs, onDone);
+					if (err) {
+						AppUtils.setRuntimeError(err);
+						if (onDone) onDone(err);
+					} else {
+						keys = _keys;
+						pieces = _pieces;
+						pieceDivs = _pieceDivs;
+						update(pieceDivs, onDone);
+					}
 				});
 			}
 		}

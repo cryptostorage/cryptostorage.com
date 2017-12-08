@@ -14,6 +14,11 @@
  */
 window.exportToBody = function(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit, environmentInfo) {
 	
+	// detect any uncaught errors
+	window.onerror = function(err) {
+		AppUtils.setRuntimeError(err);
+	};
+	
 	// poll environment info on loop
 	AppUtils.pollEnvironment(environmentInfo);
 	

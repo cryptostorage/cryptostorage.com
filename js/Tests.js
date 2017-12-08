@@ -5,7 +5,7 @@ var Tests = {
 	
 	// constants
 	REPEAT_LONG: 10,
-	REPEAT_SHORT: 1,
+	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
@@ -137,7 +137,8 @@ var Tests = {
 			AppUtils.generateKeys(getNoEncryptionConfig(), function(percent, label) {
 				assertTrue(percent >= 0 && percent <= 1);
 				progressReported = true;
-			}, function(keys, pieces, pieceDivs) {
+			}, function(err, keys, pieces, pieceDivs) {
+				assertNull(err);
 				assertTrue(progressReported);
 				assertEquals(2 * plugins.length, keys.length);
 				assertEquals(1, pieces.length);
@@ -148,7 +149,8 @@ var Tests = {
 				AppUtils.generateKeys(getEncryptionAndSplitConfig(), function(percent, label) {
 					assertTrue(percent >= 0 && percent <= 1);
 					progressReported = true;
-				}, function(keys, pieces, pieceDivs) {
+				}, function(err, keys, pieces, pieceDivs) {
+					assertNull(err);
 					assertTrue(progressReported);
 					assertEquals(2 * plugins.length, keys.length);
 					assertEquals(3, pieces.length);
@@ -583,7 +585,7 @@ var Tests = {
 				for (var j = 0; j < pieces.length; j++) {
 					try {
 						plugin.combine([pieces[j]]);
-						throw Error("fail");
+						throw new Error("fail");
 					} catch (err) {
 						if (err.message === "fail") throw new Error("Cannot combine single pieces");
 					}

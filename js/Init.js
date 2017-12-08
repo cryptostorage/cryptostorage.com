@@ -3,6 +3,11 @@
  */
 $(document).ready(function() {
 	
+	// detect any uncaught errors
+	window.onerror = function(err) {
+		AppUtils.setRuntimeError(err);
+	};
+	
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;
 		
@@ -13,9 +18,15 @@ $(document).ready(function() {
 	new AppController($("body")).render();
 	
 	// start loading common dependencies
-	LOADER.load(AppUtils.APP_DEPENDENCIES);
+	LOADER.load(AppUtils.APP_DEPENDENCIES, function() {
+		
+		// run minimum tests
+		AppUtils.runMinimumTests(function(err) {
+			if (err) AppUtils.setRuntimeError(err);
+		});
+	});
 	
-	// run tests
+	// run test suite
 	if (AppUtils.RUN_TESTS) {
 		console.log("Running tests...");
 		Tests.runTests(function(error) {

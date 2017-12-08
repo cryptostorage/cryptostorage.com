@@ -33,7 +33,7 @@ function DependencyLoader() {
 		loadjs.ready(paths, {
 			success: callback,
 			error: function() {
-				throw Error("Failed to load dependencies: " + paths);
+				throw new Error("Failed to load dependencies: " + paths);
 			}
 		});
 	}

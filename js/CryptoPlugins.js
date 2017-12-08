@@ -103,18 +103,18 @@ CryptoPlugin.prototype.combine = function(shares) {
 	var nonPrefixedShares = [];
 	for (var i = 0; i < shares.length; i++) {
 		var share = shares[i];
-		if (!AppUtils.isPossibleSplitPiece(share)) throw Error("Invalid split piece: " + share);
+		if (!AppUtils.isPossibleSplitPiece(share)) throw new Error("Invalid split piece: " + share);
 		var min = AppUtils.getMinPieces(share);
-		if (!min) throw Error("Share is not prefixed with minimum pieces: " + share);
+		if (!min) throw new Error("Share is not prefixed with minimum pieces: " + share);
 		if (!isInitialized(minShares)) minShares = min;
-		else if (min !== minShares) throw Error("Shares have different minimum threshold prefixes: " + min + " vs " + minShares);
+		else if (min !== minShares) throw new Error("Shares have different minimum threshold prefixes: " + min + " vs " + minShares);
 		nonPrefixedShares.push(share.substring(share.indexOf('c') + 1));
 	}
 	
 	// ensure sufficient shares are provided
 	if (shares.length < minShares) {
 		var additional = minShares - shares.length;
-		throw Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private key");
+		throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private key");
 	}
 	
 	// combine shares and create key

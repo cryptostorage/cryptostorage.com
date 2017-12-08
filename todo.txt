@@ -1,6 +1,5 @@
 TODO
 todos throughout code
-run minimum tests when site accessed
 decomission encryption / decryption if cancelled
 one of each button
 error/pass/warn logos not loaded if internet disconnects
