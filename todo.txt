@@ -20,7 +20,7 @@ faq
 pgp
 
 design:
-copy to clipboard tooltip confirmation
+copy to clipboard confirmation
 form validation error messages and descriptions
 copyright (?) and disclaimer
 warn if private key not included in print - alert when print clicked without show private keys?
