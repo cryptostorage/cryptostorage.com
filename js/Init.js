@@ -36,6 +36,8 @@ $(document).ready(function() {
 	}
 	
 	// pre-load images
+	var imgDiv = $("<div>").appendTo($("body"));
+	imgDiv.hide();
 	preloadImage("img/xmark_small.png");
 	preloadImage("img/warning_orange.png");
 	preloadImage("img/checkmark_small.png");
@@ -43,5 +45,6 @@ $(document).ready(function() {
 	function preloadImage(src) {
 		var img = new Image();
 		img.src = src;
+		imgDiv.append(img);
 	}
 });
