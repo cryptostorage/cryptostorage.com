@@ -3,7 +3,6 @@ todos throughout code
 decomission encryption / decryption if cancelled
 one of each button
 error/pass/warn logos not loaded if internet disconnects
-check licenses of dependencies
 internet disconnect is not critical bug after dependencies are loaded in tab
 generate button green styling
 
