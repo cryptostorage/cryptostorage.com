@@ -441,7 +441,7 @@ var Tests = {
 			for (var i = 0; i < keys.length; i++) originals.push(keys[i].copy());
 			
 			// decrypt keys
-			AppUtils.decryptKeys(keys, passphrase, null, function(err, decryptedKeys) {
+			AppUtils.decryptKeys(keys, passphrase, null, null, function(err, decryptedKeys) {
 				if (err) {
 					onDone(err);
 					return;

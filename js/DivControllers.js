@@ -1162,6 +1162,7 @@ function RecoverFileController(div) {
 	var importedPiecesDiv;				// shows imported item;
 	var controlsDiv;							// div for all control links
 	var lastKeys;
+	var canceller = {};
 	
 	this.render = function(onDone) {
 		
@@ -1251,6 +1252,8 @@ function RecoverFileController(div) {
 		controlsDiv.hide();
 		removePieces();
 		contentDiv.append(importDiv);
+		canceller.isCancelled = true;
+		canceller = {};
 	}
 	
 	// ------------------------ PRIVATE ------------------
@@ -1283,7 +1286,7 @@ function RecoverFileController(div) {
 		if (keys[0].isEncrypted()) {
 			
 			// create decryption controller and register callbacks
-			var decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+			var decryptionController = new DecryptionController($("<div>"), keys, canceller, function(warning) {
 				that.setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
 				onKeysDecrypted(getImportedPieces(), decryptedKeys, pieces, pieceDivs);
@@ -1902,10 +1905,11 @@ inheritsFrom(RecoverTextController, DivController);
  * 
  * @param div is the div to render to
  * @param encrypted keys is an array of encrypted CryptoKeys
+ * @param canceller.isCancelled specifies if the decryption process should be cancelled
  * @param onWarning(msg) is called when this controller reports a warning
  * @param onKeysDecrypted(keys, pieces, pieceDivs) is invoked on successful decryption
  */
-function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
+function DecryptionController(div, encryptedKeys, canceller, onWarning, onKeysDecrypted) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -1993,9 +1997,10 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 			// decrypt keys async
 			var copies = [];
 			for (var i = 0; i < encryptedKeys.length; i++) copies.push(encryptedKeys[i].copy());
-			AppUtils.decryptKeys(copies, passphrase, function(percent, label) {
+			AppUtils.decryptKeys(copies, passphrase, canceller, function(percent, label) {
 				setProgress(percent * decryptWeight / totalWeight, label);
 			}, function(err, decryptedKeys) {
+				if (canceller && canceller.isCancelled) return;
 				
 				// if error, switch back to input div
 				if (err) {

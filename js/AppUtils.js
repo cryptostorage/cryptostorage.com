@@ -639,8 +639,6 @@ var AppUtils = {
 			onDone(err);
 		}
 		
-		var decommissioned = false;	// TODO: remove altogether?
-		
 		// track done and total weight for progress
 		var doneWeight = 0;
 		var totalWeight = AppUtils.getWeightGenerateKeys(config);
@@ -671,12 +669,6 @@ var AppUtils = {
 			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
 			async.series(funcs, function(err, keys) {
 				try {
-					
-					// check if decommissioned
-					if (decommissioned) {
-						onDone();
-						return;
-					}
 					
 					// check for error
 					if (err) throw err;
@@ -725,19 +717,16 @@ var AppUtils = {
 		
 		function newKeyFunc(plugin, onDone) {
 			return function(onDone) {
-				if (decommissioned) onDone();
-				else {
-					setImmediate(function() {
-						try {
-							var key = plugin.newKey();
-							doneWeight += AppUtils.getWeightCreateKey();
-							if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
-							onDone(null, key);
-						} catch(err) {
-							onDone(err);
-						}
-					});	// let UI breath
-				}
+				setImmediate(function() {
+					try {
+						var key = plugin.newKey();
+						doneWeight += AppUtils.getWeightCreateKey();
+						if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
+						onDone(null, key);
+					} catch(err) {
+						onDone(err);
+					}
+				});	// let UI breath
 			}
 		}
 		
@@ -850,8 +839,6 @@ var AppUtils = {
 			if (onDone) onDone(err);
 		}
 		
-		var decommissioned = false;	// TODO: remove altogether?
-		
 		// collect originals if verifying encryption
 		var originals;
 		if (verifyEncryption) {
@@ -896,7 +883,7 @@ var AppUtils = {
 				
 				// decrypt keys
 				if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
-				AppUtils.decryptKeys(encryptedCopies, passphrase, function(percent) {
+				AppUtils.decryptKeys(encryptedCopies, passphrase, null, function(percent) {
 					if (onProgress) onProgress((doneWeight + percent * verifyWeight) / totalWeight, "Verifying encryption");
 				}, function(err, decryptedKeys) {
 					try {
@@ -927,10 +914,6 @@ var AppUtils = {
 		
 		function encryptFunc(key, scheme, passphrase) {
 			return function(onDone) {
-				if (decommissioned) {
-					onDone();
-					return;
-				}
 				key.encrypt(scheme, passphrase, function(percent) {
 					if (onProgress) onProgress((doneWeight +  AppUtils.getWeightEncryptKey(scheme) * percent) / totalWeight, "Encrypting");
 				}, function(err, key) {
@@ -1005,12 +988,11 @@ var AppUtils = {
 	 * 
 	 * @param keys are the encrypted keys to decrypt
 	 * @param phassphrase is the phassphrase to decrypt the keys
+	 * @param canceller.isCancelled specifies if decryption should be cancelled
 	 * @param onProgress(done, total) is called as progress is made
 	 * @param onDone(err, decryptedKeys) is called when decryption is complete
 	 */
-	decryptKeys: function(keys, passphrase, onProgress, onDone) {
-		
-		var decommissioned = false;	// TODO: remove altogether?
+	decryptKeys: function(keys, passphrase, canceller, onProgress, onDone) {
 		
 		// validate input
 		try {
@@ -1034,7 +1016,7 @@ var AppUtils = {
 		var doneWeight = 0;
 		if (onProgress) onProgress(0, "Decrypting");
 		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, result) {
-			if (decommissioned) return;
+			if (canceller && canceller.isCancelled) return;
 			else if (err) onDone(err);
 			else onDone(null, keys);
 		});
@@ -1042,11 +1024,12 @@ var AppUtils = {
 		// decrypts one key
 		function decryptFunc(key, passphrase) {
 			return function(onDone) {
-				if (decommissioned) return;
+				if (canceller && canceller.isCancelled) return;
 				var scheme = key.getEncryptionScheme();
 				key.decrypt(passphrase, function(percent) {
 					if (onProgress) onProgress((doneWeight + AppUtils.getWeightDecryptKey(scheme) * percent) / totalWeight, "Decrypting");
 				}, function(err, key) {
+					if (canceller && canceller.isCancelled) return;
 					if (err) onDone(err);
 					else {
 						doneWeight += AppUtils.getWeightDecryptKey(scheme);
