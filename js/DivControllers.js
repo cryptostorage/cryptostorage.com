@@ -2175,7 +2175,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
 		showLogosCheckbox = $("<input type='checkbox' class='export_checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
 		var showLogosCheckboxLabel = $("<label class='export_checkbox_label' for='showLogosCheckbox'>").appendTo(exportCheckboxes);
-		showLogosCheckboxLabel.html("Show currency logos");
+		showLogosCheckboxLabel.html("Show logos");
 		
 		// apply default state
 		showPublicCheckbox.prop('checked', true);
@@ -2274,7 +2274,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		return {
 			showPublic: showPublicCheckbox.prop('checked'),
 			showPrivate: showPrivateCheckbox.prop('checked'),
-			showCurrencyLogos: showLogosCheckbox.prop('checked')
+			showLogos: showLogosCheckbox.prop('checked')
 		};
 	}
 	

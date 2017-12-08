@@ -7,8 +7,7 @@ var PieceRenderer = {
 		pairsPerPage: 7,
 		showPublic: true,
 		showPrivate: true,
-		showCurrencyLogos: true,
-		showCryptostorageLogos: true,
+		showLogos: true,
 		qrSize: 90,
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
@@ -28,7 +27,7 @@ var PieceRenderer = {
 		var numQrs = numKeys * numPieces * 2;
 		
 		// get number of logos
-		var numLogos = config.showCurrencyLogos ? numKeys * numPieces : 0;
+		var numLogos = config.showLogos ? numKeys * numPieces : 0;
 		
 		// return total weight
 		return numQrs * getWeightQr() + numLogos * getWeightLogo();
@@ -112,10 +111,10 @@ var PieceRenderer = {
 			if (i % config.pairsPerPage === 0) {
 				if (i > 0) pieceDiv.append($("<div class='piece_page_spacer'>"));
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
-				if (piece.pieceNum || config.showCryptostorageLogos) {
+				if (piece.pieceNum || config.showLogos) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
-					if (config.showCryptostorageLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+					if (config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
 					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
 					if (piece.pieceNum) pieceNumDiv.append("Piece " + piece.pieceNum);
 				}
@@ -194,7 +193,7 @@ var PieceRenderer = {
 			
 			// center currency
 			var keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
-			if (config.showCurrencyLogos) {
+			if (config.showLogos) {
 				var keyDivCurrencyLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
 				keyDivCurrencyLogo.append(logo);
 			}

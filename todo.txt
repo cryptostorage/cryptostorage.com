@@ -23,6 +23,7 @@ design:
 copy to clipboard confirmation
 form validation error messages and descriptions
 copyright (?) and disclaimer
+unchecking show public / private on export removes from save all download?
 warn if private key not included in print - alert when print clicked without show private keys?
 option to split the passphrase and include a copy of it on each share
 export controller progress design, initial and re-render
