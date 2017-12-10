@@ -16,6 +16,7 @@ var AppUtils = {
 	ENVIRONMENT_REFRESH_RATE: 3000,	// environment refresh rate in milliseconds
 	ONLINE_DETECTION_TIMEOUT: 3000,	// timeout to detect if online
 	RUNTIME_ERRROR: null,						// unexpected application runtime error
+	NO_INTERNET_CAN_BE_ERROR: true,	// lack of internet can be critical error if running remotely
 	
 	//classify operating systems and browsers as open or closed source
 	OPEN_SOURCE_BROWSERS: arrToLowerCase([
@@ -619,8 +620,9 @@ var AppUtils = {
 	 * 	}
 	 * @param onProgress(percent, label) is invoked as progress is made (optional)
 	 * @param onDone(err, keys, pieces, pieceDivs) is invoked when done
+	 * @param noInternetIsNotErrorAfterDependenciesLoaded makes lack of internet a non-error even if remote after dependencies are loaded (used on export page)
 	 */
-	generateKeys: function(config, onProgress, onDone) {
+	generateKeys: function(config, onProgress, onDone, noInternetIsNotErrorAfterDependenciesLoaded) {
 		
 		// verify config
 		try {
@@ -655,6 +657,9 @@ var AppUtils = {
 		dependencies = arrUnique(dependencies);
 		if (onProgress) onProgress(0, "Loading dependencies");
 		LOADER.load(dependencies, function() {
+			
+			// internet is no longer required if accessing remotely
+			if (noInternetIsNotErrorAfterDependenciesLoaded) AppUtils.setNoInternetCanBeError(false);
 			
 			// collect key creation functions
 			var funcs = [];
@@ -1297,7 +1302,7 @@ var AppUtils = {
 		// check if remote and not online
 		var internetRequiredError = false;
 		if (isInitialized(info.isOnline)) {
-			if (!info.isLocal && !info.isOnline) {
+			if (!info.isLocal && !info.isOnline && AppUtils.NO_INTERNET_CAN_BE_ERROR) {
 				internetRequiredError = true;
 				checks.push({state: "fail", message: "Internet is required because application is not running locally"});
 			}
@@ -1412,6 +1417,19 @@ var AppUtils = {
 		info.runtimeError = err;
 		info.checks = AppUtils.getEnvironmentChecks(info);
 		AppUtils.notifyEnvironmentListeners(info);
+	},
+	
+	/**
+	 * Sets if lack of internet can be a critical error if the site is running remotely.
+	 * 
+	 * After dependencies are done loading in the export page, internet is no longer required
+	 * even if the site is running remotely, so this method stops treating internet disconnection
+	 * as critical.
+	 * 
+	 * @param bool specifies if no internet can be a critical error
+	 */
+	setNoInternetCanBeError(bool) {
+		AppUtils.NO_INTERNET_CAN_BE_ERROR = bool;
 	},
 	
 	/**

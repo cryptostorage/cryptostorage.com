@@ -2375,7 +2375,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 						pieceDivs = _pieceDivs;
 						update(pieceDivs, onDone);
 					}
-				});
+				}, true);
 			}
 		}
 	}

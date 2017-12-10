@@ -1,7 +1,6 @@
 TODO
 todos throughout code
 one of each button
-internet disconnect is not critical bug after dependencies are loaded in tab
 generate button green styling
 seo
 
