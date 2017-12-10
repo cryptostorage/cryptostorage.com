@@ -3,7 +3,7 @@ todos throughout code
 one of each button
 internet disconnect is not critical bug after dependencies are loaded in tab
 generate button green styling
-XML sitemap
+seo
 
 recover pulldown disabled styling improvements
 make multiple currencies logo smaller
