@@ -613,6 +613,7 @@ function FormController(div) {
 	var minPiecesInput;
 	var	btnGenerate;
 	var formErrors = {};
+	var plugins = AppUtils.getCryptoPlugins();
 	
 	this.render = function(onDone) {
 		div.empty();
@@ -624,6 +625,16 @@ function FormController(div) {
 		
 		// page div
 		var pageDiv = $("<div class='page_div'>").appendTo(div);
+		
+		// top links
+		var formLinks = $("<div>").appendTo(pageDiv);
+		var oneOfEachLink = $("<div>").appendTo(formLinks);
+		oneOfEachLink.html("Add one of each");
+		oneOfEachLink.click(function() {
+			for (var i = 0; i < plugins.length; i++) {
+				addCurrency(plugins[i].getName());
+			}
+		});
 		
 		// currency inputs
 		currencyInputs = [];
@@ -755,11 +766,6 @@ function FormController(div) {
 		if (onDone) onDone(div);
 	}
 	
-	this.setSelectedCurrency = function(plugin) {
-		assertTrue(currencyInputs.length === 1);
-		currencyInputs[0].setSelectedCurrency(plugin.getName());
-	}
-	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	// handle when generate button clicked
@@ -807,11 +813,11 @@ function FormController(div) {
 		}
 	}
 	
-	function addCurrency() {
+	function addCurrency(selectedCurrencyName) {
 		if (AppUtils.DEV_MODE) console.log("addCurrency()");
 		
 		// create input
-		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, AppUtils.getCryptoPlugins(), updateForm, function() {
+		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, plugins, selectedCurrencyName, updateForm, function() {
 			removeCurrency(currencyInput);
 		}, function(isValid) {
 			validateCurrencyInputs();
@@ -977,11 +983,12 @@ function FormController(div) {
 	 * 
 	 * @param div is the div to render to
 	 * @param idx is the index of this input relative to the other inputs to accomodate ddslick's id requirement
+	 * @param selectedCurrencyName is the name of the initial selected currency
 	 * @param onCurrencyChanged(ticker) is invoked when the user changes the currency selection
 	 * @param onDelete is invoked when the user delets this input
 	 * @param onValid(bool) is invoked when the validity state changes
 	 */
-	function CurrencyInput(div, idx, plugins, onCurrencyChanged, onDelete, onValid) {
+	function CurrencyInput(div, idx, plugins, selectedCurrencyName, onCurrencyChanged, onDelete, onValid) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
@@ -1078,6 +1085,14 @@ function FormController(div) {
 				});
 			}
 			
+			// get default selected index
+			var defaultSelectedIndex = 0;
+			if (selectedCurrencyName) {
+				for (var i = 0; i < plugins.length; i++) {
+					if (plugins[i].getName() === selectedCurrencyName) defaultSelectedIndex = i;
+				}
+			}
+			
 			// create pull down
 			selector = $("<div id='currency_selector_" + idx + "'>").appendTo(div);
 			selector.ddslick({
@@ -1085,7 +1100,7 @@ function FormController(div) {
 				background: "white",
 				imagePosition: "left",
 				selectText: "Select a Currency",
-				defaultSelectedIndex: 0,
+				defaultSelectedIndex: defaultSelectedIndex,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
 					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
@@ -1093,7 +1108,7 @@ function FormController(div) {
 				},
 			});
 			selector = $("#currency_selector_" + idx);	// ddslick requires id reference
-			that.setSelectedCurrency("Bitcoin");	// default value
+			that.setSelectedCurrency(selectedCurrencyName ? selectedCurrencyName : "Bitcoin");	// does not initialize pull down with this value, but sets some instance variables
 			
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
