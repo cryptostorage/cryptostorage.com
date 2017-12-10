@@ -747,9 +747,15 @@ input[type='checkbox'] {
 	padding-left: 7px;
 }
 
-.donate_label * {
+.donate_label, .donate_label * {
 	font-weight: bold;
-	font-size: 20px;
+	font-size: 22px;
+	text-decoration: none;
+}
+
+.donate_label > a:hover {
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 .donate_left_address {
