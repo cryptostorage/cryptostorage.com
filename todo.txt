@@ -3,6 +3,7 @@ todos throughout code
 one of each button
 internet disconnect is not critical bug after dependencies are loaded in tab
 generate button green styling
+XML sitemap
 
 recover pulldown disabled styling improvements
 make multiple currencies logo smaller
@@ -38,6 +39,8 @@ use rounded or square qr code for split form?
 code review
 loading screen when file imported
 recover warnings closeable
+constraint split input and keep in sync?
+slider points, logos, and supporting content - fill icons with white, multiple locks
 
 low priority:
 save as txt and csv
@@ -56,11 +59,3 @@ code scan
 minimize initial dependencies: condense files to single files, lazy load css
 de-allocate elements on page re-renders
 decomission export render when new render invoked
-
-consult designers
-opinion on donate page + ui designer tip address - link to open user's wallet
-error messages on key generation page - let them click button once, outline with red, deactivate until they fix.  Constrain split input and keep in sync
-disable generate button until input valid? - let them click once then disable until error corrected
-color of generate buttons / pulsing? - form button same as home page, maybe shift to darker
-slider points, logos, and supporting content - fill icons with white, multiple locks
-BIP38 vs CryptoJS encryption option for BTC/BCH - checkbox on same line as "Show passphrase", "Use BIP38 for Bitcoin and Bitcoin Cash"
