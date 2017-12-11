@@ -244,7 +244,7 @@ function EthereumPlugin() {
 			// unencrypted
 			if (str.length >= 63 && str.length <= 65) {
 				state.hex = str;
-				state.wif = str;	// TODO: different wif?
+				state.wif = str;
 				state.address = keythereum.privateKeyToAddress(state.hex);
 				state.encryption = null;
 				return new CryptoKey(this, state);
@@ -344,7 +344,7 @@ function LitecoinPlugin() {
 		var state = {};
 		
 		// unencrypted
-		if (str.length >= 52 && litecore.PrivateKey.isValid(str)) {	// TODO: litecore says 'ab' is valid ... ?
+		if (str.length >= 52 && litecore.PrivateKey.isValid(str)) {	// litecore says 'ab' is valid?
 			var key = new litecore.PrivateKey(str);
 			state.hex = key.toString();
 			state.wif = key.toWIF();
@@ -396,7 +396,7 @@ function DashPlugin() {
 		var state = {};
 		
 		// unencrypted
-		if (str.length >= 52 && dashcore.PrivateKey.isValid(str)) {	// TODO: dashcore says 'ab' is valid ... ?
+		if (str.length >= 52 && dashcore.PrivateKey.isValid(str)) {	// dashcore says 'ab' is valid?
 			var key = new dashcore.PrivateKey(str);
 			state.hex = key.toString();
 			state.wif = key.toWIF();
@@ -522,7 +522,7 @@ function ZcashPlugin() {
 		var state = {};
 		
 		// unencrypted
-		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// TODO: zcashcore says 'ab' is valid ... ?
+		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// zcashcore says 'ab' is valid?
 			var key = new zcashcore.PrivateKey(str);
 			state.hex = key.toString();
 			state.wif = key.toWIF();
