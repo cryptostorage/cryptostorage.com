@@ -1,7 +1,6 @@
 TODO
 seo
 pgp
-page selector with 50 pieces shows wrong last page on subset import
 page selector numbers too close together
 
 import/export design
