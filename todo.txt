@@ -1,6 +1,7 @@
 TODO
 seo
 pgp
+donation credits
 make multiple currencies logo smaller
 page selector with 50 pieces shows wrong last page on subset import
 page selector numbers too close together
