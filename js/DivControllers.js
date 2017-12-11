@@ -605,10 +605,13 @@ function FormController(div) {
 	var currencyInputsDiv;
 	var currencyInputs;			// tracks each currency input
 	var passphraseCheckbox;
+	var passphraseInputDiv;
 	var passphraseInput;
 	var bip38CheckboxDiv;
 	var bip38Checkbox;
+	var showPassphraseCheckbox;
 	var splitCheckbox;
+	var splitInputDiv;
 	var numPiecesInput;
 	var minPiecesInput;
 	var	btnGenerate;
@@ -627,14 +630,14 @@ function FormController(div) {
 		var pageDiv = $("<div class='page_div'>").appendTo(div);
 		
 		// top links
-		var formLinks = $("<div>").appendTo(pageDiv);
-		var oneOfEachLink = $("<div>").appendTo(formLinks);
-		oneOfEachLink.html("Add one of each");
-		oneOfEachLink.click(function() {
-			for (var i = 0; i < plugins.length; i++) {
-				addCurrency(plugins[i].getName());
-			}
-		});
+		var formLinks = $("<div class='form_links_div'>").appendTo(pageDiv);
+		var oneOfEachLink = $("<div class='form_link'>").appendTo(formLinks);
+		oneOfEachLink.html("+ Add one of each");
+		oneOfEachLink.click(function() { onOneOfEach(); });
+		formLinks.append("&nbsp;&nbsp;&nbsp;&nbsp;")
+		var startOverLink = $("<div class='form_link'>").appendTo(formLinks);
+		startOverLink.html("Start over")
+		startOverLink.click(function() { onStartOver(); });
 		
 		// currency inputs
 		currencyInputs = [];
@@ -666,7 +669,7 @@ function FormController(div) {
 		});
 		
 		// passphrase input
-		var passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
+		passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
 		var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
 		passphraseWarnDiv.append("This passphrase is required to access funds later on.  Don’t lose it!");
 		passphraseInputDiv.append("Passphrase");
@@ -684,7 +687,7 @@ function FormController(div) {
 		var bip38CheckboxLabel = $("<label for='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
 		bip38CheckboxLabel.html("Use BIP38 for Bitcoin and Bitcoin Cash");
 		var showPassphraseCheckboxDiv = $("<div class='show_passphrase_checkbox_div'>").appendTo(passphraseConfigDiv);
-		var showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
+		showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 		var showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 		showPassphraseCheckboxLabel.html("Show passphrase");
 		showPassphraseCheckbox.click(function() {
@@ -712,7 +715,7 @@ function FormController(div) {
 		});
 		
 		// split input
-		var splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
+		splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
 		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitInputDiv);
 		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
 		var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
@@ -768,6 +771,32 @@ function FormController(div) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
+	function onStartOver() {
+		
+		// reset currencies
+		for (var i = 0; i < currencyInputs.length; i++) {
+			currencyInputs[i].getDiv().remove();
+		}
+		currencyInputs = [];
+		addCurrency();
+		
+		// reset passphrase
+		passphraseCheckbox.prop('checked', false);
+		passphraseInputDiv.hide();
+		showPassphraseCheckbox.prop('checked', false);
+		passphraseInput.val("");
+		bip38Checkbox.prop('checked', false);
+		
+		// reset split
+		splitCheckbox.prop('checked', false);
+		splitInputDiv.hide();
+		numPiecesInput.val(3);
+		minPiecesInput.val(2);
+		
+		// update form
+		validateForm(true);
+	}
+	
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm(true);
@@ -813,11 +842,11 @@ function FormController(div) {
 		}
 	}
 	
-	function addCurrency(selectedCurrencyName) {
+	function addCurrency(defaultTicker) {
 		if (AppUtils.DEV_MODE) console.log("addCurrency()");
 		
 		// create input
-		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, plugins, selectedCurrencyName, updateForm, function() {
+		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, plugins, defaultTicker, updateForm, function() {
 			removeCurrency(currencyInput);
 		}, function(isValid) {
 			validateCurrencyInputs();
@@ -838,6 +867,22 @@ function FormController(div) {
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().remove();
 		validateCurrencyInputs(true);
+	}
+	
+	function onOneOfEach() {
+		
+		// remove existing currencies
+		for (var i = 0; i < currencyInputs.length; i++) {
+			currencyInputs[i].getDiv().remove();
+		}
+		currencyInputs = [];
+		
+		// add one input per currency
+		for (var i = 0; i < plugins.length; i++) {
+			addCurrency(plugins[i].getTicker());
+		}
+		validateCurrencyInputs();
+		updateForm();
 	}
 	
 	function updateForm() {
@@ -983,12 +1028,12 @@ function FormController(div) {
 	 * 
 	 * @param div is the div to render to
 	 * @param idx is the index of this input relative to the other inputs to accomodate ddslick's id requirement
-	 * @param selectedCurrencyName is the name of the initial selected currency
+	 * @param defaultTicker is the ticker of the initial selected currency
 	 * @param onCurrencyChanged(ticker) is invoked when the user changes the currency selection
 	 * @param onDelete is invoked when the user delets this input
 	 * @param onValid(bool) is invoked when the validity state changes
 	 */
-	function CurrencyInput(div, idx, plugins, selectedCurrencyName, onCurrencyChanged, onDelete, onValid) {
+	function CurrencyInput(div, idx, plugins, defaultTicker, onCurrencyChanged, onDelete, onValid) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
@@ -1010,7 +1055,8 @@ function FormController(div) {
 			return selectedPlugin;
 		}
 		
-		this.setSelectedCurrency = function(name) {
+		this.setSelectedCurrency = function(ticker) {
+			var name = AppUtils.getCryptoPlugin(ticker).getName();
 			for (var i = 0; i < selectorData.length; i++) {
 				if (selectorData[i].text === name) {
 					selector.ddslick('select', {index: i});
@@ -1087,9 +1133,9 @@ function FormController(div) {
 			
 			// get default selected index
 			var defaultSelectedIndex = 0;
-			if (selectedCurrencyName) {
+			if (defaultTicker) {
 				for (var i = 0; i < plugins.length; i++) {
-					if (plugins[i].getName() === selectedCurrencyName) defaultSelectedIndex = i;
+					if (plugins[i].getTicker() === defaultTicker) defaultSelectedIndex = i;
 				}
 			}
 			
@@ -1108,7 +1154,7 @@ function FormController(div) {
 				},
 			});
 			selector = $("#currency_selector_" + idx);	// ddslick requires id reference
-			that.setSelectedCurrency(selectedCurrencyName ? selectedCurrencyName : "Bitcoin");	// does not initialize pull down with this value, but sets some instance variables
+			that.setSelectedCurrency(defaultTicker ? defaultTicker : "BTC");	// does not initialize pull down with this value, but sets instance variables
 			
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);

@@ -356,6 +356,29 @@ input[type='checkbox'] {
 	margin-bottom: 30px;
 }
 
+.form_links_div {
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: flex;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-ms-flex-pack: end;
+	-webkit-justify-content: flex-end;
+	justify-content: flex-end;
+	margin-bottom: 5px;
+}
+
+.form_link {
+	color: blue;
+}
+
+.form_link:hover {
+	cursor: pointer;
+	text-decoration:underline;
+}
+
 .form_section_div {
 	margin-bottom: 20px;
 }
