@@ -1,7 +1,6 @@
 TODO
 seo
 pgp
-page selector numbers too close together
 
 import/export design
 homepage
