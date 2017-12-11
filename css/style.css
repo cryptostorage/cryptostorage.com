@@ -703,7 +703,6 @@ input[type='checkbox'] {
 	-webkit-align-items: center;
 	-ms-flex-align: center;
 	align-items: center;
-	margin-top: -5px;
 }
 
 .donate_right {
@@ -717,7 +716,6 @@ input[type='checkbox'] {
 	-ms-flex-pack: end;
 	-webkit-justify-content: flex-end;
 	justify-content: flex-end;
-	margin-top: -5px;
 }
 
 .donate_left_qr {
