@@ -615,7 +615,7 @@ input[type='checkbox'] {
 	justify-content : center;
 	height: 70px;
 	width: 225px;
-	background-color: rgb(50, 185, 40);
+	background-color: rgb(76, 178, 29);
 	color: white;
 	font-size:24px;
 	margin-bottom: 25px;
@@ -629,11 +629,11 @@ input[type='checkbox'] {
 
 .form_generate_btn:hover {
 	cursor: pointer;
-	background-color: rgb(55, 218, 44);
+	background-color: rgb(90, 215, 50);
 }
 
 .form_generate_btn:active {
-	background-color: rgb(35, 160, 30);
+	background-color: rgb(55, 160, 30);
 }
 
 .form_generate_btn_disabled {

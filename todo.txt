@@ -1,7 +1,5 @@
 TODO
-todos throughout code
 one of each button
-generate button green styling
 seo
 
 recover pulldown disabled styling improvements
