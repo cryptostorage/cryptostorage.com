@@ -243,11 +243,11 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		// intro slider
 		var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
 		var sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		getSlide($("<img src='img/mix.png'>"), "Create cold storage and paper wallets for multiple cryptocurrencies.").appendTo(sliderDiv);
-		getSlide($("<img src='img/printer.png'>"), "Print or download for long term storage and easy recovery.").appendTo(sliderDiv);
+		getSlide($("<img src='img/mix.png'>"), "Create paper wallets and cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
+		getSlide($("<img src='img/printer.png'>"), "Print or download for easy storage and recovery.").appendTo(sliderDiv);
 		getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces.").appendTo(sliderDiv);
+		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces for maximum security.").appendTo(sliderDiv);
 		getSlide($("<img src='img/traffic_light.png'>"), "Environment checks help generate keys securely.").appendTo(sliderDiv);
 		sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
 		
