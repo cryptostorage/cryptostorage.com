@@ -8,9 +8,15 @@ homepage
 faq
 
 design:
-one of each and start over links
+homepage
+environment checks
+export page while in progress
+recover view decrypted keys success
+form links: start over and one of each
+form info bubbles
+form error messages
+file import loading
 copy to clipboard confirmation
-form validation error messages and descriptions
 copyright (?) and disclaimer
 unchecking show public / private on export removes from save all download?
 warn if private key not included in print - alert when print clicked without show private keys?
