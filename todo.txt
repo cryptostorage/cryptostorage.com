@@ -2,6 +2,7 @@ TODO
 net neutrality 12/14
 export disabled checkbox should not be pointer
 only paint key pair after it has rendered
+print all becomes available while re-rendering
 recover -> import?
 seo
 pgp
