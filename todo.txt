@@ -2,6 +2,7 @@ TODO
 net neutrality 12/14
 export disabled checkbox should not be pointer
 only paint key pair after it has rendered
+focus password input if empty error
 print all becomes available while re-rendering
 type in 20 then 18 in split split will give error when 1 entered
 seo
