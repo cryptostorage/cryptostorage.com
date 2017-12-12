@@ -69,12 +69,8 @@ ol {
 	text-decoration: none;
 }
 
-.link_div:first-child {
-	padding-left:0px;
-}
-
 .link_div {
-	padding: 10px 0 10px 20px;
+	padding: 10px 10px 10px 10px;
 }
 
 .link_div:hover {
@@ -371,11 +367,15 @@ input[type='checkbox'] {
 }
 
 .form_link {
-	color: blue;
+	font-size: 20px;
+	font-weight: lighter;
+	opacity:0.75;
 }
 
 .form_link:hover {
+	color: black;
 	cursor: pointer;
+	opacity:0.8;
 	text-decoration:underline;
 }
 

@@ -633,7 +633,7 @@ function FormController(div) {
 		// top links
 		var formLinks = $("<div class='form_links_div'>").appendTo(pageDiv);
 		var oneOfEachLink = $("<div class='form_link'>").appendTo(formLinks);
-		oneOfEachLink.html("+ Add one of each");
+		oneOfEachLink.html("One of each");
 		oneOfEachLink.click(function() { onOneOfEach(); });
 		formLinks.append("&nbsp;&nbsp;&nbsp;&nbsp;")
 		var startOverLink = $("<div class='form_link'>").appendTo(formLinks);
