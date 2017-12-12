@@ -17,6 +17,7 @@ var AppUtils = {
 	ONLINE_DETECTION_TIMEOUT: 3000,	// timeout to detect if online
 	RUNTIME_ERRROR: null,						// unexpected application runtime error
 	NO_INTERNET_CAN_BE_ERROR: true,	// lack of internet can be critical error if running remotely
+	SLIDER_RATE: 4000,							// rate of slider transitions
 	
 	//classify operating systems and browsers as open or closed source
 	OPEN_SOURCE_BROWSERS: arrToLowerCase([
