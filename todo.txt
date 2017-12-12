@@ -1,4 +1,6 @@
 TODO
+home links offset left on mobile
+export disabled checkbox should not be pointer
 seo
 pgp
 import/export design
