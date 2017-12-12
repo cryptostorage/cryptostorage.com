@@ -3,7 +3,7 @@ net neutrality 12/14
 export disabled checkbox should not be pointer
 only paint key pair after it has rendered
 print all becomes available while re-rendering
-recover -> import?
+type in 20 then 18 in split split will give error when 1 entered
 seo
 pgp
 import/export design
@@ -40,9 +40,9 @@ recover warnings closeable
 constraint split input and keep in sync?
 slider points, logos, and supporting content - fill icons with white, multiple locks
 loading screen on file import while piecesToKeys()
+recover -> import?
 
 low priority:
-type in 20 then 18 in split split will give error when 1 entered
 recover pulldown disabled styling improvements
 another attempt at debugging bitaddress bip38 memory leak?
 save as txt and csv
