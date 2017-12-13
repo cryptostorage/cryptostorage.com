@@ -240,49 +240,55 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 		div.empty();
 		div.attr("class", "intro_div");
 		
-		// intro slider
-		var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
-		var sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-		getSlide($("<img src='img/mix.png'>"), "Create cold storage and paper wallets for multiple cryptocurrencies.").appendTo(sliderDiv);
-		getSlide($("<img src='img/printer.png'>"), "Print or download for long term storage and easy recovery.").appendTo(sliderDiv);
-		getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-		getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-		getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces for maximum security.").appendTo(sliderDiv);
-		getSlide($("<img src='img/traffic_light.png'>"), "Environment checks help generate keys securely.").appendTo(sliderDiv);
-		sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
-		
-		function getSlide(img, text) {
-			var slide = $("<div class='slide'>");
-			var slideContent = $("<div class='slide_content'>").appendTo(slide);
-			if (img) {
-				var imgDiv = $("<div>").appendTo(slideContent);
-				img.appendTo(imgDiv);
-				img.attr("class", "slide_img");
+		// load mix img
+		var mixImg = new Image();
+		mixImg.onload = function() {
+			
+			// intro slider
+			var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
+			var sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
+			getSlide($(mixImg), "Create cold storage and paper wallets for multiple cryptocurrencies.").appendTo(sliderDiv);
+			getSlide($("<img src='img/printer.png'>"), "Print or download for long term storage and easy recovery.").appendTo(sliderDiv);
+			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
+			getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
+			getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces for maximum security.").appendTo(sliderDiv);
+			getSlide($("<img src='img/traffic_light.png'>"), "Environment checks help generate keys securely.").appendTo(sliderDiv);
+			sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
+			
+			function getSlide(img, text) {
+				var slide = $("<div class='slide'>");
+				var slideContent = $("<div class='slide_content'>").appendTo(slide);
+				if (img) {
+					var imgDiv = $("<div>").appendTo(slideContent);
+					img.appendTo(imgDiv);
+					img.attr("class", "slide_img");
+				}
+				var labelDiv = $("<div class='slide_label'>").appendTo(slideContent);
+				labelDiv.html(text);
+				return slide;
 			}
-			var labelDiv = $("<div class='slide_label'>").appendTo(slideContent);
-			labelDiv.html(text);
-			return slide;
+			
+			// call to action is overlaid
+			var ctaDiv = $("<div class='cta_div'>").appendTo(div);
+			
+			// button to generate keys
+			var btnGenerate = $("<div class='btn home_generate_btn'>").appendTo(ctaDiv);
+			btnGenerate.append("Generate New Keys");
+			btnGenerate.click(function() { onSelectGenerate(); });
+			
+			// button to recover keys
+			var btnRecover = $("<div class='btn btn_recover'>").appendTo(ctaDiv);
+			btnRecover.append("or Recover Existing Keys");
+			
+			// disable recover keys if failed environment check
+			AppUtils.addEnvironmentListener(function(info) {
+				btnRecover.unbind("click");
+				if (!AppUtils.hasEnvironmentFailure(info)) btnRecover.click(function() { onSelectRecover(); });
+			});
+			
+			if (onDone) onDone(div);
 		}
-		
-		// call to action is overlaid
-		var ctaDiv = $("<div class='cta_div'>").appendTo(div);
-		
-		// button to generate keys
-		var btnGenerate = $("<div class='btn home_generate_btn'>").appendTo(ctaDiv);
-		btnGenerate.append("Generate New Keys");
-		btnGenerate.click(function() { onSelectGenerate(); });
-		
-		// button to recover keys
-		var btnRecover = $("<div class='btn btn_recover'>").appendTo(ctaDiv);
-		btnRecover.append("or Recover Existing Keys");
-		
-		// disable recover keys if failed environment check
-		AppUtils.addEnvironmentListener(function(info) {
-			btnRecover.unbind("click");
-			if (!AppUtils.hasEnvironmentFailure(info)) btnRecover.click(function() { onSelectRecover(); });
-		});
-		
-		if (onDone) onDone(div);
+		mixImg.src = "img/mix.png";
 	}
 }
 inheritsFrom(SliderController, DivController);

@@ -1,6 +1,5 @@
 TODO
 net neutrality 12/14
-wait until mix logo appears to render slider text
 export disabled checkbox should not be pointer
 only paint key pair after it has rendered
 focus password input if empty error
@@ -48,7 +47,6 @@ another attempt at debugging bitaddress bip38 memory leak?
 save as txt and csv
 pieces are blank until rendered, loading screen?
 double click cryptostorage.html opens page in browser
-wait for images before loading homepage
 try all imported file / key combinations to recover
 prevent scroll revealing some of next picture
 copy line break in pdf inserts space
