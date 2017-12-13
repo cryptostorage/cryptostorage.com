@@ -919,6 +919,9 @@ function FormController(div) {
 		
 		// update generate button
 		setGenerateEnabled(!hasFormErrors());
+		
+		// focus passphrase if error
+		if (formErrors.passphrase) passphraseInput.focus();
 	}
 	
 	function hasFormErrors() {
