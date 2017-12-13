@@ -1,6 +1,5 @@
 TODO
 update latest scryptsy
-type in 20 then 18 in split split will give error when 1 entered
 
 seo
 pgp

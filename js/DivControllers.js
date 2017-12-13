@@ -967,7 +967,7 @@ function FormController(div) {
 		if (_updateForm) updateForm();
 	}
 	
-	function validateSplit(_updateForm, blankIsError) {
+	function validateSplit(_updateForm, strictBlankAndRange) {
 		
 		// handle split not checked
 		if (!splitCheckbox.is(":checked")) {
@@ -982,8 +982,9 @@ function FormController(div) {
 			
 			// validate num pieces
 			var numPiecesError = false;
-			if (!numPiecesInput.val()) {
-				if (blankIsError) {
+			var numPieces = Number(numPiecesInput.val());
+			if (strictBlankAndRange) {
+				if (!numPiecesInput.val() || numPieces < 2) {
 					numPiecesError = true;
 					formErrors.split = true;
 					numPiecesInput.addClass("form_input_error_div");
@@ -991,31 +992,30 @@ function FormController(div) {
 					numPiecesInput.removeClass("form_input_error_div");
 				}
 			} else {
-				var numPieces = Number(numPiecesInput.val());
-				if (!isInt(numPieces) || numPieces < 2) {
+				if (!numPiecesInput.val() || isInt(numPieces)) {
+					numPiecesInput.removeClass("form_input_error_div");
+				} else {
 					numPiecesError = true;
 					formErrors.split = true;
 					numPiecesInput.addClass("form_input_error_div");
-				} else {
-					numPiecesInput.removeClass("form_input_error_div");
 				}
 			}
 			
 			// validate min pieces
-			if (!minPiecesInput.val()) {
-				if (blankIsError) {
+			var minPieces = Number(minPiecesInput.val());
+			if (strictBlankAndRange) {
+				if (!minPiecesInput.val() || minPieces < 2 || (!numPiecesError && minPieces > numPieces)) {
 					formErrors.split = true;
 					minPiecesInput.addClass("form_input_error_div");
 				} else {
 					minPiecesInput.removeClass("form_input_error_div");
 				}
 			} else {
-				var minPieces = Number(minPiecesInput.val());
-				if (!isInt(minPieces) || minPieces < 2 || (!numPiecesError && minPieces > numPieces)) {
+				if (!minPiecesInput.val() || isInt(minPieces)) {
+					minPiecesInput.removeClass("form_input_error_div");
+				} else {
 					formErrors.split = true;
 					minPiecesInput.addClass("form_input_error_div");
-				} else {
-					minPiecesInput.removeClass("form_input_error_div");
 				}
 			}
 		}
