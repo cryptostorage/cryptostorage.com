@@ -336,6 +336,18 @@ input[type='checkbox'] {
 	margin-right: 7px;
 }
 
+input[type='checkbox']:not([disabled]) {
+	cursor: pointer;
+}
+
+input[type='checkbox']:not([disabled]) +label {
+  	cursor: pointer;
+}
+
+input[type='checkbox'][disabled] +label {
+  	opacity: 0.75;
+}
+
 .question {
 	font-size: 24px;
 	margin-bottom: 10px;
@@ -1225,7 +1237,6 @@ input[type='checkbox'] {
 
 .export_checkbox_label {
 	color: white;
-	cursor: pointer;
 	font-size: 24px;
 	-webkit-user-select: none;
 	-moz-user-select: none;
