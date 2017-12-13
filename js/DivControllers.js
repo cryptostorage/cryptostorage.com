@@ -1224,7 +1224,7 @@ function RecoverFileController(div) {
 	var importedPiecesDiv;				// shows imported item;
 	var controlsDiv;							// div for all control links
 	var lastKeys;
-	var canceller = {};
+	var decryptionController;
 	
 	this.render = function(onDone) {
 		
@@ -1314,8 +1314,7 @@ function RecoverFileController(div) {
 		controlsDiv.hide();
 		removePieces();
 		contentDiv.append(importDiv);
-		canceller.isCancelled = true;
-		canceller = {};
+		if (decryptionController) decryptionController.cancel();
 	}
 	
 	// ------------------------ PRIVATE ------------------
@@ -1348,7 +1347,7 @@ function RecoverFileController(div) {
 		if (keys[0].isEncrypted()) {
 			
 			// create decryption controller and register callbacks
-			var decryptionController = new DecryptionController($("<div>"), keys, canceller, function(warning) {
+			decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
 				that.setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
 				onKeysDecrypted(getImportedPieces(), decryptedKeys, pieces, pieceDivs);
@@ -1637,6 +1636,7 @@ function RecoverTextController(div, plugins) {
 	var importedPiecesDiv;		// div for imported pieces
 	var controlsDiv;
 	var lastKeys;
+	var decryptionController;
 	
 	this.render = function(onDone) {
 		
@@ -1729,7 +1729,8 @@ function RecoverTextController(div, plugins) {
 		controlsDiv.hide();
 		contentDiv.append(passphraseInputDiv);
 		removePieces();
-		setSelectedCurrency("Bitcoin");
+		setSelectedCurrency("BTC");
+		if (decryptionController) decryptionController.cancel();
 	}
 	
 	function setSelectorEnabled(bool) {
@@ -1748,7 +1749,7 @@ function RecoverTextController(div, plugins) {
 		if (keys[0].isEncrypted()) {
 			
 			// create decryption controller and register callbacks
-			var decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+			decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
 				setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
 				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
@@ -1782,7 +1783,8 @@ function RecoverTextController(div, plugins) {
 		});
 	}
 	
-	function setSelectedCurrency(name) {
+	function setSelectedCurrency(ticker) {
+		var name = AppUtils.getCryptoPlugin(ticker).getName();
 		selector = $("#recover_selector");
 		for (var i = 0; i < selectorData.length; i++) {
 			if (selectorData[i].text === name) {
@@ -1967,11 +1969,10 @@ inheritsFrom(RecoverTextController, DivController);
  * 
  * @param div is the div to render to
  * @param encrypted keys is an array of encrypted CryptoKeys
- * @param canceller.isCancelled specifies if the decryption process should be cancelled
  * @param onWarning(msg) is called when this controller reports a warning
  * @param onKeysDecrypted(keys, pieces, pieceDivs) is invoked on successful decryption
  */
-function DecryptionController(div, encryptedKeys, canceller, onWarning, onKeysDecrypted) {
+function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -1980,6 +1981,7 @@ function DecryptionController(div, encryptedKeys, canceller, onWarning, onKeysDe
 	var passphraseInput;
 	var progressDiv;
 	var submitButton;
+	var canceller = {};
 	
 	this.render = function(onDone) {
 		
@@ -2019,6 +2021,10 @@ function DecryptionController(div, encryptedKeys, canceller, onWarning, onKeysDe
 		passphraseInput.focus();
 	}
 	
+	this.cancel = function() {
+		canceller.isCancelled = true;
+	}
+	
 	function init() {
 		progressDiv.hide();
 		labelDiv.html("Passphrase");
@@ -2044,7 +2050,7 @@ function DecryptionController(div, encryptedKeys, canceller, onWarning, onKeysDe
 		
 		// compute weights for progress bar
 		var decryptWeight = AppUtils.getWeightDecryptKeys(encryptedKeys);
-		var renderWeight = PieceRenderer.getRenderWeight(encryptedKeys.length, 1, null);
+		var renderWeight = PieceRenderer.getWeight(encryptedKeys.length, 1, null);
 		var totalWeight = decryptWeight + renderWeight;
 		
 		// switch content div to progress bar
@@ -2075,7 +2081,7 @@ function DecryptionController(div, encryptedKeys, canceller, onWarning, onKeysDe
 				var pieces = AppUtils.keysToPieces(decryptedKeys);
 				
 				// render pieces
-				PieceRenderer.renderPieces(pieces, null, null, function(percentDone) {
+				new PieceRenderer(pieces, null, null).render(function(percentDone) {
 					setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering...");
 				}, function(err, pieceDivs) {
 					if (err) throw err;
@@ -2191,6 +2197,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 	var paginator;
 	var piecesDiv;
 	var printEnabled;
+	var lastRenderer;
 	
 	// confirm exit if storage not saved or printed
 	if (confirmExit) {
@@ -2407,7 +2414,9 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 				setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(pieceDivs);
 				setPrintEnabled(false);
-				PieceRenderer.renderPieces(pieces, pieceDivs, getPieceRendererConfig(), null, function(err, pieceDivs) {
+				if (lastRenderer) lastRenderer.cancel();
+				lastRenderer = new PieceRenderer(pieces, pieceDivs, getPieceRendererConfig());
+				lastRenderer.render(null, function(err, pieceDivs) {
 					setPrintEnabled(true);
 					if (onDone) onDone();
 				});

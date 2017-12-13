@@ -1,6 +1,5 @@
 TODO
 net neutrality 12/14
-print all becomes available while re-rendering
 wait until mix logo appears to render slider text
 export disabled checkbox should not be pointer
 only paint key pair after it has rendered

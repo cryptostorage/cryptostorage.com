@@ -750,9 +750,9 @@ var AppUtils = {
 				}
 				
 				// render pieces to divs
-				var renderWeight = PieceRenderer.getRenderWeight(keys.length, config.numPieces, null);
+				var renderWeight = PieceRenderer.getWeight(keys.length, config.numPieces, null);
 				if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
-				PieceRenderer.renderPieces(pieces, null, null, function(percent) {
+				new PieceRenderer(pieces, null, null).render(function(percent) {
 					if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
 				}, function(err, pieceDivs) {
 					try {
@@ -1064,7 +1064,7 @@ var AppUtils = {
 			weight += currency.numKeys * AppUtils.getWeightCreateKey();
 			if (currency.encryption) weight += currency.numKeys * (AppUtils.getWeightEncryptKey(currency.encryption) + (keyGenConfig.verifyEncryption ? AppUtils.getWeightDecryptKey(currency.encryption) : 0));
 		}
-		return weight + PieceRenderer.getRenderWeight(numKeys, keyGenConfig.numPieces, null);
+		return weight + PieceRenderer.getWeight(numKeys, keyGenConfig.numPieces, null);
 	},
 	
 	/**
@@ -1418,6 +1418,7 @@ var AppUtils = {
 		info.runtimeError = err;
 		info.checks = AppUtils.getEnvironmentChecks(info);
 		AppUtils.notifyEnvironmentListeners(info);
+		throw err;
 	},
 	
 	/**

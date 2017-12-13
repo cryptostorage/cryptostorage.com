@@ -1,52 +1,22 @@
 /**
- * Renders a piece to a div for HTML export.
+ * Renders pieces to divs.
+ * 
+ * @param pieces are the pieces to render
+ * @param pieceDivs are the divs to render to (optional)
+ * @param config is the configuration to render
  */
-var PieceRenderer = {
-
-	defaultConfig: {
-		pairsPerPage: 7,
-		showPublic: true,
-		showPrivate: true,
-		showLogos: true,
-		qrSize: 90,
-		qrVersion: null,
-		qrErrorCorrectionLevel: 'H',
-		qrScale: 4,
-		qrPadding: 5		// spacing in pixels
-	},
+function PieceRenderer(pieces, pieceDivs, config) {
+	
+	var isCancelled = false;	// tracks if rendering is cancelled
 	
 	/**
-	 * Returns the total weight to render all keys across all pieces.
-	 */
-	getRenderWeight: function(numKeys, numPieces, config) {
-		
-		// merge configs
-		config = objectAssign({}, PieceRenderer.defaultConfig, config);
-		
-		// get number of qr codes
-		var numQrs = numKeys * numPieces * 2;
-		
-		// get number of logos
-		var numLogos = config.showLogos ? numKeys * numPieces : 0;
-		
-		// return total weight
-		return numQrs * getWeightQr() + numLogos * getWeightLogo();
-		
-		function getWeightQr() { return 15; }
-		function getWeightLogo() { return 0; }
-	},
-	
-	/**
-	 * Renders pieces.
+	 * Renders the pieces.
 	 * 
-	 * @param pieces are the pieces to render
-	 * @param pieceDivs are the divs to render to (optional)
-	 * @param config is the configuration to render
 	 * @param onProgress(percent) is invoked as progress is made
 	 * @param onDone(err, pieceDivs) is invoked when done
 	 */
-	renderPieces: function(pieces, pieceDivs, config, onProgress, onDone) {
-
+	this.render = function(onProgress, onDone) {
+		
 		// merge default config with given confi
 		config = objectAssign({}, PieceRenderer.defaultConfig, config);
 		
@@ -65,7 +35,8 @@ var PieceRenderer = {
 		
 		function renderFunc(pieceDiv, piece, config, onPieceProgress, onDone) {
 			return function(onDone) {
-				PieceRenderer.renderPiece(pieceDiv, piece, config, onPieceProgress, onDone);
+				if (isCancelled) return;
+				renderPiece(pieceDiv, piece, config, onPieceProgress, onDone);
 			}
 		}
 		
@@ -78,11 +49,19 @@ var PieceRenderer = {
 		
 		// render async
 		async.series(funcs, function(err, pieceDivs) {
+			if (isCancelled) return;
 			if (err) onDone(err);
 			else onDone(null, pieceDivs);
 		});
-	},
-		
+	}
+	
+	/**
+	 * Cancels rendering.
+	 */
+	this.cancel = function() {
+		isCancelled = true;
+	}
+	
 	/**
 	 * Renders the given piece to a new div.
 	 * 
@@ -92,7 +71,7 @@ var PieceRenderer = {
 	 * @param onProgress(percent) is invoked as progress is made
 	 * @param onDone(err, pieceDiv) is invoked when done
 	 */
-	renderPiece: function(pieceDiv, piece, config, onProgress, onDone) {
+	function renderPiece(pieceDiv, piece, config, onProgress, onDone) {
 		assertInitialized(pieceDiv);
 		
 		// div setup
@@ -136,6 +115,7 @@ var PieceRenderer = {
 			funcs.push(renderKeyPairFunc(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config));
 			function renderKeyPairFunc(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config) {
 				return function(onDone) {
+					if (isCancelled) return;
 					renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config, function() {
 						onKeyPairDone();
 						onDone();
@@ -159,6 +139,7 @@ var PieceRenderer = {
 		
 		// render pairs
 		async.series(funcs, function() {
+			if (isCancelled) return;
 			
 			// make keys copyable
 			new Clipboard(".copyable", {
@@ -174,6 +155,7 @@ var PieceRenderer = {
 		 * Renders a single key pair.
 		 */
 		function renderKeyPair(div, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config, onDone) {
+			if (isCancelled) return;
 			
 			// left qr code
 			var keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
@@ -222,6 +204,7 @@ var PieceRenderer = {
 			// add qr codes
 			if (leftValue) {
 				AppUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
+					if (isCancelled) return;
 					img.attr("class", "key_div_qr");
 					keyDivLeft.append(img);
 					addPrivateQr();
@@ -233,6 +216,7 @@ var PieceRenderer = {
 			function addPrivateQr() {
 				if (rightValue) {
 					AppUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
+						if (isCancelled) return;
 						img.attr("class", "key_div_qr");
 						keyDivRight.append(img);
 						onDone();
@@ -254,4 +238,36 @@ var PieceRenderer = {
 			}
 		}
 	}
+}
+
+// default configuration
+PieceRenderer.defaultConfig = {
+		pairsPerPage: 7,
+		showPublic: true,
+		showPrivate: true,
+		showLogos: true,
+		qrSize: 90,
+		qrVersion: null,
+		qrErrorCorrectionLevel: 'H',
+		qrScale: 4,
+		qrPadding: 5		// spacing in pixels
+};
+
+// compute render weight
+PieceRenderer.getWeight = function(numKeys, numPieces, config) {
+	
+	// merge configs
+	config = objectAssign({}, PieceRenderer.defaultConfig, config);
+	
+	// get number of qr codes
+	var numQrs = numKeys * numPieces * 2;
+	
+	// get number of logos
+	var numLogos = config.showLogos ? numKeys * numPieces : 0;
+	
+	// return total weight
+	return numQrs * getWeightQr() + numLogos * getWeightLogo();
+	
+	function getWeightQr() { return 15; }
+	function getWeightLogo() { return 0; }
 }
