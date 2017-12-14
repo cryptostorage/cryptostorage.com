@@ -1,6 +1,4 @@
 TODO
-update latest scryptsy
-
 seo
 pgp
 faq
