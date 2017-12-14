@@ -5,7 +5,7 @@ var Tests = {
 	
 	// constants
 	REPEAT_LONG: 10,
-	REPEAT_SHORT: 2,
+	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
@@ -296,7 +296,7 @@ var Tests = {
 				var max = scheme === AppUtils.EncryptionScheme.BIP38 ? Tests.REPEAT_SHORT : Tests.REPEAT_LONG;
 				if (max < 1) continue;
 				var keys = [];
-				for (var i = 0; i < max; i++) keys.push(plugin.newKey());
+				for (var j = 0; j < max; j++) keys.push(plugin.newKey());
 				funcs.push(function(onDone) { testEncryptKeys(keys, scheme, Tests.PASSPHRASE, onDone); });
 			}
 			
