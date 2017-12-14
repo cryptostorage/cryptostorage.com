@@ -1,6 +1,5 @@
 TODO
 seo
-pgp
 faq
 
 design:
