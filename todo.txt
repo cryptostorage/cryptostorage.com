@@ -1,41 +1,35 @@
 TODO
+change terminology from recover to import
+disclaimer - footer on homepage only, no need for copyright, except maybe for images
+environment checks - one bar per error/warning, white border separator, x-mark, recommend link to do right thing
+export page while in progress - header controls disabled, progress bar in middle with description underneath, no percentage
+form links: start over and one of each - font size 15px, opacity 1, blue, underline, start over below generate keys
+regenerate button under single key pair if accessed from homepage so they can disconnect and regenerate
+form info bubbles - see spec
+form error messages - see spec
+copy to clipboard confirmation - tooltip Copied!
+file import loading - see spec, only show if minimum file size
+
 seo
 faq
 
-design:
-homepage
-environment checks
-export page while in progress
-recover view decrypted keys success
-form links: start over and one of each
-form info bubbles
-form error messages
-file import loading
-copy to clipboard confirmation
-copyright (?) and disclaimer
-unchecking show public / private on export removes from save all download?
+designer:
+dependency management
+	generate new keys button shows loading page until all currency dependencies loaded
+	warning bar saying dependencies are loading, then when done tell them they should disconnect to the internet
+homepage - tbd, fill icons with white, multiple locks, too big on small screens?
+import keys success - inline or success page? dual tabs if import is inline
+warning sign badge with warning count in upper right blue bar
 warn if private key not included in print - alert when print clicked without show private keys?
-option to split the passphrase and include a copy of it on each share?
-export controller progress design, initial and re-render
-import / decryption complete - click button to view
-environment checks: app header, disable recover, disable generate, show info bar on form and export
-print progress
-tip address
-select a currency or default to first?
-homepage scale too big on small screens?
-ability to re-hide more currencies on home?
-ability to encrypt / decrypt on export page?
-use rounded or square qr code for split form?
 code review
-loading screen when file imported
-recover warnings closeable
-constraint split input and keep in sync?
-slider points, logos, and supporting content - fill icons with white, multiple locks
-loading screen on file import while piecesToKeys()
-recover -> import?
+tip address
+option to split the passphrase and include a copy of it on each share?
 
 low priority:
-export checkboxes solid cursor
+print progress - progress bar if threshold exceeded where they're expected to wait
+minify dependencies with source map download
+caching - etag dependencies, last modified tag, expire header will tell browser to cache
+homepage re-hide more currencies: hide link underneath all of them if more than 4 rows
 recover pulldown disabled styling improvements
 another attempt at debugging bitaddress bip38 memory leak?
 only paint key pair after it has rendered
