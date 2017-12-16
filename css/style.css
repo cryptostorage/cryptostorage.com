@@ -1506,6 +1506,16 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_div {
+	width: 100%;
+}
+
+.notice_bar:first-child {
+	border-top: 0px;
+}
+
+.notice_bar {
+	height:45px;
+	width:100%;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -1516,13 +1526,52 @@ input[type='checkbox'][disabled] +label {
 	-webkit-justify-content: center;
 	-ms-flex-pack: center;
 	justify-content: center;
-	background-color: rgb(247, 185, 43);
-	height:50px;
-	width:100%;
+
+	border-top: 2px solid white;
 }
 
-.notice_error {
-	background-color:red;
+.notice_bar_content {
+	width: 100%;
+	text-align: center;
+}
+
+.notice_bar_left {
+	width:50px;
+}
+
+.notice_bar_right {
+	width:50px;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: flex;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+}
+
+.notice_bar_close_img {
+	width: 25px;
+	height: 25px;
+}
+
+.notice_bar_close_img:hover {
+	cursor: pointer;
+}
+
+.notice_bar_pass {
+	background-color: green;
+}
+
+.notice_bar_fail {
+	background-color: red;
+}
+
+.notice_bar_warn {
+	background-color: rgb(247, 185, 43);
 }
 
 .copyable:hover {

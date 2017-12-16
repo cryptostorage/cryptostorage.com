@@ -768,10 +768,6 @@ function FormController(div) {
 		var warningDiv = $("<div class='red_warning'>").appendTo(pageDiv);
 		warningDiv.append("Under Development: Not Ready for Use");
 		
-		// environment checks
-		var environmentDiv = $("<div>").appendTo(pageDiv);
-		new EnvironmentCheckController(environmentDiv).render();
-		
 		// done rendering
 		if (onDone) onDone(div);
 	}
@@ -2504,7 +2500,6 @@ function NoticeController(div, config) {
 		// div setup
 		div.empty();
 		div.addClass("notice_div");
-		div.hide();
 		
 		// merge configs
 		config = objectAssign({}, getDefaultConfig(), config);
@@ -2525,81 +2520,30 @@ function NoticeController(div, config) {
 	
 	function setEnvironmentInfo(info) {
 		
-		// count number of pass, warn, and fail checks
-		var passCount = 0;
-		var failCount = 0;
-		var warnCount = 0;
+		div.empty();	// TODO: cache last notices
+		
+		// render each shown notice bar
 		for (var i = 0; i < info.checks.length; i++) {
-			if (info.checks[i].state === "pass") passCount++;
-			else if (info.checks[i].state === "fail") failCount++;
-			else if (info.checks[i].state === "warn") warnCount++;
+			if (info.checks[i].state === "pass" && config.showOnPass ||
+					info.checks[i].state === "fail" && config.showOnFail ||
+					info.checks[i].state === "warn" && config.showOnWarn) {
+				renderNoticeBar($("<div>").appendTo(div), info.checks[i]);
+			}
 		}
 		
-		// style error
-		if (failCount) div.addClass("notice_error");
-		else div.removeClass("notice_error");
-		
-		// set text and show/hide depending on config
-		if (failCount || warnCount) {
-			var str = "";
-			if (failCount) {
-				str += failCount + " error" + (failCount > 1 ? "s" : "");
-				if (warnCount) str += ", ";
-			}
-			if (warnCount) str += warnCount + " warning" + (warnCount > 1 ? "s" : "");
-			div.html(str);
-			
-			// hack for safari which requires re-paint
-			if (!div.is(":visible")) div.hide().show(0);
-			
-			// show div depending on configuration
-			if (config.showOnFail && failCount) div.show();
-			else if (config.showOnWarn && warnCount) div.show();
-			else if (config.showOnPass && passCount) div.show();
-			else div.hide();
-		} else {
-			div.hide();
+		// renders a single notice bar
+		function renderNoticeBar(noticeBar, check) {
+			noticeBar.addClass("notice_bar");
+			noticeBar.addClass(check.state === "pass" ? "notice_bar_pass" : check.state === "fail" ? "notice_bar_fail" : "notice_bar_warn");
+			noticeBar.append($("<div class='notice_bar_left'>"));
+			var noticeBarContent = $("<div class='notice_bar_content'>").appendTo(noticeBar);
+			noticeBarContent.append(check.message);
+			var closeDiv = $("<div class='notice_bar_right'>").appendTo(noticeBar);
+			var closeButton = $("<img class='notice_bar_close_img' src='img/close.png'>").appendTo(closeDiv);
+			closeButton.hide();
+			closeButton.click(function() { noticeBar.detach() });
+			noticeBar.hover(function() { closeButton.show() }, function() { closeButton.hide() });
 		}
 	}
 }
 inheritsFrom(NoticeController, DivController);
-
-/**
- * Controls environment checks.
- */
-function EnvironmentCheckController(div) {
-	DivController.call(this, div);
-	
-	this.render = function(onDone) {
-		div.empty();
-		div.addClass("environment_checks_div");
-		
-		// loading
-		div.append("Loading...");
-		
-		// listen for environment
-		AppUtils.addEnvironmentListener(function(info) {
-			renderEnvironmentChecks(info.checks);
-		});
-	}
-	
-	// render updated environment checks
-	function renderEnvironmentChecks(checks) {
-		div.empty();
-		for (var i = 0; i < checks.length; i++) {
-			var check = checks[i];
-			var img = check.state === "pass" ? $("<img src='img/checkmark_small.png'>") : check.state === "warn" ? $("<img src='img/warning_orange.png'>") : $("<img src='img/xmark_small.png'>");
-			div.append(getEnvironmentCheckDiv(img, check.message));
-		}
-		
-		function getEnvironmentCheckDiv(img, text) {
-			var div = $("<div class='environment_check_div'>");
-			div.append(img);
-			img.css("margin-right", "10px");
-			img.css("width", "32px");
-			div.append(text);
-			return div;
-		}
-	}
-}
-inheritsFrom(EnvironmentCheckController, DivController);
