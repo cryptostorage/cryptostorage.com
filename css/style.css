@@ -1523,15 +1523,28 @@ input[type='checkbox'][disabled] +label {
 	-webkit-align-items: center;
 	-ms-flex-align: center;
 	align-items: center;
-	-webkit-justify-content: center;
-	-ms-flex-pack: center;
-	justify-content: center;
 	border-top: 1px solid white;
 }
 
-.notice_bar_content {
+.notice_icon {
+	width: 30px;
+	height: 30px;
+	margin-right: 5px;
+}
+
+.notice_content {
 	width: 100%;
 	text-align: center;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: -moz-flex;
+	display: flex;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	-ms-flex-pack: center;
+	justify-content: center;
 }
 
 .notice_bar_left {

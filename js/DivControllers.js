@@ -2536,7 +2536,10 @@ function NoticeController(div, config) {
 			noticeBar.addClass("notice_bar");
 			noticeBar.addClass(check.state === "pass" ? "notice_bar_pass" : check.state === "fail" ? "notice_bar_fail" : "notice_bar_warn");
 			noticeBar.append($("<div class='notice_bar_left'>"));
-			var noticeBarContent = $("<div class='notice_bar_content'>").appendTo(noticeBar);
+			var noticeBarContent = $("<div class='notice_content'>").appendTo(noticeBar);
+			var noticeIcon = check.state === "pass" ? $("<img src='img/checkmark_small.png'>") : $("<img src='img/warning.png'>");
+			noticeIcon.addClass("notice_icon");
+			noticeBarContent.append(noticeIcon);
 			noticeBarContent.append(check.message);
 			var dismissDiv = $("<div class='notice_bar_right'>").appendTo(noticeBar);
 			if (check.state === "fail") return;	// cannot dismiss errors
