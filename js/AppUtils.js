@@ -1309,6 +1309,16 @@ var AppUtils = {
 			}
 		}
 		
+		// check if online only if no "internet required" error
+		if (isInitialized(info.isOnline) && !internetRequiredError) {
+			if (!info.isOnline) checks.push({state: "pass", message: "No internet connection"});
+			else checks.push({state: "warn", message: "Internet connection is active"});
+		}
+		
+		// check if local
+		if (info.isLocal) checks.push({state: "pass", message: "Application is running locally"});
+		else checks.push({state: "warn", message: "Application is not running locally"});
+		
 		// check open source browser
 		if (info.browser.isSupported) {
 			if (info.browser.isOpenSource) checks.push({state: "pass", message: "Browser is open source (" + info.browser.name + ")"});
@@ -1318,16 +1328,6 @@ var AppUtils = {
 		// check open source os
 		if (info.os.isOpenSource) checks.push({state: "pass", message: "Operating system is open source (" + info.os.name + ")"});
 		else checks.push({state: "warn", message: "Operating system is not open source (" + info.os.name + ")"});
-		
-		// check if local
-		if (info.isLocal) checks.push({state: "pass", message: "Application is running locally"});
-		else checks.push({state: "warn", message: "Application is not running locally"});
-		
-		// check if online only if no "internet required" error
-		if (isInitialized(info.isOnline) && !internetRequiredError) {
-			if (!info.isOnline) checks.push({state: "pass", message: "No internet connection"});
-			else checks.push({state: "warn", message: "Internet connection is active"});
-		}
 		
 		return checks;
 	},

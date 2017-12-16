@@ -2538,11 +2538,11 @@ function NoticeController(div, config) {
 			noticeBar.append($("<div class='notice_bar_left'>"));
 			var noticeBarContent = $("<div class='notice_bar_content'>").appendTo(noticeBar);
 			noticeBarContent.append(check.message);
-			var closeDiv = $("<div class='notice_bar_right'>").appendTo(noticeBar);
-			var closeButton = $("<img class='notice_bar_close_img' src='img/close.png'>").appendTo(closeDiv);
-			closeButton.hide();
-			closeButton.click(function() { noticeBar.detach() });
-			noticeBar.hover(function() { closeButton.show() }, function() { closeButton.hide() });
+			var dismissDiv = $("<div class='notice_bar_right'>").appendTo(noticeBar);
+			if (check.state === "fail") return;	// cannot dismiss errors
+			var dismiss = $("<div class='notice_bar_dismiss'>").appendTo(dismissDiv);
+			dismiss.append("Dismiss");
+			dismiss.click(function() { noticeBar.detach(); });
 		}
 	}
 }
