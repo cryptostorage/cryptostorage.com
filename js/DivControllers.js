@@ -1498,7 +1498,7 @@ function RecoverFileController(div) {
 		// collect tickers being imported
 		var tickers = [];
 		for (var i = 0; i < pieces[0].keys.length; i++) tickers.push(pieces[0].keys[i].ticker);
-		tickers = arrUnique(tickers);
+		tickers = toUniqueArray(tickers);
 		
 		// collect dependencies
 		var dependencies = AppUtils.APP_DEPENDENCIES.slice();
@@ -1507,7 +1507,7 @@ function RecoverFileController(div) {
 			var plugin = AppUtils.getCryptoPlugin(ticker);
 			for (var j = 0; j < plugin.getDependencies().length; j++) dependencies.push(plugin.getDependencies()[j]);
 		}
-		dependencies = arrUnique(dependencies);
+		dependencies = toUniqueArray(dependencies);
 		
 		// load dependencies
 		LOADER.load(dependencies, function() {
@@ -1857,7 +1857,7 @@ function RecoverTextController(div, plugins) {
 		// load dependencies
 		var dependencies = [];
 		for (var i = 0; i < selectedPlugin.getDependencies().length; i++) dependencies.push(selectedPlugin.getDependencies()[i]);
-		dependencies = arrUnique(dependencies);
+		dependencies = toUniqueArray(dependencies);
 		LOADER.load(dependencies, function() {
 			
 			// add pieces
@@ -1899,7 +1899,7 @@ function RecoverTextController(div, plugins) {
 			else {
 				for (var i = 0; i < newPieces.length; i++) {
 					var piece = newPieces[i];
-					if (arrContains(importedPieces, piece)) {
+					if (arrayContains(importedPieces, piece)) {
 						setWarningAux("Piece already added");
 						continue;
 					}
@@ -2495,12 +2495,12 @@ inheritsFrom(ExportController, DivController);
 function NoticeController(div, config) {
 	DivController.call(this, div);
 	
-	var seen = [];
+	var dismissed = {};
+	var lastChecks;
 	
 	this.render = function(onDone) {
 		
 		// div setup
-		div.empty();
 		div.addClass("notice_div");
 		
 		// merge configs
@@ -2522,10 +2522,20 @@ function NoticeController(div, config) {
 	
 	function setEnvironmentInfo(info) {
 		
+		// check if info cached
+		if (lastChecks && objectsEqual(lastChecks, info.checks)) return;
+		
+		// reset cache
+		lastChecks = info.checks;
+		dismissed[AppUtils.EnvironmentCode.IS_ONLINE] = undefined;
+		
 		// render each shown notice bar
+		div.empty();
 		for (var i = 0; i < info.checks.length; i++) {
-			if (arrContains(seen, info.checks[i].code)) continue;
-			seen.push(info.checks[i].code);
+			
+			// check if code and state are dismissed
+			if (dismissed[info.checks[i].code] === info.checks[i].state) continue;
+			
 			if (info.checks[i].state === "pass" && config.showOnPass ||
 					info.checks[i].state === "fail" && config.showOnFail ||
 					info.checks[i].state === "warn" && config.showOnWarn) {
@@ -2544,7 +2554,10 @@ function NoticeController(div, config) {
 			if (check.state === "fail") return;	// cannot dismiss errors
 			var dismiss = $("<div class='notice_bar_dismiss'>").appendTo(dismissDiv);
 			dismiss.append("Dismiss");
-			dismiss.click(function() { noticeBar.detach(); });
+			dismiss.click(function() {
+				dismissed[check.code] = check.state;
+				noticeBar.detach();
+			});
 			
 			function renderNoticeContent(noticeContent, info, check) {
 				var noticeIcon = check.state === "pass" ? $("<img src='img/checkmark_small.png'>") : $("<img src='img/warning.png'>");

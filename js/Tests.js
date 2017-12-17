@@ -5,7 +5,7 @@ var Tests = {
 	
 	// constants
 	REPEAT_LONG: 10,
-	REPEAT_SHORT: 1,
+	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
@@ -45,7 +45,7 @@ var Tests = {
 				dependencies.push(plugins[i].getDependencies()[j]);
 			}
 		}
-		dependencies = arrUnique(dependencies);
+		dependencies = toUniqueArray(dependencies);
 		LOADER.load(dependencies, function() {
 			
 			// test utilities

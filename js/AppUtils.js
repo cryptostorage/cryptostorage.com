@@ -20,12 +20,12 @@ var AppUtils = {
 	SLIDER_RATE: 4000,							// rate of slider transitions
 	
 	//classify operating systems and browsers as open or closed source
-	OPEN_SOURCE_BROWSERS: arrToLowerCase([
+	OPEN_SOURCE_BROWSERS: toLowerCaseArray([
 		"Firefox", "Chromium", "Tizen", "Epiphany", "K-Meleon", "SeaMonkey", "SlimerJS", "Arora", "Breach", "Camino",
 		"Electron", "Fennec", "Konqueror", "Midori", "PaleMoon", "Rekonq", "Sunrise", "Waterfox", "Amaya", "Bowser",
 		"Camino"
 	]),
-	CLOSED_SOURCE_BROWSERS: arrToLowerCase([
+	CLOSED_SOURCE_BROWSERS: toLowerCaseArray([
 		"Chrome", "Chrome WebView", "Chrome Mobile", "Safari", "Opera", "Opera Mini", "Samsung Internet for Android",
 		"Samsung Internet", "Opera Coast", "Yandex Browser", "UC Browser", "Maxthon", "Puffin", "Sleipnir",
 		"Windows Phone", "Internet Explorer", "Microsoft Edge", "IE", "Vivaldi", "Sailfish", "Amazon Silk", "Silk",
@@ -34,13 +34,13 @@ var AppUtils = {
 		"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
 		"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
 	]),
-	OPEN_SOURCE_OPERATING_SYSTEMS: arrToLowerCase([
+	OPEN_SOURCE_OPERATING_SYSTEMS: toLowerCaseArray([
 		"Linux", "CentOS", "Debian", "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "Mint",
 		"OpenBSD", "RedHat", "Red Hat", "SuSE", "Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen",
 		"Chromium OS", "Contiki", "DragonFly", "GNU", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "PCLinuxOS",
 		"Plan9", "VectorLinux", "Zenwalk"
 	]),
-	CLOSED_SOURCE_OPERATING_SYSTEMS: arrToLowerCase([
+	CLOSED_SOURCE_OPERATING_SYSTEMS: toLowerCaseArray([
 		"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS", "Mac OS X", "Macintosh", "Mac", "iOS",
 		"Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile", "AIX", "Amiga OS", "Bada",
 		"BeOS", "BlackBerry", "Hurd", "Linpus", "Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS",
@@ -655,7 +655,7 @@ var AppUtils = {
 				dependencies.push(pluginDependencies[j]);
 			}
 		}
-		dependencies = arrUnique(dependencies);
+		dependencies = toUniqueArray(dependencies);
 		if (onProgress) onProgress(0, "Loading dependencies");
 		LOADER.load(dependencies, function() {
 			
@@ -1183,8 +1183,8 @@ var AppUtils = {
 			browserName = browserName.toLowerCase();
 			
 			// determine if open source
-			if (arrContains(AppUtils.OPEN_SOURCE_BROWSERS, browserName)) return true;
-			if (arrContains(AppUtils.CLOSED_SOURCE_BROWSERS, browserName)) return false;
+			if (arrayContains(AppUtils.OPEN_SOURCE_BROWSERS, browserName)) return true;
+			if (arrayContains(AppUtils.CLOSED_SOURCE_BROWSERS, browserName)) return false;
 			return null;
 		}
 		
@@ -1227,8 +1227,8 @@ var AppUtils = {
 			var name = osInfo.name.toLowerCase();
 			
 			// determine if open source
-			if (arrContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, name)) return true;
-			if (arrContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, name)) return false;
+			if (arrayContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, name)) return true;
+			if (arrayContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, name)) return false;
 			return null;
 		}
 	},

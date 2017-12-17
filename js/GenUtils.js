@@ -225,9 +225,7 @@ function assertUninitialized(arg, msg) {
  * @param msg is the message to throw if the arguments are not equal
  */
 function assertEquals(arg1, arg2, msg) {
-	if (isArray(arg1) && isArray(arg2)) return arraysEqual(arg1, arg2);
-	if (isObject(arg1) && isObject(arg2)) return mapsEqual(arg1, arg2);
-	if (arg1 !== arg2) throw new Error(msg ? msg : "Arguments asserted as equal but are not equal: " + arg1 + " vs " + arg2);
+	assertTrue(equals(arg1, arg2), msg ? msg : "Arguments asserted as equal but are not equal: " + arg1 + " vs " + arg2);
 }
 
 /**
@@ -368,27 +366,12 @@ function getIndices(size) {
 }
 
 /**
- * Indicates if the given array contains the given object.
- * 
- * @param arr is the array that may or may not contain the object
- * @param obj is the object to check for inclusion in the array
- * @returns true if the array contains the object, false otherwise
- */
-function arrContains(arr, obj) {
-	assertTrue(isArray(arr));
-	for (var i = 0; i < arr.length; i++) {
-		if (arr[i] === obj) return true;
-	}
-	return false;
-}
-
-/**
  * Returns a new array containing unique elements of the given array.
  * 
  * @param arr is the array to return unique elements from
  * @returns a new array with the given array's unique elements
  */
-function arrUnique(arr) {
+function toUniqueArray(arr) {
 	return arr.filter(function(value, index, self) {
 		return self.indexOf(value) === index;
 	});
@@ -400,7 +383,7 @@ function arrUnique(arr) {
  * @param arr is the array to convert to lowercase
  * @returns a copy of the given array where each element is lowercase
  */
-function arrToLowerCase(arr) {
+function toLowerCaseArray(arr) {
 	var arr2 = [];
 	for (var i = 0; i < arr.length; i++) {
 		arr2.push(arr[i].toLowerCase());
@@ -416,6 +399,21 @@ function arrToLowerCase(arr) {
  */
 function listify(arrOrElem) {
 	return isArray(arrOrElem) ? arrOrElem : [arrOrElem];
+}
+
+/**
+ * Indicates if the given array contains the given object.
+ * 
+ * @param arr is the array that may or may not contain the object
+ * @param obj is the object to check for inclusion in the array
+ * @returns true if the array contains the object, false otherwise
+ */
+function arrayContains(arr, obj) {
+	assertTrue(isArray(arr));
+	for (var i = 0; i < arr.length; i++) {
+		if (arr[i] === obj) return true;
+	}
+	return false;
 }
 
 /**
@@ -441,17 +439,30 @@ function arraysEqual(arr1, arr2) {
 }
 
 /**
- * Determines if two maps are equal.
+ * Determines if two arguments are deep equal.
+ * 
+ * @param arg1 is an argument to compare
+ * @param arg2 is an argument to compare
+ * @returns true if the arguments are deep equals, false otherwise
+ */
+function equals(arg1, arg2) {
+	if (isArray(arg1) && isArray(arg2)) return arraysEqual(arg1, arg2);
+	if (isObject(arg1) && isObject(arg2)) return objectsEqual(arg1, arg2);
+	return arg1 === arg2;
+}
+
+/**
+ * Determines if two objects are deep equal.
  * 
  * @param map1 is a map to compare
  * @param map2 is a map to compare
  * @returns true if the maps have identical keys and values, false otherwise
  */
-function mapsEqual(map1, map2) {
+function objectsEqual(map1, map2) {
 	if (map1.size !== map2.size) return false;
 	for (var i = 0; i < Object.keys(map1).length; i++) {
 		var key = Object.keys(map1)[i];
-		if (map1[key] !== map2[key]) return false;
+		if (!equals(map1[key], map2[key])) return false;
 	}
 	return true;
 }
