@@ -12,7 +12,7 @@ environment checks: recommend links to download
 
 designer:
 homepage: tbd, fill icons with white, multiple locks, too big on small screens?
-design opinions: regenerate, form links, decryption progress, ommitted question mark
+design opinions: notices, regenerate, form links, decryption progress, ommitted question mark
 import keys success - inline or success page? dual tabs if import is inline
 regenerate confirmation
 dependency management
