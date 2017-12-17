@@ -17,10 +17,10 @@ dependency management
 	generate new keys button shows loading page (?) until all currency dependencies loaded
 	warning bar saying dependencies are loading, then when done tell them they should disconnect to the internet
 	what if clicked from homepage
+warning sign badge with warning count in upper right blue bar
 design opinions: notices, regenerate, form links, decryption progress, ommitted question mark
 regenerate confirmation
 notices on which pages
-warning sign badge with warning count in upper right blue bar
 warn if private key not included in print - alert when print clicked without show private keys?
 tip address
 code review
