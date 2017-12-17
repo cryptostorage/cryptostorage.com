@@ -1309,7 +1309,7 @@ var AppUtils = {
 		var checks = [];
 		
 		// check if browser supported
-		if (!info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWER_SUPPORTED});
+		if (!info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER_SUPPORTED});
 		
 		// check if runtime error
 		if (info.runtimeError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.RUNTIME_ERROR});

@@ -308,7 +308,6 @@ function HomeController(div) {
 		
 		// notice div
 		var noticeDiv = $("<div>").appendTo(div);
-		noticeDiv.hide();
 		new NoticeController(noticeDiv, {showOnWarn: false, showOnPass: false}).render();
 		
 		// home content

@@ -7,7 +7,6 @@ form info bubbles - see spec
 form error messages - see spec
 copy to clipboard confirmation - tooltip Copied!
 file import loading - see spec, only show if minimum file size
-test critical error on homepage
 seo
 faq
 homepage
