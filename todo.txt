@@ -12,12 +12,13 @@ environment checks: recommend links to download
 
 designer:
 homepage: tbd, fill icons with white, multiple locks, too big on small screens?
-design opinions: notices, regenerate, form links, decryption progress, ommitted question mark
 import keys success - inline or success page? dual tabs if import is inline
-regenerate confirmation
 dependency management
-	generate new keys button shows loading page until all currency dependencies loaded
+	generate new keys button shows loading page (?) until all currency dependencies loaded
 	warning bar saying dependencies are loading, then when done tell them they should disconnect to the internet
+	what if clicked from homepage
+design opinions: notices, regenerate, form links, decryption progress, ommitted question mark
+regenerate confirmation
 notices on which pages
 warning sign badge with warning count in upper right blue bar
 warn if private key not included in print - alert when print clicked without show private keys?
