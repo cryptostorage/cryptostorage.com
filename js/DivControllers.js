@@ -344,6 +344,10 @@ function HomeController(div) {
 		$("<div style='height:40px'>").appendTo(pageDiv);
 		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 		
+		// disclaimer
+		var disclaimer = $("<div class='disclaimer'>").appendTo(div);
+		disclaimer.html("Copyright cryptostorage.com.  JavaScript copyrights included in the source.  No warranty.");
+		
 		// track environment failure to disable clicking currency
 		var environmentFailure = false;
 		AppUtils.addEnvironmentListener(function(info) {

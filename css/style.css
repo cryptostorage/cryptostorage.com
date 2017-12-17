@@ -246,6 +246,11 @@ ol {
 	margin-bottom: 20px;
 }
 
+.disclaimer {
+	padding: 40px;
+	font-size: 18px;
+}
+
 .currency_row {
 	display: -webkit-flex;
 	display: -ms-flexbox;
