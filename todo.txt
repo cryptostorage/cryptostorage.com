@@ -9,6 +9,7 @@ form error messages - see spec
 copy to clipboard confirmation - tooltip Copied!
 file import loading - see spec, only show if minimum file size
 environment checks: recommend links to download
+don't render key pair until done
 
 designer:
 homepage: tbd, fill icons with white, multiple locks, too big on small screens?
