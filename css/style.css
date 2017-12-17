@@ -1617,4 +1617,5 @@ input[type='checkbox'][disabled] +label {
 
 .copyable:hover {
 	cursor: pointer;
+	text-decoration: underline;
 }
