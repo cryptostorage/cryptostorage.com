@@ -14,10 +14,10 @@ designer:
 homepage - tbd, fill icons with white, multiple locks, too big on small screens?
 import keys success - inline or success page? dual tabs if import is inline
 regenerate design and introduces risk of losing funds
-notices on which pages
 dependency management
 	generate new keys button shows loading page until all currency dependencies loaded
 	warning bar saying dependencies are loading, then when done tell them they should disconnect to the internet
+notices on which pages
 design while decryption in progress
 warning sign badge with warning count in upper right blue bar
 warn if private key not included in print - alert when print clicked without show private keys?
