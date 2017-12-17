@@ -2195,7 +2195,10 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 	var saved = false;
 	var progressDiv;
 	var progressBar;
+	var progressLabel;
+	var saveButton;
 	var printButton;
+	var savePublicButton;
 	var showPublicCheckbox;
 	var showPrivateCheckbox;
 	var showLogosCheckbox;
@@ -2219,25 +2222,17 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		div.empty();
 		div.addClass("export_div");
 		
-		// progress bar
-		progressDiv = $("<div class='export_progress_div'>").appendTo(div);
-		progressDiv.hide();
-		progressBar = UiUtils.getProgressBar(progressDiv);
-		
 		// export header
 		var exportHeader = $("<div class='export_header'>").appendTo(div);
 		
 		// export buttons
 		var exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
-		var saveButton = $("<div class='export_button'>").appendTo(exportButtons);
+		saveButton = $("<div class='export_button'>").appendTo(exportButtons);
 		saveButton.html("Save All");
-		saveButton.click(function() { saveAll(pieces); });
 		printButton = $("<div class='export_button'>").appendTo(exportButtons);
 		printButton.html("Print All");
-		printButton.click(function() { printAll(); });
-		var savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
+		savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
-		savePublicButton.click(function() { savePublicAddresses(); });
 //		var moreButton = $("<div class='export_button'>").appendTo(exportButtons);
 //		moreButton.html("...");
 //		moreButton.click(function() { console.log("More button clicked"); });
@@ -2283,6 +2278,12 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		var noticeDiv = $("<div>").appendTo(noticeDivContainer);
 		new NoticeController(noticeDiv).render();
 		
+		// progress bar
+		progressDiv = $("<div class='export_progress_div'>").appendTo(div);
+		progressDiv.hide();
+		progressBar = UiUtils.getProgressBar(progressDiv);
+		progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
+		
 		// currently showing piece
 		piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
 		
@@ -2290,6 +2291,9 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		showPublicCheckbox.click(function() { update(); });
 		showPrivateCheckbox.click(function() { update(); });
 		showLogosCheckbox.click(function() { update(); });
+		
+		// controls disabled until ready
+		setControlsEnabled(false);
 		
 		// build ui based on keyGenConfig, pieces, and pieceDivs
 		update(pieceDivs);
@@ -2384,6 +2388,32 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_public_addresses.txt");
 	}
 	
+	function setControlsEnabled(enabled) {
+		saveButton.unbind("click");
+		printButton.unbind("click");
+		savePublicButton.unbind("click");
+		setPrintEnabled(enabled);
+		if (enabled) {
+			saveButton.addClass("export_button");
+			saveButton.removeClass("export_button_disabled");
+			savePublicButton.addClass("export_button");
+			savePublicButton.removeClass("export_button_disabled");
+			showLogosCheckbox.removeAttr("disabled");
+			saveButton.click(function() { saveAll(pieces); });
+			printButton.click(function() { printAll(); });
+			savePublicButton.click(function() { savePublicAddresses(); });
+			updateHeaderCheckboxes();
+		} else {
+			saveButton.addClass("export_button_disabled");
+			saveButton.removeClass("export_button");
+			savePublicButton.addClass("export_button_disabled");
+			savePublicButton.removeClass("export_button");
+			showPublicCheckbox.attr("disabled", "disabled");
+			showPrivateCheckbox.attr("disabled", "disabled");
+			showLogosCheckbox.attr("disabled", "disabled");
+		}
+	}
+	
 	function setPrintEnabled(bool) {
 		printEnabled = bool;
 		if (bool) {
@@ -2396,7 +2426,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 	}
 	
 	function update(_pieceDivs, onDone) {
-		updateHeader();
+		updateHeaderCheckboxes();
 		pieceDivs = _pieceDivs;
 		
 		// add piece divs if given
@@ -2405,6 +2435,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 			setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(pieceDivs);
 			setPrintEnabled(true);
+			setControlsEnabled(true);
 			if (onDone) onDone();
 		}
 		
@@ -2422,6 +2453,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 				lastRenderer = new PieceRenderer(pieces, pieceDivs, getPieceRendererConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
 					setPrintEnabled(true);
+					setControlsEnabled(true);
 					if (onDone) onDone();
 				});
 			}
@@ -2435,9 +2467,11 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 			// otherwise generate keys from config
 			else {
 				assertInitialized(keyGenConfig);
+				setControlsEnabled(false);
 				AppUtils.generateKeys(keyGenConfig, function(percent, label) {
 					progressBar.set(percent);
-					progressBar.setText((label ? label + " ... " : "") + Math.round(percent * 100)  + "%");	// TODO: separate label and percent
+					progressBar.setText(Math.round(percent * 100)  + "%");
+					progressLabel.html(label);
 					progressDiv.show();
 				}, function(err, _keys, _pieces, _pieceDivs) {
 					progressDiv.hide();
@@ -2473,7 +2507,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		}
 	}
 	
-	function updateHeader() {
+	function updateHeaderCheckboxes() {
 		showPrivateCheckbox.prop('checked') ? showPublicCheckbox.removeAttr('disabled') : showPublicCheckbox.attr('disabled', 'disabled');
 		showPublicCheckbox.prop('checked') ? showPrivateCheckbox.removeAttr('disabled') : showPrivateCheckbox.attr('disabled', 'disabled');
 		showLogosCheckbox.removeAttr('disabled');
@@ -2482,7 +2516,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 inheritsFrom(ExportController, DivController);
 
 /**
- * Controls the notice div.
+ * Controls the notices div.
  * 
  * @param div is the div to render to
  * @param config is the configuration:
@@ -2570,7 +2604,7 @@ function NoticeController(div, config) {
 					if (check.state === "fail") noticeContent.append("Browser is not supported (" + info.browser.name + " " + info.browser.version + ")");
 					break;
 				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
-					if (check.state === "fail") noticeContent.append("Unexpected runtime error: " + info.runtimeError.message);
+					if (check.state === "fail") noticeContent.append("Unexpected runtime error: " + info.runtimeError);
 					break;
 				case AppUtils.EnvironmentCode.IS_ONLINE:
 					if (check.state === "pass") noticeContent.append("No internet connection");
