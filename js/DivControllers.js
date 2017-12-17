@@ -2612,7 +2612,10 @@ function NoticeController(div, config) {
 					break;
 				case AppUtils.EnvironmentCode.IS_LOCAL:
 					if (check.state === "pass") noticeContent.append("Application is running locally");
-					else noticeContent.append("Application is not running locally");
+					else {
+						noticeContent.append("Application is not running locally.  Download from&nbsp;");
+						noticeContent.append($("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>"));
+					}
 					break;
 				case AppUtils.EnvironmentCode.INTERNET_REQUIRED:
 					if (check.state === "fail") noticeContent.append("Internet is required because application is not running locally");
@@ -2626,7 +2629,7 @@ function NoticeController(div, config) {
 					else noticeContent.append("Operating system is not open source (" + info.os.name + ")");
 					break;
 				case AppUtils.EnvironmentCode.PRERELEASE:
-					if (check.state === "warn") noticeContent.append("Application is under development.  Not ready for use.");
+					if (check.state === "warn") noticeContent.append("Application is under development.  Not ready for use");
 					break;
 				default:
 					throw new Error("Unrecognized environment code: " + check.code);
