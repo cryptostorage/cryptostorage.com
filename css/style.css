@@ -176,11 +176,11 @@ ol {
 	background-color: rgb(40, 200, 40);
 }
 
-.btn_recover {
+.btn_import {
 	color: white;
 }
 
-.btn_recover:hover {
+.btn_import:hover {
 	text-decoration: underline;
 }
 
@@ -804,27 +804,27 @@ input[type='checkbox'][disabled] +label {
 	text-align: right;
 }
 
-.recover_page {
+.import_page {
 	padding: 0;
 	min-height: 700px;
 }
 
-.recover_filler {
+.import_filler {
 	height: 100px;
 }
 
-.recover_div {
+.import_div {
 	background-color: rgb(17, 119, 184);
 }
 
-.recover_tabs_div {
+.import_tabs_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
 	display: flex;
 }
 
-.recover_tab_div {
+.import_tab_div {
 	-webkit-flex: 1;
 	-ms-flex: 1;
 	flex: 1;
@@ -839,7 +839,7 @@ input[type='checkbox'][disabled] +label {
 	user-select: none;
 }
 
-.recover_tab_div:hover {
+.import_tab_div:hover {
 	cursor: pointer;
 }
 
@@ -847,11 +847,11 @@ input[type='checkbox'][disabled] +label {
 	background-color: rgb(17, 119, 184);
 }
 
-.recover_content_div {
+.import_content_div {
 	padding: 25px 50px 25px 50px;
 }
 
-.recover_warning_div {
+.import_warning_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -871,13 +871,13 @@ input[type='checkbox'][disabled] +label {
 	justify-content: center;
 }
 
-.recover_warning_div_icon {
+.import_warning_div_icon {
 	width: 25px;
 	height: 25px;
 	margin-right: 5px;
 }
 
-.recover_drag_drop {
+.import_drag_drop {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -933,20 +933,20 @@ input[type='checkbox'][disabled] +label {
 	cursor: pointer;
 }
 
-.recover_selector_container {
+.import_selector_container {
 	width: 100%;
 	height: 62px;
 	position: relative;
 }
 
-#recover_selector, .recover_selector_disabler {
+#import_selector, .import_selector_disabler {
 	width: 100%;
 	position: absolute;
 	top: 0px;
 	left: 0px;
 }
 
-.recover_selector_disabler {
+.import_selector_disabler {
 	z-index: 10;
 	height: 100%;
 }
@@ -955,7 +955,7 @@ input[type='checkbox'][disabled] +label {
 	color: grey;
 }
 
-.recover_textarea {
+.import_textarea {
 	margin-top: 10px;
 	width: 100%;
 	height: 115px;
@@ -965,7 +965,7 @@ input[type='checkbox'][disabled] +label {
 	border: 2.5px solid black;
 }
 
-.recover_button, .recover_view_button {
+.import_button, .import_view_button {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -988,25 +988,25 @@ input[type='checkbox'][disabled] +label {
 	user-select: none;
 }
 
-.recover_button:hover, .recover_view_button:hover {
+.import_button:hover, .import_view_button:hover {
 	cursor: pointer;
 	background-color: rgb(60, 240, 60);
 }
 
-.recover_button:active, .recover_view_button:active {
+.import_button:active, .import_view_button:active {
 	background-color: rgb(40, 200, 40);
 }
 
-.recover_view_button {
+.import_view_button {
 	margin-bottom: 15px;
 }
 
-.recover_imported_pieces {
+.import_imported_pieces {
 	margin-top: 15px;
 	padding: 5px;
 }
 
-.recover_file_imported_piece {
+.import_file_imported_piece {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -1018,7 +1018,7 @@ input[type='checkbox'][disabled] +label {
 	padding: 5px;
 }
 
-.recover_text_imported_piece {
+.import_text_imported_piece {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -1032,23 +1032,23 @@ input[type='checkbox'][disabled] +label {
 	padding: 5px;
 }
 
-.recover_imported_icon {
+.import_imported_icon {
 	width: 25px;
 	height: 25px;
 	margin-right: 5px;
 }
 
-.recover_imported_trash {
+.import_imported_trash {
 	width: 20px;
 	height: 20px;
 	margin-left: auto;
 }
 
-.recover_imported_trash:hover {
+.import_imported_trash:hover {
 	cursor: pointer;
 }
 
-.recover_controls {
+.import_controls {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -1061,7 +1061,7 @@ input[type='checkbox'][disabled] +label {
 	justify-content: center;
 }
 
-.recover_control_link_div {
+.import_control_link_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -1076,34 +1076,34 @@ input[type='checkbox'][disabled] +label {
 	justify-content: center;
 }
 
-.recover_control_link {
+.import_control_link {
 	font-size: 20px;
 	color: white;
 }
 
-.recover_control_link:hover {
+.import_control_link:hover {
 	cursor: pointer;
 	text-decoration: underline;
 }
 
-.recover_decryption_div {
+.import_decryption_div {
 	margin-bottom: 15px;
 }
 
-.recover_decrypt_label {
+.import_decrypt_label {
 	font-size: 30px;
 	color: white;
 	margin-bottom: 15px;
 }
 
-.recover_passphrase_input {
+.import_passphrase_input {
 	width: 100%;
 	padding: 18px;
 	margin: 0 0 10px 0;
 	border: 2.5px solid black;
 }
 
-.recover_decrypt_controls {
+.import_decrypt_controls {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -1118,7 +1118,7 @@ input[type='checkbox'][disabled] +label {
 	justify-content: center;
 }
 
-.recover_progress_div {
+.import_progress_div {
 	height: 50px;
 }
 

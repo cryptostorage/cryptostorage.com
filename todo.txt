@@ -1,5 +1,4 @@
 TODO
-change terminology from recover to import
 disclaimer - footer on homepage only, no need for copyright, except maybe for images
 environment checks: recommend links to download
 export page while in progress - header controls disabled, progress bar in middle with description underneath, no percentage

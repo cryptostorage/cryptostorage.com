@@ -605,7 +605,7 @@ var Tests = {
 			console.log("testFileImport()");
 			
 			// initialize controller
-			var controller = new RecoverFileController($("<div>"));
+			var controller = new ImportFileController($("<div>"));
 			controller.render(function() {
 				
 				// collect test functions
@@ -803,14 +803,14 @@ var Tests = {
 						var namedPieces = [];
 						namedPieces.push({name: "piece0.json", piece: pieces[0]});
 						controller.addNamedPieces(namedPieces);
-						assertEquals("Need 2 additional pieces to recover private keys", controller.getWarning());
+						assertEquals("Need 2 additional pieces to import private keys", controller.getWarning());
 						controller.startOver();
 						
 						namedPieces = [];
 						namedPieces.push({name: "piece0.json", piece: pieces[0]});
 						namedPieces.push({name: "piece1.json", piece: pieces[1]});
 						controller.addNamedPieces(namedPieces);
-						assertEquals("Need 1 additional piece to recover private keys", controller.getWarning());
+						assertEquals("Need 1 additional piece to import private keys", controller.getWarning());
 						controller.startOver();
 						
 						namedPieces = [];

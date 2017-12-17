@@ -114,7 +114,7 @@ CryptoPlugin.prototype.combine = function(shares) {
 	// ensure sufficient shares are provided
 	if (shares.length < minShares) {
 		var additional = minShares - shares.length;
-		throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private key");
+		throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private key");
 	}
 	
 	// combine shares and create key

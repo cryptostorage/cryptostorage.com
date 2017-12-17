@@ -87,7 +87,7 @@ function AppController(div) {
 	var contentDiv;
 	var homeController;
 	var formController;
-	var recoverController;
+	var importController;
 	var faqController;
 	var donateController;
 	
@@ -141,7 +141,7 @@ function AppController(div) {
 		
 		// slider
 		sliderDiv = $("<div>").appendTo(headerDiv);
-		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectRecover);
+		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectImport);
 		
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
@@ -149,8 +149,8 @@ function AppController(div) {
 		// initialize controllers
 		homeController = new HomeController($("<div>"));
 		formController = new FormController($("<div>"));
-		recoverController = new RecoverController($("<div>"));
-		recoverController.render();
+		importController = new ImportController($("<div>"));
+		importController.render();
 		faqController = new FaqController($("<div>"));
 		faqController.render();
 		donateController = new DonateController($("<div>"));
@@ -206,10 +206,10 @@ function AppController(div) {
 		setContentDiv(donateController.getDiv());
 	}
 	
-	this.showRecover = function() {
-		if (AppUtils.DEV_MODE) console.log("showRecover()");
+	this.showImport = function() {
+		if (AppUtils.DEV_MODE) console.log("showImport()");
 		sliderDiv.hide();
-		setContentDiv(recoverController.getDiv());
+		setContentDiv(importController.getDiv());
 	}
 	
 	// ---------------------------------- PRIVATE -------------------------------
@@ -225,8 +225,8 @@ function AppController(div) {
 		that.showForm();
 	}
 	
-	function onSelectRecover() {
-		that.showRecover();
+	function onSelectImport() {
+		that.showImport();
 	}
 }
 inheritsFrom(AppController, DivController);
@@ -234,7 +234,7 @@ inheritsFrom(AppController, DivController);
 /**
  * Slider main features.
  */
-function SliderController(div, onSelectGenerate, onSelectRecover) {
+function SliderController(div, onSelectGenerate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		div.empty();
@@ -276,14 +276,14 @@ function SliderController(div, onSelectGenerate, onSelectRecover) {
 			btnGenerate.append("Generate New Keys");
 			btnGenerate.click(function() { onSelectGenerate(); });
 			
-			// button to recover keys
-			var btnRecover = $("<div class='btn btn_recover'>").appendTo(ctaDiv);
-			btnRecover.append("or Recover Existing Keys");
+			// button to import keys
+			var btnImport = $("<div class='btn btn_import'>").appendTo(ctaDiv);
+			btnImport.append("or Import Existing Keys");
 			
-			// disable recover keys if failed environment check
+			// disable import keys if failed environment check
 			AppUtils.addEnvironmentListener(function(info) {
-				btnRecover.unbind("click");
-				if (!AppUtils.hasEnvironmentFailure(info)) btnRecover.click(function() { onSelectRecover(); });
+				btnImport.unbind("click");
+				if (!AppUtils.hasEnvironmentFailure(info)) btnImport.click(function() { onSelectImport(); });
 			});
 			
 			if (onDone) onDone(div);
@@ -416,13 +416,13 @@ function FaqController(div) {
 		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(pageDiv);
 		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(pageDiv);
 		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(pageDiv);
-		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be recovered from the private key.</li></ol>").appendTo(pageDiv);
+		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be imported from the private key.</li></ol>").appendTo(pageDiv);
 		$("<div class='question'>").html("How can I trust this service?").appendTo(pageDiv);
 		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is publicly audited.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(pageDiv);
-		$("<div class='question'>").html("Do I need internet access to recover my private keys?").appendTo(pageDiv);
-		$("<div class='answer'>").html("No.  The source code is everything you need to recover the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(pageDiv);
+		$("<div class='question'>").html("Do I need internet access to import my private keys?").appendTo(pageDiv);
+		$("<div class='answer'>").html("No.  The source code is everything you need to import the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(pageDiv);
 		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(pageDiv);
-		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and recovery service.  It is expected that users will import private keys into the wallet software of their choice after keys have been recovered using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future.").appendTo(pageDiv);
+		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and importy service.  It is expected that users will import private keys into the wallet software of their choice after keys have been imported using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future.").appendTo(pageDiv);
 		$("<div class='question'>").html("What formats can I export to?").appendTo(pageDiv);
 		$("<div class='answer'>").html("TODO").appendTo(pageDiv);
 		
@@ -1181,43 +1181,43 @@ function FormController(div) {
 inheritsFrom(FormController, DivController);
 
 /**
- * Recover page.
+ * Import page.
  */
-function RecoverController(div) {
+function ImportController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		
 		// div setup
 		div.empty();
 		div.attr("class", "content_div");
-		var pageDiv = $("<div class='page_div recover_page'>").appendTo(div);
+		var pageDiv = $("<div class='page_div import_page'>").appendTo(div);
 		
-		// filler to push recover div down
-		$("<div class='recover_filler'>").appendTo(pageDiv);
+		// filler to push import div down
+		$("<div class='import_filler'>").appendTo(pageDiv);
 		
-		// all recover content including tabs
-		var recoverDiv = $("<div class='recover_div'>").appendTo(pageDiv);
+		// all import content including tabs
+		var importDiv = $("<div class='import_div'>").appendTo(pageDiv);
 		
-		// render recover file and text divs
-		var recoverFileDiv = $("<div>");
-		var recoverTextDiv = $("<div>");
-		new RecoverFileController(recoverFileDiv).render(function() {
-			new RecoverTextController(recoverTextDiv, AppUtils.getCryptoPlugins()).render(function() {
-				new TwoTabController(recoverDiv, "Recover From File", recoverFileDiv, "Recover From Text", recoverTextDiv).render(function() {
+		// render import file and text divs
+		var importFileDiv = $("<div>");
+		var importTextDiv = $("<div>");
+		new ImportFileController(importFileDiv).render(function() {
+			new ImportTextController(importTextDiv, AppUtils.getCryptoPlugins()).render(function() {
+				new TwoTabController(importDiv, "Import From File", importFileDiv, "Import From Text", importTextDiv).render(function() {
 					if (onDone) onDone(div);
 				});
 			});
 		});
 	}
 }
-inheritsFrom(RecoverController, DivController);
+inheritsFrom(ImportController, DivController);
 
 /**
- * Controller to recover from file.
+ * Controller to import from file.
  * 
  * @param div is the div to render to
  */
-function RecoverFileController(div) {
+function ImportFileController(div) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -1235,10 +1235,10 @@ function RecoverFileController(div) {
 		
 		// div setup
 		div.empty();
-		div.addClass("recover_content_div");
+		div.addClass("import_content_div");
 		
 		// warning div
-		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
+		warningDiv = $("<div class='import_warning_div'>").appendTo(div);
 		warningDiv.hide();
 		
 		// set up content div
@@ -1248,7 +1248,7 @@ function RecoverFileController(div) {
 		importDiv = $("<div>").appendTo(contentDiv);
 		
 		// drag and drop importDiv
-		var dragDropDiv = $("<div class='recover_drag_drop'>").appendTo(importDiv);
+		var dragDropDiv = $("<div class='import_drag_drop'>").appendTo(importDiv);
 		var dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
 		var dragDropText = $("<div class='drag_drop_text'>").appendTo(dragDropDiv);
 		var dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
@@ -1268,11 +1268,11 @@ function RecoverFileController(div) {
 		setupDragAndDrop(dragDropDiv, onFilesImported);
 		
 		// imported files
-		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(importDiv);
+		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(importDiv);
 		importedPiecesDiv.hide();
 		
 		// controls
-		controlsDiv = $("<div class='recover_controls'>").appendTo(div);
+		controlsDiv = $("<div class='import_controls'>").appendTo(div);
 		controlsDiv.hide();
 		resetControls();
 		
@@ -1291,7 +1291,7 @@ function RecoverFileController(div) {
 		if (str) {
 			if (!img) img = $("<img src='img/warning.png'>");
 			warningDiv.append(img);
-			img.addClass("recover_warning_div_icon");
+			img.addClass("import_warning_div_icon");
 			warningDiv.append(str);
 			warningDiv.show();
 		} else {
@@ -1330,8 +1330,8 @@ function RecoverFileController(div) {
 	}
 	
 	function addControl(text, onClick) {
-		var linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
-		var link = $("<div class='recover_control_link'>").appendTo(linkDiv);
+		var linkDiv = $("<div class='import_control_link_div'>").appendTo(controlsDiv);
+		var link = $("<div class='import_control_link'>").appendTo(linkDiv);
 		link.append(text);
 		link.click(function() { onClick(); });
 	}
@@ -1379,7 +1379,7 @@ function RecoverFileController(div) {
 	function onKeysDecrypted(importedPieces, keys, pieces, pieceDivs) {
 		resetControls();
 		contentDiv.children().detach();
-		var viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
+		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Keys");
 		viewDecrypted.click(function() {
 			UiUtils.openStorage("Imported Storage", importedPieces, null, keys, pieces, pieceDivs, false);
@@ -1560,10 +1560,10 @@ function RecoverFileController(div) {
 			importedPiecesDiv.append(getImportedPieceDiv(namedPieces[i]));
 		}
 		function getImportedPieceDiv(namedPiece) {
-			var importedPieceDiv = $("<div class='recover_file_imported_piece'>").appendTo(importedPiecesDiv);
-			var icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
+			var importedPieceDiv = $("<div class='import_file_imported_piece'>").appendTo(importedPiecesDiv);
+			var icon = $("<img src='img/file.png' class='import_imported_icon'>").appendTo(importedPieceDiv);
 			importedPieceDiv.append(namedPiece.name);
-			var trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
+			var trash = $("<img src='img/trash.png' class='import_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(namedPiece.name); });
 			return importedPieceDiv;
 		}
@@ -1617,14 +1617,14 @@ function RecoverFileController(div) {
 		}
 	}
 }
-inheritsFrom(RecoverFileController, DivController);
+inheritsFrom(ImportFileController, DivController);
 
 /**
- * Controller to recover from text.
+ * Controller to import from text.
  * 
  * @param div is the div to render to
  */
-function RecoverTextController(div, plugins) {
+function ImportTextController(div, plugins) {
 	DivController.call(this, div);
 	assertTrue(plugins.length > 0);
 	
@@ -1647,10 +1647,10 @@ function RecoverTextController(div, plugins) {
 		
 		// div setup
 		div.empty();
-		div.addClass("recover_content_div");
+		div.addClass("import_content_div");
 		
 		// warning div
-		warningDiv = $("<div class='recover_warning_div'>").appendTo(div);
+		warningDiv = $("<div class='import_warning_div'>").appendTo(div);
 		warningDiv.hide();
 		
 		// set up content div
@@ -1670,24 +1670,24 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		// currency selector
-		var selectorContainer = $("<div class='recover_selector_container'>").appendTo(passphraseInputDiv);
-		selector = $("<div id='recover_selector'>").appendTo(selectorContainer);
+		var selectorContainer = $("<div class='import_selector_container'>").appendTo(passphraseInputDiv);
+		selector = $("<div id='import_selector'>").appendTo(selectorContainer);
 		
 		// text area
-		textArea = $("<textarea class='recover_textarea'>").appendTo(passphraseInputDiv);
+		textArea = $("<textarea class='import_textarea'>").appendTo(passphraseInputDiv);
 		textArea.attr("placeholder", "Enter a private key or split pieces of a private key");
 		
 		// submit button
-		var submit = $("<div class='recover_button'>").appendTo(passphraseInputDiv);
+		var submit = $("<div class='import_button'>").appendTo(passphraseInputDiv);
 		submit.html("Submit");
 		submit.click(function() { submitPieces(); });
 		
 		// imported pieces
-		importedPiecesDiv = $("<div class='recover_imported_pieces'>").appendTo(passphraseInputDiv);
+		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(passphraseInputDiv);
 		importedPiecesDiv.hide();
 		
 		// controls
-		controlsDiv = $("<div class='recover_controls'>").appendTo(div);
+		controlsDiv = $("<div class='import_controls'>").appendTo(div);
 		controlsDiv.hide();
 		resetControls();
 		
@@ -1705,8 +1705,8 @@ function RecoverTextController(div, plugins) {
 					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
 				},
 			});
-			selector = $("#recover_selector");	// ddslick requires id reference
-			selectorDisabler = $("<div class='recover_selector_disabler'>").appendTo(selectorContainer);
+			selector = $("#import_selector");	// ddslick requires id reference
+			selectorDisabler = $("<div class='import_selector_disabler'>").appendTo(selectorContainer);
 			startOver();
 			
 			// done rendering
@@ -1720,8 +1720,8 @@ function RecoverTextController(div, plugins) {
 	}
 	
 	function addControl(text, onClick) {
-		var linkDiv = $("<div class='recover_control_link_div'>").appendTo(controlsDiv);
-		var link = $("<div class='recover_control_link'>").appendTo(linkDiv);
+		var linkDiv = $("<div class='import_control_link_div'>").appendTo(controlsDiv);
+		var link = $("<div class='import_control_link'>").appendTo(linkDiv);
 		link.append(text);
 		link.click(function() { onClick(); });
 	}
@@ -1740,10 +1740,10 @@ function RecoverTextController(div, plugins) {
 	
 	function setSelectorEnabled(bool) {
 		if (bool) {
-			$("#recover_selector *").removeClass("disabled_text");
+			$("#import_selector *").removeClass("disabled_text");
 			selectorDisabler.hide();
 		} else {
-			$("#recover_selector *").addClass("disabled_text");
+			$("#import_selector *").addClass("disabled_text");
 			selectorDisabler.show();
 		}
 	}
@@ -1781,7 +1781,7 @@ function RecoverTextController(div, plugins) {
 	function onKeysDecrypted(keys, pieces, pieceDivs) {
 		resetControls();
 		contentDiv.children().detach();
-		var viewDecrypted = $("<div class='recover_view_button'>").appendTo(contentDiv);
+		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Key");
 		viewDecrypted.click(function() {
 			UiUtils.openStorage("Imported Storage", null, null, keys, pieces, pieceDivs, false);
@@ -1790,7 +1790,7 @@ function RecoverTextController(div, plugins) {
 	
 	function setSelectedCurrency(ticker) {
 		var name = AppUtils.getCryptoPlugin(ticker).getName();
-		selector = $("#recover_selector");
+		selector = $("#import_selector");
 		for (var i = 0; i < selectorData.length; i++) {
 			if (selectorData[i].text === name) {
 				selector.ddslick('select', {index: i});
@@ -1805,7 +1805,7 @@ function RecoverTextController(div, plugins) {
 		if (str) {
 			if (!img) img = $("<img src='img/warning.png'>");
 			warningDiv.append(img);
-			img.addClass("recover_warning_div_icon");
+			img.addClass("import_warning_div_icon");
 			warningDiv.append(str);
 			warningDiv.show();
 		} else {
@@ -1958,16 +1958,16 @@ function RecoverTextController(div, plugins) {
 		}
 		
 		function getImportedPieceDiv(piece) {
-			var importedPieceDiv = $("<div class='recover_text_imported_piece'>").appendTo(importedPiecesDiv);
-			var icon = $("<img src='img/file.png' class='recover_imported_icon'>").appendTo(importedPieceDiv);
+			var importedPieceDiv = $("<div class='import_text_imported_piece'>").appendTo(importedPiecesDiv);
+			var icon = $("<img src='img/file.png' class='import_imported_icon'>").appendTo(importedPieceDiv);
 			importedPieceDiv.append(AppUtils.getShortenedString(piece, MAX_PIECE_LENGTH));
-			var trash = $("<img src='img/trash.png' class='recover_imported_trash'>").appendTo(importedPieceDiv);
+			var trash = $("<img src='img/trash.png' class='import_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
 			return importedPieceDiv;
 		}
 	}
 }
-inheritsFrom(RecoverTextController, DivController);
+inheritsFrom(ImportTextController, DivController);
 
 /**
  * Controls passphrase input and key decryption on import.
@@ -1992,20 +1992,20 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		
 		// set up div
 		div.empty();
-		div.addClass("recover_decryption_div");
+		div.addClass("import_decryption_div");
 		
 		// label
-		labelDiv = $("<div class='recover_decrypt_label'>").appendTo(div);
+		labelDiv = $("<div class='import_decrypt_label'>").appendTo(div);
 		
 		// passphrase input
 		inputDiv = $("<div>").appendTo(div);
-		passphraseInput = $("<input type='password' class='recover_passphrase_input'>").appendTo(inputDiv)
-		submitButton = $("<div class='recover_button'>").appendTo(inputDiv);
+		passphraseInput = $("<input type='password' class='import_passphrase_input'>").appendTo(inputDiv)
+		submitButton = $("<div class='import_button'>").appendTo(inputDiv);
 		submitButton.html("Submit");
 		submitButton.click(function() { onSubmit(); });
 		
 		// progress bar
-		progressDiv = $("<div class='recover_progress_div'>").appendTo(div);
+		progressDiv = $("<div class='import_progress_div'>").appendTo(div);
 		
 		// initial state
 		init();
@@ -2132,11 +2132,11 @@ function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, def
 		}
 		
 		// set up tabs
-		tabsDiv = $("<div class='recover_tabs_div'>").appendTo(div);
-		tab1 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tabsDiv = $("<div class='import_tabs_div'>").appendTo(div);
+		tab1 = $("<div class='import_tab_div'>").appendTo(tabsDiv);
 		tab1.html(tabName1);
 		tab1.click(function() { selectTab(0); });
-		tab2 = $("<div class='recover_tab_div'>").appendTo(tabsDiv);
+		tab2 = $("<div class='import_tab_div'>").appendTo(tabsDiv);
 		tab2.html(tabName2);
 		tab2.click(function() { selectTab(1); });
 		

@@ -347,7 +347,7 @@ var AppUtils = {
 			if (pieces[0].pieceNum) {
 				var minPieces = AppUtils.getMinPieces(pieces[0].keys[0].wif);
 				var additional = minPieces - 1;
-				throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
+				throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private keys");
 			}
 			for (var i = 0; i < pieces[0].keys.length; i++) {
 				var pieceKey = pieces[0].keys[i];
@@ -394,7 +394,7 @@ var AppUtils = {
 			// check if minimum threshold met
 			if (pieces.length < minPieces) {
 				var additional = minPieces - pieces.length;
-				throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
+				throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private keys");
 			}
 			
 			// combine keys across pieces
@@ -410,7 +410,7 @@ var AppUtils = {
 					keys.push(key);
 				}
 			} catch (err) {
-				throw new Error("Could not recover private keys from the given pieces.  Verify the pieces are correct.");
+				throw new Error("Could not import private keys from the given pieces.  Verify the pieces are correct.");
 			}
 		}
 
