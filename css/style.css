@@ -1514,7 +1514,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_bar {
-	height:45px;
+	height:50px;
 	width:100%;
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -1534,7 +1534,7 @@ input[type='checkbox'][disabled] +label {
 
 .notice_content {
 	width: 100%;
-	text-align: center;
+	font-size: 20px;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
