@@ -373,7 +373,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (!environmentFailure) UiUtils.openStorage(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true}); 
+			if (!environmentFailure) UiUtils.openStorage(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
 		}
 		
 		function getKeyGenConfig(plugin) {
@@ -2307,6 +2307,20 @@ function ExportController(div, window, config) {
 		// currently showing piece
 		piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
 		
+		// regenerate button
+		if (config.showRegenerate) {
+			var regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
+			btnRegenerate = $("<div class='form_generate_btn'>").appendTo(regenerateDiv);
+			btnRegenerate.append("Regenerate");
+			btnRegenerate.click(function() {
+				config.keys = undefined;
+				config.pieces = undefined;
+				config.pieceDivs = undefined;
+				config.quickGenerate = true;	// hides progress bar and does not disable header
+				update();
+			});
+		}
+		
 		// register events
 		showPublicCheckbox.click(function() { update(); });
 		showPrivateCheckbox.click(function() { update(); });
@@ -2468,7 +2482,7 @@ function ExportController(div, window, config) {
 				for (var i = 0; i < config.pieces.length; i++) config.pieceDivs.push($("<div>"));
 				setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(config.pieceDivs);
-				setPrintEnabled(false);
+				if (!config.quickGenerate) setPrintEnabled(false);
 				if (lastRenderer) lastRenderer.cancel();
 				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getPieceRendererConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
@@ -2487,12 +2501,12 @@ function ExportController(div, window, config) {
 			// otherwise generate keys from config
 			else {
 				assertInitialized(config.keyGenConfig);
-				setControlsEnabled(false);
+				if (!config.quickGenerate) setControlsEnabled(false);
 				AppUtils.generateKeys(config.keyGenConfig, function(percent, label) {
 					progressBar.set(percent);
 					progressBar.setText(Math.round(percent * 100)  + "%");
 					progressLabel.html(label);
-					progressDiv.show();
+					if (!config.quickGenerate) progressDiv.show();
 				}, function(err, _keys, _pieces, _pieceDivs) {
 					progressDiv.hide();
 					if (err) {

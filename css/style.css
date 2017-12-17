@@ -1305,6 +1305,10 @@ input[type='checkbox'][disabled] +label {
 	page-break-after: always;
 }
 
+.piece_page_div:last-child {
+	margin-bottom: 0px;
+}
+
 .piece_page_header_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -1506,6 +1510,9 @@ input[type='checkbox'][disabled] +label {
 	}
 	.piece_div {
 		display: block !important
+	}
+	.export_regenerate_div {
+		display: none;
 	}
 }
 
