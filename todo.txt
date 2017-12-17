@@ -1,7 +1,7 @@
 TODO
 change terminology from recover to import
 disclaimer - footer on homepage only, no need for copyright, except maybe for images
-environment checks - one bar per error/warning, white border separator, x-mark, recommend link to do right thing
+environment checks: recommend links to download
 export page while in progress - header controls disabled, progress bar in middle with description underneath, no percentage
 form links: start over and one of each - font size 15px, opacity 1, blue, underline, start over below generate keys
 regenerate button under single key pair if accessed from homepage so they can disconnect and regenerate
