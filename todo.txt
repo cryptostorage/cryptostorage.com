@@ -25,6 +25,7 @@ warn if private key not included in print - alert when print clicked without sho
 code review
 tip address
 option to split the passphrase and include a copy of it on each share?
+ommitted question mark
 
 low priority:
 print progress - progress bar if threshold exceeded where they're expected to wait
