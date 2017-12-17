@@ -16,6 +16,7 @@ dependency management
 	generate new keys button shows loading page until all currency dependencies loaded
 	warning bar saying dependencies are loading, then when done tell them they should disconnect to the internet
 import keys success - inline or success page? dual tabs if import is inline
+design while decryption in progress
 regenerate button for frontpage generation
 homepage - tbd, fill icons with white, multiple locks, too big on small screens?
 warning sign badge with warning count in upper right blue bar
