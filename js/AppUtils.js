@@ -1286,6 +1286,20 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Enumerates environment check codes.
+	 */
+	EnvironmentCode: {
+		BROWSER_SUPPORTED: "BROWSER_SUPPORTED",
+		RUNTIME_ERROR: "RUNTIME_ERROR",
+		IS_ONLINE: "IS_ONLINE",
+		IS_LOCAL: "IS_LOCAL",
+		INTERNET_REQUIRED: "INTERNET_REQUIRED",
+		OPEN_SOURCE_BROWSER: "OPEN_SOURCE_BROWSER",
+		OPEN_SOURCE_OS: "OPEN_SOURCE_OS",
+		PRERELEASE: "PRERELEASE"
+	},
+	
+	/**
 	 * Interprets the given environment info and returns pass/fail/warn checks.
 	 * 
 	 * @param info is output from getEnvironmentInfo()
@@ -1329,20 +1343,10 @@ var AppUtils = {
 		if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPEN_SOURCE_OS});
 		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPEN_SOURCE_OS});
 		
+		// pre-release warning
+		checks.push({state: "warn", code: AppUtils.EnvironmentCode.PRERELEASE});
+		
 		return checks;
-	},
-	
-	/**
-	 * Enumerates environment check codes.
-	 */
-	EnvironmentCode: {
-		BROWSER_SUPPORTED: "BROWSER_SUPPORTED",
-		RUNTIME_ERROR: "RUNTIME_ERROR",
-		IS_ONLINE: "IS_ONLINE",
-		IS_LOCAL: "IS_LOCAL",
-		INTERNET_REQUIRED: "INTERNET_REQUIRED",
-		OPEN_SOURCE_BROWSER: "OPEN_SOURCE_BROWSER",
-		OPEN_SOURCE_OS: "OPEN_SOURCE_OS"
 	},
 	
 	/**

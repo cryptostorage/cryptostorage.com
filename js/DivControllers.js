@@ -312,7 +312,7 @@ function HomeController(div) {
 		new NoticeController(noticeDiv, {showOnWarn: false, showOnPass: false}).render();
 		
 		// home content
-		var pageDiv = $("<div class='page_div home_div'>").appendTo(div);
+		var pageDiv = $("<div class='page_div home_div vertical_flex'>").appendTo(div);
 		
 		// supported currencies
 		pageDiv.append("<div class='home_label'>Supports these cryptocurrencies</div>");
@@ -641,10 +641,6 @@ function FormController(div) {
 		var oneOfEachLink = $("<div class='form_link'>").appendTo(formLinks);
 		oneOfEachLink.html("One of each");
 		oneOfEachLink.click(function() { onOneOfEach(); });
-		formLinks.append("&nbsp;&nbsp;&nbsp;&nbsp;")
-		var startOverLink = $("<div class='form_link'>").appendTo(formLinks);
-		startOverLink.html("Start over")
-		startOverLink.click(function() { onStartOver(); });
 		
 		// currency inputs
 		currencyInputs = [];
@@ -661,7 +657,7 @@ function FormController(div) {
 		
 		// passphrase checkbox
 		var passphraseDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-		var passphraseCheckboxDiv = $("<div class='form_flex'>").appendTo(passphraseDiv);
+		var passphraseCheckboxDiv = $("<div class='horizontal_flex'>").appendTo(passphraseDiv);
 		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
 		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
 		passphraseCheckboxLabel.html("Do you want to protect your private keys with a passphrase?");
@@ -707,7 +703,7 @@ function FormController(div) {
 		
 		// split checkbox
 		var splitDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-		var splitCheckboxDiv = $("<div class='form_flex'>").appendTo(splitDiv);
+		var splitCheckboxDiv = $("<div class='horizontal_flex'>").appendTo(splitDiv);
 		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitCheckboxDiv);
 		var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitCheckboxDiv);
 		splitCheckboxLabel.html("Do you want to split your private keys into separate pieces?");
@@ -755,6 +751,11 @@ function FormController(div) {
 		btnGenerate = $("<div class='form_generate_btn'>").appendTo(generateDiv);
 		btnGenerate.append("Generate Keys");
 		
+		// start over
+		var startOverLink = $("<div class='form_start_over'>").appendTo(pageDiv);
+		startOverLink.html("Or start over")
+		startOverLink.click(function() { onStartOver(); });
+		
 		// disable generate button if environment failure
 		AppUtils.addEnvironmentListener(function(info) {
 			formErrors.environment = AppUtils.hasEnvironmentFailure(AppUtils.getCachedEnvironmentInfo());
@@ -763,10 +764,6 @@ function FormController(div) {
 		
 		// add first currency
 		addCurrency();
-		
-		// under development warning
-		var warningDiv = $("<div class='red_warning'>").appendTo(pageDiv);
-		warningDiv.append("Under Development: Not Ready for Use");
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -2624,6 +2621,9 @@ function NoticeController(div, config) {
 				case AppUtils.EnvironmentCode.OPEN_SOURCE_OS:
 					if (check.state === "pass") noticeContent.append("Operating system is open source (" + info.os.name + ")");
 					else noticeContent.append("Operating system is not open source (" + info.os.name + ")");
+					break;
+				case AppUtils.EnvironmentCode.PRERELEASE:
+					if (check.state === "warn") noticeContent.append("Application is under development.  Not ready for use.");
 					break;
 				default:
 					throw new Error("Unrecognized environment code: " + check.code);
