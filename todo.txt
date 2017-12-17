@@ -1,6 +1,6 @@
 TODO
-export page while in progress - header controls disabled
 regenerate button under single key pair if accessed from homepage so they can disconnect and regenerate
+export page while in progress - header controls disabled
 seo
 faq
 homepage
