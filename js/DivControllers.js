@@ -2178,17 +2178,19 @@ inheritsFrom(TwoTabController, DivController);
 /**
  * Export page.
  * 
- * At least one of keyGenConfig, keys, pieces, and pieceDivs are required.
+ * At least one of keyGenConfig, keys, pieces, and pieceDivs are required in the config.
  * 
  * @param div is the div to render to
  * @param window is a reference to the window for printing
- * @param keyGenConfig is a configuration to generate new storage
- * @param keys are keys to generate pieces from
- * @param pieces are pieces to export and generate pieceDivs from
- * @param pieceDivs are pre-generated piece divs ready for display
- * @param confirmExit specifies if the window should confirm exit if not saved or printed
+ * @param config specifies export page behavior
+ * 				config.keyGenConfig is a configuration to generate new storage
+ * 				config.keys are keys to generate pieces from
+ * 				config.pieces are pieces to export and generate pieceDivs from
+ * 				config.pieceDivs are pre-generated piece divs ready for display
+ * 				config.confirmExit specifies if the window should confirm exit if not saved or printed
+ * 				config.showRegenerate specifies if the regenerate button should be shown
  */
-function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, confirmExit) {
+function ExportController(div, window, config) {
 	DivController.call(this, div);
 	
 	// global variables
@@ -2208,7 +2210,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 	var lastRenderer;
 	
 	// confirm exit if storage not saved or printed
-	if (confirmExit) {
+	if (config.confirmExit) {
 		window.addEventListener("beforeunload", function (e) {
 			if (!saved) {
 			  var confirmationMessage = "Your storage has not been saved or printed.";
@@ -2260,14 +2262,14 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		sortPieces();
 		
 		// piece selection
-		var paginatorSource = getPaginatorSource(keyGenConfig, pieces);
+		var paginatorSource = getPaginatorSource(config.keyGenConfig, config.pieces);
 		if (paginatorSource) {
 			paginator = $("<div id='paginator'>").appendTo(exportHeader);
 			$("#paginator").pagination({
 				dataSource: paginatorSource,
 				pageSize: 1,
 				callback: function(data, pagination) {
-					if (pieceDivs) setVisiblePiece(pieceDivs, pagination.pageNumber - 1);
+					if (config.pieceDivs) setVisiblePiece(config.pieceDivs, pagination.pageNumber - 1);
 				}
 			});
 			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
@@ -2296,7 +2298,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		setControlsEnabled(false);
 		
 		// build ui based on keyGenConfig, pieces, and pieceDivs
-		update(pieceDivs);
+		update(config.pieceDivs);
 
 		// done rendering
 		if (onDone) onDone(div);
@@ -2305,14 +2307,14 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function sortPieces() {
-		if (!pieces) return;
+		if (!config.pieces) return;
 		
 		// bind pieces and pieceDivs
 		var elems = [];
-		for (var i = 0; i < pieces.length; i++) {
+		for (var i = 0; i < config.pieces.length; i++) {
 			elems.push({
-				piece: pieces[i],
-				pieceDiv: pieceDivs ? pieceDivs[i] : null
+				piece: config.pieces[i],
+				pieceDiv: config.pieceDivs ? config.pieceDivs[i] : null
 			});
 		}
 		
@@ -2326,12 +2328,12 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		});
 		
 		// re-assign global pieces
-		pieces = [];
-		if (pieceDivs) pieceDivs = [];
+		config.pieces = [];
+		if (config.pieceDivs) config.pieceDivs = [];
 		for (var i = 0; i < elems.length; i++) {
 			var elem = elems[i];
-			pieces.push(elem.piece);
-			if (pieceDivs) pieceDivs.push(elem.pieceDiv);
+			config.pieces.push(elem.piece);
+			if (config.pieceDivs) config.pieceDivs.push(elem.pieceDiv);
 		}
 	}
 	
@@ -2382,10 +2384,10 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 	}
 	
 	function savePublicAddresses() {
-		assertInitialized(pieces);
-		assertTrue(pieces.length > 0);
-		var publicAddressesStr = AppUtils.pieceToAddresses(pieces[0]);
-		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_public_addresses.txt");
+		assertInitialized(config.pieces);
+		assertTrue(config.pieces.length > 0);
+		var publicAddressesStr = AppUtils.pieceToAddresses(config.pieces[0]);
+		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + AppUtils.getCommonTicker(config.pieces[0]).toLowerCase() + "_public_addresses.txt");
 	}
 	
 	function setControlsEnabled(enabled) {
@@ -2399,7 +2401,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 			savePublicButton.addClass("export_button");
 			savePublicButton.removeClass("export_button_disabled");
 			showLogosCheckbox.removeAttr("disabled");
-			saveButton.click(function() { saveAll(pieces); });
+			saveButton.click(function() { saveAll(config.pieces); });
 			printButton.click(function() { printAll(); });
 			savePublicButton.click(function() { savePublicAddresses(); });
 			updateHeaderCheckboxes();
@@ -2427,30 +2429,30 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 	
 	function update(_pieceDivs, onDone) {
 		updateHeaderCheckboxes();
-		pieceDivs = _pieceDivs;
+		config.pieceDivs = _pieceDivs;
 		
 		// add piece divs if given
-		if (pieceDivs) {
-			assertInitialized(pieces);
-			setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
-			setPieceDivs(pieceDivs);
+		if (config.pieceDivs) {
+			assertInitialized(config.pieces);
+			setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
+			setPieceDivs(config.pieceDivs);
 			setPrintEnabled(true);
 			setControlsEnabled(true);
 			if (onDone) onDone();
 		}
 		
-		// else render from pieces
+		// else render from config.pieces
 		else {
-			pieceDivs = [];
+			config.pieceDivs = [];
 			
 			// render pieces if given
-			if (pieces) {
-				for (var i = 0; i < pieces.length; i++) pieceDivs.push($("<div>"));
-				setVisiblePiece(pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
-				setPieceDivs(pieceDivs);
+			if (config.pieces) {
+				for (var i = 0; i < config.pieces.length; i++) config.pieceDivs.push($("<div>"));
+				setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
+				setPieceDivs(config.pieceDivs);
 				setPrintEnabled(false);
 				if (lastRenderer) lastRenderer.cancel();
-				lastRenderer = new PieceRenderer(pieces, pieceDivs, getPieceRendererConfig());
+				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getPieceRendererConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
 					setPrintEnabled(true);
 					setControlsEnabled(true);
@@ -2459,16 +2461,16 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 			}
 			
 			// generate pieces from keys if given
-			else if (keys) {
-				pieces = AppUtils.keysToPieces(keys);
+			else if (config.keys) {
+				config.pieces = AppUtils.keysToPieces(config.keys);
 				update();
 			}
 			
 			// otherwise generate keys from config
 			else {
-				assertInitialized(keyGenConfig);
+				assertInitialized(config.keyGenConfig);
 				setControlsEnabled(false);
-				AppUtils.generateKeys(keyGenConfig, function(percent, label) {
+				AppUtils.generateKeys(config.keyGenConfig, function(percent, label) {
 					progressBar.set(percent);
 					progressBar.setText(Math.round(percent * 100)  + "%");
 					progressLabel.html(label);
@@ -2479,10 +2481,10 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 						AppUtils.setRuntimeError(err);
 						if (onDone) onDone(err);
 					} else {
-						keys = _keys;
-						pieces = _pieces;
-						pieceDivs = _pieceDivs;
-						update(pieceDivs, onDone);
+						config.keys = _keys;
+						config.pieces = _pieces;
+						config.pieceDivs = _pieceDivs;
+						update(config.pieceDivs, onDone);
 					}
 				}, true);
 			}
@@ -2501,7 +2503,7 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 	 * @param pieceIdx is the piece number to show
 	 */
 	function setVisiblePiece(pieceDivs, pieceIdx) {
-		for (var i = 0; i < pieces.length; i++) {
+		for (var i = 0; i < config.pieces.length; i++) {
 			if (i === pieceIdx) pieceDivs[i].removeClass("hidden");
 			else pieceDivs[i].addClass("hidden");
 		}
