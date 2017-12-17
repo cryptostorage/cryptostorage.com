@@ -2281,7 +2281,6 @@ function ExportController(div, window, keyGenConfig, keys, pieces, pieceDivs, co
 		// notice div
 		var noticeDivContainer = $("<div class='notice_div_container'>").appendTo(div);
 		var noticeDiv = $("<div>").appendTo(noticeDivContainer);
-		noticeDiv.hide();
 		new NoticeController(noticeDiv).render();
 		
 		// currently showing piece
