@@ -1,5 +1,4 @@
 TODO
-regenerate button under single key pair if accessed from homepage so they can disconnect and regenerate
 export page while in progress - header controls disabled
 seo
 faq
@@ -12,18 +11,18 @@ file import loading - see spec, only show if minimum file size
 environment checks: recommend links to download
 
 designer:
-notices on every page?
+homepage - tbd, fill icons with white, multiple locks, too big on small screens?
+import keys success - inline or success page? dual tabs if import is inline
+regenerate design and introduces risk of losing funds
+notices on which pages
 dependency management
 	generate new keys button shows loading page until all currency dependencies loaded
 	warning bar saying dependencies are loading, then when done tell them they should disconnect to the internet
-import keys success - inline or success page? dual tabs if import is inline
 design while decryption in progress
-regenerate button for frontpage generation
-homepage - tbd, fill icons with white, multiple locks, too big on small screens?
 warning sign badge with warning count in upper right blue bar
 warn if private key not included in print - alert when print clicked without show private keys?
-code review
 tip address
+code review
 option to split the passphrase and include a copy of it on each share?
 ommitted question mark
 
