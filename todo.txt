@@ -11,6 +11,7 @@ file import loading - see spec, only show if minimum file size
 test critical error on homepage
 seo
 faq
+homepage
 
 designer:
 notices on every page?
