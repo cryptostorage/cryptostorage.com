@@ -27,8 +27,25 @@ var UiUtils = {
 		});
 	},
 	
-	openStorage: function(browserTabName, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit) {
+	/**
+	 * Opens storage in a new tab.
+	 * 
+	 * @param browserTabName is the name of the tab
+	 * @param config is the storage configuration
+	 * 				config.importedPieces are original imported pieces
+	 * 				config.keyGenConfig is a configuration to generate new storage
+	 * 				config.keys are keys to generate pieces from
+	 * 				config.pieces are pieces to export and generate pieceDivs from
+	 * 				config.pieceDivs are pre-generated piece divs ready for display
+	 * 				config.confirmExit specifies if the window should confirm exit if not saved or printed
+	 * 				config.showRegenerate specifies if the regenerate button should be shown
+	 */
+	openStorage: function(browserTabName, config) {
 		
+		// deep copy config
+		config = objectAssign({}, config);
+		
+		// export tab dependencies
 		var dependencies = [
 			"lib/jquery-3.2.1.js",
 			"lib/jquery-ui.js",
@@ -57,7 +74,8 @@ var UiUtils = {
 		
 		// open tab
 		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
-		  window.exportToBody(window, importedPieces, keyGenConfig, keys, pieces, pieceDivs, confirmExit, AppUtils.getCachedEnvironmentInfo());
+			config.environmentInfo = AppUtils.getCachedEnvironmentInfo();
+		  window.exportToBody(window, config);
 			window.focus();
 		});
 	}
@@ -355,7 +373,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (!environmentFailure) UiUtils.openStorage(plugin.getName() + " Storage", null, getKeyGenConfig(plugin), null, null, null, true); 
+			if (!environmentFailure) UiUtils.openStorage(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true}); 
 		}
 		
 		function getKeyGenConfig(plugin) {
@@ -803,7 +821,7 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm(true);
-		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", null, getConfig(), null, null, null, true);
+		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", {keyGenConfig: getConfig(), confirmExit: true});
 		if (onDone) onDone();
 	}
 	
@@ -1368,7 +1386,7 @@ function ImportFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openStorage("Imported Storage", getImportedPieces(), null, keys, null, null, false);
+					UiUtils.openStorage("Imported Storage", {importedPieces: getImportedPieces(), keys: keys});
 				});
 			});
 		} else {
@@ -1382,7 +1400,7 @@ function ImportFileController(div) {
 		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Keys");
 		viewDecrypted.click(function() {
-			UiUtils.openStorage("Imported Storage", importedPieces, null, keys, pieces, pieceDivs, false);
+			UiUtils.openStorage("Imported Storage", {importedPieces: importedPieces, keys: keys, pieces: pieces, pieceDivs: pieceDivs});
 		});
 	}
 	
@@ -1517,7 +1535,7 @@ function ImportFileController(div) {
 				
 				// add control to view pieces
 				addControl("view imported pieces", function() {
-					UiUtils.openStorage("Imported Storage", null, null, null, pieces, null, false);
+					UiUtils.openStorage("Imported Storage", {pieces: pieces});
 				});
 				
 				// attempt to get keys
@@ -1770,7 +1788,7 @@ function ImportTextController(div, plugins) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted key", function() {
-					UiUtils.openStorage("Imported Storage", null, null, keys, null, null, false);
+					UiUtils.openStorage("Imported Storage", {keys: keys});
 				});
 			});
 		} else {
@@ -1784,7 +1802,7 @@ function ImportTextController(div, plugins) {
 		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
 		viewDecrypted.append("View Decrypted Key");
 		viewDecrypted.click(function() {
-			UiUtils.openStorage("Imported Storage", null, null, keys, pieces, pieceDivs, false);
+			UiUtils.openStorage("Imported Storage", {keys: keys, pieces: pieces, pieceDivs: pieceDivs});
 		});
 	}
 	
