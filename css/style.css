@@ -379,15 +379,13 @@ input[type='checkbox'][disabled] +label {
 }
 
 .form_link {
-	font-size: 20px;
+	font-size: 18px;
+	color: blue;
 	font-weight: lighter;
-	opacity:0.75;
 }
 
 .form_link:hover {
-	color: black;
 	cursor: pointer;
-	opacity:0.8;
 	text-decoration:underline;
 }
 
