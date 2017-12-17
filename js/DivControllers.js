@@ -2495,6 +2495,9 @@ inheritsFrom(ExportController, DivController);
  */
 function NoticeController(div, config) {
 	DivController.call(this, div);
+	
+	var seen = [];
+	
 	this.render = function(onDone) {
 		
 		// div setup
@@ -2520,10 +2523,10 @@ function NoticeController(div, config) {
 	
 	function setEnvironmentInfo(info) {
 		
-		div.empty();	// TODO: cache last notices
-		
 		// render each shown notice bar
 		for (var i = 0; i < info.checks.length; i++) {
+			if (arrContains(seen, info.checks[i].code)) continue;
+			seen.push(info.checks[i].code);
 			if (info.checks[i].state === "pass" && config.showOnPass ||
 					info.checks[i].state === "fail" && config.showOnFail ||
 					info.checks[i].state === "warn" && config.showOnWarn) {
@@ -2536,16 +2539,50 @@ function NoticeController(div, config) {
 			noticeBar.addClass("notice_bar");
 			noticeBar.addClass(check.state === "pass" ? "notice_bar_pass" : check.state === "fail" ? "notice_bar_fail" : "notice_bar_warn");
 			noticeBar.append($("<div class='notice_bar_left'>"));
-			var noticeBarContent = $("<div class='notice_content'>").appendTo(noticeBar);
-			var noticeIcon = check.state === "pass" ? $("<img src='img/checkmark_small.png'>") : $("<img src='img/warning.png'>");
-			noticeIcon.addClass("notice_icon");
-			noticeBarContent.append(noticeIcon);
-			noticeBarContent.append(check.message);
+			var noticeContent = $("<div class='notice_content'>").appendTo(noticeBar);
+			renderNoticeContent(noticeContent, info, check);
 			var dismissDiv = $("<div class='notice_bar_right'>").appendTo(noticeBar);
 			if (check.state === "fail") return;	// cannot dismiss errors
 			var dismiss = $("<div class='notice_bar_dismiss'>").appendTo(dismissDiv);
 			dismiss.append("Dismiss");
 			dismiss.click(function() { noticeBar.detach(); });
+			
+			function renderNoticeContent(noticeContent, info, check) {
+				var noticeIcon = check.state === "pass" ? $("<img src='img/checkmark_small.png'>") : $("<img src='img/warning.png'>");
+				noticeIcon.addClass("notice_icon");
+				noticeContent.append(noticeIcon);
+				
+				// interpret environment code and state
+				switch (check.code) {
+				case AppUtils.EnvironmentCode.BROWSER_SUPPORTED:
+					if (check.state === "fail") noticeContent.append("Browser is not supported (" + info.browser.name + " " + info.browser.version + ")");
+					break;
+				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
+					if (check.state === "fail") noticeContent.append("Unexpected runtime error: " + info.runtimeError.message);
+					break;
+				case AppUtils.EnvironmentCode.IS_ONLINE:
+					if (check.state === "pass") noticeContent.append("No internet connection");
+					else noticeContent.append("Internet connection is active");
+					break;
+				case AppUtils.EnvironmentCode.IS_LOCAL:
+					if (check.state === "pass") noticeContent.append("Application is running locally");
+					else noticeContent.append("Application is not running locally");
+					break;
+				case AppUtils.EnvironmentCode.INTERNET_REQUIRED:
+					if (check.state === "fail") noticeContent.append("Internet is required because application is not running locally");
+					break;
+				case AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER:
+					if (check.state === "pass") noticeContent.append("Browser is open source (" + info.browser.name + ")");
+					else noticeContent.append("Browser is not open source (" + info.browser.name + ")");
+					break;
+				case AppUtils.EnvironmentCode.OPEN_SOURCE_OS:
+					if (check.state === "pass") noticeContent.append("Operating system is open source (" + info.os.name + ")");
+					else noticeContent.append("Operating system is not open source (" + info.os.name + ")");
+					break;
+				default:
+					throw new Error("Unrecognized environment code: " + check.code);
+				}
+			}
 		}
 	}
 }

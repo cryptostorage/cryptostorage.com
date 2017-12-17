@@ -1295,41 +1295,54 @@ var AppUtils = {
 		var checks = [];
 		
 		// check if browser supported
-		if (!info.browser.isSupported) checks.push({state: "fail", message: "Browser is not supported (" + info.browser.name + " " + info.browser.version + ")"});
+		if (!info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWER_SUPPORTED});
 		
 		// check if runtime error
-		if (info.runtimeError) checks.push({state: "fail", message: "Unexpected runtime error: " + info.runtimeError.message});
+		if (info.runtimeError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.RUNTIME_ERROR});
 		
 		// check if remote and not online
 		var internetRequiredError = false;
 		if (isInitialized(info.isOnline)) {
 			if (!info.isLocal && !info.isOnline && AppUtils.NO_INTERNET_CAN_BE_ERROR) {
 				internetRequiredError = true;
-				checks.push({state: "fail", message: "Internet is required because application is not running locally"});
+				checks.push({state: "fail", code: AppUtils.EnvironmentCode.INTERNET_REQUIRED});
 			}
 		}
 		
 		// check if online only if no "internet required" error
 		if (isInitialized(info.isOnline) && !internetRequiredError) {
-			if (!info.isOnline) checks.push({state: "pass", message: "No internet connection"});
-			else checks.push({state: "warn", message: "Internet connection is active"});
+			if (!info.isOnline) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_ONLINE});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_ONLINE});
 		}
 		
 		// check if local
-		if (info.isLocal) checks.push({state: "pass", message: "Application is running locally"});
-		else checks.push({state: "warn", message: "Application is not running locally"});
+		if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
+		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
 		
 		// check open source browser
 		if (info.browser.isSupported) {
-			if (info.browser.isOpenSource) checks.push({state: "pass", message: "Browser is open source (" + info.browser.name + ")"});
-			else checks.push({state: "warn", message: "Browser is not open source (" + info.browser.name + ")"});
+			if (info.browser.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER});
 		}
 		
 		// check open source os
-		if (info.os.isOpenSource) checks.push({state: "pass", message: "Operating system is open source (" + info.os.name + ")"});
-		else checks.push({state: "warn", message: "Operating system is not open source (" + info.os.name + ")"});
+		if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPEN_SOURCE_OS});
+		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPEN_SOURCE_OS});
 		
 		return checks;
+	},
+	
+	/**
+	 * Enumerates environment check codes.
+	 */
+	EnvironmentCode: {
+		BROWSER_SUPPORTED: "BROWSER_SUPPORTED",
+		RUNTIME_ERROR: "RUNTIME_ERROR",
+		IS_ONLINE: "IS_ONLINE",
+		IS_LOCAL: "IS_LOCAL",
+		INTERNET_REQUIRED: "INTERNET_REQUIRED",
+		OPEN_SOURCE_BROWSER: "OPEN_SOURCE_BROWSER",
+		OPEN_SOURCE_OS: "OPEN_SOURCE_OS"
 	},
 	
 	/**
