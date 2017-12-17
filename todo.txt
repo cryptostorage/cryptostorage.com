@@ -1,14 +1,15 @@
 TODO
-environment checks: recommend links to download
 export page while in progress - header controls disabled
 regenerate button under single key pair if accessed from homepage so they can disconnect and regenerate
+seo
+faq
+homepage
+
 form info bubbles - see spec
 form error messages - see spec
 copy to clipboard confirmation - tooltip Copied!
 file import loading - see spec, only show if minimum file size
-seo
-faq
-homepage
+environment checks: recommend links to download
 
 designer:
 notices on every page?
