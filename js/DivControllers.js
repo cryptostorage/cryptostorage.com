@@ -2313,7 +2313,7 @@ function ExportController(div, window, config) {
 			btnRegenerate = $("<div class='form_generate_btn'>").appendTo(regenerateDiv);
 			btnRegenerate.append("Regenerate");
 			btnRegenerate.click(function() {
-				if (saved || confirm("The current key pair has not been saved.  Discard and create a new one?")) {
+				if (saved || confirm("The key pair has not been saved.  Discard and create a new one?")) {
 					saved = false;
 					config.keys = undefined;
 					config.pieces = undefined;
