@@ -2313,11 +2313,14 @@ function ExportController(div, window, config) {
 			btnRegenerate = $("<div class='form_generate_btn'>").appendTo(regenerateDiv);
 			btnRegenerate.append("Regenerate");
 			btnRegenerate.click(function() {
-				config.keys = undefined;
-				config.pieces = undefined;
-				config.pieceDivs = undefined;
-				config.quickGenerate = true;	// hides progress bar and does not disable header
-				update();
+				if (saved || confirm("The current key pair has not been saved.  Discard and create a new one?")) {
+					saved = false;
+					config.keys = undefined;
+					config.pieces = undefined;
+					config.pieceDivs = undefined;
+					config.quickGenerate = true;	// hides progress bar and does not disable header
+					update();
+				}
 			});
 		}
 		
