@@ -1,50 +1,35 @@
 TODO
-export page while in progress - header controls disabled
+homepage design and content
+export page piece selection disabled while loading
 cannot copy "not shown" exports
-export transactions which can be imported and sent making it fully functional cold storage web wallet
-regenerate confirmation should trigger on close
 confirmation should trigger on close export regardless if saved
-meeting times should be plus or minus 30% of time invested
-
-seo
-faq
-homepage
-deprioritize dash and zcash
-bitpay donation address
-
 form info bubbles - see spec
 form error messages - see spec
 copy to clipboard confirmation - tooltip Copied!
 file import loading - see spec, only show if minimum file size
-environment checks: recommend links to download
+import view imported pieces and view encrypted pieces opens in new tab
+import decrypted keys renders inline
+link to view original imported pieces in either decrypted or encrypted
+form loading screen while dependencies loading
+export loading screen while dependencies loading
+white x's on notice bars
+one of each a little smaller?
+decryption white progress bar with blue progress, black text
+question marks: not shown, use circle with slash restricted
+notices on form and import, homepage if error
+warn if private key not included in print
+refresh image on regenerate button
 don't render key pair until done
-
-designer:
-import keys success - inline or success page? dual tabs if import is inline
-	view imported pieces and view encrypted pieces opens in new tab
-	decrypted keys show inline
-	include link to view original imported pieces in either decrypted or encrypted	
-dependency management
-	generate new keys button shows loading page (?) until all currency dependencies loaded
-	warning bar saying dependencies are loading, then when done tell them they should disconnect to the internet
-	what if clicked from homepage
-	form is loading screen until all dependencies loaded, then show warnings, recommend disconnecting
-	if accessed from homepage, loading screen in new tab, then warnings, and can regenerate
-warning sign badge with warning count in upper right blue bar - see drawing of new improved warning bar
-design opinions: notices, regenerate, form links, decryption progress, ommitted question mark
-	white x's on notice bars
-	maybe refresh option on regenerate button
-	one of each a little smaller?
-	decryption white progress bar with blue progress, black text
-	question marks: not shown, use circle with slash restricted
-regenerate confirmation
-notices on which pages - form and probably recover, not homepage
-warn if private key not included in print - alert when print clicked without show private keys?
-tip address
-code review
-option to split the passphrase and include a copy of it on each share?
+warnings link to downloads
+deprioritize dash and zcash
+bitpay donation address
+seo
+faq
 
 low priority:
+export transactions which can be imported and sent making it fully functional cold storage web wallet
+meeting times should be plus or minus 30% of time invested
+option to split the passphrase and include a copy of it on each share?
 print progress - progress bar if threshold exceeded where they're expected to wait
 minify dependencies with source map download
 caching - etag dependencies, last modified tag, expire header will tell browser to cache
