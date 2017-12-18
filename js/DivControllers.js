@@ -265,12 +265,12 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			// intro slider
 			var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
 			var sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
-			getSlide($(mixImg), "Create cold storage and paper wallets for multiple cryptocurrencies.").appendTo(sliderDiv);
-			getSlide($("<img src='img/printer.png'>"), "Print or download for long term storage and easy recovery.").appendTo(sliderDiv);
-			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-			getSlide($("<img src='img/search_file.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-			getSlide($("<img src='img/passphrase_protected.png'>"), "Private keys can be passphrase protected and split into pieces for maximum security.").appendTo(sliderDiv);
-			getSlide($("<img src='img/traffic_light.png'>"), "Environment checks help generate keys securely.").appendTo(sliderDiv);
+			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
+			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage and easy recovery.").appendTo(sliderDiv);
+			getSlide($("<img src='img/security.png'>"), "Run offline so funds are never entrusted to a third party.").appendTo(sliderDiv);
+			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use, forever.  No account necessary.").appendTo(sliderDiv);
+			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split your private keys for maximum security.").appendTo(sliderDiv);
+			getSlide($("<img src='img/checklist.png'>"), "Generate your keys securely with automated environment checks.").appendTo(sliderDiv);
 			sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
 			
 			function getSlide(img, text) {
@@ -492,8 +492,8 @@ function DonateController(div, appController) {
 				var credits = [];
 				credits.push({
 					logo: AppUtils.getCryptoPlugin("ETH").getLogo(),
-					label: "UI design",
-					labelUrl: null,
+					label: "UI design - github.com/gregdracoulis",
+					labelUrl: "https://github.com/gregdracoulis",
 					address: "0x5735bb7cec965e58d03dddd167d1f27321878c51"
 				});
 				credits.push({
