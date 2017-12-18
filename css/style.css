@@ -1202,6 +1202,7 @@ input[type='checkbox'][disabled] +label {
 
 .import_progress_div {
 	height: 50px;
+	background-color: white;
 }
 
 .export_div {
