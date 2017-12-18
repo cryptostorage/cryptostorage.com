@@ -14,7 +14,8 @@ ol {
 	list-style-position: inside;
 }
 
-.horizontal_flex {
+.flex_horizontal {
+	width: 100%;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -22,10 +23,12 @@ ol {
 	-webkit-align-items: center;
 	-ms-flex-align: center;
 	align-items: center;
-	width: 100%;
+	-ms-flex-pack: center;
+	-webkit-justify-content: center;
+	justify-content: center;
 }
 
-.vertical_flex {
+.flex_vertical {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -37,6 +40,45 @@ ol {
 	-webkit-align-items: center;
 	-ms-flex-align: center;
 	align-items: center;
+	-ms-flex-pack: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+
+.flex_align_start {
+	align-items: flex-start;
+	-ms-flex-align: flex-start;
+	-webkit-align-items: flex-start;
+}
+
+.flex_align_center {
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+}
+
+.flex_align_end {
+	-webkit-align-items: end;
+	-ms-flex-align: flex-end;
+	align-items: flex-end;
+}
+
+.flex_justify_start {
+	-ms-flex-pack: flex-start;
+	-webkit-justify-content: flex-start;
+	justify-content: flex-start;
+}
+
+.flex_justify_center {
+	-ms-flex-pack: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+
+.flex_justify_end {
+	-ms-flex-pack: end;
+	-webkit-justify-content: flex-end;
+	justify-content: flex-end;
 }
 
 .app_body {
@@ -59,6 +101,15 @@ ol {
 .app_header {
 	width: 100%;
 	background-color: rgb(17, 119, 184);
+}
+
+.app_footer {
+	width: 100%;
+	background-color: rgb(17, 119, 184);
+	height: 75px;
+	color: white;
+	font-size: 18px;
+	margin-top: 50px;
 }
 
 .app_header_top {
@@ -269,8 +320,6 @@ ol {
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
 	flex-wrap: wrap;
-	-ms-flex-pack: center;
-	justify-content: center;
 }
 
 .currency_row_item_major {

@@ -25,6 +25,7 @@ deprioritize dash and zcash
 bitpay donation address
 seo
 faq
+transition all css flex to common flex classes
 
 designer:
 should home images fade or reflect?

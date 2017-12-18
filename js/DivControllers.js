@@ -103,6 +103,7 @@ function AppController(div) {
 	var sliderController;
 	var sliderDiv;
 	var contentDiv;
+	var footerDiv;
 	var homeController;
 	var formController;
 	var importController;
@@ -174,6 +175,11 @@ function AppController(div) {
 		donateController = new DonateController($("<div>"));
 		donateController.render();
 		
+		// footer
+		footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
+		footerDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
+		footerDiv.hide();
+		
 		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
 		setImmediate(function() {
 			
@@ -199,12 +205,14 @@ function AppController(div) {
 		sliderController.render(function() {
 			homeController.render(function(div) {
 				setContentDiv(div);
+				footerDiv.show();
 			});
 		});
 	}
 	
 	this.showForm = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showForm()");
+		footerDiv.hide();
 		formController.render(function(div) {
 			setContentDiv(div);
 			sliderDiv.hide();
@@ -215,18 +223,21 @@ function AppController(div) {
 	this.showFaq = function() {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
 		sliderDiv.hide();
+		footerDiv.hide();
 		setContentDiv(faqController.getDiv());
 	}
 	
 	this.showDonate = function() {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
 		sliderDiv.hide();
+		footerDiv.hide();
 		setContentDiv(donateController.getDiv());
 	}
 	
 	this.showImport = function() {
 		if (AppUtils.DEV_MODE) console.log("showImport()");
 		sliderDiv.hide();
+		footerDiv.hide();
 		setContentDiv(importController.getDiv());
 	}
 	
@@ -329,7 +340,7 @@ function HomeController(div) {
 		new NoticeController(noticeDiv, {showOnWarn: false, showOnPass: false}).render();
 		
 		// home content
-		var pageDiv = $("<div class='page_div home_div vertical_flex'>").appendTo(div);
+		var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
 		
 		// supported currencies
 		pageDiv.append("<div class='home_label'>Supports these cryptocurrencies</div>");
@@ -375,9 +386,9 @@ function HomeController(div) {
 		
 		// cryptography section
 		pageDiv.append("<div style='height: 60px'>");
-		var hFlex = $("<div class='horizontal_flex'>").appendTo(pageDiv);
+		var hFlex = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 		hFlex.append("<img width=200px src='img/key.png'>");
-		var vFlex = $("<div class='vertical_flex'>").appendTo(hFlex);
+		var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
 		vFlex.append("<div class='home_label'>Trusted cryptography</div>");
 		vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your wallet keys.</div>");
 		
@@ -392,10 +403,6 @@ function HomeController(div) {
 		downloadBtn.click(function() {
 			console.log("Download zip button clicked");	// TODO
 		});
-		
-		// disclaimer
-		var disclaimer = $("<div class='disclaimer'>").appendTo(div);
-		disclaimer.html("Copyright cryptostorage.com.  JavaScript copyrights included in the source.  No warranty.");
 		
 		// track environment failure to disable clicking currency
 		var environmentFailure = false;
@@ -709,7 +716,7 @@ function FormController(div) {
 		
 		// passphrase checkbox
 		var passphraseDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-		var passphraseCheckboxDiv = $("<div class='horizontal_flex'>").appendTo(passphraseDiv);
+		var passphraseCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseDiv);
 		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
 		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
 		passphraseCheckboxLabel.html("Do you want to protect your private keys with a passphrase?");
@@ -755,7 +762,7 @@ function FormController(div) {
 		
 		// split checkbox
 		var splitDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-		var splitCheckboxDiv = $("<div class='horizontal_flex'>").appendTo(splitDiv);
+		var splitCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(splitDiv);
 		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitCheckboxDiv);
 		var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitCheckboxDiv);
 		splitCheckboxLabel.html("Do you want to split your private keys into separate pieces?");
