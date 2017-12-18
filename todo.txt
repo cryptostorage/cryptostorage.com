@@ -1,7 +1,6 @@
 TODO
 export page piece selection disabled while loading
 cannot copy "not shown" exports
-confirmation should trigger on close export regardless if saved
 form info bubbles - see spec
 form error messages - see spec
 copy to clipboard confirmation - tooltip Copied!

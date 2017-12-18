@@ -2268,11 +2268,9 @@ function ExportController(div, window, config) {
 	// confirm exit if storage not saved or printed
 	if (config.confirmExit) {
 		window.addEventListener("beforeunload", function (e) {
-			if (!saved) {
-			  var confirmationMessage = "Your storage has not been saved or printed.";
-			  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
-			  return confirmationMessage;     												// Webkit, Safari, Chrome
-			}               
+		  var confirmationMessage = "Your storage has not been saved or printed.";
+		  (e || window.event).returnValue = confirmationMessage;	// Gecko + IE
+		  return confirmationMessage;     												// Webkit, Safari, Chrome             
 		});
 	}
 	
@@ -2351,7 +2349,7 @@ function ExportController(div, window, config) {
 			btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
 			btnRegenerate.append("Regenerate");
 			btnRegenerate.click(function() {
-				if (saved || confirm("The key pair has not been saved.  Discard and create a new one?")) {
+				if (confirm("The key pair has not been saved.  Discard and create a new one?")) {
 					saved = false;
 					config.keys = undefined;
 					config.pieces = undefined;
