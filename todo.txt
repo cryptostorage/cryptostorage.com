@@ -1,4 +1,5 @@
 TODO
+new notice bar
 export page piece selection disabled while loading
 cannot copy "not shown" exports
 form info bubbles - see spec
