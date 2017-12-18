@@ -168,10 +168,18 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			// left label and value
 			var keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivCenter);
 			keyDivLeftLabel.html(leftLabel);
-			var keyDivLeftValue = $("<div class='key_div_left_value copyable'>").appendTo(keyDivCenter);
+			var keyDivLeftValue = $("<div class='key_div_left_value'>").appendTo(keyDivCenter);
 			if (leftValue && !hasWhitespace(leftValue)) keyDivLeftValue.css("word-break", "break-all");
-			keyDivLeftValue.html(config.showPublic ? (leftValue ? leftValue : "(decrypt to view)") : "(omitted)");
-			keyDivLeftValue.addClass("copyable");
+			if (config.showPublic) {
+				if (leftValue) {
+					keyDivLeftValue.html(leftValue);
+					keyDivLeftValue.addClass("copyable");
+				} else {
+					keyDivLeftValue.html("(decrypt to view)");
+				}
+			} else {
+				keyDivLeftValue.html("(not shown)");
+			}
 			
 			// center currency
 			var keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
@@ -185,9 +193,14 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			// right label and value
 			var keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivCenter);
 			keyDivRightLabel.html(rightLabel);
-			var keyDivRightValue = $("<div class='key_div_right_value copyable'>").appendTo(keyDivCenter);
+			var keyDivRightValue = $("<div class='key_div_right_value'>").appendTo(keyDivCenter);
 			if (rightValue && !hasWhitespace(rightValue)) keyDivRightValue.css("word-break", "break-all");
-			keyDivRightValue.html(rightValue ? rightValue : "(omitted)");
+			if (rightValue) {
+				keyDivRightValue.html(rightValue);
+				keyDivRightValue.addClass("copyable");
+			} else {
+				keyDivRightValue.html("(not shown)");
+			}
 			
 			// collapse spacing for long keys
 			if (leftValue && leftValue.length > 71) {
