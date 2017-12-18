@@ -26,6 +26,10 @@ bitpay donation address
 seo
 faq
 
+designer:
+should home images fade or reflect?
+blue footer on every page?
+
 low priority:
 export transactions which can be imported and sent making it fully functional cold storage web wallet
 meeting times should be plus or minus 30% of time invested

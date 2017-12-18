@@ -171,7 +171,7 @@ ol {
 	right: 30px;
 }
 
-.home_generate_btn {
+.light_green_btn {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -182,7 +182,8 @@ ol {
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
 	height: 70px;
-	width: 250px;
+	min-width: 250px;
+	padding: 20px;
 	color: white;
 	font-size:24px;
 	margin-bottom: 10px;
@@ -195,11 +196,11 @@ ol {
 	user-select: none;
 }
 
-.home_generate_btn:hover {
+.light_green_btn:hover {
 	background-color: rgb(60, 240, 60);
 }
 
-.home_generate_btn:active {
+.light_green_btn:active {
 	background-color: rgb(40, 200, 40);
 }
 
@@ -239,13 +240,20 @@ ol {
 }
 
 .home_div {
-	padding-top: 40px;
+	padding: 40px;
 }
 
 .home_label {
 	font-size:24px;
 	font-weight: bold;
 	margin-bottom: 20px;
+}
+
+.home_description {
+	font-size: 20px;
+	margin-bottom: 20px;
+	line-height: 25px;
+	text-align: center;
 }
 
 .disclaimer {
@@ -661,7 +669,7 @@ input[type='checkbox'][disabled] +label {
 	justify-content: center;
 }
 
-.form_generate_btn {
+.dark_green_btn {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -672,7 +680,8 @@ input[type='checkbox'][disabled] +label {
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
 	height: 70px;
-	width: 225px;
+	min-width: 225px;
+	padding: 20px;
 	background-color: rgb(76, 178, 29);
 	color: white;
 	font-size:24px;
@@ -684,26 +693,26 @@ input[type='checkbox'][disabled] +label {
 	user-select: none;
 }
 
-.form_generate_btn:hover {
+.dark_green_btn:hover {
 	cursor: pointer;
 	background-color: rgb(90, 215, 50);
 }
 
-.form_generate_btn:active {
+.dark_green_btn:active {
 	background-color: rgb(55, 160, 30);
 }
 
-.form_generate_btn_disabled {
+.dark_green_btn_disabled {
 	color: black;
 	background-color: grey;
 }
 
-.form_generate_btn_disabled:hover {
+.dark_green_btn_disabled:hover {
 	background-color: grey;
 	cursor: auto;
 }
 
-.form_generate_btn_disabled:active {
+.dark_green_btn_disabled:active {
 	background-color: grey;
 }
 

@@ -268,7 +268,7 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage and easy recovery.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Run offline so funds are never entrusted to a third party.").appendTo(sliderDiv);
-			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use, forever.  No account necessary.").appendTo(sliderDiv);
+			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use, forever.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split your private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate your keys securely with automated environment checks.").appendTo(sliderDiv);
 			sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
@@ -290,7 +290,7 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			var ctaDiv = $("<div class='cta_div'>").appendTo(div);
 			
 			// button to generate keys
-			var btnGenerate = $("<div class='btn home_generate_btn'>").appendTo(ctaDiv);
+			var btnGenerate = $("<div class='btn light_green_btn'>").appendTo(ctaDiv);
 			btnGenerate.append("Generate New Keys");
 			btnGenerate.click(function() { onSelectGenerate(); });
 			
@@ -345,8 +345,6 @@ function HomeController(div) {
 			if (moreDiv) moreDiv.append(row);
 			else pageDiv.append(row);
 		}
-		
-		// add more div
 		if (moreDiv) {
 			var moreLabel = $("<div class='home_more_label'>").appendTo(pageDiv);
 			moreLabel.append("and " + (plugins.length - 7) + " more...");
@@ -356,11 +354,44 @@ function HomeController(div) {
 			});
 		}
 		
-		// sample page
-		$("<div style='height:100px'>").appendTo(pageDiv);
+		// sample page section
+		pageDiv.append("<div style='height: 60px'>");
 		pageDiv.append("<div class='home_label'>Export to printable and digital format for long term storage</div>");
-		$("<div style='height:40px'>").appendTo(pageDiv);
+		pageDiv.append("<div class='home_description'>Save your cryptocurrency wallet to JSON so it can be stored securely on a flash drive and imported easily, or print your currency easily to create a paper wallet.</div>")
 		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
+		
+		// check environment section
+		pageDiv.append("<div style='height: 60px'>");
+		pageDiv.append("<div class='home_label'>Check your environment to generate keys securely</div>");
+		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your crypto.</div>")
+		pageDiv.append($("<img width=750px src='img/notice_bar.png'>"));
+		
+		// split and passphrase section
+		pageDiv.append("<div style='height: 60px'>");
+		pageDiv.append("<div class='home_label'>Split and password protect private keys for maximum security</div>");
+		pageDiv.append("<div class='home_description'>Split your private key into multiple pieces you can store independently, and set how many pieces are needed to recover your key. Store one in your wallet, one in your safe, and one in your bank vault.</div>")
+		pageDiv.append($("<img width=750px src='img/passphrase_input.png'>"));
+		pageDiv.append($("<img width=700px src='img/split_input.png'>"));
+		
+		// cryptography section
+		pageDiv.append("<div style='height: 60px'>");
+		var hFlex = $("<div class='horizontal_flex'>").appendTo(pageDiv);
+		hFlex.append("<img width=200px src='img/key.png'>");
+		var vFlex = $("<div class='vertical_flex'>").appendTo(hFlex);
+		vFlex.append("<div class='home_label'>Trusted cryptography</div>");
+		vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your wallet keys.</div>");
+		
+		// download section
+		pageDiv.append("<div style='height: 60px'>");
+		pageDiv.append("<div class='home_label'>Download our 100% free, open-source software and run it offline</div>");
+		pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
+		pageDiv.append($("<img width=500px src='img/license.png'>"));
+		pageDiv.append("<div style='height: 20px;'>");
+		var downloadBtn = $("<div class='light_green_btn'>").appendTo(pageDiv);
+		downloadBtn.append("Download Now (zip)");
+		downloadBtn.click(function() {
+			console.log("Download zip button clicked");	// TODO
+		});
 		
 		// disclaimer
 		var disclaimer = $("<div class='disclaimer'>").appendTo(div);
@@ -769,7 +800,7 @@ function FormController(div) {
 		
 		// add generate button
 		var generateDiv = $("<div class='form_generate_div'>").appendTo(pageDiv);
-		btnGenerate = $("<div class='form_generate_btn'>").appendTo(generateDiv);
+		btnGenerate = $("<div class='dark_green_btn'>").appendTo(generateDiv);
 		btnGenerate.append("Generate Keys");
 		
 		// start over
@@ -1040,10 +1071,10 @@ function FormController(div) {
 	function setGenerateEnabled(generateEnabled) {
 		btnGenerate.unbind("click");
 		if (generateEnabled) {
-			btnGenerate.removeClass("form_generate_btn_disabled");
+			btnGenerate.removeClass("dark_green_btn_disabled");
 			btnGenerate.click(function() { onGenerate(); });
 		} else {
-			btnGenerate.addClass("form_generate_btn_disabled");
+			btnGenerate.addClass("dark_green_btn_disabled");
 		}
 	}
 	
@@ -2310,7 +2341,7 @@ function ExportController(div, window, config) {
 		// regenerate button
 		if (config.showRegenerate) {
 			var regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
-			btnRegenerate = $("<div class='form_generate_btn'>").appendTo(regenerateDiv);
+			btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
 			btnRegenerate.append("Regenerate");
 			btnRegenerate.click(function() {
 				if (saved || confirm("The key pair has not been saved.  Discard and create a new one?")) {
