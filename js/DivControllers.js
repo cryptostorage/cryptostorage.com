@@ -385,9 +385,9 @@ function HomeController(div) {
 		pageDiv.append($("<img width=700px src='img/split_input.png'>"));
 		
 		// cryptography section
-		pageDiv.append("<div style='height: 60px'>");
+		pageDiv.append("<div style='height:60px'>");
 		var hFlex = $("<div class='flex_horizontal'>").appendTo(pageDiv);
-		hFlex.append("<img width=200px src='img/key.png'>");
+		hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
 		var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
 		vFlex.append("<div class='home_label'>Trusted cryptography</div>");
 		vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your wallet keys.</div>");
