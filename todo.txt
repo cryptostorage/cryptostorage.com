@@ -11,7 +11,6 @@ link to view original imported pieces in either decrypted or encrypted which ope
 form loading screen while dependencies loading
 export loading screen while dependencies loading
 white x's on notice bars
-one of each a little smaller?
 decryption white progress bar with blue progress, black text
 question marks: not shown, use circle with slash restricted
 notices on form and import, homepage if error

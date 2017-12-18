@@ -457,7 +457,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .form_link {
-	font-size: 20px;
+	font-size: 18px;
 	color: blue;
 	font-weight: lighter;
 }
