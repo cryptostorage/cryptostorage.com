@@ -1,5 +1,4 @@
 TODO
-homepage design and content
 export page piece selection disabled while loading
 cannot copy "not shown" exports
 confirmation should trigger on close export regardless if saved
@@ -23,9 +22,10 @@ don't render key pair until done
 warnings link to downloads
 deprioritize dash and zcash
 bitpay donation address
-seo
-faq
 transition all css flex to common flex classes
+seo
+faq content
+homepage content
 
 designer:
 should home images fade or reflect?
