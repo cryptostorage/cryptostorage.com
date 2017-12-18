@@ -1,5 +1,7 @@
 TODO
+open source browser warning not showing
 export page while in progress - header controls disabled
+cannot copy "not shown" exports
 seo
 faq
 homepage
@@ -13,15 +15,27 @@ don't render key pair until done
 
 designer:
 homepage: tbd, fill icons with white, multiple locks, too big on small screens?
+	logo 215px, slider font-size 50px, slider font-weight: 600
+	header links font size 16px
 import keys success - inline or success page? dual tabs if import is inline
+	view imported pieces and view encrypted pieces opens in new tab
+	decrypted keys show inline
+	include link to view original imported pieces in either decrypted or encrypted
 dependency management
 	generate new keys button shows loading page (?) until all currency dependencies loaded
 	warning bar saying dependencies are loading, then when done tell them they should disconnect to the internet
 	what if clicked from homepage
-warning sign badge with warning count in upper right blue bar
+	form is loading screen until all dependencies loaded, then show warnings, recommend disconnecting
+	if accessed from homepage, loading screen in new tab, then warnings, and can regenerate
+warning sign badge with warning count in upper right blue bar - see drawing of new improved warning bar
 design opinions: notices, regenerate, form links, decryption progress, ommitted question mark
+	white x's on notice bars
+	maybe refresh option on regenerate button
+	one of each a little smaller?
+	decryption white progress bar with blue progress, black text
+	question marks: not shown, use circle with slash restricted
 regenerate confirmation
-notices on which pages
+notices on which pages - form and probably recover, not homepage
 warn if private key not included in print - alert when print clicked without show private keys?
 tip address
 code review
