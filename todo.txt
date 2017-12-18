@@ -5,6 +5,7 @@ cannot copy "not shown" exports
 seo
 faq
 homepage
+deprioritize dash and zcash
 
 form info bubbles - see spec
 form error messages - see spec
@@ -16,11 +17,11 @@ don't render key pair until done
 designer:
 homepage: tbd, fill icons with white, multiple locks, too big on small screens?
 	logo 215px, slider font-size 50px, slider font-weight: 600
-	header links font size 16px
+	header links font size 16
 import keys success - inline or success page? dual tabs if import is inline
 	view imported pieces and view encrypted pieces opens in new tab
 	decrypted keys show inline
-	include link to view original imported pieces in either decrypted or encrypted
+	include link to view original imported pieces in either decrypted or encrypted	
 dependency management
 	generate new keys button shows loading page (?) until all currency dependencies loaded
 	warning bar saying dependencies are loading, then when done tell them they should disconnect to the internet
