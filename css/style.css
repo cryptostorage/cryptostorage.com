@@ -74,7 +74,7 @@ ol {
 }
 
 .app_header_logo_img {
-	width: 275px;
+	width: 215px;
 }
 
 .app_header_logo_img:hover {
@@ -96,6 +96,7 @@ ol {
 
 .link_div {
 	padding: 10px 10px 10px 10px;
+	font-size: 16px;
 }
 
 .link_div:hover {
@@ -143,7 +144,8 @@ ol {
 }
 
 .slide_label {
-	font-size: 38px;
+	font-size: 50px;
+	font-weight: 600;
 	line-height: 50px;
 	text-align: center;
 	color: white;

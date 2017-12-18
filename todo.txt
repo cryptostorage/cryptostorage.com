@@ -20,9 +20,6 @@ environment checks: recommend links to download
 don't render key pair until done
 
 designer:
-homepage: tbd, fill icons with white, multiple locks, too big on small screens?
-	logo 215px, slider font-size 50px, slider font-weight: 600
-	header links font size 16
 import keys success - inline or success page? dual tabs if import is inline
 	view imported pieces and view encrypted pieces opens in new tab
 	decrypted keys show inline
