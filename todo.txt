@@ -6,6 +6,7 @@ seo
 faq
 homepage
 deprioritize dash and zcash
+bitpay donation address
 
 form info bubbles - see spec
 form error messages - see spec
