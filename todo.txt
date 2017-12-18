@@ -5,6 +5,7 @@ cannot copy "not shown" exports
 export transactions which can be imported and sent making it fully functional cold storage web wallet
 regenerate confirmation should trigger on close
 confirmation should trigger on close export regardless if saved
+meeting times should be plus or minus 40% of time invested
 
 seo
 faq
