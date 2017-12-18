@@ -1,5 +1,4 @@
 TODO
-open source browser warning not showing
 export page while in progress - header controls disabled
 cannot copy "not shown" exports
 export transactions which can be imported and sent making it fully functional cold storage web wallet
