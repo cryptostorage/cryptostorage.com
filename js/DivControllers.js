@@ -2330,7 +2330,7 @@ function ExportController(div, window, config) {
 		}
 		
 		// notice div
-		var noticeDivContainer = $("<div class='notice_div_container'>").appendTo(div);
+		var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
 		var noticeDiv = $("<div>").appendTo(noticeDivContainer);
 		new NoticeController(noticeDiv).render();
 		
@@ -2594,21 +2594,21 @@ inheritsFrom(ExportController, DivController);
  * @param div is the div to render to
  * @param config is the configuration:
  * 	{
- * 		showOnPass: bool,
- * 		showOnFail: bool,
- * 		showOnWarn: bool,
+ * 		showOnPass: bool,	// show if everything passes
+ * 		showOnFail: bool,	// show if there are any failures
+ * 		showOnWarn: bool,	// show if there are any warnings
  * 	}
  */
 function NoticeController(div, config) {
 	DivController.call(this, div);
 	
-	var dismissed = {};
 	var lastChecks;
 	
 	this.render = function(onDone) {
 		
 		// div setup
-		div.addClass("notice_div");
+		div.addClass("notice_bar");
+		div.addClass("flex_horizontal");
 		
 		// merge configs
 		config = objectAssign({}, getDefaultConfig(), config);
@@ -2634,80 +2634,42 @@ function NoticeController(div, config) {
 		
 		// reset cache
 		lastChecks = info.checks;
-		dismissed[AppUtils.EnvironmentCode.IS_ONLINE] = undefined;
+		console.log(info.checks);
 		
-		// render each shown notice bar
+		// build notice
 		div.empty();
-		for (var i = 0; i < info.checks.length; i++) {
-			
-			// check if code and state are dismissed
-			if (dismissed[info.checks[i].code] === info.checks[i].state) continue;
-			
-			if (info.checks[i].state === "pass" && config.showOnPass ||
-					info.checks[i].state === "fail" && config.showOnFail ||
-					info.checks[i].state === "warn" && config.showOnWarn) {
-				renderNoticeBar($("<div>").appendTo(div), info.checks[i]);
+		renderLeft($("<div>").appendTo(div), info);
+		renderCenter($("<div>").appendTo(div), info);
+		renderRight($("<div>").appendTo(div), info);
+		
+		// render notice left
+		function renderLeft(div, info) {
+			div.addClass("notice_bar_left flex_horizontal flex_justify_start");
+			for (var i = 0; i < info.checks.length; i++) {
+				if (info.checks[i].state === "pass") continue;
+				renderCheck($("<div>").appendTo(div), info, info.checks[i]);
 			}
 		}
 		
-		// renders a single notice bar
-		function renderNoticeBar(noticeBar, check) {
-			noticeBar.addClass("notice_bar");
-			noticeBar.addClass(check.state === "pass" ? "notice_bar_pass" : check.state === "fail" ? "notice_bar_fail" : "notice_bar_warn");
-			noticeBar.append($("<div class='notice_bar_left'>"));
-			var noticeContent = $("<div class='notice_content'>").appendTo(noticeBar);
-			renderNoticeContent(noticeContent, info, check);
-			var dismissDiv = $("<div class='notice_bar_right'>").appendTo(noticeBar);
-			if (check.state === "fail") return;	// cannot dismiss errors
-			var dismiss = $("<div class='notice_bar_dismiss'>").appendTo(dismissDiv);
-			dismiss.append("Dismiss");
-			dismiss.click(function() {
-				dismissed[check.code] = check.state;
-				noticeBar.detach();
-			});
-			
-			function renderNoticeContent(noticeContent, info, check) {
-				var noticeIcon = check.state === "pass" ? $("<img src='img/checkmark_small.png'>") : $("<img src='img/warning.png'>");
-				noticeIcon.addClass("notice_icon");
-				noticeContent.append(noticeIcon);
-				
-				// interpret environment code and state
-				switch (check.code) {
-				case AppUtils.EnvironmentCode.BROWSER_SUPPORTED:
-					if (check.state === "fail") noticeContent.append("Browser is not supported (" + info.browser.name + " " + info.browser.version + ")");
-					break;
-				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
-					if (check.state === "fail") noticeContent.append("Unexpected runtime error: " + info.runtimeError);
-					break;
-				case AppUtils.EnvironmentCode.IS_ONLINE:
-					if (check.state === "pass") noticeContent.append("No internet connection");
-					else noticeContent.append("Internet connection is active");
-					break;
-				case AppUtils.EnvironmentCode.IS_LOCAL:
-					if (check.state === "pass") noticeContent.append("Application is running locally");
-					else {
-						noticeContent.append("Application is not running locally.  Download from&nbsp;");
-						noticeContent.append($("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>"));
-					}
-					break;
-				case AppUtils.EnvironmentCode.INTERNET_REQUIRED:
-					if (check.state === "fail") noticeContent.append("Internet is required because application is not running locally");
-					break;
-				case AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER:
-					if (check.state === "pass") noticeContent.append("Browser is open source (" + info.browser.name + ")");
-					else noticeContent.append("Browser is not open source (" + info.browser.name + ")");
-					break;
-				case AppUtils.EnvironmentCode.OPEN_SOURCE_OS:
-					if (check.state === "pass") noticeContent.append("Operating system is open source (" + info.os.name + ")");
-					else noticeContent.append("Operating system is not open source (" + info.os.name + ")");
-					break;
-				case AppUtils.EnvironmentCode.PRERELEASE:
-					if (check.state === "warn") noticeContent.append("Application is under development.  Not ready for use");
-					break;
-				default:
-					throw new Error("Unrecognized environment code: " + check.code);
-				}
+		// render notice center
+		function renderCenter(div, info) {
+			div.addClass("notice_bar_center flex_horizontal");
+			div.html("Center");
+		}
+		
+		// render notice right
+		function renderRight(div, info) {
+			div.addClass("notice_bar_right flex_horizontal flex_justify_end");
+			for (var i = 0; i < info.checks.length; i++) {
+				if (info.checks[i].state !== "pass") continue;
+				renderCheck($("<div>").appendTo(div), info, info.checks[i]);
 			}
+		}
+		
+		// render a single check
+		function renderCheck(div, info, check) {
+			div.addClass("flex_horizontal");
+			div.append($("<img class='notice_icon' src='img/computer.png'>"));
 		}
 	}
 }
