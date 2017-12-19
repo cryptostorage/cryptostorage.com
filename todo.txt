@@ -14,7 +14,6 @@ question marks: not shown, use circle with slash restricted
 notices on form and import, homepage if error
 warn if private key not included in print
 refresh image on regenerate button
-don't render key pair until done
 warnings link to downloads
 deprioritize dash and zcash
 bitpay donation address
