@@ -1559,7 +1559,7 @@ input[type='checkbox'][disabled] +label {
 	.export_header {
 		display: none;
 	}
-	.notice_div_container {
+	.notice_container {
 		display: none;
 	}
 	.export_pieces_div, .export_pieces_div * {
