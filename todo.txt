@@ -1,15 +1,15 @@
 TODO
 new notice bar
+import decrypted keys renders inline
+link to view original imported pieces in either decrypted or encrypted which opens in new tab
+
 export page piece selection disabled while loading
 form info bubbles - see spec
 form error messages - see spec
 copy to clipboard confirmation - tooltip Copied!
 file import loading - see spec, only show if minimum file size
-import decrypted keys renders inline
-link to view original imported pieces in either decrypted or encrypted which opens in new tab
 form loading screen while dependencies loading
 export loading screen while dependencies loading
-white x's on notice bars
 question marks: not shown, use circle with slash restricted
 notices on form and import, homepage if error
 warn if private key not included in print
