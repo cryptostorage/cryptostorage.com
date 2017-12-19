@@ -100,8 +100,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			}
 			
 			// collect functions to render key pair
-			var keyDiv = $("<div class='key_div'>").appendTo(pageDiv);
-			if (i % config.pairsPerPage === 0) keyDiv.css("border-top", "2px solid green");
+			var placeholderDiv = $("<div class='key_div'>").appendTo(pageDiv);
 			var plugin = AppUtils.getCryptoPlugin(piece.keys[i].ticker);
 			var title = "#" + (i + 1);
 			var leftLabel = "\u25C4 Public Address";
@@ -112,11 +111,13 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			var logoLabel = plugin.getName();
 			var rightLabel = "Private Key" + (piece.pieceNum ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
 			var rightValue = config.showPrivate ? piece.keys[i].wif : null;
-			funcs.push(renderKeyPairFunc(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config));
-			function renderKeyPairFunc(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config) {
+			funcs.push(renderKeyPairFunc(placeholderDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config));
+			
+			function renderKeyPairFunc(placeholderDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config) {
 				return function(onDone) {
 					if (isCancelled) return;
-					renderKeyPair(keyDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config, function() {
+					renderKeyPair(null, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config, function(keyDiv) {
+						placeholderDiv.replaceWith(keyDiv);
 						onKeyPairDone();
 						onDone();
 					});
@@ -156,6 +157,10 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		 */
 		function renderKeyPair(div, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config, onDone) {
 			if (isCancelled) return;
+			
+			// div setup
+			if (!div) div = $("<div>");
+			div.addClass("key_div");
 			
 			// left qr code
 			var keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
@@ -232,11 +237,11 @@ function PieceRenderer(pieces, pieceDivs, config) {
 						if (isCancelled) return;
 						img.attr("class", "key_div_qr");
 						keyDivRight.append(img);
-						onDone();
+						onDone(div);
 					});
 				} else {
 					keyDivRight.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>"));
-					onDone();
+					onDone(div);
 				}
 			}
 			
