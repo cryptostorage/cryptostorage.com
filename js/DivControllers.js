@@ -2668,8 +2668,13 @@ function NoticeController(div, config) {
 		
 		// render a single check
 		function renderCheck(div, info, check) {
-			div.addClass("flex_horizontal");
-			div.append($("<img class='notice_icon' src='img/computer.png'>"));
+			div.addClass("flex_vertical");
+			div.append(getIcon(check));			
+			
+			// gets the check icon TODO
+			function getIcon(check) {
+				return $("<img class='notice_icon' src='img/computer.png'>");
+			}
 		}
 	}
 }
