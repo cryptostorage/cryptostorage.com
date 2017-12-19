@@ -2647,14 +2647,14 @@ function NoticeController(div, config) {
 			div.addClass("notice_bar_left flex_horizontal flex_justify_start");
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state === "pass") continue;
-				renderCheck($("<div>").appendTo(div), info, info.checks[i]);
+				renderCheckIcon($("<div>").appendTo(div), info, info.checks[i]);
 			}
 		}
 		
 		// render notice center
 		function renderCenter(div, info) {
 			div.addClass("notice_bar_center flex_horizontal");
-			div.html("Center");
+			renderCheckDescription($("<div>").appendTo(div), info, getFirstNonPassCheck(info));
 		}
 		
 		// render notice right
@@ -2662,18 +2662,73 @@ function NoticeController(div, config) {
 			div.addClass("notice_bar_right flex_horizontal flex_justify_end");
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state !== "pass") continue;
-				renderCheck($("<div>").appendTo(div), info, info.checks[i]);
+				renderCheckIcon($("<div>").appendTo(div), info, info.checks[i]);
 			}
 		}
 		
-		// render a single check
-		function renderCheck(div, info, check) {
+		// gets the first non-pass check
+		function getFirstNonPassCheck(info) {
+			for (var i = 0; i < info.checks.length; i++) {
+				if (info.checks[i].state !== "pass") return info.checks[i];
+			}
+			return null;
+		}
+		
+		// render single check icon
+		function renderCheckIcon(div, info, check) {
 			div.addClass("flex_vertical");
 			div.append(getIcon(check));			
 			
 			// gets the check icon TODO
 			function getIcon(check) {
 				return $("<img class='notice_icon' src='img/computer.png'>");
+			}
+		}
+		
+		// render single check description
+		function renderCheckDescription(div, info, check) {
+			
+			// all checks pass
+			if (!check) {
+				div.append("All checks pass");
+				return;
+			}
+			
+			// interpret environment code and state
+			switch (check.code) {
+				case AppUtils.EnvironmentCode.BROWSER_SUPPORTED:
+					if (check.state === "fail") div.append("Browser is not supported (" + info.browser.name + " " + info.browser.version + ")");
+					break;
+				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
+					if (check.state === "fail") div.append("Unexpected runtime error: " + info.runtimeError);
+					break;
+				case AppUtils.EnvironmentCode.IS_ONLINE:
+					if (check.state === "pass") div.append("No internet connection");
+					else div.append("Internet connection is active");
+					break;
+				case AppUtils.EnvironmentCode.IS_LOCAL:
+					if (check.state === "pass") div.append("Application is running locally");
+					else {
+						div.append("Application is not running locally.  Download from&nbsp;");
+						div.append($("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>"));
+					}
+					break;
+				case AppUtils.EnvironmentCode.INTERNET_REQUIRED:
+					if (check.state === "fail") div.append("Internet is required because application is not running locally");
+					break;
+				case AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER:
+					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
+					else div.append("Browser is not open source (" + info.browser.name + ")");
+					break;
+				case AppUtils.EnvironmentCode.OPEN_SOURCE_OS:
+					if (check.state === "pass") div.append("Operating system is open source (" + info.os.name + ")");
+					else div.append("Operating system is not open source (" + info.os.name + ")");
+					break;
+				case AppUtils.EnvironmentCode.PRERELEASE:
+					if (check.state === "warn") div.append("Application is under development.  Not ready for use");
+					break;
+				default:
+					throw new Error("Unrecognized environment code: " + check.code);
 			}
 		}
 	}
