@@ -1323,15 +1323,15 @@ var AppUtils = {
 			}
 		}
 		
+		// check if local
+		if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
+		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
+		
 		// check if online only if no "internet required" error
 		if (isInitialized(info.isOnline) && !internetRequiredError) {
 			if (!info.isOnline) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_ONLINE});
 			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_ONLINE});
 		}
-		
-		// check if local
-		if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
-		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
 		
 		// check open source browser
 		if (info.browser.isSupported) {
