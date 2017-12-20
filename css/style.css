@@ -245,9 +245,11 @@ ol {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	text-decoration: none;
 }
 
 .light_green_btn:hover {
+	cursor: pointer;
 	background-color: rgb(60, 240, 60);
 }
 
@@ -260,11 +262,8 @@ ol {
 }
 
 .btn_import:hover {
-	text-decoration: underline;
-}
-
-.btn:hover {
 	cursor: pointer;
+	text-decoration: underline;
 }
 
 .app_content {

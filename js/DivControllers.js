@@ -301,12 +301,12 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			var ctaDiv = $("<div class='cta_div'>").appendTo(div);
 			
 			// button to generate keys
-			var btnGenerate = $("<div class='btn light_green_btn'>").appendTo(ctaDiv);
+			var btnGenerate = $("<div class='light_green_btn'>").appendTo(ctaDiv);
 			btnGenerate.append("Generate New Keys");
 			btnGenerate.click(function() { onSelectGenerate(); });
 			
 			// button to import keys
-			var btnImport = $("<div class='btn btn_import'>").appendTo(ctaDiv);
+			var btnImport = $("<div class='btn_import'>").appendTo(ctaDiv);
 			btnImport.append("or Import Existing Keys");
 			
 			// disable import keys if failed environment check
@@ -398,11 +398,8 @@ function HomeController(div) {
 		pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
 		pageDiv.append($("<img width=500px src='img/license.png'>"));
 		pageDiv.append("<div style='height: 20px;'>");
-		var downloadBtn = $("<div class='light_green_btn'>").appendTo(pageDiv);
+		var downloadBtn = $("<a class='light_green_btn' href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>").appendTo(pageDiv);
 		downloadBtn.append("Download Now (zip)");
-		downloadBtn.click(function() {
-			console.log("Download zip button clicked");	// TODO
-		});
 		
 		// track environment failure to disable clicking currency
 		var environmentFailure = false;
