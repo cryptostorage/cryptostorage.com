@@ -2631,7 +2631,6 @@ function NoticeController(div, config) {
 		
 		// reset cache
 		lastChecks = info.checks;
-		console.log(info.checks);
 		
 		// build notice
 		div.empty();
@@ -2681,23 +2680,18 @@ function NoticeController(div, config) {
 				
 				// interpret environment code and state
 				switch (check.code) {
-					case AppUtils.EnvironmentCode.BROWSER_SUPPORTED:	// TODO: combine with browser check {code, state, reason?)
-						return getBrowserIcon(info);
-						break;
 					case AppUtils.EnvironmentCode.RUNTIME_ERROR:
 						break;
-					case AppUtils.EnvironmentCode.IS_ONLINE:
+					case AppUtils.EnvironmentCode.INTERNET:
 						return $("<img class='notice_icon' src='img/internet.png'>");
 						break;
 					case AppUtils.EnvironmentCode.IS_LOCAL:
 						return $("<img class='notice_icon' src='img/download.png'>");
 						break;
-					case AppUtils.EnvironmentCode.INTERNET_REQUIRED:
-						break;
-					case AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER:
+					case AppUtils.EnvironmentCode.BROWSER:
 						return $("<img class='notice_icon' src='img/browser.png'>");
 						break;
-					case AppUtils.EnvironmentCode.OPEN_SOURCE_OS:
+					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
 						return $("<img class='notice_icon' src='img/computer.png'>");
 						break;
 					case AppUtils.EnvironmentCode.PRERELEASE:
@@ -2719,15 +2713,17 @@ function NoticeController(div, config) {
 			
 			// interpret environment code and state
 			switch (check.code) {
-				case AppUtils.EnvironmentCode.BROWSER_SUPPORTED:
+				case AppUtils.EnvironmentCode.BROWSER:
 					if (check.state === "fail") div.append("Browser is not supported (" + info.browser.name + " " + info.browser.version + ")");
+					if (check.state === "warn") div.append("Browser is not open source (" + info.browser.name + ")");
+					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
 					break;
 				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
 					if (check.state === "fail") div.append("Unexpected runtime error: " + info.runtimeError);
 					break;
-				case AppUtils.EnvironmentCode.IS_ONLINE:
+				case AppUtils.EnvironmentCode.INTERNET:
 					if (check.state === "pass") div.append("No internet connection");
-					else div.append("Internet connection is active");
+					if (check.state === "warn") div.append("Internet connection is active");
 					break;
 				case AppUtils.EnvironmentCode.IS_LOCAL:
 					if (check.state === "pass") div.append("Application is running locally");
@@ -2737,14 +2733,7 @@ function NoticeController(div, config) {
 						content.append($("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>."));
 					}
 					break;
-				case AppUtils.EnvironmentCode.INTERNET_REQUIRED:
-					if (check.state === "fail") div.append("Internet is required because application is not running locally");
-					break;
-				case AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER:
-					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
-					else div.append("Browser is not open source (" + info.browser.name + ")");
-					break;
-				case AppUtils.EnvironmentCode.OPEN_SOURCE_OS:
+				case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
 					if (check.state === "pass") div.append("Operating system is open source (" + info.os.name + ")");
 					else div.append("Operating system is not open source (" + info.os.name + ")");
 					break;

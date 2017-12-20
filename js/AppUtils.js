@@ -16,7 +16,6 @@ var AppUtils = {
 	ENVIRONMENT_REFRESH_RATE: 3000,	// environment refresh rate in milliseconds
 	ONLINE_DETECTION_TIMEOUT: 3000,	// timeout to detect if online
 	RUNTIME_ERRROR: null,						// unexpected application runtime error
-	NO_INTERNET_CAN_BE_ERROR: true,	// lack of internet can be critical error if running remotely
 	SLIDER_RATE: 4000,							// rate of slider transitions
 	
 	//classify operating systems and browsers as open or closed source
@@ -1289,13 +1288,12 @@ var AppUtils = {
 	 * Enumerates environment check codes.
 	 */
 	EnvironmentCode: {
-		BROWSER_SUPPORTED: "BROWSER_SUPPORTED",
-		RUNTIME_ERROR: "RUNTIME_ERROR",
-		IS_ONLINE: "IS_ONLINE",
+		BROWSER: "BROWSER",
+		OPERATING_SYSTEM: "OPERATING_SYSTEM",
+		INTERNET: "INTERNET",
 		IS_LOCAL: "IS_LOCAL",
-		INTERNET_REQUIRED: "INTERNET_REQUIRED",
-		OPEN_SOURCE_BROWSER: "OPEN_SOURCE_BROWSER",
-		OPEN_SOURCE_OS: "OPEN_SOURCE_OS",
+		RUNTIME_ERROR: "RUNTIME_ERROR",
+		OPEN_SOURCE: "OPEN_SOURCE",
 		PRERELEASE: "PRERELEASE"
 	},
 	
@@ -1303,45 +1301,36 @@ var AppUtils = {
 	 * Interprets the given environment info and returns pass/fail/warn checks.
 	 * 
 	 * @param info is output from getEnvironmentInfo()
-	 * @returns [{state: "pass|fail|warn", message: "..."}, ...]
+	 * @returns [{state: "pass|fail|warn", code: "..."}, ...]
 	 */
 	getEnvironmentChecks: function(info) {
 		var checks = [];
 		
 		// check if browser supported
-		if (!info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER_SUPPORTED});
+		if (!info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER});
 		
 		// check if runtime error
 		if (info.runtimeError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.RUNTIME_ERROR});
-		
-		// check if remote and not online
-		var internetRequiredError = false;
-		if (isInitialized(info.isOnline)) {
-			if (!info.isLocal && !info.isOnline && AppUtils.NO_INTERNET_CAN_BE_ERROR) {
-				internetRequiredError = true;
-				checks.push({state: "fail", code: AppUtils.EnvironmentCode.INTERNET_REQUIRED});
-			}
-		}
 		
 		// check if local
 		if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
 		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
 		
-		// check if online only if no "internet required" error
-		if (isInitialized(info.isOnline) && !internetRequiredError) {
-			if (!info.isOnline) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_ONLINE});
-			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_ONLINE});
+		// check if online
+		if (isInitialized(info.isOnline)) {
+			if (!info.isOnline) checks.push({state: "pass", code: AppUtils.EnvironmentCode.INTERNET});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.INTERNET});
 		}
 		
 		// check open source browser
 		if (info.browser.isSupported) {
-			if (info.browser.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER});
-			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER});
+			if (info.browser.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.BROWSER});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.BROWSER});
 		}
 		
 		// check open source os
-		if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPEN_SOURCE_OS});
-		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPEN_SOURCE_OS});
+		if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
+		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
 		
 		// pre-release warning
 		checks.push({state: "warn", code: AppUtils.EnvironmentCode.PRERELEASE});

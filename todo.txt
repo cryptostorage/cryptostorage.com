@@ -2,6 +2,7 @@ TODO
 new notice bar
 import decrypted keys renders inline
 link to view original imported pieces in either decrypted or encrypted which opens in new tab
+dependency loading and failure
 
 export page piece selection disabled while loading
 form info bubbles - see spec
