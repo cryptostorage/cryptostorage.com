@@ -343,7 +343,15 @@ function HomeController(div) {
 		var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
 		
 		// supported currencies
-		pageDiv.append("<div class='home_label'>Supports these cryptocurrencies</div>");
+		var temp = $("<div class='home_label'>Supports these cryptocurrencies</div>");
+		var temp2 = $("<div class='home_label'><a href='www.google.com'>Supports these cryptocurrencies</a></div>");
+		pageDiv.append(temp);
+		LOADER.load(["lib/popper.js", "lib/tooltip.js"], function() {
+			console.log("creating");
+			var tooltip = new Tooltip(temp, {html: true, title: temp2.get(0), arrow: {enabled: true}});
+			tooltip.show();
+		});
+		
 		var plugins = AppUtils.getCryptoPlugins();
 		pageDiv.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 		var moreDiv = null;
