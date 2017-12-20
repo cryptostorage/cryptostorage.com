@@ -2698,7 +2698,7 @@ function NoticeController(div, config) {
 					case AppUtils.EnvironmentCode.INTERNET_REQUIRED:
 						break;
 					case AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER:
-						return getBrowserIcon(info);
+						return $("<img class='notice_icon' src='img/browser.png'>");
 						break;
 					case AppUtils.EnvironmentCode.OPEN_SOURCE_OS:
 						return $("<img class='notice_icon' src='img/computer.png'>");
@@ -2707,11 +2707,6 @@ function NoticeController(div, config) {
 						break;
 					default:
 						throw new Error("Unrecognized environment code: " + check.code);
-				}
-				
-				// TODO: browser icons
-				function getBrowserIcon(info) {
-					return $("<img class='notice_icon' src='img/browser.png'>");
 				}
 			}
 		}
