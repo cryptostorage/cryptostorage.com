@@ -2732,8 +2732,9 @@ function NoticeController(div, config) {
 				case AppUtils.EnvironmentCode.IS_LOCAL:
 					if (check.state === "pass") div.append("Application is running locally");
 					else {
-						div.append("Application is not running locally.  Download from&nbsp;");
-						div.append($("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>"));
+						var content = $("<div>").appendTo(div);
+						content.append("Application is not running locally.  Download from&nbsp;");
+						content.append($("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>."));
 					}
 					break;
 				case AppUtils.EnvironmentCode.INTERNET_REQUIRED:
