@@ -344,12 +344,15 @@ function HomeController(div) {
 		
 		// supported currencies
 		var temp = $("<div class='home_label'>Supports these cryptocurrencies</div>");
-		var temp2 = $("<div class='home_label'><a href='www.google.com'>Supports these cryptocurrencies</a></div>");
+		var temp2 = $("<div'>Yeah ... <a href='https://www.google.com'>Supports these cryptocurrencies</a></div>");
 		pageDiv.append(temp);
-		LOADER.load(["lib/popper.js", "lib/tooltip.js"], function() {
+		LOADER.load(["lib/popper.js", "lib/tippy.all.js"], function() {
 			console.log("creating");
-			var tooltip = new Tooltip(temp, {html: true, title: temp2.get(0), arrow: {enabled: true}});
-			tooltip.show();
+			tippy(temp.get(0), {
+				arrow: true,
+				html: temp2.get(0),
+				interactive: true
+			});
 		});
 		
 		var plugins = AppUtils.getCryptoPlugins();
