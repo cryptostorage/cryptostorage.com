@@ -1339,15 +1339,16 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Determines if the given environment info has a failure.
+	 * Determines if the given environment info has the given state.
 	 * 
-	 * @param info is environment info which may indicate a failure
-	 * @returns true if the environment has a failure, false otherwise
+	 * @param info is environment info with state
+	 * @param state is the state to check the environment info for
+	 * @returns true if the environment info has the given state, false otherwise
 	 */
-	hasEnvironmentFailure: function(info) {
+	hasEnvironmentState: function(info, state) {
 		assertInitialized(info);
 		for (var i = 0; i < info.checks.length; i++) {
-			if (info.checks[i].state === "fail") return true;
+			if (info.checks[i].state === state) return true;
 		}
 		return false;
 	},

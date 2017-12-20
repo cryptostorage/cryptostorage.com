@@ -312,7 +312,7 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			// disable import keys if failed environment check
 			AppUtils.addEnvironmentListener(function(info) {
 				btnImport.unbind("click");
-				if (!AppUtils.hasEnvironmentFailure(info)) btnImport.click(function() { onSelectImport(); });
+				if (!AppUtils.hasEnvironmentState(info, "fail")) btnImport.click(function() { onSelectImport(); });
 			});
 			
 			if (onDone) onDone(div);
@@ -337,7 +337,7 @@ function HomeController(div) {
 		
 		// notice div
 		var noticeDiv = $("<div>").appendTo(div);
-		new NoticeController(noticeDiv, {showOnWarn: false, showOnPass: false}).render();
+		new NoticeController(noticeDiv, {showOnFail: true, showOnWarn: false, showOnPass: false}).render();
 		
 		// home content
 		var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
@@ -404,7 +404,7 @@ function HomeController(div) {
 		// track environment failure to disable clicking currency
 		var environmentFailure = false;
 		AppUtils.addEnvironmentListener(function(info) {
-			environmentFailure = AppUtils.hasEnvironmentFailure(info);
+			environmentFailure = AppUtils.hasEnvironmentState(info, "fail");
 		});
 		
 		function onCurrencyClicked(plugin) {
@@ -814,7 +814,7 @@ function FormController(div) {
 		
 		// disable generate button if environment failure
 		AppUtils.addEnvironmentListener(function(info) {
-			formErrors.environment = AppUtils.hasEnvironmentFailure(AppUtils.getCachedEnvironmentInfo());
+			formErrors.environment = AppUtils.hasEnvironmentState(AppUtils.getCachedEnvironmentInfo(), "fail");
 			updateForm()
 		});
 		
@@ -2629,6 +2629,12 @@ function NoticeController(div, config) {
 		// check if info cached
 		if (lastChecks && objectsEqual(lastChecks, info.checks)) return;
 		
+		// show or hide notice bar depending on config
+		if (AppUtils.hasEnvironmentState(info, "fail")) { config.showOnFail ? div.show() : div.hide(); }
+		else if (AppUtils.hasEnvironmentState(info, "warn")) { config.showOnWarn ? div.show() : div.hide(); }
+		else if (config.showOnPass) div.show();
+		else div.hide();
+		
 		// reset cache
 		lastChecks = info.checks;
 		
@@ -2695,6 +2701,7 @@ function NoticeController(div, config) {
 						return $("<img class='notice_icon' src='img/computer.png'>");
 						break;
 					case AppUtils.EnvironmentCode.PRERELEASE:
+						return $("<img class='notice_icon' src='img/construction.png'>");
 						break;
 					default:
 						throw new Error("Unrecognized environment code: " + check.code);
