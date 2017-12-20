@@ -2647,7 +2647,7 @@ function NoticeController(div, config) {
 			div.addClass("notice_bar_left flex_horizontal flex_justify_start");
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state === "pass") continue;
-				renderCheckIcon($("<div>").appendTo(div), info, info.checks[i]);
+				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
 			}
 		}
 		
@@ -2662,7 +2662,7 @@ function NoticeController(div, config) {
 			div.addClass("notice_bar_right flex_horizontal flex_justify_end");
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state !== "pass") continue;
-				renderCheckIcon($("<div>").appendTo(div), info, info.checks[i]);
+				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
 			}
 		}
 		
@@ -2675,13 +2675,44 @@ function NoticeController(div, config) {
 		}
 		
 		// render single check icon
-		function renderCheckIcon(div, info, check) {
-			div.addClass("flex_vertical");
-			div.append(getIcon(check));			
+		function renderNoticeIcon(div, info, check) {
+			div.addClass("flex_vertical notice_icon_div");
+			div.append(getIcon(check));
 			
 			// gets the check icon TODO
 			function getIcon(check) {
-				return $("<img class='notice_icon' src='img/computer.png'>");
+				
+				// interpret environment code and state
+				switch (check.code) {
+					case AppUtils.EnvironmentCode.BROWSER_SUPPORTED:	// TODO: combine with browser check {code, state, reason?)
+						return getBrowserIcon(info);
+						break;
+					case AppUtils.EnvironmentCode.RUNTIME_ERROR:
+						break;
+					case AppUtils.EnvironmentCode.IS_ONLINE:
+						return $("<img class='notice_icon' src='img/internet.png'>");
+						break;
+					case AppUtils.EnvironmentCode.IS_LOCAL:
+						return $("<img class='notice_icon' src='img/download.png'>");
+						break;
+					case AppUtils.EnvironmentCode.INTERNET_REQUIRED:
+						break;
+					case AppUtils.EnvironmentCode.OPEN_SOURCE_BROWSER:
+						return getBrowserIcon(info);
+						break;
+					case AppUtils.EnvironmentCode.OPEN_SOURCE_OS:
+						return $("<img class='notice_icon' src='img/computer.png'>");
+						break;
+					case AppUtils.EnvironmentCode.PRERELEASE:
+						break;
+					default:
+						throw new Error("Unrecognized environment code: " + check.code);
+				}
+				
+				// TODO: browser icons
+				function getBrowserIcon(info) {
+					return $("<img class='notice_icon' src='img/browser.png'>");
+				}
 			}
 		}
 		
