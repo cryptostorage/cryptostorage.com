@@ -1618,6 +1618,7 @@ input[type='checkbox'][disabled] +label {
 .notice_bar_center {
 	width: 100%;
 	text-align:center;
+	font-size: 24px;
 }
 
 .notice_bar_right {
@@ -1637,8 +1638,8 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_icon {
-	width: 30px;
-	height: 30px;
+	width: 35px;
+	height: 35px;
 }
 
 .copyable:hover {

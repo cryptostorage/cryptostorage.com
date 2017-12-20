@@ -2654,7 +2654,7 @@ function NoticeController(div, config) {
 		// render notice center
 		function renderCenter(div, info) {
 			div.addClass("notice_bar_center flex_horizontal");
-			renderCheckDescription($("<div>").appendTo(div), info, getFirstNonPassCheck(info));
+			renderCheckDescription(div, info, getFirstNonPassCheck(info));
 		}
 		
 		// render notice right
