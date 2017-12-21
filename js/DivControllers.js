@@ -2730,8 +2730,8 @@ function NoticeController(div, config) {
 			
 			function getStateIcon(state) {
 				if (state === "pass") return $("<img class='notice_state_icon' src='img/circle_checkmark.png'>");
-				if (state === "fail") return $("<img class='notice_state_icon' src='img/circle_x.png'>");
-				if (state === "warn") return $("<img class='notice_state_icon' src='img/circle_exclamation.png'>");
+				if (state === "fail") return $("<img class='notice_state_icon' src='img/circle_exclamation.png'>");
+				if (state === "warn") return $("<img class='notice_state_icon' src='img/circle_x.png'>");
 				throw new Error("Unrecognized state: " + state);
 			}
 		}
