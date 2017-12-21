@@ -343,18 +343,7 @@ function HomeController(div) {
 		var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
 		
 		// supported currencies
-		var temp = $("<div class='home_label'>Supports these cryptocurrencies</div>");
-		var temp2 = $("<div'>Yeah ... <a href='https://www.google.com'>Supports these cryptocurrencies</a></div>");
-		pageDiv.append(temp);
-		LOADER.load(["lib/popper.js", "lib/tippy.all.js"], function() {
-			console.log("creating");
-			tippy(temp.get(0), {
-				arrow: true,
-				html: temp2.get(0),
-				interactive: true
-			});
-		});
-		
+		pageDiv.append($("<div class='home_label'>Supports these cryptocurrencies</div>"));
 		var plugins = AppUtils.getCryptoPlugins();
 		pageDiv.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 		var moreDiv = null;
@@ -2691,6 +2680,17 @@ function NoticeController(div, config) {
 		function renderNoticeIcon(div, info, check) {
 			div.addClass("flex_vertical notice_icon_div");
 			div.append(getIcon(check));
+			var description = $("<div>");
+			renderCheckDescription(description, info, check);
+			LOADER.load(["lib/popper.js", "lib/tippy.all.js"], function() {
+				console.log("creating");
+				tippy(div.get(0), {
+					arrow: true,
+					html: description.get(0),
+					interactive: true,
+					placement: 'bottom'
+				});
+			});
 			
 			// gets the check icon TODO
 			function getIcon(check) {
