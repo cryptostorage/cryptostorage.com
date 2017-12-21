@@ -38,9 +38,9 @@ $(document).ready(function() {
 	// pre-load images
 	var imgDiv = $("<div>").appendTo($("body"));
 	imgDiv.hide();
-	preloadImage("img/xmark_small.png");
-	preloadImage("img/warning_orange.png");
-	preloadImage("img/checkmark_small.png");
+	preloadImage("img/circle_x.png");
+	preloadImage("img/circle_exclamation.png");
+	preloadImage("img/circle_checkmark.png");
 	preloadImage("img/trash.png");
 	function preloadImage(src) {
 		var img = new Image();
