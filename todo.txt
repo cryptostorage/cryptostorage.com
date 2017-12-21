@@ -9,7 +9,6 @@ link to view original imported pieces in either decrypted or encrypted which ope
 export page piece selection disabled while loading
 form info bubbles - see spec
 form error messages - see spec
-copy to clipboard confirmation - tooltip Copied!
 file import loading - see spec, only show if minimum file size
 form loading screen while dependencies loading
 export loading screen while dependencies loading
