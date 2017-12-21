@@ -48,7 +48,6 @@ var UiUtils = {
 		// export tab dependencies
 		var dependencies = [
 			"lib/jquery-3.2.1.js",
-			"lib/jquery-ui.js",
 			"lib/loadjs.js",
 			"lib/async.js",
 			"lib/setImmediate.js",

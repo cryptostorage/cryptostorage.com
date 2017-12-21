@@ -84,6 +84,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		// setup pages and collect functions to render keys
 		var pageDiv;
 		var funcs = [];
+		var temp;
 		for (var i = 0; i < piece.keys.length; i++) {
 			
 			// render new page
@@ -149,7 +150,29 @@ function PieceRenderer(pieces, pieceDivs, config) {
 				}
 			});
 			
-			onDone(null, pieceDiv);
+			// copied tooltip
+			LOADER.load(["lib/popper.js", "lib/tippy.all.js"], function() {
+				pieceDiv.find(".copyable").each(function(i, copyable) {
+					var placement = $(this).hasClass("key_div_left_value") ? "top" : "bottom";
+					tippy(copyable, {
+						arrow : true,
+						html : $("<div>Copied!</div>").get(0),
+						interactive : true,
+						placement : placement,
+						theme : 'translucent',
+						trigger : "click",
+						distance : 20,
+						onShow : function() {
+							setTimeout(function() {
+								copyable._tippy.hide();
+							}, 1500)
+						}
+					});
+				});
+				
+				// done
+				onDone(null, pieceDiv);
+			});
 		});
 		
 		/**
