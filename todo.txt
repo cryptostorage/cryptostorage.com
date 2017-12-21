@@ -1,4 +1,5 @@
 TODO
+notice right not taking up space if no icons
 notice tooltips can stay persisted
 import decrypted keys renders inline
 link to view original imported pieces in either decrypted or encrypted which opens in new tab
