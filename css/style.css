@@ -1590,9 +1590,20 @@ input[type='checkbox'][disabled] +label {
 
 .notice_bar {
 	width: 100%;
-	background-color: rgb(235, 92, 29);
 	padding: 10px 20px 10px 20px;
 	color: white;
+}
+
+.notice_warn {
+	background-color: rgb(235, 92, 29);
+}
+
+.notice_fail {
+	background-color: red;
+}
+
+.notice_pass {
+	background-color: rgb(55, 218, 44);
 }
 
 .notice_bar_left {

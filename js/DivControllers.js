@@ -1243,12 +1243,14 @@ function ImportController(div) {
 		// div setup
 		div.empty();
 		div.attr("class", "content_div");
+		
+		// notice div
+		var noticeDiv = $("<div>").appendTo(div);
+		new NoticeController(noticeDiv).render();
+		
+		// set up page div
 		var pageDiv = $("<div class='page_div import_page'>").appendTo(div);
-		
-		// filler to push import div down
 		$("<div class='import_filler'>").appendTo(pageDiv);
-		
-		// all import content including tabs
 		var importDiv = $("<div class='import_div'>").appendTo(pageDiv);
 		
 		// render import file and text divs
@@ -2620,7 +2622,7 @@ function NoticeController(div, config) {
 		return {
 			showOnFail: true,
 			showOnWarn: true,
-			showOnPass: false
+			showOnPass: true
 		};
 	}
 	
@@ -2630,9 +2632,9 @@ function NoticeController(div, config) {
 		if (lastChecks && objectsEqual(lastChecks, info.checks)) return;
 		
 		// show or hide notice bar depending on config
-		if (AppUtils.hasEnvironmentState(info, "fail")) { config.showOnFail ? div.show() : div.hide(); }
-		else if (AppUtils.hasEnvironmentState(info, "warn")) { config.showOnWarn ? div.show() : div.hide(); }
-		else if (config.showOnPass) div.show();
+		if (AppUtils.hasEnvironmentState(info, "fail")) { div.addClass("notice_fail"); config.showOnFail ? div.show() : div.hide(); }
+		else if (AppUtils.hasEnvironmentState(info, "warn")) { div.addClass("notice_warn"); config.showOnWarn ? div.show() : div.hide(); }
+		else if (config.showOnPass) { div.addClass("notice_pass"); div.show(); }
 		else div.hide();
 		
 		// reset cache
