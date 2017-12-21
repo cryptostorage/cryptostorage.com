@@ -161,7 +161,8 @@ function PieceRenderer(pieces, pieceDivs, config) {
 						placement : placement,
 						theme : 'translucent',
 						trigger : "click",
-						distance : 20,
+						distance : 10,
+						arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
 						onShow : function() {
 							setTimeout(function() {
 								copyable._tippy.hide();

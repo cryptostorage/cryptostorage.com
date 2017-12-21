@@ -501,7 +501,7 @@ function DonateController(div, appController) {
 		var pageDiv = $("<div class='page_div'>").appendTo(div);
 		
 		// load qr code dependency
-		LOADER.load(["lib/qrcode.js", "lib/async.js", "lib/clipboard.js"], function() {
+		LOADER.load(["lib/qrcode.js", "lib/async.js", "lib/clipboard.js", "lib/popper.js", "lib/tippy.all.js"], function() {
 			
 			// build donate section
 			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
@@ -550,6 +550,25 @@ function DonateController(div, appController) {
 						text: function(trigger) {
 							return $(trigger).html();
 						}
+					});
+					
+					// copied tooltips
+					div.find(".copyable").each(function(i, copyable) {
+						tippy(copyable, {
+							arrow : true,
+							html : $("<div>Copied!</div>").get(0),
+							interactive : true,
+							placement : "top",
+							theme : 'translucent',
+							trigger : "click",
+							distance : 5,
+							arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+							onShow : function() {
+								setTimeout(function() {
+									copyable._tippy.hide();
+								}, 1500)
+							}
+						});
 					});
 					
 					if (onDone) onDone(div);
