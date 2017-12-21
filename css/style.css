@@ -1604,6 +1604,10 @@ input[type='checkbox'][disabled] +label {
 	text-align:center;
 }
 
+.notice_bar_center a {
+	color: blue;
+}
+
 .notice_bar_center_major, notice_bar_center_major * {
 	font-size: 22px !important;
 	line-height: 25px;
@@ -1611,7 +1615,7 @@ input[type='checkbox'][disabled] +label {
 
 .notice_bar_center_minor, .notice_bar_center_minor * {
 	font-size: 18px !important;
-	line-height: 22px;
+	line-height: 25px;
 }
 
 .notice_bar_right {

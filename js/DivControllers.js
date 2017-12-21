@@ -2698,43 +2698,6 @@ function NoticeController(div, config) {
 				});
 			});
 			
-			// render single check description
-			function renderTooltip(div, info, check) {
-				
-				// interpret environment code and state
-				switch (check.code) {
-					case AppUtils.EnvironmentCode.BROWSER:
-						if (check.state === "fail") div.append("Browser is not supported (" + info.browser.name + " " + info.browser.version + ")");
-						if (check.state === "warn") div.append("Browser is not open source (" + info.browser.name + ")");
-						if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
-						break;
-					case AppUtils.EnvironmentCode.RUNTIME_ERROR:
-						if (check.state === "fail") div.append("Unexpected runtime error: " + info.runtimeError);
-						break;
-					case AppUtils.EnvironmentCode.INTERNET:
-						if (check.state === "pass") div.append("No internet connection");
-						if (check.state === "warn") div.append("Internet connection is active");
-						break;
-					case AppUtils.EnvironmentCode.IS_LOCAL:
-						if (check.state === "pass") div.append("Application is running locally");
-						else {
-							var content = $("<div>").appendTo(div);
-							content.append("Application is not running locally<br>");
-							content.append($("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>Download from GitHub</a>."));
-						}
-						break;
-					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
-						if (check.state === "pass") div.append("Operating system is open source (" + info.os.name + ")");
-						else div.append("Operating system is not open source (" + info.os.name + ")");
-						break;
-					case AppUtils.EnvironmentCode.PRERELEASE:
-						if (check.state === "warn") div.append("Application is under development.  Not ready for use");
-						break;
-					default:
-						throw new Error("Unrecognized environment code: " + check.code);
-				}
-			}
-			
 			// gets the check icon TODO
 			function getIcon(check) {
 				
@@ -2791,7 +2754,7 @@ function NoticeController(div, config) {
 					else {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Application is not running locally</div>");
-						content.append("<div class='notice_bar_center_minor'>Download from <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a></div>");
+						content.append("<div class='notice_bar_center_minor'><a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
