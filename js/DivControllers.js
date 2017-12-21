@@ -2680,17 +2680,60 @@ function NoticeController(div, config) {
 		function renderNoticeIcon(div, info, check) {
 			div.addClass("flex_vertical notice_icon_div");
 			div.append(getIcon(check));
+			
+			// tooltip
 			var description = $("<div>");
-			renderCheckDescription(description, info, check);
+			renderTooltip(description, info, check);
 			LOADER.load(["lib/popper.js", "lib/tippy.all.js"], function() {
-				console.log("creating");
 				tippy(div.get(0), {
 					arrow: true,
 					html: description.get(0),
 					interactive: true,
-					placement: 'bottom'
+					placement: 'bottom',
+					interactive: true,
+					theme: 'translucent',
+					trigger: "mouseenter click",
+					distance: 20,
+					arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2.1px)'
 				});
 			});
+			
+			// render single check description
+			function renderTooltip(div, info, check) {
+				
+				// interpret environment code and state
+				switch (check.code) {
+					case AppUtils.EnvironmentCode.BROWSER:
+						if (check.state === "fail") div.append("Browser is not supported (" + info.browser.name + " " + info.browser.version + ")");
+						if (check.state === "warn") div.append("Browser is not open source (" + info.browser.name + ")");
+						if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
+						break;
+					case AppUtils.EnvironmentCode.RUNTIME_ERROR:
+						if (check.state === "fail") div.append("Unexpected runtime error: " + info.runtimeError);
+						break;
+					case AppUtils.EnvironmentCode.INTERNET:
+						if (check.state === "pass") div.append("No internet connection");
+						if (check.state === "warn") div.append("Internet connection is active");
+						break;
+					case AppUtils.EnvironmentCode.IS_LOCAL:
+						if (check.state === "pass") div.append("Application is running locally");
+						else {
+							var content = $("<div>").appendTo(div);
+							content.append("Application is not running locally<br>");
+							content.append($("<a class='translucent_theme_a' target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>Download from GitHub</a>."));
+						}
+						break;
+					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
+						if (check.state === "pass") div.append("Operating system is open source (" + info.os.name + ")");
+						else div.append("Operating system is not open source (" + info.os.name + ")");
+						break;
+					case AppUtils.EnvironmentCode.PRERELEASE:
+						if (check.state === "warn") div.append("Application is under development.  Not ready for use");
+						break;
+					default:
+						throw new Error("Unrecognized environment code: " + check.code);
+				}
+			}
 			
 			// gets the check icon TODO
 			function getIcon(check) {

@@ -1584,21 +1584,6 @@ input[type='checkbox'][disabled] +label {
 	display: none;
 }
 
-.environment_checks_div {
-	border: 2.5px solid;
-}
-
-.environment_check_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	margin: 10px;
-}
-
 .notice_container {
 	width: 100%;
 }
@@ -1606,7 +1591,7 @@ input[type='checkbox'][disabled] +label {
 .notice_bar {
 	width: 100%;
 	background-color: rgb(235, 92, 29);
-	padding: 15px 20px 15px 20px;
+	padding: 10px 20px 10px 20px;
 	color: white;
 }
 
@@ -1644,4 +1629,25 @@ input[type='checkbox'][disabled] +label {
 .copyable:hover {
 	cursor: pointer;
 	text-decoration: underline;
+}
+
+.tippy-tooltip.translucent-theme {
+  background-color: rgba(0, 0, 0, .7);
+  text-align: left;
+  border-radius: 20px;
+}
+
+.tippy-tooltip.translucent-theme * {
+  font-size: 16px;
+}
+
+.translucent_theme_a {
+	color: #56C1FF;
+}
+
+.tippy-popper[x-placement^=bottom] .tippy-tooltip.translucent-theme .tippy-arrow
+	{
+	border-bottom: 7px solid rgba(0, 0, 0, .7);
+	border-right: 7px solid transparent;
+	border-left: 7px solid transparent
 }
