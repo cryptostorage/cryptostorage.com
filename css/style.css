@@ -1602,7 +1602,16 @@ input[type='checkbox'][disabled] +label {
 .notice_bar_center {
 	width: 100%;
 	text-align:center;
-	font-size: 24px;
+}
+
+.notice_bar_center_major, notice_bar_center_major * {
+	font-size: 22px !important;
+	line-height: 25px;
+}
+
+.notice_bar_center_minor, .notice_bar_center_minor * {
+	font-size: 18px !important;
+	line-height: 22px;
 }
 
 .notice_bar_right {
@@ -1622,8 +1631,8 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_icon {
-	width: 35px;
-	height: 35px;
+	width: 40px;
+	height: 40px;
 }
 
 .copyable:hover {
@@ -1638,10 +1647,11 @@ input[type='checkbox'][disabled] +label {
 }
 
 .tippy-tooltip.translucent-theme * {
-  font-size: 16px;
+  font-size: 16px !important;
+  line-height: unset !important;
 }
 
-.translucent_theme_a {
+.tippy-tooltip.translucent-theme a {
 	color: #56C1FF;
 }
 

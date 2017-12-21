@@ -2683,7 +2683,7 @@ function NoticeController(div, config) {
 			
 			// tooltip
 			var description = $("<div>");
-			renderTooltip(description, info, check);
+			renderCheckDescription(description, info, check);
 			LOADER.load(["lib/popper.js", "lib/tippy.all.js"], function() {
 				tippy(div.get(0), {
 					arrow: true,
@@ -2720,7 +2720,7 @@ function NoticeController(div, config) {
 						else {
 							var content = $("<div>").appendTo(div);
 							content.append("Application is not running locally<br>");
-							content.append($("<a class='translucent_theme_a' target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>Download from GitHub</a>."));
+							content.append($("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>Download from GitHub</a>."));
 						}
 						break;
 					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
@@ -2790,8 +2790,8 @@ function NoticeController(div, config) {
 					if (check.state === "pass") div.append("Application is running locally");
 					else {
 						var content = $("<div>").appendTo(div);
-						content.append("Application is not running locally.  Download from&nbsp;");
-						content.append($("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>."));
+						content.append("<div class='notice_bar_center_major'>Application is not running locally</div>");
+						content.append("<div class='notice_bar_center_minor'>Download from <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a></div>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
