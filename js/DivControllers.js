@@ -2693,7 +2693,7 @@ function NoticeController(div, config) {
 					placement: 'bottom',
 					interactive: true,
 					theme: 'translucent',
-					trigger: "mouseenter click focus",
+					trigger: "mouseenter",
 					distance: 20,
 					arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2.1px)'
 				});
