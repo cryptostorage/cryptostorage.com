@@ -2680,6 +2680,7 @@ function NoticeController(div, config) {
 		function renderNoticeIcon(div, info, check) {
 			div.addClass("flex_vertical notice_icon_div");
 			div.append(getIcon(check));
+			div.append(getStateIcon(check.state));
 			
 			// tooltip
 			var description = $("<div>");
@@ -2723,6 +2724,13 @@ function NoticeController(div, config) {
 					default:
 						throw new Error("Unrecognized environment code: " + check.code);
 				}
+			}
+			
+			function getStateIcon(state) {
+				if (state === "pass") return $("<img class='notice_state_icon' src='img/circle_checkmark.png'>");
+				if (state === "fail") return $("<img class='notice_state_icon' src='img/circle_x.png'>");
+				if (state === "warn") return $("<img class='notice_state_icon' src='img/circle_exclamation.png'>");
+				throw new Error("Unrecognized state: " + state);
 			}
 		}
 		
