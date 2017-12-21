@@ -38,10 +38,17 @@ $(document).ready(function() {
 	// pre-load images
 	var imgDiv = $("<div>").appendTo($("body"));
 	imgDiv.hide();
+	preloadImage("img/computer.png");
+	preloadImage("img/browser.png");
+	preloadImage("img/internet.png");
+	preloadImage("img/download.png");
+	preloadImage("img/construction.png");
 	preloadImage("img/circle_x.png");
 	preloadImage("img/circle_exclamation.png");
 	preloadImage("img/circle_checkmark.png");
 	preloadImage("img/trash.png");
+	preloadImage("img/file.png");
+	preloadImage("img/files.png");
 	function preloadImage(src) {
 		var img = new Image();
 		img.src = src;
