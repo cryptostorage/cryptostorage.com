@@ -2747,10 +2747,14 @@ function NoticeController(div, config) {
 					break;
 				case AppUtils.EnvironmentCode.INTERNET:
 					if (check.state === "pass") div.append("No internet connection");
-					if (check.state === "warn") div.append("Internet connection is active");
+					if (check.state === "warn") {
+						var content = $("<div>").appendTo(div);
+						content.append("<div class='notice_bar_center_major'>Internet connection is active</div>");
+						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for greater security when generating keys</div>");
+					}
 					break;
 				case AppUtils.EnvironmentCode.IS_LOCAL:
-					if (check.state === "pass") div.append("Application is running locally");
+					if (check.state === "pass") div.append("<div class='notice_bar_center_major'>Application is running locally</div>");
 					else {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Application is not running locally</div>");
