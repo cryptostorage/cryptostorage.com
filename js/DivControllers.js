@@ -73,7 +73,7 @@ var UiUtils = {
 		
 		// open tab
 		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
-			config.environmentInfo = AppUtils.getCachedEnvironmentInfo();
+			config.environmentInfo = AppUtils.getCachedEnvironment();
 		  window.exportToBody(window, config);
 			window.focus();
 		});

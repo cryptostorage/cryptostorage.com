@@ -1353,6 +1353,13 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Returns the cached environment info.
+	 */
+	getCachedEnvironment: function() {
+		return AppUtils.environment;
+	},
+	
+	/**
 	 * Polls environment info and notifies listeners on loop.
 	 * 
 	 * @param initialEnvironmentInfo is initial environment info to notify listeners
