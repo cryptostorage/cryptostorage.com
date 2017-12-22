@@ -18,6 +18,7 @@ homepage content
 file import loading - see spec, only show if minimum file size
 form should error if ddslick hasn't loaded from ImportTextController
 common browser icons
+"application is not running locally" is not true, it's not hosted locally
 
 designer:
 should home images fade or reflect?
