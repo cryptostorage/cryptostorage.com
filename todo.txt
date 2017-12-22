@@ -1,5 +1,6 @@
 TODO
 loading screen while dependencies loading: form, import, direct export.  error if cannot get
+don't load tippy on homepage
 import decrypted keys renders inline
 link to view original imported pieces in either decrypted or encrypted which opens in new tab
 export page piece selection disabled while loading
