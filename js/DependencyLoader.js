@@ -12,7 +12,7 @@ function DependencyLoader() {
 	 * Loads the given paths.
 	 * 
 	 * @param paths is one or more paths to load as a string or string[]
-	 * @param callback is invoked when the paths are loaded
+	 * @param callback(err) is invoked when the paths are loaded or fail
 	 */
 	this.load = function(paths, callback) {
 		
@@ -32,9 +32,7 @@ function DependencyLoader() {
 		// invokes callback when all paths loaded
 		loadjs.ready(paths, {
 			success: callback,
-			error: function() {
-				throw new Error("Failed to load dependencies: " + paths);
-			}
+			error: function() { if (callback) callback(new Error("Failed to load dependencies: " + paths)); }
 		});
 	}
 }
