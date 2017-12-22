@@ -71,6 +71,8 @@ var UiUtils = {
 			"lib/clipboard.js"
 		];
 		
+		// TODO: load these first.  if failure, notice.  if success, open window
+		
 		// open tab
 		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
 			config.environmentInfo = AppUtils.getCachedEnvironment();
