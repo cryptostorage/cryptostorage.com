@@ -1652,8 +1652,8 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_state_icon {
-	width: 20px;
-	height: 20px;
+	width: 16px;
+	height: 16px;
 	position: absolute;
 	bottom: -5px;
 	right: -5px;

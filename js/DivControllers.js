@@ -2658,6 +2658,9 @@ function NoticeController(div, config) {
 		// reset cache
 		lastChecks = info.checks;
 		
+		// track tippy divs to fix bug where more than one becomes visible
+		var tippies = [];
+		
 		// build notice
 		div.empty();
 		renderLeft($("<div>").appendTo(div), info);
@@ -2698,6 +2701,8 @@ function NoticeController(div, config) {
 		
 		// render single check icon
 		function renderNoticeIcon(div, info, check) {
+			tippies.push(div);
+			
 			div.addClass("flex_vertical notice_icon_div");
 			div.append(getIcon(check));
 			div.append(getStateIcon(check.state));
@@ -2715,7 +2720,12 @@ function NoticeController(div, config) {
 					trigger: "mouseenter",
 					multiple: 'false',
 					distance: 20,
-					arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)'
+					arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+					onShow: function() {
+						for (var i = 0; i < tippies.length; i++) {
+							if (tippies[i] !== div) tippies[i].get(0)._tippy.hide();	// manually hide other tippy divs
+						}
+					}
 				});
 			});
 			

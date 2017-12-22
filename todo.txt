@@ -1,7 +1,5 @@
 TODO
 notice right not taking up space if no icons
-notice tooltips can stay persisted
-notice icons smaller content
 dependency loading and failure
 form should error if ddslick hasn't loaded from ImportTextController
 import decrypted keys renders inline
