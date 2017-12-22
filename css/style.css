@@ -1699,3 +1699,9 @@ input[type='checkbox'][disabled] +label {
 	border-right: 7px solid transparent;
 	border-left: 7px solid transparent
 }
+
+.loading {
+	margin-top: 150px;
+	width: 100px;
+	height: 100px;
+}

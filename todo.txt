@@ -19,6 +19,7 @@ file import loading - see spec, only show if minimum file size
 form should error if ddslick hasn't loaded from ImportTextController
 common browser icons
 "application is not running locally" is not true, it's not hosted locally
+add DependencyLoader.isLoaded() and only show loading if not already loaded
 
 designer:
 should home images fade or reflect?

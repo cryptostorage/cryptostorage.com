@@ -12,7 +12,6 @@ var AppUtils = {
 	MIN_PASSWORD_LENGTH: 7,
 	CRYPTOSTORAGE_URL: "https://cryptostorage.com",
 	ONLINE_IMAGE_URL: "https://cryptostorage.com/favicon.ico",
-	APP_DEPENDENCIES: ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/ua-parser.js", "lib/clipboard.js"],
 	ENVIRONMENT_REFRESH_RATE: 3000,	// environment refresh rate in milliseconds
 	ONLINE_DETECTION_TIMEOUT: 3000,	// timeout to detect if online
 	RUNTIME_ERRROR: null,						// unexpected application runtime error
@@ -45,6 +44,21 @@ var AppUtils = {
 		"BeOS", "BlackBerry", "Hurd", "Linpus", "Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS",
 		"Sailfish", "Series40", "Solaris", "Symbian", "WebOS"
 	]),
+	
+	// returns all app dependencies after inital homescreen is loaded
+	appDependencies: null,	// cache app dependencies
+	getAppDependencies: function() {
+		if (AppUtils.appDependencies) return AppUtils.appDependencies;
+		AppUtils.appDependencies = ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/ua-parser.js", "lib/clipboard.js", "lib/popper.js", "lib/tippy.all.js"];
+		var plugins = AppUtils.getCryptoPlugins();
+		for (var i = 0; i < plugins.length; i++) {
+			for (var j = 0; j < plugins[i].getDependencies().length; j++) {
+				AppUtils.appDependencies.push(plugins[i].getDependencies()[j]);
+			}
+		}
+		AppUtils.appDependencies = toUniqueArray(AppUtils.appDependencies);
+		return AppUtils.appDependencies;
+	},
 	
 	/**
 	 * Returns all crypto plugins.
