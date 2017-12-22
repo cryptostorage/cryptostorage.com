@@ -51,11 +51,11 @@ var UiUtils = {
 			"lib/loadjs.js",
 			"js/DependencyLoader.js",
 			"js/GenUtils.js",
+			"js/CryptoPlugins.js",
+			"js/CryptoKey.js",
 			"js/AppUtils.js",
 			"js/DivControllers.js",
-			"js/BodyExporter.js",
-			"js/CryptoPlugins.js",
-			"js/CryptoKey.js"
+			"js/BodyExporter.js"
 		];
 		
 		// open tab

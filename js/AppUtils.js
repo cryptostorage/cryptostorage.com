@@ -51,8 +51,6 @@ var AppUtils = {
 			"lib/async.js",
 			"lib/setImmediate.js",
 			"js/PieceRenderer.js",
-			"js/CryptoPlugins.js",
-			"js/CryptoKey.js",
 			"lib/jquery-csv.js",
 			"lib/qrcode.js",
 			"lib/jszip.js",
@@ -1332,11 +1330,8 @@ var AppUtils = {
 	getEnvironmentChecks: function(info) {
 		var checks = [];
 		
-		console.log(info);
-		if (!info.browser) throw new Error("no browser info");
-		
 		// check if browser supported
-		if (!info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER});
+		if (info.browser && !info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER});
 		
 		// check if runtime error
 		if (info.runtimeError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.RUNTIME_ERROR});
@@ -1345,8 +1340,10 @@ var AppUtils = {
 		if (info.dependencyError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.INTERNET});
 		
 		// check if local
-		if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
-		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
+		if (isInitialized(info.isLocal)) {
+			if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
+		}
 		
 		// check if online
 		if (!info.dependencyError && isInitialized(info.isOnline)) {
@@ -1355,14 +1352,16 @@ var AppUtils = {
 		}
 		
 		// check open source browser
-		if (info.browser.isSupported) {
+		if (info.browser && info.browser.isSupported) {
 			if (info.browser.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.BROWSER});
 			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.BROWSER});
 		}
 		
 		// check open source os
-		if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
-		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
+		if (isInitialized(info.os)) {
+			if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
+		}
 		
 		// pre-release warning
 		checks.push({state: "warn", code: AppUtils.EnvironmentCode.PRERELEASE});
@@ -1449,12 +1448,7 @@ var AppUtils = {
 	 * Set an unexpected runtime error and notifies all listeners of the updated environment.
 	 */
 	setRuntimeError: function(err) {
-		if (!AppUtils.environment) {
-			console.log("Initializing environment");
-			console.log(AppUtils.environment);
-			throw new Error("Why");
-			AppUtils.environment = {};
-		}
+		if (!AppUtils.environment) AppUtils.environment = {};
 		AppUtils.RUNTIME_ERROR = err;
 		AppUtils.environment.runtimeError = err;
 		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
