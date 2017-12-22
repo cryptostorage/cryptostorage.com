@@ -1612,8 +1612,8 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_bar_left {
-	min-width: 250px;
-	max-width: 250px;
+	min-width: 275px;
+	max-width: 275px;
 }
 
 .notice_bar_center {
@@ -1636,8 +1636,8 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_bar_right {
-	min-width: 250px;
-	max-width: 250px;
+	min-width: 275x;
+	max-width: 275px;
 }
 
 .notice_icon_div {

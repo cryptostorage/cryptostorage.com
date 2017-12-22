@@ -709,14 +709,18 @@ function FormController(div) {
 		
 		// load dependencies
 		LOADER.load(AppUtils.getAppDependencies(), function(err) {
-			if (err) throw err;
-			
-			// remove loading div
-			loading.detach();
 			
 			// notice div
 			var noticeDiv = $("<div>").appendTo(div);
 			new NoticeController(noticeDiv).render();
+			
+			// remove loading div
+			loading.detach();
+			
+			// error propagates to notice div
+			// TODO: catch and fail gracefully with environment setter
+			// AppUtils.setEnvironmentCheck(AppUtils.EnvironmentCheck.INTERNET, "fail")
+			if (err) throw new Error("Could not load dependencies.  Connect to the internet");
 			
 			// page div
 			var pageDiv = $("<div class='page_div'>").appendTo(div);
@@ -2738,22 +2742,17 @@ function NoticeController(div, config) {
 				// interpret environment code and state
 				switch (check.code) {
 					case AppUtils.EnvironmentCode.RUNTIME_ERROR:
-						break;
+						return $("<img class='notice_icon' src='img/skull.png'>");
 					case AppUtils.EnvironmentCode.INTERNET:
 						return $("<img class='notice_icon' src='img/internet.png'>");
-						break;
 					case AppUtils.EnvironmentCode.IS_LOCAL:
 						return $("<img class='notice_icon' src='img/download.png'>");
-						break;
 					case AppUtils.EnvironmentCode.BROWSER:
 						return $("<img class='notice_icon' src='img/browser.png'>");
-						break;
 					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
 						return $("<img class='notice_icon' src='img/computer.png'>");
-						break;
 					case AppUtils.EnvironmentCode.PRERELEASE:
 						return $("<img class='notice_icon' src='img/construction.png'>");
-						break;
 					default:
 						throw new Error("Unrecognized environment code: " + check.code);
 				}
