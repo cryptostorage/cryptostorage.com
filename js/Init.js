@@ -16,11 +16,15 @@ $(document).ready(function() {
 	
 	// render application to html body
 	new AppController($("body")).render(function() {
-			
+		
+	});
+	
 //		// start loading common dependencies
 //		LOADER.load(AppUtils.getAppDependencies(), function() {
 //			
 //			// run minimum tests
+//		<script src="js/PieceRenderer.js"></script>
+//		<script src="js/Tests.js"></script>
 //			AppUtils.runMinimumTests(function(err) {
 //				if (err) AppUtils.setRuntimeError(err);
 //			});
@@ -55,5 +59,4 @@ $(document).ready(function() {
 //			img.src = src;
 //			imgDiv.append(img);
 //		}
-	});
 });

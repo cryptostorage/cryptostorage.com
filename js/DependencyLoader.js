@@ -35,4 +35,26 @@ function DependencyLoader() {
 			error: function() { if (callback) callback(new Error("Failed to load dependencies: " + paths)); }
 		});
 	}
+	
+	/**
+	 * Determines if the given paths are loaded.
+	 * 
+	 * @param paths is one or more paths to check if loaded
+	 */
+	this.isLoaded = function(paths) {
+		
+		// listify paths
+		if (!isArray(paths)) {
+			assertTrue(isString(paths));
+			paths = [paths];
+		}
+		
+		// check if each path is loaded
+		for (var i = 0; i < paths.length; i++) {
+			if (!loadjs.isDefined(paths[i])) return false;
+		}
+		
+		// all paths loaded
+		return true;
+	}
 }

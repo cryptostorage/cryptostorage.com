@@ -1,4 +1,5 @@
 TODO
+donate and import pages rendering on first load, each loads dependencies
 loading screen while dependencies loading: form, import, direct export.  error if cannot get
 don't load tippy on homepage
 import decrypted keys renders inline

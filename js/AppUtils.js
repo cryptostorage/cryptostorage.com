@@ -45,10 +45,26 @@ var AppUtils = {
 	]),
 	
 	// returns all app dependencies after inital homescreen is loaded
-	appDependencies: null,	// cache app dependencies
 	getAppDependencies: function() {
 		if (AppUtils.appDependencies) return AppUtils.appDependencies;
-		AppUtils.appDependencies = ["lib/async.js", "lib/qrcode.js", "lib/jszip.js", "lib/crypto-js.js", "lib/bitaddress.js", "lib/progressbar.js", "lib/jquery.ddslick.js", "lib/ua-parser.js", "lib/clipboard.js", "lib/popper.js", "lib/tippy.all.js"];
+		AppUtils.appDependencies = [
+			"lib/async.js",
+			"lib/setImmediate.js",
+			"js/PieceRenderer.js",
+			"js/CryptoPlugins.js",
+			"js/CryptoKey.js",
+			"lib/jquery-csv.js",
+			"lib/qrcode.js",
+			"lib/jszip.js",
+			"lib/FileSaver.js",
+			"lib/crypto-js.js",
+			"lib/progressbar.js",
+			"lib/pagination.js",
+			"lib/bitaddress.js",
+			"lib/ua-parser.js",
+			"lib/clipboard.js",
+			"lib/jquery.ddslick.js"
+		];
 		var plugins = AppUtils.getCryptoPlugins();
 		for (var i = 0; i < plugins.length; i++) {
 			for (var j = 0; j < plugins[i].getDependencies().length; j++) {
@@ -62,7 +78,6 @@ var AppUtils = {
 	/**
 	 * Returns all crypto plugins.
 	 */
-	plugins: null,	// cache plugins
 	getCryptoPlugins: function() {
 		if (!AppUtils.plugins) {
 			AppUtils.plugins = [];
@@ -1317,6 +1332,9 @@ var AppUtils = {
 	getEnvironmentChecks: function(info) {
 		var checks = [];
 		
+		console.log(info);
+		if (!info.browser) throw new Error("no browser info");
+		
 		// check if browser supported
 		if (!info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER});
 		
@@ -1362,6 +1380,8 @@ var AppUtils = {
 	/**
 	 * Polls environment info and notifies listeners on loop.
 	 * 
+	 * Requires lib/ua-parser.js to be loaded.
+	 * 
 	 * @param initialEnvironmentInfo is initial environment info to notify listeners
 	 */
 	pollEnvironment: function(initialEnvironmentInfo) {
@@ -1369,18 +1389,14 @@ var AppUtils = {
 		// notify listeners of initial environment info
 		if (initialEnvironmentInfo) setEnvironmentInfo(initialEnvironmentInfo);
 		
-		// load dependency
-		LOADER.load("lib/ua-parser.js", function() {
-			
-			// refresh environment info on loop
-			refreshEnvironmentInfo();
-			function refreshEnvironmentInfo() {
-				AppUtils.getEnvironment(function(info) {
-					setEnvironmentInfo(info);
-				});
-				setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
-			}
-		});
+		// refresh environment info on loop
+		refreshEnvironmentInfo();
+		function refreshEnvironmentInfo() {
+			AppUtils.getEnvironment(function(info) {
+				setEnvironmentInfo(info);
+			});
+			setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
+		}
 		
 		function setEnvironmentInfo(info) {
 			AppUtils.environment = info;
@@ -1433,7 +1449,12 @@ var AppUtils = {
 	 * Set an unexpected runtime error and notifies all listeners of the updated environment.
 	 */
 	setRuntimeError: function(err) {
-		if (!AppUtils.environment) AppUtils.environment = {};
+		if (!AppUtils.environment) {
+			console.log("Initializing environment");
+			console.log(AppUtils.environment);
+			throw new Error("Why");
+			AppUtils.environment = {};
+		}
 		AppUtils.RUNTIME_ERROR = err;
 		AppUtils.environment.runtimeError = err;
 		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);

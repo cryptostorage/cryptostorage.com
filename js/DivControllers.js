@@ -45,33 +45,18 @@ var UiUtils = {
 		// deep copy config
 		config = objectAssign({}, config);
 		
-		// export tab dependencies
+		// minimal dependencies to make window work
 		var dependencies = [
 			"lib/jquery-3.2.1.js",
 			"lib/loadjs.js",
-			"lib/async.js",
-			"lib/setImmediate.js",
-			"js/BodyExporter.js",
-			"js/GenUtils.js",
-			"js/DivControllers.js",
-			"js/PieceRenderer.js",
-			"js/AppUtils.js",
-			"js/CryptoPlugins.js",
-			"js/CryptoKey.js",
 			"js/DependencyLoader.js",
-			"lib/jquery-csv.js",
-			"lib/qrcode.js",
-			"lib/jszip.js",
-			"lib/FileSaver.js",
-			"lib/crypto-js.js",
-			"lib/progressbar.js",
-			"lib/pagination.js",
-			"lib/bitaddress.js",
-			"lib/ua-parser.js",
-			"lib/clipboard.js"
+			"js/GenUtils.js",
+			"js/AppUtils.js",
+			"js/DivControllers.js",
+			"js/BodyExporter.js",
+			"js/CryptoPlugins.js",
+			"js/CryptoKey.js"
 		];
-		
-		// TODO: load these first.  if failure, notice.  if success, open window
 		
 		// open tab
 		newWindow(null, browserTabName, dependencies, ["css/style.css", "css/pagination.css"], getInternalStyleSheetText(), function(window) {
@@ -113,11 +98,6 @@ function AppController(div) {
 	
 	this.render = function(onDone) {
 		div.empty();
-		
-		// start polling starting with synchronized environment info
-		LOADER.load("lib/ua-parser.js", function() {
-			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
-		});
 		
 		// header
 		var headerDiv = $("<div class='app_header'>").appendTo(div);
@@ -170,11 +150,11 @@ function AppController(div) {
 		homeController = new HomeController($("<div>"));
 		formController = new FormController($("<div>"));
 		importController = new ImportController($("<div>"));
-		importController.render();
+//		importController.render();	// TODO: render these after initial homepage done
 		faqController = new FaqController($("<div>"));
-		faqController.render();
+//		faqController.render();
 		donateController = new DonateController($("<div>"));
-		donateController.render();
+//		donateController.render();
 		
 		// footer
 		footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
@@ -198,6 +178,11 @@ function AppController(div) {
 			// done rendering
 			if (onDone) onDone(div);
 		});
+		
+//		// start polling starting with synchronized environment info
+//		LOADER.load("lib/ua-parser.js", function() {
+//			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
+//		});
 	}
 	
 	this.showHome = function() {
@@ -1246,7 +1231,6 @@ function FormController(div) {
 				defaultSelectedIndex: defaultSelectedIndex,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
-					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
 					onCurrencyChanged(selectedPlugin.getTicker());
 				},
 			});
@@ -2357,50 +2341,59 @@ function ExportController(div, window, config) {
 			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
 		}
 		
-		// notice div
-		var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
-		var noticeDiv = $("<div>").appendTo(noticeDivContainer);
-		new NoticeController(noticeDiv).render();
-		
-		// progress bar
-		progressDiv = $("<div class='export_progress_div'>").appendTo(div);
-		progressDiv.hide();
-		progressBar = UiUtils.getProgressBar(progressDiv);
-		progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
-		
-		// currently showing piece
-		piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
-		
-		// regenerate button
-		if (config.showRegenerate) {
-			var regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
-			btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
-			btnRegenerate.append("Regenerate");
-			btnRegenerate.click(function() {
-				if (confirm("Discard key pair and create a new one?")) {
-					saved = false;
-					config.keys = undefined;
-					config.pieces = undefined;
-					config.pieceDivs = undefined;
-					config.quickGenerate = true;	// hides progress bar and does not disable header
-					update();
-				}
-			});
-		}
-		
-		// register events
-		showPublicCheckbox.click(function() { update(); });
-		showPrivateCheckbox.click(function() { update(); });
-		showLogosCheckbox.click(function() { update(); });
-		
 		// controls disabled until ready
 		setControlsEnabled(false);
 		
-		// build ui based on keyGenConfig, pieces, and pieceDivs
-		update(config.pieceDivs);
+		// load dependencies
+		LOADER.load(AppUtils.getAppDependencies(), function(err) {
+			
+			// handle error
+			if (err) {
+				throw err;	// TODO
+			}
+			
+			// notice div
+			var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
+			var noticeDiv = $("<div>").appendTo(noticeDivContainer);
+			new NoticeController(noticeDiv).render();
+			
+			// progress bar
+			progressDiv = $("<div class='export_progress_div'>").appendTo(div);
+			progressDiv.hide();
+			progressBar = UiUtils.getProgressBar(progressDiv);
+			progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
+			
+			// currently showing piece
+			piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
+			
+			// regenerate button
+			if (config.showRegenerate) {
+				var regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
+				btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
+				btnRegenerate.append("Regenerate");
+				btnRegenerate.click(function() {
+					if (confirm("Discard key pair and create a new one?")) {
+						saved = false;
+						config.keys = undefined;
+						config.pieces = undefined;
+						config.pieceDivs = undefined;
+						config.quickGenerate = true;	// hides progress bar and does not disable header
+						update();
+					}
+				});
+			}
+			
+			// register events
+			showPublicCheckbox.click(function() { update(); });
+			showPrivateCheckbox.click(function() { update(); });
+			showLogosCheckbox.click(function() { update(); });
+			
+			// build ui based on keyGenConfig, pieces, and pieceDivs
+			update(config.pieceDivs);
 
-		// done rendering
-		if (onDone) onDone(div);
+			// done rendering
+			if (onDone) onDone(div);
+		});
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
