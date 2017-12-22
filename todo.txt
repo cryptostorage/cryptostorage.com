@@ -1,8 +1,5 @@
 TODO
-form loading screen while dependencies loading
-export loading screen while dependencies loading
-notice error if dependencies fail to download
-form should error if ddslick hasn't loaded from ImportTextController
+loading screen while dependencies loading: form, import, direct export.  error if cannot get
 import decrypted keys renders inline
 link to view original imported pieces in either decrypted or encrypted which opens in new tab
 export page piece selection disabled while loading
@@ -19,6 +16,7 @@ seo
 faq content
 homepage content
 file import loading - see spec, only show if minimum file size
+form should error if ddslick hasn't loaded from ImportTextController
 
 designer:
 should home images fade or reflect?
