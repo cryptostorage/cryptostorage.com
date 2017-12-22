@@ -2390,10 +2390,10 @@ function ExportController(div, window, config) {
 			
 			// build ui based on keyGenConfig, pieces, and pieceDivs
 			update(config.pieceDivs);
-
-			// done rendering
-			if (onDone) onDone(div);
 		});
+		
+		// done rendering
+		if (onDone) onDone(div);
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
