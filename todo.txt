@@ -17,6 +17,7 @@ faq content
 homepage content
 file import loading - see spec, only show if minimum file size
 form should error if ddslick hasn't loaded from ImportTextController
+common browser icons
 
 designer:
 should home images fade or reflect?

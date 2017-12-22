@@ -370,12 +370,6 @@ function HomeController(div) {
 		pageDiv.append("<div class='home_description'>Save your cryptocurrency wallet to JSON so it can be stored securely on a flash drive and imported easily, or print your currency easily to create a paper wallet.</div>")
 		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 		
-		// check environment section
-		pageDiv.append("<div style='height: 60px'>");
-		pageDiv.append("<div class='home_label'>Check your environment to generate keys securely</div>");
-		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your crypto.</div>")
-		pageDiv.append($("<img width=750px src='img/notice_bar.png'>"));
-		
 		// split and passphrase section
 		pageDiv.append("<div style='height: 60px'>");
 		pageDiv.append("<div class='home_label'>Split and password protect private keys for maximum security</div>");
@@ -383,12 +377,18 @@ function HomeController(div) {
 		pageDiv.append($("<img width=750px src='img/passphrase_input.png'>"));
 		pageDiv.append($("<img width=700px src='img/split_input.png'>"));
 		
+		// check environment section
+		pageDiv.append("<div style='height: 60px'>");
+		pageDiv.append("<div class='home_label'>Check your environment to generate keys securely</div>");
+		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your crypto.</div>")
+		pageDiv.append($("<img width=750px src='img/notice_bar.png'>"));
+		
 		// cryptography section
 		pageDiv.append("<div style='height:60px'>");
 		var hFlex = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 		hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
 		var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
-		vFlex.append("<div class='home_label'>Trusted cryptography</div>");
+		vFlex.append("<div class='home_label'>Strong cryptography</div>");
 		vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your wallet keys.</div>");
 		
 		// download section
