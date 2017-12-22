@@ -1,5 +1,4 @@
 TODO
-notice right not taking up space if no icons
 dependency loading and failure
 form should error if ddslick hasn't loaded from ImportTextController
 import decrypted keys renders inline
