@@ -14,7 +14,6 @@ var AppUtils = {
 	ONLINE_IMAGE_URL: "https://cryptostorage.com/favicon.ico",
 	ENVIRONMENT_REFRESH_RATE: 3000,	// environment refresh rate in milliseconds
 	ONLINE_DETECTION_TIMEOUT: 3000,	// timeout to detect if online
-	RUNTIME_ERRROR: null,						// unexpected application runtime error
 	SLIDER_RATE: 4000,							// rate of slider transitions
 	
 	//classify operating systems and browsers as open or closed source
@@ -672,9 +671,6 @@ var AppUtils = {
 		if (onProgress) onProgress(0, "Loading dependencies");
 		LOADER.load(dependencies, function() {
 			
-			// internet is no longer required if accessing remotely
-			if (noInternetIsNotErrorAfterDependenciesLoaded) AppUtils.setNoInternetCanBeError(false);
-			
 			// collect key creation functions
 			var funcs = [];
 			for (var i = 0; i < config.currencies.length; i++) {
@@ -1272,12 +1268,13 @@ var AppUtils = {
 	 * 
 	 * @returns info that can be acquired synchronously
 	 */
-	getEnvironmentInfoSync: function() {
+	getEnvironmentSync: function() {
 		var info = {};
 		info.browser = AppUtils.getBrowserInfo();
 		info.os = AppUtils.getOsInfo();
 		info.isLocal = AppUtils.isLocal();
 		info.runtimeError = AppUtils.RUNTIME_ERROR;
+		info.dependencyError = AppUtils.DEPENDENCY_ERROR;
 		info.checks = AppUtils.getEnvironmentChecks(info);
 		return info;
 	},
@@ -1289,9 +1286,9 @@ var AppUtils = {
 	 * 
 	 * @param onDone(info) is asynchronously invoked when all info is retrieved
 	 */
-	getEnvironmentInfo: function(onDone) {
+	getEnvironment: function(onDone) {
 		AppUtils.isOnline(function(online) {
-			var info = AppUtils.getEnvironmentInfoSync();
+			var info = AppUtils.getEnvironmentSync();
 			info.isOnline = online;
 			info.checks = AppUtils.getEnvironmentChecks(info);
 			if (onDone) onDone(info);
@@ -1326,12 +1323,15 @@ var AppUtils = {
 		// check if runtime error
 		if (info.runtimeError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.RUNTIME_ERROR});
 		
+		// check if dependency error
+		if (info.dependencyError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.INTERNET});
+		
 		// check if local
 		if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
 		else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
 		
 		// check if online
-		if (isInitialized(info.isOnline)) {
+		if (!info.dependencyError && isInitialized(info.isOnline)) {
 			if (!info.isOnline) checks.push({state: "pass", code: AppUtils.EnvironmentCode.INTERNET});
 			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.INTERNET});
 		}
@@ -1353,28 +1353,6 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Determines if the given environment info has the given state.
-	 * 
-	 * @param info is environment info with state
-	 * @param state is the state to check the environment info for
-	 * @returns true if the environment info has the given state, false otherwise
-	 */
-	hasEnvironmentState: function(info, state) {
-		assertInitialized(info);
-		for (var i = 0; i < info.checks.length; i++) {
-			if (info.checks[i].state === state) return true;
-		}
-		return false;
-	},
-	
-	/**
-	 * Returns cached environment info.
-	 */
-	getCachedEnvironmentInfo: function() {
-		return AppUtils.cachedEnvironmentInfo
-	},
-	
-	/**
 	 * Polls environment info and notifies listeners on loop.
 	 * 
 	 * @param initialEnvironmentInfo is initial environment info to notify listeners
@@ -1390,7 +1368,7 @@ var AppUtils = {
 			// refresh environment info on loop
 			refreshEnvironmentInfo();
 			function refreshEnvironmentInfo() {
-				AppUtils.getEnvironmentInfo(function(info) {
+				AppUtils.getEnvironment(function(info) {
 					setEnvironmentInfo(info);
 				});
 				setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
@@ -1398,7 +1376,7 @@ var AppUtils = {
 		});
 		
 		function setEnvironmentInfo(info) {
-			AppUtils.cachedEnvironmentInfo = info;
+			AppUtils.environment = info;
 			AppUtils.notifyEnvironmentListeners(info);
 		}
 	},
@@ -1414,7 +1392,7 @@ var AppUtils = {
 		assertInitialized(listener);
 		if (!AppUtils.environmentListeners) AppUtils.environmentListeners = [];
 		AppUtils.environmentListeners.push(listener);
-		if (AppUtils.cachedEnvironmentInfo) listener(AppUtils.cachedEnvironmentInfo);
+		if (AppUtils.environment) listener(AppUtils.environment);
 	},
 	
 	/**
@@ -1431,28 +1409,42 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Determines if the given environment info has the given state.
+	 * 
+	 * @param info is environment info with state
+	 * @param state is the state to check the environment info for
+	 * @returns true if the environment info has the given state, false otherwise
+	 */
+	hasEnvironmentState: function(state) {
+		for (var i = 0; i < AppUtils.environment.checks.length; i++) {
+			if (AppUtils.environment.checks[i].state === state) return true;
+		}
+		return false;
+	},
+	
+	/**
 	 * Set an unexpected runtime error and notifies all listeners of the updated environment.
 	 */
 	setRuntimeError: function(err) {
+		if (!AppUtils.environment) AppUtils.environment = {};
 		AppUtils.RUNTIME_ERROR = err;
-		var info = AppUtils.getCachedEnvironmentInfo();
-		info.runtimeError = err;
-		info.checks = AppUtils.getEnvironmentChecks(info);
-		AppUtils.notifyEnvironmentListeners(info);
+		AppUtils.environment.runtimeError = err;
+		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
+		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
 		throw err;
 	},
 	
 	/**
-	 * Sets if lack of internet can be a critical error if the site is running remotely.
+	 * Sets an error if cannot fetch dependencies.
 	 * 
-	 * After dependencies are done loading in the export page, internet is no longer required
-	 * even if the site is running remotely, so this method stops treating internet disconnection
-	 * as critical.
-	 * 
-	 * @param bool specifies if no internet can be a critical error
+	 * @param bool specifies if the dependency error is enabled or disabled
 	 */
-	setNoInternetCanBeError(bool) {
-		AppUtils.NO_INTERNET_CAN_BE_ERROR = bool;
+	setDependencyError: function(bool) {
+		if (!AppUtils.environment) AppUtils.environment = {};
+		AppUtils.DEPENDENCY_ERROR = bool;
+		AppUtils.environment.dependencyError = bool;
+		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
+		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
 	},
 	
 	/**

@@ -114,7 +114,7 @@ function AppController(div) {
 		
 		// start polling starting with synchronized environment info
 		LOADER.load("lib/ua-parser.js", function() {
-			AppUtils.pollEnvironment(AppUtils.getEnvironmentInfoSync());
+			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
 		});
 		
 		// header
@@ -309,9 +309,9 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			btnImport.append("or Import Existing Keys");
 			
 			// disable import keys if failed environment check
-			AppUtils.addEnvironmentListener(function(info) {
+			AppUtils.addEnvironmentListener(function() {
 				btnImport.unbind("click");
-				if (!AppUtils.hasEnvironmentState(info, "fail")) btnImport.click(function() { onSelectImport(); });
+				if (!AppUtils.hasEnvironmentState("fail")) btnImport.click(function() { onSelectImport(); });
 			});
 			
 			if (onDone) onDone(div);
@@ -402,8 +402,8 @@ function HomeController(div) {
 		
 		// track environment failure to disable clicking currency
 		var environmentFailure = false;
-		AppUtils.addEnvironmentListener(function(info) {
-			environmentFailure = AppUtils.hasEnvironmentState(info, "fail");
+		AppUtils.addEnvironmentListener(function() {
+			environmentFailure = AppUtils.hasEnvironmentState("fail");
 		});
 		
 		function onCurrencyClicked(plugin) {
@@ -718,9 +718,11 @@ function FormController(div) {
 			loading.detach();
 			
 			// error propagates to notice div
-			// TODO: catch and fail gracefully with environment setter
-			// AppUtils.setEnvironmentCheck(AppUtils.EnvironmentCheck.INTERNET, "fail")
-			if (err) throw new Error("Could not load dependencies.  Connect to the internet");
+			if (err) {
+				AppUtils.setDependencyError(true);
+				onDone(div);
+				return;
+			}
 			
 			// page div
 			var pageDiv = $("<div class='page_div'>").appendTo(div);
@@ -846,8 +848,8 @@ function FormController(div) {
 			startOverLink.click(function() { onStartOver(); });
 			
 			// disable generate button if environment failure
-			AppUtils.addEnvironmentListener(function(info) {
-				formErrors.environment = AppUtils.hasEnvironmentState(AppUtils.getCachedEnvironmentInfo(), "fail");
+			AppUtils.addEnvironmentListener(function() {
+				formErrors.environment = AppUtils.hasEnvironmentState("fail");
 				updateForm()
 			});
 			
@@ -2630,10 +2632,6 @@ function NoticeController(div, config) {
 	
 	this.render = function(onDone) {
 		
-		// div setup
-		div.addClass("notice_bar");
-		div.addClass("flex_horizontal");
-		
 		// merge configs
 		config = objectAssign({}, getDefaultConfig(), config);
 		
@@ -2656,9 +2654,13 @@ function NoticeController(div, config) {
 		// check if info cached
 		if (lastChecks && objectsEqual(lastChecks, info.checks)) return;
 		
-		// show or hide notice bar depending on config
-		if (AppUtils.hasEnvironmentState(info, "fail")) { div.addClass("notice_fail"); config.showOnFail ? div.show() : div.hide(); }
-		else if (AppUtils.hasEnvironmentState(info, "warn")) { div.addClass("notice_warn"); config.showOnWarn ? div.show() : div.hide(); }
+		// div setup
+		div.empty();
+		div.removeClass();
+		div.addClass("notice_bar");
+		div.addClass("flex_horizontal");
+		if (AppUtils.hasEnvironmentState("fail")) { div.addClass("notice_fail"); config.showOnFail ? div.show() : div.hide(); }
+		else if (AppUtils.hasEnvironmentState("warn")) { div.addClass("notice_warn"); config.showOnWarn ? div.show() : div.hide(); }
 		else if (config.showOnPass) { div.addClass("notice_pass"); div.show(); }
 		else div.hide();
 		
@@ -2787,10 +2789,14 @@ function NoticeController(div, config) {
 					break;
 				case AppUtils.EnvironmentCode.INTERNET:
 					if (check.state === "pass") div.append("No internet connection");
-					if (check.state === "warn") {
+					else if (check.state === "warn") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Internet connection is active</div>");
 						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for greater security when generating keys</div>");
+					} else if (check.state === "fail") {
+						var content = $("<div>").appendTo(div);
+						content.append("<div class='notice_bar_center_major'>Internet required to load dependencies</div>");
+						content.append("<div class='notice_bar_center_minor'>Connect to the internet and refresh the page</div>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.IS_LOCAL:
