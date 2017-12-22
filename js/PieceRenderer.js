@@ -252,7 +252,8 @@ function PieceRenderer(pieces, pieceDivs, config) {
 					addPrivateQr();
 				});
 			} else {
-				keyDivLeft.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>"));
+				var omitted = $("<div class='key_div_qr_omitted flex_horizontal'>").appendTo(keyDivLeft);
+				omitted.append($("<img src='img/restricted.png' class='key_div_qr_omitted_img'>"));
 				addPrivateQr();
 			}
 			function addPrivateQr() {
@@ -264,7 +265,8 @@ function PieceRenderer(pieces, pieceDivs, config) {
 						onDone(div);
 					});
 				} else {
-					keyDivRight.append($("<img src='img/question_mark.png' class='key_div_qr_omitted'>"));
+					var omitted = $("<div class='key_div_qr_omitted flex_horizontal'>").appendTo(keyDivRight);
+					omitted.append($("<img src='img/restricted.png' class='key_div_qr_omitted_img'>"));
 					onDone(div);
 				}
 			}

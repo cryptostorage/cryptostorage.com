@@ -1434,6 +1434,11 @@ input[type='checkbox'][disabled] +label {
 	border: solid thin;
 }
 
+.key_div_qr_omitted_img {
+	width: 80px;
+	height: 80px;
+}
+
 .key_div_left {
 	display: -webkit-flex;
 	display: -ms-flexbox;
