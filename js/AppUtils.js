@@ -60,7 +60,8 @@ var AppUtils = {
 			"lib/bitaddress.js",
 			"lib/ua-parser.js",
 			"lib/clipboard.js",
-			"lib/jquery.ddslick.js"
+			"lib/jquery.ddslick.js",
+			"js/CryptoKey.js"
 		];
 		var plugins = AppUtils.getCryptoPlugins();
 		for (var i = 0; i < plugins.length; i++) {

@@ -51,10 +51,9 @@ var UiUtils = {
 			"lib/loadjs.js",
 			"lib/setImmediate.js",
 			"js/GenUtils.js",
-			"js/AppUtils.js",
-			"js/CryptoPlugins.js",
-			"js/CryptoKey.js",
 			"js/DependencyLoader.js",
+			"js/CryptoPlugins.js",
+			"js/AppUtils.js",
 			"js/DivControllers.js",
 			"js/BodyExporter.js"
 		];

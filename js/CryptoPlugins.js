@@ -156,8 +156,6 @@ function BitcoinPlugin() {
 			state.wif = key.getBitcoinWalletImportFormat();
 			state.address = key.getBitcoinAddress();
 			state.encryption = null;
-			console.log("here goes");
-			console.log(this);
 			return new CryptoKey(this, state);
 		}
 		

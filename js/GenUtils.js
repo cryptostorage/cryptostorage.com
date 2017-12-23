@@ -674,6 +674,7 @@ function getInternalStyleSheet() {
 function getInternalStyleSheetText() {
 	var internalCss = "";
 	var internalStyleSheet = getInternalStyleSheet();
+	if (!internalStyleSheet) return null;
 	for (var i = 0; i < internalStyleSheet.cssRules.length; i++) {
 		internalCss += internalStyleSheet.cssRules[i].cssText + "\n";
 	}
