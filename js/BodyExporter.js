@@ -22,7 +22,7 @@ window.exportToBody = function(window, config) {
 	};
 	
 	// poll environment info on loop
-	AppUtils.pollEnvironment(config.environmentInfo);
+	AppUtils.pollEnvironment(config.environmentInfo);	// TODO: this is getting called before ua-parser.js loaded
 	
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;
