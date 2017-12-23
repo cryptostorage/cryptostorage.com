@@ -62,6 +62,8 @@ var AppUtils = {
 			"lib/clipboard.js",
 			"lib/jquery.ddslick.js",
 			"js/CryptoKey.js",
+			"js/AppUtils.js",
+			"js/BodyExporter.js"
 		];
 		var plugins = AppUtils.getCryptoPlugins();
 		for (var i = 0; i < plugins.length; i++) {
