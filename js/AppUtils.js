@@ -61,7 +61,10 @@ var AppUtils = {
 			"lib/ua-parser.js",
 			"lib/clipboard.js",
 			"lib/jquery.ddslick.js",
+			"lib/popper.js",
+			"lib/tippy.all.js",
 			"js/CryptoKey.js",
+			"js/GenUtils.js",
 			"js/AppUtils.js",
 			"js/BodyExporter.js"
 		];

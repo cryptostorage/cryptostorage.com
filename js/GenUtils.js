@@ -724,6 +724,7 @@ function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
  */
 function newWindow(div, title, jsPaths, cssPaths, internalCss, onLoad) {
 	var w = window.open();
+	w.opener = null;
 	w.document.write(buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss));
 	w.addEventListener('load', function() {
 		if (onLoad) onLoad(w);
