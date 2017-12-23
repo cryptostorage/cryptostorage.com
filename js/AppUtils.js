@@ -49,7 +49,6 @@ var AppUtils = {
 		if (AppUtils.appDependencies) return AppUtils.appDependencies;
 		AppUtils.appDependencies = [
 			"lib/async.js",
-			"lib/setImmediate.js",
 			"js/PieceRenderer.js",
 			"lib/jquery-csv.js",
 			"lib/qrcode.js",

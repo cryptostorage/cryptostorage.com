@@ -49,11 +49,12 @@ var UiUtils = {
 		var dependencies = [
 			"lib/jquery-3.2.1.js",
 			"lib/loadjs.js",
-			"js/DependencyLoader.js",
+			"lib/setImmediate.js",
 			"js/GenUtils.js",
+			"js/AppUtils.js",
 			"js/CryptoPlugins.js",
 			"js/CryptoKey.js",
-			"js/AppUtils.js",
+			"js/DependencyLoader.js",
 			"js/DivControllers.js",
 			"js/BodyExporter.js"
 		];
