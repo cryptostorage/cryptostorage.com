@@ -54,6 +54,7 @@ var UiUtils = {
 			"js/DependencyLoader.js",
 			"js/CryptoPlugins.js",
 			"js/DivControllers.js",
+			"js/AppUtils.js",
 			"js/BodyExporter.js"
 		];
 		
