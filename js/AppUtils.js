@@ -46,8 +46,10 @@ var AppUtils = {
 	
 	// returns all app dependencies after inital homescreen is loaded
 	getAppDependencies: function() {
+		console.log("AppUtils.getAppDependencies()");
 		if (AppUtils.appDependencies) return AppUtils.appDependencies;
 		AppUtils.appDependencies = [
+			"css/style.css",
 			"lib/async.js",
 			"js/PieceRenderer.js",
 			"lib/jquery-csv.js",
@@ -56,6 +58,7 @@ var AppUtils = {
 			"lib/FileSaver.js",
 			"lib/crypto-js.js",
 			"lib/progressbar.js",
+			"css/pagination.css",
 			"lib/pagination.js",
 			"lib/bitaddress.js",
 			"lib/ua-parser.js",
