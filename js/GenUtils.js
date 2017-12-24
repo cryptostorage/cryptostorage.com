@@ -806,3 +806,42 @@ function isZipFile(file) {
 function isJsonFile(file) {
 	return file.name.endsWith(".json") || file.type === 'application/json';
 }
+
+/**
+ * Fetches the given list of images.
+ * 
+ * Prerequisite: async.js.
+ * 
+ * @param paths are the paths to the images to fetch
+ * @param onDone(err, images) is called when done
+ */
+function loadImages(paths, onDone) {
+	
+	// listify paths
+	if (!isArray(paths)) {
+		assertTrue(isString(paths));
+		paths = [paths];
+	}
+	
+	console.log("Loading images: " + paths);
+	
+	// collect functions to fetch images
+	var funcs = [];
+	for (var i = 0; i < paths.length; i++) {
+		funcs.push(loadFunc(paths[i]));
+	}
+	
+	// fetch in parallel
+	async.parallel(funcs, onDone);
+	
+	// callback function to fetch a single image
+	function loadFunc(path) {
+		return function(onDone) {
+			console.log("Loading image: " + path);
+			var img = new Image();
+			img.onload = function() { onDone(null, img); }
+			img.onerror = function() { onDone(new Error("Cannot load image: " + path)); }
+			img.src = path;
+		}
+	}
+}

@@ -696,152 +696,155 @@ function FormController(div) {
 		
 		// load dependencies
 		LOADER.load(AppUtils.getAppDependencies(), function(err) {
-			
-			// notice div
-			var noticeDiv = $("<div>").appendTo(div);
-			new NoticeController(noticeDiv).render();
-			
-			// remove loading div
-			loading.detach();
-			
-			// error propagates to notice div
-			if (err) {
-				AppUtils.setDependencyError(true);
-				onDone(div);
-				return;
-			}
-			
-			// page div
-			var pageDiv = $("<div class='page_div'>").appendTo(div);
-			
-			// top links
-			var formLinks = $("<div class='form_links_div'>").appendTo(pageDiv);
-			var oneOfEachLink = $("<div class='form_link'>").appendTo(formLinks);
-			oneOfEachLink.html("One of each");
-			oneOfEachLink.click(function() { onOneOfEach(); });
-			
-			// currency inputs
-			currencyInputs = [];
-			var currencyDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-			currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(currencyDiv);
-			
-			// link to add currency
-			var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
-			var addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
-			addCurrencySpan.html("+ Add another currency");
-			addCurrencySpan.click(function() {
+			loadImages(AppUtils.getAppImages(), function(err) {
+				if (err) throw err;	// TODO
+				
+				// notice div
+				var noticeDiv = $("<div>").appendTo(div);
+				new NoticeController(noticeDiv).render();
+				
+				// remove loading div
+				loading.detach();
+				
+				// error propagates to notice div
+				if (err) {
+					AppUtils.setDependencyError(true);
+					onDone(div);
+					return;
+				}
+				
+				// page div
+				var pageDiv = $("<div class='page_div'>").appendTo(div);
+				
+				// top links
+				var formLinks = $("<div class='form_links_div'>").appendTo(pageDiv);
+				var oneOfEachLink = $("<div class='form_link'>").appendTo(formLinks);
+				oneOfEachLink.html("One of each");
+				oneOfEachLink.click(function() { onOneOfEach(); });
+				
+				// currency inputs
+				currencyInputs = [];
+				var currencyDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
+				currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(currencyDiv);
+				
+				// link to add currency
+				var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
+				var addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
+				addCurrencySpan.html("+ Add another currency");
+				addCurrencySpan.click(function() {
+					addCurrency();
+				});
+				
+				// passphrase checkbox
+				var passphraseDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
+				var passphraseCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseDiv);
+				passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
+				var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
+				passphraseCheckboxLabel.html("Do you want to protect your private keys with a passphrase?");
+				passphraseCheckbox.click(function() {
+					if (passphraseCheckbox.prop('checked')) {
+						passphraseInputDiv.show();
+						passphraseInput.focus();
+					} else {
+						passphraseInputDiv.hide();
+						validatePassphrase(true);
+					}
+				});
+				
+				// passphrase input
+				passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
+				var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
+				passphraseWarnDiv.append("This passphrase is required to access funds later on.  Don’t lose it!");
+				passphraseInputDiv.append("Passphrase");
+				passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
+				passphraseInput.on("input focusout", function(e) {
+					passphraseInput.removeClass("form_input_error_div");
+					formErrors.passphrase = false;
+					updateForm();
+				});
+				
+				// passphrase config
+				var passphraseConfigDiv = $("<div class='passphrase_config_div'>").appendTo(passphraseInputDiv);
+				bip38CheckboxDiv = $("<div class='bip38_checkbox_div'>").appendTo(passphraseConfigDiv);
+				bip38Checkbox = $("<input type='checkbox' id='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
+				var bip38CheckboxLabel = $("<label for='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
+				bip38CheckboxLabel.html("Use BIP38 for Bitcoin and Bitcoin Cash");
+				var showPassphraseCheckboxDiv = $("<div class='show_passphrase_checkbox_div'>").appendTo(passphraseConfigDiv);
+				showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
+				var showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
+				showPassphraseCheckboxLabel.html("Show passphrase");
+				showPassphraseCheckbox.click(function() {
+					if (showPassphraseCheckbox.prop('checked')) {
+						passphraseInput.attr("type", "text");
+					} else {
+						passphraseInput.attr("type", "password");
+					}
+				});
+				
+				// split checkbox
+				var splitDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
+				var splitCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(splitDiv);
+				splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitCheckboxDiv);
+				var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitCheckboxDiv);
+				splitCheckboxLabel.html("Do you want to split your private keys into separate pieces?");
+				splitCheckbox.click(function() {
+					if (splitCheckbox.prop('checked')) {
+						splitInputDiv.show();
+						validateSplit(true, true);
+					} else {
+						splitInputDiv.hide();
+						validateSplit(true, false);
+					}
+				});
+				
+				// split input
+				splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
+				var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitInputDiv);
+				var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
+				var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
+				var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
+				splitNumLabelTop.html("Split Each Key Into");
+				numPiecesInput = $("<input type='tel' value='3' min='2'>").appendTo(splitNumDiv);
+				var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
+				splitNumLabelBottom.html("Pieces");
+				var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitInputDiv);
+				var splitMinDiv = $("<div class='split_min_div'>").appendTo(splitInputDiv);
+				var splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
+				splitMinLabelTop.html("Require");
+				minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
+				var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
+				splitMinLabelBottom.html("To Recover");	
+				numPiecesInput.on("input", function(e) { validateSplit(true, false); });
+				numPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
+				minPiecesInput.on("input", function(e) { validateSplit(true, false); });
+				minPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
+				
+				// apply default configuration
+				passphraseCheckbox.prop('checked', false);
+				passphraseInputDiv.hide();
+				showPassphraseCheckbox.prop('checked', false);
+				splitCheckbox.prop('checked', false);
+				splitInputDiv.hide();
+				
+				// add generate button
+				var generateDiv = $("<div class='form_generate_div'>").appendTo(pageDiv);
+				btnGenerate = $("<div class='dark_green_btn'>").appendTo(generateDiv);
+				btnGenerate.append("Generate Keys");
+				
+				// start over
+				var startOverLink = $("<div class='form_start_over'>").appendTo(pageDiv);
+				startOverLink.html("Or start over")
+				startOverLink.click(function() { onStartOver(); });
+				
+				// disable generate button if environment failure
+				AppUtils.addEnvironmentListener(function() {
+					formErrors.environment = AppUtils.hasEnvironmentState("fail");
+					updateForm()
+				});
+				
+				// add first currency
 				addCurrency();
 			});
-			
-			// passphrase checkbox
-			var passphraseDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-			var passphraseCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseDiv);
-			passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
-			var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
-			passphraseCheckboxLabel.html("Do you want to protect your private keys with a passphrase?");
-			passphraseCheckbox.click(function() {
-				if (passphraseCheckbox.prop('checked')) {
-					passphraseInputDiv.show();
-					passphraseInput.focus();
-				} else {
-					passphraseInputDiv.hide();
-					validatePassphrase(true);
-				}
-			});
-			
-			// passphrase input
-			passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
-			var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
-			passphraseWarnDiv.append("This passphrase is required to access funds later on.  Don’t lose it!");
-			passphraseInputDiv.append("Passphrase");
-			passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
-			passphraseInput.on("input focusout", function(e) {
-				passphraseInput.removeClass("form_input_error_div");
-				formErrors.passphrase = false;
-				updateForm();
-			});
-			
-			// passphrase config
-			var passphraseConfigDiv = $("<div class='passphrase_config_div'>").appendTo(passphraseInputDiv);
-			bip38CheckboxDiv = $("<div class='bip38_checkbox_div'>").appendTo(passphraseConfigDiv);
-			bip38Checkbox = $("<input type='checkbox' id='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
-			var bip38CheckboxLabel = $("<label for='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
-			bip38CheckboxLabel.html("Use BIP38 for Bitcoin and Bitcoin Cash");
-			var showPassphraseCheckboxDiv = $("<div class='show_passphrase_checkbox_div'>").appendTo(passphraseConfigDiv);
-			showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
-			var showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
-			showPassphraseCheckboxLabel.html("Show passphrase");
-			showPassphraseCheckbox.click(function() {
-				if (showPassphraseCheckbox.prop('checked')) {
-					passphraseInput.attr("type", "text");
-				} else {
-					passphraseInput.attr("type", "password");
-				}
-			});
-			
-			// split checkbox
-			var splitDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-			var splitCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(splitDiv);
-			splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitCheckboxDiv);
-			var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitCheckboxDiv);
-			splitCheckboxLabel.html("Do you want to split your private keys into separate pieces?");
-			splitCheckbox.click(function() {
-				if (splitCheckbox.prop('checked')) {
-					splitInputDiv.show();
-					validateSplit(true, true);
-				} else {
-					splitInputDiv.hide();
-					validateSplit(true, false);
-				}
-			});
-			
-			// split input
-			splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
-			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitInputDiv);
-			var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
-			var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
-			var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
-			splitNumLabelTop.html("Split Each Key Into");
-			numPiecesInput = $("<input type='tel' value='3' min='2'>").appendTo(splitNumDiv);
-			var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
-			splitNumLabelBottom.html("Pieces");
-			var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitInputDiv);
-			var splitMinDiv = $("<div class='split_min_div'>").appendTo(splitInputDiv);
-			var splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
-			splitMinLabelTop.html("Require");
-			minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
-			var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
-			splitMinLabelBottom.html("To Recover");	
-			numPiecesInput.on("input", function(e) { validateSplit(true, false); });
-			numPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
-			minPiecesInput.on("input", function(e) { validateSplit(true, false); });
-			minPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
-			
-			// apply default configuration
-			passphraseCheckbox.prop('checked', false);
-			passphraseInputDiv.hide();
-			showPassphraseCheckbox.prop('checked', false);
-			splitCheckbox.prop('checked', false);
-			splitInputDiv.hide();
-			
-			// add generate button
-			var generateDiv = $("<div class='form_generate_div'>").appendTo(pageDiv);
-			btnGenerate = $("<div class='dark_green_btn'>").appendTo(generateDiv);
-			btnGenerate.append("Generate Keys");
-			
-			// start over
-			var startOverLink = $("<div class='form_start_over'>").appendTo(pageDiv);
-			startOverLink.html("Or start over")
-			startOverLink.click(function() { onStartOver(); });
-			
-			// disable generate button if environment failure
-			AppUtils.addEnvironmentListener(function() {
-				formErrors.environment = AppUtils.hasEnvironmentState("fail");
-				updateForm()
-			});
-			
-			// add first currency
-			addCurrency();
 		});
 		
 		// done rendering

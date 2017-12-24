@@ -82,6 +82,20 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Returns app image dependencies.
+	 */
+	getAppImages: function() {
+		return [
+			"img/skull.png",
+			"img/internet.png",
+			"img/browser.png",
+			"img/computer.png",
+			"img/download.png",
+			"img/cryptostorage_export.png"
+		];
+	},
+	
+	/**
 	 * Returns all crypto plugins.
 	 */
 	getCryptoPlugins: function() {
