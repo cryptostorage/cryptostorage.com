@@ -151,29 +151,27 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			});
 			
 			// copied tooltip
-			LOADER.load(["lib/popper.js", "lib/tippy.all.js"], function() {
-				pieceDiv.find(".copyable").each(function(i, copyable) {
-					var placement = $(this).hasClass("key_div_left_value") ? "top" : "bottom";
-					tippy(copyable, {
-						arrow : true,
-						html : $("<div>Copied!</div>").get(0),
-						interactive : true,
-						placement : placement,
-						theme : 'translucent',
-						trigger : "click",
-						distance : 10,
-						arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
-						onShow : function() {
-							setTimeout(function() {
-								copyable._tippy.hide();
-							}, 1500)
-						}
-					});
+			pieceDiv.find(".copyable").each(function(i, copyable) {
+				var placement = $(this).hasClass("key_div_left_value") ? "top" : "bottom";
+				tippy(copyable, {
+					arrow : true,
+					html : $("<div>Copied!</div>").get(0),
+					interactive : true,
+					placement : placement,
+					theme : 'translucent',
+					trigger : "click",
+					distance : 10,
+					arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+					onShow : function() {
+						setTimeout(function() {
+							copyable._tippy.hide();
+						}, 1500)
+					}
 				});
-				
-				// done
-				onDone(null, pieceDiv);
 			});
+			
+			// done
+			onDone(null, pieceDiv);
 		});
 		
 		/**

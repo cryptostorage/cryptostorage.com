@@ -51,6 +51,44 @@ var UiUtils = {
 		  window.exportToBody(window, config);
 			window.focus();
 		});
+	},
+	
+	/**
+	 * Renders loading UI until the given dependences are loaded.
+	 * 
+	 * @param div is the div to render to
+	 * @param dependencies are the dependencies to load
+	 * @param onDone(err) is invoked when done or on error
+	 */
+	loadingDiv: function(div, dependencies, onDone) {
+		
+		// check if dependencies loaded
+		if (LOADER.isLoaded(dependencies)) {
+			if (onDone) onDone();
+		}
+		
+		// loading UI
+		else {
+			
+			// loading div
+			var loading = $("<div class='flex_horizontal'>").appendTo(div);
+			loading.append("<img class='loading' src='img/loading.gif'>");
+			
+			// load dependencies
+			LOADER.load(dependencies, function(err) {
+				
+				// check for error
+				if (err) {
+					if (onDone) onDone(err);
+				}
+				
+				// remove loading div and render
+				else {
+					loading.detach();
+					if (onDone) onDone();
+				}
+			});
+		}
 	}
 }
 
@@ -144,11 +182,11 @@ function AppController(div) {
 		homeController = new HomeController($("<div>"));
 		formController = new FormController($("<div>"));
 		importController = new ImportController($("<div>"));
-//		importController.render();	// TODO: render these after initial homepage done
+		importController.render();	// TODO: render these after initial homepage done
 		faqController = new FaqController($("<div>"));
-//		faqController.render();
+		faqController.render();
 		donateController = new DonateController($("<div>"));
-//		donateController.render();
+		donateController.render();
 		
 		// footer
 		footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
@@ -471,14 +509,28 @@ function DonateController(div, appController) {
 	
 	this.render = function(onDone) {
 		
-		// div setup
-		div.empty();
-		div.attr("class", "content_div");
-		var pageDiv = $("<div class='page_div'>").appendTo(div);
+		// loading screen
+		UiUtils.loadingDiv(div, AppUtils.getAppDependencies(), function(err) {
+			if (err) {
+				console.log("hit an error");
+				AppUtils.setDependencyError(true);
+			}
+			else {
+				console.log("Rendering donate");
+				renderAux();
+			}
+		});
 		
-		// load qr code dependency
-		LOADER.load(["lib/qrcode.js", "lib/async.js", "lib/clipboard.js", "lib/popper.js", "lib/tippy.all.js"], function() {
+		// done rendering
+		if (onDone) onDone(div);
+		
+		function renderAux() {
 			
+			// div setup
+			div.empty();
+			div.attr("class", "content_div");
+			var pageDiv = $("<div class='page_div'>").appendTo(div);
+
 			// build donate section
 			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
 			titleDiv.html("Donate");
@@ -546,11 +598,9 @@ function DonateController(div, appController) {
 							}
 						});
 					});
-					
-					if (onDone) onDone(div);
 				});
 			});
-		});
+		}
 		
 		/**
 		 * Renders the given donations.
@@ -679,28 +729,11 @@ function FormController(div) {
 		div.empty();
 		div.attr("class", "content_div");
 		
-		// check if dependencies loaded
-		if (!LOADER.isLoaded(AppUtils.getAppDependencies())) {
-			
-			// loading div
-			var loading = $("<div class='flex_horizontal'>").appendTo(div);
-			loading.append("<img class='loading' src='img/loading.gif'>");
-			
-			// load dependencies
-			LOADER.load(AppUtils.getAppDependencies(), function(err) {
-				
-				// check for error
-				if (err) {
-					AppUtils.setDependencyError(true);
-					onDone(div);
-				} else {
-					
-					// remove loading div and render
-					loading.detach();
-					renderAux();
-				}
-			});
-		} else renderAux();
+		// loading screen
+		UiUtils.loadingDiv(div, AppUtils.getAppDependencies(), function(err) {
+			if (err) AppUtils.setDependencyError(true);
+			else renderAux();
+		})
 		
 		// renders after dependencies loaded
 		function renderAux() {
@@ -1141,7 +1174,6 @@ function FormController(div) {
 				if (selectorData[i].text === name) {
 					selector.ddslick('select', {index: i});
 					selectedPlugin = plugins[i];
-					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
 					if (!initializing) onCurrencyChanged(selectedPlugin.getTicker());
 					break;
 				}
@@ -1260,29 +1292,41 @@ function ImportController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		
-		// div setup
-		div.empty();
-		div.attr("class", "content_div");
+		// loading screen until dependencies loaded
+		UiUtils.loadingDiv(div, AppUtils.getAppDependencies(), function(err) {
+			if (err) AppUtils.setDependencyError(err);
+			else renderAux();
+		});
 		
-		// notice div
-		var noticeDiv = $("<div>").appendTo(div);
-		new NoticeController(noticeDiv).render();
+		// done rendering
+		if (onDone) onDone(div);
 		
-		// set up page div
-		var pageDiv = $("<div class='page_div import_page'>").appendTo(div);
-		$("<div class='import_filler'>").appendTo(pageDiv);
-		var importDiv = $("<div class='import_div'>").appendTo(pageDiv);
-		
-		// render import file and text divs
-		var importFileDiv = $("<div>");
-		var importTextDiv = $("<div>");
-		new ImportFileController(importFileDiv).render(function() {
-			new ImportTextController(importTextDiv, AppUtils.getCryptoPlugins()).render(function() {
-				new TwoTabController(importDiv, "Import From File", importFileDiv, "Import From Text", importTextDiv).render(function() {
-					if (onDone) onDone(div);
+		function renderAux() {
+			
+			// div setup
+			div.empty();
+			div.attr("class", "content_div");
+			
+			// notice div
+			var noticeDiv = $("<div>").appendTo(div);
+			new NoticeController(noticeDiv).render();
+			
+			// set up page div
+			var pageDiv = $("<div class='page_div import_page'>").appendTo(div);
+			$("<div class='import_filler'>").appendTo(pageDiv);
+			var importDiv = $("<div class='import_div'>").appendTo(pageDiv);
+			
+			// render import file and text divs
+			var importFileDiv = $("<div>");
+			var importTextDiv = $("<div>");
+			new ImportFileController(importFileDiv).render(function() {
+				new ImportTextController(importTextDiv, AppUtils.getCryptoPlugins()).render(function() {
+					new TwoTabController(importDiv, "Import From File", importFileDiv, "Import From Text", importTextDiv).render(function() {
+						if (onDone) onDone(div);
+					});
 				});
 			});
-		});
+		}
 	}
 }
 inheritsFrom(ImportController, DivController);
@@ -1523,10 +1567,8 @@ function ImportFileController(div) {
 				onNamedPieces(null, [namedPiece]);
 			}
 			else if (isZipFile(file)) {
-				LOADER.load("lib/jszip.js", function() {
-					AppUtils.zipToPieces(data, function(namedPieces) {
-						onNamedPieces(null, namedPieces);
-					});
+				AppUtils.zipToPieces(data, function(namedPieces) {
+					onNamedPieces(null, namedPieces);
 				});
 			}
 		}
@@ -1575,27 +1617,23 @@ function ImportFileController(div) {
 		for (var i = 0; i < pieces[0].keys.length; i++) tickers.push(pieces[0].keys[i].ticker);
 		tickers = toUniqueArray(tickers);
 		
-		// load dependencies
-		LOADER.load(AppUtils.getAppDependencies(), function() {
+		// create keys
+		try {
 			
-			// create keys
-			try {
-				
-				// add control to view pieces
-				addControl("view imported pieces", function() {
-					UiUtils.openStorage("Imported Storage", {pieces: pieces});
-				});
-				
-				// attempt to get keys
-				var keys = AppUtils.piecesToKeys(pieces);
-				if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
-				lastKeys = keys;
-			} catch (err) {
-				var img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
-				that.setWarning(err.message, img);
-			}
-			if (onDone) onDone();
-		});
+			// add control to view pieces
+			addControl("view imported pieces", function() {
+				UiUtils.openStorage("Imported Storage", {pieces: pieces});
+			});
+			
+			// attempt to get keys
+			var keys = AppUtils.piecesToKeys(pieces);
+			if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
+			lastKeys = keys;
+		} catch (err) {
+			var img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
+			that.setWarning(err.message, img);
+		}
+		if (onDone) onDone();
 		
 		function keysDifferent(keys1, keys2) {
 			if (!keys1 && keys2) return true;
@@ -1758,26 +1796,23 @@ function ImportTextController(div, plugins) {
 		resetControls();
 		
 		// initialize pull down
-		LOADER.load("lib/jquery.ddslick.js", function() {	// ensure loaded before or only return after loaded
-			selector.ddslick({
-				data:selectorData,
-				background: "white",
-				imagePosition: "left",
-				selectText: "Select a Currency",
-				width:'100%',
-				defaultSelectedIndex: 0,
-				onSelected: function(selection) {
-					selectedPlugin = plugins[selection.selectedIndex];
-					LOADER.load(selectedPlugin.getDependencies());	// start loading dependencies
-				},
-			});
-			selector = $("#import_selector");	// ddslick requires id reference
-			selectorDisabler = $("<div class='import_selector_disabler'>").appendTo(selectorContainer);
-			startOver();
-			
-			// done rendering
-			if (onDone) onDone(div);
+		selector.ddslick({
+			data:selectorData,
+			background: "white",
+			imagePosition: "left",
+			selectText: "Select a Currency",
+			width:'100%',
+			defaultSelectedIndex: 0,
+			onSelected: function(selection) {
+				selectedPlugin = plugins[selection.selectedIndex];
+			},
 		});
+		selector = $("#import_selector");	// ddslick requires id reference
+		selectorDisabler = $("<div class='import_selector_disabler'>").appendTo(selectorContainer);
+		startOver();
+		
+		// done rendering
+		if (onDone) onDone(div);
 	}
 	
 	function resetControls() {
@@ -1920,15 +1955,8 @@ function ImportTextController(div, plugins) {
 			if (line.trim() !== "") contentLines.push(line);
 		}
 		
-		// load dependencies
-		var dependencies = [];
-		for (var i = 0; i < selectedPlugin.getDependencies().length; i++) dependencies.push(selectedPlugin.getDependencies()[i]);
-		dependencies = toUniqueArray(dependencies);
-		LOADER.load(dependencies, function() {
-			
-			// add pieces
-			updatePieces(contentLines);
-		});
+		// add pieces
+		updatePieces(contentLines);
 	}
 	
 	function updatePieces(newPieces) {
@@ -2288,28 +2316,17 @@ function ExportController(div, window, config) {
 		div.empty();
 		div.addClass("export_div");
 		
-		// check if dependencies loaded
-		if (!LOADER.isLoaded(AppUtils.getExportDependencies())) {
-			
-			// loading div
-			var loading = $("<div class='flex_horizontal'>").appendTo(div);
-			loading.append("<img class='loading' src='img/loading.gif'>");
-			
-			// load dependencies
-			LOADER.load(AppUtils.getExportDependencies(), function(err) {
-				
-				// check for error
-				if (err) {
-					AppUtils.setDependencyError(true);
-					onDone(div);
-				} else {
-					
-					// remove loading div and render
-					loading.detach();
-					renderAux();
-				}
-			});
-		} else renderAux();
+		// loading screen
+		UiUtils.loadingDiv(div, AppUtils.getExportDependencies(), function(err) {
+			if (err) {
+				AppUtils.setDependencyError(true);
+			} else {
+				renderAux();
+			}
+		});
+		
+		// done rendering
+		if (onDone) onDone(div);
 		
 		// renders after dependencies loaded
 		function renderAux() {
@@ -2733,23 +2750,21 @@ function NoticeController(div, config) {
 			// tooltip
 			var description = $("<div>");
 			renderCheckDescription(description, info, check);
-			LOADER.load(["lib/popper.js", "lib/tippy.all.js"], function() {
-				tippy(div.get(0), {
-					arrow: true,
-					html: description.get(0),
-					interactive: true,
-					placement: 'bottom',
-					theme: 'translucent',
-					trigger: "mouseenter",
-					multiple: 'false',
-					distance: 20,
-					arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-					onShow: function() {
-						for (var i = 0; i < tippies.length; i++) {
-							if (tippies[i] !== div) tippies[i].get(0)._tippy.hide();	// manually hide other tippy divs
-						}
+			tippy(div.get(0), {
+				arrow: true,
+				html: description.get(0),
+				interactive: true,
+				placement: 'bottom',
+				theme: 'translucent',
+				trigger: "mouseenter",
+				multiple: 'false',
+				distance: 20,
+				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+				onShow: function() {
+					for (var i = 0; i < tippies.length; i++) {
+						if (tippies[i] !== div) tippies[i].get(0)._tippy.hide();	// manually hide other tippy divs
 					}
-				});
+				}
 			});
 			
 			// gets the check icon TODO
