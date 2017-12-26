@@ -679,27 +679,35 @@ function FormController(div) {
 		div.empty();
 		div.attr("class", "content_div");
 		
-		// loading div
-		var loading = $("<div class='flex_horizontal'>").appendTo(div);
-		loading.append("<img class='loading' src='img/loading.gif'>");
+		// check if dependencies loaded
+		if (!LOADER.isLoaded(AppUtils.getAppDependencies())) {
+			
+			// loading div
+			var loading = $("<div class='flex_horizontal'>").appendTo(div);
+			loading.append("<img class='loading' src='img/loading.gif'>");
+			
+			// load dependencies
+			LOADER.load(AppUtils.getAppDependencies(), function(err) {
+				
+				// check for error
+				if (err) {
+					AppUtils.setDependencyError(true);
+					onDone(div);
+				} else {
+					
+					// remove loading div and render
+					loading.detach();
+					renderAux();
+				}
+			});
+		} else renderAux();
 		
-		// load dependencies
-		// TODO: only show loading if dependencies not loaded
-		LOADER.load(AppUtils.getAppDependencies(), function(err) {
+		// renders form after dependencies loaded
+		function renderAux() {
 			
 			// notice div
 			var noticeDiv = $("<div>").appendTo(div);
 			new NoticeController(noticeDiv).render();
-			
-			// remove loading div
-			loading.detach();
-			
-			// error propagates to notice div
-			if (err) {
-				AppUtils.setDependencyError(true);
-				onDone(div);
-				return;
-			}
 			
 			// page div
 			var pageDiv = $("<div class='page_div'>").appendTo(div);
@@ -832,7 +840,7 @@ function FormController(div) {
 			
 			// add first currency
 			addCurrency();
-		});
+		}
 		
 		// done rendering
 		onDone(div);
