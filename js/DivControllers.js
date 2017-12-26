@@ -511,14 +511,8 @@ function DonateController(div, appController) {
 		
 		// loading screen
 		UiUtils.loadingDiv(div, AppUtils.getAppDependencies(), function(err) {
-			if (err) {
-				console.log("hit an error");
-				AppUtils.setDependencyError(true);
-			}
-			else {
-				console.log("Rendering donate");
-				renderAux();
-			}
+			if (err) AppUtils.setDependencyError(true);
+			else renderAux();
 		});
 		
 		// done rendering
