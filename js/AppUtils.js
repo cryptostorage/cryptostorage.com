@@ -44,55 +44,93 @@ var AppUtils = {
 		"Sailfish", "Series40", "Solaris", "Symbian", "WebOS"
 	]),
 	
-	// returns all app dependencies after inital homescreen is loaded
-	getAppDependencies: function() {
-		console.log("AppUtils.getAppDependencies()");
-		if (AppUtils.appDependencies) return AppUtils.appDependencies;
-		AppUtils.appDependencies = [
+	// ------------------------- APPLICATION DEPENDENCIES -----------------------
+	
+	getNoticeDependencies: function() {
+		return [
+			"lib/ua-parser.js",
+			"lib/popper.js",
+			"lib/tippy.all.js",
+			"img/skull.png",
+			"img/internet.png",
+			"img/browser.png",
+			"img/computer.png",
+			"img/download.png",
+		];
+	},
+	
+	getCryptoDependencies: function() {
+		var dependencies = [];
+		var plugins = AppUtils.getCryptoPlugins();
+		for (var i = 0; i < plugins.length; i++) {
+			dependencies = dependencies.concat(plugins[i].getDependencies());
+		}
+		return dependencies;
+	},
+
+	getExportDependencies: function() {
+		var dependencies = [
 			"css/style.css",
+			"lib/jquery-3.2.1.js",
+			"lib/loadjs.js",
 			"lib/async.js",
+			"js/DependencyLoader.js",
+			"lib/pagination.js",
+			"js/GenUtils.js",
+			"js/AppUtils.js",
+			"js/CryptoPlugins.js",
+			"js/DivControllers.js",
+			"js/BodyExporter.js",
 			"js/PieceRenderer.js",
-			"lib/jquery-csv.js",
+			"lib/async.js",
 			"lib/qrcode.js",
 			"lib/jszip.js",
 			"lib/FileSaver.js",
 			"lib/crypto-js.js",
 			"lib/progressbar.js",
 			"css/pagination.css",
-			"lib/pagination.js",
 			"lib/bitaddress.js",
 			"lib/ua-parser.js",
 			"lib/clipboard.js",
-			"lib/jquery.ddslick.js",
-			"lib/popper.js",
-			"lib/tippy.all.js",
 			"js/CryptoKey.js",
-			"js/GenUtils.js",
-			"js/AppUtils.js",
-			"js/BodyExporter.js"
-		];
-		var plugins = AppUtils.getCryptoPlugins();
-		for (var i = 0; i < plugins.length; i++) {
-			for (var j = 0; j < plugins[i].getDependencies().length; j++) {
-				AppUtils.appDependencies.push(plugins[i].getDependencies()[j]);
-			}
-		}
-		AppUtils.appDependencies = toUniqueArray(AppUtils.appDependencies);
-		return AppUtils.appDependencies;
-	},
-	
-	/**
-	 * Returns app image dependencies.
-	 */
-	getAppImages: function() {
-		return [
-			"img/skull.png",
-			"img/internet.png",
-			"img/browser.png",
-			"img/computer.png",
-			"img/download.png",
+			"lib/setImmediate.js",
 			"img/cryptostorage_export.png"
 		];
+		
+		// add crypto dependencies
+		dependencies = dependencies.concat(AppUtils.getCryptoDependencies());
+		
+		// return unique array
+		return toUniqueArray(dependencies);
+	},
+	
+	// returns all app dependencies after inital homescreen is loaded
+	getAppDependencies: function() {
+		
+		// app dependencies
+		var dependencies = [
+			"lib/pagination.js",
+			"js/PieceRenderer.js",
+			"lib/qrcode.js",
+			"lib/jszip.js",
+			"lib/FileSaver.js",
+			"lib/crypto-js.js",
+			"lib/progressbar.js",
+			"css/pagination.css",
+			"lib/bitaddress.js",
+			"lib/ua-parser.js",
+			"lib/clipboard.js",
+			"js/CryptoKey.js",
+			"lib/setImmediate.js",
+			"img/cryptostorage_export.png",
+			"lib/jquery.ddslick.js",
+		];
+		
+		// add export dependencies
+		dependencies = dependencies.concat(AppUtils.getCryptoDependencies());
+		
+		// return unique array
+		return toUniqueArray(dependencies);
 	},
 	
 	/**

@@ -3,11 +3,11 @@
  */
 $(document).ready(function() {
 	
-	// detect any uncaught errors
+	// notify any uncaught errors
 	window.onerror = function(err) {
 		AppUtils.setRuntimeError(err);
 	};
-	
+
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;
 		

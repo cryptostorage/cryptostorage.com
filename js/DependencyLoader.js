@@ -4,17 +4,19 @@ var LOADER = new DependencyLoader();
 /**
  * Loads dependencies.
  * 
- * Uses loadjs under the covers: https://github.com/muicss/loadjs
+ * Requires loadjs.js.
  */
 function DependencyLoader() {
+	
+	var loadedImages = [];
 	
 	/**
 	 * Loads the given paths.
 	 * 
 	 * @param paths is one or more paths to load as a string or string[]
-	 * @param callback(err) is invoked when the paths are loaded or fail
+	 * @param onDone(err) is invoked when the paths are loaded or fail
 	 */
-	this.load = function(paths, callback) {
+	this.load = function(paths, onDone) {
 		
 		// listify paths
 		if (!isArray(paths)) {
@@ -22,18 +24,46 @@ function DependencyLoader() {
 			paths = [paths];
 		}
 		
-		// only load paths that aren't previously defined
+		// collect images and scripts that aren't loaded
+		var imagesToLoad = [];
+		var scriptsToLoad = [];
 		for (var i = 0; i < paths.length; i++) {
 			var path = paths[i];
 			assertDefined(path);
-			if (!loadjs.isDefined(path)) loadjs(path, path);
+			if (path.endsWith(".png") || path.endsWith(".jpg")) {
+				if (!arrayContains(loadedImages, path)) imagesToLoad.push(path);
+			} else {
+				scriptsToLoad.push(path);
+				if (!loadjs.isDefined(path)) loadjs(path, path);
+			}
 		}
 		
-		// invokes callback when all paths loaded
-		loadjs.ready(paths, {
-			success: callback,
-			error: function() { if (callback) callback(new Error("Failed to load dependencies: " + paths)); }
+		// execute functions to fetch scripts and images
+		var funcs = [getScriptsFunc(scriptsToLoad), getImagesFunc(imagesToLoad)];
+		async.parallel(funcs, function(err, result) {
+			if (onDone) onDone(err);
 		});
+		
+		function getScriptsFunc(paths) {
+			return function(onDone) {
+				loadjs.ready(scriptsToLoad, {
+					success: onDone,
+					error: function() { onDone(new Error("Failed to load dependencies: " + paths)); }
+				});
+			}
+		}
+		
+		function getImagesFunc(paths) {
+			return function(onDone) {
+				getImages(paths, function(err) {
+					if (err) onDone(err);
+					else {
+						loadedImages = loadedImages.concat(imagesToLoad);
+						onDone();
+					}
+				});
+			}
+		}
 	}
 	
 	/**
@@ -51,7 +81,7 @@ function DependencyLoader() {
 		
 		// check if each path is loaded
 		for (var i = 0; i < paths.length; i++) {
-			if (!loadjs.isDefined(paths[i])) return false;
+			if (!arrayContains(loadedImages, paths[i]) && !loadjs.isDefined(paths[i])) return false;
 		}
 		
 		// all paths loaded
