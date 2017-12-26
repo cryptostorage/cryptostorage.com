@@ -684,6 +684,7 @@ function FormController(div) {
 		loading.append("<img class='loading' src='img/loading.gif'>");
 		
 		// load dependencies
+		// TODO: only show loading if dependencies not loaded
 		LOADER.load(AppUtils.getAppDependencies(), function(err) {
 			
 			// notice div
@@ -2334,11 +2335,15 @@ function ExportController(div, window, config) {
 		setControlsEnabled(false);
 		
 		// load dependencies
-		LOADER.load(AppUtils.getAppDependencies(), function(err) {
+		LOADER.load(AppUtils.getExportDependencies(), function(err) {
+			
+			// poll environment info on loop
+			AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
 			
 			// handle error
 			if (err) {
-				throw err;	// TODO
+				AppUtils.setDependenceError(true);
+				return;
 			}
 			
 			// notice div

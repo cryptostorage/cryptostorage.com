@@ -67,38 +67,48 @@ var AppUtils = {
 		}
 		return dependencies;
 	},
+	
+	getExportJs: function() {
+		return [
+			"lib/jquery-3.2.1.js",
+			"lib/async.js",
+			"lib/loadjs.js",
+			"js/DependencyLoader.js",
+			"js/GenUtils.js",
+			"js/AppUtils.js",
+			"js/DivControllers.js",
+			"js/CryptoPlugins.js",
+			"js/BodyExporter.js"
+		];
+	},
+	
+	getExportCss: function() {
+		return [
+			"css/style.css",
+			"css/pagination.css"
+		]
+	},
 
 	getExportDependencies: function() {
 		var dependencies = [
-			"css/style.css",
-			"lib/jquery-3.2.1.js",
-			"lib/loadjs.js",
-			"lib/async.js",
-			"js/DependencyLoader.js",
+			"css/pagination.css",
 			"lib/pagination.js",
-			"js/GenUtils.js",
-			"js/AppUtils.js",
-			"js/CryptoPlugins.js",
-			"js/DivControllers.js",
-			"js/BodyExporter.js",
 			"js/PieceRenderer.js",
-			"lib/async.js",
 			"lib/qrcode.js",
 			"lib/jszip.js",
 			"lib/FileSaver.js",
 			"lib/crypto-js.js",
 			"lib/progressbar.js",
-			"css/pagination.css",
 			"lib/bitaddress.js",
-			"lib/ua-parser.js",
 			"lib/clipboard.js",
 			"js/CryptoKey.js",
 			"lib/setImmediate.js",
 			"img/cryptostorage_export.png"
 		];
 		
-		// add crypto dependencies
+		// add dependencies
 		dependencies = dependencies.concat(AppUtils.getCryptoDependencies());
+		dependencies = dependencies.concat(AppUtils.getNoticeDependencies());
 		
 		// return unique array
 		return toUniqueArray(dependencies);
@@ -109,6 +119,7 @@ var AppUtils = {
 		
 		// app dependencies
 		var dependencies = [
+			"css/pagination.css",
 			"lib/pagination.js",
 			"js/PieceRenderer.js",
 			"lib/qrcode.js",
@@ -116,18 +127,15 @@ var AppUtils = {
 			"lib/FileSaver.js",
 			"lib/crypto-js.js",
 			"lib/progressbar.js",
-			"css/pagination.css",
 			"lib/bitaddress.js",
-			"lib/ua-parser.js",
 			"lib/clipboard.js",
 			"js/CryptoKey.js",
-			"lib/setImmediate.js",
-			"img/cryptostorage_export.png",
 			"lib/jquery.ddslick.js",
 		];
 		
-		// add export dependencies
+		// add dependencies
 		dependencies = dependencies.concat(AppUtils.getCryptoDependencies());
+		dependencies = dependencies.concat(AppUtils.getNoticeDependencies());
 		
 		// return unique array
 		return toUniqueArray(dependencies);
@@ -1432,6 +1440,15 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Sets the cached environment info.
+	 * 
+	 * @param environment is the cached environment info to set
+	 */
+	setCachedEnvironment: function(environment) {
+		AppUtils.environment = environment;
+	},
+	
+	/**
 	 * Returns the cached environment info.
 	 */
 	getCachedEnvironment: function() {
@@ -1448,6 +1465,7 @@ var AppUtils = {
 	pollEnvironment: function(initialEnvironmentInfo) {
 		
 		// notify listeners of initial environment info
+		console.log("Setting initial info: " + initialEnvironmentInfo);
 		if (initialEnvironmentInfo) setEnvironmentInfo(initialEnvironmentInfo);
 		
 		// refresh environment info on loop

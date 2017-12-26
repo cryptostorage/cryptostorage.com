@@ -21,8 +21,8 @@ window.exportToBody = function(window, config) {
 		AppUtils.setRuntimeError(err);
 	};
 	
-	// poll environment info on loop
-	AppUtils.pollEnvironment(config.environmentInfo);	// TODO: this is getting called before ua-parser.js loaded
+	// set initial environment info
+	if (config.environmentInfo) AppUtils.setCachedEnvironment(config.environmentInfo);
 	
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;
