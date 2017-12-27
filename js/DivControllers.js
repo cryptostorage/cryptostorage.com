@@ -62,12 +62,12 @@ var UiUtils = {
 	 */
 	loadingDiv: function(div, dependencies, onDone) {
 		
-		// check if dependencies loaded
+		// done if dependencies loaded
 		if (LOADER.isLoaded(dependencies)) {
 			if (onDone) onDone();
 		}
 		
-		// loading UI
+		// dependencies not loaded
 		else {
 			
 			// loading div
