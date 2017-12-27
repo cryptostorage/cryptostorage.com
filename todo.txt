@@ -1,14 +1,12 @@
 TODO
 tippy error on copy imported decrypted keys
 popper.js.map 404 when deployed
-loading screen while dependencies loading: form, import, direct export.  error if cannot get
-don't load tippy on homepage
+test dependency errors
 import decrypted keys renders inline
 link to view original imported pieces in either decrypted or encrypted which opens in new tab
 export page piece selection disabled while loading
 form info bubbles - see spec
 form error messages - see spec
-notices on form and import, homepage if error
 warn if private key not included in print
 refresh image on regenerate button
 warnings link to downloads
@@ -19,7 +17,6 @@ seo
 faq content
 homepage content
 file import loading - see spec, only show if minimum file size
-form should error if ddslick hasn't loaded from ImportTextController
 common browser icons
 "application is not running locally" is not true, it's not hosted locally
 add DependencyLoader.isLoaded() and only show loading if not already loaded
