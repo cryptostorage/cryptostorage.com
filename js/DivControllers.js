@@ -2373,7 +2373,7 @@ function ExportController(div, window, config) {
 			var paginatorSource = getPaginatorSource(config.keyGenConfig, config.pieces);
 			if (paginatorSource) {
 				paginator = $("<div id='paginator'>").appendTo(exportHeader);
-				$("#paginator").pagination({
+				$("#paginator", exportHeader).pagination({
 					dataSource: paginatorSource,
 					pageSize: 1,
 					callback: function(data, pagination) {
@@ -2428,9 +2428,6 @@ function ExportController(div, window, config) {
 			// build ui based on keyGenConfig, pieces, and pieceDivs
 			update(config.pieceDivs);
 		}
-		
-		// done rendering
-		if (onDone) onDone(div);
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
