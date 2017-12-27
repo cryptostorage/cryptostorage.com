@@ -47,7 +47,9 @@ var AppUtils = {
 	// ------------------------- APPLICATION DEPENDENCIES -----------------------
 	
 	getHomeDependencies: function() {
-		return [
+		var dependencies = [
+			"lib/slick.js",
+			"lib/setImmediate.js",
 			"img/checklist.png",
 			"img/cryptostorage_white.png",
 			"img/key.png",
@@ -59,6 +61,13 @@ var AppUtils = {
 			"img/notice_bar.png",
 			"img/print_sample.png"
 		];
+		
+		// crypto logos
+		for (var i = 0; i < AppUtils.getCryptoPlugins().length; i++) {
+			dependencies.push(AppUtils.getCryptoPlugins()[i].getLogoPath());
+		}
+		
+		return dependencies;
 	},
 	
 	getNoticeDependencies: function() {
@@ -79,6 +88,8 @@ var AppUtils = {
 	
 	getCryptoDependencies: function() {
 		var dependencies = [];
+		dependencies.push("lib/crypto-js.js");
+		dependencies.push("lib/bitcoinjs.js");
 		var plugins = AppUtils.getCryptoPlugins();
 		for (var i = 0; i < plugins.length; i++) {
 			dependencies = dependencies.concat(plugins[i].getDependencies());

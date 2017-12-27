@@ -2,14 +2,6 @@
  * Invoked when document initialized.
  */
 $(document).ready(function() {
-	
-	// notify any uncaught errors
-	window.onerror = function(err) {
-		LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
-			if (!err) AppUtils.setRuntimeError(err);
-		});
-		throw err;
-	};
 
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;
@@ -20,6 +12,13 @@ $(document).ready(function() {
 	// render application to html body
 	new AppController($("body")).render(function() {
 		
+		// catch unexpected errors
+		LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
+			window.onerror = function(err) {
+				if (err) AppUtils.setRuntimeError(err);
+				throw err;
+			};
+		});
 	});
 	
 //		// start loading common dependencies

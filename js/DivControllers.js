@@ -164,26 +164,26 @@ function AppController(div) {
 			return div;
 		}
 		
-		// slider
-		sliderDiv = $("<div>").appendTo(headerDiv);
-		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectImport);
-		
-		// main content
-		contentDiv = $("<div class='app_content'>").appendTo(div);
-		
-		// footer
-		footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
-		footerDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
-		footerDiv.hide();
-		
-		// load home dependencies
-		LOADER.load(AppUtils.getHomeDependencies(), function(err) {
+		// loading div until ready
+		UiUtils.loadingDiv(div, AppUtils.getHomeDependencies(), function(err) {
 			
 			// check for error
 			if (err) {
 				AppUtils.setDependencyError(true);
 				throw err;
 			}
+		
+			// slider
+			sliderDiv = $("<div>").appendTo(headerDiv);
+			sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectImport);
+			
+			// main content
+			contentDiv = $("<div class='app_content'>").appendTo(div);
+			
+			// footer
+			footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
+			footerDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
+			footerDiv.hide();
 			
 			// get identifier
 			var href = window.location.href;
