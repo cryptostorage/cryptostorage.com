@@ -46,6 +46,21 @@ var AppUtils = {
 	
 	// ------------------------- APPLICATION DEPENDENCIES -----------------------
 	
+	getHomeDependencies: function() {
+		return [
+			"img/checklist.png",
+			"img/cryptostorage_white.png",
+			"img/key.png",
+			"img/keys.png",
+			"img/microscope.png",
+			"img/mix.png",
+			"img/security.png",
+			"img/license.png",
+			"img/notice_bar.png",
+			"img/print_sample.png"
+		];
+	},
+	
 	getNoticeDependencies: function() {
 		return [
 			"lib/ua-parser.js",
@@ -56,6 +71,9 @@ var AppUtils = {
 			"img/browser.png",
 			"img/computer.png",
 			"img/download.png",
+			"img/circle_checkmark.png",
+			"img/circle_exclamation.png",
+			"img/circle_x.png"
 		];
 	},
 	

@@ -123,15 +123,8 @@ function AppController(div) {
 	
 	this.render = function(onDone) {
 		
-		// start polling starting with synchronized environment info
-		LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
-			if (err) throw err;
-			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
-		});
-		
-		div.empty();
-		
 		// header
+		div.empty();
 		var headerDiv = $("<div class='app_header'>").appendTo(div);
 		
 		// header logo
@@ -145,25 +138,25 @@ function AppController(div) {
 		// header links
 		var linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
 		var homeLink = getLinkDiv("Home");
-		homeLink.click(function() {
-			window.location.href = "#home";
-			that.showHome();
-		});
 		var gitHubLink = $("<a target='_blank' class='link_div' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>");
 		var faqLink = getLinkDiv("FAQ");
-		faqLink.click(function() {
-			window.location.href = "#faq";
-			that.showFaq();
-		});
 		var donateLink = getLinkDiv("Donate");
-		donateLink.click(function() {
-			window.location.href = "#donate";
-			that.showDonate();
-		});
 		linksDiv.append(homeLink);
 		linksDiv.append(gitHubLink);
 		linksDiv.append(faqLink);
 		linksDiv.append(donateLink);
+		homeLink.click(function() {
+			window.location.href = "#home";
+			that.showHome();
+		});
+		faqLink.click(function() {
+			window.location.href = "#faq";
+			that.showFaq();
+		});
+		donateLink.click(function() {
+			window.location.href = "#donate";
+			that.showDonate();
+		});
 		
 		function getLinkDiv(label) {
 			var div = $("<div class='link_div'>");
@@ -178,28 +171,31 @@ function AppController(div) {
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
-		// initialize controllers
-		homeController = new HomeController($("<div>"));
-		formController = new FormController($("<div>"));
-		importController = new ImportController($("<div>"));
-		importController.render();	// TODO: render these after initial homepage done
-		faqController = new FaqController($("<div>"));
-		faqController.render();
-		donateController = new DonateController($("<div>"));
-		donateController.render();
-		
 		// footer
 		footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
 		footerDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
 		footerDiv.hide();
 		
-		// timeout fixes issue on safari where cryptostorage logo doesn't reliably show
-		setImmediate(function() {
+		// load home dependencies
+		LOADER.load(AppUtils.getHomeDependencies(), function(err) {
+			
+			// check for error
+			if (err) {
+				AppUtils.setDependencyError(true);
+				throw err;
+			}
 			
 			// get identifier
 			var href = window.location.href;
 			var lastIdx = href.lastIndexOf("#");
 			var identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+			
+			// initialize controllers
+			homeController = new HomeController($("<div>"));
+			formController = new FormController($("<div>"));
+			importController = new ImportController($("<div>"));
+			faqController = new FaqController($("<div>"));
+			donateController = new DonateController($("<div>"));
 			
 			// show page based on identifier
 			if (identifier === "home") that.showHome();
@@ -209,6 +205,17 @@ function AppController(div) {
 			
 			// done rendering
 			if (onDone) onDone(div);
+			
+			// render other pages
+			importController.render();
+			faqController.render();
+			donateController.render();
+			
+			// start polling starting with synchronized environment info
+			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
+				if (err) throw err;
+				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
+			});
 		});
 	}
 	

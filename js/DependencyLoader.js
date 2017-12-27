@@ -46,10 +46,13 @@ function DependencyLoader() {
 		
 		function getScriptsFunc(paths) {
 			return function(onDone) {
-				loadjs.ready(scriptsToLoad, {
-					success: onDone,
-					error: function() { onDone(new Error("Failed to load dependencies: " + paths)); }
-				});
+				if (!paths.length) onDone();
+				else {
+					loadjs.ready(paths, {
+						success: onDone,
+						error: function() { onDone(new Error("Failed to load dependencies: " + paths)); }
+					});
+				}
 			}
 		}
 		
@@ -58,7 +61,7 @@ function DependencyLoader() {
 				getImages(paths, function(err) {
 					if (err) onDone(err);
 					else {
-						loadedImages = loadedImages.concat(imagesToLoad);
+						loadedImages = loadedImages.concat(paths);
 						onDone();
 					}
 				});
