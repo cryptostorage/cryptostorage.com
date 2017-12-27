@@ -1,5 +1,4 @@
 TODO
-tippy error on copy imported decrypted keys
 popper.js.map 404 when deployed
 test dependency errors
 import decrypted keys renders inline

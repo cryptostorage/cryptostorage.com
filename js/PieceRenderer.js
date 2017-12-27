@@ -142,34 +142,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		// render pairs
 		async.series(funcs, function() {
 			if (isCancelled) return;
-			
-			// make keys copyable
-			new Clipboard(".copyable", {
-				text: function(trigger) {
-					return $(trigger).html();
-				}
-			});
-			
-			// copied tooltip
-			pieceDiv.find(".copyable").each(function(i, copyable) {
-				tippy(copyable, {
-					arrow : true,
-					html : $("<div>Copied!</div>").get(0),
-					interactive : true,
-					placement : "top",
-					theme : 'translucent',
-					trigger : "click",
-					distance : 10,
-					arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
-					onShow : function() {
-						setTimeout(function() {
-							copyable._tippy.hide();
-						}, 1500)
-					}
-				});
-			});
-			
-			// done
+			PieceRenderer.makeCopyable(pieceDiv);
 			onDone(null, pieceDiv);
 		});
 		
@@ -311,4 +284,36 @@ PieceRenderer.getWeight = function(numKeys, numPieces, config) {
 	
 	function getWeightQr() { return 15; }
 	function getWeightLogo() { return 0; }
+}
+
+/**
+ * Makes the given div copyable assuming it is a rendered piece(s).
+ */
+PieceRenderer.makeCopyable = function(div) {
+	
+	// copy keys to clipboard
+	new Clipboard(".copyable", {
+		text: function(trigger) {
+			return $(trigger).html();
+		}
+	});
+	
+	// copied tooltip
+	div.find(".copyable").each(function(i, copyable) {
+		tippy(copyable, {
+			arrow : true,
+			html : $("<div>Copied!</div>").get(0),
+			interactive : true,
+			placement : "top",
+			theme : 'translucent',
+			trigger : "click",
+			distance : 10,
+			arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+			onShow : function() {
+				setTimeout(function() {
+					copyable._tippy.hide();
+				}, 1500)
+			}
+		});
+	});
 }
