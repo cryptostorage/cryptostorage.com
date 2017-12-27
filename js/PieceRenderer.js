@@ -152,12 +152,11 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			
 			// copied tooltip
 			pieceDiv.find(".copyable").each(function(i, copyable) {
-				var placement = $(this).hasClass("key_div_left_value") ? "top" : "bottom";
 				tippy(copyable, {
 					arrow : true,
 					html : $("<div>Copied!</div>").get(0),
 					interactive : true,
-					placement : placement,
+					placement : "top",
 					theme : 'translucent',
 					trigger : "click",
 					distance : 10,
