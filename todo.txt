@@ -1,5 +1,4 @@
 TODO
-click notices hides tippy
 quick generate loading progress hidden, regenerate button only after key pair rendered
 popper.js.map 404 when deployed
 test dependency errors
