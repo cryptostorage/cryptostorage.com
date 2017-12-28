@@ -28,13 +28,11 @@ $(document).ready(function() {
 			
 			// run test suite
 			if (AppUtils.RUN_TESTS) {
-				LOADER.load("js/Tests.js", function(err) {
-					if (err) throw err;
-					console.log("Running tests...");
-					Tests.runTests(function(error) {
-						if (error) throw error;
-						console.log("All tests pass");
-					});
+				if (err) throw err;
+				console.log("Running tests...");
+				Tests.runTests(function(error) {
+					if (error) throw error;
+					console.log("All tests pass");
 				});
 			}
 		});
