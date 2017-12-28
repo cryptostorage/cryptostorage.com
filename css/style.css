@@ -947,7 +947,6 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_success_links > * {
-	margin-top:3px;
 	margin-right: 20px;
 }
 
