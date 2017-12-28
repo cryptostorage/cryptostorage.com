@@ -1,5 +1,6 @@
 TODO
 quick generate loading progress hidden, regenerate button only after key pair rendered
+1px border on mobile safari import print
 test dependency errors
 import decrypted keys renders inline
 link to view original imported pieces in either decrypted or encrypted which opens in new tab
