@@ -5,7 +5,7 @@
  * 
  * @param window is the window to export to
  * @param config is the export configuration
- * 				config.importedPieces are original imported pieces
+ * 				config.splitPieces are imported split pieces
  * 				config.keyGenConfig is a configuration to generate new storage
  * 				config.keys are keys to generate pieces from
  * 				config.pieces are pieces to export and generate pieceDivs from

@@ -32,7 +32,7 @@ var UiUtils = {
 	 * 
 	 * @param browserTabName is the name of the tab
 	 * @param config is the storage configuration
-	 * 				config.importedPieces are original imported pieces
+	 * 				config.splitPieces are imported split pieces
 	 * 				config.keyGenConfig is a configuration to generate new storage
 	 * 				config.keys are keys to generate pieces from
 	 * 				config.pieces are pieces to export and generate pieceDivs from
@@ -1472,15 +1472,7 @@ function ImportFileController(div) {
 		link.click(function() { onClick(); });
 	}
 	
-	function getImportedPieces() {
-		var pieces = [];
-		for (var i = 0; i < importedNamedPieces.length; i++) {
-			pieces.push(importedNamedPieces[i].piece);
-		}
-		return pieces;
-	}
-	
-	function onKeysImported(keys) {
+	function onKeysImported(pieces, keys) {
 		resetControls();
 		that.setWarning("");
 		keys = listify(keys);
@@ -1490,8 +1482,8 @@ function ImportFileController(div) {
 			// create decryption controller and register callbacks
 			decryptionController = new DecryptionController(decryptionDiv, keys, function(warning) {
 				that.setWarning(warning);
-			}, function(decryptedKeys, pieces, pieceDivs) {
-				onKeysDecrypted(getImportedPieces(), decryptedKeys, pieces, pieceDivs);
+			}, function(decryptedKeys, decryptedPieces, decryptedPieceDivs) {
+				onKeysDecrypted(pieces, decryptedKeys, decryptedPieces, decryptedPieceDivs);
 			});
 			
 			// render decryption controller
@@ -1505,11 +1497,11 @@ function ImportFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openStorage("Encrypted Keys", {importedPieces: getImportedPieces(), keys: keys});
+					UiUtils.openStorage("Encrypted Keys", {splitPieces: pieces.length > 1 ? pieces : null, keys: keys});
 				});
 			});
 		} else {
-			onKeysDecrypted(getImportedPieces(), keys);
+			onKeysDecrypted(pieces, keys);
 		}
 	}
 	
@@ -1528,9 +1520,11 @@ function ImportFileController(div) {
 		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
-		var viewImported = $("<div class='import_control_link'>").appendTo(successLinks);
-		viewImported.append("view imported pieces");
-		viewImported.click(function() { UiUtils.openStorage("Imported Pieces", {pieces: importedPieces}); });
+		if (importedPieces.length > 1) {
+			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
+			viewSplit.append("view split pieces");
+			viewSplit.click(function() { UiUtils.openStorage("Imported Pieces", {pieces: importedPieces}); });
+		}
 		
 		// inline storage
 		var storageDiv = $("<div>").appendTo(importedStorageDiv);
@@ -1663,7 +1657,7 @@ function ImportFileController(div) {
 			
 			// attempt to get keys
 			var keys = AppUtils.piecesToKeys(pieces);
-			if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(keys);
+			if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(pieces, keys);
 			lastKeys = keys;
 		} catch (err) {
 			var img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
@@ -2342,7 +2336,7 @@ inheritsFrom(TwoTabController, DivController);
  * @param div is the div to render to
  * @param window is a reference to the window for printing
  * @param config specifies export page behavior
- * 				config.importedPieces are original imported pieces
+ * 				config.splitPieces are imported split pieces
  * 				config.keyGenConfig is a configuration to generate new storage
  * 				config.keys are keys to generate pieces from
  * 				config.pieces are pieces to export and generate pieceDivs from
@@ -2434,12 +2428,12 @@ function ExportController(div, window, config) {
 			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
 		}
 		
-		// view imported pieces
-		if (config.importedPieces) {
+		// view split pieces
+		if (config.splitPieces) {
 			var viewImported = $("<div class='import_control_link'>").appendTo(exportHeader);
-			viewImported.html("view imported pieces");
+			viewImported.html("view split pieces");
 			viewImported.click(function() {
-				UiUtils.openStorage("Imported Pieces", {pieces: config.importedPieces});
+				UiUtils.openStorage("Imported Pieces", {pieces: config.splitPieces});
 			});
 		}
 		
