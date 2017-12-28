@@ -2759,7 +2759,7 @@ function NoticeController(div, config) {
 			else numNoticesLeft++;
 		}
 		var maxNotices = Math.max(numNoticesLeft, numNoticesRight);
-		var width = maxNotices * (40 + 16);
+		var width = maxNotices * (40 + 16);	// icon width + padding
 		
 		// build notice
 		div.empty();
@@ -2770,7 +2770,8 @@ function NoticeController(div, config) {
 		// render notice left
 		function renderLeft(div, info) {
 			div.addClass("notice_bar_left flex_horizontal flex_justify_start");
-			div.css("width", width);
+			div.css("min-width", width);
+			div.css("max-width", width);
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state === "pass") continue;
 				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
@@ -2786,7 +2787,8 @@ function NoticeController(div, config) {
 		// render notice right
 		function renderRight(div, info) {
 			div.addClass("notice_bar_right flex_horizontal flex_justify_end");
-			div.css("width", width);
+			div.css("min-width", width);
+			div.css("max-width", width);
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state !== "pass") continue;
 				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
@@ -2883,7 +2885,7 @@ function NoticeController(div, config) {
 					else if (check.state === "warn") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Internet connection is active</div>");
-						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for greater security when generating keys</div>");
+						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for greater security</div>");
 					} else if (check.state === "fail") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Connect to the internet</div>");

@@ -1642,7 +1642,7 @@ input[type='checkbox'][disabled] +label {
 
 .notice_bar {
 	width: 100%;
-	padding: 10px 15px 10px 15px;
+	padding: 10px 20px 10px 20px;
 	color: white;
 }
 
@@ -1665,6 +1665,7 @@ input[type='checkbox'][disabled] +label {
 .notice_bar_center {
 	width: 100%;
 	text-align:center;
+	min-height: 45px;
 }
 
 .notice_bar_center a {
@@ -1677,8 +1678,8 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_bar_center_minor, .notice_bar_center_minor * {
-	font-size: 18px !important;
-	line-height: 25px;
+	font-size: 16px !important;
+	margin-top: -2px;
 }
 
 .notice_bar_right {
