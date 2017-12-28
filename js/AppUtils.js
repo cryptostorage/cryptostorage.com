@@ -160,6 +160,7 @@ var AppUtils = {
 			"lib/bitaddress.js",
 			"lib/clipboard.js",
 			"js/CryptoKey.js",
+			"js/Tests.js",
 			"lib/jquery.ddslick.js",
 			"img/trash.png",
 			"img/file.png",

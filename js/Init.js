@@ -19,7 +19,7 @@ $(document).ready(function() {
 	new AppController($("body")).render(function() {
 		
 		// load notice bar and tests
-		LOADER.load(AppUtils.getNoticeDependencies().concat(["js/Tests.js"]), function(err) {
+		LOADER.load(AppUtils.getAppDependencies(), function(err) {
 				
 			// run minimum tests
 			AppUtils.runMinimumTests(function(err) {
