@@ -15,7 +15,7 @@
  * 				config.environmentInfo is initial info for the export (optional)
  */
 window.exportToBody = function(window, config) {
-			
+
 	// detect any uncaught errors
 	LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
 		if (err) throw err;
