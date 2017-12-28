@@ -39,7 +39,7 @@ var UiUtils = {
 	 * 				config.pieceDivs are pre-generated piece divs ready for display
 	 * 				config.confirmExit specifies if the window should confirm exit if not saved or printed
 	 * 				config.showRegenerate specifies if the regenerate button should be shown
-	 * 				config.showNotices specifies if noticies
+	 * 				config.showNotices specifies if notices should be shown
 	 */
 	openStorage: function(browserTabName, config) {
 		
