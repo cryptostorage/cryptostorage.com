@@ -47,7 +47,7 @@ var UiUtils = {
 		config = objectAssign({}, config);
 		
 		// default config
-		config.showNotices = true;
+		if (!isInitialized(config.showNotices)) config.showNotices = true;
 		
 		// open tab
 		newWindow(null, browserTabName, AppUtils.getExportJs(), AppUtils.getExportCss(), getInternalStyleSheetText(), function(window) {
@@ -2470,13 +2470,6 @@ function ExportController(div, window, config) {
 			showPrivateCheckbox.click(function() { update(); });
 			showLogosCheckbox.click(function() { update(); });
 			
-			// make copyable which is lost when piece divs are copied to child window
-			if (config.pieceDivs) {
-				for (var i = 0; i < config.pieceDivs.length; i++) {
-					PieceRenderer.makeCopyable(config.pieceDivs[i]);
-				}
-			}
-			
 			// build ui based on keyGenConfig, pieces, and pieceDivs
 			update(config.pieceDivs);
 		}
@@ -2611,6 +2604,14 @@ function ExportController(div, window, config) {
 		
 		// add piece divs if given
 		if (config.pieceDivs) {
+			
+			// make copyable
+			if (config.pieceDivs) {
+				for (var i = 0; i < config.pieceDivs.length; i++) {
+					PieceRenderer.makeCopyable(config.pieceDivs[i]);
+				}
+			}
+			
 			assertInitialized(config.pieces);
 			setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(config.pieceDivs);
@@ -2626,22 +2627,18 @@ function ExportController(div, window, config) {
 			// render pieces if given
 			if (config.pieces) {
 				for (var i = 0; i < config.pieces.length; i++) config.pieceDivs.push($("<div>"));
-				setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
-				setPieceDivs(config.pieceDivs);
 				if (!config.quickGenerate) setPrintEnabled(false);
 				if (lastRenderer) lastRenderer.cancel();
 				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getPieceRendererConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
-					setPrintEnabled(true);
-					setControlsEnabled(true);
-					if (onDone) onDone();
+					update(config.pieceDivs, onDone);
 				});
 			}
 			
 			// generate pieces from keys if given
 			else if (config.keys) {
 				config.pieces = AppUtils.keysToPieces(config.keys);
-				update();
+				update(null, onDone);
 			}
 			
 			// otherwise generate keys from config
