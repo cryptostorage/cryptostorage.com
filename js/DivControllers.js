@@ -1449,7 +1449,9 @@ function ImportFileController(div) {
 	this.startOver = function() {
 		that.setWarning("");
 		importedStorageDiv.hide();
-		importedInputDiv.show();
+		importInputDiv.show();
+		fileInputDiv.show();
+		decryptionDiv.hide();
 		importedPiecesDiv.hide();
 		controlsDiv.hide();
 		removePieces();
