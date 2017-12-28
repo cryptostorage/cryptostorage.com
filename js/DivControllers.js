@@ -1528,16 +1528,15 @@ function ImportFileController(div) {
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
 		
-		// inline storage TODO pass imported pieces
+		// inline storage
 		var storageDiv = $("<div>").appendTo(importedStorageDiv);
-		var config = {
-				keys: keys,
-				pieces: pieces,
-				pieceDivs: pieceDivs
-		}
-		new ExportController(storageDiv, window, config).render(function() {
-			
-		});
+		new ExportController(storageDiv, window, {
+			importedPieces: importedPieces,
+			keys: keys,
+			pieces: pieces,
+			pieceDivs: pieceDivs
+		}).render();
+		
 //		// add view decrypted button
 //		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
 //		viewDecrypted.append("View Decrypted Keys");
@@ -2355,6 +2354,7 @@ inheritsFrom(TwoTabController, DivController);
  * @param div is the div to render to
  * @param window is a reference to the window for printing
  * @param config specifies export page behavior
+ * 				config.importedPieces are original imported pieces
  * 				config.keyGenConfig is a configuration to generate new storage
  * 				config.keys are keys to generate pieces from
  * 				config.pieces are pieces to export and generate pieceDivs from
@@ -2444,6 +2444,15 @@ function ExportController(div, window, config) {
 				}
 			});
 			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
+		}
+		
+		// view imported pieces
+		if (config.importedPieces) {
+			var viewImported = $("<div class='import_control_link'>").appendTo(exportHeader);
+			viewImported.html("view imported pieces");
+			viewImported.click(function() {
+				UiUtils.openStorage("Imported Pieces", {pieces: config.importedPieces});
+			});
 		}
 		
 		// controls disabled until ready
@@ -2912,7 +2921,7 @@ function NoticeController(div, config) {
 					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
 					break;
 				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
-					if (check.state === "fail") div.append("Unexpected runtime error: " + info.runtimeError);
+					if (check.state === "fail") div.append("Unexpected error: " + info.runtimeError);
 					break;
 				case AppUtils.EnvironmentCode.INTERNET:
 					if (check.state === "pass") div.append("No internet connection");

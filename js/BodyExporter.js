@@ -33,8 +33,6 @@ window.exportToBody = function(window, config) {
 	
 	// pagination requires div attached to dom
 	var body = $("body", window.document);
-	var container = $("<div>").appendTo(body);
-	container.hide();
 	
 	// clone piece divs because IE cannot transfer elements across windows
 	if (config.pieceDivs) {
@@ -47,32 +45,35 @@ window.exportToBody = function(window, config) {
 		config.pieceDivs = clonedDivs;
 	}
 	
-	// handle two tabs with split and reconstituted pieces
-	if (config.importedPieces && config.importedPieces.length > 1) {
-		new ExportController($("<div>").appendTo(container), window, {pieces: config.importedPieces, confirmExit: config.confirmExit}).render(function(tab1) {
-			var tabName2 = config.keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
-			new ExportController($("<div>").appendTo(container), window, config).render(function(tab2) {
-				container.detach();
-				container.children().detach();
-				renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
-			});
-		});
-	}
+	// render storage export
+	new ExportController($("<div>").appendTo(body), window, config).render();	// TODO: just pass in body?
 	
-	// handle one tab
-	else {
-		new ExportController($("<div>").appendTo(container), window, config).render(function(tab1) {
-			container.detach();
-			container.children().detach();
-			renderExportTabs(body, null, tab1);
-		});
-	}
-	
-	function renderExportTabs(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx, onDone) {
-		var tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
-		tabController.render(function(div) {
-			tabController.getTabsDiv().addClass("export_tabs");
-			if (onDone) onDone(div);
-		});
-	}
+//	// handle two tabs with split and reconstituted pieces
+//	if (config.importedPieces && config.importedPieces.length > 1) {
+//		new ExportController($("<div>").appendTo(container), window, {pieces: config.importedPieces, confirmExit: config.confirmExit}).render(function(tab1) {
+//			var tabName2 = config.keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
+//			new ExportController($("<div>").appendTo(container), window, config).render(function(tab2) {
+//				container.detach();
+//				container.children().detach();
+//				renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
+//			});
+//		});
+//	}
+//	
+//	// handle one tab
+//	else {
+//		new ExportController($("<div>").appendTo(container), window, config).render(function(tab1) {
+//			container.detach();
+//			container.children().detach();
+//			renderExportTabs(body, null, tab1);
+//		});
+//	}
+//	
+//	function renderExportTabs(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx, onDone) {
+//		var tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
+//		tabController.render(function(div) {
+//			tabController.getTabsDiv().addClass("export_tabs");
+//			if (onDone) onDone(div);
+//		});
+//	}
 }

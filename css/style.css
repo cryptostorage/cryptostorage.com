@@ -141,13 +141,13 @@ ol {
 	-ms-flex-align: center;
 	align-items: center;
 	margin-left: auto;
-	color: white;
 	text-decoration: none;
 }
 
 .link_div {
 	padding: 10px 10px 10px 10px;
 	font-size: 16px;
+	color:white;
 }
 
 .link_div:hover {
