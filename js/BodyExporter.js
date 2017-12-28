@@ -46,34 +46,5 @@ window.exportToBody = function(window, config) {
 	}
 	
 	// render storage export
-	new ExportController($("<div>").appendTo(body), window, config).render();	// TODO: just pass in body?
-	
-//	// handle two tabs with split and reconstituted pieces
-//	if (config.importedPieces && config.importedPieces.length > 1) {
-//		new ExportController($("<div>").appendTo(container), window, {pieces: config.importedPieces, confirmExit: config.confirmExit}).render(function(tab1) {
-//			var tabName2 = config.keys[0].isEncrypted() ? "Encrypted Keys" : "Decrypted Keys";
-//			new ExportController($("<div>").appendTo(container), window, config).render(function(tab2) {
-//				container.detach();
-//				container.children().detach();
-//				renderExportTabs(body, "Imported Pieces", tab1, tabName2, tab2, 1);
-//			});
-//		});
-//	}
-//	
-//	// handle one tab
-//	else {
-//		new ExportController($("<div>").appendTo(container), window, config).render(function(tab1) {
-//			container.detach();
-//			container.children().detach();
-//			renderExportTabs(body, null, tab1);
-//		});
-//	}
-//	
-//	function renderExportTabs(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx, onDone) {
-//		var tabController = new TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx);
-//		tabController.render(function(div) {
-//			tabController.getTabsDiv().addClass("export_tabs");
-//			if (onDone) onDone(div);
-//		});
-//	}
+	new ExportController($("<div>").appendTo(body), window, config).render();
 }

@@ -1539,13 +1539,6 @@ function ImportFileController(div) {
 			pieces: pieces,
 			pieceDivs: pieceDivs
 		}).render();
-		
-//		// add view decrypted button
-//		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
-//		viewDecrypted.append("View Decrypted Keys");
-//		viewDecrypted.click(function() {
-//			UiUtils.openStorage("Imported Storage", {importedPieces: importedPieces, keys: keys, pieces: pieces, pieceDivs: pieceDivs});
-//		});
 	}
 	
 	// handle imported files
