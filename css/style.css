@@ -947,6 +947,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_success_links > * {
+	margin-top:3px;
 	margin-right: 18px;
 }
 
@@ -960,10 +961,10 @@ input[type='checkbox'][disabled] +label {
 	color: white;
 }
 
-.import_checkmark {
-	height: 65px;
-	width: 65px;
-	margin-right: 20px;
+.import_success_checkmark {
+	height: 40px;
+	width: 40px;
+	margin-right: 15px;
 }
 
 .import_warning_div {

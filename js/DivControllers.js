@@ -1520,12 +1520,11 @@ function ImportFileController(div) {
 		importedStorageDiv.show();
 		
 		// import success message
-		var successDiv = $("<div class='import_success_div flex_horizontal'>").appendTo(importedStorageDiv);
-		successDiv.append($("<img class='import_checkmark' src='img/checkmark.png'>"));
-		var successText = $("<div class='flex_vertical'>").appendTo(successDiv);
-		var successTitle = $("<div class='import_success_title'>").appendTo(successText);
+		var successDiv = $("<div class='import_success_div flex_vertical'>").appendTo(importedStorageDiv);
+		var successTitle = $("<div class='import_success_title flex_horizontal'>").appendTo(successDiv);
+		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
 		successTitle.append("Imported Successfully");
-		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successText);
+		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successDiv);
 		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
@@ -1943,41 +1942,23 @@ function ImportTextController(div, plugins) {
 		importedStorageDiv.empty();
 		importedStorageDiv.show();
 		
-		var importSuccessDiv = $("<div class='import_success_div flex_vertical'>").appendTo(importedStorageDiv);
-		var importSuccessMsgDiv = $("<div class='import_success_msg_div flex_horizontal'>").appendTo(importSuccessDiv);
-		importSuccessMsgDiv.append($("<img class='import_checkmark' src='img/checkmark.png'>"));
-		importSuccessMsgDiv.append("Imported Successfully");
-		var startOver = $("<div class='import_control_link'>").appendTo(importSuccessDiv);
-		startOver.append("start over");
-		startOver.click(function() { that.startOver(); });
-		
 		// import success message
-		var successDiv = $("<div class='import_success_div flex_horizontal'>").appendTo(importedStorageDiv);
-		successDiv.append($("<img class='import_checkmark' src='img/checkmark.png'>"));
-		var successText = $("<div class='flex_vertical'>").appendTo(successDiv);
-		var successTitle = $("<div class='import_success_title'>").appendTo(successText);
+		var successDiv = $("<div class='import_success_div flex_vertical'>").appendTo(importedStorageDiv);
+		var successTitle = $("<div class='import_success_title flex_horizontal'>").appendTo(successDiv);
+		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
 		successTitle.append("Imported Successfully");
-		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successText);
+		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successDiv);
 		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
 		
-		// inline storage TODO pass imported pieces
+		// inline storage
 		var storageDiv = $("<div>").appendTo(importedStorageDiv);
-		var config = {
-				keys: keys,
-				pieces: pieces,
-				pieceDivs: pieceDivs
-		}
-		new ExportController(storageDiv, window, config).render(function() {
-			
-		});
-		
-//		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
-//		viewDecrypted.append("View Decrypted Key");
-//		viewDecrypted.click(function() {
-//			UiUtils.openStorage("Imported Storage", {keys: keys, pieces: pieces, pieceDivs: pieceDivs});
-//		});
+		new ExportController(storageDiv, window, {
+			keys: keys,
+			pieces: pieces,
+			pieceDivs: pieceDivs
+		}).render();
 	}
 	
 	function setSelectedCurrency(ticker) {
