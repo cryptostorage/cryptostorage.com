@@ -161,6 +161,9 @@ var AppUtils = {
 			"lib/clipboard.js",
 			"js/CryptoKey.js",
 			"lib/jquery.ddslick.js",
+			"img/trash.png",
+			"img/file.png",
+			"img/files.png"
 		];
 		
 		// add dependencies
@@ -747,8 +750,6 @@ var AppUtils = {
 	 * @param noInternetIsNotErrorAfterDependenciesLoaded makes lack of internet a non-error even if remote after dependencies are loaded (used on export page)
 	 */
 	generateKeys: function(config, onProgress, onDone, noInternetIsNotErrorAfterDependenciesLoaded) {
-		
-		console.log("generateKeys()");
 		
 		// verify config
 		try {
