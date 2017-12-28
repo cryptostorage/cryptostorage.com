@@ -891,7 +891,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_filler {
-	height: 100px;
+	height: 75px;
 }
 
 .import_div {

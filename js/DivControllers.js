@@ -1516,6 +1516,7 @@ function ImportFileController(div) {
 	function onKeysDecrypted(importedPieces, keys, pieces, pieceDivs) {
 		resetControls();
 		importInputDiv.hide();
+		importedStorageDiv.empty();
 		importedStorageDiv.show();
 		
 		// import success message
