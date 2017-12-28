@@ -2317,6 +2317,60 @@ function ExportController(div, window, config) {
 		div.empty();
 		div.addClass("export_div");
 		
+		// export header
+		var exportHeader = $("<div class='export_header'>").appendTo(div);
+		
+		// export buttons
+		var exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
+		saveButton = $("<div class='export_button'>").appendTo(exportButtons);
+		saveButton.html("Save All");
+		printButton = $("<div class='export_button'>").appendTo(exportButtons);
+		printButton.html("Print All");
+		savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
+		savePublicButton.html("Save Public Addresses");
+//		var moreButton = $("<div class='export_button'>").appendTo(exportButtons);
+//		moreButton.html("...");
+//		moreButton.click(function() { console.log("More button clicked"); });
+		
+		// export checkboxes
+		var exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
+		showPublicCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
+		var showPublicCheckboxLabel = $("<label class='export_checkbox_label' for='showPublicCheckbox'>").appendTo(exportCheckboxes);
+		showPublicCheckboxLabel.html("Show public addresses");
+		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
+		showPrivateCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
+		var showPrivateCheckboxLabel = $("<label class='export_checkbox_label' for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
+		showPrivateCheckboxLabel.html("Show private keys");
+		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
+		showLogosCheckbox = $("<input type='checkbox' class='export_checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
+		var showLogosCheckboxLabel = $("<label class='export_checkbox_label' for='showLogosCheckbox'>").appendTo(exportCheckboxes);
+		showLogosCheckboxLabel.html("Show logos");
+		
+		// apply default state
+		showPublicCheckbox.prop('checked', true);
+		showPrivateCheckbox.prop('checked', true);
+		showLogosCheckbox.prop('checked', true);
+		
+		// sort pieces and pieceDivs by piece number
+		sortPieces();
+		
+		// piece selection
+		var paginatorSource = getPaginatorSource(config.keyGenConfig, config.pieces);
+		if (paginatorSource) {
+			paginator = $("<div id='paginator'>").appendTo(exportHeader);
+			$("#paginator", exportHeader).pagination({
+				dataSource: paginatorSource,
+				pageSize: 1,
+				callback: function(data, pagination) {
+					if (config.pieceDivs) setVisiblePiece(config.pieceDivs, pagination.pageNumber - 1);
+				}
+			});
+			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
+		}
+		
+		// controls disabled until ready
+		setControlsEnabled(false);
+		
 		// loading screen
 		UiUtils.loadingDiv(div, AppUtils.getExportDependencies(), function(err) {
 			if (err) {
@@ -2331,60 +2385,6 @@ function ExportController(div, window, config) {
 		
 		// renders after dependencies loaded
 		function renderAux() {
-			
-			// export header
-			var exportHeader = $("<div class='export_header'>").appendTo(div);
-			
-			// export buttons
-			var exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
-			saveButton = $("<div class='export_button'>").appendTo(exportButtons);
-			saveButton.html("Save All");
-			printButton = $("<div class='export_button'>").appendTo(exportButtons);
-			printButton.html("Print All");
-			savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
-			savePublicButton.html("Save Public Addresses");
-//			var moreButton = $("<div class='export_button'>").appendTo(exportButtons);
-//			moreButton.html("...");
-//			moreButton.click(function() { console.log("More button clicked"); });
-			
-			// export checkboxes
-			var exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
-			showPublicCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
-			var showPublicCheckboxLabel = $("<label class='export_checkbox_label' for='showPublicCheckbox'>").appendTo(exportCheckboxes);
-			showPublicCheckboxLabel.html("Show public addresses");
-			exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
-			showPrivateCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
-			var showPrivateCheckboxLabel = $("<label class='export_checkbox_label' for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
-			showPrivateCheckboxLabel.html("Show private keys");
-			exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
-			showLogosCheckbox = $("<input type='checkbox' class='export_checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
-			var showLogosCheckboxLabel = $("<label class='export_checkbox_label' for='showLogosCheckbox'>").appendTo(exportCheckboxes);
-			showLogosCheckboxLabel.html("Show logos");
-			
-			// apply default state
-			showPublicCheckbox.prop('checked', true);
-			showPrivateCheckbox.prop('checked', true);
-			showLogosCheckbox.prop('checked', true);
-			
-			// sort pieces and pieceDivs by piece number
-			sortPieces();
-			
-			// piece selection
-			var paginatorSource = getPaginatorSource(config.keyGenConfig, config.pieces);
-			if (paginatorSource) {
-				paginator = $("<div id='paginator'>").appendTo(exportHeader);
-				$("#paginator", exportHeader).pagination({
-					dataSource: paginatorSource,
-					pageSize: 1,
-					callback: function(data, pagination) {
-						if (config.pieceDivs) setVisiblePiece(config.pieceDivs, pagination.pageNumber - 1);
-					}
-				});
-				$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
-			}
-			
-			// controls disabled until ready
-			setControlsEnabled(false);
 			
 			// poll environment info on loop
 			AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
