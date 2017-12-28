@@ -3,8 +3,6 @@ quick generate loading progress hidden, regenerate button only after key pair re
 import successfully checkmark brighter green
 1px border on mobile safari import print
 test dependency errors
-import decrypted keys renders inline
-link to view original imported pieces in either decrypted or encrypted which opens in new tab
 export page piece selection disabled while loading
 form info bubbles - see spec
 form error messages - see spec
