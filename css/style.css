@@ -895,7 +895,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_div {
-	background-color: rgb(17, 119, 184);
+
 }
 
 .import_tabs_div {
@@ -929,7 +929,12 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_content_div {
+
+}
+
+.import_input_div {
 	padding: 25px 50px 25px 50px;
+	background-color: rgb(17, 119, 184);
 }
 
 .import_warning_div {
@@ -1216,7 +1221,7 @@ input[type='checkbox'][disabled] +label {
 	-webkit-align-items: center;
 	-ms-flex-align: center;
 	align-items: center;
-	min-width: 971px;
+	min-width: 750px;
 	-webkit-text-size-adjust: 100%;
 }
 

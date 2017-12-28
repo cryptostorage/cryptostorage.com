@@ -39,11 +39,15 @@ var UiUtils = {
 	 * 				config.pieceDivs are pre-generated piece divs ready for display
 	 * 				config.confirmExit specifies if the window should confirm exit if not saved or printed
 	 * 				config.showRegenerate specifies if the regenerate button should be shown
+	 * 				config.showNotices specifies if noticies
 	 */
 	openStorage: function(browserTabName, config) {
 		
 		// deep copy config
 		config = objectAssign({}, config);
+		
+		// default config
+		config.showNotices = true;
 		
 		// open tab
 		newWindow(null, browserTabName, AppUtils.getExportJs(), AppUtils.getExportCss(), getInternalStyleSheetText(), function(window) {
@@ -1341,13 +1345,15 @@ function ImportFileController(div) {
 	DivController.call(this, div);
 	
 	var that = this;
+	var importInputDiv;						// all import input
 	var warningDiv;
 	var warningMsg;
-	var contentDiv;								// div for all non control links
-	var importDiv;								// div for all file import
+	var fileInputDiv;							// drag and drop and imported pieces
+	var decryptionDiv;						// password input and decryption
 	var importedNamedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
-	var importedPiecesDiv;				// shows imported item;
+	var importedPiecesDiv;				// shows imported items
 	var controlsDiv;							// div for all control links
+	var importedStorageDiv;				// inline storage
 	var lastKeys;
 	var decryptionController;
 	
@@ -1357,18 +1363,22 @@ function ImportFileController(div) {
 		div.empty();
 		div.addClass("import_content_div");
 		
+		// div to collect all import input
+		importInputDiv = $("<div class='import_input_div'>").appendTo(div);
+		
 		// warning div
-		warningDiv = $("<div class='import_warning_div'>").appendTo(div);
+		warningDiv = $("<div class='import_warning_div'>").appendTo(importInputDiv);
 		warningDiv.hide();
 		
-		// set up content div
-		contentDiv = $("<div>").appendTo(div);
-		
 		// all file importing
-		importDiv = $("<div>").appendTo(contentDiv);
+		fileInputDiv = $("<div>").appendTo(importInputDiv);
 		
-		// drag and drop importDiv
-		var dragDropDiv = $("<div class='import_drag_drop'>").appendTo(importDiv);
+		// decryption div
+		decryptionDiv = $("<div>").appendTo(importInputDiv);
+		decryptionDiv.hide();
+		
+		// drag and drop div
+		var dragDropDiv = $("<div class='import_drag_drop'>").appendTo(fileInputDiv);
 		var dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
 		var dragDropText = $("<div class='drag_drop_text'>").appendTo(dragDropDiv);
 		var dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
@@ -1388,13 +1398,17 @@ function ImportFileController(div) {
 		setupDragAndDrop(dragDropDiv, onFilesImported);
 		
 		// imported files
-		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(importDiv);
+		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(fileInputDiv);
 		importedPiecesDiv.hide();
 		
 		// controls
-		controlsDiv = $("<div class='import_controls'>").appendTo(div);
+		controlsDiv = $("<div class='import_controls'>").appendTo(importInputDiv);
 		controlsDiv.hide();
 		resetControls();
+		
+		// div for inline storage
+		importedStorageDiv = $("<div class='import_storage_div'>").appendTo(div);
+		importedStorageDiv.hide();
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -1434,11 +1448,11 @@ function ImportFileController(div) {
 	
 	this.startOver = function() {
 		that.setWarning("");
-		contentDiv.children().detach();
+		importedStorageDiv.hide();
+		importedInputDiv.show();
 		importedPiecesDiv.hide();
 		controlsDiv.hide();
 		removePieces();
-		contentDiv.append(importDiv);
 		if (decryptionController) decryptionController.cancel();
 	}
 	
@@ -1472,18 +1486,19 @@ function ImportFileController(div) {
 		if (keys[0].isEncrypted()) {
 			
 			// create decryption controller and register callbacks
-			decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+			decryptionController = new DecryptionController(decryptionDiv, keys, function(warning) {
 				that.setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
 				onKeysDecrypted(getImportedPieces(), decryptedKeys, pieces, pieceDivs);
 			});
 			
 			// render decryption controller
-			decryptionController.render(function(decryptionDiv) {
+			decryptionController.render(function() {
 				
 				// replace content div with passphrase input
-				contentDiv.children().detach();
-				contentDiv.append(decryptionDiv);
+				fileInputDiv.hide();
+				decryptionDiv.show();
+				controlsDiv.show();
 				decryptionController.focus();
 				
 				// add control to view encrypted keys
@@ -1498,12 +1513,25 @@ function ImportFileController(div) {
 	
 	function onKeysDecrypted(importedPieces, keys, pieces, pieceDivs) {
 		resetControls();
-		contentDiv.children().detach();
-		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
-		viewDecrypted.append("View Decrypted Keys");
-		viewDecrypted.click(function() {
-			UiUtils.openStorage("Imported Storage", {importedPieces: importedPieces, keys: keys, pieces: pieces, pieceDivs: pieceDivs});
+		importInputDiv.hide();
+		importedStorageDiv.show();
+		
+		// render decrypted keys inline
+		// TODO: pass imported pieces
+		var config = {
+				keys: keys,
+				pieces: pieces,
+				pieceDivs: pieceDivs
+		}
+		new ExportController(importedStorageDiv, window, config).render(function() {
+			
 		});
+//		// add view decrypted button
+//		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
+//		viewDecrypted.append("View Decrypted Keys");
+//		viewDecrypted.click(function() {
+//			UiUtils.openStorage("Imported Storage", {importedPieces: importedPieces, keys: keys, pieces: pieces, pieceDivs: pieceDivs});
+//		});
 	}
 	
 	// handle imported files
@@ -2284,6 +2312,7 @@ inheritsFrom(TwoTabController, DivController);
  * 				config.pieceDivs are pre-generated piece divs ready for display
  * 				config.confirmExit specifies if the window should confirm exit if not saved or printed
  * 				config.showRegenerate specifies if the regenerate button should be shown
+ * 				config.showNotices specifies if notices should be shown
  */
 function ExportController(div, window, config) {
 	DivController.call(this, div);
@@ -2386,13 +2415,17 @@ function ExportController(div, window, config) {
 		// renders after dependencies loaded
 		function renderAux() {
 			
-			// poll environment info on loop
-			AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
-			
-			// notice div
-			var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
-			var noticeDiv = $("<div>").appendTo(noticeDivContainer);
-			new NoticeController(noticeDiv).render();
+			// notices
+			if (config.showNotices) {
+				
+				// poll environment info on loop
+				AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
+				
+				// notice div
+				var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
+				var noticeDiv = $("<div>").appendTo(noticeDivContainer);
+				new NoticeController(noticeDiv).render();
+			}
 			
 			// progress bar
 			progressDiv = $("<div class='export_progress_div'>").appendTo(div);
