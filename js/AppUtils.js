@@ -165,7 +165,9 @@ var AppUtils = {
 			"lib/jquery.ddslick.js",
 			"img/trash.png",
 			"img/file.png",
-			"img/files.png"
+			"img/files.png",
+			"img/checkmark.png",
+			"img/drag_and_drop.png"
 		];
 		
 		// add dependencies

@@ -1497,7 +1497,7 @@ function ImportFileController(div) {
 			// render decryption controller
 			decryptionController.render(function() {
 				
-				// replace content div with passphrase input
+				// replace file input div with decryption
 				fileInputDiv.hide();
 				decryptionDiv.show();
 				controlsDiv.show();
@@ -1775,9 +1775,11 @@ function ImportTextController(div, plugins) {
 	
 	var MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
 	
+	var that = this;
+	var importInputDiv;				// all import input
 	var warningDiv;
-	var contentDiv;
-	var passphraseInputDiv;
+	var textInputDiv;					// all text input
+	var decryptionDiv;				// decryption div
 	var selector;
 	var selectorDisabler;
 	var selectedPlugin;
@@ -1787,6 +1789,7 @@ function ImportTextController(div, plugins) {
 	var controlsDiv;
 	var lastKeys;
 	var decryptionController;
+	var importedStorageDiv;		// inline storage
 	
 	this.render = function(onDone) {
 		
@@ -1794,15 +1797,19 @@ function ImportTextController(div, plugins) {
 		div.empty();
 		div.addClass("import_content_div");
 		
+		// div to collect all import input
+		importInputDiv = $("<div class='import_input_div'>").appendTo(div);
+		
 		// warning div
-		warningDiv = $("<div class='import_warning_div'>").appendTo(div);
+		warningDiv = $("<div class='import_warning_div'>").appendTo(importInputDiv);
 		warningDiv.hide();
 		
-		// set up content div
-		contentDiv = $("<div>").appendTo(div);
+		// all text importing
+		textInputDiv = $("<div>").appendTo(importInputDiv);
 		
-		// all passphrase input
-		passphraseInputDiv = $("<div>").appendTo(contentDiv);
+		// decryption div
+		decryptionDiv = $("<div>").appendTo(importInputDiv);
+		decryptionDiv.hide();
 		
 		// currency selector data
 		selectorData = [];
@@ -1815,26 +1822,30 @@ function ImportTextController(div, plugins) {
 		}
 		
 		// currency selector
-		var selectorContainer = $("<div class='import_selector_container'>").appendTo(passphraseInputDiv);
+		var selectorContainer = $("<div class='import_selector_container'>").appendTo(textInputDiv);
 		selector = $("<div id='import_selector'>").appendTo(selectorContainer);
 		
 		// text area
-		textArea = $("<textarea class='import_textarea'>").appendTo(passphraseInputDiv);
+		textArea = $("<textarea class='import_textarea'>").appendTo(textInputDiv);
 		textArea.attr("placeholder", "Enter a private key or split pieces of a private key");
 		
 		// submit button
-		var submit = $("<div class='import_button'>").appendTo(passphraseInputDiv);
+		var submit = $("<div class='import_button'>").appendTo(textInputDiv);
 		submit.html("Submit");
 		submit.click(function() { submitPieces(); });
 		
 		// imported pieces
-		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(passphraseInputDiv);
+		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(textInputDiv);
 		importedPiecesDiv.hide();
 		
 		// controls
-		controlsDiv = $("<div class='import_controls'>").appendTo(div);
+		controlsDiv = $("<div class='import_controls'>").appendTo(importInputDiv);
 		controlsDiv.hide();
 		resetControls();
+		
+		// div for inline storage
+		importedStorageDiv = $("<div class='imported_storage_div'>").appendTo(div);
+		importedStorageDiv.hide();
 		
 		// initialize pull down
 		selector.ddslick({
@@ -1850,7 +1861,7 @@ function ImportTextController(div, plugins) {
 		});
 		selector = $("#import_selector");	// ddslick requires id reference
 		selectorDisabler = $("<div class='import_selector_disabler'>").appendTo(selectorContainer);
-		startOver();
+		that.startOver();
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -1858,7 +1869,7 @@ function ImportTextController(div, plugins) {
 	
 	function resetControls() {
 		controlsDiv.empty();
-		addControl("start over", startOver);
+		addControl("start over", that.startOver);
 	}
 	
 	function addControl(text, onClick) {
@@ -1868,13 +1879,15 @@ function ImportTextController(div, plugins) {
 		link.click(function() { onClick(); });
 	}
 	
-	function startOver() {
+	this.startOver = function() {
 		setWarning("");
 		textArea.val("");
-		contentDiv.children().detach();
+		importedStorageDiv.hide();
+		importInputDiv.show();
+		textInputDiv.show();
+		decryptionDiv.hide();
 		importedPiecesDiv.hide();
 		controlsDiv.hide();
-		contentDiv.append(passphraseInputDiv);
 		removePieces();
 		setSelectedCurrency("BTC");
 		if (decryptionController) decryptionController.cancel();
@@ -1896,18 +1909,19 @@ function ImportTextController(div, plugins) {
 		if (keys[0].isEncrypted()) {
 			
 			// create decryption controller and register callbacks
-			decryptionController = new DecryptionController($("<div>"), keys, function(warning) {
+			decryptionController = new DecryptionController(decryptionDiv, keys, function(warning) {
 				setWarning(warning);
 			}, function(decryptedKeys, pieces, pieceDivs) {
 				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
 			});
 			
 			// render decryption controller
-			decryptionController.render(function(decryptionDiv) {
+			decryptionController.render(function() {
 				
-				// replace content div with passphrase input
-				contentDiv.children().detach();
-				contentDiv.append(decryptionDiv);
+				// replace text input div with decryption
+				textInputDiv.hide();
+				decryptionDiv.show();
+				controlsDiv.show();
 				decryptionController.focus();
 				
 				// add control to view encrypted keys
@@ -1922,12 +1936,35 @@ function ImportTextController(div, plugins) {
 	
 	function onKeysDecrypted(keys, pieces, pieceDivs) {
 		resetControls();
-		contentDiv.children().detach();
-		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
-		viewDecrypted.append("View Decrypted Key");
-		viewDecrypted.click(function() {
-			UiUtils.openStorage("Imported Storage", {keys: keys, pieces: pieces, pieceDivs: pieceDivs});
+		importInputDiv.hide();
+		importedStorageDiv.empty();
+		importedStorageDiv.show();
+		
+		// import success message
+		var importSuccessDiv = $("<div class='import_success_div flex_vertical'>").appendTo(importedStorageDiv);
+		var importSuccessMsgDiv = $("<div class='import_success_msg_div flex_horizontal'>").appendTo(importSuccessDiv);
+		importSuccessMsgDiv.append($("<img class='import_checkmark' src='img/checkmark.png'>"));
+		importSuccessMsgDiv.append("Imported Successfully");
+		var startOver = $("<div class='import_control_link'>").appendTo(importSuccessDiv);
+		startOver.append("start over");
+		startOver.click(function() { that.startOver(); });
+		
+		// inline storage TODO pass imported pieces
+		var storageDiv = $("<div>").appendTo(importedStorageDiv);
+		var config = {
+				keys: keys,
+				pieces: pieces,
+				pieceDivs: pieceDivs
+		}
+		new ExportController(storageDiv, window, config).render(function() {
+			
 		});
+		
+//		var viewDecrypted = $("<div class='import_view_button'>").appendTo(contentDiv);
+//		viewDecrypted.append("View Decrypted Key");
+//		viewDecrypted.click(function() {
+//			UiUtils.openStorage("Imported Storage", {keys: keys, pieces: pieces, pieceDivs: pieceDivs});
+//		});
 	}
 	
 	function setSelectedCurrency(ticker) {
