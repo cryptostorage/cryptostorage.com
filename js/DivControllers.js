@@ -2913,7 +2913,7 @@ function NoticeController(div, config) {
 					} else if (check.state === "fail") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Connect to the internet</div>");
-						content.append("<div class='notice_bar_center_minor'>Internet is required to download dependencies</div>");
+						content.append("<div class='notice_bar_center_minor'>Internet is required because the application is not running locally</div>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.IS_LOCAL:
