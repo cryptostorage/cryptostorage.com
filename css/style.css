@@ -929,7 +929,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_content_div {
-
+	
 }
 
 .import_input_div {
@@ -1269,6 +1269,7 @@ input[type='checkbox'][disabled] +label {
 	background-color: rgb(17, 119, 184);
 	width: 100%;
 	padding: 10px;
+	margin-top: -2px;	/* fix mobile safari border showing */
 }
 
 .export_buttons {
@@ -1282,6 +1283,7 @@ input[type='checkbox'][disabled] +label {
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
 	margin: 10px;
+	margin-top: 12px;	/* fix mobile safari border showing */
 	-ms-flex-pack: center;
 	justify-content: center;
 }
