@@ -1573,6 +1573,28 @@ input[type='checkbox'][disabled] +label {
 	body * {
 		visibility: hidden;
 	}
+	.app_body {
+		display: unset;
+		width: unset;
+	}
+	.app_header {
+		display: none;
+	}
+	.page_div {
+		width:unset;
+	}
+	.content_div {
+		display:unset;
+	}
+	.import_tabs_div {
+		display: none;
+	}
+	.import_filler {
+		display: none;
+	}
+	.import_success_div {
+		display: none;
+	}
 	.export_tabs {
 		display: none;
 	}
@@ -1586,6 +1608,9 @@ input[type='checkbox'][disabled] +label {
 		display: none;
 	}
 	.notice_container {
+		display: none;
+	}
+	.notice_bar {
 		display: none;
 	}
 	.export_pieces_div, .export_pieces_div * {

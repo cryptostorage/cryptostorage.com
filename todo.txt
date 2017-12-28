@@ -12,6 +12,8 @@ warnings link to downloads
 deprioritize dash and zcash
 bitpay donation address
 transition all css flex to common flex classes
+navigate away from import resets it
+notice controller description max width with icons
 seo
 faq content
 homepage content
