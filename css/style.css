@@ -81,6 +81,12 @@ ol {
 	justify-content: flex-end;
 }
 
+.flex_justify_space_between {
+	-ms-flex-pack: space-between;
+	-webkit-justify-content: space-between;
+	justify-content: space-between;
+}
+
 .app_body {
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -940,16 +946,23 @@ input[type='checkbox'][disabled] +label {
 	padding: 25px 0 10px 0;
 }
 
-.import_success_msg_div {
-	font-size: 26px;
+.import_success_links > * {
+	margin-right: 18px;
+}
+
+.import_success_links > *:last-child {
+	margin-right: 0px;
+}
+
+.import_success_title {
+	font-size: 28px;
 	font-weight: bold;
 	color: white;
-	margin-bottom: -10px;
 }
 
 .import_checkmark {
-	height: 50px;
-	width: 50px;
+	height: 65px;
+	width: 65px;
 	margin-right: 20px;
 }
 

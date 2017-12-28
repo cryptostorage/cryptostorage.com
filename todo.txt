@@ -1,5 +1,6 @@
 TODO
 quick generate loading progress hidden, regenerate button only after key pair rendered
+import successfully checkmark brighter green
 1px border on mobile safari import print
 test dependency errors
 import decrypted keys renders inline

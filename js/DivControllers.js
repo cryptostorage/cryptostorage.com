@@ -1505,7 +1505,7 @@ function ImportFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openStorage("Imported Storage", {importedPieces: getImportedPieces(), keys: keys});
+					UiUtils.openStorage("Encrypted Keys", {importedPieces: getImportedPieces(), keys: keys});
 				});
 			});
 		} else {
@@ -1520,18 +1520,22 @@ function ImportFileController(div) {
 		importedStorageDiv.show();
 		
 		// import success message
-		var importSuccessDiv = $("<div class='import_success_div flex_vertical'>").appendTo(importedStorageDiv);
-		var importSuccessMsgDiv = $("<div class='import_success_msg_div flex_horizontal'>").appendTo(importSuccessDiv);
-		importSuccessMsgDiv.append($("<img class='import_checkmark' src='img/checkmark.png'>"));
-		importSuccessMsgDiv.append("Imported Successfully");
-		var startOver = $("<div class='import_control_link'>").appendTo(importSuccessDiv);
+		var successDiv = $("<div class='import_success_div flex_horizontal'>").appendTo(importedStorageDiv);
+		successDiv.append($("<img class='import_checkmark' src='img/checkmark.png'>"));
+		var successText = $("<div class='flex_vertical'>").appendTo(successDiv);
+		var successTitle = $("<div class='import_success_title'>").appendTo(successText);
+		successTitle.append("Imported Successfully");
+		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successText);
+		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
+		var viewImported = $("<div class='import_control_link'>").appendTo(successLinks);
+		viewImported.append("view imported pieces");
+		viewImported.click(function() { UiUtils.openStorage("Imported Pieces", {pieces: importedPieces}); });
 		
 		// inline storage
 		var storageDiv = $("<div>").appendTo(importedStorageDiv);
 		new ExportController(storageDiv, window, {
-			importedPieces: importedPieces,
 			keys: keys,
 			pieces: pieces,
 			pieceDivs: pieceDivs
@@ -1925,7 +1929,7 @@ function ImportTextController(div, plugins) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted key", function() {
-					UiUtils.openStorage("Imported Storage", {keys: keys});
+					UiUtils.openStorage("Encrypted Key", {keys: keys});
 				});
 			});
 		} else {
@@ -1939,12 +1943,22 @@ function ImportTextController(div, plugins) {
 		importedStorageDiv.empty();
 		importedStorageDiv.show();
 		
-		// import success message
 		var importSuccessDiv = $("<div class='import_success_div flex_vertical'>").appendTo(importedStorageDiv);
 		var importSuccessMsgDiv = $("<div class='import_success_msg_div flex_horizontal'>").appendTo(importSuccessDiv);
 		importSuccessMsgDiv.append($("<img class='import_checkmark' src='img/checkmark.png'>"));
 		importSuccessMsgDiv.append("Imported Successfully");
 		var startOver = $("<div class='import_control_link'>").appendTo(importSuccessDiv);
+		startOver.append("start over");
+		startOver.click(function() { that.startOver(); });
+		
+		// import success message
+		var successDiv = $("<div class='import_success_div flex_horizontal'>").appendTo(importedStorageDiv);
+		successDiv.append($("<img class='import_checkmark' src='img/checkmark.png'>"));
+		var successText = $("<div class='flex_vertical'>").appendTo(successDiv);
+		var successTitle = $("<div class='import_success_title'>").appendTo(successText);
+		successTitle.append("Imported Successfully");
+		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successText);
+		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
 		
