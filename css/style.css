@@ -887,7 +887,7 @@ input[type='checkbox'][disabled] +label {
 
 .import_page {
 	padding: 0;
-	min-height: 700px;
+	min-height: 600px;
 }
 
 .import_filler {
@@ -1642,7 +1642,7 @@ input[type='checkbox'][disabled] +label {
 
 .notice_bar {
 	width: 100%;
-	padding: 10px 20px 10px 20px;
+	padding: 10px 15px 10px 15px;
 	color: white;
 }
 
@@ -1659,8 +1659,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_bar_left {
-	min-width: 275px;
-	max-width: 275px;
+	margin-right: 15px;
 }
 
 .notice_bar_center {
@@ -1683,8 +1682,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_bar_right {
-	min-width: 275x;
-	max-width: 275px;
+	margin-left: 15px;
 }
 
 .notice_icon_div {

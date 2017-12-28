@@ -2751,6 +2751,16 @@ function NoticeController(div, config) {
 		// track tippy divs to fix bug where more than one becomes visible
 		var tippies = [];
 		
+		// compute width of icon divs based on max number of icons
+		var numNoticesLeft = 0;
+		var numNoticesRight = 0;
+		for (var i = 0; i < info.checks.length; i++) {
+			if (info.checks[i].state === "pass") numNoticesRight++;
+			else numNoticesLeft++;
+		}
+		var maxNotices = Math.max(numNoticesLeft, numNoticesRight);
+		var width = maxNotices * (40 + 16);
+		
 		// build notice
 		div.empty();
 		renderLeft($("<div>").appendTo(div), info);
@@ -2760,6 +2770,7 @@ function NoticeController(div, config) {
 		// render notice left
 		function renderLeft(div, info) {
 			div.addClass("notice_bar_left flex_horizontal flex_justify_start");
+			div.css("width", width);
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state === "pass") continue;
 				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
@@ -2775,6 +2786,7 @@ function NoticeController(div, config) {
 		// render notice right
 		function renderRight(div, info) {
 			div.addClass("notice_bar_right flex_horizontal flex_justify_end");
+			div.css("width", width);
 			for (var i = 0; i < info.checks.length; i++) {
 				if (info.checks[i].state !== "pass") continue;
 				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
