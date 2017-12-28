@@ -867,7 +867,7 @@ function FormController(div) {
 			
 			// start over
 			var startOverLink = $("<div class='form_start_over'>").appendTo(pageDiv);
-			startOverLink.html("Or start over")
+			startOverLink.html("or start over")
 			startOverLink.click(function() { onStartOver(); });
 			
 			// disable generate button if environment failure
