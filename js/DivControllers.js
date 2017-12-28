@@ -2469,7 +2469,7 @@ function ExportController(div, window, config) {
 			showPrivateCheckbox.click(function() { update(); });
 			showLogosCheckbox.click(function() { update(); });
 			
-			// re-apply copyable which is lost when piece divs are copied to child window
+			// make copyable which is lost when piece divs are copied to child window
 			if (config.pieceDivs) {
 				for (var i = 0; i < config.pieceDivs.length; i++) {
 					PieceRenderer.makeCopyable(config.pieceDivs[i]);

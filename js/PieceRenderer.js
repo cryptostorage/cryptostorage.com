@@ -142,7 +142,6 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		// render pairs
 		async.series(funcs, function() {
 			if (isCancelled) return;
-			PieceRenderer.makeCopyable(pieceDiv);
 			onDone(null, pieceDiv);
 		});
 		
