@@ -958,7 +958,6 @@ function FormController(div) {
 	}
 	
 	function addCurrency(defaultTicker) {
-		if (AppUtils.DEV_MODE) console.log("addCurrency()");
 		
 		// create input
 		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, plugins, defaultTicker, updateForm, function() {

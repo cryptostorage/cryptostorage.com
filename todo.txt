@@ -1,4 +1,8 @@
 TODO
+two sliders while export encrypting
+import large split doesn't render piece divs in real time
+larger wifi icon
+backwards bitcoin logo
 quick generate loading progress hidden, regenerate button only after key pair rendered
 import successfully checkmark brighter green, larger, more padding
 can't click import link right away
@@ -10,7 +14,6 @@ form error messages - see spec
 warn if private key not included in print
 refresh image on regenerate button
 warnings link to downloads
-deprioritize dash and zcash
 bitpay donation address
 transition all css flex to common flex classes
 navigate away from import should reset it, maybe confirm if decrypting
