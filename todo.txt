@@ -1,6 +1,7 @@
 TODO
 quick generate loading progress hidden, regenerate button only after key pair rendered
-import successfully checkmark brighter green
+import successfully checkmark brighter green, larger, more padding
+can't click import link right away
 1px border on mobile safari import print
 test dependency errors
 export page piece selection disabled while loading
