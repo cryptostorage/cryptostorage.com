@@ -21,6 +21,7 @@ file import loading - see spec, only show if minimum file size
 common browser icons
 "application is not running locally" is not true, it's not hosted locally
 add DependencyLoader.isLoaded() and only show loading if not already loaded
+occasional drag and drop error, new window?
 
 designer:
 should home images fade or reflect?
