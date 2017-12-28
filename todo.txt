@@ -13,7 +13,7 @@ warnings link to downloads
 deprioritize dash and zcash
 bitpay donation address
 transition all css flex to common flex classes
-navigate away from import should reset it
+navigate away from import should reset it, maybe confirm if decrypting
 seo
 faq content
 homepage content
