@@ -2829,8 +2829,8 @@ function NoticeController(div, config) {
 						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for greater security when generating keys</div>");
 					} else if (check.state === "fail") {
 						var content = $("<div>").appendTo(div);
-						content.append("<div class='notice_bar_center_major'>Internet required to load dependencies</div>");
-						content.append("<div class='notice_bar_center_minor'>Connect to the internet and refresh the page</div>");
+						content.append("<div class='notice_bar_center_major'>Connect to the internet</div>");
+						content.append("<div class='notice_bar_center_minor'>Internet is required to download dependencies</div>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.IS_LOCAL:
