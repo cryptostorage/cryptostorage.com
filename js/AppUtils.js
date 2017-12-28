@@ -108,7 +108,8 @@ var AppUtils = {
 			"js/AppUtils.js",
 			"js/DivControllers.js",
 			"js/CryptoPlugins.js",
-			"js/BodyExporter.js"
+			"js/BodyExporter.js",
+			"lib/pagination.js"
 		];
 	},
 	

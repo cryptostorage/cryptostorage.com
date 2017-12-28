@@ -20,6 +20,7 @@ $(document).ready(function() {
 		
 		// load notice bar and tests
 		LOADER.load(AppUtils.getAppDependencies(), function(err) {
+			if (err) throw err;
 				
 			// run minimum tests
 			AppUtils.runMinimumTests(function(err) {
@@ -28,10 +29,9 @@ $(document).ready(function() {
 			
 			// run test suite
 			if (AppUtils.RUN_TESTS) {
-				if (err) throw err;
 				console.log("Running tests...");
-				Tests.runTests(function(error) {
-					if (error) throw error;
+				Tests.runTests(function(err) {
+					if (err) throw error;
 					console.log("All tests pass");
 				});
 			}
