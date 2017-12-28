@@ -1407,7 +1407,7 @@ function ImportFileController(div) {
 		resetControls();
 		
 		// div for inline storage
-		importedStorageDiv = $("<div class='import_storage_div'>").appendTo(div);
+		importedStorageDiv = $("<div class='imported_storage_div'>").appendTo(div);
 		importedStorageDiv.hide();
 		
 		// done rendering
@@ -1518,14 +1518,23 @@ function ImportFileController(div) {
 		importInputDiv.hide();
 		importedStorageDiv.show();
 		
-		// render decrypted keys inline
-		// TODO: pass imported pieces
+		// import success message
+		var importSuccessDiv = $("<div class='import_success_div flex_vertical'>").appendTo(importedStorageDiv);
+		var importSuccessMsgDiv = $("<div class='import_success_msg_div flex_horizontal'>").appendTo(importSuccessDiv);
+		importSuccessMsgDiv.append($("<img class='import_checkmark' src='img/checkmark.png'>"));
+		importSuccessMsgDiv.append("Imported Successfully");
+		var startOver = $("<div class='import_control_link'>").appendTo(importSuccessDiv);
+		startOver.append("start over");
+		startOver.click(function() { that.startOver(); });
+		
+		// inline storage TODO pass imported pieces
+		var storageDiv = $("<div>").appendTo(importedStorageDiv);
 		var config = {
 				keys: keys,
 				pieces: pieces,
 				pieceDivs: pieceDivs
 		}
-		new ExportController(importedStorageDiv, window, config).render(function() {
+		new ExportController(storageDiv, window, config).render(function() {
 			
 		});
 //		// add view decrypted button

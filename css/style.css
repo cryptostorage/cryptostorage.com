@@ -937,6 +937,24 @@ input[type='checkbox'][disabled] +label {
 	background-color: rgb(17, 119, 184);
 }
 
+.import_success_div {
+	padding: 25px 0 10px 0;
+	background-color: rgb(17, 119, 184);
+}
+
+.import_success_msg_div {
+	font-size: 26px;
+	font-weight: bold;
+	color: white;
+	margin-bottom: -10px;
+}
+
+.import_checkmark {
+	height: 50px;
+	width: 50px;
+	margin-right: 20px;
+}
+
 .import_warning_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
