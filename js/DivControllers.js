@@ -290,12 +290,14 @@ inheritsFrom(AppController, DivController);
 function SliderController(div, onSelectGenerate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
-		div.empty();
-		div.attr("class", "intro_div");
 		
 		// load mix img
 		var mixImg = new Image();
 		mixImg.onload = function() {
+			
+			// div setup
+			div.empty();
+			div.attr("class", "intro_div");
 			
 			// intro slider
 			var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
