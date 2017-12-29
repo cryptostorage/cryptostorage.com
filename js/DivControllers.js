@@ -788,7 +788,7 @@ function FormController(div) {
 			// passphrase input
 			passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
 			var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
-			passphraseWarnDiv.append("This passphrase is required to access funds later on.  Don’t lose it!");
+			passphraseWarnDiv.append("This passphrase is required to access funds later on.  <b>Don’t lose it.</b>");
 			passphraseInputDiv.append("Passphrase");
 			passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
 			passphraseInput.on("input focusout", function(e) {
