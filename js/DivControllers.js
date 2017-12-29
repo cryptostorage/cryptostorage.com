@@ -86,10 +86,12 @@ var UiUtils = {
 					if (onDone) onDone(err);
 				}
 				
-				// remove loading div and render
+				// remove loading div and done
 				else {
-					loading.detach();
-					if (onDone) onDone();
+					setImmediate(function() {	// let UI breath
+						loading.detach();
+						if (onDone) onDone();
+					})
 				}
 			});
 		}
@@ -290,6 +292,7 @@ inheritsFrom(AppController, DivController);
 function SliderController(div, onSelectGenerate, onSelectImport) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
+		div.empty();
 		
 		// load mix img
 		var mixImg = new Image();

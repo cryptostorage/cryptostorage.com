@@ -1,8 +1,5 @@
 TODO
-pause / jerky after loading screens
-1px border on mobile safari import print
 private key (unencrypted) when not shown
-test dependency errors - disable import new tabs
 export page piece selection disabled while loading
 form info bubbles - see spec
 form error messages - see spec
@@ -19,6 +16,9 @@ common browser icons
 occasional drag and drop error, new window?
 github description page
 public address -> public key?
+regenerate button disappears briefly on mobile
+test dependency errors - disable import new tabs
+1px border on mobile safari import print
 
 designer:
 should home images fade or reflect?
