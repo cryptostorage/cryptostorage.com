@@ -1,5 +1,4 @@
 TODO
-private key (unencrypted) when not shown
 export page piece selection disabled while loading
 form info bubbles - see spec
 form error messages - see spec

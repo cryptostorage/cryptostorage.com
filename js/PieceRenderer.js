@@ -110,7 +110,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			logo.attr("width", "100%");
 			logo.attr("height", "100%");
 			var logoLabel = plugin.getName();
-			var rightLabel = "Private Key" + (piece.pieceNum ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") + " \u25ba";
+			var rightLabel = "Private Key" + (config.showPrivate ? (piece.pieceNum ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") : "") + " \u25ba";
 			var rightValue = config.showPrivate ? piece.keys[i].wif : null;
 			funcs.push(renderKeyPairFunc(placeholderDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config));
 			
