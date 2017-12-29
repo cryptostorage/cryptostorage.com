@@ -2909,7 +2909,7 @@ function NoticeController(div, config) {
 					else if (check.state === "warn") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Internet connection is active</div>");
-						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for greater security</div>");
+						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for better security</div>");
 					} else if (check.state === "fail") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Connect to the internet</div>");

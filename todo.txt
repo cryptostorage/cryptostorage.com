@@ -20,13 +20,10 @@ warnings link to downloads
 bitpay donation address
 transition all css flex to common flex classes
 navigate away from import should reset it, maybe confirm if decrypting
-seo
 faq content
 homepage content
 file import loading - see spec, only show if minimum file size
 common browser icons
-"application is not running locally" is not true, it's not hosted locally
-add DependencyLoader.isLoaded() and only show loading if not already loaded
 occasional drag and drop error, new window?
 github description page
 
