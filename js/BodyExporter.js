@@ -10,7 +10,7 @@
  * 				config.keys are keys to generate pieces from
  * 				config.pieces are pieces to export and generate pieceDivs from
  * 				config.pieceDivs are pre-generated piece divs ready for display
- * 				config.confirmExit specifies if the window should confirm exit if not saved or printed
+ * 				config.confirmExit specifies if the window should confirm exit
  * 				config.showRegenerate specifies if the regenerate button should be shown
  * 				config.environmentInfo is initial info for the export (optional)
  */
