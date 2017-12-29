@@ -18,6 +18,7 @@ public address -> public key?
 regenerate button disappears briefly on mobile
 test dependency errors - disable import new tabs
 1px border on mobile safari import print
+all environment checks pass design
 
 designer:
 should home images fade or reflect?
