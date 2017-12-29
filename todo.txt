@@ -3,6 +3,7 @@ two sliders while export encrypting
 import large split doesn't render piece divs in real time
 larger wifi icon
 backwards bitcoin cash logo
+bold don't lose it in reference to passphrase
 quick generate loading progress hidden, regenerate button only after key pair rendered
 import successfully checkmark brighter green, larger, more padding
 can't click import link right away
