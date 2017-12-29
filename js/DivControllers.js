@@ -2632,16 +2632,8 @@ function ExportController(div, window, config) {
 		updateHeaderCheckboxes();
 		config.pieceDivs = _pieceDivs;
 		
-		// add piece divs if given
+	// add piece divs if given
 		if (config.pieceDivs) {
-			
-			// make copyable
-			if (config.pieceDivs) {
-				for (var i = 0; i < config.pieceDivs.length; i++) {
-					PieceRenderer.makeCopyable(config.pieceDivs[i]);
-				}
-			}
-			
 			assertInitialized(config.pieces);
 			setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(config.pieceDivs);
@@ -2657,11 +2649,15 @@ function ExportController(div, window, config) {
 			// render pieces if given
 			if (config.pieces) {
 				for (var i = 0; i < config.pieces.length; i++) config.pieceDivs.push($("<div>"));
+				setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
+				setPieceDivs(config.pieceDivs);
 				if (!config.quickGenerate) setPrintEnabled(false);
 				if (lastRenderer) lastRenderer.cancel();
 				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getPieceRendererConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
-					update(config.pieceDivs, onDone);
+					setPrintEnabled(true);
+					setControlsEnabled(true);
+					if (onDone) onDone();
 				});
 			}
 			

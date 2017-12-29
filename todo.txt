@@ -1,5 +1,4 @@
 TODO
-import large split doesn't render piece divs in real time
 quick generate loading progress hidden, regenerate button only after key pair rendered
 pause / jerky after loading screens
 can't click import link right away
@@ -22,6 +21,7 @@ file import loading - see spec, only show if minimum file size
 common browser icons
 occasional drag and drop error, new window?
 github description page
+public address -> public key?
 
 designer:
 should home images fade or reflect?
