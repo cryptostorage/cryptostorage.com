@@ -1,5 +1,4 @@
 TODO
-export page piece selection disabled while loading
 navigate away from import should reset it, maybe confirm if decrypting
 form info bubbles - see spec
 form error messages - see spec
