@@ -428,7 +428,11 @@ input[type='checkbox']:not([disabled]) +label {
 }
 
 input[type='checkbox'][disabled] +label {
-  	opacity: 0.75;
+  	opacity: 0.5;
+}
+
+.disabled {
+	opacity: 0.5;
 }
 
 .question {

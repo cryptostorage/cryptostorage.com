@@ -59,7 +59,7 @@
 }
 
 .paginationjs .paginationjs-pages li.disabled>a {
-	opacity: .3
+	opacity: 0.5;
 }
 
 .paginationjs .paginationjs-pages li.disabled>a:hover {

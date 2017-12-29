@@ -2361,6 +2361,7 @@ function ExportController(div, window, config) {
 	var showLogosCheckbox;
 	var paginator;
 	var piecesDiv;
+	var piecesLabel;
 	var printEnabled;
 	var lastRenderer;
 	var regenerateDiv;
@@ -2426,7 +2427,8 @@ function ExportController(div, window, config) {
 					if (config.pieceDivs) setVisiblePiece(config.pieceDivs, pagination.pageNumber - 1);
 				}
 			});
-			$("<div class='export_piece_selection_label'>Pieces</div>").appendTo(exportHeader);
+			piecesLabel = $("<div class='export_piece_selection_label'>").appendTo(exportHeader);
+			piecesLabel.html("Pieces");
 		}
 		
 		// view split pieces
@@ -2597,6 +2599,7 @@ function ExportController(div, window, config) {
 		setPrintEnabled(enabled);
 		if (paginator) paginator.pagination(enabled ? "enable" : "disable");
 		if (enabled) {
+			if (piecesLabel) piecesLabel.removeClass("disabled");
 			saveButton.addClass("export_button");
 			saveButton.removeClass("export_button_disabled");
 			savePublicButton.addClass("export_button");
@@ -2607,6 +2610,7 @@ function ExportController(div, window, config) {
 			savePublicButton.click(function() { savePublicAddresses(); });
 			updateHeaderCheckboxes();
 		} else {
+			if (piecesLabel) piecesLabel.addClass("disabled");
 			saveButton.addClass("export_button_disabled");
 			saveButton.removeClass("export_button");
 			savePublicButton.addClass("export_button_disabled");
