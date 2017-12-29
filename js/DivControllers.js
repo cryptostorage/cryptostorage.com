@@ -1518,7 +1518,7 @@ function ImportFileController(div) {
 		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
 		successTitle.append("Imported Successfully");
 		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successDiv);
-		if (importedPieces.length) successLinks.append("<div class='import_success_checkmark'>");
+		if (importedPieces.length > 1) successLinks.append("<div class='import_success_checkmark'>");	// filler to center control links under title text
 		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
@@ -2632,11 +2632,12 @@ function ExportController(div, window, config) {
 		updateHeaderCheckboxes();
 		config.pieceDivs = _pieceDivs;
 		
-	// add piece divs if given
+		// add piece divs if given
 		if (config.pieceDivs) {
 			assertInitialized(config.pieces);
 			setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(config.pieceDivs);
+			makePieceDivsCopyable(config.pieceDivs);
 			setPrintEnabled(true);
 			setControlsEnabled(true);
 			if (onDone) onDone();
@@ -2655,6 +2656,7 @@ function ExportController(div, window, config) {
 				if (lastRenderer) lastRenderer.cancel();
 				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getPieceRendererConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
+					makePieceDivsCopyable(pieceDivs);
 					setPrintEnabled(true);
 					setControlsEnabled(true);
 					if (onDone) onDone();
@@ -2688,6 +2690,13 @@ function ExportController(div, window, config) {
 						update(config.pieceDivs, onDone);
 					}
 				}, true);
+			}
+		}
+		
+		// make piece divs copyable which is lost when rendered pieces transfered to new tab
+		function makePieceDivsCopyable(pieceDivs) {
+			for (var i = 0; i < pieceDivs.length; i++) {
+				PieceRenderer.makeCopyable(pieceDivs[i]);
 			}
 		}
 	}

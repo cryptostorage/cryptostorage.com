@@ -1285,7 +1285,7 @@ input[type='checkbox'][disabled] +label {
 	align-items: center;
 	background-color: rgb(17, 119, 184);
 	width: 100%;
-	padding: 10px;
+	padding: 12px;
 	margin-top: -2px;	/* fix mobile safari border showing */
 }
 
