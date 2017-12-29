@@ -1476,8 +1476,8 @@ input[type='checkbox'][disabled] +label {
 }
 
 .key_div_qr_omitted_img {
-	width: 80px;
-	height: 80px;
+	width: 75px;
+	height: 75px;
 }
 
 .key_div_left {

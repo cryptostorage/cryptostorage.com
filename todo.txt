@@ -2,7 +2,6 @@ TODO
 pause / jerky after loading screens
 can't click import link right away
 1px border on mobile safari import print
-thinner restricted.png
 private key (unencrypted) when not shown
 test dependency errors - disable import new tabs
 export page piece selection disabled while loading
