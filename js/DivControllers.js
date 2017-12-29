@@ -2365,6 +2365,7 @@ function ExportController(div, window, config) {
 	var piecesDiv;
 	var printEnabled;
 	var lastRenderer;
+	var regenerateDiv;
 	
 	// confirm exit if storage not saved or printed
 	if (config.confirmExit) {
@@ -2480,7 +2481,8 @@ function ExportController(div, window, config) {
 			
 			// regenerate button
 			if (config.showRegenerate) {
-				var regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
+				regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
+				regenerateDiv.hide();
 				btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
 				btnRegenerate.append("Regenerate");
 				btnRegenerate.click(function() {
@@ -2489,7 +2491,6 @@ function ExportController(div, window, config) {
 						config.keys = undefined;
 						config.pieces = undefined;
 						config.pieceDivs = undefined;
-						config.quickGenerate = true;	// hides progress bar and does not disable header
 						update();
 					}
 				});
@@ -2631,6 +2632,7 @@ function ExportController(div, window, config) {
 	function update(_pieceDivs, onDone) {
 		updateHeaderCheckboxes();
 		config.pieceDivs = _pieceDivs;
+		if (regenerateDiv) regenerateDiv.hide();
 		
 		// add piece divs if given
 		if (config.pieceDivs) {
@@ -2640,6 +2642,7 @@ function ExportController(div, window, config) {
 			makePieceDivsCopyable(config.pieceDivs);
 			setPrintEnabled(true);
 			setControlsEnabled(true);
+			if (regenerateDiv) regenerateDiv.show();
 			if (onDone) onDone();
 		}
 		
@@ -2652,13 +2655,14 @@ function ExportController(div, window, config) {
 				for (var i = 0; i < config.pieces.length; i++) config.pieceDivs.push($("<div>"));
 				setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(config.pieceDivs);
-				if (!config.quickGenerate) setPrintEnabled(false);
+				setPrintEnabled(false);
 				if (lastRenderer) lastRenderer.cancel();
 				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getPieceRendererConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
 					makePieceDivsCopyable(pieceDivs);
 					setPrintEnabled(true);
 					setControlsEnabled(true);
+					if (regenerateDiv) regenerateDiv.show();
 					if (onDone) onDone();
 				});
 			}
@@ -2672,16 +2676,18 @@ function ExportController(div, window, config) {
 			// otherwise generate keys from config
 			else {
 				assertInitialized(config.keyGenConfig);
-				if (!config.quickGenerate) setControlsEnabled(false);
+				var quickGenerate = isQuickGenerate(config.keyGenConfig);
+				if (!quickGenerate) setControlsEnabled(false);
 				AppUtils.generateKeys(config.keyGenConfig, function(percent, label) {
 					progressBar.set(percent);
 					progressBar.setText(Math.round(percent * 100)  + "%");
 					progressLabel.html(label);
-					if (!config.quickGenerate) progressDiv.show();
+					if (!quickGenerate) progressDiv.show();
 				}, function(err, _keys, _pieces, _pieceDivs) {
 					progressDiv.hide();
 					if (err) {
 						AppUtils.setRuntimeError(err);
+						if (regenerateDiv) regenerateDiv.show();
 						if (onDone) onDone(err);
 					} else {
 						config.keys = _keys;
@@ -2690,6 +2696,19 @@ function ExportController(div, window, config) {
 						update(config.pieceDivs, onDone);
 					}
 				}, true);
+			}
+			
+			/**
+			 * Determines if the given key gen config will be generated "quickly".
+			 */
+			function isQuickGenerate(keyGenConfig) {
+				var numPairs = 0;
+				for (var i = 0; i < keyGenConfig.currencies.length; i++) {
+					if (keyGenConfig.currencies[i].encryption === AppUtils.EncryptionScheme.BIP38) return false;	// BIP38 is slow
+					numPairs += keyGenConfig.currencies[i].numKeys;
+				}
+				numPairs *= keyGenConfig.splitEnabled ? keyGenConfig.numPieces : 1;
+				return numPairs <= 2;
 			}
 		}
 		
