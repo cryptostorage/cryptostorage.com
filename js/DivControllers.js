@@ -334,12 +334,7 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			// button to import keys
 			var btnImport = $("<div class='btn_import'>").appendTo(ctaDiv);
 			btnImport.append("or Import Existing Keys");
-			
-			// disable import keys if failed environment check
-			AppUtils.addEnvironmentListener(function() {
-				btnImport.unbind("click");
-				if (!AppUtils.hasEnvironmentState("fail")) btnImport.click(function() { onSelectImport(); });
-			});
+			btnImport.click(function() { onSelectImport(); });
 			
 			if (onDone) onDone(div);
 		}
