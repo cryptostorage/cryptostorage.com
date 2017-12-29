@@ -1,4 +1,5 @@
 TODO
+import split pieces enables export header at different times
 navigate away from import should reset it, maybe confirm if decrypting
 occasional drag and drop error, new window?
 common browser icons
