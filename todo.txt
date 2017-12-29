@@ -1,5 +1,6 @@
 TODO
 export page piece selection disabled while loading
+navigate away from import should reset it, maybe confirm if decrypting
 form info bubbles - see spec
 form error messages - see spec
 warn if private key not included in print
@@ -7,7 +8,6 @@ refresh image on regenerate button
 warnings link to downloads
 bitpay donation address
 transition all css flex to common flex classes
-navigate away from import should reset it, maybe confirm if decrypting
 faq content
 homepage content
 file import loading - see spec, only show if minimum file size
