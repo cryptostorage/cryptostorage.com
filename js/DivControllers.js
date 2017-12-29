@@ -2595,6 +2595,7 @@ function ExportController(div, window, config) {
 		printButton.unbind("click");
 		savePublicButton.unbind("click");
 		setPrintEnabled(enabled);
+		if (paginator) paginator.pagination(enabled ? "enable" : "disable");
 		if (enabled) {
 			saveButton.addClass("export_button");
 			saveButton.removeClass("export_button_disabled");
