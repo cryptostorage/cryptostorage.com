@@ -3,7 +3,6 @@ two sliders while export encrypting
 import large split doesn't render piece divs in real time
 larger wifi icon
 quick generate loading progress hidden, regenerate button only after key pair rendered
-import successfully checkmark brighter green, larger, more padding
 pause / jerky after loading screens
 can't click import link right away
 1px border on mobile safari import print

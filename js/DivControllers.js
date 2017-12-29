@@ -1516,6 +1516,7 @@ function ImportFileController(div) {
 		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
 		successTitle.append("Imported Successfully");
 		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successDiv);
+		if (importedPieces.length) successLinks.append("<div class='import_success_checkmark'>");
 		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
