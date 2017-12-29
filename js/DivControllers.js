@@ -306,9 +306,9 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
 			var sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
 			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
-			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage and easy recovery.").appendTo(sliderDiv);
+			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Run offline so funds are never entrusted to a third party.").appendTo(sliderDiv);
-			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use, forever.  No account necessary.").appendTo(sliderDiv);
+			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split your private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate your keys securely with automated environment checks.").appendTo(sliderDiv);
 			sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
