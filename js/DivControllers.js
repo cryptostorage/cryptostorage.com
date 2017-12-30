@@ -803,6 +803,7 @@ function FormController(div) {
 			bip38Checkbox = $("<input type='checkbox' id='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
 			var bip38CheckboxLabel = $("<label for='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
 			bip38CheckboxLabel.html("Use BIP38 for Bitcoin and Bitcoin Cash");
+			var bip38Info = $("<img src='img/information.png' class='information_img'>").appendTo(bip38CheckboxDiv);
 			var showPassphraseCheckboxDiv = $("<div class='show_passphrase_checkbox_div'>").appendTo(passphraseConfigDiv);
 			showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 			var showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
@@ -813,6 +814,23 @@ function FormController(div) {
 				} else {
 					passphraseInput.attr("type", "password");
 				}
+			});
+			
+			// bip38 tooltip
+			var bip38Tooltip = $("<div>");
+			bip38Tooltip.append("BIP38 is a method to encrypt Bitcoin private keys<br>with a passphrase.<br><br>");
+			bip38Tooltip.append("It's slower than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default) which<br>makes it more secure against brute force attacks.<br><br>");
+			bip38Tooltip.append("See the <a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38 specification</a> for more information.");
+			tippy(bip38Info.get(0), {
+				arrow: true,
+				html: bip38Tooltip.get(0),
+				interactive: true,
+				placement: 'right',
+				theme: 'translucent',
+				trigger: "mouseenter",
+				multiple: 'false',
+				distance: 10,
+				arrowTransform: 'scaleX(1) scaleY(1)'
 			});
 			
 			// split checkbox

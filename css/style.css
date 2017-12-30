@@ -1774,3 +1774,9 @@ input[type='checkbox'][disabled] +label {
 	width: 50px;
 	height: 50px;
 }
+
+.information_img {
+	width: 23px;
+	height: 23px;
+	margin-left: 5px;
+}
