@@ -1780,3 +1780,7 @@ input[type='checkbox'][disabled] +label {
 	height: 23px;
 	margin-left: 5px;
 }
+
+.information_img:hover {
+	cursor: pointer;
+}

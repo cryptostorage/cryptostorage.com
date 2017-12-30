@@ -826,7 +826,7 @@ function FormController(div) {
 				interactive: true,
 				placement: 'bottom',
 				theme: 'translucent',
-				trigger: "mouseenter",
+				trigger: "click",
 				multiple: 'false',
 				distance: 10,
 				arrowTransform: 'scaleX(1) scaleY(1)'
