@@ -1,10 +1,11 @@
 TODO
 import split pieces enables export header at different times
+form error messages - see spec
 navigate away from import should reset it, maybe confirm if decrypting
+unrecognized private key invalid split pieces overflows
 occasional drag and drop error, new window?
 common browser icons
 form info bubbles - see spec
-form error messages - see spec
 warn if private key not included in print
 refresh image on regenerate button
 warnings link to downloads
@@ -20,7 +21,6 @@ test dependency errors - disable import new tabs
 1px border on mobile safari import print
 all environment checks pass design
 mobile safari tooltip line
-unrecognized private key invalid split pieces overflows
 export save corresponds to what's shown
 
 designer:
