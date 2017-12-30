@@ -21,6 +21,7 @@ test dependency errors - disable import new tabs
 all environment checks pass design
 mobile safari tooltip line
 unrecognized private key invalid split pieces overflows
+export save corresponds to what's shown
 
 designer:
 should home images fade or reflect?
