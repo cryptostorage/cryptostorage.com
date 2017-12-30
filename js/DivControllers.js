@@ -818,7 +818,7 @@ function FormController(div) {
 			
 			// bip38 tooltip
 			var bip38Tooltip = $("<div>");
-			bip38Tooltip.append("BIP38 is a <a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>specification</a> to encrypt Bitcoin private<br>keys with a passphrase.<br><br>");
+			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a specification to encrypt Bitcoin private<br>keys with a passphrase.<br><br>");
 			bip38Tooltip.append("It's slower than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default), but it's<br>more secure against brute force attacks.");
 			tippy(bip38Info.get(0), {
 				arrow: true,
