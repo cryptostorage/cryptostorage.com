@@ -8,7 +8,6 @@ form info bubbles - see spec
 warnings link to downloads
 bitpay credit
 common browser icons
-public address -> public key?
 regenerate button disappears briefly on mobile
 let UI breath during bip38
 remove under development warning
