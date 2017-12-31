@@ -20,6 +20,8 @@ should home images fade or reflect?
 blue footer on every page?
 view split pieces and placement
 tip address
+credit non-donations
+all checks pass design
 
 low priority:
 1px border on mobile safari import print
