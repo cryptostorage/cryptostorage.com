@@ -474,6 +474,8 @@ var AppUtils = {
 	 * 
 	 * @param pieces are the pieces to convert to keys
 	 * @returns keys built from the pieces
+	 * 
+	 * TODO: this method needs to accomodate missing private keys
 	 */
 	piecesToKeys: function(pieces) {
 		assertTrue(pieces.length > 0);
@@ -623,7 +625,7 @@ var AppUtils = {
 					var piece;
 					try {
 						piece = JSON.parse(str);
-						AppUtils.validatePiece(piece);
+						AppUtils.validatePiece(piece, true);
 					} catch (err) {
 						//throw err;
 						console.log(err);
@@ -740,11 +742,6 @@ var AppUtils = {
 		assertTrue(piece.keys.length > 0, "piece.keys is empty");
 		var minPieces;
 		for (var i = 0; i < piece.keys.length; i++) {
-			if (piece.pieceNum) {
-				// TODO: can't get min pieces when private key is unknown
-				if (!minPieces) minPieces = AppUtils.getMinPieces(piece.keys[i].wif);
-				else if (minPieces !== AppUtils.getMinPieces(piece.keys[i].wif)) throw new Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");
-			}
 			assertDefined(piece.keys[i].ticker, "piece.keys[" + i + "].ticker is not defined");
 			assertDefined(piece.keys[i].encryption, "piece.keys[" + i + "].encryption is not defined");
 			if (allowMissingPublicXorPrivate) {
@@ -752,6 +749,10 @@ var AppUtils = {
 			} else {
 				assertDefined(piece.keys[i].address, "piece.keys[" + i + "].address is not defined");
 				assertDefined(piece.keys[i].wif, "piece.keys[" + i + "].wif is not defined");
+			}
+			if (piece.pieceNum && piece.keys[i].wif) {
+				if (!minPieces) minPieces = AppUtils.getMinPieces(piece.keys[i].wif);
+				else if (minPieces !== AppUtils.getMinPieces(piece.keys[i].wif)) throw new Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");
 			}
 		}
 	},
