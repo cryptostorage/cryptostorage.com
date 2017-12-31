@@ -1,7 +1,6 @@
 TODO
 form error messages - see spec
 navigate away from import should reset it, maybe confirm if decrypting
-unrecognized private key invalid split pieces overflows
 occasional drag and drop error, new window?
 common browser icons
 form info bubbles - see spec
@@ -21,6 +20,7 @@ test dependency errors - disable import new tabs
 all environment checks pass design
 mobile safari tooltip line
 export save corresponds to what's shown
+site did not work on devices simultaneously
 
 designer:
 should home images fade or reflect?

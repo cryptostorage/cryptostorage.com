@@ -1677,7 +1677,7 @@ function ImportFileController(div) {
 			if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(pieces, keys);
 			lastKeys = keys;
 		} catch (err) {
-			var img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
+			var img = err.message.indexOf("additional piece") > -1 ? $("<img src='img/files.png'>") : null;
 			that.setWarning(err.message, img);
 		}
 		if (onDone) onDone();
@@ -2097,8 +2097,10 @@ function ImportTextController(div, plugins) {
 				key = selectedPlugin.combine(importedPieces);
 			} catch (err) {
 				if (!warningSet) {
-					var img = err.message.indexOf("additional piece") > 0 ? $("<img src='img/files.png'>") : null;
-					setWarning(err.message, img);
+					console.log(err.message);
+					if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
+					else if (err.message.indexOf("Unrecognized private key") > -1) setWarning("Pieces do not combine to make valid private key");
+					else setWarning(err.message);
 				}
 			}
 		}
