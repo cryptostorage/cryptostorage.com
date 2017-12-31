@@ -51,13 +51,14 @@ var AppUtils = {
 		var dependencies = [
 			"lib/slick.js",
 			"lib/setImmediate.js",
-			"img/checklist.png",
 			"img/cryptostorage_white.png",
-			"img/key.png",
-			"img/keys.png",
-			"img/microscope.png",
 			"img/mix.png",
+			"img/printer.png",
 			"img/security.png",
+			"img/microscope.png",
+			"img/keys.png",
+			"img/checklist.png",
+			"img/key.png",
 			"img/license.png",
 			"img/notice_bar.png",
 			"img/print_sample.png"
@@ -134,7 +135,8 @@ var AppUtils = {
 			"lib/clipboard.js",
 			"js/CryptoKey.js",
 			"lib/setImmediate.js",
-			"img/cryptostorage_export.png"
+			"img/cryptostorage_export.png",
+			"img/restricted.png"
 		];
 		
 		// add dependencies
@@ -163,9 +165,15 @@ var AppUtils = {
 			"js/CryptoKey.js",
 			"js/Tests.js",
 			"lib/jquery.ddslick.js",
+			"img/loading.gif",
+			"img/information.png",
 			"img/trash.png",
+			"img/qr_code.png",
+			"img/split_lines_2.png",
+			"img/split_lines_3.png",
 			"img/file.png",
 			"img/files.png",
+			"img/warning.png",
 			"img/checkmark.png",
 			"img/drag_and_drop.png"
 		];

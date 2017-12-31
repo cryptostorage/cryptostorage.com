@@ -74,26 +74,31 @@ var UiUtils = {
 		// dependencies not loaded
 		else {
 			
-			// loading div
-			var loading = $("<div class='flex_horizontal'>").appendTo(div);
-			loading.append("<img class='loading' src='img/loading.gif'>");
-			
-			// load dependencies
-			LOADER.load(dependencies, function(err) {
+			// load loading gif
+			var loading = new Image();
+			loading.onload = function() {
+				$(loading).addClass("loading");
+				var loadingDiv = $("<div class='flex_horizontal'>").appendTo(div);
+				loadingDiv.append(loading);
 				
-				// check for error
-				if (err) {
-					if (onDone) onDone(err);
-				}
-				
-				// remove loading div and done
-				else {
-					setImmediate(function() {	// let UI breath
-						loading.detach();
-						if (onDone) onDone();
-					})
-				}
-			});
+				// load dependencies
+				LOADER.load(dependencies, function(err) {
+					
+					// check for error
+					if (err) {
+						if (onDone) onDone(err);
+					}
+					
+					// remove loading div and done
+					else {
+						setImmediate(function() {	// let UI breath
+							loadingDiv.detach();
+							if (onDone) onDone();
+						})
+					}
+				});
+			};
+			loading.src = "img/loading.gif";
 		}
 	}
 }

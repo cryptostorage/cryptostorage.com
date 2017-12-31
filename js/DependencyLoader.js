@@ -30,7 +30,7 @@ function DependencyLoader() {
 		for (var i = 0; i < paths.length; i++) {
 			var path = paths[i];
 			assertDefined(path);
-			if (path.endsWith(".png") || path.endsWith(".jpg")) {
+			if (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".gif")) {
 				if (!arrayContains(loadedImages, path)) imagesToLoad.push(path);
 			} else {
 				scriptsToLoad.push(path);
