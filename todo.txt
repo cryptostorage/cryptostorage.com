@@ -10,6 +10,8 @@ bitpay credit
 common browser icons
 public address -> public key?
 regenerate button disappears briefly on mobile
+let UI breath during bip38
+preload all import images
 
 faq content
 homepage content

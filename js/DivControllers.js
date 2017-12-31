@@ -227,12 +227,12 @@ function AppController(div) {
 	
 	this.showHome = function() {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
-		importController.startOver();
 		sliderDiv.show();
 		sliderController.render(function() {
 			homeController.render(function(div) {
 				setContentDiv(div);
 				footerDiv.show();
+				importController.startOver();
 			});
 		});
 	}
@@ -251,16 +251,16 @@ function AppController(div) {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
 		sliderDiv.hide();
 		footerDiv.hide();
-		importController.startOver();
 		setContentDiv(faqController.getDiv());
+		importController.startOver();
 	}
 	
 	this.showDonate = function() {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
 		sliderDiv.hide();
 		footerDiv.hide();
-		importController.startOver();
 		setContentDiv(donateController.getDiv());
+		importController.startOver();
 	}
 	
 	this.showImport = function() {
