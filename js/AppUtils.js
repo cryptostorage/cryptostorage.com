@@ -670,9 +670,36 @@ var AppUtils = {
 		// convert array to csv
 		return arrToCsv(csvArr);
 	},
-
-	pieceToJson: function(piece) {
+	
+	pieceToJson: function(piece, config) {
 		return JSON.stringify(piece);
+	},
+	
+	/**
+	 * Transforms the given piece according to the given configuration.
+	 * 
+	 * @param piece is the piece to transform
+	 * @param config specifies how to modify the piece
+	 * 				config.showPublic will include public addresses if undefined or true, excluded otherwise
+	 * 				config.showPrivate will include private addresses if undefined or true, excluded otherwise
+	 * @returns a new piece with the given configuration applied
+	 */
+	transformPiece: function(piece, config) {
+		config = objectAssign(getDefaultConfig(), config);
+		var copy = JSON.parse(JSON.stringify(piece));
+		for (var i = 0; i < copy.keys.length; i++) {
+			var key = copy.keys[i];
+			if (!config.showPublic) delete key.address;
+			if (!config.showPrivate) delete key.wif;
+		}
+		return copy;
+		
+		function getDefaultConfig() {
+			return {
+				showPublic: true,
+				showPrivate: true
+			}
+		}
 	},
 
 	pieceToStr: function(piece) {
@@ -694,7 +721,14 @@ var AppUtils = {
 		return str.trim();
 	},
 
-	validatePiece: function(piece) {
+	/**
+	 * Validates the given piece.
+	 * 
+	 * @param piece is the piece to validate
+	 * @param allowMissingPublicXorPrivate specifies if publics xor privates can be omitted
+	 * @throws an exception if the piece is not valid
+	 */
+	validatePiece: function(piece, allowMissingPublicXorPrivate) {
 		assertDefined(piece.version, "piece.version is not defined");
 		assertNumber(piece.version, "piece.version is not a number");
 		if (isDefined(piece.pieceNum)) {
@@ -707,13 +741,18 @@ var AppUtils = {
 		var minPieces;
 		for (var i = 0; i < piece.keys.length; i++) {
 			if (piece.pieceNum) {
+				// TODO: can't get min pieces when private key is unknown
 				if (!minPieces) minPieces = AppUtils.getMinPieces(piece.keys[i].wif);
 				else if (minPieces !== AppUtils.getMinPieces(piece.keys[i].wif)) throw new Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");
 			}
 			assertDefined(piece.keys[i].ticker, "piece.keys[" + i + "].ticker is not defined");
-			assertDefined(piece.keys[i].address, "piece.keys[" + i + "].address is not defined");
-			assertDefined(piece.keys[i].wif, "piece.keys[" + i + "].wif is not defined");
 			assertDefined(piece.keys[i].encryption, "piece.keys[" + i + "].encryption is not defined");
+			if (allowMissingPublicXorPrivate) {
+				if (!isDefined(piece.keys[i].address) && !isDefined(piece.keys[i].wif)) throw new Error("piece.keys[" + i + "] is missing an address and private key");
+			} else {
+				assertDefined(piece.keys[i].address, "piece.keys[" + i + "].address is not defined");
+				assertDefined(piece.keys[i].wif, "piece.keys[" + i + "].wif is not defined");
+			}
 		}
 	},
 	

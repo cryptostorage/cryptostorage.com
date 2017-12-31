@@ -1472,9 +1472,10 @@ function ImportFileController(div) {
 		for (var i = 0; i < namedPieces.length; i++) {
 			var namedPiece = namedPieces[i];
 			try {
-				AppUtils.validatePiece(namedPiece.piece);
+				AppUtils.validatePiece(namedPiece.piece, true);
 				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
 			} catch (err) {
+				if (AppUtils.DEV_MODE) console.log(err);
 				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.message);
 			}
 		}
@@ -1512,13 +1513,13 @@ function ImportFileController(div) {
 		that.setWarning("");
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
-		if (keys[0].isEncrypted()) {
+		if (keys[0].hasPrivateKey() && keys[0].isEncrypted()) {
 			
 			// create decryption controller and register callbacks
 			decryptionController = new DecryptionController(decryptionDiv, keys, function(warning) {
 				that.setWarning(warning);
 			}, function(decryptedKeys, decryptedPieces, decryptedPieceDivs) {
-				onKeysDecrypted(pieces, decryptedKeys, decryptedPieces, decryptedPieceDivs);
+				showStorage(pieces, decryptedKeys, decryptedPieces, decryptedPieceDivs);
 			});
 			
 			// render decryption controller
@@ -1536,11 +1537,11 @@ function ImportFileController(div) {
 				});
 			});
 		} else {
-			onKeysDecrypted(pieces, keys);
+			showStorage(pieces, keys);
 		}
 	}
 	
-	function onKeysDecrypted(importedPieces, keys, pieces, pieceDivs) {
+	function showStorage(importedPieces, keys, pieces, pieceDivs) {
 		resetControls();
 		importInputDiv.hide();
 		importedStorageDiv.empty();
@@ -1696,6 +1697,7 @@ function ImportFileController(div) {
 			if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(pieces, keys);
 			lastKeys = keys;
 		} catch (err) {
+			if (AppUtils.DEV_MODE) console.log(err);
 			var img = err.message.indexOf("additional piece") > -1 ? $("<img src='img/files.png'>") : null;
 			that.setWarning(err.message, img);
 		}
@@ -2596,7 +2598,8 @@ function ExportController(div, window, config) {
 		return null;
 	}
 	
-	function getPieceRendererConfig() {
+	// TODO: show -> include
+	function getExportConfig() {
 		return {
 			showPublic: showPublicCheckbox.prop('checked'),
 			showPrivate: showPrivateCheckbox.prop('checked'),
@@ -2613,13 +2616,21 @@ function ExportController(div, window, config) {
 	function saveAll(pieces) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
+		
+		// transform pieces according to export config
+		var transformedPieces = [];
+		var config = getExportConfig();
+		for (var i = 0; i < pieces.length; i++) {
+			transformedPieces.push(AppUtils.transformPiece(pieces[i], config));
+		}
+		
 		saved = true;
 		var name = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
 		if (pieces.length === 1) {
-			var jsonStr = AppUtils.pieceToJson(pieces[0]);
+			var jsonStr = AppUtils.pieceToJson(transformedPieces[0]);
 			saveAs(new Blob([jsonStr]), name + ".json");
 		} else {
-			AppUtils.piecesToZip(pieces, function(blob) {
+			AppUtils.piecesToZip(transformedPieces, function(blob) {
 				saveAs(blob, name + ".zip");
 			});
 		}
@@ -2718,7 +2729,7 @@ function ExportController(div, window, config) {
 				setPrintEnabled(false);
 				setControlsEnabled(true);
 				if (lastRenderer) lastRenderer.cancel();
-				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getPieceRendererConfig());
+				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getExportConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
 					makePieceDivsCopyable(pieceDivs);
 					setPrintEnabled(true);

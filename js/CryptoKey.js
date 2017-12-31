@@ -56,6 +56,10 @@ function CryptoKey(plugin, state) {
 		return this.state.wif;
 	}
 	
+	this.hasPrivateKey = function() {
+		return isInitialized(this.state.hex) || isInitialized(this.state.wif);
+	}
+	
 	this.encrypt = function(scheme, passphrase, onProgress, onDone) {
 		this.plugin.encrypt(scheme, this, passphrase, onProgress, onDone);
 	}
