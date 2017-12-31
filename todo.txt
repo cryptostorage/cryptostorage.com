@@ -1,4 +1,6 @@
 TODO
+export save corresponds to what's shown
+site did not work on devices simultaneously
 form error messages - see spec
 occasional drag and drop error, new window?
 form info bubbles - see spec
@@ -18,8 +20,6 @@ test dependency errors - disable import new tabs
 1px border on mobile safari import print
 all environment checks pass design
 mobile safari tooltip line
-export save corresponds to what's shown
-site did not work on devices simultaneously
 
 designer:
 should home images fade or reflect?
