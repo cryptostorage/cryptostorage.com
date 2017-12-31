@@ -227,6 +227,7 @@ function AppController(div) {
 	
 	this.showHome = function() {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
+		importController.startOver();
 		sliderDiv.show();
 		sliderController.render(function() {
 			homeController.render(function(div) {
@@ -250,6 +251,7 @@ function AppController(div) {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
 		sliderDiv.hide();
 		footerDiv.hide();
+		importController.startOver();
 		setContentDiv(faqController.getDiv());
 	}
 	
@@ -257,6 +259,7 @@ function AppController(div) {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
 		sliderDiv.hide();
 		footerDiv.hide();
+		importController.startOver();
 		setContentDiv(donateController.getDiv());
 	}
 	
@@ -1311,6 +1314,10 @@ inheritsFrom(FormController, DivController);
  */
 function ImportController(div) {
 	DivController.call(this, div);
+	
+	var importFileController;
+	var importTextController;
+	
 	this.render = function(onDone) {
 		
 		// loading screen until dependencies loaded
@@ -1340,14 +1347,21 @@ function ImportController(div) {
 			// render import file and text divs
 			var importFileDiv = $("<div>");
 			var importTextDiv = $("<div>");
-			new ImportFileController(importFileDiv).render(function() {
-				new ImportTextController(importTextDiv, AppUtils.getCryptoPlugins()).render(function() {
+			importFileController = new ImportFileController(importFileDiv);
+			importFileController.render(function() {
+				importTextController = new ImportTextController(importTextDiv, AppUtils.getCryptoPlugins());
+				importTextController.render(function() {
 					new TwoTabController(importDiv, "Import From File", importFileDiv, "Import From Text", importTextDiv).render(function() {
 						if (onDone) onDone(div);
 					});
 				});
 			});
 		}
+	}
+	
+	this.startOver = function() {
+		if (importFileController) importFileController.startOver();
+		if (importTextController) importTextController.startOver();
 	}
 }
 inheritsFrom(ImportController, DivController);

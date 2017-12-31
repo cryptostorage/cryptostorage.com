@@ -1,8 +1,6 @@
 TODO
 form error messages - see spec
-navigate away from import should reset it, maybe confirm if decrypting
 occasional drag and drop error, new window?
-common browser icons
 form info bubbles - see spec
 warn if private key not included in print
 refresh image on regenerate button
@@ -11,6 +9,7 @@ bitpay credit
 transition all css flex to common flex classes
 faq content
 homepage content
+common browser icons
 file import loading - see spec, only show if minimum file size
 github description page
 public address -> public key?
@@ -29,6 +28,7 @@ view split pieces and placement
 tip address
 
 low priority:
+confirm navigate away from import if decrypting
 export transactions which can be imported and sent making it fully functional cold storage web wallet
 meeting times should be plus or minus 30% of time invested
 option to split the passphrase and include a copy of it on each share?
@@ -53,3 +53,4 @@ code scan
 minimize initial dependencies: condense files to single files, lazy load css
 de-allocate elements on page re-renders
 decomission export render when new render invoked
+"pieces have different addresses" -> "pieces are incompatible" for import validation error
