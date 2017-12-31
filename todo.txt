@@ -1,25 +1,21 @@
 TODO
 export save corresponds to what's shown
-site did not work on devices simultaneously
+warn if private key not included in print
+refresh image on regenerate button
+site did not work on devices on same ip simultaneously
 form error messages - see spec
 occasional drag and drop error, new window?
 form info bubbles - see spec
-warn if private key not included in print
-refresh image on regenerate button
 warnings link to downloads
 bitpay credit
-transition all css flex to common flex classes
-faq content
-homepage content
 common browser icons
-file import loading - see spec, only show if minimum file size
-github description page
 public address -> public key?
 regenerate button disappears briefly on mobile
-test dependency errors - disable import new tabs
-1px border on mobile safari import print
 all environment checks pass design
-mobile safari tooltip line
+
+faq content
+homepage content
+github description page
 
 designer:
 should home images fade or reflect?
@@ -28,6 +24,11 @@ view split pieces and placement
 tip address
 
 low priority:
+1px border on mobile safari import print
+mobile safari tooltip line
+disable import new tabs if environment error
+file import loading - see spec, only show if minimum file size
+transition all css flex to common flex classes
 confirm navigate away from import if decrypting
 export transactions which can be imported and sent making it fully functional cold storage web wallet
 meeting times should be plus or minus 30% of time invested

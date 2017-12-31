@@ -1599,7 +1599,7 @@ var AppUtils = {
 	 * 
 	 * @param bool specifies if no internet can be a critical error
 	 */
-	setNoInternetCanBeError(bool) {
+	setNoInternetCanBeError: function(bool) {
 		AppUtils.NO_INTERNET_CAN_BE_ERROR = bool;
 	},
 	

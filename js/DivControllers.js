@@ -321,8 +321,8 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 				var slideContent = $("<div class='slide_content'>").appendTo(slide);
 				if (img) {
 					var imgDiv = $("<div>").appendTo(slideContent);
-					img.appendTo(imgDiv);
 					img.attr("class", "slide_img");
+					img.appendTo(imgDiv);
 				}
 				var labelDiv = $("<div class='slide_label'>").appendTo(slideContent);
 				labelDiv.html(text);
