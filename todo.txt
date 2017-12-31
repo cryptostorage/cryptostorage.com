@@ -1,8 +1,8 @@
 TODO
 export save corresponds to what's shown
 warn if private key not included in print
-refresh image on regenerate button
 form error messages - see spec
+refresh image on regenerate button
 occasional drag and drop error, new window?
 form info bubbles - see spec
 warnings link to downloads
@@ -12,6 +12,7 @@ public address -> public key?
 regenerate button disappears briefly on mobile
 let UI breath during bip38
 preload all import images
+remove under development warning
 
 faq content
 homepage content
