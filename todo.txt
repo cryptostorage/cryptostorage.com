@@ -2,7 +2,6 @@ TODO
 export save corresponds to what's shown
 warn if private key not included in print
 refresh image on regenerate button
-site did not work on devices on same ip simultaneously
 form error messages - see spec
 occasional drag and drop error, new window?
 form info bubbles - see spec
@@ -11,7 +10,6 @@ bitpay credit
 common browser icons
 public address -> public key?
 regenerate button disappears briefly on mobile
-all environment checks pass design
 
 faq content
 homepage content
@@ -39,6 +37,7 @@ caching - etag dependencies, last modified tag, expire header will tell browser 
 homepage re-hide more currencies: hide link underneath all of them if more than 4 rows
 recover pulldown disabled styling improvements
 another attempt at debugging bitaddress bip38 memory leak?
+site did not work on devices on same ip simultaneously
 save as txt and csv
 pieces are blank until rendered, loading screen?
 double click cryptostorage.html opens page in browser

@@ -2956,7 +2956,7 @@ function NoticeController(div, config) {
 			function getStateIcon(state) {
 				if (state === "pass") return $("<img class='notice_state_icon' src='img/circle_checkmark.png'>");
 				if (state === "fail") return $("<img class='notice_state_icon' src='img/circle_exclamation.png'>");
-				if (state === "warn") return $("<img class='notice_state_icon' src='img/circle_x.png'>");
+				if (state === "warn") return $("<img class='notice_state_icon' src='img/circle_exclamation.png'>");
 				throw new Error("Unrecognized state: " + state);
 			}
 		}
@@ -2966,7 +2966,8 @@ function NoticeController(div, config) {
 			
 			// all checks pass
 			if (!check) {
-				div.append("All checks pass");
+				var content = $("<div>").appendTo(div);
+				content.append("<div class='notice_bar_center_major flex_horizontal'>All security checks pass</div>");
 				return;
 			}
 			
