@@ -2379,6 +2379,7 @@ function ExportController(div, window, config) {
 	var paginator;
 	var piecesDiv;
 	var piecesLabel;
+	var controlsEnabled;
 	var printEnabled;
 	var lastRenderer;
 	var regenerateDiv;
@@ -2459,6 +2460,7 @@ function ExportController(div, window, config) {
 		
 		// controls disabled until ready
 		setControlsEnabled(false);
+		setPrintEnabled(false);
 		
 		// loading screen
 		UiUtils.loadingDiv(div, AppUtils.getExportDependencies(), function(err) {
@@ -2609,11 +2611,17 @@ function ExportController(div, window, config) {
 		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + AppUtils.getCommonTicker(config.pieces[0]).toLowerCase() + "_public_addresses.txt");
 	}
 	
+	/**
+	 * Enables or disables export controls.
+	 * 
+	 * Does not affect the print button which is controlled separately.
+	 */
 	function setControlsEnabled(enabled) {
+		controlsEnabled = enabled;
 		saveButton.unbind("click");
 		printButton.unbind("click");
 		savePublicButton.unbind("click");
-		setPrintEnabled(enabled);
+		updateHeaderCheckboxes();
 		if (paginator) paginator.pagination(enabled ? "enable" : "disable");
 		if (enabled) {
 			if (piecesLabel) piecesLabel.removeClass("disabled");
@@ -2625,7 +2633,6 @@ function ExportController(div, window, config) {
 			saveButton.click(function() { saveAll(config.pieces); });
 			printButton.click(function() { printAll(); });
 			savePublicButton.click(function() { savePublicAddresses(); });
-			updateHeaderCheckboxes();
 		} else {
 			if (piecesLabel) piecesLabel.addClass("disabled");
 			saveButton.addClass("export_button_disabled");
@@ -2646,6 +2653,18 @@ function ExportController(div, window, config) {
 		} else {
 			printButton.addClass("export_button_disabled");
 			printButton.removeClass("export_button");
+		}
+	}
+	
+	function updateHeaderCheckboxes() {
+		if (controlsEnabled) {
+			showPrivateCheckbox.prop('checked') ? showPublicCheckbox.removeAttr('disabled') : showPublicCheckbox.attr('disabled', 'disabled');
+			showPublicCheckbox.prop('checked') ? showPrivateCheckbox.removeAttr('disabled') : showPrivateCheckbox.attr('disabled', 'disabled');
+			showLogosCheckbox.removeAttr('disabled');
+		} else {
+			showPublicCheckbox.attr('disabled');
+			showPrivateCheckbox.attr('disabled');
+			showLogosCheckbox.attr('disabled');
 		}
 	}
 	
@@ -2676,12 +2695,12 @@ function ExportController(div, window, config) {
 				setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(config.pieceDivs);
 				setPrintEnabled(false);
+				setControlsEnabled(true);
 				if (lastRenderer) lastRenderer.cancel();
 				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getPieceRendererConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
 					makePieceDivsCopyable(pieceDivs);
 					setPrintEnabled(true);
-					setControlsEnabled(true);
 					if (regenerateDiv) regenerateDiv.show();
 					if (onDone) onDone();
 				});
@@ -2756,12 +2775,6 @@ function ExportController(div, window, config) {
 			if (i === pieceIdx) pieceDivs[i].removeClass("hidden");
 			else pieceDivs[i].addClass("hidden");
 		}
-	}
-	
-	function updateHeaderCheckboxes() {
-		showPrivateCheckbox.prop('checked') ? showPublicCheckbox.removeAttr('disabled') : showPublicCheckbox.attr('disabled', 'disabled');
-		showPublicCheckbox.prop('checked') ? showPrivateCheckbox.removeAttr('disabled') : showPrivateCheckbox.attr('disabled', 'disabled');
-		showLogosCheckbox.removeAttr('disabled');
 	}
 }
 inheritsFrom(ExportController, DivController);

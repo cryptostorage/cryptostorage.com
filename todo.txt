@@ -1,5 +1,4 @@
 TODO
-import split pieces enables export header at different times
 form error messages - see spec
 navigate away from import should reset it, maybe confirm if decrypting
 unrecognized private key invalid split pieces overflows
