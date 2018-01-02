@@ -2747,8 +2747,7 @@ function ExportController(div, window, config) {
 					progressDiv.hide();
 					if (err) {
 						AppUtils.setRuntimeError(err);
-						if (regenerateDiv) regenerateDiv.show();
-						if (onDone) onDone(err);
+						throw err;
 					} else {
 						config.keys = _keys;
 						config.pieces = _pieces;

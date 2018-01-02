@@ -513,6 +513,74 @@ function MoneroPlugin() {
 inheritsFrom(MoneroPlugin, CryptoPlugin);
 
 /**
+ * Zcoin plugin.
+ */
+function ZcoinPlugin() {
+	this.getName = function() { return "Zcoin"; }
+	this.getTicker = function() { return "XZC" };
+	this.getLogoPath = function() { return "img/bitcoin.png"; }
+	this.getDependencies = function() { return ["lib/zcoin.js"]; }
+	this.getDonationAddress = function() { return "1GzoPirZZUbEDf25gBN1vCYkWLDjDmrFBy"; }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS]; }
+	this.newKey = function(str) {
+		
+		// create key if not given
+		if (!str) {
+			str = new Zcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
+			var key = new Zcoin.ECKey(str);
+			key.setCompressed(true);
+			var hex = key.getBitcoinHexFormat();
+			var wif = key.getBitcoinWalletImportFormat();
+			console.log(hex);
+			console.log(wif);
+			console.log(Zcoin.ECKey.decodeCompressedWalletImportFormat("84ZEmstRnXuxppBBULsL3SKZuypRDRWVY5SDY58wcvtDzCtG2xx"));
+		}
+		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
+		
+		// unencrypted private key
+		if (Zcoin.ECKey.isWalletImportFormat(str) || Zcoin.ECKey.isCompressedWalletImportFormat(str) || Zcoin.ECKey.isHexFormat(str)) {
+			var key = new Zcoin.ECKey(str);
+			key.setCompressed(true);
+			state.hex = key.getBitcoinHexFormat();
+			state.wif = key.getBitcoinWalletImportFormat();
+			state.address = key.getBitcoinAddress();
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// wif cryptojs
+		else if (AppUtils.isWifCryptoJs(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// encrypted hex
+		else if (isHex(str) && str.length > 100) {
+			state.hex = str;
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// otherwise key is not recognized
+		throw new Error("Unrecognized private key: " + str);		
+	}
+	this.isAddress = function(str) {
+		try {
+			Zcoin.Address.decodeString(str);
+			return true;
+		} catch (err) {
+			return false;
+		}
+	}
+}
+inheritsFrom(ZcoinPlugin, CryptoPlugin);
+
+/**
  * Zcash plugin.
  */
 function ZcashPlugin() {

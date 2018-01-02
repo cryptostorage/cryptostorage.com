@@ -199,6 +199,7 @@ var AppUtils = {
 			AppUtils.plugins.push(new LitecoinPlugin());
 			AppUtils.plugins.push(new EthereumClassicPlugin());
 			AppUtils.plugins.push(new OmiseGoPlugin());
+			AppUtils.plugins.push(new ZcoinPlugin());
 			AppUtils.plugins.push(new DashPlugin());
 			AppUtils.plugins.push(new ZcashPlugin());
 		}
@@ -861,7 +862,7 @@ var AppUtils = {
 		
 		function newKeyFunc(plugin, onDone) {
 			return function(onDone) {
-				setImmediate(function() {
+				setImmediate(function() {	// let UI breath
 					try {
 						var key = plugin.newKey();
 						doneWeight += AppUtils.getWeightCreateKey();
@@ -870,7 +871,7 @@ var AppUtils = {
 					} catch(err) {
 						onDone(err);
 					}
-				});	// let UI breath
+				});
 			}
 		}
 		
