@@ -1,5 +1,4 @@
 TODO
-export save corresponds to what's shown
 warn if private key not included in print
 form error messages - see spec
 refresh image on regenerate button

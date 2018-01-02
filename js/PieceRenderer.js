@@ -84,7 +84,6 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		// setup pages and collect functions to render keys
 		var pageDiv;
 		var funcs = [];
-		var temp;
 		for (var i = 0; i < piece.keys.length; i++) {
 			
 			// render new page
@@ -100,29 +99,20 @@ function PieceRenderer(pieces, pieceDivs, config) {
 				}
 			}
 			
-			// collect functions to render key pair
+			// collect function to render key pair
 			var placeholderDiv = $("<div class='key_div'>").appendTo(pageDiv);
-			var plugin = AppUtils.getCryptoPlugin(piece.keys[i].ticker);
-			var title = "#" + (i + 1);
-			var leftLabel = "\u25C4 Public Address";
-			var leftValue = config.showPublic ? piece.keys[i].address : null;
-			var logo = plugin.getLogo();
-			logo.attr("width", "100%");
-			logo.attr("height", "100%");
-			var logoLabel = plugin.getName();
-			var rightLabel = "Private Key" + (config.showPrivate ? (piece.pieceNum ? " (split)" : piece.keys[i].encryption ? " (encrypted)" : " (unencrypted)") : "") + " \u25ba";
-			var rightValue = config.showPrivate ? piece.keys[i].wif : null;
-			funcs.push(renderKeyPairFunc(placeholderDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config));
-			
-			function renderKeyPairFunc(placeholderDiv, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config) {
-				return function(onDone) {
-					if (isCancelled) return;
-					renderKeyPair(null, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config, function(keyDiv) {
-						placeholderDiv.replaceWith(keyDiv);
-						onKeyPairDone();
-						onDone();
-					});
-				}
+			funcs.push(renderKeyPairFunc(placeholderDiv, piece.keys[i], isInitialized(piece.pieceNum), config));
+		}
+		
+		// callback function to render key pair
+		function renderKeyPairFunc(placeholderDiv, pieceKey, isSplit, config) {
+			return function(onDone) {
+				if (isCancelled) return;
+				renderKeyPair(null, pieceKey, isSplit, config, function(keyDiv) {
+					placeholderDiv.replaceWith(keyDiv);
+					onKeyPairDone();
+					onDone();
+				});
 			}
 		}
 		
@@ -147,9 +137,29 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		
 		/**
 		 * Renders a single key pair.
+		 * 
+		 * @param div is the div to render to
+		 * @param pieceKey is the piece key to render
+		 * @param isSplit specifies if the pieceKey is a split key piece
+		 * @param config is the render configuration
+		 * @param onDone is invoked when rendering is done
 		 */
-		function renderKeyPair(div, title, leftLabel, leftValue, logo, logoLabel, rightLabel, rightValue, config, onDone) {
+		function renderKeyPair(div, pieceKey, isSplit, config, onDone) {
 			if (isCancelled) return;
+			
+			// content to render
+			var title = "#" + (i + 1);
+			var leftLabel = "\u25C4 Public Address";
+			var leftValue = (!pieceKey.address && pieceKey.encryption) ? "(decrypt to view)" : config.showPublic ? pieceKey.address : "(not shown)";
+			var leftCopyable = config.showPublic && pieceKey.address;
+			var rightLabel = "Private Key" + (pieceKey.wif && config.showPrivate ? (isSplit ? " (split)" : pieceKey.encryption ? " (encrypted)" : " (unencrypted)") : "") + " \u25ba";
+			var rightValue = pieceKey.wif && config.showPrivate ? pieceKey.wif : "(not shown)";
+			var rightCopyable = pieceKey.wif && config.showPrivate;
+			var plugin = AppUtils.getCryptoPlugin(pieceKey.ticker);
+			var currencyLogo = plugin.getLogo();
+			currencyLogo.attr("width", "100%");
+			currencyLogo.attr("height", "100%");
+			var currencyLabel = plugin.getName();
 			
 			// div setup
 			if (!div) div = $("<div>");
@@ -167,44 +177,32 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			var keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivCenter);
 			keyDivLeftLabel.html(leftLabel);
 			var keyDivLeftValue = $("<div class='key_div_left_value'>").appendTo(keyDivCenter);
-			if (leftValue && !hasWhitespace(leftValue)) keyDivLeftValue.css("word-break", "break-all");
-			if (config.showPublic) {
-				if (leftValue) {
-					keyDivLeftValue.html(leftValue);
-					keyDivLeftValue.addClass("copyable");
-				} else {
-					keyDivLeftValue.html("(decrypt to view)");
-				}
-			} else {
-				keyDivLeftValue.html("(not shown)");
-			}
+			if (!hasWhitespace(leftValue)) keyDivLeftValue.css("word-break", "break-all");
+			keyDivLeftValue.html(leftValue);
+			if (leftCopyable) keyDivLeftValue.addClass("copyable");
 			
 			// center currency
 			var keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
-			if (config.showLogos) {
+			if (currencyLogo) {
 				var keyDivCurrencyLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
-				keyDivCurrencyLogo.append(logo);
+				keyDivCurrencyLogo.append(currencyLogo);
 			}
 			var keyDivCurrencyLabel = $("<div class='key_div_currency_label'>").appendTo(keyDivCurrency);
-			keyDivCurrencyLabel.html("&nbsp;" + logoLabel);
+			keyDivCurrencyLabel.html(currencyLabel);
 			
 			// right label and value
 			var keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivCenter);
 			keyDivRightLabel.html(rightLabel);
 			var keyDivRightValue = $("<div class='key_div_right_value'>").appendTo(keyDivCenter);
-			if (rightValue && !hasWhitespace(rightValue)) keyDivRightValue.css("word-break", "break-all");
-			if (rightValue) {
-				keyDivRightValue.html(rightValue);
-				keyDivRightValue.addClass("copyable");
-			} else {
-				keyDivRightValue.html("(not shown)");
-			}
+			if (!hasWhitespace(rightValue)) keyDivRightValue.css("word-break", "break-all");
+			keyDivRightValue.html(rightValue);
+			if (rightCopyable) keyDivRightValue.addClass("copyable");
 			
 			// collapse spacing for long keys
-			if (leftValue && leftValue.length > 71) {
+			if (leftValue.length > 71) {
 				keyDivCurrency.css("margin-top", "-15px");
 			}
-			if (rightValue && rightValue.length > 150) {
+			if (rightValue.length > 150) {
 				keyDivCurrency.css("margin-top", "-10px");
 				keyDivRightLabel.css("margin-top", "-15px");
 			}
@@ -213,7 +211,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			var keyDivRight = $("<div class='key_div_right'>").appendTo(div);
 			
 			// add qr codes
-			if (leftValue) {
+			if (leftCopyable) {
 				AppUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
 					if (isCancelled) return;
 					img.attr("class", "key_div_qr");
@@ -226,7 +224,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 				addPrivateQr();
 			}
 			function addPrivateQr() {
-				if (rightValue) {
+				if (rightCopyable) {
 					AppUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
 						if (isCancelled) return;
 						img.attr("class", "key_div_qr");

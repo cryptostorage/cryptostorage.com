@@ -474,8 +474,6 @@ var AppUtils = {
 	 * 
 	 * @param pieces are the pieces to convert to keys
 	 * @returns keys built from the pieces
-	 * 
-	 * TODO: this method needs to accomodate missing private keys
 	 */
 	piecesToKeys: function(pieces) {
 		assertTrue(pieces.length > 0);
@@ -484,7 +482,7 @@ var AppUtils = {
 		// handle one piece
 		if (pieces.length === 1) {
 			assertTrue(pieces[0].keys.length > 0);
-			if (pieces[0].pieceNum) {
+			if (pieces[0].pieceNum && pieces[0].keys[0].wif) {
 				var minPieces = AppUtils.getMinPieces(pieces[0].keys[0].wif);
 				var additional = minPieces - 1;
 				throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private keys");
@@ -496,7 +494,7 @@ var AppUtils = {
 				state.wif = pieceKey.wif;
 				state.encryption = pieceKey.encryption;
 				var key = new CryptoKey(AppUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
-				if (key.getHex() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// set address because it cannot be derived from encrypted key
+				if (key.hasPrivateKey() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// set address because it cannot be derived from encrypted key
 				keys.push(key);
 			}
 		}
@@ -526,13 +524,15 @@ var AppUtils = {
 					else if (address !== piece.keys[i].address) throw new Error("Pieces have different addresses");
 					if (!encryption) encryption = piece.keys[i].encryption;
 					else if (encryption !== piece.keys[i].encryption) throw new Error("Pieces have different encryption states");
-					if (!minPieces) minPieces = AppUtils.getMinPieces(piece.keys[i].wif);
-					else if (minPieces !== AppUtils.getMinPieces(piece.keys[i].wif)) throw new Error("Pieces have different minimum threshold prefixes");
+					if (pieces[j].keys[i].wif) {
+						if (!minPieces) minPieces = AppUtils.getMinPieces(piece.keys[i].wif);
+						else if (minPieces !== AppUtils.getMinPieces(piece.keys[i].wif)) throw new Error("Pieces have different minimum threshold prefixes");
+					}
 				}
 			}
 			
 			// check if minimum threshold met
-			if (pieces.length < minPieces) {
+			if (minPieces && pieces.length < minPieces) {
 				var additional = minPieces - pieces.length;
 				throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private keys");
 			}
@@ -540,14 +540,18 @@ var AppUtils = {
 			// combine keys across pieces
 			try {
 				for (var i = 0; i < pieces[0].keys.length; i++) {
-					var shares = [];
-					for (var j = 0; j < pieces.length; j++) {
-						var piece = pieces[j];
-						shares.push(piece.keys[i].wif);
+					if (pieces[0].keys[i].wif) {
+						var shares = [];
+						for (var j = 0; j < pieces.length; j++) {
+							var piece = pieces[j];
+							shares.push(piece.keys[i].wif);
+						}
+						var key = AppUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
+						if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
+						keys.push(key);
+					} else {
+						keys.push(new CryptoKey(AppUtils.getCryptoPlugin(pieces[0].keys[i].ticker), {address: pieces[0].keys[i].address}));
 					}
-					var key = AppUtils.getCryptoPlugin(pieces[0].keys[i].ticker).combine(shares);
-					if (key.isEncrypted() && pieces[0].keys[i].address) key.setAddress(pieces[0].keys[i].address);
-					keys.push(key);
 				}
 			} catch (err) {
 				throw new Error("Could not import private keys from the given pieces.  Verify the pieces are correct.");

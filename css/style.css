@@ -1555,6 +1555,7 @@ input[type='checkbox'][disabled] +label {
 .key_div_currency_logo {
 	width: 29px;
 	height: 29px;
+	margin-right: 5px;
 }
 
 .key_div_currency_label {

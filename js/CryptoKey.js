@@ -40,11 +40,15 @@ function CryptoKey(plugin, state) {
 	}
 	
 	this.setAddress = function(address) {
-		if (this.isEncrypted()) {
-			if (!this.plugin.isAddress(address)) throw new Error("Address is invalid: " + address);
-			this.state.address = address;
+		if (this.hasPrivateKey()) {
+			if (this.isEncrypted()) {
+				if (!this.plugin.isAddress(address)) throw new Error("Address is invalid: " + address);
+				this.state.address = address;
+			} else {
+				if (this.state.address !== address) throw new Error("Cannot change address of unencrypted key");
+			}
 		} else {
-			if (this.state.address !== address) throw new Error("Cannot change address of unencrypted key");
+			this.state.address = address;
 		}
 	}
 	
