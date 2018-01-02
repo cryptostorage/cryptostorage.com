@@ -2623,7 +2623,7 @@ function ExportController(div, window, config) {
 	
 	function printAll() {
 		if (!printEnabled) return;
-		if (getExportConfig().showPrivate || confirm("Private keys are NOT included.\n\nFUNDS WILL NOT BE RECOVERABLE FROM THE PRINTED DOCUMENT.\n\nPrint anyway?")) {
+		if (getExportConfig().showPrivate || confirm("Private keys will NOT be exported.\n\nFUNDS WILL NOT BE RECOVERABLE FROM THE PRINTED DOCUMENT\n\nPrint anyway?")) {
 			saved = true;
 			window.print();
 		}
@@ -2632,7 +2632,7 @@ function ExportController(div, window, config) {
 	function saveAll(pieces) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
-		if (getExportConfig().showPrivate || confirm("Private keys are NOT included.\n\nFUNDS WILL NOT BE RECOVERABLE FROM THE SAVED FILE.\n\nSave anyway?")) {
+		if (getExportConfig().showPrivate || confirm("Private keys will NOT be exported.\n\nFUNDS WILL NOT BE RECOVERABLE FROM THE SAVED FILE\n\nSave anyway?")) {
 			
 			// transform pieces according to export config
 			var transformedPieces = [];
