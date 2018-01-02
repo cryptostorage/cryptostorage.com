@@ -1787,3 +1787,10 @@ input[type='checkbox'][disabled] +label {
 .information_img:hover {
 	cursor: pointer;
 }
+
+.refresh_img {
+	margin-left:10px;
+	width:25px;
+	height:25px;
+	opacity:0.5;
+}

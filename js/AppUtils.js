@@ -136,7 +136,8 @@ var AppUtils = {
 			"js/CryptoKey.js",
 			"lib/setImmediate.js",
 			"img/cryptostorage_export.png",
-			"img/restricted.png"
+			"img/restricted.png",
+			"img/refresh.png"
 		];
 		
 		// add dependencies

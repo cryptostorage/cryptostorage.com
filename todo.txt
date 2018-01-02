@@ -1,9 +1,6 @@
 TODO
 form error messages - see spec
-refresh image on regenerate button
-occasional drag and drop error, new window?
 form info bubbles - see spec
-warnings link to downloads
 bitpay credit
 common browser icons
 regenerate button disappears briefly on mobile
@@ -14,6 +11,7 @@ faq content
 homepage content
 github description page
 remove under development warning
+final design review
 sanity tests
 release
 announce
@@ -25,6 +23,8 @@ view split pieces and placement
 tip address
 credit non-donations
 all checks pass design
+blue link against red notice is hard to read
+refresh image on regenerate button
 
 low priority:
 let UI breath during bip38

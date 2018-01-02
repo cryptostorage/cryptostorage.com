@@ -2541,6 +2541,7 @@ function ExportController(div, window, config) {
 				regenerateDiv.hide();
 				btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
 				btnRegenerate.append("Regenerate");
+				btnRegenerate.append("<img src='img/refresh.png' class='refresh_img'>");
 				btnRegenerate.click(function() {
 					if (confirm("Discard key pair and create a new one?")) {
 						saved = false;
@@ -3032,8 +3033,16 @@ function NoticeController(div, config) {
 			// interpret environment code and state
 			switch (check.code) {
 				case AppUtils.EnvironmentCode.BROWSER:
-					if (check.state === "fail") div.append("Browser is not supported (" + info.browser.name + " " + info.browser.version + ")");
-					if (check.state === "warn") div.append("Browser is not open source (" + info.browser.name + ")");
+					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
+					else {
+						var content = $("<div>").appendTo(div);
+						if (check.state === "fail") content.append("<div class='notice_bar_center_major'>Browser is not supported (" + info.browser.name + " " + info.browser.version + ")</div>");
+						else content.append("<div class='notice_bar_center_major'>Browser is not open source (" + info.browser.name + ")</div>");
+						content.append("<div class='notice_bar_center_minor'>Recommendations:&nbsp;<a target='_blank' href='https://www.mozilla.org/en-US/firefox/'>Firefox</a>&nbsp;<a target='_blank' href='https://www.chromium.org/getting-involved/download-chromium'>Chromium</a>&nbsp;<a target='_blank' href='https://brave.com'>Brave</a>");
+					}
+					
+					if (check.state === "fail") 
+					if (check.state === "warn") 
 					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
 					break;
 				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
@@ -3048,7 +3057,7 @@ function NoticeController(div, config) {
 					} else if (check.state === "fail") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Connect to the internet</div>");
-						content.append("<div class='notice_bar_center_minor'>Internet is required because the application is not running locally</div>");
+						content.append("<div class='notice_bar_center_minor'>Internet is required because the application is not running locally.  <a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.IS_LOCAL:
@@ -3061,7 +3070,11 @@ function NoticeController(div, config) {
 					break;
 				case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
 					if (check.state === "pass") div.append("Operating system is open source (" + info.os.name + ")");
-					else div.append("Operating system is not open source (" + info.os.name + ")");
+					else {
+						var content = $("<div>").appendTo(div);
+						content.append("<div class='notice_bar_center_major'>Operating system is not open source (" + info.os.name + ")</div>");
+						content.append("<div class='notice_bar_center_minor'>Recommendations:&nbsp;<a target='_blank' href='https://tails.boum.org'>Tails</a>&nbsp;<a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>&nbsp;<a target='_blank' href='https://www.raspberrypi.org'>Raspberry Pi</a>");
+					}
 					break;
 				case AppUtils.EnvironmentCode.PRERELEASE:
 					if (check.state === "warn") div.append("Application is under development.  Not ready for use");
