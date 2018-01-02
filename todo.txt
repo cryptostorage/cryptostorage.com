@@ -1,5 +1,4 @@
 TODO
-warn if private key not included in print
 form error messages - see spec
 refresh image on regenerate button
 occasional drag and drop error, new window?
