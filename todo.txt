@@ -7,14 +7,16 @@ warnings link to downloads
 bitpay credit
 common browser icons
 regenerate button disappears briefly on mobile
-let UI breath during bip38
-remove under development warning
 disabled pagination is not same opacity as other disableds
 minimum tests should create keys for every currency
 
 faq content
 homepage content
 github description page
+remove under development warning
+sanity tests
+release
+announce
 
 designer:
 should home images fade or reflect?
@@ -25,6 +27,7 @@ credit non-donations
 all checks pass design
 
 low priority:
+let UI breath during bip38
 1px border on mobile safari import print
 mobile safari tooltip line
 disable import new tabs if environment error
