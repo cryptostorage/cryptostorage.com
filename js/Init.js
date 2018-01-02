@@ -5,7 +5,7 @@ $(document).ready(function() {
 	
 	// catch unexpected errors
 	window.onerror = function(err) {
-		if (err) AppUtils.setRuntimeError(err);
+		AppUtils.setRuntimeError(err);
 		throw err;
 	};
 
@@ -24,7 +24,7 @@ $(document).ready(function() {
 				
 			// run minimum tests
 			AppUtils.runMinimumTests(function(err) {
-				if (err) AppUtils.setRuntimeError(err);
+				if (err) throw err;
 			});
 			
 			// run test suite

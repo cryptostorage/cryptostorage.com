@@ -17,13 +17,10 @@
 window.exportToBody = function(window, config) {
 
 	// detect any uncaught errors
-	LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
-		if (err) throw err;
-		window.onerror = function(err) {
-			AppUtils.setRuntimeError(err);
-			throw err;
-		}
-	});
+	window.onerror = function(err) {
+		AppUtils.setRuntimeError(err);
+		throw err;
+	}
 	
 	// set initial environment info
 	if (config.environmentInfo) AppUtils.setCachedEnvironment(config.environmentInfo);

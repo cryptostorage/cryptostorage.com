@@ -2756,16 +2756,11 @@ function ExportController(div, window, config) {
 					if (!quickGenerate) progressDiv.show();
 				}, function(err, _keys, _pieces, _pieceDivs) {
 					progressDiv.hide();
-					if (err) {
-						AppUtils.setRuntimeError(err);
-						if (regenerateDiv) regenerateDiv.show();
-						if (onDone) onDone(err);
-					} else {
-						config.keys = _keys;
-						config.pieces = _pieces;
-						config.pieceDivs = _pieceDivs;
-						update(config.pieceDivs, onDone);
-					}
+					if (err) throw err;
+					config.keys = _keys;
+					config.pieces = _pieces;
+					config.pieceDivs = _pieceDivs;
+					update(config.pieceDivs, onDone);
 				}, true);
 			}
 			

@@ -901,16 +901,16 @@ var AppUtils = {
 		
 		function newKeyFunc(plugin, onDone) {
 			return function(onDone) {
-				setImmediate(function() {
+				setImmediate(function() {	// let UI breath
 					try {
 						var key = plugin.newKey();
-						doneWeight += AppUtils.getWeightCreateKey();
-						if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
-						onDone(null, key);
 					} catch(err) {
 						onDone(err);
 					}
-				});	// let UI breath
+					doneWeight += AppUtils.getWeightCreateKey();
+					if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
+					onDone(null, key);
+				});
 			}
 		}
 		
