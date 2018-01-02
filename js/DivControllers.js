@@ -2623,30 +2623,35 @@ function ExportController(div, window, config) {
 	
 	function printAll() {
 		if (!printEnabled) return;
-		saved = true;
-		window.print();
+		if (getExportConfig().showPrivate || confirm("Private keys are NOT included.\n\nFUNDS WILL NOT BE RECOVERABLE FROM THE PRINTED DOCUMENT.\n\nPrint anyway?")) {
+			saved = true;
+			window.print();
+		}
 	}
 	
 	function saveAll(pieces) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
 		
-		// transform pieces according to export config
-		var transformedPieces = [];
-		var config = getExportConfig();
-		for (var i = 0; i < pieces.length; i++) {
-			transformedPieces.push(AppUtils.transformPiece(pieces[i], config));
-		}
-		
-		saved = true;
-		var name = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
-		if (pieces.length === 1) {
-			var jsonStr = AppUtils.pieceToJson(transformedPieces[0]);
-			saveAs(new Blob([jsonStr]), name + ".json");
-		} else {
-			AppUtils.piecesToZip(transformedPieces, function(blob) {
-				saveAs(blob, name + ".zip");
-			});
+		if (getExportConfig().showPrivate || confirm("Private keys are NOT included.\n\nFUNDS WILL NOT BE RECOVERABLE FROM THE SAVED FILE.\n\nSave anyway?")) {
+			
+			// transform pieces according to export config
+			var transformedPieces = [];
+			var config = getExportConfig();
+			for (var i = 0; i < pieces.length; i++) {
+				transformedPieces.push(AppUtils.transformPiece(pieces[i], config));
+			}
+			
+			saved = true;
+			var name = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
+			if (pieces.length === 1) {
+				var jsonStr = AppUtils.pieceToJson(transformedPieces[0]);
+				saveAs(new Blob([jsonStr]), name + ".json");
+			} else {
+				AppUtils.piecesToZip(transformedPieces, function(blob) {
+					saveAs(blob, name + ".zip");
+				});
+			}
 		}
 	}
 	
