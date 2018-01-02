@@ -1793,8 +1793,8 @@ input[type='checkbox'][disabled] +label {
 	width:25px;
 	height:25px;
 	opacity:0.5;
-	-webkit-transition: -webkit-transform 1s ease; 
-    -moz-transition: -moz-transform 1s ease;
-    -o-transition: -o-transform 1s ease;
-    transition: transform 1s ease, top 1s ease;
+	-webkit-transition: -webkit-transform .8s ease; 
+    -moz-transition: -moz-transform .8s ease;
+    -o-transition: -o-transform .8s ease;
+    transition: transform .8s ease;
 }
