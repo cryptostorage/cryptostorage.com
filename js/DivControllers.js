@@ -2538,12 +2538,19 @@ function ExportController(div, window, config) {
 			// regenerate button
 			if (config.showRegenerate) {
 				regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
-				regenerateDiv.hide();
 				btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
 				btnRegenerate.append("Regenerate");
-				btnRegenerate.append("<img src='img/refresh.png' class='refresh_img'>");
+				var refreshImg = $("<img src='img/refresh.png' class='refresh_img rotate2'>").appendTo(btnRegenerate);
 				btnRegenerate.click(function() {
 					if (confirm("Discard key pair and create a new one?")) {
+						
+						// rotate refresh icon
+						refreshImg.data("deg", refreshImg.data("deg") ? refreshImg.data("deg") + 360 : 360);
+						refreshImg.css({
+								"-webkit-transform": "rotate(" + refreshImg.data("deg") + "deg)",
+				        "-moz-transform": "rotate(" + refreshImg.data("deg") + "deg)",
+				        "transform": "rotate(" + refreshImg.data("deg") + "deg)"
+						})
 						saved = false;
 						config.keys = undefined;
 						config.pieces = undefined;
@@ -2751,7 +2758,6 @@ function ExportController(div, window, config) {
 	function update(_pieceDivs, onDone) {
 		updateHeaderCheckboxes();
 		config.pieceDivs = _pieceDivs;
-		if (regenerateDiv) regenerateDiv.hide();
 		
 		// add piece divs if given
 		if (config.pieceDivs) {
@@ -2761,7 +2767,6 @@ function ExportController(div, window, config) {
 			makePieceDivsCopyable(config.pieceDivs);
 			setPrintEnabled(true);
 			setControlsEnabled(true);
-			if (regenerateDiv) regenerateDiv.show();
 			if (onDone) onDone();
 		}
 		
@@ -2781,7 +2786,6 @@ function ExportController(div, window, config) {
 				lastRenderer.render(null, function(err, pieceDivs) {
 					makePieceDivsCopyable(pieceDivs);
 					setPrintEnabled(true);
-					if (regenerateDiv) regenerateDiv.show();
 					if (onDone) onDone();
 				});
 			}
