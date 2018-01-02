@@ -2406,8 +2406,8 @@ function ExportController(div, window, config) {
 	var printEnabled;
 	var lastRenderer;
 	var regenerateDiv;
-	var includesPublic;
-	var includesPrivate;
+	var publicAvailable;
+	var privateAvailable;
 	
 	// confirm exit if storage not saved or printed
 	if (config.confirmExit) {
@@ -2452,15 +2452,15 @@ function ExportController(div, window, config) {
 		showLogosCheckboxLabel.html("Show logos");
 		
 		// apply default checkbox state
-		includesPublic = (!config.keys && !config.pieces) || isPublicIncluded(config.keys, config.pieces);
-		includesPrivate = (!config.keys && !config.pieces) || isPrivateIncluded(config.keys, config.pieces);
-		if (includesPublic) {
+		publicAvailable = (!config.keys && !config.pieces) || isPublicAvailable(config.keys, config.pieces);
+		privateAvailable = (!config.keys && !config.pieces) || isPrivateAvailable(config.keys, config.pieces);
+		if (publicAvailable) {
 			showPublicCheckbox.prop('checked', true);
 		} else {
 			showPublicCheckbox.prop('checked', false);
 			showPublicCheckbox.attr("disabled", "disabled");
 		}
-		if (includesPrivate) {
+		if (privateAvailable) {
 			showPrivateCheckbox.prop('checked', true);
 		} else {
 			showPrivateCheckbox.prop('checked', false);
@@ -2632,7 +2632,6 @@ function ExportController(div, window, config) {
 	function saveAll(pieces) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
-		
 		if (getExportConfig().showPrivate || confirm("Private keys are NOT included.\n\nFUNDS WILL NOT BE RECOVERABLE FROM THE SAVED FILE.\n\nSave anyway?")) {
 			
 			// transform pieces according to export config
@@ -2670,20 +2669,23 @@ function ExportController(div, window, config) {
 	function setControlsEnabled(enabled) {
 		controlsEnabled = enabled;
 		saveButton.unbind("click");
-		printButton.unbind("click");
 		savePublicButton.unbind("click");
 		updateHeaderCheckboxes();
 		if (paginator) paginator.pagination(enabled ? "enable" : "disable");
 		if (enabled) {
 			if (piecesLabel) piecesLabel.removeClass("disabled");
+			showLogosCheckbox.removeAttr("disabled");
 			saveButton.addClass("export_button");
 			saveButton.removeClass("export_button_disabled");
-			savePublicButton.addClass("export_button");
-			savePublicButton.removeClass("export_button_disabled");
-			showLogosCheckbox.removeAttr("disabled");
 			saveButton.click(function() { saveAll(config.pieces); });
-			printButton.click(function() { printAll(); });
-			savePublicButton.click(function() { savePublicAddresses(); });
+			if (publicAvailable) {
+				savePublicButton.addClass("export_button");
+				savePublicButton.removeClass("export_button_disabled");
+				savePublicButton.click(function() { savePublicAddresses(); });
+			} else {
+				savePublicButton.addClass("export_button_disabled");
+				savePublicButton.removeClass("export_button");
+			}
 		} else {
 			if (piecesLabel) piecesLabel.addClass("disabled");
 			saveButton.addClass("export_button_disabled");
@@ -2697,10 +2699,12 @@ function ExportController(div, window, config) {
 	}
 	
 	function setPrintEnabled(bool) {
+		printButton.unbind("click");
 		printEnabled = bool;
 		if (bool) {
 			printButton.addClass("export_button");
 			printButton.removeClass("export_button_disabled");
+			printButton.click(function() { printAll(); });
 		} else {
 			printButton.addClass("export_button_disabled");
 			printButton.removeClass("export_button");
@@ -2710,12 +2714,12 @@ function ExportController(div, window, config) {
 	function updateHeaderCheckboxes() {
 		if (controlsEnabled) {
 			if (showPrivateCheckbox.prop('checked')) {
-				if (includesPublic) showPublicCheckbox.removeAttr('disabled');
+				if (publicAvailable) showPublicCheckbox.removeAttr('disabled');
 			} else {
 				showPublicCheckbox.attr('disabled', 'disabled')
 			}
 			if (showPublicCheckbox.prop('checked')) {
-				if (includesPrivate) showPrivateCheckbox.removeAttr('disabled');
+				if (privateAvailable) showPrivateCheckbox.removeAttr('disabled');
 			} else {
 				showPrivateCheckbox.attr('disabled', 'disabled');
 			}
@@ -2727,7 +2731,7 @@ function ExportController(div, window, config) {
 		}
 	}
 	
-	function isPublicIncluded(keys, pieces) {
+	function isPublicAvailable(keys, pieces) {
 		if (keys) {
 			return isInitialized(keys[0].getAddress());
 		} else if (pieces) {
@@ -2735,7 +2739,7 @@ function ExportController(div, window, config) {
 		} else throw new Error("Neither keys nor pieces provided");
 	}
 	
-	function isPrivateIncluded(keys, pieces) {
+	function isPrivateAvailable(keys, pieces) {
 		if (keys) {
 			return isInitialized(keys[0].getWif());
 		} else if (pieces) {

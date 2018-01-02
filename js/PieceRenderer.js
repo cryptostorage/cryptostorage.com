@@ -183,7 +183,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			
 			// center currency
 			var keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
-			if (currencyLogo) {
+			if (config.showLogos) {
 				var keyDivCurrencyLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
 				keyDivCurrencyLogo.append(currencyLogo);
 			}
