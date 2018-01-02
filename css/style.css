@@ -1399,7 +1399,7 @@ input[type='checkbox'][disabled] +label {
 
 .export_pieces_div {
 	background-color: white;
-	padding: 40px 25px 25px 25px;
+	padding: 40px 25px 40px 25px;
 }
 
 .piece_div {
