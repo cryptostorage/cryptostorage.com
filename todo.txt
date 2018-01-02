@@ -1,8 +1,10 @@
 TODO
+tests
 form error messages - see spec
 form info bubbles - see spec
 bitpay credit
 common browser icons
+formatting on IE <11
 
 faq content
 homepage content
