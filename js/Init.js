@@ -3,6 +3,9 @@
  */
 $(document).ready(function() {
 	
+	// welcome message :)
+	console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
+	
 	// catch unexpected errors
 	window.onerror = function(err) {
 		AppUtils.setRuntimeError(err);
@@ -25,6 +28,7 @@ $(document).ready(function() {
 			// run minimum tests
 			AppUtils.runMinimumTests(function(err) {
 				if (err) throw err;
+				console.log("Minimum tests pass");
 			});
 			
 			// run test suite
