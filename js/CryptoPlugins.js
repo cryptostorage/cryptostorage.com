@@ -335,6 +335,18 @@ function OmiseGoPlugin() {
 inheritsFrom(OmiseGoPlugin, EthereumPlugin);
 
 /**
+ * Basic Attention Token plugin.
+ */
+function BasicAttentionTokenPlugin() {
+	EthereumPlugin.call(this);
+	this.getName = function() { return "Basic Attention Token"; }
+	this.getTicker = function() { return "BAT" };
+	this.getLogoPath = function() { return "img/bat.png"; }
+	this.getDonationAddress = function() { return "0x8318b3abd42902f3822d01e1b39ded59fcf0c896"; }
+}
+inheritsFrom(BasicAttentionTokenPlugin, EthereumPlugin);
+
+/**
  * Litecoin plugin.
  */
 function LitecoinPlugin() {

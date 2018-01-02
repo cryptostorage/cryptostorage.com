@@ -360,7 +360,7 @@ ol {
 
 .currency_row_label_major {
 	font-size: 20px;
-	white-space: nowrap;
+	text-align: center;
 }
 
 .currency_row_item_minor {
@@ -394,7 +394,7 @@ ol {
 
 .currency_row_label_minor {
 	font-size: 20px;
-	white-space: nowrap;
+	text-align: center;
 }
 
 .home_more_label {

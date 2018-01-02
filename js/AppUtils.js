@@ -95,6 +95,7 @@ var AppUtils = {
 		var plugins = AppUtils.getCryptoPlugins();
 		for (var i = 0; i < plugins.length; i++) {
 			dependencies = dependencies.concat(plugins[i].getDependencies());
+			dependencies.push(plugins[i].getLogoPath());
 		}
 		return dependencies;
 	},
@@ -198,10 +199,11 @@ var AppUtils = {
 			AppUtils.plugins.push(new MoneroPlugin());
 			AppUtils.plugins.push(new BitcoinCashPlugin());
 			AppUtils.plugins.push(new LitecoinPlugin());
-			AppUtils.plugins.push(new EthereumClassicPlugin());
 			AppUtils.plugins.push(new OmiseGoPlugin());
 			AppUtils.plugins.push(new DashPlugin());
 			AppUtils.plugins.push(new ZcashPlugin());
+			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
+			AppUtils.plugins.push(new EthereumClassicPlugin());
 		}
 		return AppUtils.plugins;
 	},
