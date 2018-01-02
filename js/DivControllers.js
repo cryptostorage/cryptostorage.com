@@ -2406,6 +2406,8 @@ function ExportController(div, window, config) {
 	var printEnabled;
 	var lastRenderer;
 	var regenerateDiv;
+	var includesPublic;
+	var includesPrivate;
 	
 	// confirm exit if storage not saved or printed
 	if (config.confirmExit) {
@@ -2449,9 +2451,21 @@ function ExportController(div, window, config) {
 		var showLogosCheckboxLabel = $("<label class='export_checkbox_label' for='showLogosCheckbox'>").appendTo(exportCheckboxes);
 		showLogosCheckboxLabel.html("Show logos");
 		
-		// apply default state
-		showPublicCheckbox.prop('checked', true);
-		showPrivateCheckbox.prop('checked', true);
+		// apply default checkbox state
+		includesPublic = (!config.keys && !config.pieces) || isPublicIncluded(config.keys, config.pieces);
+		includesPrivate = (!config.keys && !config.pieces) || isPrivateIncluded(config.keys, config.pieces);
+		if (includesPublic) {
+			showPublicCheckbox.prop('checked', true);
+		} else {
+			showPublicCheckbox.prop('checked', false);
+			showPublicCheckbox.attr("disabled", "disabled");
+		}
+		if (includesPrivate) {
+			showPrivateCheckbox.prop('checked', true);
+		} else {
+			showPrivateCheckbox.prop('checked', false);
+			showPrivateCheckbox.attr("disabled", "disabled");
+		}
 		showLogosCheckbox.prop('checked', true);
 		
 		// sort pieces and pieceDivs by piece number
@@ -2690,14 +2704,38 @@ function ExportController(div, window, config) {
 	
 	function updateHeaderCheckboxes() {
 		if (controlsEnabled) {
-			showPrivateCheckbox.prop('checked') ? showPublicCheckbox.removeAttr('disabled') : showPublicCheckbox.attr('disabled', 'disabled');
-			showPublicCheckbox.prop('checked') ? showPrivateCheckbox.removeAttr('disabled') : showPrivateCheckbox.attr('disabled', 'disabled');
+			if (showPrivateCheckbox.prop('checked')) {
+				if (includesPublic) showPublicCheckbox.removeAttr('disabled');
+			} else {
+				showPublicCheckbox.attr('disabled', 'disabled')
+			}
+			if (showPublicCheckbox.prop('checked')) {
+				if (includesPrivate) showPrivateCheckbox.removeAttr('disabled');
+			} else {
+				showPrivateCheckbox.attr('disabled', 'disabled');
+			}
 			showLogosCheckbox.removeAttr('disabled');
 		} else {
 			showPublicCheckbox.attr('disabled');
 			showPrivateCheckbox.attr('disabled');
 			showLogosCheckbox.attr('disabled');
 		}
+	}
+	
+	function isPublicIncluded(keys, pieces) {
+		if (keys) {
+			return isInitialized(keys[0].getAddress());
+		} else if (pieces) {
+			return isInitialized(pieces[0].keys[0].address);
+		} else throw new Error("Neither keys nor pieces provided");
+	}
+	
+	function isPrivateIncluded(keys, pieces) {
+		if (keys) {
+			return isInitialized(keys[0].getWif());
+		} else if (pieces) {
+			return isInitialized(pieces[0].keys[0].wif);
+		} else throw new Error("Neither keys nor pieces provided");
 	}
 	
 	function update(_pieceDivs, onDone) {
