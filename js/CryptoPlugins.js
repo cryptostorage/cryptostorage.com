@@ -524,28 +524,26 @@ function ZcoinPlugin() {
 	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function(str) {
 		
+		var txt = "84pfJfz15ucgKaEhJx1rP6DoKvAehVRvaj8fkE2SfCFABY6KAx7";
+		var key = new Zcoin.ECKey(txt);
+		console.log(key.getBitcoinHexFormat());
+		console.log(key.getBitcoinWalletImportFormat());
+		
 		// create key if not given
-		if (!str) {
-			str = new Zcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
-			var key = new Zcoin.ECKey(str);
-			key.setCompressed(true);
-			var hex = key.getBitcoinHexFormat();
-			var wif = key.getBitcoinWalletImportFormat();
-			console.log(hex);
-			console.log(wif);
-			console.log(Zcoin.ECKey.decodeCompressedWalletImportFormat("84ZEmstRnXuxppBBULsL3SKZuypRDRWVY5SDY58wcvtDzCtG2xx"));
-		}
+		if (!str) str = new Zcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
 		
 		// unencrypted private key
-		if (Zcoin.ECKey.isWalletImportFormat(str) || Zcoin.ECKey.isCompressedWalletImportFormat(str) || Zcoin.ECKey.isHexFormat(str)) {
+		if (Zcoin.ECKey.isWalletImportFormat(str) || Zcoin.ECKey.isCompressedWalletImportFormat(str) || Zcoin.ECKey.isHexFormat(str) || Zcoin.ECKey.isBase64Format(str) || Zcoin.ECKey.isMiniFormat(str)) {
 			var key = new Zcoin.ECKey(str);
 			key.setCompressed(true);
 			state.hex = key.getBitcoinHexFormat();
 			state.wif = key.getBitcoinWalletImportFormat();
 			state.address = key.getBitcoinAddress();
 			state.encryption = null;
+			console.log(state.hex);
+			console.log(state.wif);
 			return new CryptoKey(this, state);
 		}
 		

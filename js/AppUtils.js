@@ -865,12 +865,12 @@ var AppUtils = {
 				setImmediate(function() {	// let UI breath
 					try {
 						var key = plugin.newKey();
-						doneWeight += AppUtils.getWeightCreateKey();
-						if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
-						onDone(null, key);
 					} catch(err) {
 						onDone(err);
 					}
+					doneWeight += AppUtils.getWeightCreateKey();
+					if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
+					onDone(null, key);
 				});
 			}
 		}

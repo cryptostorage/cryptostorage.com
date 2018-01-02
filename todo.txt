@@ -12,6 +12,7 @@ regenerate button disappears briefly on mobile
 let UI breath during bip38
 remove under development warning
 disabled pagination is not same opacity as other disableds
+minimum tests should create keys for every currency
 
 faq content
 homepage content
