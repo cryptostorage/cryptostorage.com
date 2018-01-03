@@ -1474,7 +1474,7 @@ function ImportFileController(div) {
 				AppUtils.validatePiece(namedPiece.piece, true);
 				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
 			} catch (err) {
-				if (AppUtils.DEV_MODE) console.log(err);
+				console.log(err);
 				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.message);
 			}
 		}

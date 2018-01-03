@@ -5,7 +5,7 @@ var AppUtils = {
 		
 	// app constants
 	RUN_TESTS: false,
-	DEV_MODE: true,
+	DEV_MODE: false,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,

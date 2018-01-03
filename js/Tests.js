@@ -670,28 +670,6 @@ var Tests = {
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.keys[0].ticker is not defined", controller.getWarning());
 						controller.startOver();
-
-						piece = { version: 1.0, keys: [{
-							ticker: "BTC",
-							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",
-							encryption: null
-						}]};
-						namedPieces = [];
-						namedPieces.push({name: 'piece.json', piece: piece});
-						controller.addNamedPieces(namedPieces);
-						assertEquals("Invalid piece 'piece.json': piece.keys[0].address is not defined", controller.getWarning());
-						controller.startOver();
-						
-						piece = { version: 1.0, keys: [{
-							ticker: "BTC",
-							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
-							encryption: null
-						}]};
-						namedPieces = [];
-						namedPieces.push({name: 'piece.json', piece: piece});
-						controller.addNamedPieces(namedPieces);
-						assertEquals("Invalid piece 'piece.json': piece.keys[0].wif is not defined", controller.getWarning());
-						controller.startOver();
 						
 						piece = { version: 1.0, keys: [{
 							ticker: "BTC",
