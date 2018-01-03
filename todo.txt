@@ -2,6 +2,7 @@ TODO
 form info bubbles - see spec
 common browser icons
 formatting on IE <11
+notice export still loads hard, loading should encompass rendering too
 
 faq content
 homepage content
@@ -24,7 +25,6 @@ blue link against red notice is hard to read
 refresh image on regenerate button
 
 low priority:
-notice export still loads hard, loading should encompass rendering too
 let UI breath during bip38
 1px border on mobile safari import print
 mobile safari tooltip line
