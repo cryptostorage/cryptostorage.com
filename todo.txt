@@ -1,5 +1,4 @@
 TODO
-form info bubbles - see spec
 common browser icons
 formatting on IE <11
 notice export still loads hard, loading should encompass rendering too
