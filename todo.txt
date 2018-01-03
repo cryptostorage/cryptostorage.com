@@ -1,5 +1,4 @@
 TODO
-text import remaining disabled color after navigate away
 notice images still load hard
 tests
 form error messages - see spec

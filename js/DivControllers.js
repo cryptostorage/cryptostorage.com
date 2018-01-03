@@ -1320,6 +1320,7 @@ inheritsFrom(FormController, DivController);
 function ImportController(div) {
 	DivController.call(this, div);
 	
+	var tabController;
 	var importFileController;
 	var importTextController;
 	
@@ -1327,14 +1328,7 @@ function ImportController(div) {
 		
 		// loading screen until dependencies loaded
 		UiUtils.loadingDiv(div, AppUtils.getAppDependencies(), function(err) {
-			if (err) AppUtils.setDependencyError(err);
-			else renderAux();
-		});
-		
-		// done rendering
-		if (onDone) onDone(div);
-		
-		function renderAux() {
+			if (err) throw err;
 			
 			// div setup
 			div.empty();
@@ -1356,15 +1350,20 @@ function ImportController(div) {
 			importFileController.render(function() {
 				importTextController = new ImportTextController(importTextDiv, AppUtils.getCryptoPlugins());
 				importTextController.render(function() {
-					new TwoTabController(importDiv, "Import From File", importFileDiv, "Import From Text", importTextDiv).render(function() {
+					tabController = new TwoTabController(importDiv, "Import From File", importFileDiv, "Import From Text", importTextDiv);
+					tabController.render(function() {
 						if (onDone) onDone(div);
 					});
 				});
 			});
-		}
+		});
+		
+		// done rendering
+		if (onDone) onDone(div);
 	}
 	
 	this.startOver = function() {
+		if (tabController) tabController.selectTab(0);
 		if (importFileController) importFileController.startOver();
 		if (importTextController) importTextController.startOver();
 	}
@@ -1851,6 +1850,19 @@ function ImportTextController(div, plugins) {
 		// currency selector
 		var selectorContainer = $("<div class='import_selector_container'>").appendTo(textInputDiv);
 		selector = $("<div id='import_selector'>").appendTo(selectorContainer);
+		selector.ddslick({
+			data: selectorData,
+			background: "white",
+			imagePosition: "left",
+			selectText: "Select a Currency",
+			width:'100%',
+			defaultSelectedIndex: 0,
+			onSelected: function(selection) {
+				selectedPlugin = plugins[selection.selectedIndex];
+			},
+		});
+		selector = $("#import_selector", div);	// ddslick requires id reference
+		selectorDisabler = $("<div class='import_selector_disabler'>").appendTo(selectorContainer);
 		
 		// text area
 		textArea = $("<textarea class='import_textarea'>").appendTo(textInputDiv);
@@ -1874,20 +1886,7 @@ function ImportTextController(div, plugins) {
 		importedStorageDiv = $("<div class='imported_storage_div'>").appendTo(div);
 		importedStorageDiv.hide();
 		
-		// initialize pull down
-		selector.ddslick({
-			data:selectorData,
-			background: "white",
-			imagePosition: "left",
-			selectText: "Select a Currency",
-			width:'100%',
-			defaultSelectedIndex: 0,
-			onSelected: function(selection) {
-				selectedPlugin = plugins[selection.selectedIndex];
-			},
-		});
-		selector = $("#import_selector");	// ddslick requires id reference
-		selectorDisabler = $("<div class='import_selector_disabler'>").appendTo(selectorContainer);
+		// initialize
 		that.startOver();
 		
 		// done rendering
@@ -1916,17 +1915,29 @@ function ImportTextController(div, plugins) {
 		importedPiecesDiv.hide();
 		controlsDiv.hide();
 		removePieces();
+		setSelectorEnabled(true);
 		setSelectedCurrency("BTC");
 		if (decryptionController) decryptionController.cancel();
 	}
 	
 	function setSelectorEnabled(bool) {
 		if (bool) {
-			$("#import_selector *").removeClass("disabled_text");
+			$("*", selector).removeClass("disabled_text");
 			selectorDisabler.hide();
 		} else {
-			$("#import_selector *").addClass("disabled_text");
+			$("*", selector).addClass("disabled_text");
 			selectorDisabler.show();
+		}
+	}
+	
+	function setSelectedCurrency(ticker) {
+		var name = AppUtils.getCryptoPlugin(ticker).getName();
+		for (var i = 0; i < selectorData.length; i++) {
+			if (selectorData[i].text === name) {
+				selector.ddslick('select', {index: i});
+				selectedPlugin = plugins[i];
+				break;
+			}
 		}
 	}
 	
@@ -1984,18 +1995,6 @@ function ImportTextController(div, plugins) {
 			pieces: pieces,
 			pieceDivs: pieceDivs
 		}).render();
-	}
-	
-	function setSelectedCurrency(ticker) {
-		var name = AppUtils.getCryptoPlugin(ticker).getName();
-		selector = $("#import_selector");
-		for (var i = 0; i < selectorData.length; i++) {
-			if (selectorData[i].text === name) {
-				selector.ddslick('select', {index: i});
-				selectedPlugin = plugins[i];
-				break;
-			}
-		}
 	}
 	
 	function setWarning(str, img) {
@@ -2118,7 +2117,6 @@ function ImportTextController(div, plugins) {
 				key = selectedPlugin.combine(importedPieces);
 			} catch (err) {
 				if (!warningSet) {
-					console.log(err.message);
 					if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 					else if (err.message.indexOf("Unrecognized private key") > -1) setWarning("Pieces do not combine to make valid private key");
 					else setWarning(err.message);
@@ -2311,6 +2309,7 @@ inheritsFrom(DecryptionController, DivController);
 function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, defaultTabIdx) {
 	DivController.call(this, div);
 	
+	var that = this;
 	var tabsDiv;
 	var tab1;
 	var tab2;
@@ -2328,16 +2327,16 @@ function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, def
 		tabsDiv = $("<div class='import_tabs_div'>").appendTo(div);
 		tab1 = $("<div class='import_tab_div'>").appendTo(tabsDiv);
 		tab1.html(tabName1);
-		tab1.click(function() { selectTab(0); });
+		tab1.click(function() { that.selectTab(0); });
 		tab2 = $("<div class='import_tab_div'>").appendTo(tabsDiv);
 		tab2.html(tabName2);
-		tab2.click(function() { selectTab(1); });
+		tab2.click(function() { that.selectTab(1); });
 		
 		// add content div
 		contentDiv = $("<div>").appendTo(div);
 		
 		// start on first tab by default
-		selectTab(defaultTabIdx ? defaultTabIdx : 0);
+		that.selectTab(defaultTabIdx ? defaultTabIdx : 0);
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -2347,7 +2346,7 @@ function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, def
 		return tabsDiv;
 	}
 	
-	function selectTab(idx) {
+	this.selectTab = function(idx) {
 		switch(idx) {
 		case 0:
 			tab1.addClass("active_tab");
