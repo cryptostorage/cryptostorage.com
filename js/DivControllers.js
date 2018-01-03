@@ -822,7 +822,6 @@ function FormController(div) {
 			bip38Checkbox = $("<input type='checkbox' id='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
 			var bip38CheckboxLabel = $("<label for='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
 			bip38CheckboxLabel.html("Use BIP38 for Bitcoin and Bitcoin Cash");
-			var bip38Info = $("<img src='img/information.png' class='information_img'>").appendTo(bip38CheckboxDiv);
 			var showPassphraseCheckboxDiv = $("<div class='show_passphrase_checkbox_div'>").appendTo(passphraseConfigDiv);
 			showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 			var showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
@@ -836,6 +835,7 @@ function FormController(div) {
 			});
 			
 			// bip38 tooltip
+			var bip38Info = $("<img src='img/information.png' class='information_img'>").appendTo(bip38CheckboxDiv);
 			var bip38Tooltip = $("<div>");
 			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys<br>with a passphrase.<br><br>");
 			bip38Tooltip.append("It takes longer than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default), which<br> makes it more secure against brute force attacks.");
@@ -843,12 +843,11 @@ function FormController(div) {
 				arrow: true,
 				html: bip38Tooltip.get(0),
 				interactive: true,
-				placement: 'right',
+				placement: 'bottom',
 				theme: 'translucent',
 				trigger: "mouseenter",
 				multiple: 'false',
 				distance: 10,
-				arrowTransform: 'scaleX(1) scaleY(1)'
 			});
 			
 			// split checkbox
@@ -865,6 +864,23 @@ function FormController(div) {
 					splitInputDiv.hide();
 					validateSplit(false);
 				}
+			});
+			
+			// split checkbox tooltip
+			var splitInfo = $("<img src='img/information.png' class='information_img'>").appendTo(splitCheckboxDiv);
+			var splitTooltip = $("<div>");
+			splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split the private<br>keys into separate pieces where some of the pieces<br>are required in order to recover all private keys.<br><br>");
+			splitTooltip.append("For example, 20 key pairs can be generated and<br>split into 3 pieces.  Each piece will contain 20<br>shares, one for each key pair.  2 of the 3 pieces<br>can be required to recover all 20 private keys.<br><br>");
+			splitTooltip.append("This is useful for geographically separating your<br>cold storage across locations so the funds cannot<br>be accessed until the pieces are physically<br>recombined.");
+			tippy(splitInfo.get(0), {
+				arrow: true,
+				html: splitTooltip.get(0),
+				interactive: true,
+				placement: 'bottom',
+				theme: 'translucent',
+				trigger: "mouseenter",
+				multiple: 'false',
+				distance: 10,
 			});
 			
 			// split input
@@ -3049,7 +3065,7 @@ function NoticeController(div, config) {
 						var content = $("<div>").appendTo(div);
 						if (check.state === "fail") content.append("<div class='notice_bar_center_major'>Browser is not supported (" + info.browser.name + " " + info.browser.version + ")</div>");
 						else content.append("<div class='notice_bar_center_major'>Browser is not open source (" + info.browser.name + ")</div>");
-						content.append("<div class='notice_bar_center_minor'>Recommendations:&nbsp;<a target='_blank' href='https://www.mozilla.org/en-US/firefox/'>Firefox</a>&nbsp;<a target='_blank' href='https://www.chromium.org/getting-involved/download-chromium'>Chromium</a>&nbsp;<a target='_blank' href='https://brave.com'>Brave</a>");
+						content.append("<div class='notice_bar_center_minor'>Recommended browsers: <a target='_blank' href='https://www.mozilla.org/en-US/firefox/'>Firefox</a>, <a target='_blank' href='https://www.chromium.org/getting-involved/download-chromium'>Chromium</a>, or <a target='_blank' href='https://brave.com'>Brave</a>");
 					}
 					
 					if (check.state === "fail") 
@@ -3084,7 +3100,7 @@ function NoticeController(div, config) {
 					else {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Operating system is not open source (" + info.os.name + ")</div>");
-						content.append("<div class='notice_bar_center_minor'>Recommendations:&nbsp;<a target='_blank' href='https://tails.boum.org'>Tails</a>&nbsp;<a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>&nbsp;<a target='_blank' href='https://www.raspberrypi.org'>Raspberry Pi</a>");
+						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: <a target='_blank' href='https://tails.boum.org'>Tails</a>, <a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>, or&nbsp;<a target='_blank' href='https://www.raspberrypi.org/downloads/raspbian/'>Raspbian</a> for the <a target='_blank' href='https://www.raspberrypi.org'>Raspberry Pi</a>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.PRERELEASE:
