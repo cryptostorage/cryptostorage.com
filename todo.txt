@@ -32,7 +32,7 @@ file import loading - see spec, only show if minimum file size
 transition all css flex to common flex classes
 confirm navigate away from import if decrypting
 export transactions which can be imported and sent making it fully functional cold storage web wallet
-meeting times should be plus or minus 30% of time invested
+meeting times should be plus or minus 20% of time invested
 option to split the passphrase and include a copy of it on each share?
 print progress - progress bar if threshold exceeded where they're expected to wait
 minify dependencies with source map download
