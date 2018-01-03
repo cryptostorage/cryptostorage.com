@@ -1772,6 +1772,24 @@ input[type='checkbox'][disabled] +label {
 	border-left: 7px solid transparent
 }
 
+.tippy-tooltip.error-theme {
+  background-color: rgb(255, 0, 0);
+  text-align: left;
+  border-radius: 20px;
+}
+
+.tippy-tooltip.error-theme * {
+  font-size: 18px !important;
+  line-height: unset !important;
+}
+
+.tippy-popper[x-placement^=bottom] .tippy-tooltip.error-theme .tippy-arrow
+	{
+	border-bottom: 7px solid rgb(255, 0, 0);
+	border-right: 7px solid transparent;
+	border-left: 7px solid transparent
+}
+
 .loading {
 	margin-top: 200px;
 	width: 35px;

@@ -788,8 +788,10 @@ function FormController(div) {
 					passphraseInputDiv.show();
 					passphraseInput.focus();
 				} else {
+					passphraseInput.val("");
+					bip38Checkbox.prop('checked', false);
 					passphraseInputDiv.hide();
-					validatePassphrase(true);
+					setPassphraseError(false);
 				}
 			});
 			
@@ -799,11 +801,7 @@ function FormController(div) {
 			passphraseWarnDiv.append("This passphrase is required to access funds later on.  <b>Don’t lose it.</b>");
 			passphraseInputDiv.append("Passphrase");
 			passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
-			passphraseInput.on("input focusout", function(e) {
-				passphraseInput.removeClass("form_input_error_div");
-				formErrors.passphrase = false;
-				updateForm();
-			});
+			passphraseInput.on("input", function(e) { setPassphraseError(false); });
 			
 			// passphrase config
 			var passphraseConfigDiv = $("<div class='passphrase_config_div'>").appendTo(passphraseInputDiv);
@@ -832,9 +830,9 @@ function FormController(div) {
 				arrow: true,
 				html: bip38Tooltip.get(0),
 				interactive: true,
-				placement: 'bottom',
+				placement: 'right',
 				theme: 'translucent',
-				trigger: "click",
+				trigger: "mouseenter",
 				multiple: 'false',
 				distance: 10,
 				arrowTransform: 'scaleX(1) scaleY(1)'
@@ -849,10 +847,10 @@ function FormController(div) {
 			splitCheckbox.click(function() {
 				if (splitCheckbox.prop('checked')) {
 					splitInputDiv.show();
-					validateSplit(true, true);
+					validateSplit(true);
 				} else {
 					splitInputDiv.hide();
-					validateSplit(true, false);
+					validateSplit(false);
 				}
 			});
 			
@@ -873,10 +871,10 @@ function FormController(div) {
 			minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
 			var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
 			splitMinLabelBottom.html("To Recover");	
-			numPiecesInput.on("input", function(e) { validateSplit(true, false); });
-			numPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
-			minPiecesInput.on("input", function(e) { validateSplit(true, false); });
-			minPiecesInput.on("focusout", function(e) { validateSplit(true, true); });
+			numPiecesInput.on("input", function(e) { validateSplit(false); });
+			numPiecesInput.on("focusout", function(e) { validateSplit(true); });
+			minPiecesInput.on("input", function(e) { validateSplit(false); });
+			minPiecesInput.on("focusout", function(e) { validateSplit(true); });
 			
 			// apply default configuration
 			passphraseCheckbox.prop('checked', false);
@@ -898,7 +896,7 @@ function FormController(div) {
 			// disable generate button if environment failure
 			AppUtils.addEnvironmentListener(function() {
 				formErrors.environment = AppUtils.hasEnvironmentState("fail");
-				updateForm()
+				updateGenerateButton();
 			});
 			
 			// add first currency
@@ -934,12 +932,12 @@ function FormController(div) {
 		minPiecesInput.val(2);
 		
 		// update form
-		validateForm(true);
+		validateForm();
 	}
 	
 	// handle when generate button clicked
 	function onGenerate(onDone) {
-		validateForm(true);
+		validateForm();
 		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", {keyGenConfig: getConfig(), confirmExit: true});
 		if (onDone) onDone();
 	}
@@ -985,18 +983,18 @@ function FormController(div) {
 	function addCurrency(defaultTicker) {
 		
 		// create input
-		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, plugins, defaultTicker, updateForm, function() {
+		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, plugins, defaultTicker, updateBip38Checkbox, function() {
 			removeCurrency(currencyInput);
 		}, function(isValid) {
 			validateCurrencyInputs();
-			updateForm();
+			updateGenerateButton();
 		});
 		
 		// update currency inputs and add to page
 		currencyInputs.push(currencyInput);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().appendTo(currencyInputsDiv);
-		updateForm();
+		updateBip38Checkbox();
 	}
 	
 	function removeCurrency(currencyInput) {
@@ -1005,7 +1003,7 @@ function FormController(div) {
 		currencyInputs.splice(idx, 1);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().remove();
-		validateCurrencyInputs(true);
+		validateCurrencyInputs();
 	}
 	
 	function onOneOfEach() {
@@ -1021,10 +1019,10 @@ function FormController(div) {
 			addCurrency(plugins[i].getTicker());
 		}
 		validateCurrencyInputs();
-		updateForm();
+		updateBip38Checkbox();
 	}
 	
-	function updateForm() {
+	function updateBip38Checkbox() {
 		
 		// determine if BTC is selected
 		var btcFound = false;
@@ -1048,35 +1046,32 @@ function FormController(div) {
 		
 		// show or hide bip38 checkbox
 		btcFound || bchFound ? bip38CheckboxDiv.show() : bip38CheckboxDiv.hide();
-		
-		// update generate button
+	}
+	
+	function updateGenerateButton() {
 		setGenerateEnabled(!hasFormErrors());
-		
-		// focus passphrase if error
-		if (formErrors.passphrase) passphraseInput.focus();
 	}
 	
 	function hasFormErrors() {
 		return formErrors.environment || formErrors.currencyInputs || formErrors.passphrase || formErrors.split;
 	}
 	
-	function validateForm(_updateForm) {
-		validateCurrencyInputs(false);
-		validatePassphrase(false);
-		validateSplit(false, true);
-		if (_updateForm) updateForm();
+	function validateForm() {
+		validateCurrencyInputs();
+		validatePassphrase();
+		validateSplit(true);
 	}
 	
-	function validateCurrencyInputs(_updateForm) {
+	function validateCurrencyInputs() {
 		var err = null;
 		for (var i = 0; i < currencyInputs.length; i++) {
 			if (!currencyInputs[i].isValid()) err = true;
 		}
 		formErrors.currencyInputs = err;
-		if (_updateForm) updateForm();
+		updateGenerateButton();
 	}
 	
-	function validatePassphrase(_updateForm) {
+	function validatePassphrase() {
 		
 		// handle passphrase not checked
 		if (!passphraseCheckbox.is(":checked")) {
@@ -1087,19 +1082,41 @@ function FormController(div) {
 		// handle passphrase checked
 		else {
 			var passphrase = passphraseInput.val();
-			if (!passphrase || passphrase.length < AppUtils.MIN_PASSWORD_LENGTH) {
-				formErrors.passphrase = true;
-				passphraseInput.addClass("form_input_error_div");
-			} else {
-				formErrors.passphrase = false;
-				passphraseInput.removeClass("form_input_error_div");
-			}
+			setPassphraseError(!passphrase || passphrase.length < AppUtils.MIN_PASSWORD_LENGTH);
 		}
 
-		if (_updateForm) updateForm();
+		updateGenerateButton();
 	}
 	
-	function validateSplit(_updateForm, strictBlankAndRange) {
+	function setPassphraseError(bool) {
+		if (bool) {
+			formErrors.passphrase = true;
+			passphraseInput.addClass("form_input_error_div");
+			passphraseInput.focus();
+			
+//			// error tooltip
+//			tippy(passphraseInput.get(0), {
+//				arrow: true,
+//				html: $("<div>Passphrase must be at least 7 characters</div>").get(0),
+//				interactive: false,
+//				placement: 'bottom',
+//				theme: 'error',
+//				trigger: "manual",
+//				multiple: 'false',
+//				distance: 10,
+//				arrowTransform: 'scaleX(1) scaleY(1)',
+//				onShow: function() { console.log("onShow()"); },
+//				onHide: function() { console.log("onHide()"); }
+//			});
+//			passphraseInput.get(0)._tippy.show();
+		} else {
+			passphraseInput.removeClass("form_input_error_div");
+			formErrors.passphrase = false;
+		}
+		updateGenerateButton();
+	}
+	
+	function validateSplit(strictBlankAndRange) {
 		
 		// handle split not checked
 		if (!splitCheckbox.is(":checked")) {
@@ -1152,7 +1169,7 @@ function FormController(div) {
 			}
 		}
 		
-		if (_updateForm) updateForm();
+		updateGenerateButton();
 	}
 	
 	function setGenerateEnabled(generateEnabled) {
