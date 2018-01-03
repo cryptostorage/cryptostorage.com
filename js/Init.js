@@ -3,7 +3,7 @@
  */
 $(document).ready(function() {
 	
-	// welcome message :)
+	// welcome :)
 	console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
 	
 	// catch unexpected errors
