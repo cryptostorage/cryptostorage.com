@@ -812,7 +812,8 @@ function FormController(div) {
 				theme: 'error',
 				trigger: "manual",
 				distance: 10,
-				arrowTransform: 'scaleX(1) scaleY(1)',
+				arrowTransform: 'translateX(310)',
+				offset: '-220, 0'
 			});
 			
 			// passphrase config
@@ -836,8 +837,8 @@ function FormController(div) {
 			
 			// bip38 tooltip
 			var bip38Tooltip = $("<div>");
-			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a specification to encrypt Bitcoin private<br>keys with a passphrase.<br><br>");
-			bip38Tooltip.append("It's slower than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default), but it's<br>more secure against brute force attacks.");
+			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys<br>with a passphrase.<br><br>");
+			bip38Tooltip.append("It takes longer than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default), which<br> makes it more secure against brute force attacks.");
 			tippy(bip38Info.get(0), {
 				arrow: true,
 				html: bip38Tooltip.get(0),
