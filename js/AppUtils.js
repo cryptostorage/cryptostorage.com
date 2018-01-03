@@ -194,10 +194,10 @@ var AppUtils = {
 	getCryptoPlugins: function() {
 		if (!AppUtils.plugins) {
 			AppUtils.plugins = [];
-			AppUtils.plugins.push(new BitcoinCashPlugin());
+			AppUtils.plugins.push(new BitcoinPlugin());
 			AppUtils.plugins.push(new EthereumPlugin());
 			AppUtils.plugins.push(new MoneroPlugin());
-			AppUtils.plugins.push(new BitcoinPlugin());
+			AppUtils.plugins.push(new BitcoinCashPlugin());
 			AppUtils.plugins.push(new LitecoinPlugin());
 			AppUtils.plugins.push(new DashPlugin());
 			AppUtils.plugins.push(new ZcashPlugin());
