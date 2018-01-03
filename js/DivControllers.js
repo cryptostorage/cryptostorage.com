@@ -803,6 +803,20 @@ function FormController(div) {
 			passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
 			passphraseInput.on("input", function(e) { setPassphraseError(false); });
 			
+			// password error tooltip
+			tippy(passphraseInput.get(0), {
+				arrow: true,
+				html: $("<div>Passphrase must be at least 7 characters</div>").get(0),
+				interactive: false,
+				placement: 'bottom',
+				theme: 'error',
+				trigger: "manual",
+				distance: 10,
+				arrowTransform: 'scaleX(1) scaleY(1)',
+				onShow: function() { console.log("onShow()"); },
+				onHide: function() { console.log("onHide()"); }
+			});
+			
 			// passphrase config
 			var passphraseConfigDiv = $("<div class='passphrase_config_div'>").appendTo(passphraseInputDiv);
 			bip38CheckboxDiv = $("<div class='bip38_checkbox_div'>").appendTo(passphraseConfigDiv);
@@ -1093,25 +1107,11 @@ function FormController(div) {
 			formErrors.passphrase = true;
 			passphraseInput.addClass("form_input_error_div");
 			passphraseInput.focus();
-			
-//			// error tooltip
-//			tippy(passphraseInput.get(0), {
-//				arrow: true,
-//				html: $("<div>Passphrase must be at least 7 characters</div>").get(0),
-//				interactive: false,
-//				placement: 'bottom',
-//				theme: 'error',
-//				trigger: "manual",
-//				multiple: 'false',
-//				distance: 10,
-//				arrowTransform: 'scaleX(1) scaleY(1)',
-//				onShow: function() { console.log("onShow()"); },
-//				onHide: function() { console.log("onHide()"); }
-//			});
-//			passphraseInput.get(0)._tippy.show();
+			passphraseInput.get(0)._tippy.show();
 		} else {
 			passphraseInput.removeClass("form_input_error_div");
 			formErrors.passphrase = false;
+			passphraseInput.get(0)._tippy.hide();
 		}
 		updateGenerateButton();
 	}
