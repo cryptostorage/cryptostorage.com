@@ -2500,18 +2500,7 @@ function ExportController(div, window, config) {
 		
 		// loading screen
 		UiUtils.loadingDiv(div, AppUtils.getExportDependencies(), function(err) {
-			if (err) {
-				AppUtils.setDependencyError(true);
-			} else {
-				renderAux();
-			}
-		});
-		
-		// done rendering
-		if (onDone) onDone(div);
-		
-		// renders after dependencies loaded
-		function renderAux() {
+			if (err) throw err;
 			
 			// notices
 			if (config.showNotices) {
@@ -2566,7 +2555,10 @@ function ExportController(div, window, config) {
 			
 			// build ui based on keyGenConfig, pieces, and pieceDivs
 			update(config.pieceDivs);
-		}
+		});
+		
+		// done rendering
+		if (onDone) onDone(div);
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
