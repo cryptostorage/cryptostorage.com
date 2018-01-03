@@ -813,8 +813,6 @@ function FormController(div) {
 				trigger: "manual",
 				distance: 10,
 				arrowTransform: 'scaleX(1) scaleY(1)',
-				onShow: function() { console.log("onShow()"); },
-				onHide: function() { console.log("onHide()"); }
 			});
 			
 			// passphrase config
@@ -1107,7 +1105,7 @@ function FormController(div) {
 			formErrors.passphrase = true;
 			passphraseInput.addClass("form_input_error_div");
 			passphraseInput.focus();
-			passphraseInput.get(0)._tippy.show();
+			setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
 		} else {
 			passphraseInput.removeClass("form_input_error_div");
 			formErrors.passphrase = false;
