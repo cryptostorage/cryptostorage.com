@@ -1,8 +1,7 @@
 TODO
-formatting on IE <11
 common browser icons
 notice export still loads hard, loading should encompass rendering too
-auto width tooltips
+IE testing
 
 faq content
 homepage content

@@ -1338,7 +1338,7 @@ function FormController(div) {
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
 					onCurrencyChanged(selectedPlugin.getTicker());
-				},
+				}
 			});
 			selector = $("#currency_selector_" + idx);	// ddslick requires id reference
 			that.setSelectedCurrency(defaultTicker ? defaultTicker : "BTC");	// does not initialize pull down with this value, but sets instance variables
