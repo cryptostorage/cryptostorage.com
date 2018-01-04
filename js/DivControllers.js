@@ -883,7 +883,7 @@ function FormController(div) {
 			var splitTooltip = $("<div>");
 			splitTooltip.append("Splits the generated keys into separate pieces using <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a>.  The pieces must be recombined in order to recover all private keys.<br><br>");
 			splitTooltip.append("For example, 20 key pairs can be split into 3 pieces. Each piece will contain 20 key  pairs, but 2 of the 3 pieces are necessary to recover the private keys.<br><br>");
-			splitTooltip.append("This is useful for geographically separating pieces of your cold storage so the funds cannot be accessed until the pieces are recombined.");
+			splitTooltip.append("This is useful for geographically splitting your cold storage so the funds cannot be accessed until the pieces are physically recombined.");
 			tippy(splitInfo.get(0), {
 				arrow: true,
 				html: splitTooltip.get(0),
