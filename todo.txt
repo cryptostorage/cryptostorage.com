@@ -1,6 +1,6 @@
 TODO
-common browser icons
 notice export still loads hard, loading should encompass rendering too
+common browser icons
 IE testing
 faq content
 homepage content
