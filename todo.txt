@@ -1,8 +1,8 @@
 TODO
-common browser icons
 formatting on IE <11
+common browser icons
 notice export still loads hard, loading should encompass rendering too
-auto width function automatically inserts breaks
+auto width tooltips
 
 faq content
 homepage content
