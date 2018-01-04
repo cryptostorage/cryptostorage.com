@@ -2,15 +2,15 @@ TODO
 common browser icons
 notice export still loads hard, loading should encompass rendering too
 IE testing
-
 faq content
 homepage content
 github description page
 remove under development warning
 final design review
 sanity tests
-get visually similar domains
-release
+get similar domains
+sign code
+hosting
 announce
 
 designer:
