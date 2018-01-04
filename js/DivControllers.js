@@ -316,7 +316,7 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs 100% in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
+			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split your private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate your keys securely with automated environment checks.").appendTo(sliderDiv);
 			sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
@@ -426,7 +426,7 @@ function HomeController(div) {
 		
 		// download section
 		pageDiv.append("<div style='height: 60px'>");
-		pageDiv.append("<div class='home_label'>Download our 100% free, open-source software and run it offline</div>");
+		pageDiv.append("<div class='home_label'>Download our 100% free, open source software and run it offline</div>");
 		pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
 		pageDiv.append($("<img width=500px src='img/license.png'>"));
 		pageDiv.append("<div style='height: 20px;'>");
@@ -838,7 +838,7 @@ function FormController(div) {
 			var bip38Info = $("<img src='img/information.png' class='information_img'>").appendTo(bip38CheckboxDiv);
 			var bip38Tooltip = $("<div>");
 			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys<br>with a passphrase.<br><br>");
-			bip38Tooltip.append("It takes longer than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default), which<br> makes it more secure against brute force attacks.");
+			bip38Tooltip.append("BIP38 takes much longer to encrypt and decrypt private keys which makes it more secure against brute force attacks than CryptoJS<a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default), which<br> makes it more secure against brute force attacks.");
 			tippy(bip38Info.get(0), {
 				arrow: true,
 				html: bip38Tooltip.get(0),
@@ -2654,7 +2654,7 @@ function ExportController(div, window, config) {
 	
 	function printAll() {
 		if (!printEnabled) return;
-		if (getExportConfig().showPrivate || confirm("Private keys will NOT be exported.\n\nFUNDS WILL NOT BE RECOVERABLE FROM THE PRINTED DOCUMENT\n\nPrint anyway?")) {
+		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this printed document because the private keys are not included.\n\nContinue?")) {
 			saved = true;
 			window.print();
 		}
@@ -2663,7 +2663,7 @@ function ExportController(div, window, config) {
 	function saveAll(pieces) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
-		if (getExportConfig().showPrivate || confirm("Private keys will NOT be exported.\n\nFUNDS WILL NOT BE RECOVERABLE FROM THE SAVED FILE\n\nSave anyway?")) {
+		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this saved file because the private keys are not included.\n\nContinue?")) {
 			
 			// transform pieces according to export config
 			var transformedPieces = [];
