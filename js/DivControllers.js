@@ -100,6 +100,13 @@ var UiUtils = {
 			};
 			loading.src = "img/loading.gif";
 		}
+	},
+	
+	/**
+	 * Returns the maximum width for UI tooltips.
+	 */
+	getInfoTooltipsMaxWidth: function() {
+		return "500px";
 	}
 }
 
@@ -811,8 +818,10 @@ function FormController(div) {
 				placement: 'bottom',
 				theme: 'error',
 				trigger: "manual",
-				distance: 10,
-				arrowTransform: 'translateX(310)',
+				multiple: 'false',
+				maxWidth: UiUtils.getInfoTooltipsMaxWidth(),
+				distance: 20,
+				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateX(250) translateY(-2px)',
 				offset: '-220, 0'
 			});
 			
@@ -837,8 +846,8 @@ function FormController(div) {
 			// bip38 tooltip
 			var bip38Info = $("<img src='img/information.png' class='information_img'>").appendTo(bip38CheckboxDiv);
 			var bip38Tooltip = $("<div>");
-			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys<br>with a passphrase.<br><br>");
-			bip38Tooltip.append("BIP38 takes much longer to encrypt and decrypt private keys which makes it more secure against brute force attacks than CryptoJS<a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default), which<br> makes it more secure against brute force attacks.");
+			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys with a passphrase.<br><br>");
+			bip38Tooltip.append("BIP38 takes longer to encrypt and decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default), which makes it more difficult crack with brute force.");
 			tippy(bip38Info.get(0), {
 				arrow: true,
 				html: bip38Tooltip.get(0),
@@ -847,7 +856,10 @@ function FormController(div) {
 				theme: 'translucent',
 				trigger: "mouseenter",
 				multiple: 'false',
-				distance: 10,
+				maxWidth: UiUtils.getInfoTooltipsMaxWidth(),
+				distance: 20,
+				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+				offset: '0, 0'
 			});
 			
 			// split checkbox
@@ -869,9 +881,9 @@ function FormController(div) {
 			// split checkbox tooltip
 			var splitInfo = $("<img src='img/information.png' class='information_img'>").appendTo(splitCheckboxDiv);
 			var splitTooltip = $("<div>");
-			splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split all private<br>keys into separate pieces where some of the pieces<br>must be recombined in order to recover all private<br>keys.<br><br>");
-			splitTooltip.append("For example, 20 key pairs can be generated and<br>split into 3 pieces.  Each piece will contain 20<br>shares, one for each key pair.  2 of the 3 pieces<br>can be required to recover all 20 private keys.<br><br>");
-			splitTooltip.append("This is useful for geographically separating your<br>cold storage so the funds cannot be accessed until<br>the pieces are physically recombined.");
+			splitTooltip.append("Splits the generated keys into separate pieces using <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a>.  The pieces must be recombined in order to recover all private keys.<br><br>");
+			splitTooltip.append("For example, 20 key pairs can be split into 3 pieces. Each piece will contain 20 key  pairs, but 2 of the 3 pieces are necessary to recover the private keys.<br><br>");
+			splitTooltip.append("This is useful for geographically separating pieces of your cold storage so the funds cannot be accessed until the pieces are recombined.");
 			tippy(splitInfo.get(0), {
 				arrow: true,
 				html: splitTooltip.get(0),
@@ -880,7 +892,10 @@ function FormController(div) {
 				theme: 'translucent',
 				trigger: "mouseenter",
 				multiple: 'false',
-				distance: 10,
+				maxWidth: UiUtils.getInfoTooltipsMaxWidth(),
+				distance: 20,
+				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+				offset: '-180, 0'
 			});
 			
 			// split input

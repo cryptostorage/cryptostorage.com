@@ -1743,12 +1743,6 @@ input[type='checkbox'][disabled] +label {
 	text-decoration: underline;
 }
 
-.tippy-tooltip.translucent-theme {
-  background-color: rgba(0, 0, 0, .7);
-  text-align: left;
-  border-radius: 20px;
-}
-
 .tippy-tooltip.translucent-theme * {
   font-size: 18px !important;
   line-height: unset !important;
@@ -1758,16 +1752,22 @@ input[type='checkbox'][disabled] +label {
 	color: #56C1FF;
 }
 
+.tippy-tooltip.translucent-theme {
+  background-color: rgba(94, 94, 94, .91);
+  text-align: left;
+  border-radius: 20px;
+}
+
 .tippy-popper[x-placement^=bottom] .tippy-tooltip.translucent-theme .tippy-arrow
 	{
-	border-bottom: 7px solid rgba(0, 0, 0, .7);
+	border-bottom: 7px solid rgba(94, 94, 94, .91);
 	border-right: 7px solid transparent;
 	border-left: 7px solid transparent
 }
 
 .tippy-popper[x-placement^=top] .tippy-tooltip.translucent-theme .tippy-arrow
 	{
-	border-top: 7px solid rgba(0, 0, 0, .7);
+	border-top: 7px solid rgba(94, 94, 94, .91);
 	border-right: 7px solid transparent;
 	border-left: 7px solid transparent
 }
