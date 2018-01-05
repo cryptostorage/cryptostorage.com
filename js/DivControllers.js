@@ -564,13 +564,13 @@ function DonateController(div, appController) {
 					address: plugin.getDonationAddress()
 				});
 			}
-			renderDonationAddresses(donations, function(donationsDiv) {
+			renderCredits(donations, function(donationsDiv) {
 				pageDiv.append(donationsDiv);
 				
 				// build credits section
 				pageDiv.append("<br><br>");
 				titleDiv = $("<div class='title'>").appendTo(pageDiv);
-				titleDiv.html("Credits");
+				titleDiv.html("Special Thanks To");
 				var credits = [];
 				credits.push({
 					logo: AppUtils.getCryptoPlugin("ETH").getLogo(),
@@ -590,7 +590,12 @@ function DonateController(div, appController) {
 					labelUrl: "https://moneroaddress.org",
 					address: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
 				});
-				renderDonationAddresses(credits, function(donationsDiv) {
+				credits.push({
+					label: "BitPay",
+					labelUrl: "https://bitpay.com",
+					image: $("<img src='img/bitpay.png'>")
+				});
+				renderCredits(credits, function(donationsDiv) {
 					pageDiv.append(donationsDiv);
 					
 					// make addresses copyable
@@ -623,100 +628,106 @@ function DonateController(div, appController) {
 		}
 		
 		/**
-		 * Renders the given donations.
+		 * Renders the given credits.
 		 * 
-		 * @param donations are [{logo: <logo>, label: <label>, value: <value>}, ...].
+		 * @param credits are credits to render
 		 * @param onDone(div) is invoked when done
 		 */
-		function renderDonationAddresses(donations, onDone) {
+		function renderCredits(credits, onDone) {
 			
 			// div to render to
-			var donationsDiv = $("<div>");
+			var creditsDiv = $("<div>");
 			
 			// collect functions to render values
 			var left = true;
 			var funcs = [];
-			for (var i = 0; i < donations.length; i++) {
-				var donation = donations[i];
-				var donationDiv = $("<div>").appendTo(donationsDiv); 
+			for (var i = 0; i < credits.length; i++) {
+				var credit = credits[i];
+				var creditDiv = $("<div>").appendTo(creditsDiv); 
 				if (left) {
-					funcs.push(renderLeftFunc(donationDiv, donation));
+					funcs.push(renderLeftFunc(creditDiv, credit));
 				} else {
-					funcs.push(renderRightFunc(donationDiv, donation));
+					funcs.push(renderRightFunc(creditDiv, credit));
 				}
 				left = !left;
 			}
 			
-			function renderLeftFunc(donationDiv, donation) {
-				return function(onDone) { renderLeft(donationDiv, donation, onDone); }
+			function renderLeftFunc(creditDiv, credit) {
+				return function(onDone) { renderLeft(creditDiv, credit, onDone); }
 			}
 			
-			function renderRightFunc(donationDiv, donation) {
-				return function(onDone) { renderRight(donationDiv, donation, onDone); }
+			function renderRightFunc(creditDiv, credit) {
+				return function(onDone) { renderRight(creditDiv, credit, onDone); }
 			}
 			
 			// render addresses in parallel
 			async.parallel(funcs, function(err, results) {
 				if (err) throw err;
-				onDone(donationsDiv);
+				onDone(creditsDiv);
 			});
 		}
 		
-		function renderLeft(div, donation, onDone) {
-			div.attr("class", "donate_left");
-			var qrDiv = $("<div>").appendTo(div);
-			var labelAddressDiv = $("<div class='donate_label_address'>").appendTo(div);
-			var logoLabelDiv = $("<div class='donate_left_logo_label'>").appendTo(labelAddressDiv);
-			var logo = $("<img src='" + donation.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-			logo.attr("class", "donate_logo");
-			var labelDiv = $("<div class='donate_label'>").appendTo(logoLabelDiv);
-			if (donation.labelUrl) {
-				labelDiv.append($("<a target='_blank' href='" + donation.labelUrl + "'>" + donation.label + "</a>"));
-			} else {
-				labelDiv.append(donation.label);
+		function renderLeft(div, credit, onDone) {
+			div.attr("class", "credit_left");
+			var imgDiv = $("<div>").appendTo(div);
+			var labelAddressDiv = $("<div class='credit_label_address'>").appendTo(div);
+			var logoLabelDiv = $("<div class='credit_left_logo_label'>").appendTo(labelAddressDiv);
+			if (credit.logo) {
+				var logo = $("<img src='" + credit.logo.get(0).src + "'>").appendTo(logoLabelDiv);
+				logo.attr("class", "credit_logo");
 			}
-			var addressDiv = $("<div class='donate_left_address copyable'>").appendTo(labelAddressDiv);
-			addressDiv.append(donation.address);
-			
-			// render qr code
-			try {
-				AppUtils.renderQrCode(donation.address, null, function(img) {
-					img.attr("class", "donate_left_qr");
-					qrDiv.append(img);
+			var labelDiv = $("<div class='credit_label'>").appendTo(logoLabelDiv);
+			if (credit.labelUrl) {
+				labelDiv.append($("<a target='_blank' href='" + credit.labelUrl + "'>" + credit.label + "</a>"));
+			} else {
+				labelDiv.append(credit.label);
+			}
+			if (credit.address) {
+				var addressDiv = $("<div class='credit_left_address copyable'>").appendTo(labelAddressDiv);
+				addressDiv.append(credit.address);
+			}
+			if (credit.image) {
+				credit.image.attr("class", "credit_right_img");
+				imgDiv.append(credit.image);
+				onDone();
+			} else {
+				AppUtils.renderQrCode(credit.address, null, function(img) {
+					img.attr("class", "credit_left_img");
+					imgDiv.append(img);
 					onDone();
 				});
-			} catch (err) {
-				console.log("Could not render QR code");
-				onDone();
 			}
 		}
 		
-		function renderRight(div, donation, onDone) {
-			div.attr("class", "donate_right");
-			var labelAddressDiv = $("<div class='donate_label_address'>").appendTo(div);
-			var logoLabelDiv = $("<div class='donate_right_logo_label'>").appendTo(labelAddressDiv);
-			var logo = $("<img src='" + donation.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-			logo.attr("class", "donate_logo");
-			var labelDiv = $("<div class='donate_label'>").appendTo(logoLabelDiv);
-			if (donation.labelUrl) {
-				labelDiv.append($("<a target='_blank' href='" + donation.labelUrl + "'>" + donation.label + "</a>"));
-			} else {
-				labelDiv.append(donation.label);
+		function renderRight(div, credit, onDone) {
+			div.attr("class", "credit_right");
+			var labelAddressDiv = $("<div class='credit_label_address'>").appendTo(div);
+			var logoLabelDiv = $("<div class='credit_right_logo_label'>").appendTo(labelAddressDiv);
+			if (credit.logo) {
+				var logo = $("<img src='" + credit.logo.get(0).src + "'>").appendTo(logoLabelDiv);
+				logo.attr("class", "credit_logo");
 			}
-			var addressDiv = $("<div class='donate_right_address copyable'>").appendTo(labelAddressDiv);
-			addressDiv.append(donation.address);
-			var qrDiv = $("<div>").appendTo(div);
-			
-			// render qr code
-			try {
-				AppUtils.renderQrCode(donation.address, null, function(img) {
-					img.attr("class", "donate_right_qr");
-					qrDiv.append(img);
+			var labelDiv = $("<div class='credit_label'>").appendTo(logoLabelDiv);
+			if (credit.labelUrl) {
+				labelDiv.append($("<a target='_blank' href='" + credit.labelUrl + "'>" + credit.label + "</a>"));
+			} else {
+				labelDiv.append(credit.label);
+			}
+			if (credit.address) {
+				var addressDiv = $("<div class='credit_right_address copyable'>").appendTo(labelAddressDiv);
+				addressDiv.append(credit.address);
+			}
+			var imgDiv = $("<div>").appendTo(div);
+			if (credit.image) {
+				credit.image.attr("class", "credit_right_img");
+				imgDiv.append(credit.image);
+				onDone();
+			} else {
+				AppUtils.renderQrCode(credit.address, null, function(img) {
+					img.attr("class", "credit_right_img");
+					imgDiv.append(img);
 					onDone();
 				});
-			} catch (err) {
-				console.log("Could not render QR code");
-				onDone();
 			}
 		}
 	}
