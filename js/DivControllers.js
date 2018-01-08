@@ -217,17 +217,19 @@ function AppController(div) {
 		var pageMap = pagesMap[page];
 		pageMap.show(function() {
 			
-			// start rendering other pages
-			for (var key in pagesMap) {
-				if (pagesMap.hasOwnProperty(key)) {
-					pagesMap[key].renderer.render();
-				}
-			}
-			
 			// poll environment starting with synchronized environment info
 			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
 				if (err) throw err;
 				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
+				
+				// start rendering other pages
+				for (var key in pagesMap) {
+					if (pagesMap.hasOwnProperty(key)) {
+						pagesMap[key].renderer.render();
+					}
+				}
+				
+				// done rendering application
 				if (onDone) onDone();
 			});
 		});
@@ -287,8 +289,8 @@ function AppController(div) {
 		if (AppUtils.DEV_MODE) console.log("showImport()");
 		sliderDiv.hide();
 		footerDiv.hide();
+		setContentDiv(importLoader.getDiv());
 		importLoader.render(function() {
-			setContentDiv(importLoader.getDiv());
 			if (onDone) onDone();
 		});
 	}
@@ -3202,9 +3204,6 @@ function LoadController(renderer) {
 			
 			// don't show div while rendering
 			renderer.getDiv().hide();
-			
-			// done rendering loader
-			if (onDone) onDone(wrapper);
 				
 			// render content
 			renderer.render(function() {
@@ -3212,6 +3211,7 @@ function LoadController(renderer) {
 				wrapper = null;
 				isLoading = false;
 				renderer.getDiv().show();
+				if (onDone) onDone(wrapper);
 			});
 		};
 		loadingImg.src = "img/loading.gif";
