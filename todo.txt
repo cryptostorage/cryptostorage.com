@@ -1,6 +1,5 @@
 TODO
 cryptostorage.com/faq, etc
-minimize homepage load time
 ios not loading on wifi network
 uncheck password after error flings tooltip
 common browser icons
