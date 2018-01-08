@@ -2,6 +2,7 @@ TODO
 password error line
 cryptostorage.com/faq, etc
 minimize homepage load time
+ios not loading on wifi network
 notice export still loads hard, loading should encompass rendering too
 uncheck password after error flings tooltip
 common browser icons
