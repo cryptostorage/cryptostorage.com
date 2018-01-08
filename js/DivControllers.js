@@ -2465,6 +2465,7 @@ function ExportController(div, window, config) {
 	var regenerateDiv;
 	var publicAvailable;
 	var privateAvailable;
+	var quickGenerate = isQuickGenerate();	// only show notice bar and key pair when completely done
 	
 	// confirm exit if storage not saved or printed
 	if (config.confirmExit) {
@@ -2490,9 +2491,6 @@ function ExportController(div, window, config) {
 		printButton.html("Print All");
 		savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
-//		var moreButton = $("<div class='export_button'>").appendTo(exportButtons);
-//		moreButton.html("...");
-//		moreButton.click(function() { console.log("More button clicked"); });
 		
 		// export checkboxes
 		var exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
@@ -2556,67 +2554,89 @@ function ExportController(div, window, config) {
 		setControlsEnabled(false);
 		setPrintEnabled(false);
 		
-		// loading screen
-		UiUtils.loadingDiv(div, AppUtils.getExportDependencies(), function(err) {
-			if (err) throw err;
-			
-			// notices
-			if (config.showNotices) {
+		// internal renderer for export content
+		function ExportContentController(div) {
+			DivController.call(this, div);
+			this.render = function(onDone) {
 				
-				// poll environment info on loop
-				AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
-				
-				// notice div
-				var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
-				var noticeDiv = $("<div>").appendTo(noticeDivContainer);
-				new NoticeController(noticeDiv).render();
-			}
-			
-			// progress bar
-			progressDiv = $("<div class='export_progress_div'>").appendTo(div);
-			progressDiv.hide();
-			progressBar = UiUtils.getProgressBar(progressDiv);
-			progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
-			
-			// currently showing piece
-			piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
-			
-			// regenerate button
-			if (config.showRegenerate) {
-				regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
-				btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
-				btnRegenerate.append("Regenerate");
-				var refreshImg = $("<img src='img/refresh.png' class='refresh_img rotate2'>").appendTo(btnRegenerate);
-				btnRegenerate.click(function() {
-					if (confirm("Discard key pair and create a new one?")) {
+				// load export dependencies
+				LOADER.load(AppUtils.getExportDependencies(), function(err) {
+					if (err) throw err;
+
+					// notices
+					if (config.showNotices) {
 						
-						// rotate refresh icon
-						refreshImg.data("deg", refreshImg.data("deg") ? refreshImg.data("deg") + 360 : 360);
-						refreshImg.css({
-								"-webkit-transform": "rotate(" + refreshImg.data("deg") + "deg)",
-				        "-moz-transform": "rotate(" + refreshImg.data("deg") + "deg)",
-				        "transform": "rotate(" + refreshImg.data("deg") + "deg)"
-						})
-						saved = false;
-						config.keys = undefined;
-						config.pieces = undefined;
-						config.pieceDivs = undefined;
-						update();
+						// poll environment info on loop
+						AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
+						
+						// notice div
+						var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
+						var noticeDiv = $("<div>").appendTo(noticeDivContainer);
+						new NoticeController(noticeDiv).render(function() { renderAux(); });
+					} else {
+						renderAux();
+					}
+					
+					function renderAux() {
+						
+						// progress bar
+						progressDiv = $("<div class='export_progress_div'>").appendTo(div);
+						progressDiv.hide();
+						progressBar = UiUtils.getProgressBar(progressDiv);
+						progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
+						
+						// currently showing piece
+						piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
+						
+						// register events
+						showPublicCheckbox.click(function() { update(); });
+						showPrivateCheckbox.click(function() { update(); });
+						showLogosCheckbox.click(function() { update(); });
+						
+						// done rendering if not quick generate
+						if (onDone && !quickGenerate) onDone(div);
+						
+						// build ui based on keyGenConfig, pieces, and pieceDivs
+						update(config.pieceDivs, function() {
+							
+							// regenerate button
+							if (config.showRegenerate) {
+								regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
+								btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
+								btnRegenerate.append("Regenerate");
+								var refreshImg = $("<img src='img/refresh.png' class='refresh_img rotate2'>").appendTo(btnRegenerate);
+								btnRegenerate.click(function() {
+									if (confirm("Discard key pair and create a new one?")) {
+										
+										// rotate refresh icon
+										refreshImg.data("deg", refreshImg.data("deg") ? refreshImg.data("deg") + 180 : 180);
+										refreshImg.css({
+												"-webkit-transform": "rotate(" + refreshImg.data("deg") + "deg)",
+								        "-moz-transform": "rotate(" + refreshImg.data("deg") + "deg)",
+								        "transform": "rotate(" + refreshImg.data("deg") + "deg)"
+										})
+										saved = false;
+										config.keys = undefined;
+										config.pieces = undefined;
+										config.pieceDivs = undefined;
+										update();
+									}
+								});
+							}
+							
+							// done rendering if quick generate 
+							if (onDone && quickGenerate) onDone(div);
+						});
 					}
 				});
 			}
-			
-			// register events
-			showPublicCheckbox.click(function() { update(); });
-			showPrivateCheckbox.click(function() { update(); });
-			showLogosCheckbox.click(function() { update(); });
-			
-			// build ui based on keyGenConfig, pieces, and pieceDivs
-			update(config.pieceDivs);
-		});
+		}
+		inheritsFrom(ExportContentController, DivController);
 		
-		// done rendering
-		if (onDone) onDone(div);
+		// load export content controller
+		new LoadController(new ExportContentController($("<div class='flex_vertical'>").appendTo(div))).render(function() {
+			if (onDone) onDone(div);
+		});
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
@@ -2848,7 +2868,6 @@ function ExportController(div, window, config) {
 			// otherwise generate keys from config
 			else {
 				assertInitialized(config.keyGenConfig);
-				var quickGenerate = isQuickGenerate(config.keyGenConfig);
 				if (!quickGenerate) setControlsEnabled(false);
 				AppUtils.generateKeys(config.keyGenConfig, function(percent, label) {
 					progressBar.set(percent);
@@ -2863,19 +2882,6 @@ function ExportController(div, window, config) {
 					config.pieceDivs = _pieceDivs;
 					update(config.pieceDivs, onDone);
 				}, true);
-			}
-			
-			/**
-			 * Determines if the given key gen config will be generated "quickly".
-			 */
-			function isQuickGenerate(keyGenConfig) {
-				var numPairs = 0;
-				for (var i = 0; i < keyGenConfig.currencies.length; i++) {
-					if (keyGenConfig.currencies[i].encryption === AppUtils.EncryptionScheme.BIP38) return false;	// BIP38 is slow
-					numPairs += keyGenConfig.currencies[i].numKeys;
-				}
-				numPairs *= keyGenConfig.splitEnabled ? keyGenConfig.numPieces : 1;
-				return numPairs <= 2;
 			}
 		}
 		
@@ -2904,6 +2910,20 @@ function ExportController(div, window, config) {
 			else pieceDivs[i].addClass("hidden");
 		}
 	}
+	
+	/**
+	 * Determines if the renderer's config will be generated "quickly".
+	 */
+	function isQuickGenerate() {
+		var keyGenConfig = config.keyGenConfig;
+		var numPairs = 0;
+		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
+			if (keyGenConfig.currencies[i].encryption === AppUtils.EncryptionScheme.BIP38) return false;	// BIP38 is slow
+			numPairs += keyGenConfig.currencies[i].numKeys;
+		}
+		numPairs *= keyGenConfig.splitEnabled ? keyGenConfig.numPieces : 1;
+		return numPairs <= 2;
+	}
 }
 inheritsFrom(ExportController, DivController);
 
@@ -2929,8 +2949,15 @@ function NoticeController(div, config) {
 		config = objectAssign({}, getDefaultConfig(), config);
 		
 		// listen for environment
+		var first = true;
 		AppUtils.addEnvironmentListener(function(info) {
 			setEnvironmentInfo(info);
+			
+			// done rendering
+			if (first) {
+				first = false;
+				if (onDone) onDone(div);
+			}
 		});
 	}
 	
@@ -3139,3 +3166,46 @@ function NoticeController(div, config) {
 	}
 }
 inheritsFrom(NoticeController, DivController);
+
+/**
+ * Invokes the renderer and presents a loading wheel until it's done.
+ * 
+ * @param renderer renders the content
+ */
+function LoadController(renderer) {
+	DivController.call(this, renderer.getDiv());
+	this.render = function(onDone) {
+		
+		// check if already rendered
+		if (renderer.getDiv().children().length) {
+			if (onDone) onDone(renderer.getDiv());
+			return;
+		}
+		
+		// load loading gif
+		var loadingImg = new Image();
+		loadingImg.onload = function() {
+			$(loadingImg).addClass("loading");
+			
+			// wrap renderer's div
+			renderer.getDiv().wrap("<div class='flex_vertical'>");	// wrap div with loading
+			var wrapper = renderer.getDiv().parent();
+			wrapper.prepend(loadingImg);
+			
+			// don't show div while rendering
+			renderer.getDiv().hide();
+			
+			console.log("rendering");
+				
+			// render content
+			renderer.render(function() {
+				console.log("done rendering");
+				wrapper.replaceWith(renderer.getDiv());
+				renderer.getDiv().show();
+				if (onDone) onDone(renderer.getDiv());
+			});
+		};
+		loadingImg.src = "img/loading.gif";
+	}
+}
+inheritsFrom(LoadController, DivController);
