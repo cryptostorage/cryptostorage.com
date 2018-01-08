@@ -1758,7 +1758,7 @@ function ImportFileController(div) {
 		}
 		
 		// import keys
-		if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(pieces, keys);
+		if (keys && keys.length && keysDifferent(lastKeys, keys)) onKeysImported(pieces, keys);
 		lastKeys = keys;
 		
 		// done rendering
