@@ -131,11 +131,11 @@ function AppController(div) {
 	var sliderDiv;
 	var contentDiv;
 	var footerDiv;
-	var homeController;
-	var formController;
-	var importController;
+	var homeLoader;
+	var formLoader;
+	var importLoader;
 	var faqController;
-	var donateController;
+	var donateLoader;
 	
 	this.render = function(onDone) {
 		
@@ -207,11 +207,11 @@ function AppController(div) {
 			var identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
 			
 			// initialize controllers
-			homeController = new HomeController($("<div>"));
-			formController = new LoadController(new FormController($("<div>")));
-			importController = new ImportController($("<div>"));
-			faqController = new FaqController($("<div>"));
-			donateController = new LoadController(new DonateController($("<div>")));
+			homeLoader = new HomeController($("<div>"));
+			formLoader = new LoadController(new FormController($("<div>")));
+			importLoader = new LoadController(new ImportController($("<div>")));
+			faqController = new LoadController(new FaqController($("<div>")));
+			donateLoader = new LoadController(new DonateController($("<div>")));
 			
 			// show page based on identifier
 			if (identifier === "home") that.showHome();
@@ -223,9 +223,9 @@ function AppController(div) {
 			if (onDone) onDone(div);
 			
 			// render other pages
-			importController.render();
+			importLoader.render();
 			faqController.render();
-			donateController.render();
+			donateLoader.render();
 			
 			// start polling starting with synchronized environment info
 			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
@@ -239,10 +239,10 @@ function AppController(div) {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
 		sliderDiv.show();
 		sliderController.render(function() {
-			homeController.render(function(div) {
+			homeLoader.render(function(div) {
 				setContentDiv(div);
 				footerDiv.show();
-				importController.startOver();
+				importLoader.getRenderer().startOver();
 			});
 		});
 	}
@@ -250,7 +250,7 @@ function AppController(div) {
 	this.showForm = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showForm()");
 		footerDiv.hide();
-		formController.render(function(div) {
+		formLoader.render(function(div) {
 			setContentDiv(div);
 			sliderDiv.hide();
 			if (onDone) onDone();
@@ -262,22 +262,22 @@ function AppController(div) {
 		sliderDiv.hide();
 		footerDiv.hide();
 		setContentDiv(faqController.getDiv());
-		importController.startOver();
+		importLoader.getRenderer().startOver();
 	}
 	
 	this.showDonate = function() {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
 		sliderDiv.hide();
 		footerDiv.hide();
-		setContentDiv(donateController.getDiv());
-		importController.startOver();
+		setContentDiv(donateLoader.getDiv());
+		importLoader.getRenderer().startOver();
 	}
 	
 	this.showImport = function() {
 		if (AppUtils.DEV_MODE) console.log("showImport()");
 		sliderDiv.hide();
 		footerDiv.hide();
-		setContentDiv(importController.getDiv());
+		setContentDiv(importLoader.getDiv());
 	}
 	
 	// ---------------------------------- PRIVATE -------------------------------
@@ -1373,8 +1373,8 @@ function ImportController(div) {
 	
 	this.render = function(onDone) {
 		
-		// loading screen until dependencies loaded
-		UiUtils.loadingDiv(div, AppUtils.getAppDependencies(), function(err) {
+		// load dependencies
+		LOADER.load(AppUtils.getAppDependencies(), function(err) {
 			if (err) throw err;
 			
 			// div setup
@@ -1404,9 +1404,6 @@ function ImportController(div) {
 				});
 			});
 		});
-		
-		// done rendering
-		if (onDone) onDone(div);
 	}
 	
 	this.startOver = function() {
@@ -3190,7 +3187,7 @@ function LoadController(renderer) {
 			// don't show div while rendering
 			renderer.getDiv().hide();
 			
-			// done rendering load
+			// done rendering loader
 			if (onDone) onDone(wrapper);
 				
 			// render content
@@ -3206,6 +3203,10 @@ function LoadController(renderer) {
 	
 	this.getDiv = function() {
 		return wrapper ? wrapper : renderer.getDiv();
+	}
+	
+	this.getRenderer = function() {
+		return renderer;
 	}
 }
 inheritsFrom(LoadController, DivController);
