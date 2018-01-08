@@ -208,7 +208,7 @@ function AppController(div) {
 			
 			// initialize controllers
 			homeController = new HomeController($("<div>"));
-			formController = new FormController($("<div>"));
+			formController = new LoadController(new FormController($("<div>")));
 			importController = new ImportController($("<div>"));
 			faqController = new FaqController($("<div>"));
 			donateController = new LoadController(new DonateController($("<div>")));
@@ -754,14 +754,9 @@ function FormController(div) {
 		div.empty();
 		div.attr("class", "content_div flex_vertical");
 		
-		// loading screen
-		UiUtils.loadingDiv(div, AppUtils.getAppDependencies(), function(err) {
-			if (err) AppUtils.setDependencyError(true);
-			else renderAux();
-		})
-		
-		// renders after dependencies loaded
-		function renderAux() {
+		// load dependencies
+		LOADER.load(AppUtils.getAppDependencies(), function(err) {
+			if (err) throw err;
 			
 			// notice div
 			var noticeDiv = $("<div>").appendTo(div);
@@ -950,10 +945,10 @@ function FormController(div) {
 			
 			// add first currency
 			addCurrency();
-		}
-		
-		// done rendering
-		onDone(div);
+			
+			// done rendering
+			onDone(div);
+		});
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -3168,8 +3163,13 @@ inheritsFrom(NoticeController, DivController);
  */
 function LoadController(renderer) {
 	DivController.call(this, renderer.getDiv());
+	var isLoading = false;
 	var wrapper;
 	this.render = function(onDone) {
+		
+		// ignore if loading
+		if (isLoading) return;
+		isLoading = true;
 		
 		// check if already rendered
 		if (renderer.getDiv().children().length) {
@@ -3191,12 +3191,13 @@ function LoadController(renderer) {
 			renderer.getDiv().hide();
 			
 			// done rendering load
-			if (onDone) onDone(renderer.getDiv());
+			if (onDone) onDone(wrapper);
 				
 			// render content
 			renderer.render(function() {
 				wrapper.replaceWith(renderer.getDiv());
 				wrapper = null;
+				isLoading = false;
 				renderer.getDiv().show();
 			});
 		};
