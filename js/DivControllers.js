@@ -182,12 +182,7 @@ function AppController(div) {
 		
 		// loading div until ready
 		UiUtils.loadingDiv(div, AppUtils.getHomeDependencies(), function(err) {
-			
-			// check for error
-			if (err) {
-				AppUtils.setDependencyError(true);
-				throw err;
-			}
+			if (err) throw err;
 		
 			// slider
 			sliderDiv = $("<div>").appendTo(headerDiv);
