@@ -91,10 +91,8 @@ var UiUtils = {
 					
 					// remove loading div and done
 					else {
-						setImmediate(function() {	// let UI breath
-							loadingDiv.detach();
-							if (onDone) onDone();
-						})
+						loadingDiv.detach();
+						if (onDone) onDone();
 					}
 				});
 			};
@@ -129,7 +127,7 @@ DivController.prototype.onHide = function() { }
 function AppController(div) {
 	
 	var that = this;
-	var sliderController;
+	var introController;
 	var sliderDiv;
 	var contentDiv;
 	var footerDiv;
@@ -193,7 +191,7 @@ function AppController(div) {
 		
 			// slider
 			sliderDiv = $("<div>").appendTo(headerDiv);
-			sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectImport);
+			introController = new IntroController(sliderDiv, onSelectGenerate, onSelectImport);
 			
 			// main content
 			contentDiv = $("<div class='app_content'>").appendTo(div);
@@ -240,7 +238,7 @@ function AppController(div) {
 	this.showHome = function() {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
 		sliderDiv.show();
-		sliderController.render(function() {
+		introController.render(function() {
 			homeController.render(function(div) {
 				setContentDiv(div);
 				footerDiv.show();
@@ -302,10 +300,11 @@ function AppController(div) {
 inheritsFrom(AppController, DivController);
 
 /**
- * Slider main features.
+ * Intro with slider and call to action.
  */
-function SliderController(div, onSelectGenerate, onSelectImport) {
+function IntroController(div, onSelectGenerate, onSelectImport) {
 	DivController.call(this, div);
+	var that = this;
 	this.render = function(onDone) {
 		div.empty();
 		
@@ -318,15 +317,13 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			div.attr("class", "intro_div");
 			
 			// intro slider
-			var sliderContainerDiv = $("<div class='slider_container'>").appendTo(div);
-			var sliderDiv = $("<div class='single-item'>").appendTo(sliderContainerDiv);
+			sliderDiv = $("<div class='slider_div'>").appendTo(div);
 			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs 100% in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split your private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate your keys securely with automated environment checks.").appendTo(sliderDiv);
-			sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
 			
 			function getSlide(img, text) {
 				var slide = $("<div class='slide'>");
@@ -354,12 +351,14 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			btnImport.append("or Import Existing Keys");
 			btnImport.click(function() { onSelectImport(); });
 			
-			if (onDone) onDone(div);
+			// initialize slider
+			sliderDiv.on("init", function() { if (onDone) onDone(); });
+			sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
 		}
 		mixImg.src = "img/mix.png";
 	}
 }
-inheritsFrom(SliderController, DivController);
+inheritsFrom(IntroController, DivController);
 
 /**
  * Home page content.
@@ -500,7 +499,7 @@ function FaqController(div) {
 		
 		// div setup
 		div.empty();
-		div.attr("class", "content_div");
+		div.attr("class", "content_div flex_vertical");
 		var pageDiv = $("<div class='page_div'>").appendTo(div);
 		
 		// title
@@ -595,6 +594,7 @@ function DonateController(div, appController) {
 					labelUrl: "https://bitpay.com",
 					image: $("<img src='img/bitpay.png'>")
 				});
+				
 				renderCredits(credits, function(donationsDiv) {
 					pageDiv.append(donationsDiv);
 					

@@ -50,7 +50,7 @@ var AppUtils = {
 	getHomeDependencies: function() {
 		var dependencies = [
 			"lib/slick.js",
-			"lib/setImmediate.js",
+			"css/slick.css",
 			"img/cryptostorage_white.png",
 			"img/mix.png",
 			"img/printer.png",
@@ -74,6 +74,7 @@ var AppUtils = {
 	
 	getNoticeDependencies: function() {
 		return [
+			"lib/setImmediate.js",
 			"lib/ua-parser.js",
 			"lib/popper.js",
 			"lib/tippy.all.js",
@@ -151,9 +152,10 @@ var AppUtils = {
 	
 	// returns all app dependencies after inital homescreen is loaded
 	getAppDependencies: function() {
-		
+
 		// app dependencies
 		var dependencies = [
+			"lib/setImmediate.js",
 			"css/pagination.css",
 			"lib/pagination.js",
 			"js/PieceRenderer.js",

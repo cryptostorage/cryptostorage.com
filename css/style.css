@@ -29,6 +29,7 @@ ol {
 }
 
 .flex_vertical {
+	width: 100%;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -115,7 +116,6 @@ ol {
 	height: 75px;
 	color: white;
 	font-size: 18px;
-	margin-top: 50px;
 }
 
 .app_header_top {
@@ -178,7 +178,7 @@ ol {
 	position: relative;
 }
 
-.slider_container {
+.slider_div {
 	padding: 0;
 	width: 100%;
 	background-color: rgb(17, 119, 184);
@@ -273,27 +273,15 @@ ol {
 	text-decoration: underline;
 }
 
-.app_content {
-	width: 100%;
-}
-
 .content_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-flex-direction: column;
-	-moz-flex-direction: column;
-	-ms-flex-direction: column;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
+
 }
 
 .page_div {
 	width: 875px;
 	background-color: white;
 	padding: 25px;
+	margin-bottom: 50px;
 }
 
 .home_div {
@@ -1713,6 +1701,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_icon_div {
+	width: unset;
 	margin: 0 8px 0 8px;
 	position: relative;
 }
@@ -1753,21 +1742,21 @@ input[type='checkbox'][disabled] +label {
 }
 
 .tippy-tooltip.translucent-theme {
-  background-color: rgba(94, 94, 94, .91);
+  background-color: rgba(50, 50, 50, .91);
   text-align: left;
   border-radius: 20px;
 }
 
 .tippy-popper[x-placement^=bottom] .tippy-tooltip.translucent-theme .tippy-arrow
 	{
-	border-bottom: 7px solid rgba(94, 94, 94, .91);
+	border-bottom: 7px solid rgba(50, 50, 50, .91);
 	border-right: 7px solid transparent;
 	border-left: 7px solid transparent
 }
 
 .tippy-popper[x-placement^=top] .tippy-tooltip.translucent-theme .tippy-arrow
 	{
-	border-top: 7px solid rgba(94, 94, 94, .91);
+	border-top: 7px solid rgba(50, 50, 50, .91);
 	border-right: 7px solid transparent;
 	border-left: 7px solid transparent
 }
@@ -1811,8 +1800,8 @@ input[type='checkbox'][disabled] +label {
 	width:25px;
 	height:25px;
 	opacity:0.5;
-	-webkit-transition: -webkit-transform .8s ease; 
-    -moz-transition: -moz-transform .8s ease;
-    -o-transition: -o-transform .8s ease;
-    transition: transform .8s ease;
+	-webkit-transition: -webkit-transform .5s ease; 
+    -moz-transition: -moz-transform .5s ease;
+    -o-transition: -o-transform .5s ease;
+    transition: transform .5s ease;
 }

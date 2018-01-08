@@ -21,7 +21,7 @@ $(document).ready(function() {
 	// render application to html body
 	new AppController($("body")).render(function() {
 		
-		// load notice bar and tests
+		// run tests
 		LOADER.load(AppUtils.getAppDependencies(), function(err) {
 			if (err) throw err;
 				

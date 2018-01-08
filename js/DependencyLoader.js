@@ -38,6 +38,12 @@ function DependencyLoader() {
 			}
 		}
 		
+		// done if everything loaded
+		if (!imagesToLoad.length && !scriptsToLoad.length) {
+			if (onDone) onDone();
+			return;
+		}
+		
 		// execute functions to fetch scripts and images
 		var funcs = [getScriptsFunc(scriptsToLoad), getImagesFunc(imagesToLoad)];
 		async.parallel(funcs, function(err, result) {
