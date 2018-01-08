@@ -3195,14 +3195,13 @@ function LoadController(renderer) {
 			// don't show div while rendering
 			renderer.getDiv().hide();
 			
-			console.log("rendering");
+			// done rendering load
+			if (onDone) onDone(renderer.getDiv());
 				
 			// render content
 			renderer.render(function() {
-				console.log("done rendering");
 				wrapper.replaceWith(renderer.getDiv());
 				renderer.getDiv().show();
-				if (onDone) onDone(renderer.getDiv());
 			});
 		};
 		loadingImg.src = "img/loading.gif";
