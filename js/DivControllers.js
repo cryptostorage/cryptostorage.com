@@ -224,7 +224,7 @@ function AppController(div) {
 				}
 			}
 			
-			// start polling starting with synchronized environment info
+			// poll environment starting with synchronized environment info
 			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
 				if (err) throw err;
 				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
