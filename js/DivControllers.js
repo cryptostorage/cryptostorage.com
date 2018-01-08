@@ -131,7 +131,7 @@ function AppController(div) {
 	var sliderDiv;
 	var contentDiv;
 	var footerDiv;
-	var homeLoader;
+	var homeController;
 	var formLoader;
 	var importLoader;
 	var faqController;
@@ -180,64 +180,64 @@ function AppController(div) {
 			return div;
 		}
 		
-		// loading div until ready
-		UiUtils.loadingDiv(div, AppUtils.getHomeDependencies(), function(err) {
-			if (err) throw err;
+		// slider
+		sliderDiv = $("<div>").appendTo(headerDiv);
+		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectImport);
 		
-			// slider
-			sliderDiv = $("<div>").appendTo(headerDiv);
-			sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectImport);
-			
-			// main content
-			contentDiv = $("<div class='app_content'>").appendTo(div);
-			
-			// footer
-			footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
-			footerDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
-			footerDiv.hide();
-			
-			// get identifier
-			var href = window.location.href;
-			var lastIdx = href.lastIndexOf("#");
-			var identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
-			
-			// initialize controllers
-			homeLoader = new HomeController($("<div>"));
-			formLoader = new LoadController(new FormController($("<div>")));
-			importLoader = new LoadController(new ImportController($("<div>")));
-			faqController = new LoadController(new FaqController($("<div>")));
-			donateLoader = new LoadController(new DonateController($("<div>")));
-			
-			// show page based on identifier
-			if (identifier === "home") that.showHome();
-			else if (identifier === "faq") that.showFaq();
-			else if (identifier === "donate") that.showDonate();
-			else that.showHome();
-			
-			// done rendering
-			if (onDone) onDone(div);
-			
-			// render other pages
-			importLoader.render();
-			faqController.render();
-			donateLoader.render();
-			
-			// start polling starting with synchronized environment info
-			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
-				if (err) throw err;
-				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
-			});
+		// main content
+		contentDiv = $("<div class='app_content'>").appendTo(div);
+		
+		// footer
+		footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
+		footerDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
+		footerDiv.hide();
+		
+		// get identifier
+		var href = window.location.href;
+		var lastIdx = href.lastIndexOf("#");
+		var identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+		
+		// initialize controllers
+		homeController = new HomeController($("<div>"));
+		formLoader = new LoadController(new FormController($("<div>")));
+		importLoader = new LoadController(new ImportController($("<div>")));
+		faqController = new FaqController($("<div>"));
+		donateLoader = new LoadController(new DonateController($("<div>")));
+		
+		// show page based on identifier
+		if (identifier === "home") that.showHome();
+		else if (identifier === "faq") that.showFaq();
+		else if (identifier === "donate") that.showDonate();
+		else that.showHome();
+		
+		// done rendering
+		if (onDone) onDone(div);
+		
+		// render other pages
+//			importLoader.render();
+//			faqController.render();
+//			donateLoader.render();
+		
+		// start polling starting with synchronized environment info
+		LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
+			if (err) throw err;
+			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
 		});
 	}
 	
 	this.showHome = function() {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
-		sliderDiv.show();
-		sliderController.render(function() {
-			homeLoader.render(function(div) {
-				setContentDiv(div);
-				footerDiv.show();
-				importLoader.getRenderer().startOver();
+		
+		// loading div until ready
+		UiUtils.loadingDiv(div, AppUtils.getHomeDependencies(), function(err) {
+			if (err) throw err;
+			homeController.render(function() {
+				sliderDiv.show();
+				sliderController.render(function() {
+					setContentDiv(homeController.getDiv());
+					footerDiv.show();
+					importLoader.getRenderer().startOver();
+				});
 			});
 		});
 	}
@@ -245,8 +245,8 @@ function AppController(div) {
 	this.showForm = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showForm()");
 		footerDiv.hide();
-		formLoader.render(function(div) {
-			setContentDiv(div);
+		setContentDiv(formLoader.getDiv());
+		formLoader.render(function() {
 			sliderDiv.hide();
 			if (onDone) onDone();
 		});
@@ -257,7 +257,9 @@ function AppController(div) {
 		sliderDiv.hide();
 		footerDiv.hide();
 		setContentDiv(faqController.getDiv());
-		importLoader.getRenderer().startOver();
+		faqController.render(function() {
+			importLoader.getRenderer().startOver();
+		});
 	}
 	
 	this.showDonate = function() {
@@ -265,7 +267,9 @@ function AppController(div) {
 		sliderDiv.hide();
 		footerDiv.hide();
 		setContentDiv(donateLoader.getDiv());
-		importLoader.getRenderer().startOver();
+		donateLoader.render(function() {
+			importLoader.getRenderer().startOver();
+		});
 	}
 	
 	this.showImport = function() {
@@ -273,6 +277,7 @@ function AppController(div) {
 		sliderDiv.hide();
 		footerDiv.hide();
 		setContentDiv(importLoader.getDiv());
+		importLoader.render();
 	}
 	
 	// ---------------------------------- PRIVATE -------------------------------
@@ -3160,7 +3165,10 @@ function LoadController(renderer) {
 	this.render = function(onDone) {
 		
 		// ignore if loading
-		if (isLoading) return;
+		if (isLoading) {
+			if (onDone) onDone();
+			return;
+		}
 		isLoading = true;
 		
 		// check if already rendered

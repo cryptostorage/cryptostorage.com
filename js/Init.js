@@ -21,24 +21,24 @@ $(document).ready(function() {
 	// render application to html body
 	new AppController($("body")).render(function() {
 		
-		// run tests
-		LOADER.load(AppUtils.getAppDependencies(), function(err) {
-			if (err) throw err;
-				
-			// run minimum tests
-			AppUtils.runMinimumTests(function(err) {
-				if (err) throw err;
-				console.log("Minimum tests pass");
-			});
-			
-			// run test suite
-			if (AppUtils.RUN_TESTS) {
-				console.log("Running tests...");
-				Tests.runTests(function(err) {
-					if (err) throw error;
-					console.log("All tests pass");
-				});
-			}
-		});
+//		// run tests
+//		LOADER.load(AppUtils.getAppDependencies(), function(err) {
+//			if (err) throw err;
+//				
+//			// run minimum tests
+//			AppUtils.runMinimumTests(function(err) {
+//				if (err) throw err;
+//				console.log("Minimum tests pass");
+//			});
+//			
+//			// run test suite
+//			if (AppUtils.RUN_TESTS) {
+//				console.log("Running tests...");
+//				Tests.runTests(function(err) {
+//					if (err) throw error;
+//					console.log("All tests pass");
+//				});
+//			}
+//		});
 	});
 });
