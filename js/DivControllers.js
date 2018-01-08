@@ -2615,7 +2615,7 @@ function ExportController(div, window, config) {
 		inheritsFrom(ExportContentController, DivController);
 		
 		// load export content controller
-		new LoadController(new ExportContentController($("<div class='flex_vertical'>").appendTo(div))).render(function() {
+		new LoadController(new ExportContentController($("<div class='export_content_div flex_vertical'>").appendTo(div))).render(function() {
 			if (onDone) onDone(div);
 		});
 	}

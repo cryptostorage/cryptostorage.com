@@ -1619,6 +1619,9 @@ input[type='checkbox'][disabled] +label {
 	.export_div {
 		display: unset;
 	}
+	.export_content_div {
+		display: unset;
+	}
 	.export_progress_div {
 		display: none;
 	}
