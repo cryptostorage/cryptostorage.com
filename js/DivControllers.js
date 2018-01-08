@@ -179,7 +179,7 @@ function AppController(div) {
 			return div;
 		}
 		
-		// slider
+		// slider (has to be attached to the DOM and shown to work, so it's a special case and not part of HomeController)
 		sliderDiv = $("<div>").appendTo(headerDiv);
 		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectImport);
 		
@@ -233,17 +233,20 @@ function AppController(div) {
 	this.showHome = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
 		
-		// loading div until ready
+		// loading div until dependencies loaded
 		UiUtils.loadingDiv(div, AppUtils.getHomeDependencies(), function(err) {
 			if (err) throw err;
-			homeController.render(function() {
-				sliderDiv.show();
-				sliderController.render(function() {
-					setContentDiv(homeController.getDiv());
+			sliderDiv.show();
+			sliderController.render(function() {
+				setContentDiv(homeController.getDiv());
+				if (homeController.getDiv().children().length) {
+					importLoader.getRenderer().startOver();
+					if (onDone) onDone();
+				} else homeController.render(function() {
 					importLoader.getRenderer().startOver();
 					if (onDone) onDone();
 				});
-			});
+			})
 		});
 	}
 	
@@ -288,7 +291,6 @@ function AppController(div) {
 	// ---------------------------------- PRIVATE -------------------------------
 	
 	function setContentDiv(div) {
-		console.log("setContentDiv()");
 		contentDiv.children().detach();
 		contentDiv.append(div);
 	}
