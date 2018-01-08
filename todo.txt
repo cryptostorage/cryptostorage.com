@@ -1,5 +1,4 @@
 TODO
-password error line
 cryptostorage.com/faq, etc
 minimize homepage load time
 ios not loading on wifi network
