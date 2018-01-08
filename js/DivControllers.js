@@ -195,7 +195,7 @@ function AppController(div) {
 		// get identifier
 		var href = window.location.href;
 		var lastIdx = href.lastIndexOf("#");
-		var identifier = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+		var page = lastIdx === -1 ? "home" : href.substring(lastIdx + 1);
 		
 		// initialize controllers
 		homeController = new HomeController($("<div>"));
@@ -204,28 +204,36 @@ function AppController(div) {
 		faqController = new FaqController($("<div>"));
 		donateLoader = new LoadController(new DonateController($("<div>")));
 		
-		// show page based on identifier
-		if (identifier === "home") that.showHome();
-		else if (identifier === "faq") that.showFaq();
-		else if (identifier === "donate") that.showDonate();
-		else that.showHome();
+		// map pages to renderers and show functions
+		var pagesMap = {
+				"home": {renderer: homeController, show: that.showHome},
+				"form": {renderer: formLoader, show: that.showForm},
+				"import": {renderer: importLoader, show: that.showImport},
+				"faq": {renderer: faqController, show: that.showFaq},
+				"donate": {renderer: donateLoader, show: that.showDonate}
+		}
 		
-		// done rendering
-		if (onDone) onDone(div);
-		
-		// render other pages
-//			importLoader.render();
-//			faqController.render();
-//			donateLoader.render();
-		
-		// start polling starting with synchronized environment info
-		LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
-			if (err) throw err;
-			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
+		// show initial page
+		var pageMap = pagesMap[page];
+		pageMap.show(function() {
+			
+			// start rendering other pages
+			for (var key in pagesMap) {
+				if (pagesMap.hasOwnProperty(key)) {
+					pagesMap[key].renderer.render();
+				}
+			}
+			
+			// start polling starting with synchronized environment info
+			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
+				if (err) throw err;
+				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
+				if (onDone) onDone();
+			});
 		});
 	}
 	
-	this.showHome = function() {
+	this.showHome = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
 		
 		// loading div until ready
@@ -237,6 +245,7 @@ function AppController(div) {
 					setContentDiv(homeController.getDiv());
 					footerDiv.show();
 					importLoader.getRenderer().startOver();
+					if (onDone) onDone();
 				});
 			});
 		});
@@ -252,32 +261,36 @@ function AppController(div) {
 		});
 	}
 	
-	this.showFaq = function() {
+	this.showFaq = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
 		sliderDiv.hide();
 		footerDiv.hide();
 		setContentDiv(faqController.getDiv());
 		faqController.render(function() {
 			importLoader.getRenderer().startOver();
+			if (onDone) onDone();
 		});
 	}
 	
-	this.showDonate = function() {
+	this.showDonate = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
 		sliderDiv.hide();
 		footerDiv.hide();
 		setContentDiv(donateLoader.getDiv());
 		donateLoader.render(function() {
 			importLoader.getRenderer().startOver();
+			if (onDone) onDone();
 		});
 	}
 	
-	this.showImport = function() {
+	this.showImport = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showImport()");
 		sliderDiv.hide();
 		footerDiv.hide();
-		setContentDiv(importLoader.getDiv());
-		importLoader.render();
+		importLoader.render(function() {
+			setContentDiv(importLoader.getDiv());
+			if (onDone) onDone();
+		});
 	}
 	
 	// ---------------------------------- PRIVATE -------------------------------
