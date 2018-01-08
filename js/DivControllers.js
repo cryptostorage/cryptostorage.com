@@ -218,6 +218,7 @@ function AppController(div) {
 				
 				// start rendering other pages
 				for (var key in pagesMap) {
+					if (key === page) continue;
 					if (pagesMap.hasOwnProperty(key)) {
 						pagesMap[key].renderer.render();
 					}
@@ -248,9 +249,9 @@ function AppController(div) {
 	
 	this.showForm = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showForm()");
+		sliderDiv.hide();
 		setContentDiv(formLoader.getDiv());
 		formLoader.render(function() {
-			sliderDiv.hide();
 			if (onDone) onDone();
 		});
 	}
@@ -287,6 +288,7 @@ function AppController(div) {
 	// ---------------------------------- PRIVATE -------------------------------
 	
 	function setContentDiv(div) {
+		console.log("setContentDiv()");
 		contentDiv.children().detach();
 		contentDiv.append(div);
 	}
