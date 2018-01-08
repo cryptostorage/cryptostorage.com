@@ -130,7 +130,6 @@ function AppController(div) {
 	var sliderController;
 	var sliderDiv;
 	var contentDiv;
-	var footerDiv;
 	var homeController;
 	var formLoader;
 	var importLoader;
@@ -187,11 +186,6 @@ function AppController(div) {
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
-		// footer
-		footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
-		footerDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
-		footerDiv.hide();
-		
 		// get identifier
 		var href = window.location.href;
 		var lastIdx = href.lastIndexOf("#");
@@ -245,7 +239,6 @@ function AppController(div) {
 				sliderDiv.show();
 				sliderController.render(function() {
 					setContentDiv(homeController.getDiv());
-					footerDiv.show();
 					importLoader.getRenderer().startOver();
 					if (onDone) onDone();
 				});
@@ -255,7 +248,6 @@ function AppController(div) {
 	
 	this.showForm = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showForm()");
-		footerDiv.hide();
 		setContentDiv(formLoader.getDiv());
 		formLoader.render(function() {
 			sliderDiv.hide();
@@ -266,7 +258,6 @@ function AppController(div) {
 	this.showFaq = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
 		sliderDiv.hide();
-		footerDiv.hide();
 		setContentDiv(faqController.getDiv());
 		faqController.render(function() {
 			importLoader.getRenderer().startOver();
@@ -277,7 +268,6 @@ function AppController(div) {
 	this.showDonate = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
 		sliderDiv.hide();
-		footerDiv.hide();
 		setContentDiv(donateLoader.getDiv());
 		donateLoader.render(function() {
 			importLoader.getRenderer().startOver();
@@ -288,7 +278,6 @@ function AppController(div) {
 	this.showImport = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showImport()");
 		sliderDiv.hide();
-		footerDiv.hide();
 		setContentDiv(importLoader.getDiv());
 		importLoader.render(function() {
 			if (onDone) onDone();
@@ -452,6 +441,13 @@ function HomeController(div) {
 		var downloadBtn = $("<a class='light_green_btn' href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>").appendTo(pageDiv);
 		downloadBtn.append("Download Now (zip)");
 		
+		// footer
+		var footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
+		footerDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
+		
+		// done rendering
+		if (onDone) onDone(div);
+		
 		// track environment failure to disable clicking currency
 		var environmentFailure = false;
 		AppUtils.addEnvironmentListener(function() {
@@ -476,8 +472,6 @@ function HomeController(div) {
 			});
 			return config;
 		}
-		
-		if (onDone) onDone(div);
 	}
 	
 	function getCurrencyRow(plugins, isMajor, onCurrencyClicked) {
