@@ -28,6 +28,7 @@ refresh image on regenerate button
 
 low priority:
 es6 with modules
+loading gif resets on init of other renderers
 let UI breath during bip38
 1px border on mobile safari import print
 mobile safari tooltip line
