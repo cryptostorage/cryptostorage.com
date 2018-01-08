@@ -283,9 +283,7 @@ function AppController(div) {
 	// ---------------------------------- PRIVATE -------------------------------
 	
 	function setContentDiv(div) {
-		while (contentDiv.get(0).hasChildNodes()) {
-			contentDiv.get(0).removeChild(contentDiv.get(0).lastChild);
-		}
+		contentDiv.children().detach();
 		contentDiv.append(div);
 	}
 	
@@ -3170,6 +3168,7 @@ inheritsFrom(NoticeController, DivController);
  */
 function LoadController(renderer) {
 	DivController.call(this, renderer.getDiv());
+	var wrapper;
 	this.render = function(onDone) {
 		
 		// check if already rendered
@@ -3185,7 +3184,7 @@ function LoadController(renderer) {
 			
 			// wrap renderer's div
 			renderer.getDiv().wrap("<div class='flex_vertical'>");	// wrap div with loading
-			var wrapper = renderer.getDiv().parent();
+			wrapper = renderer.getDiv().parent();
 			wrapper.prepend(loadingImg);
 			
 			// don't show div while rendering
@@ -3197,10 +3196,15 @@ function LoadController(renderer) {
 			// render content
 			renderer.render(function() {
 				wrapper.replaceWith(renderer.getDiv());
+				wrapper = null;
 				renderer.getDiv().show();
 			});
 		};
 		loadingImg.src = "img/loading.gif";
+	}
+	
+	this.getDiv = function() {
+		return wrapper ? wrapper : renderer.getDiv();
 	}
 }
 inheritsFrom(LoadController, DivController);
