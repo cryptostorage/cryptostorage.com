@@ -371,7 +371,7 @@ function HomeController(div) {
 		
 		// div setup
 		div.empty();
-		div.attr("class", "content_div");
+		div.attr("class", "content_div flex_vertical");
 		
 		// notice div
 		var noticeDiv = $("<div>").appendTo(div);
@@ -547,7 +547,7 @@ function DonateController(div, appController) {
 			
 			// div setup
 			div.empty();
-			div.attr("class", "content_div");
+			div.attr("class", "content_div flex_vertical");
 			var pageDiv = $("<div class='page_div'>").appendTo(div);
 
 			// build donate section
@@ -758,7 +758,7 @@ function FormController(div) {
 	
 	this.render = function(onDone) {
 		div.empty();
-		div.attr("class", "content_div");
+		div.attr("class", "content_div flex_vertical");
 		
 		// loading screen
 		UiUtils.loadingDiv(div, AppUtils.getAppDependencies(), function(err) {
@@ -1390,7 +1390,7 @@ function ImportController(div) {
 			
 			// div setup
 			div.empty();
-			div.attr("class", "content_div");
+			div.attr("class", "content_div flex_vertical");
 			
 			// notice div
 			var noticeDiv = $("<div>").appendTo(div);

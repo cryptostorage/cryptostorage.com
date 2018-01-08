@@ -273,6 +273,10 @@ ol {
 	text-decoration: underline;
 }
 
+.app_content {
+	width:100%;
+}
+
 .content_div {
 
 }
