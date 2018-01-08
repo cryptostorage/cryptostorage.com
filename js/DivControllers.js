@@ -127,7 +127,7 @@ DivController.prototype.onHide = function() { }
 function AppController(div) {
 	
 	var that = this;
-	var introController;
+	var sliderController;
 	var sliderDiv;
 	var contentDiv;
 	var footerDiv;
@@ -191,7 +191,7 @@ function AppController(div) {
 		
 			// slider
 			sliderDiv = $("<div>").appendTo(headerDiv);
-			introController = new IntroController(sliderDiv, onSelectGenerate, onSelectImport);
+			sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectImport);
 			
 			// main content
 			contentDiv = $("<div class='app_content'>").appendTo(div);
@@ -238,7 +238,7 @@ function AppController(div) {
 	this.showHome = function() {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
 		sliderDiv.show();
-		introController.render(function() {
+		sliderController.render(function() {
 			homeController.render(function(div) {
 				setContentDiv(div);
 				footerDiv.show();
@@ -302,7 +302,7 @@ inheritsFrom(AppController, DivController);
 /**
  * Intro with slider and call to action.
  */
-function IntroController(div, onSelectGenerate, onSelectImport) {
+function SliderController(div, onSelectGenerate, onSelectImport) {
 	DivController.call(this, div);
 	var that = this;
 	this.render = function(onDone) {
@@ -358,7 +358,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 		mixImg.src = "img/mix.png";
 	}
 }
-inheritsFrom(IntroController, DivController);
+inheritsFrom(SliderController, DivController);
 
 /**
  * Home page content.
