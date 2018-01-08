@@ -1742,23 +1742,26 @@ function ImportFileController(div) {
 		for (var i = 0; i < pieces[0].keys.length; i++) tickers.push(pieces[0].keys[i].ticker);
 		tickers = toUniqueArray(tickers);
 		
-		// create keys
+		// add control to view pieces
+		addControl("view imported pieces", function() {
+			UiUtils.openStorage("Imported Storage", {pieces: pieces});
+		});
+		
+		// attempt to get keys
+		var keys;
 		try {
-			
-			// add control to view pieces
-			addControl("view imported pieces", function() {
-				UiUtils.openStorage("Imported Storage", {pieces: pieces});
-			});
-			
-			// attempt to get keys
 			var keys = AppUtils.piecesToKeys(pieces);
-			if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(pieces, keys);
-			lastKeys = keys;
 		} catch (err) {
 			if (AppUtils.DEV_MODE) console.log(err);
 			var img = err.message.indexOf("additional piece") > -1 ? $("<img src='img/files.png'>") : null;
 			that.setWarning(err.message, img);
 		}
+		
+		// import keys
+		if (keysDifferent(lastKeys, keys) && keys.length) onKeysImported(pieces, keys);
+		lastKeys = keys;
+		
+		// done rendering
 		if (onDone) onDone();
 		
 		function keysDifferent(keys1, keys2) {
@@ -2466,7 +2469,7 @@ function ExportController(div, window, config) {
 	var regenerateDiv;
 	var publicAvailable;
 	var privateAvailable;
-	var quickGenerate = isQuickGenerate();	// only show notice bar and key pair when completely done
+	var quickGenerate = isQuickGenerate();	// only show notice bar and key pair when completely done if quick generate
 	
 	// confirm exit if storage not saved or printed
 	if (config.confirmExit) {
@@ -2917,6 +2920,7 @@ function ExportController(div, window, config) {
 	 */
 	function isQuickGenerate() {
 		var keyGenConfig = config.keyGenConfig;
+		if (!keyGenConfig) return false;
 		var numPairs = 0;
 		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
 			if (keyGenConfig.currencies[i].encryption === AppUtils.EncryptionScheme.BIP38) return false;	// BIP38 is slow
