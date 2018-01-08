@@ -534,98 +534,104 @@ function DonateController(div, appController) {
 	
 	this.render = function(onDone) {
 		
-		// loading screen
-		UiUtils.loadingDiv(div, AppUtils.getAppDependencies(), function(err) {
-			if (err) AppUtils.setDependencyError(true);
-			else renderAux();
-		});
-		
-		// done rendering
-		if (onDone) onDone(div);
-		
-		function renderAux() {
-			
-			// div setup
-			div.empty();
-			div.attr("class", "content_div flex_vertical");
-			var pageDiv = $("<div class='page_div'>").appendTo(div);
+		function DonateControllerAux(div) {
+			DivController.call(this, div);
+			this.render = function(onDone) {
+				
+				// load dependencies
+				LOADER.load(AppUtils.getAppDependencies(), function(err) {
+					if (err) throw err;
+					
+					// div setup
+					div.empty();
+					div.attr("class", "content_div flex_vertical");
+					var pageDiv = $("<div class='page_div'>").appendTo(div);
 
-			// build donate section
-			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
-			titleDiv.html("Donate");
-			var donations = [];
-			var plugins = AppUtils.getCryptoPlugins();
-			for (var i = 0; i < plugins.length; i++) {
-				var plugin = plugins[i];
-				donations.push({
-					logo: plugin.getLogo(),
-					label: plugin.getName(),
-					address: plugin.getDonationAddress()
-				});
-			}
-			renderCredits(donations, function(donationsDiv) {
-				pageDiv.append(donationsDiv);
-				
-				// build credits section
-				pageDiv.append("<br><br>");
-				titleDiv = $("<div class='title'>").appendTo(pageDiv);
-				titleDiv.html("Special Thanks To");
-				var credits = [];
-				credits.push({
-					logo: AppUtils.getCryptoPlugin("ETH").getLogo(),
-					label: "UI design - github.com/gregdracoulis",
-					labelUrl: "https://github.com/gregdracoulis",
-					address: "0x5735bb7cec965e58d03dddd167d1f27321878c51"
-				});
-				credits.push({
-					logo: AppUtils.getCryptoPlugin("BTC").getLogo(),
-					label: "bitaddress.org",
-					labelUrl: "https://bitaddress.org",
-					address: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
-				});
-				credits.push({
-					logo: AppUtils.getCryptoPlugin("XMR").getLogo(),
-					label: "moneroaddress.org",
-					labelUrl: "https://moneroaddress.org",
-					address: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
-				});
-				credits.push({
-					label: "BitPay",
-					labelUrl: "https://bitpay.com",
-					image: $("<img src='img/bitpay.png'>")
-				});
-				
-				renderCredits(credits, function(donationsDiv) {
-					pageDiv.append(donationsDiv);
-					
-					// make addresses copyable
-					new Clipboard(".copyable", {
-						text: function(trigger) {
-							return $(trigger).html();
-						}
-					});
-					
-					// copied tooltips
-					div.find(".copyable").each(function(i, copyable) {
-						tippy(copyable, {
-							arrow : true,
-							html : $("<div>Copied!</div>").get(0),
-							interactive : true,
-							placement : "top",
-							theme : 'translucent',
-							trigger : "click",
-							distance : 5,
-							arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
-							onShow : function() {
-								setTimeout(function() {
-									copyable._tippy.hide();
-								}, 1500)
-							}
+					// build donate section
+					var titleDiv = $("<div class='title'>").appendTo(pageDiv);
+					titleDiv.html("Donate");
+					var donations = [];
+					var plugins = AppUtils.getCryptoPlugins();
+					for (var i = 0; i < plugins.length; i++) {
+						var plugin = plugins[i];
+						donations.push({
+							logo: plugin.getLogo(),
+							label: plugin.getName(),
+							address: plugin.getDonationAddress()
+						});
+					}
+					renderCredits(donations, function(donationsDiv) {
+						pageDiv.append(donationsDiv);
+						
+						// build credits section
+						pageDiv.append("<br><br>");
+						titleDiv = $("<div class='title'>").appendTo(pageDiv);
+						titleDiv.html("Special Thanks To");
+						var credits = [];
+						credits.push({
+							logo: AppUtils.getCryptoPlugin("ETH").getLogo(),
+							label: "UI design - github.com/gregdracoulis",
+							labelUrl: "https://github.com/gregdracoulis",
+							address: "0x5735bb7cec965e58d03dddd167d1f27321878c51"
+						});
+						credits.push({
+							logo: AppUtils.getCryptoPlugin("BTC").getLogo(),
+							label: "bitaddress.org",
+							labelUrl: "https://bitaddress.org",
+							address: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
+						});
+						credits.push({
+							logo: AppUtils.getCryptoPlugin("XMR").getLogo(),
+							label: "moneroaddress.org",
+							labelUrl: "https://moneroaddress.org",
+							address: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
+						});
+						credits.push({
+							label: "BitPay",
+							labelUrl: "https://bitpay.com",
+							image: $("<img src='img/bitpay.png'>")
+						});
+						
+						renderCredits(credits, function(donationsDiv) {
+							pageDiv.append(donationsDiv);
+							
+							// make addresses copyable
+							new Clipboard(".copyable", {
+								text: function(trigger) {
+									return $(trigger).html();
+								}
+							});
+							
+							// copied tooltips
+							div.find(".copyable").each(function(i, copyable) {
+								tippy(copyable, {
+									arrow : true,
+									html : $("<div>Copied!</div>").get(0),
+									interactive : true,
+									placement : "top",
+									theme : 'translucent',
+									trigger : "click",
+									distance : 5,
+									arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+									onShow : function() {
+										setTimeout(function() {
+											copyable._tippy.hide();
+										}, 1500)
+									}
+								});
+							});
+							
+							// done rendering
+							if (onDone) onDone(div);
 						});
 					});
 				});
-			});
+			}
 		}
+		inheritsFrom(DonateControllerAux, DivController);
+		
+		// loading screen
+		new LoadController(new DonateControllerAux(div)).render(onDone);
 		
 		/**
 		 * Renders the given credits.
