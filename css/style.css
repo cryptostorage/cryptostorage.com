@@ -1788,8 +1788,8 @@ input[type='checkbox'][disabled] +label {
 
 .loading {
 	margin-top: 200px;
-	width: 35px;
-	height: 35px;
+	width: 25px;
+	height: 25px;
 }
 
 .information_img {
