@@ -808,6 +808,7 @@ function FormController(div) {
 					passphraseInputDiv.show();
 					passphraseInput.focus();
 				} else {
+					passphraseInput.get(0)._tippy.hide(0);
 					passphraseInput.val("");
 					bip38Checkbox.prop('checked', false);
 					passphraseInputDiv.hide();

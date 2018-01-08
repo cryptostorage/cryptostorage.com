@@ -1,8 +1,7 @@
 TODO
-import storage header is disabled at first, doesn't need to be
 cryptostorage.com/faq, etc
-ios not loading on wifi network
-uncheck password after error flings tooltip
+import storage header is disabled at first, doesn't need to be
+ios not loading slow
 common browser icons
 IE testing
 faq content
