@@ -1,4 +1,5 @@
 TODO
+sluggish on load
 IE10 notice controller not centered
 let browser breath after initial load
 brave window.open() returns null
