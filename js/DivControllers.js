@@ -3111,7 +3111,7 @@ function NoticeController(div, config) {
 					case AppUtils.EnvironmentCode.BROWSER:
 						return getBrowserIcon(info);
 					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
-						return $("<img class='notice_icon' src='img/computer.png'>");
+						return getOperatingSystemIcon(info);
 					case AppUtils.EnvironmentCode.PRERELEASE:
 						return $("<img class='notice_icon' src='img/construction.png'>");
 					default:
@@ -3120,13 +3120,17 @@ function NoticeController(div, config) {
 			}
 			
 			function getBrowserIcon(info) {
-				var name = info.browser.name.toLowerCase();
-				if (strContains(name, "firefox")) return $("<img class='notice_icon' src='img/firefox.png'>");
-				else if (strContains(name, "chrome")) return $("<img class='notice_icon' src='img/chrome.png'>");
-				else if (strContains(name, "chromium")) return $("<img class='notice_icon' src='img/chrome.png'>");
-				else if (strContains(name, "safari")) return $("<img class='notice_icon' src='img/safari.png'>");
-				else if (strContains(name, "ie") || strContains(name, "internet explorer")) return $("<img class='notice_icon' src='img/internet_explorer.png'>");
+				var name = info.browser.name;
+				if (strContains(name, "Firefox")) return $("<img class='notice_icon' src='img/firefox.png'>");
+				else if (strContains(name, "Chrome")) return $("<img class='notice_icon' src='img/chrome.png'>");
+				else if (strContains(name, "Chromium")) return $("<img class='notice_icon' src='img/chrome.png'>");
+				else if (strContains(name, "Safari")) return $("<img class='notice_icon' src='img/safari.png'>");
+				else if (strContains(name, "IE") || strContains(name, "Internet Explorer")) return $("<img class='notice_icon' src='img/internet_explorer.png'>");
 				else return $("<img class='notice_icon' src='img/browser.png'>");
+			}
+			
+			function getOperatingSystemIcon(info) {
+				return $("<img class='notice_icon' src='img/computer.png'>");
 			}
 			
 			function getStateIcon(state) {
