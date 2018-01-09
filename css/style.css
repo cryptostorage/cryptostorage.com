@@ -1759,7 +1759,7 @@ input[type='checkbox'][disabled] +label {
 	height: 16px;
 	position: absolute;
 	bottom: -5px;
-	right: -5px;
+	right: -7px;
 }
 
 .copyable:hover {

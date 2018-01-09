@@ -3097,7 +3097,7 @@ function NoticeController(div, config) {
 				}
 			});
 			
-			// gets the check icon TODO
+			// gets the check icon
 			function getIcon(check) {
 				
 				// interpret environment code and state
@@ -3109,7 +3109,7 @@ function NoticeController(div, config) {
 					case AppUtils.EnvironmentCode.IS_LOCAL:
 						return $("<img class='notice_icon' src='img/download.png'>");
 					case AppUtils.EnvironmentCode.BROWSER:
-						return $("<img class='notice_icon' src='img/browser.png'>");
+						return getBrowserIcon(info);
 					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
 						return $("<img class='notice_icon' src='img/computer.png'>");
 					case AppUtils.EnvironmentCode.PRERELEASE:
@@ -3117,6 +3117,16 @@ function NoticeController(div, config) {
 					default:
 						throw new Error("Unrecognized environment code: " + check.code);
 				}
+			}
+			
+			function getBrowserIcon(info) {
+				var name = info.browser.name.toLowerCase();
+				if (strContains(name, "firefox")) return $("<img class='notice_icon' src='img/firefox.png'>");
+				else if (strContains(name, "chrome")) return $("<img class='notice_icon' src='img/chrome.png'>");
+				else if (strContains(name, "chromium")) return $("<img class='notice_icon' src='img/chrome.png'>");
+				else if (strContains(name, "safari")) return $("<img class='notice_icon' src='img/safari.png'>");
+				else if (strContains(name, "ie") || strContains(name, "internet explorer")) return $("<img class='notice_icon' src='img/internet_explorer.png'>");
+				else return $("<img class='notice_icon' src='img/browser.png'>");
 			}
 			
 			function getStateIcon(state) {
@@ -3145,12 +3155,8 @@ function NoticeController(div, config) {
 						var content = $("<div>").appendTo(div);
 						if (check.state === "fail") content.append("<div class='notice_bar_center_major'>Browser is not supported (" + info.browser.name + " " + info.browser.version + ")</div>");
 						else content.append("<div class='notice_bar_center_major'>Browser is not open source (" + info.browser.name + ")</div>");
-						content.append("<div class='notice_bar_center_minor'>Recommended browsers: <a target='_blank' href='https://www.mozilla.org/en-US/firefox/'>Firefox</a>, <a target='_blank' href='https://www.chromium.org/getting-involved/download-chromium'>Chromium</a>, or <a target='_blank' href='https://brave.com'>Brave</a>");
+						content.append("<div class='notice_bar_center_minor'>Recommended browsers: <a target='_blank' href='https://www.mozilla.org/en-US/firefox/'>Firefox</a> or <a target='_blank' href='https://www.chromium.org/getting-involved/download-chromium'>Chromium</a>");
 					}
-					
-					if (check.state === "fail") 
-					if (check.state === "warn") 
-					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
 					break;
 				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
 					if (check.state === "fail") div.append("Unexpected error: " + info.runtimeError);

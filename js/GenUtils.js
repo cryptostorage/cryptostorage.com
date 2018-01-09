@@ -417,6 +417,17 @@ function arrayContains(arr, obj) {
 }
 
 /**
+ * Indicates if the given string contains the given substring.
+ * 
+ * @param str is the string to search for a substring
+ * @param substring is the substring to searchin within the string
+ * @returns true if the substring is within the string, false otherwise
+ */
+function strContains(str, substring) {
+	return str.indexOf(substring) > -1;
+}
+
+/**
  * Determines if two arrays are equal.
  * 
  * @param arr1 is an array to compare
