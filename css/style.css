@@ -1687,7 +1687,9 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_bar_center {
-	width: 100%;
+	-webkit-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
 	text-align:center;
 	min-height: 45px;
 }

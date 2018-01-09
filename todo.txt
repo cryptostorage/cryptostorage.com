@@ -1,5 +1,4 @@
 TODO
-IE10 notice controller not centered
 brave window.open() returns null
 import storage header is disabled at first, doesn't need to be
 common browser icons
