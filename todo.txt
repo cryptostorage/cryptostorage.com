@@ -1,5 +1,5 @@
 TODO
-common browser icons
+common os icons
 
 homepage content
 faq content
