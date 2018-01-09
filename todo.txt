@@ -1,6 +1,5 @@
 TODO
 firefox window.open() returns null
-prepend div then detach others for faster load
 import storage header is disabled at first, doesn't need to be
 common browser icons
 application version
