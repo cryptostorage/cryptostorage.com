@@ -341,8 +341,8 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs 100% in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split your private keys for maximum security.").appendTo(sliderDiv);
-			getSlide($("<img src='img/checklist.png'>"), "Generate your keys securely with automated environment checks.").appendTo(sliderDiv);
+			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split private keys for maximum security.").appendTo(sliderDiv);
+			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automated environment checks.").appendTo(sliderDiv);
 			
 			function getSlide(img, text) {
 				var slide = $("<div class='slide'>");
@@ -459,8 +459,12 @@ function HomeController(div) {
 		downloadBtn.append("Download Now (zip)");
 		
 		// footer
-		var footerDiv = $("<div class='app_footer flex_horizontal'>").appendTo(div);
-		footerDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
+		var footerDiv = $("<div class='home_footer_div flex_horizontal'>").appendTo(div);
+		footerDiv.append($("<div class='home_footer_version flex_horizontal'></div>"));
+		var descriptionDiv = $("<div class='home_footer_description flex_horizontal'>").appendTo(footerDiv);
+		descriptionDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
+		var versionDiv = $("<div class='home_footer_version flex_horizontal flex_justify_end'>").appendTo(footerDiv);
+		versionDiv.append("<a href='./versions.txt' target='_blank'>version 0.0.1-alpha</a>");
 		
 		// done rendering
 		if (onDone) onDone(div);

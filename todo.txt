@@ -1,6 +1,5 @@
 TODO
 common browser icons
-application version
 
 homepage content
 faq content

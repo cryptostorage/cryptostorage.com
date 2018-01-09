@@ -110,14 +110,6 @@ ol {
 	background-color: rgb(17, 119, 184);
 }
 
-.app_footer {
-	width: 100%;
-	background-color: rgb(17, 119, 184);
-	height: 75px;
-	color: white;
-	font-size: 18px;
-}
-
 .app_header_top {
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -308,11 +300,6 @@ ol {
 	text-align: center;
 }
 
-.disclaimer {
-	padding: 40px;
-	font-size: 18px;
-}
-
 .currency_row {
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -400,6 +387,40 @@ ol {
 .home_more_label:hover {
 	cursor: pointer;
 	text-decoration:underline;
+}
+
+.home_footer_div {
+	width: 100%;
+	background-color: rgb(17, 119, 184);
+	height: 75px;
+	color: white;
+}
+
+.home_footer_div a {
+	padding: 10px 10px 10px 10px;
+	font-size: 16px;
+	color:white;
+	text-decoration: none;
+}
+.home_footer_div a:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.home_footer_version {
+	padding-right:20px;
+	text-align:center;
+	-webkit-flex: .2;
+	-ms-flex: .2;
+	flex: .2;
+}
+
+.home_footer_description {
+	font-size: 18px;
+	text-align:center;
+	-webkit-flex: .6;
+	-ms-flex: .6;
+	flex: .6;
 }
 
 input[type='tel'] {
