@@ -3192,6 +3192,9 @@ inheritsFrom(NoticeController, DivController);
 /**
  * Invokes the renderer and presents a loading wheel until it's done.
  * 
+ * Works by wrapping the renderer's div with the loader's div.
+ * Call getDiv() to get best representation of current state (wrapper or renderer's div).
+ * 
  * @param renderer renders the content
  */
 function LoadController(renderer) {
@@ -3203,7 +3206,7 @@ function LoadController(renderer) {
 	 * Renders the loader.
 	 * 
 	 * @param onRenderDone(div) is invoked when the renderer's div is rendered
-	 * @param onLoaderDone(wrapper) is invoked when load wheel is rendered
+	 * @param onLoaderDone(div) is invoked when load wheel is rendered
 	 */
 	this.render = function(onRenderDone, onLoaderDone) {
 		
