@@ -2980,7 +2980,9 @@ function NoticeController(div, config) {
 			// done rendering
 			if (first) {
 				first = false;
-				if (onDone) onDone(div);
+				setImmediate(function() {	// fix issue where notice bar doesn't render full width
+					if (onDone) onDone(div);
+				});
 			}
 		});
 	}
