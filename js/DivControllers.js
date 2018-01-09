@@ -262,51 +262,49 @@ function AppController(div) {
 	
 	this.showForm = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showForm()");
-		sliderDiv.hide();
-		setContentDiv(formLoader.getDiv());
-		formLoader.render(function() {
+		console.log("rendering form");
+		formLoader.render(onDone, function() {
+			console.log("setContentDiv(formLoader)");
+			sliderDiv.hide();
+			setContentDiv(formLoader.getDiv());
 			importLoader.getRenderer().startOver();
-			if (onDone) onDone();
 		});
 	}
 	
 	this.showFaq = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
-		sliderDiv.hide();
-		setContentDiv(faqController.getDiv());
-		faqController.render(function() {
+		faqController.render(onDone, function() {
+			sliderDiv.hide();
+			setContentDiv(faqController.getDiv());
 			formLoader.getRenderer().startOver();
 			importLoader.getRenderer().startOver();
-			if (onDone) onDone();
 		});
 	}
 	
 	this.showDonate = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
-		sliderDiv.hide();
-		setContentDiv(donateLoader.getDiv());
-		donateLoader.render(function() {
+		donateLoader.render(onDone, function() {
+			sliderDiv.hide();
+			setContentDiv(donateLoader.getDiv());
 			formLoader.getRenderer().startOver();
 			importLoader.getRenderer().startOver();
-			if (onDone) onDone();
 		});
 	}
 	
 	this.showImport = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showImport()");
-		sliderDiv.hide();
-		setContentDiv(importLoader.getDiv());
-		importLoader.render(function() {
+		importLoader.render(onDone, function() {
+			sliderDiv.hide();
+			setContentDiv(importLoader.getDiv());
 			formLoader.getRenderer().startOver();
-			if (onDone) onDone();
 		});
 	}
 	
 	// ---------------------------------- PRIVATE -------------------------------
 	
 	function setContentDiv(div) {
-		contentDiv.children().detach();
-		contentDiv.append(div);
+		contentDiv.prepend(div);
+		while (contentDiv.children().length > 1) contentDiv.children().last().detach();
 	}
 	
 	function onSelectGenerate() {
@@ -3202,18 +3200,26 @@ function LoadController(renderer) {
 	DivController.call(this, renderer.getDiv());
 	var isLoading = false;
 	var wrapper;
-	this.render = function(onDone) {
+	
+	/**
+	 * Renders the loader.
+	 * 
+	 * @param onRenderDone(div) is invoked when the renderer's div is rendered
+	 * @param onLoaderDone(wrapper) is invoked when load wheel is rendered
+	 */
+	this.render = function(onRenderDone, onLoaderDone) {
 		
 		// ignore if loading
 		if (isLoading) {
-			if (onDone) onDone();
+			if (onLoaderDone) onLoaderDone(wrapper);
 			return;
 		}
 		isLoading = true;
 		
 		// check if already rendered
 		if (renderer.getDiv().children().length) {
-			if (onDone) onDone(renderer.getDiv());
+			if (onRenderDone) onRenderDone(renderer.getDiv());
+			if (onLoaderDone) onLoaderDone(renderer.getDiv());
 			return;
 		}
 		
@@ -3227,6 +3233,9 @@ function LoadController(renderer) {
 			wrapper = renderer.getDiv().parent();
 			wrapper.prepend(loadingImg);
 			
+			// load is done
+			if (onLoaderDone) onLoaderDone(wrapper);
+			
 			// don't show div while rendering
 			renderer.getDiv().hide();
 				
@@ -3236,7 +3245,7 @@ function LoadController(renderer) {
 				wrapper = null;
 				isLoading = false;
 				renderer.getDiv().show();
-				if (onDone) onDone(wrapper);
+				if (onRenderDone) onRenderDone(renderer.getDiv());
 			});
 		};
 		loadingImg.src = "img/loading.gif";
