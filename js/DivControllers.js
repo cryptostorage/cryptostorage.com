@@ -249,13 +249,13 @@ function AppController(div) {
 			sliderDiv.show();
 			sliderController.render(function() {
 				setContentDiv(homeController.getDiv());
-				if (homeController.getDiv().children().length) {
+				if (homeController.getDiv().children().length) finish();
+				else homeController.render(finish);
+				function finish() {
+					formLoader.getRenderer().startOver();
 					importLoader.getRenderer().startOver();
 					if (onDone) onDone();
-				} else homeController.render(function() {
-					importLoader.getRenderer().startOver();
-					if (onDone) onDone();
-				});
+				}
 			})
 		});
 	}
@@ -265,6 +265,7 @@ function AppController(div) {
 		sliderDiv.hide();
 		setContentDiv(formLoader.getDiv());
 		formLoader.render(function() {
+			importLoader.getRenderer().startOver();
 			if (onDone) onDone();
 		});
 	}
@@ -274,6 +275,7 @@ function AppController(div) {
 		sliderDiv.hide();
 		setContentDiv(faqController.getDiv());
 		faqController.render(function() {
+			formLoader.getRenderer().startOver();
 			importLoader.getRenderer().startOver();
 			if (onDone) onDone();
 		});
@@ -284,6 +286,7 @@ function AppController(div) {
 		sliderDiv.hide();
 		setContentDiv(donateLoader.getDiv());
 		donateLoader.render(function() {
+			formLoader.getRenderer().startOver();
 			importLoader.getRenderer().startOver();
 			if (onDone) onDone();
 		});
@@ -294,6 +297,7 @@ function AppController(div) {
 		sliderDiv.hide();
 		setContentDiv(importLoader.getDiv());
 		importLoader.render(function() {
+			formLoader.getRenderer().startOver();
 			if (onDone) onDone();
 		});
 	}
@@ -979,6 +983,9 @@ function FormController(div) {
 	}
 	
 	this.startOver = function() {
+		
+		// ignore if not initialized
+		if (!currencyInputs) return;
 		
 		// reset currencies
 		for (var i = 0; i < currencyInputs.length; i++) {
