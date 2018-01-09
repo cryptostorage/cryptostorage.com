@@ -1,6 +1,5 @@
 TODO
 IE testing
-IE11 piece selector is href which leaves page
 brave window.open() returns null
 import storage header is disabled at first, doesn't need to be
 common browser icons
