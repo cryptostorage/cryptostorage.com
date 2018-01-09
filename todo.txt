@@ -3,8 +3,8 @@ IE10 notice controller not centered
 brave window.open() returns null
 import storage header is disabled at first, doesn't need to be
 common browser icons
-faq content
 homepage content
+faq content
 github description page
 remove under development warning
 final design review
