@@ -1,5 +1,4 @@
 TODO
-import storage header is disabled at first, doesn't need to be
 common browser icons
 application version
 
@@ -40,6 +39,7 @@ meeting times should be plus or minus 20% of time invested
 option to split the passphrase and include a copy of it on each share?
 print progress - progress bar if threshold exceeded where they're expected to wait
 minify dependencies with source map download
+import storage header is disabled at first, doesn't need to be
 caching - etag dependencies, last modified tag, expire header will tell browser to cache
 homepage re-hide more currencies: hide link underneath all of them if more than 4 rows
 recover pulldown disabled styling improvements

@@ -1603,6 +1603,8 @@ input[type='checkbox'][disabled] +label {
 	}
 	.page_div {
 		width:unset;
+		margin:0;
+		padding:0;
 	}
 	.content_div {
 		display:unset;
