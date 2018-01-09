@@ -1,7 +1,6 @@
 TODO
 IE testing
 brave window.open() returns null
-mobile safari loading slow
 import storage header is disabled at first, doesn't need to be
 common browser icons
 faq content
