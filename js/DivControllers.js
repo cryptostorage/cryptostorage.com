@@ -262,9 +262,7 @@ function AppController(div) {
 	
 	this.showForm = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showForm()");
-		console.log("rendering form");
 		formLoader.render(onDone, function() {
-			console.log("setContentDiv(formLoader)");
 			sliderDiv.hide();
 			setContentDiv(formLoader.getDiv());
 			importLoader.getRenderer().startOver();
