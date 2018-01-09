@@ -189,7 +189,8 @@ function AppController(div) {
 		// get identifier
 		var href = window.location.href;
 		var lastIdx = href.lastIndexOf("#");
-		var page = lastIdx === -1 ? "home" : href.substring(lastIdx + 1);
+		var page = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+		if (!page) page = "home";
 		
 		// initialize controllers
 		homeController = new HomeController($("<div>"));

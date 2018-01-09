@@ -1711,7 +1711,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_icon_div {
-	width: unset;
+	width: auto !important;
 	margin: 0 8px 0 8px;
 	position: relative;
 }
