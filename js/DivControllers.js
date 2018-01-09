@@ -202,7 +202,7 @@ function AppController(div) {
 		// map pages to renderers and show functions
 		var pagesMap = {
 				"home": {renderer: homeController, show: that.showHome},
-				"form": {renderer: formLoader, show: that.showForm},
+				"new": {renderer: formLoader, show: that.showForm},
 				"import": {renderer: importLoader, show: that.showImport},
 				"faq": {renderer: faqController, show: that.showFaq},
 				"donate": {renderer: donateLoader, show: that.showDonate}
@@ -306,10 +306,12 @@ function AppController(div) {
 	}
 	
 	function onSelectGenerate() {
+		window.location.href = "#new";
 		that.showForm();
 	}
 	
 	function onSelectImport() {
+		window.location.href = "#import";
 		that.showImport();
 	}
 }
@@ -757,6 +759,7 @@ inheritsFrom(DonateController, DivController);
 function FormController(div) {
 	DivController.call(this, div);
 	
+	var that = this;
 	var currencyInputsDiv;
 	var currencyInputs;			// tracks each currency input
 	var passphraseCheckbox;
@@ -959,7 +962,7 @@ function FormController(div) {
 			// start over
 			var startOverLink = $("<div class='form_start_over'>").appendTo(pageDiv);
 			startOverLink.html("or start over")
-			startOverLink.click(function() { onStartOver(); });
+			startOverLink.click(function() { that.startOver(); });
 			
 			// disable generate button if environment failure
 			AppUtils.addEnvironmentListener(function() {
@@ -975,9 +978,7 @@ function FormController(div) {
 		});
 	}
 	
-	// -------------------------------- PRIVATE ---------------------------------
-	
-	function onStartOver() {
+	this.startOver = function() {
 		
 		// reset currencies
 		for (var i = 0; i < currencyInputs.length; i++) {
@@ -1047,6 +1048,8 @@ function FormController(div) {
 			}
 		}
 	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
 	
 	function addCurrency(defaultTicker) {
 		
