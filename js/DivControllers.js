@@ -211,22 +211,31 @@ function AppController(div) {
 		// show initial page
 		var pageMap = pagesMap[page];
 		pageMap.show(function() {
-			
+				
 			// poll environment starting with synchronized environment info
 			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
 				if (err) throw err;
 				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
 				
-				// start rendering other pages
+				// collect functions to render other pages
+				var funcs = [];
 				for (var key in pagesMap) {
 					if (key === page) continue;
 					if (pagesMap.hasOwnProperty(key)) {
-						pagesMap[key].renderer.render();
+						funcs.push(renderPage(pagesMap[key].renderer));
 					}
 				}
+				function renderPage(renderer) {
+					return function(onDone) { renderer.render(function() { onDone(); }); }
+				}
 				
-				// done rendering application
-				if (onDone) onDone();
+				// render other pages in series
+				async.series(funcs, function(err) {
+					if (err) throw err;
+					
+					// done rendering application
+					if (onDone) onDone();
+				})
 			});
 		});
 	}

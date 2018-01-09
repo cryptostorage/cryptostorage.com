@@ -1,7 +1,6 @@
 TODO
-sluggish on load
+#identifiers for form and import
 IE10 notice controller not centered
-let browser breath after initial load
 brave window.open() returns null
 import storage header is disabled at first, doesn't need to be
 common browser icons
