@@ -271,11 +271,12 @@ function AppController(div) {
 	
 	this.showFaq = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
-		faqController.render(onDone, function() {
+		faqController.render(function() {
 			sliderDiv.hide();
 			setContentDiv(faqController.getDiv());
 			formLoader.getRenderer().startOver();
 			importLoader.getRenderer().startOver();
+			if (onDone) onDone();
 		});
 	}
 	
