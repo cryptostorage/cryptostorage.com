@@ -1,4 +1,4 @@
-See https://github.com/cryptostorage/cryptostorage.com for full source code history.
+Full source code history: https://github.com/cryptostorage/cryptostorage.com
 
 01/20/2018
 cryptostorage.com-v0.0.1-alpha
