@@ -278,6 +278,7 @@ ol {
 	background-color: white;
 	padding: 25px;
 	margin-bottom: 50px;
+	min-height: 550px;
 }
 
 .home_div {
@@ -914,7 +915,6 @@ input[type='checkbox'][disabled] +label {
 
 .import_page {
 	padding: 0;
-	min-height: 600px;
 }
 
 .import_filler {
