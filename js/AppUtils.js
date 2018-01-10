@@ -44,14 +44,12 @@ var AppUtils = {
 		"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
 		"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
 	],
-	OPEN_SOURCE_OPERATING_SYSTEMS: [
-		"iOS", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "OpenBSD", "Symbian OS", "webOS", "webOS", "Tizen", "Chromium OS",
-		"Contiki", "DragonFly", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "Plan9" 
-	].concat(OperatingSystems.LINUX),
-
+	OPEN_SOURCE_OPERATING_SYSTEMS: [].concat(OperatingSystems.LINUX),
 	CLOSED_SOURCE_OPERATING_SYSTEMS: [
 		"Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "AIX", "Amiga OS", "Bada", "BeOS", "BlackBerry", "Hurd", "Linpus",
-		"Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS", "Sailfish", "Series40", "Solaris", "Symbian", "WebOS"
+		"Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS", "Sailfish", "Series40", "Solaris", "Symbian", "WebOS",
+		"iOS", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "OpenBSD", "Symbian OS", "webOS", "webOS", "Tizen", "Chromium OS",
+		"Contiki", "DragonFly", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "Plan9" 
 	].concat(OperatingSystems.OSX).concat(OperatingSystems.IOS).concat(OperatingSystems.WINDOWS),
 	
 	// ------------------------- APPLICATION DEPENDENCIES -----------------------
@@ -68,7 +66,8 @@ var AppUtils = {
 			"img/keys.png",
 			"img/checklist.png",
 			"img/key.png",
-			"img/license.png",
+			"img/mit.png",
+			"img/github.png",
 			"img/notice_bar.png",
 			"img/print_sample.png"
 		];
@@ -1409,8 +1408,8 @@ var AppUtils = {
 		return info;
 		
 		function isOpenSourceOs(osInfo) {
-			if (arrayContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, name)) return true;
-			if (arrayContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, name)) return false;
+			if (arrayContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, osInfo.name)) return true;
+			if (arrayContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, osInfo.name)) return false;
 			return null;
 		}
 	},
