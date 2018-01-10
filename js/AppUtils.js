@@ -1677,20 +1677,23 @@ var AppUtils = {
 		config.verifyEncryption = true;
 		config.currencies = [];
 		var plugins = AppUtils.getCryptoPlugins();
-		for (var i = 0; i < plugins.length; i++) {
-			config.currencies.push({
-				ticker: plugins[i].getTicker(),
-				numKeys: 1,
-				encryption: AppUtils.EncryptionScheme.CRYPTOJS
-			});
-		}
+		config.currencies.push({
+			ticker: AppUtils.getCryptoPlugin("BTC").getTicker(),
+			numKeys: 1,
+			encryption: AppUtils.EncryptionScheme.CRYPTOJS
+		});
+		config.currencies.push({
+			ticker: AppUtils.getCryptoPlugin("XMR").getTicker(),
+			numKeys: 1,
+			encryption: AppUtils.EncryptionScheme.CRYPTOJS
+		});
 		
 		// generate keys and test
 		AppUtils.generateKeys(config, null, function(err, keys, pieces, pieceDivs) {
 			if (err) onDone(err);
 			else {
 				try {
-					assertEquals(plugins.length, keys.length);
+					assertEquals(2, keys.length);
 					assertEquals(3, pieces.length);
 					assertEquals(3, pieceDivs.length);
 					onDone(null);

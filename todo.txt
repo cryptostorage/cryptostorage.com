@@ -1,5 +1,4 @@
 TODO
-min tests only a few keys
 common os icons
 
 homepage content
