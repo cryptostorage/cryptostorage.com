@@ -7,7 +7,6 @@ var OperatingSystems = {
 			"PCLinuxOS", "VectorLinux", "Zenwalk", "GNU"
 		],
 		OSX: ["Mac OS", "Mac OS X", "Macintosh", "Mac"],
-		IOS: ["iOS"],
 		WINDOWS: ["Windows Phone", "Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile"],
 }
 
@@ -46,7 +45,7 @@ var AppUtils = {
 		"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
 	],
 	OPEN_SOURCE_OPERATING_SYSTEMS: [
-		"FreeBSD", "Gentoo", "Haiku", "Kubuntu", "OpenBSD", "Symbian OS", "webOS", "webOS", "Tizen", "Chromium OS",
+		"iOS", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "OpenBSD", "Symbian OS", "webOS", "webOS", "Tizen", "Chromium OS",
 		"Contiki", "DragonFly", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "Plan9" 
 	].concat(OperatingSystems.LINUX),
 
