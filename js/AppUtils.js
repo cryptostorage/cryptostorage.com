@@ -1408,8 +1408,8 @@ var AppUtils = {
 		return info;
 		
 		function isOpenSourceOs(osInfo) {
-			if (arrayContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, name)) return true;
-			if (arrayContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, name)) return false;
+			if (arrayContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, osInfo.name)) return true;
+			if (arrayContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, osInfo.name)) return false;
 			return null;
 		}
 	},
