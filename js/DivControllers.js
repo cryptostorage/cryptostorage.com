@@ -424,25 +424,25 @@ function HomeController(div) {
 		
 		// sample page section
 		pageDiv.append("<div style='height: 60px'>");
-		pageDiv.append("<div class='home_label'>Export to printable and digital format for long term storage</div>");
-		pageDiv.append("<div class='home_description'>Save your cryptocurrency wallet to JSON so it can be stored securely on a flash drive and imported easily, or print your currency easily to create a paper wallet.</div>")
+		pageDiv.append("<div class='home_label'>Print or save for long term storage</div>");
+		pageDiv.append("<div class='home_description'>Save your keys to a file which can be stored securely on a flash drive, or print your keys to easily create a paper wallet.</div>")
 		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 		
-		// split and passphrase section
+		// check environment section
 		pageDiv.append("<div style='height: 0px'>");
+		pageDiv.append("<div class='home_label'>Check your environment to generate keys securely</div>");
+		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks help guide you to generate keys in a secure environment.</div>")
+		pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
+		
+		// split and passphrase section
+		pageDiv.append("<div style='height: 50px'>");
 		pageDiv.append("<div class='home_label'>Split and password protect private keys for maximum security</div>");
 		pageDiv.append("<div class='home_description'>Split your private key into multiple pieces you can store independently, and set how many pieces are needed to recover your key. Store one in your wallet, one in your safe, and one in your bank vault.</div>")
 		pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
 		pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
 		
-		// check environment section
-		pageDiv.append("<div style='height: 60px'>");
-		pageDiv.append("<div class='home_label'>Check your environment to generate keys securely</div>");
-		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your crypto.</div>")
-		pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
-		
 		// cryptography section
-		pageDiv.append("<div style='height:50px'>");
+		pageDiv.append("<div style='height:60px'>");
 		var hFlex = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 		hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
 		var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
