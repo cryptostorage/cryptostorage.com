@@ -425,7 +425,7 @@ function HomeController(div) {
 		// sample page section
 		pageDiv.append("<div style='height: 60px'>");
 		pageDiv.append("<div class='home_label'>Create paper wallets or save to file</div>");
-		pageDiv.append("<div class='home_description'>Save your keys to a file which can be stored on a flash drive and imported easily, or print to paper to easily create paper wallets.</div>")
+		pageDiv.append("<div class='home_description'>Save keys to a file which can be stored on a flash drive and imported easily, or print to paper to easily create paper wallets.</div>")
 		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 		
 		// check environment section
@@ -437,7 +437,7 @@ function HomeController(div) {
 		// split and passphrase section
 		pageDiv.append("<div style='height: 50px'>");
 		pageDiv.append("<div class='home_label'>Passphrase protect and split private keys for maximum security</div>");
-		pageDiv.append("<div class='home_description'>Split private keys into multiple pieces which can be stored independently.  Set how many pieces are needed to recover your keys.  Store one in your safe, one in your bank vault, or one with a trusted family member.</div>")
+		pageDiv.append("<div class='home_description'>Split private keys into multiple pieces which can be stored independently.  Set how many pieces are needed to recover your keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
 		pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
 		pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
 		
