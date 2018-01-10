@@ -1,6 +1,4 @@
 TODO
-common os icons
-
 homepage content
 faq content
 github description page

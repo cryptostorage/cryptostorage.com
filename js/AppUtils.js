@@ -1,4 +1,17 @@
 /**
+ * Operating systems separate so AppUtils can reference.
+ */
+var OperatingSystems = {
+		LINUX: [
+			"Linux", "CentOS", "Debian", "Fedora", "Linux Mint", "Mint", "RedHat", "Red Hat", "SuSE", "Ubuntu", "Xubuntu",
+			"PCLinuxOS", "VectorLinux", "Zenwalk", "GNU"
+		],
+		OSX: ["Mac OS", "Mac OS X", "Macintosh", "Mac"],
+		IOS: ["iOS"],
+		WINDOWS: ["Windows Phone", "Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile"],
+}
+
+/**
  * Collection of utilities and constants for cryptostorage.com.
  */
 var AppUtils = {
@@ -17,13 +30,13 @@ var AppUtils = {
 	SLIDER_RATE: 4000,							// rate of slider transitions
 	NO_INTERNET_CAN_BE_ERROR: true,	// lack of internet can be critical error if running remotely
 	
-	//classify operating systems and browsers as open or closed source
-	OPEN_SOURCE_BROWSERS: toLowerCaseArray([
+	// classify operating systems and browsers as open or closed source
+	OPEN_SOURCE_BROWSERS: [
 		"Firefox", "Chromium", "Tizen", "Epiphany", "K-Meleon", "SeaMonkey", "SlimerJS", "Arora", "Breach", "Camino",
 		"Electron", "Fennec", "Konqueror", "Midori", "PaleMoon", "Rekonq", "Sunrise", "Waterfox", "Amaya", "Bowser",
 		"Camino"
-	]),
-	CLOSED_SOURCE_BROWSERS: toLowerCaseArray([
+	],
+	CLOSED_SOURCE_BROWSERS: [
 		"Chrome", "Chrome WebView", "Chrome Mobile", "Safari", "Opera", "Opera Mini", "Samsung Internet for Android",
 		"Samsung Internet", "Opera Coast", "Yandex Browser", "UC Browser", "Maxthon", "Puffin", "Sleipnir",
 		"Windows Phone", "Internet Explorer", "Microsoft Edge", "IE", "Vivaldi", "Sailfish", "Amazon Silk", "Silk",
@@ -31,19 +44,16 @@ var AppUtils = {
 		"Avant Browser", "Flock", "Galeon", "GreenBrowser", "iCab", "Lunascape", "Maxthon", "Nook Browser", "Raven",
 		"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
 		"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
-	]),
-	OPEN_SOURCE_OPERATING_SYSTEMS: toLowerCaseArray([
-		"Linux", "CentOS", "Debian", "Fedora", "FreeBSD", "Gentoo", "Haiku", "Kubuntu", "Linux Mint", "Mint",
-		"OpenBSD", "RedHat", "Red Hat", "SuSE", "Ubuntu", "Xubuntu", "Symbian OS", "webOS", "webOS ", "Tizen",
-		"Chromium OS", "Contiki", "DragonFly", "GNU", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "PCLinuxOS",
-		"Plan9", "VectorLinux", "Zenwalk"
-	]),
-	CLOSED_SOURCE_OPERATING_SYSTEMS: toLowerCaseArray([
-		"Windows Phone", "Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "Mac OS", "Mac OS X", "Macintosh", "Mac", "iOS",
-		"Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile", "AIX", "Amiga OS", "Bada",
-		"BeOS", "BlackBerry", "Hurd", "Linpus", "Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS",
-		"Sailfish", "Series40", "Solaris", "Symbian", "WebOS"
-	]),
+	],
+	OPEN_SOURCE_OPERATING_SYSTEMS: [
+		"FreeBSD", "Gentoo", "Haiku", "Kubuntu", "OpenBSD", "Symbian OS", "webOS", "webOS", "Tizen", "Chromium OS",
+		"Contiki", "DragonFly", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "Plan9" 
+	].concat(OperatingSystems.LINUX),
+
+	CLOSED_SOURCE_OPERATING_SYSTEMS: [
+		"Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "AIX", "Amiga OS", "Bada", "BeOS", "BlackBerry", "Hurd", "Linpus",
+		"Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS", "Sailfish", "Series40", "Solaris", "Symbian", "WebOS"
+	].concat(OperatingSystems.OSX).concat(OperatingSystems.IOS).concat(OperatingSystems.WINDOWS),
 	
 	// ------------------------- APPLICATION DEPENDENCIES -----------------------
 	
@@ -1361,11 +1371,6 @@ var AppUtils = {
 		
 		// determines if browser is open source
 		function isOpenSourceBrowser(browserName) {
-			
-			// get lowercase name
-			browserName = browserName.toLowerCase();
-			
-			// determine if open source
 			if (arrayContains(AppUtils.OPEN_SOURCE_BROWSERS, browserName)) return true;
 			if (arrayContains(AppUtils.CLOSED_SOURCE_BROWSERS, browserName)) return false;
 			return null;
@@ -1405,11 +1410,6 @@ var AppUtils = {
 		return info;
 		
 		function isOpenSourceOs(osInfo) {
-			
-			// get lowercase name
-			var name = osInfo.name.toLowerCase();
-			
-			// determine if open source
 			if (arrayContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, name)) return true;
 			if (arrayContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, name)) return false;
 			return null;
