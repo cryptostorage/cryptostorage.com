@@ -2,6 +2,7 @@ TODO
 homepage content
 faq content
 github description page
+remove under development warning
 final design review
 get similar domains
 sign code
