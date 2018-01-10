@@ -424,20 +424,20 @@ function HomeController(div) {
 		
 		// sample page section
 		pageDiv.append("<div style='height: 60px'>");
-		pageDiv.append("<div class='home_label'>Print or save for long term storage</div>");
-		pageDiv.append("<div class='home_description'>Save your keys to a file which can be stored securely on a flash drive, or print your keys to easily create a paper wallet.</div>")
+		pageDiv.append("<div class='home_label'>Create paper wallets or save to file</div>");
+		pageDiv.append("<div class='home_description'>Save your keys to a file which can be stored on a flash drive and imported easily, or print to paper to easily create paper wallets.</div>")
 		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 		
 		// check environment section
 		pageDiv.append("<div style='height: 0px'>");
-		pageDiv.append("<div class='home_label'>Check your environment to generate keys securely</div>");
-		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks help guide you to generate keys in a secure environment.</div>")
+		pageDiv.append("<div class='home_label'>Generate keys securely with automated environment checks</div>");
+		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks guide you to generate keys in a secure environment.</div>")
 		pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
 		
 		// split and passphrase section
 		pageDiv.append("<div style='height: 50px'>");
-		pageDiv.append("<div class='home_label'>Split and passphrase protect your private keys for maximum security</div>");
-		pageDiv.append("<div class='home_description'>Split your private key into multiple pieces you can store independently, and set how many pieces are needed to recover your key. Store one in your wallet, one in your safe, and one in your bank vault.</div>")
+		pageDiv.append("<div class='home_label'>Passphrase protect and split private keys for maximum security</div>");
+		pageDiv.append("<div class='home_description'>Split private keys into multiple pieces which can be stored independently.  Set how many pieces are needed to recover your keys.  Store one in your safe, one in your bank vault, or one with a trusted family member.</div>")
 		pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
 		pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
 		
@@ -451,11 +451,12 @@ function HomeController(div) {
 		
 		// download section
 		pageDiv.append("<div style='height: 60px'>");
-		pageDiv.append("<div class='home_label'>Download our free, open-source, client-side software and run it offline</div>");
+		pageDiv.append("<div class='home_label'>Download our 100% free and open-source software and run it offline</div>");
 		pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
 		var licenseDiv = $("<div class='flex_horizontal'>").appendTo(pageDiv);
-		licenseDiv.append("<img src='img/mit.png' class='license_img'>");
-		licenseDiv.append("<img src='img/github.png' class='license_img'>");
+		var mitImg = $().appendTo(licenseDiv);
+		licenseDiv.append("<a href='./LICENSE.txt'><img src='img/mit.png' class='license_img'></a>");
+		licenseDiv.append("<a href='https://github.com/cryptostorage/cryptostorage.com'><img src='img/github.png' class='license_img'></a>");
 		pageDiv.append("<div style='height: 20px;'>");
 		var downloadBtn = $("<a class='light_green_btn' href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>").appendTo(pageDiv);
 		downloadBtn.append("Download Now (zip)");
@@ -464,7 +465,7 @@ function HomeController(div) {
 		var footerDiv = $("<div class='home_footer_div flex_horizontal'>").appendTo(div);
 		footerDiv.append($("<div class='home_footer_version flex_horizontal'></div>"));
 		var descriptionDiv = $("<div class='home_footer_description flex_horizontal'>").appendTo(footerDiv);
-		descriptionDiv.append("© cryptostorage.com.  JavaScript copyrights included in the source. No warranty.");
+		descriptionDiv.append("© cryptostorage.com.  MIT licensed.<br>JavaScript copyrights included in the source. No warranty.");
 		var versionDiv = $("<div class='home_footer_version flex_horizontal flex_justify_end'>").appendTo(footerDiv);
 		versionDiv.append("<a href='./versions.txt' target='_blank'>version 0.0.1 alpha</a>");
 		
