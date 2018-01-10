@@ -1,8 +1,6 @@
 TODO
 mobile home notice bar right side cut off
 mobile frequently disconnects
-notice bar tooltip should be internet for consistency
-notice bar height slightly less
 
 homepage content
 faq content
