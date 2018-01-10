@@ -436,7 +436,7 @@ function HomeController(div) {
 		
 		// split and passphrase section
 		pageDiv.append("<div style='height: 50px'>");
-		pageDiv.append("<div class='home_label'>Split and password protect private keys for maximum security</div>");
+		pageDiv.append("<div class='home_label'>Split and passphrase protect your private keys for maximum security</div>");
 		pageDiv.append("<div class='home_description'>Split your private key into multiple pieces you can store independently, and set how many pieces are needed to recover your key. Store one in your wallet, one in your safe, and one in your bank vault.</div>")
 		pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
 		pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
@@ -451,7 +451,7 @@ function HomeController(div) {
 		
 		// download section
 		pageDiv.append("<div style='height: 60px'>");
-		pageDiv.append("<div class='home_label'>Download our 100% free, open source software and run it offline</div>");
+		pageDiv.append("<div class='home_label'>Download our free, open-source, client-side software and run it offline</div>");
 		pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
 		var licenseDiv = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 		licenseDiv.append("<img src='img/mit.png' class='license_img'>");
