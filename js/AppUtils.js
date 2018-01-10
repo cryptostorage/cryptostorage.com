@@ -68,7 +68,8 @@ var AppUtils = {
 			"img/keys.png",
 			"img/checklist.png",
 			"img/key.png",
-			"img/license.png",
+			"img/mit.png",
+			"img/github.png",
 			"img/notice_bar.png",
 			"img/print_sample.png"
 		];

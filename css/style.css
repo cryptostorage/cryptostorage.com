@@ -1839,3 +1839,9 @@ input[type='checkbox'][disabled] +label {
     -o-transition: -o-transform .5s ease;
     transition: transform .5s ease;
 }
+
+.license_img {
+	width: 75px;
+	height: 75px;
+	margin: 10px 10px 10px 10px;
+}
