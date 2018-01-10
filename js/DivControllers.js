@@ -2973,8 +2973,6 @@ function NoticeController(div, config) {
 	
 	this.render = function(onDone) {
 		
-		console.log("rendering");
-		
 		// merge configs
 		config = objectAssign({}, getDefaultConfig(), config);
 		
