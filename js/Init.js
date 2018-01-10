@@ -22,23 +22,27 @@ $(document).ready(function() {
 	new AppController($("body")).render(function() {
 		
 		// run tests
-		LOADER.load(AppUtils.getAppDependencies(), function(err) {
-			if (err) throw err;
-				
-			// run minimum tests
-			AppUtils.runMinimumTests(function(err) {
-				if (err) throw err;
-				console.log("Minimum tests pass");
-			});
+		if (AppUtils.RUN_MIN_TESTS || AppUtils.RUN_FULL_TESTS) {
 			
-			// run test suite
-			if (AppUtils.RUN_TESTS) {
-				console.log("Running tests...");
-				Tests.runTests(function(err) {
-					if (err) throw error;
-					console.log("All tests pass");
+			// load dependencies
+			LOADER.load(AppUtils.getAppDependencies(), function(err) {
+				if (err) throw err;
+					
+				// run minimum tests
+				AppUtils.runMinimumTests(function(err) {
+					if (err) throw err;
+					console.log("Minimum tests pass");
 				});
-			}
-		});
+				
+				// run full tests
+				if (AppUtils.RUN_FULL_TESTS) {
+					console.log("Running tests...");
+					Tests.runTests(function(err) {
+						if (err) throw error;
+						console.log("All tests pass");
+					});
+				}
+			});
+		}
 	});
 });

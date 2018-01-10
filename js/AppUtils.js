@@ -16,9 +16,11 @@ var OperatingSystems = {
 var AppUtils = {
 		
 	// app constants
-	RUN_TESTS: false,
-	DEV_MODE: false,
+	RUN_MIN_TESTS: false,
+	RUN_FULL_TESTS: false,
+	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
+	MOCK_ENVIRONMENT_ENABLED: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
 	MIN_PASSWORD_LENGTH: 7,
@@ -28,6 +30,16 @@ var AppUtils = {
 	ONLINE_DETECTION_TIMEOUT: 4000,	// timeout to detect if online
 	SLIDER_RATE: 4000,							// rate of slider transitions
 	NO_INTERNET_CAN_BE_ERROR: true,	// lack of internet can be critical error if running remotely
+	
+	/**
+	 * Mock environment checks.
+	 */
+	MOCK_ENVIRONMENT: {
+		browser: {name: "Firefox", version: "42.0", major: 42, isOpenSource: true, isSupported: true, windowCryptoExists: true},
+		os: {name: "Linux", version: "10.12", isOpenSource: true},
+		isLocal: true,
+		isOnline: false,
+	},
 	
 	// classify operating systems and browsers as open or closed source
 	OPEN_SOURCE_BROWSERS: [
@@ -1441,6 +1453,17 @@ var AppUtils = {
 	 * @returns info that can be acquired synchronously
 	 */
 	getEnvironmentSync: function() {
+		
+		// check if mock environment
+		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) {
+			var info = copyProperties(AppUtils.MOCK_ENVIRONMENT);
+			delete info.isOnline;	// async
+			info.runtimeError = AppUtils.RUNTIME_ERROR;
+			info.dependencyError = AppUtils.DEPENDENCY_ERROR;
+			info.checks = AppUtils.getEnvironmentChecks(info);
+			return info;
+		}
+		
 		var info = {};
 		info.browser = AppUtils.getBrowserInfo();
 		info.os = AppUtils.getOsInfo();
@@ -1459,6 +1482,16 @@ var AppUtils = {
 	 * @param onDone(info) is asynchronously invoked when all info is retrieved
 	 */
 	getEnvironment: function(onDone) {
+		
+		// check if mock environment
+		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) {
+			var info = AppUtils.getEnvironmentSync();
+			info.isOnline = AppUtils.MOCK_ENVIRONMENT.isOnline;
+			info.checks = AppUtils.getEnvironmentChecks(info);
+			if (onDone) onDone(info);
+			return;
+		}
+		
 		AppUtils.isOnline(function(online) {
 			var info = AppUtils.getEnvironmentSync();
 			info.isOnline = online;
@@ -1477,7 +1510,7 @@ var AppUtils = {
 		IS_LOCAL: "IS_LOCAL",
 		RUNTIME_ERROR: "RUNTIME_ERROR",
 		OPEN_SOURCE: "OPEN_SOURCE",
-		PRERELEASE: "PRERELEASE"
+		DEV_MODE: "DEV_MODE"
 	},
 	
 	/**
@@ -1531,8 +1564,8 @@ var AppUtils = {
 			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
 		}
 		
-		// pre-release warning
-		checks.push({state: "warn", code: AppUtils.EnvironmentCode.PRERELEASE});
+		// dev mode warning
+		if (AppUtils.DEV_MODE) checks.push({state: "warn", code: AppUtils.EnvironmentCode.DEV_MODE});
 		
 		return checks;
 	},

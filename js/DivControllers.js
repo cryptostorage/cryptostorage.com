@@ -1555,7 +1555,7 @@ function ImportFileController(div) {
 				AppUtils.validatePiece(namedPiece.piece, true);
 				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
 			} catch (err) {
-				console.log(err);
+				if (AppUtils.DEV_MODE) console.log(err);
 				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.message);
 			}
 		}
@@ -3116,7 +3116,7 @@ function NoticeController(div, config) {
 						return getBrowserIcon(info);
 					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
 						return getOperatingSystemIcon(info);
-					case AppUtils.EnvironmentCode.PRERELEASE:
+					case AppUtils.EnvironmentCode.DEV_MODE:
 						return $("<img class='notice_icon' src='img/construction.png'>");
 					default:
 						throw new Error("Unrecognized environment code: " + check.code);
@@ -3203,7 +3203,7 @@ function NoticeController(div, config) {
 						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: <a target='_blank' href='https://tails.boum.org'>Tails</a>, <a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>, or <a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>");
 					}
 					break;
-				case AppUtils.EnvironmentCode.PRERELEASE:
+				case AppUtils.EnvironmentCode.DEV_MODE:
 					if (check.state === "warn") div.append("Application is under development.  Not ready for use");
 					break;
 				default:
