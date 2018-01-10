@@ -3130,6 +3130,12 @@ function NoticeController(div, config) {
 			}
 			
 			function getOperatingSystemIcon(info) {
+				var name = info.os.name;
+				if (arrayContains(OperatingSystems.LINUX, name)) return $("<img class='notice_icon' src='img/linux.png'>");
+				else if (arrayContains(OperatingSystems.OSX, name)) return $("<img class='notice_icon' src='img/osx.png'>");
+				else if (arrayContains(OperatingSystems.IOS, name)) return $("<img class='notice_icon' src='img/ios.png'>");
+				else if (arrayContains(OperatingSystems.WINDOWS, name)) return $("<img class='notice_icon' src='img/windows.png'>");
+				else if (strContains(name, "Android")) return $("<img class='notice_icon' src='img/android.png'>");
 				return $("<img class='notice_icon' src='img/computer.png'>");
 			}
 			

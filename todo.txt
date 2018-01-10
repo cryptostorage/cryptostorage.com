@@ -1,5 +1,5 @@
 TODO
-common os icons
+multiple tooltips of hover on reload
 
 homepage content
 faq content

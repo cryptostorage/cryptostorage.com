@@ -1,4 +1,17 @@
 /**
+ * Operating systems separate so AppUtils can reference.
+ */
+var OperatingSystems = {
+		LINUX: [
+			"Linux", "CentOS", "Debian", "Fedora", "Linux Mint", "Mint", "RedHat", "Red Hat", "SuSE", "Ubuntu", "Xubuntu",
+			"PCLinuxOS", "VectorLinux", "Zenwalk", "GNU"
+		],
+		OSX: ["Mac OS", "Mac OS X", "Macintosh", "Mac"],
+		IOS: ["iOS"],
+		WINDOWS: ["Windows Phone", "Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile"],
+}
+
+/**
  * Collection of utilities and constants for cryptostorage.com.
  */
 var AppUtils = {
@@ -32,20 +45,15 @@ var AppUtils = {
 		"RockMelt", "SlimBrowser", "SRWare Iron", "Swiftfox", "WebPositive", "Android Browser", "Baidu", "Blazer",
 		"Comodo Dragon", "Dolphin", "Edge", "iCab", "IE Mobile", "IEMobile", "Kindle", "WeChat", "Yandex"
 	],
-	LINUX_OPERATING_SYSTEMS: [
-		"Linux", "CentOS", "Debian", "Fedora", "Linux Mint", "Mint", "RedHat", "Red Hat", "SuSE", "Ubuntu", "Xubuntu",
-		"PCLinuxOS", "VectorLinux", "Zenwalk", "GNU"
-	],
 	OPEN_SOURCE_OPERATING_SYSTEMS: [
 		"FreeBSD", "Gentoo", "Haiku", "Kubuntu", "OpenBSD", "Symbian OS", "webOS", "webOS", "Tizen", "Chromium OS",
 		"Contiki", "DragonFly", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "Plan9" 
-	].concat(AppUtils.LINUX_OPERATING_SYSTEMS),
-	APPLE_OPERATING_SYSTEMS: ["Mac OS", "Mac OS X", "Macintosh", "Mac", "iOS"],
-	WINDOWS_OPERATING_SYSTEMS: ["Windows Phone", "Windows 98;", "Windows 98", "Windows", "Windows ", "Windows Phone", "Windows Mobile"],
+	].concat(OperatingSystems.LINUX),
+
 	CLOSED_SOURCE_OPERATING_SYSTEMS: [
 		"Android", "Chrome OS", "Cygwin", "hpwOS", "Tablet OS", "AIX", "Amiga OS", "Bada", "BeOS", "BlackBerry", "Hurd", "Linpus",
 		"Mandriva", "Morph OS", "OpenVMS", "OS/2", "QNX", "RIM Tablet OS", "Sailfish", "Series40", "Solaris", "Symbian", "WebOS"
-	].concat(AppUtils.APPLE_OPERATING_SYSTEMS).concat(AppUtils.WINDOWS_OPERATING_SYSTEMS),
+	].concat(OperatingSystems.OSX).concat(OperatingSystems.IOS).concat(OperatingSystems.WINDOWS),
 	
 	// ------------------------- APPLICATION DEPENDENCIES -----------------------
 	
