@@ -1452,24 +1452,14 @@ var AppUtils = {
 	 * 
 	 * @returns info that can be acquired synchronously
 	 */
-	getEnvironmentSync: function() {
-		
-		// check if mock environment
-		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) {
-			var info = copyProperties(AppUtils.MOCK_ENVIRONMENT);
-			delete info.isOnline;	// async
-			info.runtimeError = AppUtils.RUNTIME_ERROR;
-			info.dependencyError = AppUtils.DEPENDENCY_ERROR;
-			info.checks = AppUtils.getEnvironmentChecks(info);
-			return info;
-		}
-		
+	getEnvironmentSync: function() {		
 		var info = {};
 		info.browser = AppUtils.getBrowserInfo();
 		info.os = AppUtils.getOsInfo();
 		info.isLocal = AppUtils.isLocal();
 		info.runtimeError = AppUtils.RUNTIME_ERROR;
 		info.dependencyError = AppUtils.DEPENDENCY_ERROR;
+		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = objectAssign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
 		info.checks = AppUtils.getEnvironmentChecks(info);
 		return info;
 	},
@@ -1482,19 +1472,10 @@ var AppUtils = {
 	 * @param onDone(info) is asynchronously invoked when all info is retrieved
 	 */
 	getEnvironment: function(onDone) {
-		
-		// check if mock environment
-		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) {
-			var info = AppUtils.getEnvironmentSync();
-			info.isOnline = AppUtils.MOCK_ENVIRONMENT.isOnline;
-			info.checks = AppUtils.getEnvironmentChecks(info);
-			if (onDone) onDone(info);
-			return;
-		}
-		
 		AppUtils.isOnline(function(online) {
 			var info = AppUtils.getEnvironmentSync();
 			info.isOnline = online;
+			if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = objectAssign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
 			info.checks = AppUtils.getEnvironmentChecks(info);
 			if (onDone) onDone(info);
 		});
