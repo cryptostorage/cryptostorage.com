@@ -101,14 +101,14 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			
 			// collect function to render key pair
 			var placeholderDiv = $("<div class='key_div'>").appendTo(pageDiv);
-			funcs.push(renderKeyPairFunc(placeholderDiv, piece.keys[i], isInitialized(piece.pieceNum), config));
+			funcs.push(renderKeyPairFunc(placeholderDiv, piece, i, config));
 		}
 		
 		// callback function to render key pair
-		function renderKeyPairFunc(placeholderDiv, pieceKey, isSplit, config) {
+		function renderKeyPairFunc(placeholderDiv, piece, index, config) {
 			return function(onDone) {
 				if (isCancelled) return;
-				renderKeyPair(null, pieceKey, isSplit, config, function(keyDiv) {
+				renderKeyPair(null, piece, index, config, function(keyDiv) {
 					placeholderDiv.replaceWith(keyDiv);
 					onKeyPairDone();
 					onDone();
@@ -139,16 +139,19 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		 * Renders a single key pair.
 		 * 
 		 * @param div is the div to render to
-		 * @param pieceKey is the piece key to render
-		 * @param isSplit specifies if the pieceKey is a split key piece
+		 * @param piece is the piece containing the key pair to render
+		 * @param index is the index of the key pair within the piece
 		 * @param config is the render configuration
 		 * @param onDone is invoked when rendering is done
 		 */
-		function renderKeyPair(div, pieceKey, isSplit, config, onDone) {
+		function renderKeyPair(div, piece, index, config, onDone) {
 			if (isCancelled) return;
 			
+			var pieceKey = piece.keys[index];
+			var isSplit = isInitialized(piece.pieceNum);
+			
 			// content to render
-			var title = "#" + (i + 1);
+			var title = piece.keys.length > 1 ? "#" + (index + 1) : "";
 			var leftLabel = "\u25C4 Public Address";
 			var leftValue = (!pieceKey.address && pieceKey.encryption) ? "(decrypt to view)" : config.showPublic ? pieceKey.address : "(not shown)";
 			var leftCopyable = config.showPublic && pieceKey.address;
