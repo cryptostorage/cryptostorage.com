@@ -3117,7 +3117,7 @@ function NoticeController(div, config) {
 					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
 						return getOperatingSystemIcon(info);
 					case AppUtils.EnvironmentCode.DEV_MODE:
-						return $("<img class='notice_icon' src='img/construction.png'>");
+						return $("<img class='notice_icon' style='width:35px; height:35px;' src='img/construction.png'>");
 					default:
 						throw new Error("Unrecognized environment code: " + check.code);
 				}
@@ -3129,7 +3129,7 @@ function NoticeController(div, config) {
 				else if (strContains(name, "Chrome")) return $("<img class='notice_icon' src='img/chrome.png'>");
 				else if (strContains(name, "Chromium")) return $("<img class='notice_icon' src='img/chrome.png'>");
 				else if (strContains(name, "Safari")) return $("<img class='notice_icon' src='img/safari.png'>");
-				else if (strContains(name, "IE") || strContains(name, "Internet Explorer")) return $("<img class='notice_icon' src='img/internet_explorer.png'>");
+				else if (strContains(name, "IE") || strContains(name, "Internet Explorer")) return $("<img class='notice_icon' style='width:35px; height:35px;' src='img/internet_explorer.png'>");
 				else return $("<img class='notice_icon' src='img/browser.png'>");
 			}
 			
