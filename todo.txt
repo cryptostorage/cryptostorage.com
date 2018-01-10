@@ -1,6 +1,4 @@
 TODO
-multiple tooltips of hover on reload
-
 homepage content
 faq content
 github description page

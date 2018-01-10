@@ -2967,8 +2967,11 @@ function NoticeController(div, config) {
 	DivController.call(this, div);
 	
 	var lastChecks;
+	var tippies;
 	
 	this.render = function(onDone) {
+		
+		console.log("rendering");
 		
 		// merge configs
 		config = objectAssign({}, getDefaultConfig(), config);
@@ -3015,7 +3018,8 @@ function NoticeController(div, config) {
 		lastChecks = info.checks;
 		
 		// track tippy divs to fix bug where more than one becomes visible
-		var tippies = [];
+		if (tippies) for (var i = 0; i < tippies.length; i++) tippies[i].get(0)._tippy.hide();
+		tippies = [];
 		
 		// compute width of icon divs based on max number of icons
 		var numNoticesLeft = 0;
