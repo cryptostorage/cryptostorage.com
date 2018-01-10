@@ -1533,7 +1533,7 @@ var AppUtils = {
 		}
 		
 		// pre-release warning
-		checks.push({state: "warn", code: AppUtils.EnvironmentCode.PRERELEASE});
+		//checks.push({state: "warn", code: AppUtils.EnvironmentCode.PRERELEASE});
 		
 		return checks;
 	},

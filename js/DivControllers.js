@@ -464,7 +464,7 @@ function HomeController(div) {
 		var descriptionDiv = $("<div class='home_footer_description flex_horizontal'>").appendTo(footerDiv);
 		descriptionDiv.append("Creative Commons Attribution 3.0 licensed.  No warranties expressed or implied.");
 		var versionDiv = $("<div class='home_footer_version flex_horizontal flex_justify_end'>").appendTo(footerDiv);
-		versionDiv.append("<a href='./versions.txt' target='_blank'>version 0.0.1-alpha</a>");
+		versionDiv.append("<a href='./versions.txt' target='_blank'>version 0.0.1 alpha</a>");
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -3200,7 +3200,7 @@ function NoticeController(div, config) {
 					else {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Operating system is not open source (" + info.os.name + ")</div>");
-						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: <a target='_blank' href='https://tails.boum.org'>Tails</a>, <a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>, or&nbsp;<a target='_blank' href='https://www.raspberrypi.org/downloads/raspbian/'>Raspbian</a> for the <a target='_blank' href='https://www.raspberrypi.org'>Raspberry Pi</a>");
+						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: <a target='_blank' href='https://tails.boum.org'>Tails</a>, <a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>, or <a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.PRERELEASE:
