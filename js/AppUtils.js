@@ -77,11 +77,13 @@ var AppUtils = {
 			"img/microscope.png",
 			"img/keys.png",
 			"img/checklist.png",
+			"img/passphrase_input.png",
+			"img/split_input.png",
+			"img/print_sample.png",
+			"img/notice_bars.png",
 			"img/key.png",
 			"img/mit.png",
 			"img/github.png",
-			"img/notice_bar.png",
-			"img/print_sample.png"
 		];
 		
 		// crypto logos

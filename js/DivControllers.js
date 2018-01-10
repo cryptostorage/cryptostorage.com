@@ -429,7 +429,7 @@ function HomeController(div) {
 		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 		
 		// split and passphrase section
-		pageDiv.append("<div style='height: 10px'>");
+		pageDiv.append("<div style='height: 0px'>");
 		pageDiv.append("<div class='home_label'>Split and password protect private keys for maximum security</div>");
 		pageDiv.append("<div class='home_description'>Split your private key into multiple pieces you can store independently, and set how many pieces are needed to recover your key. Store one in your wallet, one in your safe, and one in your bank vault.</div>")
 		pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
@@ -439,10 +439,10 @@ function HomeController(div) {
 		pageDiv.append("<div style='height: 60px'>");
 		pageDiv.append("<div class='home_label'>Check your environment to generate keys securely</div>");
 		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your crypto.</div>")
-		pageDiv.append($("<img width=750px src='img/notice_bar.png'>"));
+		pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
 		
 		// cryptography section
-		pageDiv.append("<div style='height:60px'>");
+		pageDiv.append("<div style='height:50px'>");
 		var hFlex = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 		hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
 		var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
