@@ -3,6 +3,7 @@ homepage content
 faq content
 github description page
 remove under development warning
+regenerate donate
 final design review
 get similar domains
 sign code
