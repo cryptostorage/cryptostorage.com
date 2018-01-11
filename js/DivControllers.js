@@ -431,7 +431,7 @@ function HomeController(div) {
 		// check environment section
 		pageDiv.append("<div style='height: 0px'>");
 		pageDiv.append("<div class='home_label'>Generate keys securely with automated environment checks</div>");
-		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks guide you to generate keys in a secure environment.</div>")
+		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks help you generate keys in a secure environment.</div>")
 		pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
 		
 		// split and passphrase section
