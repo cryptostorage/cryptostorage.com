@@ -197,7 +197,7 @@ function AppController(div) {
 		var href = window.location.href;
 		var lastIdx = href.lastIndexOf("#");
 		var page = lastIdx === -1 ? null : href.substring(lastIdx + 1);
-		
+
 		// show first page
 		if (page === "home") that.showHome();
 		else if (page === "new") that.showForm();
@@ -376,7 +376,6 @@ function HomeController(div) {
 		
 		// notice div
 		var noticeDiv = $("<div>").appendTo(div);
-		new NoticeController(noticeDiv, {showOnFail: true, showOnWarn: false, showOnPass: false}).render();
 		
 		// home content
 		var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
@@ -453,6 +452,9 @@ function HomeController(div) {
 		
 		// done rendering
 		if (onDone) onDone(div);
+		
+		// render notice bar
+		new NoticeController(noticeDiv, {showOnFail: true, showOnWarn: false, showOnPass: false}).render();
 		
 		// track environment failure to disable clicking currency
 		var environmentFailure = false;
