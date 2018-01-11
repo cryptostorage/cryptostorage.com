@@ -374,8 +374,8 @@ function HomeController(div) {
 		div.empty();
 		div.attr("class", "content_div flex_vertical");
 		
-		// notice div
-		var noticeDiv = $("<div>").appendTo(div);
+		// notice container
+		var noticeContainer = $("<div class='notice_container'>").appendTo(div);
 		
 		// home content
 		var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
@@ -454,7 +454,7 @@ function HomeController(div) {
 		if (onDone) onDone(div);
 		
 		// render notice bar
-		new NoticeController(noticeDiv, {showOnFail: true, showOnWarn: false, showOnPass: false}).render();
+		new NoticeController($("<div>").appendTo(noticeContainer), {showOnFail: true, showOnWarn: false, showOnPass: false}).render();
 		
 		// track environment failure to disable clicking currency
 		var environmentFailure = false;
