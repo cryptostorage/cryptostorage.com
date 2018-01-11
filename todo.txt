@@ -1,5 +1,6 @@
 TODO
 don't render other pages on start, just download dependencies
+divController.getDependencies()
 bullet point environment checks
 mobile home notice bar right side cut off
 mobile frequently disconnects
