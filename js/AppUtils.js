@@ -16,7 +16,7 @@ var OperatingSystems = {
 var AppUtils = {
 		
 	// app constants
-	RUN_MIN_TESTS: false,
+	RUN_MIN_TESTS: true,
 	RUN_FULL_TESTS: false,
 	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,

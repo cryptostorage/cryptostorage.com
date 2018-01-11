@@ -186,12 +186,6 @@ function AppController(div) {
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
-		// get identifier
-		var href = window.location.href;
-		var lastIdx = href.lastIndexOf("#");
-		var page = lastIdx === -1 ? null : href.substring(lastIdx + 1);
-		if (!page) page = "home";
-		
 		// initialize controllers
 		homeController = new HomeController($("<div>"));
 		formLoader = new LoadController(new FormController($("<div>")));
@@ -199,43 +193,31 @@ function AppController(div) {
 		faqController = new FaqController($("<div>"));
 		donateLoader = new LoadController(new DonateController($("<div>")));
 		
-		// map pages to renderers and show functions
-		var pagesMap = {
-				"home": {renderer: homeController, show: that.showHome},
-				"new": {renderer: formLoader, show: that.showForm},
-				"import": {renderer: importLoader, show: that.showImport},
-				"faq": {renderer: faqController, show: that.showFaq},
-				"donate": {renderer: donateLoader, show: that.showDonate}
-		}
+		// get page identifier
+		var href = window.location.href;
+		var lastIdx = href.lastIndexOf("#");
+		var page = lastIdx === -1 ? null : href.substring(lastIdx + 1);
 		
-		// show initial page
-		var pageMap = pagesMap[page];
-		pageMap.show(function() {
-				
-			// poll environment starting with synchronized environment info
-			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
+		// show first page
+		if (page === "home") that.showHome();
+		else if (page === "new") that.showForm();
+		else if (page === "import") that.showImport();
+		else if (page === "faq") that.showFaq();
+		else if (page === "donate") that.showDonate();
+		else that.showHome();
+		
+		// load notice dependencies and start polling
+		LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
+			if (err) throw err;
+			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
+			
+			// load all dependencies in the background
+			var dependencies = toUniqueArray(AppUtils.getHomeDependencies().concat(AppUtils.getAppDependencies()));
+			LOADER.load(dependencies, function(err) {
 				if (err) throw err;
-				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
 				
-				// collect functions to render other pages
-				var funcs = [];
-				for (var key in pagesMap) {
-					if (key === page) continue;
-					if (pagesMap.hasOwnProperty(key)) {
-						funcs.push(renderPage(pagesMap[key].renderer));
-					}
-				}
-				function renderPage(renderer) {
-					return function(onDone) { renderer.render(function() { onDone(); }); }
-				}
-				
-				// render other pages in series
-				async.series(funcs, function(err) {
-					if (err) throw err;
-					
-					// done rendering application
-					if (onDone) onDone();
-				})
+				// done initializing application
+				if (onDone) onDone();
 			});
 		});
 	}
