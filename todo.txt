@@ -1,4 +1,5 @@
 TODO
+warning when running live should say "download from github then disconnect from the internet"
 homepage content
 faq content
 github description page
