@@ -7,7 +7,6 @@ remove under development warning
 regenerate donate
 final design review
 get similar domains
-mobile frequently disconnects
 sign code
 hosting
 announce
