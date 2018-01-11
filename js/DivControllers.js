@@ -193,31 +193,39 @@ function AppController(div) {
 		faqController = new FaqController($("<div>"));
 		donateLoader = new LoadController(new DonateController($("<div>")));
 		
+		// map pages to show functions
+		var showFuncs = {
+				"home": that.showHome,
+				"new": that.showForm,
+				"import": that.showImport,
+				"faq": that.showFaq,
+				"donate": that.showDonate
+		}
+		
 		// get page identifier
 		var href = window.location.href;
 		var lastIdx = href.lastIndexOf("#");
 		var page = lastIdx === -1 ? null : href.substring(lastIdx + 1);
-
-		// show first page
-		if (page === "home") that.showHome();
-		else if (page === "new") that.showForm();
-		else if (page === "import") that.showImport();
-		else if (page === "faq") that.showFaq();
-		else if (page === "donate") that.showDonate();
-		else that.showHome();
 		
-		// load notice dependencies and start polling
-		LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
-			if (err) throw err;
-			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
+		// default page
+		if (!showFuncs[page]) page = "home";
+		
+		// show initial page
+		showFuncs[page](function() {
 			
-			// load all dependencies in the background
-			var dependencies = toUniqueArray(AppUtils.getHomeDependencies().concat(AppUtils.getAppDependencies()));
-			LOADER.load(dependencies, function(err) {
+			// load notice dependencies and start polling
+			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
 				if (err) throw err;
+				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
 				
-				// done initializing application
-				if (onDone) onDone();
+				// load all dependencies in the background
+				var dependencies = toUniqueArray(AppUtils.getHomeDependencies().concat(AppUtils.getAppDependencies()));
+				LOADER.load(dependencies, function(err) {
+					if (err) throw err;
+					
+					// done initializing application
+					if (onDone) onDone();
+				});
 			});
 		});
 	}
