@@ -412,26 +412,26 @@ function HomeController(div) {
 		}
 		
 		// sample page section
-		pageDiv.append("<div style='height: 60px'>");
+		pageDiv.append("<div style='height: 70px'>");
 		pageDiv.append("<div class='home_label'>Create paper wallets and save to file</div>");
 		pageDiv.append("<div class='home_description'>Save keys to a file which can be stored on a flash drive and imported easily, or print to paper to easily create paper wallets.</div>")
 		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 		
 		// check environment section
-		pageDiv.append("<div style='height: 0px'>");
+		pageDiv.append("<div style='height: 10px'>");
 		pageDiv.append("<div class='home_label'>Generate keys securely with automated environment checks</div>");
 		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks help you generate keys in a secure environment.</div>")
 		pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
 		
 		// split and passphrase section
-		pageDiv.append("<div style='height: 60px'>");
+		pageDiv.append("<div style='height: 70px'>");
 		pageDiv.append("<div class='home_label'>Passphrase protect and split private keys for maximum security</div>");
 		pageDiv.append("<div class='home_description'>Split private keys into multiple pieces which can be stored independently.  Set how many pieces are needed to recover your keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
 		pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
 		pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
 		
 		// cryptography section
-		pageDiv.append("<div style='height:60px'>");
+		pageDiv.append("<div style='height:70px'>");
 		var hFlex = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 		hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
 		var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
@@ -439,7 +439,7 @@ function HomeController(div) {
 		vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your wallet keys.</div>");
 		
 		// download section
-		pageDiv.append("<div style='height: 60px'>");
+		pageDiv.append("<div style='height: 70px'>");
 		pageDiv.append("<div class='home_label'>Download our 100% free and open-source software and run it offline</div>");
 		pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
 		var licenseDiv = $("<div class='flex_horizontal'>").appendTo(pageDiv);
