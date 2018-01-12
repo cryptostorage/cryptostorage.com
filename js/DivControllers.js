@@ -582,12 +582,12 @@ function FaqController(div) {
 		pageDiv.append($("<div class='question'>").html("How can I generate keys as securely as possible using cryptostorage.com?"));
 		var generateDiv = $("<div class='answer'>").appendTo(pageDiv);
 		var generateList = $("<ol>").appendTo(generateDiv);
-		generateList.append("<li>Download and verify cryptostorage.com-<i>[version].zip.  See \"How can I download and verify the source code?\"</i>");
+		generateList.append("<li>Download and verify cryptostorage.com-<i>[version]</i>.zip.  See \"How can I download and verify the source code?\"</li>");
 		var generateTransfer = $("<li>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-grapped computer using a flash drive.</li>").appendTo(generateList);
 		var generateTransferList = $("<ul>").appendTo(generateTransfer);
 		generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
 		generateTransferList.append("<li>An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi</li>");
-		generateList.append("<li>Unzip cryptostorage.com-<i>[version].zip</li>");
+		generateList.append("<li>Unzip cryptostorage.com-<i>[version]</i>.zip</li>");
 		var generateBrowser = $("<li>Open index.html in the unzipped folder in a browser.</li>").appendTo(generateList);
 		var generateBrowserList = $("<ul>").appendTo(generateBrowser);
 		generateBrowserList.append("<li>An open-source browser is recommended like Firefox or Chromium</li>");
