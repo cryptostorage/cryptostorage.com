@@ -1856,5 +1856,4 @@ input[type='checkbox'][disabled] +label {
 	background-color: black;
 	opacity: 0.75;
 	color: white;
-	display: inline-block;
 }
