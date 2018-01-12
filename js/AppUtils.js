@@ -201,7 +201,8 @@ var AppUtils = {
 			"img/files.png",
 			"img/warning.png",
 			"img/checkmark.png",
-			"img/drag_and_drop.png"
+			"img/drag_and_drop.png",
+			"img/key_pair.png"
 		];
 		
 		// add dependencies
