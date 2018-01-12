@@ -566,10 +566,12 @@ function FaqController(div) {
 		verify1List.append("<li>Download the source code (.zip), signature file (.sig), and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.")
 		verify1List.append("<li>Verify the signature of the source code zip file<br><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div><br>" +
 				"You should see output similar to this.  The RSA keys must match.<br>" +
-				"<div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser <woodser@users.noreply.github.com>\"</li>");
+				"<div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser <woodser@users.noreply.github.com>\"</div><br>" +
+				"The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.<br><br>" +
+				"Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s signature, which is not necessary.</li>");
 		var verify2 = $("<li>Verify the source code has the correct checksum</li>").appendTo(verifyList);
 		var verify2List = $("<ol>").appendTo(verify2);
-		verify2List.append("<li>Download the source code (.zip) and checksum.txt from the latest release on GitHub</li>");
+		verify2List.append("<li>Download the source code (.zip) and checksum.txt from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a></li>");
 		verify2List.append("<li>Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.  Common instructions for Mac, Windows, and Linux are provided.</li>");
 		verify2List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt</li>");
 
