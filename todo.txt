@@ -1,4 +1,5 @@
 TODO
+faq identifiers
 list formatting affecting jquery.ddslick
 fix donate flicker, maybe min width
 faq may need loader
