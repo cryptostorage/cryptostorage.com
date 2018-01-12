@@ -576,7 +576,7 @@ function FaqController(div) {
 				"Linux: <div class='terminal_cmd'>sha256sum cryptostorage-<i>[version]</i>.zip</div><br>" + 
 				"Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i></div><br>" + 
 				"Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></li>");
-		verify2List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt</li>");
+		verify2List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
 
 		pageDiv.append($("<div class='question'>").html("What are the steps to generate cold storage as securely as possible?"));
 		pageDiv.append($("<div class='answer'>").html("TODO"));
