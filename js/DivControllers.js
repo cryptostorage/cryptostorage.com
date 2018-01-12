@@ -578,8 +578,17 @@ function FaqController(div) {
 				"Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></li>");
 		verify2List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
 
-		pageDiv.append($("<div class='question'>").html("What are the steps to generate cold storage as securely as possible?"));
-		pageDiv.append($("<div class='answer'>").html("TODO"));
+		// faq to generate keys as securely as possible
+		pageDiv.append($("<div class='question'>").html("How can I generate keys as securely as possible using cryptostorage.com?"));
+		var generateDiv = $("<div class='answer'>").appendTo(pageDiv);
+		var generateList = $("<ol>").appendTo(generateDiv);
+		generateList.append("<li>Download and verify cryptostorage.com-<i>[version].zip.  See \"How can I download and verify the source code?\"</i>");
+		var generateTransfer = $("<li>Put cryptostorage.com-<i>[version]</i>.zip on a secure, air-grapped computer using a flash drive.</li>").appendTo(generateList);
+		var generateTransferList = $("<ul>").appendTo(generateTransfer);
+		generateTransferList.append("<li>Hello there</li>");
+
+		
+		pageDiv.append($("<div class='answer'>").html("1. Download and verify cryptostorage.com-<i>[version].zip.  See \"How can I download and verify the source code?\"</i><br>"));
 		pageDiv.append($("<div class='question'>").html("What does it mean to split private keys?"));
 		pageDiv.append($("<div class='answer'>").html("A private key can be split into separate pieces where some of the pieces are required to reconstitute the original private key.<br><br>" +
 				"For example, a private key can be split into 3 pieces and 2 of the pieces can be required to recover the original private key.<br><br>" +
