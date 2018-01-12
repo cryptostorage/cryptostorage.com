@@ -583,12 +583,24 @@ function FaqController(div) {
 		var generateDiv = $("<div class='answer'>").appendTo(pageDiv);
 		var generateList = $("<ol>").appendTo(generateDiv);
 		generateList.append("<li>Download and verify cryptostorage.com-<i>[version].zip.  See \"How can I download and verify the source code?\"</i>");
-		var generateTransfer = $("<li>Put cryptostorage.com-<i>[version]</i>.zip on a secure, air-grapped computer using a flash drive.</li>").appendTo(generateList);
+		var generateTransfer = $("<li>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-grapped computer using a flash drive.</li>").appendTo(generateList);
 		var generateTransferList = $("<ul>").appendTo(generateTransfer);
-		generateTransferList.append("<li>Hello there</li>");
-
-		
-		pageDiv.append($("<div class='answer'>").html("1. Download and verify cryptostorage.com-<i>[version].zip.  See \"How can I download and verify the source code?\"</i><br>"));
+		generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
+		generateTransferList.append("<li>An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi</li>");
+		generateList.append("<li>Unzip cryptostorage.com-<i>[version].zip</li>");
+		var generateBrowser = $("<li>Open index.html in the unzipped folder in a browser.</li>").appendTo(generateList);
+		var generateBrowserList = $("<ul>").appendTo(generateBrowser);
+		generateBrowserList.append("<li>An open-source browser is recommended like Firefox or Chromium</li>");
+		var generateChecks = $("<li>Confirm that all environment checks pass.</li>").appendTo(generateList)
+		var generateChecksList = $("<ol>").appendTo(generateChecks);
+		generateChecksList.append("<li>Go to Generate New Keys from the homepage</li>");
+		generateChecksList.append("<li>The notice bar at the top should indicate that all checks pass.</li>");
+		var generateKeys = $("<li>Fill out the form and click Generate Keys.</li>").appendTo(generateList);
+		var generateKeysList = $("<ul>").appendTo(generateKeys);
+		generateKeysList.append("<li>Protecting your keys with a passphrase is <b>strongly recommended</b>.");
+		generateKeysList.append("<li>Optionally split your keys for maximum security.</li>");
+		generateList.append("<li>Save the generated keys to a flash drive or printed paper for safe keeping.<br><br>" +
+				"The keys can be imported at any by relaunching the application in a secure environment.</li>");
 		pageDiv.append($("<div class='question'>").html("What does it mean to split private keys?"));
 		pageDiv.append($("<div class='answer'>").html("A private key can be split into separate pieces where some of the pieces are required to reconstitute the original private key.<br><br>" +
 				"For example, a private key can be split into 3 pieces and 2 of the pieces can be required to recover the original private key.<br><br>" +
