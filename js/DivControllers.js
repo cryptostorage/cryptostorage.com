@@ -565,7 +565,7 @@ function FaqController(div) {
 			pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed."));
 			
 			// faq to download and verify source code
-			pageDiv.append($("<div class='question'>").html("How can I download and verify the source code?"));
+			pageDiv.append($("<div id='faq_download_verify' class='question'>").html("How do I download and verify the source code?"));
 			var verifyDiv = $("<div class='answer'>").appendTo(pageDiv);
 			verifyDiv.append("Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and has not been modified by an attacker.<br><br>");
 			verifyDiv.append("<b>Verifying the source code is highly recommended.<b><br><br>");
@@ -595,7 +595,7 @@ function FaqController(div) {
 			pageDiv.append($("<div id='faq_generate_keys' class='question'>").html("How can I generate keys as securely as possible using cryptostorage.com?"));
 			var generateDiv = $("<div class='answer'>").appendTo(pageDiv);
 			var generateList = $("<ol>").appendTo(generateDiv);
-			generateList.append("<li>Download and verify cryptostorage.com-<i>[version]</i>.zip.  See \"How can I download and verify the source code?\"</li>");
+			generateList.append("<li>Download and verify cryptostorage.com-<i>[version]</i>.zip.  See \"<a href='#faq_download_verify'>How do I download and verify the source code?</a>\"</li>");
 			var generateTransfer = $("<li>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-grapped computer using a flash drive.</li>").appendTo(generateList);
 			var generateTransferList = $("<ul>").appendTo(generateTransfer);
 			generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
