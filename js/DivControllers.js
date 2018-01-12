@@ -530,18 +530,37 @@ function FaqController(div) {
 		titleDiv.html("Frequently Asked Questions");
 		
 		// questions and answers
-		$("<div class='question'>").html("What is cryptostorage.com?").appendTo(pageDiv);
-		$("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.").appendTo(pageDiv);
-		$("<div class='question'>").html("How should I use cryptostorage.com to generate secure storage for my cryptocurrencies?").appendTo(pageDiv);
-		$("<div class='answer'>").html("<ol><li>Download the source code and its signature file to a flash drive.</li><li>Verify the source code has not been tampered with: TODO</li><li>Test before using by sending a small transaction and verifying that funds can be imported from the private key.</li></ol>").appendTo(pageDiv);
-		$("<div class='question'>").html("How can I trust this service?").appendTo(pageDiv);
-		$("<div class='answer'>").html("Cryptostorage.com is 100% open source and verifiable.  Downloading and verifying the source code will ensure the source code matches what is publicly audited.  See \"How do I generate secure storage using cryptostorage.com?\" for instructions to download and verify the source code.").appendTo(pageDiv);
-		$("<div class='question'>").html("Do I need internet access to import my private keys?").appendTo(pageDiv);
-		$("<div class='answer'>").html("No.  The source code is everything you need to import the private keys.  Users should save a copy of this site for future use so there is no dependence on third parties to access this software.  Further, the source code for this site is hosted on GitHub.com. (TODO)").appendTo(pageDiv);
-		$("<div class='question'>").html("Can I send funds from private keys using cryptostorage.com?").appendTo(pageDiv);
-		$("<div class='answer'>").html("Not currently.  Cryptostorage.com is a public/private key generation and importy service.  It is expected that users will import private keys into the wallet software of their choice after keys have been imported using crypstorage.com.  Support to send funds from cryptostorage.com may be considered in the future.").appendTo(pageDiv);
-		$("<div class='question'>").html("What formats can I export to?").appendTo(pageDiv);
-		$("<div class='answer'>").html("TODO").appendTo(pageDiv);
+		pageDiv.append($("<div class='question'>").html("What is cryptostorage.com?"));
+		pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."));
+		pageDiv.append($("<div class='question'>").html("What is a public/private key pair?"));
+		pageDiv.append($("<div class='answer'>").html("A public/private key pair is a public address and a private key.<br><br>" +
+				"The public address is used to receive funds.  It can be shared with anyone.<br><br>" + 
+				"The private key authorizes funds sent to its corresponding public address to be moved.  Anyone with the private key can access the funds, so it's critical to keep private keys safe, secure, and private."));
+		pageDiv.append($("<div class='question'>").html("How does cryptostorage.com help me keep my private keys safe, secure, and private?"));
+		pageDiv.append($("<div class='answer'>").html("First, this application runs only in your devices browser.  Generated keys are never shared with a third party, including us, the site owners.<br><br>" + 
+				"Second, this application lets you passphrase protect all generated private keys.  The passphrase is required to decrypt the private keys in order to access funds.<br><br>Third, this application lets you split private keys into separate pieces which must be recombined in order to recover the private keys.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.<br><br>" +
+				"Fourth, this application lets you save the generated keys to a digital file and printed paper for safe long term storage.<br><br>" +
+				"Fifth, cryptostorage.com automatically recommends ways to improve the security of the environment the application is running in."));
+		pageDiv.append($("<div class='question'>").html("What does cryptostorage.com recommend to improve the security of the environment the application is running in?"));
+		pageDiv.append($("<div class='answer'>").html("In order of importance:<br><br>" +
+				"1. Download, verify, and run the source code offline, not from the cryptostorage.com domain.<br>" +
+				"2. Run the source code on a device that is disconnected from the internet and will ideally never be connected to the internet again<br>" +
+				"3. Run the source code in an open source browser like Firefox or Chromium<br>" +
+				"4. Run the source code on an open source operating system like Tails, Ubuntu, or Raspbian for the Raspberry Pi."));
+		pageDiv.append($("<div class='question'>").html("How can I trust this service?"));
+		pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed."));
+		pageDiv.append($("<div class='question'>").html("How can I download and verify the source code?"));
+		pageDiv.append($("<div class='answer'>").html("TODO"));
+		pageDiv.append($("<div class='question'>").html("What does it mean to split private keys?"));
+		pageDiv.append($("<div class='answer'>").html("A private key can be split into separate pieces where some of the pieces are required to reconstitute the original private key.<br><br>" +
+				"For example, a private key can be split into 3 pieces and 2 of the pieces can be required to recover the original private key.<br><br>" +
+				"This is useful for geographically separating pieces of private keys so funds cannot be accessed without physically recombining the pieces."));
+		pageDiv.append($("<div class='question'>").html("Are my funds ever entrusted to a third party?"));
+		pageDiv.append($("<div class='answer'>").html("No.  The public/private key pairs are generated only in your devices browser so they are never shared with a third party by design."));
+		pageDiv.append($("<div class='question'>").html("Do I need to be online to recover private keys?"));
+		pageDiv.append($("<div class='answer'>").html("No.  The application's source code is everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub."));
+		pageDiv.append($("<div class='question'>").html("Can I send funds using cryptostorage.com?"));
+		pageDiv.append($("<div class='answer'>").html("Not currently. Cryptostorage.com is a public/private key generation and recovery service. It is expected that users will import private keys into the wallet of their choice after keys have been recovered using crypstorage.com."));
 		
 		// done rendering
 		if (onDone) onDone(div);
