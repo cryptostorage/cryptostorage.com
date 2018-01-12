@@ -10,14 +10,6 @@ body {
 	margin: 0;
 }
 
-ol, ul {
-	padding-left: 22px;
-}
-
-li {
-	padding: 15px 0px 0px 15px;
-}
-
 .flex_horizontal {
 	width: 100%;
 	display: -webkit-flex;
@@ -470,6 +462,14 @@ input[type='checkbox'][disabled] +label {
 	font-size: 18px;
 	line-height: 25px;
 	margin-bottom: 30px;
+}
+
+.answer ol, .answer ul {
+	padding-left: 22px;
+}
+
+.answer li {
+	padding: 15px 0px 0px 15px;
 }
 
 .form_links_div {
