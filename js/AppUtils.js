@@ -172,6 +172,14 @@ var AppUtils = {
 		return toUniqueArray(dependencies);
 	},
 	
+	// return all faq dependencies
+	getFaqDependencies: function() {
+		return [
+			"lib/setImmediate.js",
+			"img/key_pair.png"
+		];
+	},
+	
 	// returns all app dependencies after inital homescreen is loaded
 	getAppDependencies: function() {
 
@@ -202,7 +210,6 @@ var AppUtils = {
 			"img/warning.png",
 			"img/checkmark.png",
 			"img/drag_and_drop.png",
-			"img/key_pair.png"
 		];
 		
 		// add dependencies

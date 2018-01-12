@@ -530,7 +530,7 @@ function FaqController(div) {
 	this.render = function(onDone) {
 		
 		// load dependencies
-		LOADER.load(AppUtils.getAppDependencies(), function(err) {
+		LOADER.load(AppUtils.getFaqDependencies(), function(err) {
 			if (err) throw err;
 			
 			// div setup
