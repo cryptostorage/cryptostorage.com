@@ -1849,3 +1849,12 @@ input[type='checkbox'][disabled] +label {
 	height: 75px;
 	margin: 10px 10px 10px 10px;
 }
+
+.terminal_cmd {
+	font-family: monospace;
+	padding: 10px;
+	background-color: black;
+	opacity: 0.75;
+	color: white;
+	display: inline-block;
+}

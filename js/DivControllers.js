@@ -553,14 +553,15 @@ function FaqController(div) {
 		// faq to download and verify source code
 		pageDiv.append($("<div class='question'>").html("How can I download and verify the source code?"));
 		var verifyDiv = $("<div class='answer'>").appendTo(pageDiv);
-		verifyDiv.append("Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and not a version that has been modified by an attacker.<br><br>");
+		verifyDiv.append("Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and has not been modified by an attacker.<br><br>");
 		verifyDiv.append("<b>Verifying the source code is highly recommended.<b><br><br>");
 		verifyDiv.append("The source code can be verified in two ways.");
 		var verifyList = $("<ol>").appendTo(verifyDiv);
-		var verify1 = $("<li>Verify the source code has been signed by woodser's PGP key</li>").appendTo(verifyList);
+		var verify1 = $("<li>Verify the source code has been signed by woodser's PGP key.</li>").appendTo(verifyList);
 		var verify1List = $("<ol>").appendTo(verify1);
-		verify1List.append("<li>Install PGP software on your device</li>");
-		verify1List.append("<li>Download woodser’s public PGP key, woodser.asc, from the root of the GitHub source repository.</li>");
+		verify1List.append("<li>Install <a target='_blank' href='https://www.openpgp.org/'>PGP software</a> on your device.</li>");
+		verify1List.append("<li>Download woodser’s public PGP key, \"woodser.asc\", from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>root of the GitHub source repository</a>.</li>");
+		verify1List.append("<li>Import woodser's PGP key:<br><div class='terminal_cmd'>gpg --import woodser.asc<div></li>");
 		var verify2 = $("<li>Verify the source code has the correct checksum</li>").appendTo(verifyList);
 		var verify2List = $("<ol>").appendTo(verify2);
 		verify2List.append("<li>Download the source code (.zip) and checksum.txt from the latest release on GitHub</li>");
