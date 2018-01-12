@@ -565,7 +565,7 @@ function FaqController(div) {
 		verify1List.append("<li>Import woodser's PGP key:<br><div class='terminal_cmd'>gpg --import woodser.asc<div></li>");
 		verify1List.append("<li>Download the source code (.zip), signature file (.sig), and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.")
 		verify1List.append("<li>Verify the signature of the source code zip file<br><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div><br>" +
-				"You should see output with this RSA key:<br>" +
+				"You should see output similar to this.  The RSA keys must match.<br>" +
 				"<div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser <woodser@users.noreply.github.com>\"</li>");
 		var verify2 = $("<li>Verify the source code has the correct checksum</li>").appendTo(verifyList);
 		var verify2List = $("<ol>").appendTo(verify2);
