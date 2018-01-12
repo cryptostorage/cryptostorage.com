@@ -10,8 +10,12 @@ body {
 	margin: 0;
 }
 
-ol {
-	list-style-position: inside;
+ol, ul {
+	padding-left: 22px;
+}
+
+li {
+	padding: 15px 0px 0px 15px;
 }
 
 .flex_horizontal {

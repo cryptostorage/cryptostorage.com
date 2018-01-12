@@ -549,8 +549,24 @@ function FaqController(div) {
 				"4. Run the source code on an open source operating system like Tails, Ubuntu, or Raspbian for the Raspberry Pi."));
 		pageDiv.append($("<div class='question'>").html("How can I trust this service?"));
 		pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed."));
+		
+		// faq to download and verify source code
 		pageDiv.append($("<div class='question'>").html("How can I download and verify the source code?"));
-		pageDiv.append($("<div class='answer'>").html("TODO"));
+		var verifyDiv = $("<div class='answer'>").appendTo(pageDiv);
+		verifyDiv.append("Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and not a version that has been modified by an attacker.<br><br>");
+		verifyDiv.append("<b>Verifying the source code is highly recommended.<b><br><br>");
+		verifyDiv.append("The source code can be verified in two ways.");
+		var verifyList = $("<ol>").appendTo(verifyDiv);
+		var verify1 = $("<li>Verify the source code has been signed by woodser's PGP key</li>").appendTo(verifyList);
+		var verify1List = $("<ol>").appendTo(verify1);
+		verify1List.append("<li>Install PGP software on your device</li>");
+		verify1List.append("<li>Download woodser’s public PGP key, woodser.asc, from the root of the GitHub source repository.</li>");
+		var verify2 = $("<li>Verify the source code has the correct checksum</li>").appendTo(verifyList);
+		var verify2List = $("<ol>").appendTo(verify2);
+		verify2List.append("<li>Download the source code (.zip) and checksum.txt from the latest release on GitHub</li>");
+		verify2List.append("<li>Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.  Common instructions for Mac, Windows, and Linux are provided.</li>");
+		verify2List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt</li>");
+
 		pageDiv.append($("<div class='question'>").html("What are the steps to generate cold storage as securely as possible?"));
 		pageDiv.append($("<div class='answer'>").html("TODO"));
 		pageDiv.append($("<div class='question'>").html("What does it mean to split private keys?"));
