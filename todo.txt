@@ -1,5 +1,6 @@
 TODO
 fix donate flicker, maybe min width
+faq may need loader
 warning when running live should say "download from github then disconnect from the internet"
 homepage content
 faq content

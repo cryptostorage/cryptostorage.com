@@ -533,7 +533,8 @@ function FaqController(div) {
 		pageDiv.append($("<div class='question'>").html("What is cryptostorage.com?"));
 		pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."));
 		pageDiv.append($("<div class='question'>").html("What is a public/private key pair?"));
-		pageDiv.append($("<div class='answer'>").html("A public/private key pair is a public address and a private key.<br><br>" +
+		pageDiv.append($("<div class='answer'>").html("A public/private key pair is a public address and a private key.  For example:<br><br>" +
+				"<img class='sample_key_pair_img' src='img/key_pair.png'><br><br>" +
 				"The public address is used to receive funds.  It can be shared with anyone.<br><br>" + 
 				"The private key authorizes funds sent to its public address to be moved.  Anyone with the private key can access the funds, so it's critical to keep private keys safe and private."));
 		pageDiv.append($("<div class='question'>").html("How does cryptostorage.com help me keep my private keys safe and private?"));

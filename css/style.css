@@ -1857,3 +1857,7 @@ input[type='checkbox'][disabled] +label {
 	opacity: 0.75;
 	color: white;
 }
+
+.sample_key_pair_img {
+	width: 100%;
+}
