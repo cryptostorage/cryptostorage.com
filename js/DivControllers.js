@@ -542,6 +542,9 @@ function FaqController(div) {
 			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
 			titleDiv.html("Frequently Asked Questions");
 			
+			// div for question links
+			var questionLinks = $("<div>").appendTo(pageDiv);
+			
 			// questions and answers
 			pageDiv.append($("<div class='question'>").html("What is cryptostorage.com?"));
 			pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."));
@@ -613,7 +616,7 @@ function FaqController(div) {
 			generateKeysList.append("<li>Protecting your keys with a passphrase is <b>strongly recommended</b>.");
 			generateKeysList.append("<li>Optionally split your keys for maximum security.</li>");
 			generateList.append("<li>Save the generated keys to a flash drive or printed paper for safe keeping.<br><br>" +
-					"The keys can be imported at any by relaunching the application in a secure environment.</li>");
+					"The keys can be imported at any time by relaunching the application in a secure environment.</li>");
 			pageDiv.append($("<div class='question'>").html("What does it mean to split private keys?"));
 			pageDiv.append($("<div class='answer'>").html("A private key can be split into separate pieces where some of the pieces are required to reconstitute the original private key.<br><br>" +
 					"For example, a private key can be split into 3 pieces and 2 of the pieces can be required to recover the original private key.<br><br>" +
@@ -624,6 +627,14 @@ function FaqController(div) {
 			pageDiv.append($("<div class='answer'>").html("No.  The application's source code is everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub."));
 			pageDiv.append($("<div class='question'>").html("Can I send funds using cryptostorage.com?"));
 			pageDiv.append($("<div class='answer'>").html("Not currently. Cryptostorage.com is a public/private key generation and recovery service. It is expected that users will import private keys into the wallet of their choice after keys have been recovered using crypstorage.com."));
+			
+			// build question links
+			$(".question", pageDiv).each(function(idx) {
+				$(this).attr("id", "faq" + (idx + 1));
+				questionLinks.append($("<a href='#faq" + (idx + 1) + "'>" + $(this).get(0).innerHTML + "</a>"));
+				questionLinks.append("<br>");
+			});
+			questionLinks.append("<br>");
 			
 			// done rendering
 			if (onDone) onDone(div);
