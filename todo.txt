@@ -1,4 +1,5 @@
 TODO
+regenerate pgp key
 prioritize checksum
 warning when running live should say "download from github then disconnect from the internet"
 homepage content
