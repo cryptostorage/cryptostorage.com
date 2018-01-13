@@ -149,8 +149,8 @@ function AppController(div) {
 		homeLoader = new LoadController(new HomeController($("<div>")));
 		formLoader = new LoadController(new FormController($("<div>")));
 		importLoader = new LoadController(new ImportController($("<div>")));
-		faqLoader = new LoadController(new FaqController($("<div>")));
-		donateLoader = new LoadController(new DonateController($("<div>")));
+		faqLoader = new LoadController(new FaqController($("<div>")), {enableScroll: true});
+		donateLoader = new LoadController(new DonateController($("<div>")), {enableScroll: true});
 		
 		// map pages to show functions
 		var showFuncs = {
@@ -3267,15 +3267,17 @@ inheritsFrom(NoticeController, DivController);
 /**
  * Invokes the renderer and presents a loading wheel until it's done.
  * 
- * Works by wrapping the renderer's div with the loader's div until done.
+ * Requires that the div be hidden while rendering.
  * 
- * Requires that the div can be hidden while rendered.
+ * Works by wrapping the renderer's div with the loader's div until done.
  * 
  * Call getDiv() to get the best representation of current state (wrapper or renderer's div).
  * 
  * @param renderer renders the content to a div which is hidden by a loading wheel until done
+ * @param config allows load rendering customization
+ * 				config.enableScroll	specifies if the scroll bar should show during loading (UI tweak)
  */
-function LoadController(renderer) {
+function LoadController(renderer, config) {
 	DivController.call(this, renderer.getDiv());
 	var isLoading = false;
 	var wrapper;
@@ -3311,6 +3313,7 @@ function LoadController(renderer) {
 			renderer.getDiv().wrap("<div class='flex_vertical'>");	// wrap div with loading
 			wrapper = renderer.getDiv().parent();
 			wrapper.prepend(loadingImg);
+			if (config && config.enableScroll) wrapper.css("margin-bottom", "1200px");
 			
 			// load is done
 			if (onLoaderDone) onLoaderDone(wrapper);
