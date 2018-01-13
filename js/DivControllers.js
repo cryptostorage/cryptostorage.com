@@ -58,50 +58,6 @@ var UiUtils = {
 	},
 	
 	/**
-	 * Renders loading UI until the given dependences are loaded.
-	 * 
-	 * @param div is the div to render to
-	 * @param dependencies are the dependencies to load
-	 * @param onDone(err) is invoked when done or on error
-	 */
-	loadingDiv: function(div, dependencies, onDone) {
-		
-		// done if dependencies loaded
-		if (LOADER.isLoaded(dependencies)) {
-			if (onDone) onDone();
-		}
-		
-		// dependencies not loaded
-		else {
-			
-			// load loading gif
-			var loading = new Image();
-			loading.onload = function() {
-				$(loading).addClass("loading");
-				div.empty();
-				var loadingDiv = $("<div class='flex_horizontal'>").appendTo(div);
-				loadingDiv.append(loading);
-				
-				// load dependencies
-				LOADER.load(dependencies, function(err) {
-					
-					// check for error
-					if (err) {
-						if (onDone) onDone(err);
-					}
-					
-					// remove loading div and done
-					else {
-						loadingDiv.detach();
-						if (onDone) onDone();
-					}
-				});
-			};
-			loading.src = "img/loading.gif";
-		}
-	},
-	
-	/**
 	 * Returns the maximum width for UI tooltips.
 	 */
 	getInfoTooltipsMaxWidth: function() {
@@ -128,14 +84,15 @@ DivController.prototype.onHide = function() { }
 function AppController(div) {
 	
 	var that = this;
-	var sliderController;
-	var sliderDiv;
+	var introDiv;
+	var introController;
 	var contentDiv;
-	var homeController;
+	var homeLoader;
 	var formLoader;
 	var importLoader;
 	var faqLoader;
 	var donateLoader;
+	var currentPage;
 	
 	this.render = function(onDone) {
 		
@@ -181,14 +138,15 @@ function AppController(div) {
 		}
 		
 		// slider (has to be attached to the DOM and shown to work, so it's a special case and not part of HomeController)
-		sliderDiv = $("<div>").appendTo(headerDiv);
-		sliderController = new SliderController(sliderDiv, onSelectGenerate, onSelectImport);
+		introDiv = $("<div class='intro_div'>").hide();
+		introDiv.appendTo(headerDiv);
+		introController = new IntroController(introDiv, onSelectGenerate, onSelectImport);
 		
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
 		
 		// initialize controllers
-		homeController = new HomeController($("<div>"));
+		homeLoader = new LoadController(new HomeController($("<div>")));
 		formLoader = new LoadController(new FormController($("<div>")));
 		importLoader = new LoadController(new ImportController($("<div>")));
 		faqLoader = new LoadController(new FaqController($("<div>")));
@@ -222,7 +180,7 @@ function AppController(div) {
 				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
 				
 				// load all dependencies in the background
-				var dependencies = toUniqueArray(AppUtils.getHomeDependencies().concat(AppUtils.getAppDependencies()));
+				var dependencies = toUniqueArray(AppUtils.getHomeDependencies().concat(AppUtils.getAppDependencies()).concat(AppUtils.getFaqDependencies()));
 				LOADER.load(dependencies, function(err) {
 					if (err) throw err;
 					
@@ -235,28 +193,25 @@ function AppController(div) {
 	
 	this.showHome = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
-		
-		// loading div until dependencies loaded
-		UiUtils.loadingDiv(contentDiv, AppUtils.getHomeDependencies(), function(err) {
-			if (err) throw err;
-			sliderDiv.show();
-			sliderController.render(function() {
-				setContentDiv(homeController.getDiv());
-				if (homeController.getDiv().children().length) finish();
-				else homeController.render(finish);
-				function finish() {
-					formLoader.getRenderer().startOver();
-					importLoader.getRenderer().startOver();
-					if (onDone) onDone();
-				}
-			})
+		currentPage = "home";
+		homeLoader.render(function() {
+			if (currentPage !== "home") return;
+			introDiv.show();
+			introController.render(function() {
+				if (onDone) onDone();
+			});
+		}, function() {
+			setContentDiv(homeLoader.getDiv());
+			formLoader.getRenderer().startOver();
+			importLoader.getRenderer().startOver();
 		});
 	}
 	
 	this.showForm = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showForm()");
+		currentPage = "form";
 		formLoader.render(onDone, function() {
-			sliderDiv.hide();
+			introDiv.hide();
 			setContentDiv(formLoader.getDiv());
 			importLoader.getRenderer().startOver();
 		});
@@ -264,6 +219,7 @@ function AppController(div) {
 	
 	this.showFaq = function(onDone, fragmentId) {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
+		currentPage = "faq";
 		faqLoader.render(function() {
 			setImmediate(function() {
 				if (fragmentId) {
@@ -273,7 +229,7 @@ function AppController(div) {
 				if (onDone) onDone();
 			});
 		}, function() {
-			sliderDiv.hide();
+			introDiv.hide();
 			setContentDiv(faqLoader.getDiv());
 			formLoader.getRenderer().startOver();
 			importLoader.getRenderer().startOver();
@@ -282,8 +238,9 @@ function AppController(div) {
 	
 	this.showDonate = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showDonate()");
+		currentPage = "donate";
 		donateLoader.render(onDone, function() {
-			sliderDiv.hide();
+			introDiv.hide();
 			setContentDiv(donateLoader.getDiv());
 			formLoader.getRenderer().startOver();
 			importLoader.getRenderer().startOver();
@@ -292,8 +249,9 @@ function AppController(div) {
 	
 	this.showImport = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showImport()");
+		currentPage = "import";
 		importLoader.render(onDone, function() {
-			sliderDiv.hide();
+			introDiv.hide();
 			setContentDiv(importLoader.getDiv());
 			formLoader.getRenderer().startOver();
 		});
@@ -321,7 +279,7 @@ inheritsFrom(AppController, DivController);
 /**
  * Intro with slider and call to action.
  */
-function SliderController(div, onSelectGenerate, onSelectImport) {
+function IntroController(div, onSelectGenerate, onSelectImport) {
 	DivController.call(this, div);
 	var that = this;
 	this.render = function(onDone) {
@@ -377,7 +335,7 @@ function SliderController(div, onSelectGenerate, onSelectImport) {
 		mixImg.src = "img/mix.png";
 	}
 }
-inheritsFrom(SliderController, DivController);
+inheritsFrom(IntroController, DivController);
 
 /**
  * Home page content.
@@ -388,97 +346,101 @@ function HomeController(div) {
 	DivController.call(this, div);
 	this.render = function(onDone) {
 		
-		// div setup
-		div.empty();
-		div.attr("class", "content_div flex_vertical");
-		
-		// notice container
-		var noticeContainer = $("<div class='notice_container'>").appendTo(div);
-		
-		// home content
-		var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
-		
-		// supported currencies
-		pageDiv.append($("<div class='home_label'>Supports these tokens</div>"));
-		var plugins = AppUtils.getCryptoPlugins();
-		pageDiv.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
-		var moreDiv = null;
-		for (var i = 3; i < plugins.length; i += 4) {
-			var row = getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked);
-			if (i >= 7 && !moreDiv) {
-				moreDiv = $("<div>").appendTo(pageDiv);
-				moreDiv.hide();
+		// load home dependencies
+		LOADER.load(AppUtils.getHomeDependencies(), function() {
+			
+			// div setup
+			div.empty();
+			div.attr("class", "content_div flex_vertical");
+			
+			// notice container
+			var noticeContainer = $("<div class='notice_container'>").appendTo(div);
+			
+			// home content
+			var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
+			
+			// supported currencies
+			pageDiv.append($("<div class='home_label'>Supports these tokens</div>"));
+			var plugins = AppUtils.getCryptoPlugins();
+			pageDiv.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
+			var moreDiv = null;
+			for (var i = 3; i < plugins.length; i += 4) {
+				var row = getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked);
+				if (i >= 7 && !moreDiv) {
+					moreDiv = $("<div>").appendTo(pageDiv);
+					moreDiv.hide();
+				}
+				if (moreDiv) moreDiv.append(row);
+				else pageDiv.append(row);
 			}
-			if (moreDiv) moreDiv.append(row);
-			else pageDiv.append(row);
-		}
-		if (moreDiv) {
-			var moreLabel = $("<div class='home_more_label'>").appendTo(pageDiv);
-			moreLabel.append("and " + (plugins.length - 7) + " more...");
-			moreLabel.click(function() {
-				moreLabel.hide();
-				moreDiv.show();
+			if (moreDiv) {
+				var moreLabel = $("<div class='home_more_label'>").appendTo(pageDiv);
+				moreLabel.append("and " + (plugins.length - 7) + " more...");
+				moreLabel.click(function() {
+					moreLabel.hide();
+					moreDiv.show();
+				});
+			}
+			
+			// sample page section
+			pageDiv.append("<div style='height: 70px'>");
+			pageDiv.append("<div class='home_label'>Create paper wallets and save to file</div>");
+			pageDiv.append("<div class='home_description'>Save keys to a file which can be stored on a flash drive and imported easily, or print to paper to easily create paper wallets.</div>")
+			pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
+			
+			// check environment section
+			pageDiv.append("<div style='height: 10px'>");
+			pageDiv.append("<div class='home_label'>Generate keys securely with automated environment checks</div>");
+			pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks help you generate keys in a secure environment.</div>")
+			pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
+			
+			// split and passphrase section
+			pageDiv.append("<div style='height: 70px'>");
+			pageDiv.append("<div class='home_label'>Passphrase protect and split private keys for maximum security</div>");
+			pageDiv.append("<div class='home_description'>Split private keys into multiple pieces which can be stored independently.  Set how many pieces are needed to recover your keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
+			pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
+			pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
+			
+			// cryptography section
+			pageDiv.append("<div style='height:70px'>");
+			var hFlex = $("<div class='flex_horizontal'>").appendTo(pageDiv);
+			hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
+			var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
+			vFlex.append("<div class='home_label'>Strong cryptography</div>");
+			vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your wallet keys.</div>");
+			
+			// download section
+			pageDiv.append("<div style='height: 70px'>");
+			pageDiv.append("<div class='home_label'>Download our 100% free and open-source software and run it offline</div>");
+			pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
+			var licenseDiv = $("<div class='flex_horizontal'>").appendTo(pageDiv);
+			var mitImg = $().appendTo(licenseDiv);
+			licenseDiv.append("<a href='./LICENSE.txt'><img src='img/mit.png' class='license_img'></a>");
+			licenseDiv.append("<a href='https://github.com/cryptostorage/cryptostorage.com'><img src='img/github.png' class='license_img'></a>");
+			pageDiv.append("<div style='height: 20px;'>");
+			var downloadBtn = $("<a class='light_green_btn' href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>").appendTo(pageDiv);
+			downloadBtn.append("Download Now (zip)");
+			
+			// footer
+			var footerDiv = $("<div class='home_footer_div flex_horizontal'>").appendTo(div);
+			footerDiv.append($("<div class='home_footer_version flex_horizontal'></div>"));
+			var descriptionDiv = $("<div class='home_footer_description flex_horizontal'>").appendTo(footerDiv);
+			descriptionDiv.append("© cryptostorage.com.  MIT licensed.<br>JavaScript copyrights included in the source. No warranty.");
+			var versionDiv = $("<div class='home_footer_version flex_horizontal flex_justify_end'>").appendTo(footerDiv);
+			versionDiv.append("<a href='./versions.txt' target='_blank'>version 0.0.1 alpha</a>");
+			
+			// done rendering
+			if (onDone) onDone(div);
+			
+			// render notice bar
+			new NoticeController($("<div>").appendTo(noticeContainer), {showOnFail: true, showOnWarn: false, showOnPass: false}).render();
+			
+			// track environment failure to disable clicking currency
+			var environmentFailure = false;
+			AppUtils.addEnvironmentListener(function() {
+				environmentFailure = AppUtils.hasEnvironmentState("fail");
 			});
-		}
-		
-		// sample page section
-		pageDiv.append("<div style='height: 70px'>");
-		pageDiv.append("<div class='home_label'>Create paper wallets and save to file</div>");
-		pageDiv.append("<div class='home_description'>Save keys to a file which can be stored on a flash drive and imported easily, or print to paper to easily create paper wallets.</div>")
-		pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
-		
-		// check environment section
-		pageDiv.append("<div style='height: 10px'>");
-		pageDiv.append("<div class='home_label'>Generate keys securely with automated environment checks</div>");
-		pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks help you generate keys in a secure environment.</div>")
-		pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
-		
-		// split and passphrase section
-		pageDiv.append("<div style='height: 70px'>");
-		pageDiv.append("<div class='home_label'>Passphrase protect and split private keys for maximum security</div>");
-		pageDiv.append("<div class='home_description'>Split private keys into multiple pieces which can be stored independently.  Set how many pieces are needed to recover your keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
-		pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
-		pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
-		
-		// cryptography section
-		pageDiv.append("<div style='height:70px'>");
-		var hFlex = $("<div class='flex_horizontal'>").appendTo(pageDiv);
-		hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
-		var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
-		vFlex.append("<div class='home_label'>Strong cryptography</div>");
-		vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your wallet keys.</div>");
-		
-		// download section
-		pageDiv.append("<div style='height: 70px'>");
-		pageDiv.append("<div class='home_label'>Download our 100% free and open-source software and run it offline</div>");
-		pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
-		var licenseDiv = $("<div class='flex_horizontal'>").appendTo(pageDiv);
-		var mitImg = $().appendTo(licenseDiv);
-		licenseDiv.append("<a href='./LICENSE.txt'><img src='img/mit.png' class='license_img'></a>");
-		licenseDiv.append("<a href='https://github.com/cryptostorage/cryptostorage.com'><img src='img/github.png' class='license_img'></a>");
-		pageDiv.append("<div style='height: 20px;'>");
-		var downloadBtn = $("<a class='light_green_btn' href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>").appendTo(pageDiv);
-		downloadBtn.append("Download Now (zip)");
-		
-		// footer
-		var footerDiv = $("<div class='home_footer_div flex_horizontal'>").appendTo(div);
-		footerDiv.append($("<div class='home_footer_version flex_horizontal'></div>"));
-		var descriptionDiv = $("<div class='home_footer_description flex_horizontal'>").appendTo(footerDiv);
-		descriptionDiv.append("© cryptostorage.com.  MIT licensed.<br>JavaScript copyrights included in the source. No warranty.");
-		var versionDiv = $("<div class='home_footer_version flex_horizontal flex_justify_end'>").appendTo(footerDiv);
-		versionDiv.append("<a href='./versions.txt' target='_blank'>version 0.0.1 alpha</a>");
-		
-		// done rendering
-		if (onDone) onDone(div);
-		
-		// render notice bar
-		new NoticeController($("<div>").appendTo(noticeContainer), {showOnFail: true, showOnWarn: false, showOnPass: false}).render();
-		
-		// track environment failure to disable clicking currency
-		var environmentFailure = false;
-		AppUtils.addEnvironmentListener(function() {
-			environmentFailure = AppUtils.hasEnvironmentState("fail");
-		});
+		})
 		
 		function onCurrencyClicked(plugin) {
 			if (!environmentFailure) UiUtils.openStorage(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
@@ -3305,10 +3267,13 @@ inheritsFrom(NoticeController, DivController);
 /**
  * Invokes the renderer and presents a loading wheel until it's done.
  * 
- * Works by wrapping the renderer's div with the loader's div.
- * Call getDiv() to get best representation of current state (wrapper or renderer's div).
+ * Works by wrapping the renderer's div with the loader's div until done.
  * 
- * @param renderer renders the content
+ * Requires that the div can be hidden while rendered.
+ * 
+ * Call getDiv() to get the best representation of current state (wrapper or renderer's div).
+ * 
+ * @param renderer renders the content to a div which is hidden by a loading wheel until done
  */
 function LoadController(renderer) {
 	DivController.call(this, renderer.getDiv());
@@ -3328,16 +3293,16 @@ function LoadController(renderer) {
 			if (onLoaderDone) onLoaderDone(wrapper);
 			return;
 		}
-		isLoading = true;
 		
 		// check if already rendered
 		if (renderer.getDiv().children().length) {
-			if (onRenderDone) onRenderDone(renderer.getDiv());
 			if (onLoaderDone) onLoaderDone(renderer.getDiv());
+			if (onRenderDone) onRenderDone(renderer.getDiv());
 			return;
 		}
 		
 		// load loading gif
+		isLoading = true;
 		var loadingImg = new Image();
 		loadingImg.onload = function() {
 			$(loadingImg).addClass("loading");

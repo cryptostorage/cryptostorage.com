@@ -164,6 +164,7 @@ body {
 	width: 100%;
 	background-color: rgb(17, 119, 184);
 	position: relative;
+	min-height: 245px;
 }
 
 .slider_div {

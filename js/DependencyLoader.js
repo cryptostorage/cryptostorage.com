@@ -33,8 +33,10 @@ function DependencyLoader() {
 			if (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".gif")) {
 				if (!arrayContains(loadedImages, path)) imagesToLoad.push(path);
 			} else {
-				scriptsToLoad.push(path);
-				if (!loadjs.isDefined(path)) loadjs(path, path);
+				if (!loadjs.isDefined(path)) {
+					scriptsToLoad.push(path);
+					loadjs(path, path);
+				}
 			}
 		}
 		
@@ -44,11 +46,18 @@ function DependencyLoader() {
 			return;
 		}
 		
-		// execute functions to fetch scripts and images
-		var funcs = [getScriptsFunc(scriptsToLoad), getImagesFunc(imagesToLoad)];
-		async.parallel(funcs, function(err, result) {
-			if (onDone) onDone(err);
-		});
+		// simulate load time
+		if (AppUtils.SIMULATED_LOAD_TIME) {
+			setTimeout(function() { loadAsync(); }, AppUtils.SIMULATED_LOAD_TIME);
+		} else loadAsync();
+		
+		// executes functions to fetch scripts and images
+		function loadAsync() {
+			var funcs = [getScriptsFunc(scriptsToLoad), getImagesFunc(imagesToLoad)];
+			async.parallel(funcs, function(err, result) {
+				if (onDone) onDone(err);
+			});
+		}
 		
 		function getScriptsFunc(paths) {
 			return function(onDone) {
