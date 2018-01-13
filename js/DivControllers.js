@@ -434,13 +434,13 @@ function HomeController(div) {
 			
 			// render notice bar
 			new NoticeController($("<div>").appendTo(noticeContainer), {showOnFail: true, showOnWarn: false, showOnPass: false}).render();
-			
-			// track environment failure to disable clicking currency
-			var environmentFailure = false;
-			AppUtils.addEnvironmentListener(function() {
-				environmentFailure = AppUtils.hasEnvironmentState("fail");
-			});
-		})
+		});
+		
+		// track environment failure to disable clicking currency
+		var environmentFailure = false;
+		AppUtils.addEnvironmentListener(function() {
+			environmentFailure = AppUtils.hasEnvironmentState("fail");
+		});
 		
 		function onCurrencyClicked(plugin) {
 			if (!environmentFailure) UiUtils.openStorage(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
