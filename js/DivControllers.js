@@ -558,7 +558,7 @@ function FaqController(div) {
 					"Second, this application lets you passphrase protect all generated private keys.  The passphrase is required to decrypt the private keys in order to access funds.<br><br>Third, this application lets you split private keys into separate pieces which must be recombined in order to recover the private keys.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.<br><br>" +
 					"Fourth, this application lets you save the generated keys to a digital file and printed paper for safe long term storage.<br><br>" +
 					"Fifth, cryptostorage.com automatically recommends ways to improve the security of the environment the application is running in."));
-			pageDiv.append($("<div class='question'>").html("What recommendations does cryptostorage.com make to improve the security of my environment?"));
+			pageDiv.append($("<div class='question'>").html("How should I improve the security of my environment?"));
 			pageDiv.append($("<div class='answer'>").html("In order of importance:<br><br>" +
 					"1. Download, verify, and run the source code offline, not from the cryptostorage.com domain.<br>" +
 					"2. Run the source code on a device that is disconnected from the internet and will ideally never be connected to the internet again<br>" +
