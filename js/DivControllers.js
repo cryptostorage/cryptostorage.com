@@ -137,7 +137,7 @@ function AppController(div) {
 			return div;
 		}
 		
-		// slider (has to be attached to the DOM and shown to work, so it's a special case and not part of HomeController)
+		// slider has to be attached to the DOM and shown to work, so it's a special case and not part of HomeController
 		introDiv = $("<div class='intro_div'>").hide();
 		introDiv.appendTo(headerDiv);
 		introController = new IntroController(introDiv, onSelectGenerate, onSelectImport);
@@ -171,7 +171,7 @@ function AppController(div) {
 		if (page.startsWith("faq")) page = "faq";
 		else if (!showFuncs[page]) page = "home";
 		
-		// show initial page
+		// show first page
 		showFuncs[page](function() {
 			
 			// load notice dependencies and start polling
