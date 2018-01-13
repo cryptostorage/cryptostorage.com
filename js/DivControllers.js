@@ -297,7 +297,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			sliderDiv = $("<div class='slider_div'>").appendTo(div);
 			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage.").appendTo(sliderDiv);
-			getSlide($("<img src='img/security.png'>"), "Runs 100% in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
+			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automated environment checks.").appendTo(sliderDiv);
@@ -384,20 +384,20 @@ function HomeController(div) {
 			
 			// sample page section
 			pageDiv.append("<div style='height: 70px'>");
-			pageDiv.append("<div class='home_label'>Create paper wallets and save to file</div>");
-			pageDiv.append("<div class='home_description'>Save keys to a file which can be stored on a flash drive and imported easily, or print to paper to easily create paper wallets.</div>")
+			pageDiv.append("<div class='home_label'>Export to printable and digital formats for long term storage</div>");
+			pageDiv.append("<div class='home_description'>Save keys to a file which can be stored securely on a flash drive, or print to paper to easily create paper wallets.</div>")
 			pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 			
 			// check environment section
 			pageDiv.append("<div style='height: 10px'>");
 			pageDiv.append("<div class='home_label'>Generate keys securely with automated environment checks</div>");
-			pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks help you generate keys in a secure environment.</div>")
+			pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks help generate keys in a secure environment.</div>")
 			pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
 			
 			// split and passphrase section
 			pageDiv.append("<div style='height: 70px'>");
 			pageDiv.append("<div class='home_label'>Passphrase protect and split private keys for maximum security</div>");
-			pageDiv.append("<div class='home_description'>Split private keys into multiple pieces which can be stored independently.  Set how many pieces are needed to recover your keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
+			pageDiv.append("<div class='home_description'>Split private keys into multiple pieces which can be stored independently.  Set how many pieces are needed to recover the keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
 			pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
 			pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
 			
@@ -407,7 +407,7 @@ function HomeController(div) {
 			hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
 			var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
 			vFlex.append("<div class='home_label'>Strong cryptography</div>");
-			vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your wallet keys.</div>");
+			vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your keys.</div>");
 			
 			// download section
 			pageDiv.append("<div style='height: 70px'>");
@@ -506,13 +506,13 @@ function FaqController(div) {
 			titleDiv.html("Frequently Asked Questions");
 			
 			// div for question links
-			var questionLinks = $("<div>").appendTo(pageDiv);
+			var faqLinks = $("<div class='faq_links'>").appendTo(pageDiv);
 			
 			// questions and answers
 			pageDiv.append($("<div class='question'>").html("What is cryptostorage.com?"));
 			pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."));
 			pageDiv.append($("<div class='question'>").html("What is a public/private key pair?"));
-			pageDiv.append($("<div class='answer'>").html("A public/private key pair is a public address and a private key.  For example:<br><br>" +
+			pageDiv.append($("<div class='answer'>").html("A public/private key pair is a public address and a private key.  For example:<br>" +
 					"<img class='sample_key_pair_img' src='img/key_pair.png'><br><br>" +
 					"The public address is used to receive funds.  It can be shared with anyone.<br><br>" + 
 					"The private key authorizes funds sent to its public address to be moved.  Anyone with the private key can access the funds, so it's critical to keep private keys safe and private."));
@@ -521,17 +521,41 @@ function FaqController(div) {
 					"Second, this application lets you passphrase protect all generated private keys.  The passphrase is required to decrypt the private keys in order to access funds.<br><br>Third, this application lets you split private keys into separate pieces which must be recombined in order to recover the private keys.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.<br><br>" +
 					"Fourth, this application lets you save the generated keys to a digital file and printed paper for safe long term storage.<br><br>" +
 					"Fifth, cryptostorage.com automatically recommends ways to improve the security of the environment the application is running in."));
-			pageDiv.append($("<div class='question'>").html("How should I improve the security of my environment?"));
-			pageDiv.append($("<div class='answer'>").html("In order of importance:<br><br>" +
-					"1. Download, verify, and run the source code offline, not from the cryptostorage.com domain.<br>" +
-					"2. Run the source code on a device that is disconnected from the internet and will ideally never be connected to the internet again<br>" +
-					"3. Run the source code in an open source browser like Firefox or Chromium<br>" +
-					"4. Run the source code on an open source operating system like Tails, Ubuntu, or Raspbian for the Raspberry Pi."));
-			pageDiv.append($("<div class='question'>").html("How can I trust this service?"));
-			pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed."));
+			pageDiv.append($("<div class='question'>").html("What environment recommendations does cryptostorage.com make?"));
+			var recommendationsDiv = $("<div class='answer'>").appendTo(pageDiv);
+			recommendationsDiv.append("In order of importance:<br>");
+			var recommendationsList = $("<ol>").appendTo(recommendationsDiv);
+			recommendationsList.append("<li>Download, verify, and run the source code offline, not from the cryptostorage.com domain.</li>");
+			recommendationsList.append("<li>Run the source code on a device that is disconnected from the internet and will ideally never be connected to the internet again.</li>");
+			recommendationsList.append("<li>Run the source code in an open source browser like Firefox or Chromium.</li>");
+			recommendationsList.append("<li>Run the source code on an open source operating system like Tails, Ubuntu, or Raspbian for the Raspberry Pi.</li>");
+			
+			// faq to generate keys as securely as possible
+			pageDiv.append($("<div id='faq_generate_keys' class='question'>").html("How can I generate keys as securely as possible using cryptostorage.com?"));
+			var generateDiv = $("<div class='answer'>").appendTo(pageDiv);
+			var generateList = $("<ol>").appendTo(generateDiv);
+			generateList.append("<li>Download and verify cryptostorage.com-<i>[version]</i>.zip.  See \"<a href='#faq6'>How can I download and verify the source code?</a>\"</li>");
+			var generateTransfer = $("<li>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-grapped computer using a flash drive.</li>").appendTo(generateList);
+			var generateTransferList = $("<ul>").appendTo(generateTransfer);
+			generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
+			generateTransferList.append("<li>An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi</li>");
+			generateList.append("<li>Unzip cryptostorage.com-<i>[version]</i>.zip</li>");
+			var generateBrowser = $("<li>Open index.html in the unzipped folder in a browser.</li>").appendTo(generateList);
+			var generateBrowserList = $("<ul>").appendTo(generateBrowser);
+			generateBrowserList.append("<li>An open-source browser is recommended like Firefox or Chromium</li>");
+			var generateChecks = $("<li>Confirm that all environment checks pass.</li>").appendTo(generateList)
+			var generateChecksList = $("<ol>").appendTo(generateChecks);
+			generateChecksList.append("<li>Go to Generate New Keys from the homepage</li>");
+			generateChecksList.append("<li>The notice bar at the top should indicate that all checks pass:<br><img style='width:100%;' src='img/notice_bar_pass.png'></div></li>");
+			var generateKeys = $("<li>Fill out the form and click Generate Keys.</li>").appendTo(generateList);
+			var generateKeysList = $("<ul>").appendTo(generateKeys);
+			generateKeysList.append("<li>Protecting your keys with a passphrase is <b>strongly recommended</b>.");
+			generateKeysList.append("<li>Optionally split your keys for maximum security.</li>");
+			generateList.append("<li>Save the generated keys to a flash drive or printed paper for safe keeping.<br><br>" +
+					"The keys can be imported at any time by relaunching the application in a secure environment.</li>");
 			
 			// faq to download and verify source code
-			pageDiv.append($("<div id='faq_download_verify' class='question'>").html("How do I download and verify the source code?"));
+			pageDiv.append($("<div id='faq_download_verify' class='question'>").html("How can I download and verify the source code?"));
 			var verifyDiv = $("<div class='answer'>").appendTo(pageDiv);
 			verifyDiv.append("Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and has not been modified by an attacker.<br><br>");
 			verifyDiv.append("<b>Verifying the source code is highly recommended.<b><br><br>");
@@ -556,36 +580,15 @@ function FaqController(div) {
 					"Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i></div><br>" + 
 					"Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></li>");
 			verify2List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
-
-			// faq to generate keys as securely as possible
-			pageDiv.append($("<div id='faq_generate_keys' class='question'>").html("How can I generate keys as securely as possible using cryptostorage.com?"));
-			var generateDiv = $("<div class='answer'>").appendTo(pageDiv);
-			var generateList = $("<ol>").appendTo(generateDiv);
-			generateList.append("<li>Download and verify cryptostorage.com-<i>[version]</i>.zip.  See \"<a href='#faq6'>How do I download and verify the source code?</a>\"</li>");
-			var generateTransfer = $("<li>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-grapped computer using a flash drive.</li>").appendTo(generateList);
-			var generateTransferList = $("<ul>").appendTo(generateTransfer);
-			generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
-			generateTransferList.append("<li>An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi</li>");
-			generateList.append("<li>Unzip cryptostorage.com-<i>[version]</i>.zip</li>");
-			var generateBrowser = $("<li>Open index.html in the unzipped folder in a browser.</li>").appendTo(generateList);
-			var generateBrowserList = $("<ul>").appendTo(generateBrowser);
-			generateBrowserList.append("<li>An open-source browser is recommended like Firefox or Chromium</li>");
-			var generateChecks = $("<li>Confirm that all environment checks pass.</li>").appendTo(generateList)
-			var generateChecksList = $("<ol>").appendTo(generateChecks);
-			generateChecksList.append("<li>Go to Generate New Keys from the homepage</li>");
-			generateChecksList.append("<li>The notice bar at the top should indicate that all checks pass:<br><img style='width:100%;' src='img/notice_bar_pass.png'></div></li>");
-			var generateKeys = $("<li>Fill out the form and click Generate Keys.</li>").appendTo(generateList);
-			var generateKeysList = $("<ul>").appendTo(generateKeys);
-			generateKeysList.append("<li>Protecting your keys with a passphrase is <b>strongly recommended</b>.");
-			generateKeysList.append("<li>Optionally split your keys for maximum security.</li>");
-			generateList.append("<li>Save the generated keys to a flash drive or printed paper for safe keeping.<br><br>" +
-					"The keys can be imported at any time by relaunching the application in a secure environment.</li>");
+			
+			pageDiv.append($("<div class='question'>").html("How can I trust this service?"));
+			pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed."));
+			pageDiv.append($("<div class='question'>").html("Are my funds ever entrusted to a third party?"));
+			pageDiv.append($("<div class='answer'>").html("No.  The public/private key pairs are generated only in your devices browser so they are never shared with a third party by design."));
 			pageDiv.append($("<div class='question'>").html("What does it mean to split private keys?"));
 			pageDiv.append($("<div class='answer'>").html("A private key can be split into separate pieces where some of the pieces are required to reconstitute the original private key.<br><br>" +
 					"For example, a private key can be split into 3 pieces and 2 of the pieces can be required to recover the original private key.<br><br>" +
 					"This is useful for geographically separating pieces of private keys so funds cannot be accessed without physically recombining the pieces."));
-			pageDiv.append($("<div class='question'>").html("Are my funds ever entrusted to a third party?"));
-			pageDiv.append($("<div class='answer'>").html("No.  The public/private key pairs are generated only in your devices browser so they are never shared with a third party by design."));
 			pageDiv.append($("<div class='question'>").html("Do I need to be online to recover private keys?"));
 			pageDiv.append($("<div class='answer'>").html("No.  The application's source code is everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub."));
 			pageDiv.append($("<div class='question'>").html("Can I send funds using cryptostorage.com?"));
@@ -598,10 +601,8 @@ function FaqController(div) {
 					id = "faq" + (idx + 1);
 					$(this).attr("id", id);
 				}
-				questionLinks.append($("<a href='#" + id + "'>" + $(this).get(0).innerHTML + "</a>"));
-				questionLinks.append("<br>");
+				faqLinks.append($("<div class='faq_link'><a href='#" + id + "'>" + $(this).get(0).innerHTML + "</a></div>"));
 			});
-			questionLinks.append("<br>");
 			
 			// done rendering
 			if (onDone) onDone(div);
