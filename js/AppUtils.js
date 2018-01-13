@@ -20,7 +20,6 @@ var AppUtils = {
 	RUN_FULL_TESTS: false,
 	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
-	MOCK_ENVIRONMENT_ENABLED: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
 	MIN_PASSWORD_LENGTH: 7,
@@ -35,6 +34,7 @@ var AppUtils = {
 	/**
 	 * Mock environment checks.
 	 */
+	MOCK_ENVIRONMENT_ENABLED: false,
 	MOCK_ENVIRONMENT: {
 		browser: {name: "Firefox", version: "42.0", major: 42, isOpenSource: true, isSupported: true, windowCryptoExists: true},
 		os: {name: "Linux", version: "10.12", isOpenSource: true},
@@ -177,7 +177,8 @@ var AppUtils = {
 	getFaqDependencies: function() {
 		return [
 			"lib/setImmediate.js",
-			"img/key_pair.png"
+			"img/key_pair.png",
+			"img/notice_bar_pass.png"
 		];
 	},
 	

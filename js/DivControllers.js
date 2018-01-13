@@ -573,7 +573,7 @@ function FaqController(div) {
 			var generateChecks = $("<li>Confirm that all environment checks pass.</li>").appendTo(generateList)
 			var generateChecksList = $("<ol>").appendTo(generateChecks);
 			generateChecksList.append("<li>Go to Generate New Keys from the homepage</li>");
-			generateChecksList.append("<li>The notice bar at the top should indicate that all checks pass.</li>");
+			generateChecksList.append("<li>The notice bar at the top should indicate that all checks pass:<br><img style='width:100%;' src='img/notice_bar_pass.png'></div></li>");
 			var generateKeys = $("<li>Fill out the form and click Generate Keys.</li>").appendTo(generateList);
 			var generateKeysList = $("<ul>").appendTo(generateKeys);
 			generateKeysList.append("<li>Protecting your keys with a passphrase is <b>strongly recommended</b>.");
@@ -593,8 +593,12 @@ function FaqController(div) {
 			
 			// build question links
 			$(".question", pageDiv).each(function(idx) {
-				$(this).attr("id", "faq" + (idx + 1));
-				questionLinks.append($("<a href='#faq" + (idx + 1) + "'>" + $(this).get(0).innerHTML + "</a>"));
+				var id = $(this).attr("id");
+				if (!id) {
+					id = "faq" + (idx + 1);
+					$(this).attr("id", id);
+				}
+				questionLinks.append($("<a href='#" + id + "'>" + $(this).get(0).innerHTML + "</a>"));
 				questionLinks.append("<br>");
 			});
 			questionLinks.append("<br>");
