@@ -1,5 +1,4 @@
 TODO
-fix donate flicker, maybe min width
 warning when running live should say "download from github then disconnect from the internet"
 homepage content
 faq content
