@@ -236,7 +236,7 @@ function AppController(div) {
 		if (AppUtils.DEV_MODE) console.log("showHome()");
 		
 		// loading div until dependencies loaded
-		UiUtils.loadingDiv(div, AppUtils.getHomeDependencies(), function(err) {
+		UiUtils.loadingDiv(contentDiv, AppUtils.getHomeDependencies(), function(err) {
 			if (err) throw err;
 			sliderDiv.show();
 			sliderController.render(function() {
