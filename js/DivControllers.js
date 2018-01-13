@@ -78,6 +78,7 @@ var UiUtils = {
 			var loading = new Image();
 			loading.onload = function() {
 				$(loading).addClass("loading");
+				div.empty();
 				var loadingDiv = $("<div class='flex_horizontal'>").appendTo(div);
 				loadingDiv.append(loading);
 				
