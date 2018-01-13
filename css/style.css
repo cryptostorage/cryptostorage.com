@@ -1854,8 +1854,7 @@ input[type='checkbox'][disabled] +label {
 	font-family: monospace;
 	padding: 10px;
 	background-color: black;
-	opacity: 0.75;
-	color: white;
+	color: rgb(60, 240, 60);;
 }
 
 .sample_key_pair_img {
