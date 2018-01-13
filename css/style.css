@@ -451,6 +451,7 @@ input[type='checkbox'][disabled] +label {
 .question {
 	font-size: 24px;
 	margin-bottom: 10px;
+	font-weight: bold;
 }
 
 .answer * {
@@ -469,7 +470,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .answer li {
-	padding: 15px 0px 0px 15px;
+	padding: 10px 0px 0px 15px;
 }
 
 .form_links_div {
