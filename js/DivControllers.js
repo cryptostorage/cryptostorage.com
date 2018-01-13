@@ -558,7 +558,7 @@ function FaqController(div) {
 			pageDiv.append($("<div id='faq_download_verify' class='question'>").html("How can I download and verify the source code?"));
 			var verifyDiv = $("<div class='answer'>").appendTo(pageDiv);
 			verifyDiv.append("Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and has not been modified by an attacker.<br><br>");
-			verifyDiv.append("<b>Verifying the source code is highly recommended.<b><br><br>");
+			verifyDiv.append("<b>Verifying the source code is highly recommended but not mandatory to use from the cryptostorage.com domain.<b><br><br>");
 			verifyDiv.append("The source code can be verified in two ways.");
 			var verifyList = $("<ol>").appendTo(verifyDiv);
 			var verify1 = $("<li>Verify the source code has been signed by woodser's PGP key.</li>").appendTo(verifyList);
