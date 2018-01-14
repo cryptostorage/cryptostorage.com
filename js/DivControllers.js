@@ -963,7 +963,7 @@ function FormController(div) {
 			var splitCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(splitDiv);
 			splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitCheckboxDiv);
 			var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitCheckboxDiv);
-			splitCheckboxLabel.html("Do you want to split your private keys into separate pieces?");
+			splitCheckboxLabel.html("Do you want to split your storage into separate pieces?");
 			splitCheckbox.click(function() {
 				if (splitCheckbox.prop('checked')) {
 					splitInputDiv.show();

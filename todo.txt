@@ -7,7 +7,7 @@ all pieces shown, connected to piece links
 back button works?
 donation addresses clearly indicate currency
 split bitpay credit to include website
-
+improve split info tooltip
 regenerate pgp key
 prioritize checksum
 warning when running live should say "download from github then disconnect from the internet"
