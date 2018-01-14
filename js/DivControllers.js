@@ -861,10 +861,10 @@ function FormController(div) {
 			var pageDiv = $("<div class='page_div'>").appendTo(div);
 			
 			// top links
-			var formLinks = $("<div class='form_links_div'>").appendTo(pageDiv);
-			var oneOfEachLink = $("<div class='form_link'>").appendTo(formLinks);
-			oneOfEachLink.html("One of each");
-			oneOfEachLink.click(function() { onOneOfEach(); });
+//			var formLinks = $("<div class='form_links_div'>").appendTo(pageDiv);
+//			var oneOfEachLink = $("<div class='form_link'>").appendTo(formLinks);
+//			oneOfEachLink.html("One of each");
+//			oneOfEachLink.click(function() { onOneOfEach(); });
 			
 			// currency inputs
 			currencyInputs = [];
