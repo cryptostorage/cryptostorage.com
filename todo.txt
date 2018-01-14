@@ -36,6 +36,7 @@ new window dependencies are not reliably cached
 link back to cryptostorage home from export window
 
 low priority:
+ddslick animation could be cleaner
 mobile brave/firefox window.open returns null
 cryptostorage.com/faq, etc
 es6 with modules
