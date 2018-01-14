@@ -1,5 +1,6 @@
 TODO
 select a currency default
+slow ddslick
 remove one of each
 sample label over frontpage
 form split wording still confusing
