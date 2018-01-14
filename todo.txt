@@ -1,14 +1,13 @@
 TODO
-strong cryptography remove you/us
 select a currency default
-remove "and 3 more"
-application's source code "has" everything
 remove one of each
 sample label over frontpage
 form split wording still confusing
 piece -> pieces
 all pieces shown, connected to piece links
 back button works?
+donation addresses clearly indicate currency
+split bitpay credit to include website
 
 regenerate pgp key
 prioritize checksum

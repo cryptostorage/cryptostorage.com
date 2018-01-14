@@ -344,6 +344,7 @@ inheritsFrom(IntroController, DivController);
  */
 function HomeController(div) {
 	DivController.call(this, div);
+	var moreLink = false;
 	this.render = function(onDone) {
 		
 		// load home dependencies
@@ -382,6 +383,12 @@ function HomeController(div) {
 				});
 			}
 			
+			// don't show more link
+			if (!moreLink) {
+				moreLabel.hide();
+				moreDiv.show();
+			}
+			
 			// sample page section
 			pageDiv.append("<div style='height: 70px'>");
 			pageDiv.append("<div class='home_label'>Export to printable and digital formats for long term storage</div>");
@@ -391,13 +398,13 @@ function HomeController(div) {
 			// check environment section
 			pageDiv.append("<div style='height: 10px'>");
 			pageDiv.append("<div class='home_label'>Generate keys securely with automated environment checks</div>");
-			pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Our automated environment checks help generate keys in a secure environment.</div>")
+			pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Automatic environment checks encourage keys to be generated in a secure environment.</div>")
 			pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
 			
 			// split and passphrase section
 			pageDiv.append("<div style='height: 70px'>");
 			pageDiv.append("<div class='home_label'>Passphrase protect and split private keys for maximum security</div>");
-			pageDiv.append("<div class='home_description'>Split private keys into multiple pieces which can be stored independently.  Set how many pieces are needed to recover the keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
+			pageDiv.append("<div class='home_description'>Split storage into multiple pieces which can be stored independently.  Set how many pieces are needed to recover the keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
 			pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
 			pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
 			
@@ -407,7 +414,7 @@ function HomeController(div) {
 			hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
 			var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
 			vFlex.append("<div class='home_label'>Strong cryptography</div>");
-			vFlex.append("<div class='home_description'>We use the latest window.crypto API available in browsers, which gives us access to a cryptographically secure random number generator and cryptographic primitives. This allows us to securely generate random values as seeds for your keys.</div>");
+			vFlex.append("<div class='home_description'>Uses the latest window.crypto API available in browsers, which gives access to a cryptographically secure random number generator. This allows generation of random values as seeds for your keys.</div>");
 			
 			// download section
 			pageDiv.append("<div style='height: 70px'>");
@@ -424,8 +431,8 @@ function HomeController(div) {
 			// footer
 			var footerDiv = $("<div class='home_footer_div flex_horizontal'>").appendTo(div);
 			footerDiv.append($("<div class='home_footer_version flex_horizontal'></div>"));
-			var descriptionDiv = $("<div class='home_footer_description flex_horizontal'>").appendTo(footerDiv);
-			descriptionDiv.append("© cryptostorage.com.  MIT licensed.<br>JavaScript copyrights included in the source. No warranty.");
+			var descriptionDiv = $("<div class='home_footer_description flex_vertical'>").appendTo(footerDiv);
+			descriptionDiv.append("<div><a href='./LICENSE.txt'>MIT licensed.</a></div>JavaScript copyrights included in the source. No warranty.");
 			var versionDiv = $("<div class='home_footer_version flex_horizontal flex_justify_end'>").appendTo(footerDiv);
 			versionDiv.append("<a href='./versions.txt' target='_blank'>version 0.0.1 alpha</a>");
 			
@@ -590,7 +597,7 @@ function FaqController(div) {
 					"For example, a private key can be split into 3 pieces and 2 of the pieces can be required to recover the original private key.<br><br>" +
 					"This is useful for geographically separating pieces of private keys so funds cannot be accessed without physically recombining the pieces."));
 			pageDiv.append($("<div class='question'>").html("Do I need to be online to recover private keys?"));
-			pageDiv.append($("<div class='answer'>").html("No.  The application's source code is everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub."));
+			pageDiv.append($("<div class='answer'>").html("No.  The application's source code has everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub."));
 			pageDiv.append($("<div class='question'>").html("Can I send funds using cryptostorage.com?"));
 			pageDiv.append($("<div class='answer'>").html("Not currently. Cryptostorage.com is a public/private key generation and recovery service. It is expected that users will import private keys into the wallet of their choice after keys have been recovered using crypstorage.com."));
 			
