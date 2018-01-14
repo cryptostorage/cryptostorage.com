@@ -1171,6 +1171,7 @@ function FormController(div) {
 		var btcFound = false;
 		for (var i = 0; i < currencyInputs.length; i++) {
 			var currencyInput = currencyInputs[i];
+			if (!currencyInput.getSelectedPlugin()) continue;
 			if (currencyInput.getSelectedPlugin().getTicker() === "BTC") {
 				btcFound = true;
 				break;
@@ -1181,6 +1182,7 @@ function FormController(div) {
 		var bchFound = false;
 		for (var i = 0; i < currencyInputs.length; i++) {
 			var currencyInput = currencyInputs[i];
+			if (!currencyInput.getSelectedPlugin()) continue;
 			if (currencyInput.getSelectedPlugin().getTicker() === "BCH") {
 				bchFound = true;
 				break;
@@ -1344,13 +1346,34 @@ function FormController(div) {
 		}
 		
 		this.setSelectedCurrency = function(ticker) {
-			var name = AppUtils.getCryptoPlugin(ticker).getName();
-			for (var i = 0; i < selectorData.length; i++) {
-				if (selectorData[i].text === name) {
-					selector.ddslick('select', {index: i});
-					selectedPlugin = plugins[i];
-					if (!initializing) onCurrencyChanged(selectedPlugin.getTicker());
-					break;
+						
+			// reset dropdown
+			if (ticker === null || ticker === undefined) {
+				selector.ddslick("destroy");
+				selector = $("#currency_selector_" + idx, div);	// ddslick requires id reference
+				selector.ddslick({
+					data: selectorData,
+					background: "white",
+					imagePosition: "left",
+					selectText: "Select a Currency...",
+					defeaultSelectedIndex: null,
+					onSelected: function(selection) {
+						selectedPlugin = plugins[selection.selectedIndex];
+					}
+				});
+				selectedPlugin = null;
+				selector = $("#currency_selector_" + idx, div);	// ddslick requires id reference
+			}
+			
+			// set to currency
+			else {
+				var name = AppUtils.getCryptoPlugin(ticker).getName();
+				for (var i = 0; i < selectorData.length; i++) {
+					if (selectorData[i].text === name) {
+						selector.ddslick('select', {index: i});
+						selectedPlugin = plugins[i];
+						break;
+					}
 				}
 			}
 		}
@@ -1378,6 +1401,13 @@ function FormController(div) {
 		// ---------------------- PRIVATE ------------------------
 		
 		function validate(ignoreBlank) {
+			
+			// check if currency is selected
+			console.log("Validating")
+			// TODO: need to validate input here
+			if (!that.getSelectedPlugin()) {
+				selector.addClass("form_input_error_div");
+			}
 			
 			// check for blank box
 			if (ignoreBlank && !numKeysInput.val()) {
@@ -1428,19 +1458,8 @@ function FormController(div) {
 			
 			// create pull down
 			selector = $("<div id='currency_selector_" + idx + "'>").appendTo(div);
-			selector.ddslick({
-				data:selectorData,
-				background: "white",
-				imagePosition: "left",
-				selectText: "Select a Currency",
-				defaultSelectedIndex: defaultSelectedIndex,
-				onSelected: function(selection) {
-					selectedPlugin = plugins[selection.selectedIndex];
-					onCurrencyChanged(selectedPlugin.getTicker());
-				}
-			});
-			selector = $("#currency_selector_" + idx);	// ddslick requires id reference
-			that.setSelectedCurrency(defaultTicker ? defaultTicker : "BTC");	// does not initialize pull down with this value, but sets instance variables
+			that.setSelectedCurrency(null);	// initializes selector
+			if (defaultTicker) that.setSelectedCurrency(defaultTicker);
 			
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
@@ -1948,20 +1967,21 @@ function ImportTextController(div, plugins) {
 	var MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
 	
 	var that = this;
-	var importInputDiv;				// all import input
+	var importInputDiv;					// all import input
 	var warningDiv;
-	var textInputDiv;					// all text input
-	var decryptionDiv;				// decryption div
+	var textInputDiv;						// all text input
+	var decryptionDiv;					// decryption div
 	var selector;
 	var selectorDisabler;
 	var selectedPlugin;
 	var textArea;
-	var importedPieces = [];	// string[]
-	var importedPiecesDiv;		// div for imported pieces
+	var importedPieces = [];		// string[]
+	var importedPiecesDiv;			// div for imported pieces
 	var controlsDiv;
 	var lastKeys;
 	var decryptionController;
-	var importedStorageDiv;		// inline storage
+	var importedStorageDiv;			// inline storage
+	var selectDefault = false;	// dropdown selection is assigned a defaultd
 	
 	this.render = function(onDone) {
 		
@@ -1996,18 +2016,6 @@ function ImportTextController(div, plugins) {
 		// currency selector
 		var selectorContainer = $("<div class='import_selector_container'>").appendTo(textInputDiv);
 		selector = $("<div id='import_selector'>").appendTo(selectorContainer);
-		selector.ddslick({
-			data: selectorData,
-			background: "white",
-			imagePosition: "left",
-			selectText: "Select a Currency",
-			width:'100%',
-			defaultSelectedIndex: 0,
-			onSelected: function(selection) {
-				selectedPlugin = plugins[selection.selectedIndex];
-			},
-		});
-		selector = $("#import_selector", div);	// ddslick requires id reference
 		selectorDisabler = $("<div class='import_selector_disabler'>").appendTo(selectorContainer);
 		
 		// text area
@@ -2062,7 +2070,7 @@ function ImportTextController(div, plugins) {
 		controlsDiv.hide();
 		removePieces();
 		setSelectorEnabled(true);
-		setSelectedCurrency("BTC");
+		setSelectedCurrency(null);
 		if (decryptionController) decryptionController.cancel();
 	}
 	
@@ -2077,12 +2085,35 @@ function ImportTextController(div, plugins) {
 	}
 	
 	function setSelectedCurrency(ticker) {
-		var name = AppUtils.getCryptoPlugin(ticker).getName();
-		for (var i = 0; i < selectorData.length; i++) {
-			if (selectorData[i].text === name) {
-				selector.ddslick('select', {index: i});
-				selectedPlugin = plugins[i];
-				break;
+		
+		// reset dropdown
+		if (ticker === null) {
+			selector.ddslick("destroy");
+			selector = $("#import_selector", div);	// ddslick requires id reference
+			selector.ddslick({
+				data: selectorData,
+				background: "white",
+				imagePosition: "left",
+				selectText: "Select a Currency...",
+				width:'100%',
+				defeaultSelectedIndex: null,
+				onSelected: function(selection) {
+					selectedPlugin = plugins[selection.selectedIndex];
+				}
+			});
+			selectedPlugin: null,
+			selector = $("#import_selector", div);	// ddslick requires id reference
+		}
+		
+		// set to currency
+		else {
+			var name = AppUtils.getCryptoPlugin(ticker).getName();
+			for (var i = 0; i < selectorData.length; i++) {
+				if (selectorData[i].text === name) {
+					selector.ddslick('select', {index: i});
+					selectedPlugin = plugins[i];
+					break;
+				}
 			}
 		}
 	}
