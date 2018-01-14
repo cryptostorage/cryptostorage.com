@@ -1448,14 +1448,6 @@ function FormController(div) {
 				});
 			}
 			
-			// get default selected index
-			var defaultSelectedIndex = 0;
-			if (defaultTicker) {
-				for (var i = 0; i < plugins.length; i++) {
-					if (plugins[i].getTicker() === defaultTicker) defaultSelectedIndex = i;
-				}
-			}
-			
 			// create pull down
 			selector = $("<div id='currency_selector_" + idx + "'>").appendTo(div);
 			that.setSelectedCurrency(null);	// initializes selector
