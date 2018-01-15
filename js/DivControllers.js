@@ -2204,6 +2204,12 @@ function ImportTextController(div, plugins) {
 		var val = textArea.val();
 		textArea.val("");
 		
+		// check for unselected currency
+		if (!selectedPlugin) {
+			setWarning("No currency selected");
+			return;
+		}
+		
 		// check for empty text
 		if (val.trim() === "") {
 			setWarning("No text entered");
