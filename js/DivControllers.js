@@ -2690,7 +2690,7 @@ function ExportController(div, window, config) {
 				}
 			});
 			piecesLabel = $("<div class='export_piece_selection_label'>").appendTo(exportHeader);
-			piecesLabel.html("Pieces");
+			piecesLabel.html("Piece");
 		}
 		
 		// view split pieces
