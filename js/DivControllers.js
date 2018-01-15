@@ -671,6 +671,9 @@ function FaqController(div) {
 	 */
 	function QuestionAnswerController(div, question, answer, id) {
 		DivController.call(this, div);
+		var rightTriangle = "►";
+		var downTriangle = "▼";
+		
 		var arrowDiv;
 		var answerDiv;
 		this.render = function(onDone) {
@@ -682,7 +685,7 @@ function FaqController(div) {
 			
 			// arrow div
 			arrowDiv = $("<div class='faq_arrow_div'>").appendTo(div);
-			arrowDiv.append("▶");
+			arrowDiv.append(rightTriangle);
 			arrowDiv.click(function() { toggle(); });
 			
 			// question and answer
@@ -710,16 +713,16 @@ function FaqController(div) {
 		this.showAnswer = function(bool) {
 			if (bool) {
 				answerDiv.show();
-				arrowDiv.html("▼");
+				arrowDiv.html(downTriangle);
 			} else {
 				answerDiv.hide();
-				arrowDiv.html("▶");
+				arrowDiv.html(rightTriangle);
 			}
 		}
 		
 		function toggle() {
 			answerDiv.toggle();
-			arrowDiv.html(answerDiv.is(":visible") ? "▼" : "▶");
+			arrowDiv.html(answerDiv.is(":visible") ? downTriangle : rightTriangle);
 		}
 	}
 	inheritsFrom(QuestionAnswerController, DivController);

@@ -459,7 +459,8 @@ input[type='checkbox'][disabled] +label {
 
 .faq_arrow_div {
 	color: blue;
-	width: 30px;
+	width: 35px;
+	font-size: 24px;
 }
 
 .faq_arrow_div:hover {
@@ -476,13 +477,13 @@ input[type='checkbox'][disabled] +label {
 	cursor: pointer;
 }
 
-.answer * {
+.answer, .answer * {
+	font-size: 18px;
 	line-height: 25px;
 }
 
 .answer {
 	margin-top: 20px;
-	line-height: 25px;
 }
 
 .answer ol, .answer ul {
