@@ -1444,13 +1444,15 @@ function FormController(div) {
 			}
 			
 			// validate num keys
-			var numKeys = that.getNumKeys();
-			if (isInt(numKeys) && numKeys >= 1) {
-				numKeysInput.removeClass("form_input_error_div");
-				validNumKeys = true;
-			} else {
-				numKeysInput.addClass("form_input_error_div");
-				validNumKeys = false;
+			else {
+				var numKeys = that.getNumKeys();
+				if (isInt(numKeys) && numKeys >= 1) {
+					numKeysInput.removeClass("form_input_error_div");
+					validNumKeys = true;
+				} else {
+					numKeysInput.addClass("form_input_error_div");
+					validNumKeys = false;
+				}
 			}
 			
 			// update valid state
