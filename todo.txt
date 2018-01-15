@@ -1,5 +1,4 @@
 TODO
-select a currency default
 sample label over frontpage
 form split wording still confusing
 piece -> pieces
