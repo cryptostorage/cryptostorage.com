@@ -515,15 +515,18 @@ function FaqController(div) {
 			// build questions and ansewrs
 			var questionsAnswers = [
 				{
+					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is cryptostorage.com?"; },
 					getAnswer: function() { return "Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."; }
 				}, {
+					id: "faq_key_pair",
 					getQuestion: function() { return "What is a public/private key pair?" },
 					getAnswer: function() { return "A public/private key pair is a public address and a private key.  For example:<br>" +
 						"<img class='sample_key_pair_img' src='img/key_pair.png'><br><br>" +
 						"The public address is used to receive funds.  It can be shared with anyone.<br><br>" + 
 						"The private key authorizes funds sent to its public address to be moved.  Anyone with the private key can access the funds, so it's critical to keep private keys safe and private."; }
 				}, {
+					id: "faq_safe_keys",
 					getQuestion: function() { return "How does cryptostorage.com help me keep my private keys safe and private?"; },
 					getAnswer: function() { return "First, this application generates keys only in your device's browser.  Keys are never shared with a third party, including us, the site owners.<br><br>" + 
 						"Second, this application lets you passphrase protect all generated private keys.  The passphrase is required to decrypt the private keys in order to access funds.<br><br>" + 
@@ -531,6 +534,7 @@ function FaqController(div) {
 						"Fourth, this application lets you save the generated keys to a digital file and printed paper for safe long term storage.<br><br>" +
 						"Fifth, cryptostorage.com automatically recommends ways to improve the security of the environment the application is running in."; }
 				}, {
+					id: "faq_recommendations",
 					getQuestion: function() { return "What environment recommendations does cryptostorage.com make?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
@@ -543,6 +547,7 @@ function FaqController(div) {
 						return answerDiv;
 					}
 				}, {
+					id: "faq_generate_keys",
 					getQuestion: function() { return "How can I generate keys as securely as possible using cryptostorage.com?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
@@ -569,6 +574,7 @@ function FaqController(div) {
 						return answerDiv;
 					}
 				}, {
+					id: "faq_download_verify",
 					getQuestion: function() { return "How can I download and verify the source code?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
@@ -598,39 +604,63 @@ function FaqController(div) {
 						return answerDiv;
 					}
 				}, {
+					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this service?"; },
 					getAnswer: function() { return "Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed."; }
 				}, {
+					id: "faq_trusted_third_party",
 					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
 					getAnswer: function() { return "No.  The public/private key pairs are generated only in your devices browser so they are never shared with a third party by design."; }
 				}, {
+					id: "faq_split_keys",
 					getQuestion: function() { return "What does it mean to split private keys?"; },
 					getAnswer: function() { return "A private key can be split into separate pieces where some of the pieces are required to reconstitute the original private key.<br><br>" +
 						"For example, a private key can be split into 3 pieces and 2 of the pieces can be required to recover the original private key.<br><br>" +
 						"This is useful for geographically separating pieces of private keys so funds cannot be accessed without physically recombining the pieces."; }
 				}, {
+					id: "faq_online_to_recover",
 					getQuestion: function() { return "Do I need to be online to recover private keys?"; },
 					getAnswer: function() { return "No.  The application's source code has everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub."; }
 				}, {
+					id: "faq_send_funds",
 					getQuestion: function() { return "Can I send funds using cryptostorage.com?"; },
 					getAnswer: function() { return "Not currently. Cryptostorage.com is a public/private key generation and recovery service. It is expected that users will import private keys into the wallet of their choice after keys have been recovered using crypstorage.com."; }
 				}
 			];
 			
+			// collect question answer controllers
+			var qaControllers = [];
+			for (var i = 0; i < questionsAnswers.length; i++) {
+				var questionAnswer = questionsAnswers[i];
+				assertInitialized(questionAnswer.id);
+				qaControllers.push(new QuestionAnswerController($("<div>").appendTo(pageDiv), questionAnswer.getQuestion(), questionAnswer.getAnswer(), questionAnswer.id));
+			}
+			
 			// render questions and answers
 			var funcs = [];
-			for (var i = 0; i < questionsAnswers.length; i++) {
-				funcs.push(renderQA($("<div>").appendTo(pageDiv), questionsAnswers[i]));
-			}
-			function renderQA(div, questionAnswer) { 
+			for (var i = 0; i < qaControllers.length; i++) funcs.push(renderQA(qaControllers[i]));
+			function renderQA(qaController) { 
 				return function(onDone) {
-					new QuestionAnswerController(div, questionAnswer.getQuestion(), questionAnswer.getAnswer()).render(function() {
+					qaController.render(function() {
 						if (onDone) onDone();
 					});
 				}
 			}
 			async.series(funcs, function(err) {
 				if (err) throw err;
+				
+				// open referenced faq
+				openHash();
+				$(window).on('hashchange', function() { openHash(); });
+				function openHash() {
+					for (var i = 0; i < qaControllers.length; i++) {
+						if ("#" + qaControllers[i].getDiv().attr("id") === window.location.hash) {
+							qaControllers[i].showAnswer(true);
+						}
+					}
+				}
+				
+				// done rendering
 				if (onDone) onDone(div);
 			});
 		});
@@ -639,7 +669,7 @@ function FaqController(div) {
 	/**
 	 * Controls a single question/answer.
 	 */
-	function QuestionAnswerController(div, question, answer) {
+	function QuestionAnswerController(div, question, answer, id) {
 		DivController.call(this, div);
 		var arrowDiv;
 		var answerDiv;
@@ -648,6 +678,7 @@ function FaqController(div) {
 			// div setup
 			div.empty();
 			div.addClass("question_answer_div flex_horizontal flex_justify_start flex_align_start");
+			if (id) div.attr("id", id);
 			
 			// arrow div
 			arrowDiv = $("<div class='faq_arrow_div'>").appendTo(div);
@@ -660,6 +691,11 @@ function FaqController(div) {
 			// question div
 			var questionDiv = $("<div class='question'>").appendTo(qaDiv);
 			questionDiv.append(question);
+			questionDiv.click(function() {
+				if (history.pushState) history.pushState(null, null, "#" + id);
+				else location.hash = "#" + id;
+			});
+			
 			questionDiv.click(function() { toggle(); });
 			
 			// answer div
@@ -669,6 +705,16 @@ function FaqController(div) {
 			
 			// done rendering
 			if (onDone) onDone(div);
+		},
+		
+		this.showAnswer = function(bool) {
+			if (bool) {
+				answerDiv.show();
+				arrowDiv.html("▼");
+			} else {
+				answerDiv.hide();
+				arrowDiv.html("▶");
+			}
 		}
 		
 		function toggle() {
