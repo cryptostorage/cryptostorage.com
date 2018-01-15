@@ -1278,66 +1278,28 @@ input[type='checkbox'][disabled] +label {
 }
 
 .export_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-flex-direction: column;
-	-moz-flex-direction: column;
-	-ms-flex-direction: column;
-	flex-direction: column;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
 	align-items: center;
 	min-width: 750px;
 	-webkit-text-size-adjust: 100%;
 	background-color: white;
 }
 
-.export_progress_div {
-	margin-top:100px;
-	width: 800px;
-	height: 50px;
-}
-
-.export_progress_label {
-	width: 100%;
-	text-align: center;
-	font-size: 20px;
-}
-
 .export_header {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-flex-direction: column;
-	-moz-flex-direction: column;
-	-ms-flex-direction: column;
-	flex-direction: column;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
 	align-items: center;
 	background-color: rgb(17, 119, 184);
 	width: 100%;
-	padding: 12px;
 	margin-top: -2px;	/* fix mobile safari border showing */
 }
 
+.export_controls {
+	padding: 12px;
+	margin-top: 2px;	/* fix mobile safari border showing */
+}
+
 .export_buttons {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center; -ms-flex-pack : center;
-	justify-content : center;
-	margin: 10px;
-	margin-top: 12px;	/* fix mobile safari border showing */
 	-ms-flex-pack: center;
 	justify-content: center;
+	margin-top: 5px;
 }
 
 .export_button {
@@ -1387,7 +1349,7 @@ input[type='checkbox'][disabled] +label {
 	align-items: center;
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
-	margin: 10px;
+	margin-top: 10px;
 	-ms-flex-pack: center;
 	justify-content: center;
 }
@@ -1417,13 +1379,30 @@ input[type='checkbox'][disabled] +label {
 	align-items: center;
 	-webkit-justify-content: center; -ms-flex-pack : center;
 	justify-content : center;
-	margin: 10px 0 5px 0;
+	margin-top: 10px;
 	-ms-flex-pack: center;
 	justify-content: center;
 }
 
 .export_piece_selection_label {
+	margin-top: 5px;
 	color: white;
+}
+
+.export_progress_div {
+	margin-top:100px;
+	width: 800px;
+	height: 50px;
+}
+
+.export_progress_label {
+	width: 100%;
+	text-align: center;
+	font-size: 20px;
+}
+
+.export_content_div {
+	
 }
 
 .export_pieces_div {
@@ -1433,6 +1412,11 @@ input[type='checkbox'][disabled] +label {
 
 .piece_div {
 	width: 750px;
+	margin-bottom: 50px;
+}
+
+.piece_div:last-child {
+	margin-bottom: 0px;
 }
 
 .piece_page_div {
@@ -1685,7 +1669,9 @@ input[type='checkbox'][disabled] +label {
 		padding: 0px;
 	}
 	.piece_div {
-		display: block !important
+		display: block !important;
+		margin: 0;
+		padding: 0;
 	}
 	.export_regenerate_div {
 		display: none;

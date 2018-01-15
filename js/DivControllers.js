@@ -2630,13 +2630,16 @@ function ExportController(div, window, config) {
 	
 	this.render = function(onDone) {
 		div.empty();
-		div.addClass("export_div");
+		div.addClass("export_div flex_vertical");
 		
 		// export header
-		var exportHeader = $("<div class='export_header'>").appendTo(div);
+		var exportHeader = $("<div class='export_header flex_vertical'>").appendTo(div);
+		
+		// export controls
+		var exportControls = $("<div class='export_controls flex_vertical'>").appendTo(exportHeader);
 		
 		// export buttons
-		var exportButtons = $("<div class='export_buttons'>").appendTo(exportHeader);
+		var exportButtons = $("<div class='export_buttons flex_horizontal'>").appendTo(exportControls);
 		saveButton = $("<div class='export_button'>").appendTo(exportButtons);
 		saveButton.html("Save All");
 		printButton = $("<div class='export_button'>").appendTo(exportButtons);
@@ -2645,7 +2648,7 @@ function ExportController(div, window, config) {
 		savePublicButton.html("Save Public Addresses");
 		
 		// export checkboxes
-		var exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportHeader);
+		var exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportControls);
 		showPublicCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		var showPublicCheckboxLabel = $("<label class='export_checkbox_label' for='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		showPublicCheckboxLabel.html("Show public addresses");
@@ -2681,7 +2684,7 @@ function ExportController(div, window, config) {
 		// piece selection
 		var paginatorSource = getPaginatorSource(config.keyGenConfig, config.pieces);
 		if (paginatorSource) {
-			paginator = $("<div id='paginator'>").appendTo(exportHeader);
+			paginator = $("<div id='paginator'>").appendTo(exportControls);
 			$("#paginator", exportHeader).pagination({
 				dataSource: paginatorSource,
 				pageSize: 1,
@@ -2689,13 +2692,13 @@ function ExportController(div, window, config) {
 					if (config.pieceDivs) setVisiblePiece(config.pieceDivs, pagination.pageNumber - 1);
 				}
 			});
-			piecesLabel = $("<div class='export_piece_selection_label'>").appendTo(exportHeader);
+			piecesLabel = $("<div class='export_piece_selection_label'>").appendTo(exportControls);
 			piecesLabel.html("Piece");
 		}
 		
 		// view split pieces
 		if (config.splitPieces) {
-			var viewImported = $("<div class='import_control_link'>").appendTo(exportHeader);
+			var viewImported = $("<div class='import_control_link'>").appendTo(exportControls);
 			viewImported.html("view split pieces");
 			viewImported.click(function() {
 				UiUtils.openStorage("Imported Pieces", {pieces: config.splitPieces});
@@ -2722,7 +2725,7 @@ function ExportController(div, window, config) {
 						AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
 						
 						// notice div
-						var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
+						var noticeDivContainer = $("<div class='notice_container'>").appendTo(exportHeader);
 						var noticeDiv = $("<div>").appendTo(noticeDivContainer);
 						new NoticeController(noticeDiv).render(function() { renderAux(); });
 					} else {
@@ -3047,7 +3050,10 @@ function ExportController(div, window, config) {
 	
 	function setPieceDivs(pieceDivs) {
 		piecesDiv.empty();
-		for (var i = 0; i < pieceDivs.length; i++) piecesDiv.append(pieceDivs[i]);
+		for (var i = 0; i < pieceDivs.length; i++) {
+			pieceDivs[i].attr("id", "export_piece_" + (i + 1));
+			piecesDiv.append(pieceDivs[i]);
+		}
 	}
 	
 	/**
@@ -3057,10 +3063,8 @@ function ExportController(div, window, config) {
 	 * @param pieceIdx is the piece number to show
 	 */
 	function setVisiblePiece(pieceDivs, pieceIdx) {
-		for (var i = 0; i < config.pieces.length; i++) {
-			if (i === pieceIdx) pieceDivs[i].removeClass("hidden");
-			else pieceDivs[i].addClass("hidden");
-		}
+		window.location.hash = "";
+		window.location.hash = "export_piece_" + (pieceIdx + 1);		
 	}
 	
 	/**

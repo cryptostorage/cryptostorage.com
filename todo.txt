@@ -1,7 +1,7 @@
 TODO
+all pieces shown, connected to piece links
 sample label over frontpage
 form split wording still confusing + info tooltip
-all pieces shown, connected to piece links
 back button works?
 donation addresses clearly indicate currency
 split bitpay credit to include website
