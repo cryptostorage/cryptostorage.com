@@ -542,7 +542,7 @@ function FaqController(div) {
 			var generateDiv = $("<div class='answer'>").appendTo(pageDiv);
 			var generateList = $("<ol>").appendTo(generateDiv);
 			generateList.append("<li>Download and verify cryptostorage.com-<i>[version]</i>.zip.  See \"<a href='#faq6'>How can I download and verify the source code?</a>\"</li>");
-			var generateTransfer = $("<li>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-grapped computer using a flash drive.</li>").appendTo(generateList);
+			var generateTransfer = $("<li>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-gapped computer using a flash drive.</li>").appendTo(generateList);
 			var generateTransferList = $("<ul>").appendTo(generateTransfer);
 			generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
 			generateTransferList.append("<li>An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi</li>");
