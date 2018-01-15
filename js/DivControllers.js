@@ -1078,7 +1078,7 @@ function FormController(div) {
 	
 	// handle when generate button clicked
 	function onGenerate(onDone) {
-		validateForm();
+		validateForm(true);
 		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", {keyGenConfig: getConfig(), confirmExit: true});
 		if (onDone) onDone();
 	}
@@ -1201,15 +1201,16 @@ function FormController(div) {
 		return formErrors.environment || formErrors.currencyInputs || formErrors.passphrase || formErrors.split;
 	}
 	
-	function validateForm() {
-		validateCurrencyInputs();
+	function validateForm(validateCurrencySelection) {
+		validateCurrencyInputs(validateCurrencySelection);
 		validatePassphrase();
 		validateSplit(true);
 	}
 	
-	function validateCurrencyInputs() {
+	function validateCurrencyInputs(validateCurrencySelection) {
 		var err = null;
 		for (var i = 0; i < currencyInputs.length; i++) {
+			if (validateCurrencySelection) currencyInputs[i].validate();
 			if (!currencyInputs[i].isValid()) err = true;
 		}
 		formErrors.currencyInputs = err;
@@ -1321,9 +1322,9 @@ function FormController(div) {
 	 * @param defaultTicker is the ticker of the initial selected currency
 	 * @param onCurrencyChanged(ticker) is invoked when the user changes the currency selection
 	 * @param onDelete is invoked when the user delets this input
-	 * @param onValid(bool) is invoked when the validity state changes
+	 * @param onValidChange(bool) is invoked when the validity state changes
 	 */
-	function CurrencyInput(div, idx, plugins, defaultTicker, onCurrencyChanged, onDelete, onValid) {
+	function CurrencyInput(div, idx, plugins, defaultTicker, onCurrencyChanged, onDelete, onValidChange) {
 		assertInitialized(div);
 		assertInitialized(plugins);
 		
@@ -1336,14 +1337,16 @@ function FormController(div) {
 		var trashImg;
 		var initializing = true;
 		var valid = true;
+		var validCurrency = true;
+		var validNumKeys = true;
 		
 		this.getDiv = function() {
 			return div;
-		}
+		},
 		
 		this.getSelectedPlugin = function() {
 			return selectedPlugin;
-		}
+		},
 		
 		this.setSelectedCurrency = function(ticker) {
 						
@@ -1359,6 +1362,7 @@ function FormController(div) {
 					defeaultSelectedIndex: null,
 					onSelected: function(selection) {
 						selectedPlugin = plugins[selection.selectedIndex];
+						validateCurrency();
 					}
 				});
 				selectedPlugin = null;
@@ -1372,17 +1376,18 @@ function FormController(div) {
 					if (selectorData[i].text === name) {
 						selector.ddslick('select', {index: i});
 						selectedPlugin = plugins[i];
+						validateCurrency();
 						break;
 					}
 				}
 			}
-		}
+		},
 		
 		this.getNumKeys = function() {
 			var num = Number(numKeysInput.val());
 			if (isInt(num)) return num;
 			return null;
-		}
+		},
 		
 		this.setTrashEnabled = function(enabled) {
 			trashDiv.unbind("click");
@@ -1392,43 +1397,73 @@ function FormController(div) {
 			} else {
 				trashImg.addClass("trash_div_disabled");
 			}
-		}
+		},
 		
+		/**
+		 * Indicates if any validation errors are visible on this currency input.
+		 * 
+		 * @returns true if any validation errors are visible, false otherwise
+		 */
 		this.isValid = function() {
 			return valid;
+		},
+		
+		/**
+		 * Validates the currency input.
+		 * 
+		 * @returns true if this currency input has validation errors visible on the UI, false otherwise
+		 */
+		this.validate = function() {
+			validateCurrency();
+			validateNumKeys(false);
+			return that.isValid();
 		}
 		
 		// ---------------------- PRIVATE ------------------------
 		
-		function validate(ignoreBlank) {
-			
-			// check if currency is selected
-			console.log("Validating")
-			// TODO: need to validate input here
-			if (!that.getSelectedPlugin()) {
-				selector.addClass("form_input_error_div");
+		function validateCurrency() {
+			if (selectedPlugin) {
+				validCurrency = true;
+				$(".dd-select", selector).removeClass("form_input_error_div");
+			} else {
+				validCurrency = false;
+				$(".dd-select", selector).addClass("form_input_error_div");
 			}
+			
+			// update valid state
+			updateValidity();
+			return validCurrency;
+		}
+		
+		function validateNumKeys(ignoreBlank) {
 			
 			// check for blank box
 			if (ignoreBlank && !numKeysInput.val()) {
 				numKeysInput.removeClass("form_input_error_div");
-				return;
+				validNumKeys = true;
 			}
 			
 			// validate num keys
 			var numKeys = that.getNumKeys();
 			if (isInt(numKeys) && numKeys >= 1) {
 				numKeysInput.removeClass("form_input_error_div");
-				if (!valid) {
-					valid = true;
-					onValid(valid);
-				}
+				validNumKeys = true;
 			} else {
 				numKeysInput.addClass("form_input_error_div");
-				if (valid) {
-					valid = false;
-					onValid(false);
-				}
+				validNumKeys = false;
+			}
+			
+			// update valid state
+			updateValidity();
+			return validNumKeys;
+		}
+		
+		function updateValidity() {
+			if (validCurrency && validNumKeys !== valid) {
+				valid = validCurrency && validNumKeys;
+				onValidChange(valid);
+			} else {
+				valid = validCurrency && validNumKeys;
 			}
 		}
 		
@@ -1457,8 +1492,8 @@ function FormController(div) {
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 			rightDiv.append("Key pairs to generate&nbsp;&nbsp;");
 			numKeysInput = $("<input type='tel' value='1' min='1'>").appendTo(rightDiv);
-			numKeysInput.on("input", function(e) { validate(true); });
-			numKeysInput.on("focusout", function(e) { validate(false); });
+			numKeysInput.on("input", function(e) { validateNumKeys(true); });
+			numKeysInput.on("focusout", function(e) { validateNumKeys(false); });
 			rightDiv.append("&nbsp;&nbsp;");
 			trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 			trashDiv.click(function() { onDelete(); });
