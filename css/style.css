@@ -460,7 +460,8 @@ input[type='checkbox'][disabled] +label {
 .faq_arrow_div {
 	color: blue;
 	width: 35px;
-	font-size: 24px;
+	font-size: 18px;
+	line-height: 30px;
 }
 
 .faq_arrow_div:hover {
@@ -468,8 +469,9 @@ input[type='checkbox'][disabled] +label {
 }
 
 .question {
-	font-size: 24px;
-	color: blue
+	font-size: 22px;
+	color: blue;
+	line-height: 30px;
 }
 
 .question:hover {
