@@ -512,9 +512,6 @@ function FaqController(div) {
 			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
 			titleDiv.html("Frequently Asked Questions");
 			
-			// div for question links
-			var faqLinks = $("<div class='faq_links'>").appendTo(pageDiv);
-			
 			// build questions and ansewrs
 			var questionsAnswers = [
 				{
