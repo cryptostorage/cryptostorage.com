@@ -449,29 +449,43 @@ input[type='checkbox'][disabled] +label {
 	opacity: 0.5;
 }
 
-.faq_links {
-	margin-bottom:40px;
+.question_answer_div {
+	margin-bottom: 20px;
 }
 
-.faq_link {
-	margin-bottom:10px;
+.question_answer:last-child {
+	margin-bottom: 0;
+}
+
+.faq_arrow_div {
+	color: blue;
+	width: 35px;
+	font-size: 18px;
+	line-height: 30px;
+}
+
+.faq_arrow_div:hover {
+	cursor: pointer;
 }
 
 .question {
-	font-size: 24px;
-	margin-bottom: 10px;
-	font-weight: bold;
+	font-size: 22px;
+	color: blue;
+	line-height: 30px;
 }
 
-.answer * {
+.question:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.answer, .answer * {
 	font-size: 18px;
 	line-height: 25px;
 }
 
 .answer {
-	font-size: 18px;
-	line-height: 25px;
-	margin-bottom: 40px;
+	margin-top: 20px;
 }
 
 .answer ol, .answer ul {
