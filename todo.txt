@@ -2,6 +2,7 @@ TODO
 rename sample to demo
 115, 253, 233 light blue
 form split wording still confusing + info tooltip
+faq paragraph formatting
 back button works?
 regenerate pgp key
 prioritize checksum
