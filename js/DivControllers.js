@@ -512,109 +512,220 @@ function FaqController(div) {
 			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
 			titleDiv.html("Frequently Asked Questions");
 			
-			// div for question links
-			var faqLinks = $("<div class='faq_links'>").appendTo(pageDiv);
-			
-			// questions and answers
-			pageDiv.append($("<div class='question'>").html("What is cryptostorage.com?"));
-			pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."));
-			pageDiv.append($("<div class='question'>").html("What is a public/private key pair?"));
-			pageDiv.append($("<div class='answer'>").html("A public/private key pair is a public address and a private key.  For example:<br>" +
-					"<img class='sample_key_pair_img' src='img/key_pair.png'><br><br>" +
-					"The public address is used to receive funds.  It can be shared with anyone.<br><br>" + 
-					"The private key authorizes funds sent to its public address to be moved.  Anyone with the private key can access the funds, so it's critical to keep private keys safe and private."));
-			pageDiv.append($("<div class='question'>").html("How does cryptostorage.com help me keep my private keys safe and private?"));
-			pageDiv.append($("<div class='answer'>").html("First, this application generates keys only in your device's browser.  Keys are never shared with a third party, including us, the site owners.<br><br>" + 
-					"Second, this application lets you passphrase protect all generated private keys.  The passphrase is required to decrypt the private keys in order to access funds.<br><br>Third, this application lets you split private keys into separate pieces which must be recombined in order to recover the private keys.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.<br><br>" +
-					"Fourth, this application lets you save the generated keys to a digital file and printed paper for safe long term storage.<br><br>" +
-					"Fifth, cryptostorage.com automatically recommends ways to improve the security of the environment the application is running in."));
-			pageDiv.append($("<div class='question'>").html("What environment recommendations does cryptostorage.com make?"));
-			var recommendationsDiv = $("<div class='answer'>").appendTo(pageDiv);
-			recommendationsDiv.append("In order of importance:<br>");
-			var recommendationsList = $("<ol>").appendTo(recommendationsDiv);
-			recommendationsList.append("<li>Download, verify, and run the source code offline, not from the cryptostorage.com domain.</li>");
-			recommendationsList.append("<li>Run the source code on a device that is disconnected from the internet and will ideally never be connected to the internet again.</li>");
-			recommendationsList.append("<li>Run the source code in an open source browser like Firefox or Chromium.</li>");
-			recommendationsList.append("<li>Run the source code on an open source operating system like Tails, Ubuntu, or Raspbian for the Raspberry Pi.</li>");
-			
-			// faq to generate keys as securely as possible
-			pageDiv.append($("<div id='faq_generate_keys' class='question'>").html("How can I generate keys as securely as possible using cryptostorage.com?"));
-			var generateDiv = $("<div class='answer'>").appendTo(pageDiv);
-			var generateList = $("<ol>").appendTo(generateDiv);
-			generateList.append("<li>Download and verify cryptostorage.com-<i>[version]</i>.zip.  See \"<a href='#faq6'>How can I download and verify the source code?</a>\"</li>");
-			var generateTransfer = $("<li>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-grapped computer using a flash drive.</li>").appendTo(generateList);
-			var generateTransferList = $("<ul>").appendTo(generateTransfer);
-			generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
-			generateTransferList.append("<li>An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi</li>");
-			generateList.append("<li>Unzip cryptostorage.com-<i>[version]</i>.zip</li>");
-			var generateBrowser = $("<li>Open index.html in the unzipped folder in a browser.</li>").appendTo(generateList);
-			var generateBrowserList = $("<ul>").appendTo(generateBrowser);
-			generateBrowserList.append("<li>An open-source browser is recommended like Firefox or Chromium</li>");
-			var generateChecks = $("<li>Confirm that all environment checks pass.</li>").appendTo(generateList)
-			var generateChecksList = $("<ol>").appendTo(generateChecks);
-			generateChecksList.append("<li>Go to Generate New Keys from the homepage</li>");
-			generateChecksList.append("<li>The notice bar at the top should indicate that all checks pass:<br><img style='width:100%;' src='img/notice_bar_pass.png'></div></li>");
-			var generateKeys = $("<li>Fill out the form and click Generate Keys.</li>").appendTo(generateList);
-			var generateKeysList = $("<ul>").appendTo(generateKeys);
-			generateKeysList.append("<li>Protecting your keys with a passphrase is <b>strongly recommended</b>.");
-			generateKeysList.append("<li>Optionally split your keys for maximum security.</li>");
-			generateList.append("<li>Save the generated keys to a flash drive or printed paper for safe keeping.<br><br>" +
-					"The keys can be imported at any time by relaunching the application in a secure environment.</li>");
-			
-			// faq to download and verify source code
-			pageDiv.append($("<div id='faq_download_verify' class='question'>").html("How can I download and verify the source code?"));
-			var verifyDiv = $("<div class='answer'>").appendTo(pageDiv);
-			verifyDiv.append("Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and has not been modified by an attacker.<br><br>");
-			verifyDiv.append("<b>Verifying the source code is highly recommended but not required to use this site.<b><br><br>");
-			verifyDiv.append("The source code can be verified in two ways.");
-			var verifyList = $("<ol>").appendTo(verifyDiv);
-			var verify1 = $("<li>Verify the source code has been signed by woodser's PGP key.</li>").appendTo(verifyList);
-			var verify1List = $("<ol>").appendTo(verify1);
-			verify1List.append("<li>Install <a target='_blank' href='https://www.openpgp.org/'>PGP software</a> on your device.</li>");
-			verify1List.append("<li>Download woodser’s public PGP key, \"woodser.asc\", from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>root of the GitHub source repository</a>.</li>");
-			verify1List.append("<li>Import woodser's PGP key:<br><div class='terminal_cmd'>gpg --import woodser.asc<div></li>");
-			verify1List.append("<li>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.")
-			verify1List.append("<li>Verify the signature of the source code zip file<br><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div><br>" +
-					"You should see output similar to this.  The RSA keys must match.<br>" +
-					"<div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser <woodser@users.noreply.github.com>\"</div><br>" +
-					"The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.<br><br>" +
-					"Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s pgp key, which is not necessary.</li>");
-			var verify2 = $("<li>Verify the source code has the correct checksum.</li>").appendTo(verifyList);
-			var verify2List = $("<ol>").appendTo(verify2);
-			verify2List.append("<li>Download cryptostorage-<i>[version]</i>.zip and checksum.txt from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</li>");
-			verify2List.append("<li>Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.<br><br>" +
-					"Linux: <div class='terminal_cmd'>sha256sum cryptostorage-<i>[version]</i>.zip</div><br>" + 
-					"Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i></div><br>" + 
-					"Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></li>");
-			verify2List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
-			
-			pageDiv.append($("<div class='question'>").html("How can I trust this service?"));
-			pageDiv.append($("<div class='answer'>").html("Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed."));
-			pageDiv.append($("<div class='question'>").html("Are my funds ever entrusted to a third party?"));
-			pageDiv.append($("<div class='answer'>").html("No.  The public/private key pairs are generated only in your devices browser so they are never shared with a third party by design."));
-			pageDiv.append($("<div class='question'>").html("What does it mean to split private keys?"));
-			pageDiv.append($("<div class='answer'>").html("A private key can be split into separate pieces where some of the pieces are required to reconstitute the original private key.<br><br>" +
-					"For example, a private key can be split into 3 pieces and 2 of the pieces can be required to recover the original private key.<br><br>" +
-					"This is useful for geographically separating pieces of private keys so funds cannot be accessed without physically recombining the pieces."));
-			pageDiv.append($("<div class='question'>").html("Do I need to be online to recover private keys?"));
-			pageDiv.append($("<div class='answer'>").html("No.  The application's source code has everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub."));
-			pageDiv.append($("<div class='question'>").html("Can I send funds using cryptostorage.com?"));
-			pageDiv.append($("<div class='answer'>").html("Not currently. Cryptostorage.com is a public/private key generation and recovery service. It is expected that users will import private keys into the wallet of their choice after keys have been recovered using crypstorage.com."));
-			
-			// build question links
-			$(".question", pageDiv).each(function(idx) {
-				var id = $(this).attr("id");
-				if (!id) {
-					id = "faq" + (idx + 1);
-					$(this).attr("id", id);
+			// build questions and ansewrs
+			var questionsAnswers = [
+				{
+					id: "faq_what_is_cryptostorage",
+					getQuestion: function() { return "What is cryptostorage.com?"; },
+					getAnswer: function() { return "Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."; }
+				}, {
+					id: "faq_key_pair",
+					getQuestion: function() { return "What is a public/private key pair?" },
+					getAnswer: function() { return "A public/private key pair is a public address and a private key.  For example:<br>" +
+						"<img class='sample_key_pair_img' src='img/key_pair.png'><br><br>" +
+						"The public address is used to receive funds.  It can be shared with anyone.<br><br>" + 
+						"The private key authorizes funds sent to its public address to be moved.  Anyone with the private key can access the funds, so it's critical to keep private keys safe and private."; }
+				}, {
+					id: "faq_safe_keys",
+					getQuestion: function() { return "How does cryptostorage.com help me keep my private keys safe and private?"; },
+					getAnswer: function() { return "First, this application generates keys only in your device's browser.  Keys are never shared with a third party, including us, the site owners.<br><br>" + 
+						"Second, this application lets you passphrase protect all generated private keys.  The passphrase is required to decrypt the private keys in order to access funds.<br><br>" + 
+						"Third, this application lets you split private keys into separate pieces which must be recombined in order to recover the private keys.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.<br><br>" +
+						"Fourth, this application lets you save the generated keys to a digital file and printed paper for safe long term storage.<br><br>" +
+						"Fifth, cryptostorage.com automatically recommends ways to improve the security of the environment the application is running in."; }
+				}, {
+					id: "faq_recommendations",
+					getQuestion: function() { return "What environment recommendations does cryptostorage.com make?"; },
+					getAnswer: function() {
+						var answerDiv = $("<div>");
+						answerDiv.append("In order of importance:<br>");
+						var recommendationsList = $("<ol>").appendTo(answerDiv);
+						recommendationsList.append("<li>Download, verify, and run the source code offline, not from the cryptostorage.com domain.</li>");
+						recommendationsList.append("<li>Run the source code on a device that is disconnected from the internet and will ideally never be connected to the internet again.</li>");
+						recommendationsList.append("<li>Run the source code in an open source browser like Firefox or Chromium.</li>");
+						recommendationsList.append("<li>Run the source code on an open source operating system like Tails, Ubuntu, or Raspbian for the Raspberry Pi.</li>");
+						return answerDiv;
+					}
+				}, {
+					id: "faq_generate_keys",
+					getQuestion: function() { return "How can I generate keys as securely as possible using cryptostorage.com?"; },
+					getAnswer: function() {
+						var answerDiv = $("<div>");
+						var generateList = $("<ol>").appendTo(answerDiv);
+						generateList.append("<li>Download and verify cryptostorage.com-<i>[version]</i>.zip.  See \"<a href='#faq6'>How can I download and verify the source code?</a>\"</li>");
+						var generateTransfer = $("<li>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-gapped computer using a flash drive.</li>").appendTo(generateList);
+						var generateTransferList = $("<ul>").appendTo(generateTransfer);
+						generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
+						generateTransferList.append("<li>An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi</li>");
+						generateList.append("<li>Unzip cryptostorage.com-<i>[version]</i>.zip</li>");
+						var generateBrowser = $("<li>Open index.html in the unzipped folder in a browser.</li>").appendTo(generateList);
+						var generateBrowserList = $("<ul>").appendTo(generateBrowser);
+						generateBrowserList.append("<li>An open-source browser is recommended like Firefox or Chromium</li>");
+						var generateChecks = $("<li>Confirm that all environment checks pass.</li>").appendTo(generateList)
+						var generateChecksList = $("<ol>").appendTo(generateChecks);
+						generateChecksList.append("<li>Go to Generate New Keys from the homepage</li>");
+						generateChecksList.append("<li>The notice bar at the top should indicate that all checks pass:<br><img style='width:100%;' src='img/notice_bar_pass.png'></div></li>");
+						var generateKeys = $("<li>Fill out the form and click Generate Keys.</li>").appendTo(generateList);
+						var generateKeysList = $("<ul>").appendTo(generateKeys);
+						generateKeysList.append("<li>Protecting your keys with a passphrase is <b>strongly recommended</b>.");
+						generateKeysList.append("<li>Optionally split your keys for maximum security.</li>");
+						generateList.append("<li>Save the generated keys to a flash drive or printed paper for safe keeping.<br><br>" +
+								"The keys can be imported at any time by relaunching the application in a secure environment.</li>");
+						return answerDiv;
+					}
+				}, {
+					id: "faq_download_verify",
+					getQuestion: function() { return "How can I download and verify the source code?"; },
+					getAnswer: function() {
+						var answerDiv = $("<div>");
+						answerDiv.append("Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and has not been modified by an attacker.<br><br>");
+						answerDiv.append("<b>Verifying the source code is highly recommended but not required to use this site.<b><br><br>");
+						answerDiv.append("The source code can be verified in two ways.");
+						var verifyList = $("<ol>").appendTo(answerDiv);
+						var verify1 = $("<li>Verify the source code has been signed by woodser's PGP key.</li>").appendTo(verifyList);
+						var verify1List = $("<ol>").appendTo(verify1);
+						verify1List.append("<li>Install <a target='_blank' href='https://www.openpgp.org/'>PGP software</a> on your device.</li>");
+						verify1List.append("<li>Download woodser’s public PGP key, \"woodser.asc\", from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>root of the GitHub source repository</a>.</li>");
+						verify1List.append("<li>Import woodser's PGP key:<br><div class='terminal_cmd'>gpg --import woodser.asc<div></li>");
+						verify1List.append("<li>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.")
+						verify1List.append("<li>Verify the signature of the source code zip file<br><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div><br>" +
+								"You should see output similar to this.  The RSA keys must match.<br>" +
+								"<div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser <woodser@users.noreply.github.com>\"</div><br>" +
+								"The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.<br><br>" +
+								"Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s pgp key, which is not necessary.</li>");
+						var verify2 = $("<li>Verify the source code has the correct checksum.</li>").appendTo(verifyList);
+						var verify2List = $("<ol>").appendTo(verify2);
+						verify2List.append("<li>Download cryptostorage-<i>[version]</i>.zip and checksum.txt from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</li>");
+						verify2List.append("<li>Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.<br><br>" +
+								"Linux: <div class='terminal_cmd'>sha256sum cryptostorage-<i>[version]</i>.zip</div><br>" + 
+								"Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i></div><br>" + 
+								"Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></li>");
+						verify2List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
+						return answerDiv;
+					}
+				}, {
+					id: "faq_trust",
+					getQuestion: function() { return "How can I trust this service?"; },
+					getAnswer: function() { return "Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed."; }
+				}, {
+					id: "faq_trusted_third_party",
+					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
+					getAnswer: function() { return "No.  The public/private key pairs are generated only in your devices browser so they are never shared with a third party by design."; }
+				}, {
+					id: "faq_split_keys",
+					getQuestion: function() { return "What does it mean to split private keys?"; },
+					getAnswer: function() { return "A private key can be split into separate pieces where some of the pieces are required to reconstitute the original private key.<br><br>" +
+						"For example, a private key can be split into 3 pieces and 2 of the pieces can be required to recover the original private key.<br><br>" +
+						"This is useful for geographically separating pieces of private keys so funds cannot be accessed without physically recombining the pieces."; }
+				}, {
+					id: "faq_online_to_recover",
+					getQuestion: function() { return "Do I need to be online to recover private keys?"; },
+					getAnswer: function() { return "No.  The application's source code has everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub."; }
+				}, {
+					id: "faq_send_funds",
+					getQuestion: function() { return "Can I send funds using cryptostorage.com?"; },
+					getAnswer: function() { return "Not currently. Cryptostorage.com is a public/private key generation and recovery service. It is expected that users will import private keys into the wallet of their choice after keys have been recovered using crypstorage.com."; }
 				}
-				faqLinks.append($("<div class='faq_link'><a href='#" + id + "'>" + $(this).get(0).innerHTML + "</a></div>"));
+			];
+			
+			// collect question answer controllers
+			var qaControllers = [];
+			for (var i = 0; i < questionsAnswers.length; i++) {
+				var questionAnswer = questionsAnswers[i];
+				assertInitialized(questionAnswer.id);
+				qaControllers.push(new QuestionAnswerController($("<div>").appendTo(pageDiv), questionAnswer.getQuestion(), questionAnswer.getAnswer(), questionAnswer.id));
+			}
+			
+			// render questions and answers
+			var funcs = [];
+			for (var i = 0; i < qaControllers.length; i++) funcs.push(renderQA(qaControllers[i]));
+			function renderQA(qaController) { 
+				return function(onDone) {
+					qaController.render(function() {
+						if (onDone) onDone();
+					});
+				}
+			}
+			async.series(funcs, function(err) {
+				if (err) throw err;
+				
+				// open referenced faq
+				openHash();
+				$(window).on('hashchange', function() { openHash(); });
+				function openHash() {
+					for (var i = 0; i < qaControllers.length; i++) {
+						if ("#" + qaControllers[i].getDiv().attr("id") === window.location.hash) {
+							qaControllers[i].showAnswer(true);
+						}
+					}
+				}
+				
+				// done rendering
+				if (onDone) onDone(div);
 			});
+		});
+	}
+	
+	/**
+	 * Controls a single question/answer.
+	 */
+	function QuestionAnswerController(div, question, answer, id) {
+		DivController.call(this, div);
+		var rightTriangle = "►";
+		var downTriangle = "▼";
+		
+		var arrowDiv;
+		var answerDiv;
+		this.render = function(onDone) {
+			
+			// div setup
+			div.empty();
+			div.addClass("question_answer_div flex_horizontal flex_justify_start flex_align_start");
+			if (id) div.attr("id", id);
+			
+			// arrow div
+			arrowDiv = $("<div class='faq_arrow_div'>").appendTo(div);
+			arrowDiv.append(rightTriangle);
+			arrowDiv.click(function() { toggle(); });
+			
+			// question and answer
+			var qaDiv = $("<div class='flex_vertical flex_align_start flex_justify_start'>").appendTo(div);
+			
+			// question div
+			var questionDiv = $("<div class='question'>").appendTo(qaDiv);
+			questionDiv.append(question);
+			questionDiv.click(function() {
+				if (history.pushState) history.pushState(null, null, "#" + id);
+				else location.hash = "#" + id;
+			});
+			
+			questionDiv.click(function() { toggle(); });
+			
+			// answer div
+			answerDiv = $("<div class='answer'>").appendTo(qaDiv);
+			answerDiv.hide();
+			answerDiv.append(answer);
 			
 			// done rendering
 			if (onDone) onDone(div);
-		});
+		},
+		
+		this.showAnswer = function(bool) {
+			if (bool) {
+				answerDiv.show();
+				arrowDiv.html(downTriangle);
+			} else {
+				answerDiv.hide();
+				arrowDiv.html(rightTriangle);
+			}
+		}
+		
+		function toggle() {
+			answerDiv.toggle();
+			arrowDiv.html(answerDiv.is(":visible") ? downTriangle : rightTriangle);
+		}
 	}
+	inheritsFrom(QuestionAnswerController, DivController);
 }
 inheritsFrom(FaqController, DivController);
 
@@ -1444,13 +1555,15 @@ function FormController(div) {
 			}
 			
 			// validate num keys
-			var numKeys = that.getNumKeys();
-			if (isInt(numKeys) && numKeys >= 1) {
-				numKeysInput.removeClass("form_input_error_div");
-				validNumKeys = true;
-			} else {
-				numKeysInput.addClass("form_input_error_div");
-				validNumKeys = false;
+			else {
+				var numKeys = that.getNumKeys();
+				if (isInt(numKeys) && numKeys >= 1) {
+					numKeysInput.removeClass("form_input_error_div");
+					validNumKeys = true;
+				} else {
+					numKeysInput.addClass("form_input_error_div");
+					validNumKeys = false;
+				}
 			}
 			
 			// update valid state

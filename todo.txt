@@ -1,6 +1,8 @@
 TODO
-all pieces shown, connected to piece links
-sample label over frontpage
+lighter sample over homepage
+straight arrow and bullet points on home environment checks
+colored piece selector
+all pieces show on one page
 form split wording still confusing + info tooltip
 back button works?
 donation addresses clearly indicate currency
