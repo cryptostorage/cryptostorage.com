@@ -54,7 +54,7 @@
 .paginationjs .paginationjs-pages li.active>a {
 	height: 28px;
 	line-height: 28px;
-	color: white;
+	color: rgb(115, 253, 233);
 	font-weight: bold;
 }
 
