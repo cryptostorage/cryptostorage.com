@@ -1391,7 +1391,7 @@ var AppUtils = {
 			return false;
 		}
 		
-		// determines if browser is open source
+		// determines if browser is open-source
 		function isOpenSourceBrowser(browserName) {
 			if (arrayContains(AppUtils.OPEN_SOURCE_BROWSERS, browserName)) return true;
 			if (arrayContains(AppUtils.CLOSED_SOURCE_BROWSERS, browserName)) return false;
@@ -1545,13 +1545,13 @@ var AppUtils = {
 			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.INTERNET});
 		}
 		
-		// check open source browser
+		// check open-source browser
 		if (info.browser && info.browser.isSupported) {
 			if (info.browser.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.BROWSER});
 			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.BROWSER});
 		}
 		
-		// check open source os
+		// check open-source os
 		if (isInitialized(info.os)) {
 			if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
 			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});

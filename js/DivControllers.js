@@ -298,7 +298,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
+			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automated environment checks.").appendTo(sliderDiv);
 			
@@ -419,7 +419,7 @@ function HomeController(div) {
 			// download section
 			pageDiv.append("<div style='height: 70px'>");
 			pageDiv.append("<div class='home_label'>Download our 100% free and open-source software and run it offline</div>");
-			pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
+			pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open-source, so the community can maintain it indefinitely.</div>")
 			var licenseDiv = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 			var mitImg = $().appendTo(licenseDiv);
 			licenseDiv.append("<a href='./LICENSE.txt'><img src='img/mit.png' class='license_img'></a>");
@@ -517,7 +517,7 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is cryptostorage.com?"; },
-					getAnswer: function() { return "Cryptostorage.com is an open source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."; }
+					getAnswer: function() { return "Cryptostorage.com is an open-source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."; }
 				}, {
 					id: "faq_key_pair",
 					getQuestion: function() { return "What is a public/private key pair?" },
@@ -542,8 +542,8 @@ function FaqController(div) {
 						var recommendationsList = $("<ol>").appendTo(answerDiv);
 						recommendationsList.append("<li>Download, verify, and run the source code offline, not from the cryptostorage.com domain.</li>");
 						recommendationsList.append("<li>Run the source code on a device that is disconnected from the internet and will ideally never be connected to the internet again.</li>");
-						recommendationsList.append("<li>Run the source code in an open source browser like Firefox or Chromium.</li>");
-						recommendationsList.append("<li>Run the source code on an open source operating system like Tails, Ubuntu, or Raspbian for the Raspberry Pi.</li>");
+						recommendationsList.append("<li>Run the source code in an open-source browser like Firefox or Chromium.</li>");
+						recommendationsList.append("<li>Run the source code on an open-source operating system like Tails, Ubuntu, or Raspbian for the Raspberry Pi.</li>");
 						return answerDiv;
 					}
 				}, {
@@ -3412,11 +3412,11 @@ function NoticeController(div, config) {
 			// interpret environment code and state
 			switch (check.code) {
 				case AppUtils.EnvironmentCode.BROWSER:
-					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
+					if (check.state === "pass") div.append("Browser is open-source (" + info.browser.name + ")");
 					else {
 						var content = $("<div>").appendTo(div);
 						if (check.state === "fail") content.append("<div class='notice_bar_center_major'>Browser is not supported (" + info.browser.name + " " + info.browser.version + ")</div>");
-						else content.append("<div class='notice_bar_center_major'>Browser is not open source (" + info.browser.name + ")</div>");
+						else content.append("<div class='notice_bar_center_major'>Browser is not open-source (" + info.browser.name + ")</div>");
 						content.append("<div class='notice_bar_center_minor'>Recommended browsers: <a target='_blank' href='https://www.mozilla.org/en-US/firefox/'>Firefox</a> or <a target='_blank' href='https://www.chromium.org/getting-involved/download-chromium'>Chromium</a>");
 					}
 					break;
@@ -3444,10 +3444,10 @@ function NoticeController(div, config) {
 					}
 					break;
 				case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
-					if (check.state === "pass") div.append("Operating system is open source (" + info.os.name + ")");
+					if (check.state === "pass") div.append("Operating system is open-source (" + info.os.name + ")");
 					else {
 						var content = $("<div>").appendTo(div);
-						content.append("<div class='notice_bar_center_major'>Operating system is not open source (" + info.os.name + ")</div>");
+						content.append("<div class='notice_bar_center_major'>Operating system is not open-source (" + info.os.name + ")</div>");
 						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: <a target='_blank' href='https://tails.boum.org'>Tails</a>, <a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>, or <a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>");
 					}
 					break;
