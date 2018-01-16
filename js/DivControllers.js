@@ -3443,7 +3443,8 @@ function NoticeController(div, config) {
 					else if (check.state === "warn") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Internet connection is active</div>");
-						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for better security</div>");
+						if (info.isLocal) content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for better security</div>");
+						else content.append("<div class='notice_bar_center_minor'><a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a> then disconnect from the internet</div>");
 					} else if (check.state === "fail") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Connect to the internet</div>");

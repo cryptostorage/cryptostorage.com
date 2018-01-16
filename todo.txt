@@ -3,7 +3,6 @@ finish faq
 115, 253, 233 light blue
 form split wording still confusing + info tooltip
 back button works?
-warning when running live should say "download from github then disconnect from the internet"
 homepage content
 faq content
 github description page
