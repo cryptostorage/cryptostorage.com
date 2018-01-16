@@ -467,10 +467,6 @@ input[type='checkbox'][disabled] +label {
 	margin-top: 20px;
 }
 
-.question_answer:last-child {
-	margin-bottom: 0;
-}
-
 .faq_arrow_div {
 	width: 35px;
 	font-size: 18px;
@@ -498,11 +494,11 @@ input[type='checkbox'][disabled] +label {
 }
 
 .answer {
-	margin-top: 20px;
+
 }
 
 .answer p {
-	margin-bottom: 20px;
+	margin-top: 20px;
 }
 
 .answer p:last-child {
@@ -515,11 +511,7 @@ input[type='checkbox'][disabled] +label {
 
 .answer li {
 	padding-left: 10px;
-	margin-bottom: 20px;
-}
-
-.answer li:last-child {
-	margin-bottom: 0px;
+	margin-top: 20px;
 }
 
 .form_links_div {

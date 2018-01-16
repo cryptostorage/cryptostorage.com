@@ -518,13 +518,13 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is cryptostorage.com?"; },
-					getAnswer: function() { return "Cryptostorage.com is an open-source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser."; }
+					getAnswer: function() { return "<p>Cryptostorage.com is an open-source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.</p>"; }
 				}, {
 					id: "faq_key_pair",
 					getQuestion: function() { return "What is a public/private key pair?" },
 					getAnswer: function() { return "<p>A public/private key pair is a public address and a private key.  For example:</p>" +
 						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
-						"<p>The public address is used to receive funds.  It can be shared with anyone.<p>" + 
+						"<p>The public address is used to receive funds.  It can be shared with anyone.</p>" + 
 						"<p>The private key authorizes funds sent to its public address to be moved.  Anyone with the private key can access the funds, so it's critical to keep private keys safe and private.</p>"; }
 				}, {
 					id: "faq_safe_keys",
@@ -583,38 +583,37 @@ function FaqController(div) {
 						answerDiv.append("<p>Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and has not been modified by an attacker.</p>");
 						answerDiv.append("<p><b>Verifying the source code is highly recommended but not required to use this site.<b></p>");
 						answerDiv.append("<p>The source code can be verified in two ways.  Either method is sufficient.");
-						var verifyList = $("<ol>").appendTo(answerDiv);
-						var verify1 = $("<li><p>Verify the source code has been signed by woodser's PGP key.<p></li>").appendTo(verifyList);
-						var verify1List = $("<ol>").appendTo(verify1);
-						verify1List.append("<li><p>Install <a target='_blank' href='https://www.openpgp.org/'>PGP software</a> on your device.</p></li>");
-						verify1List.append("<li><p>Download woodser’s public PGP key, \"woodser.asc\", from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>root of the GitHub source repository</a>.</p></li>");
-						verify1List.append("<li><p>Import woodser's PGP key:</p>" +
+						answerDiv.append($("<p>Method #1: Verify the source code has the correct checksum.</p>"));
+						var verify1List = $("<ol>").appendTo(answerDiv);
+						verify1List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip and checksum.txt from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p></li>");
+						verify1List.append("<li><p>Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.</p>" +
+								"</p>Linux: <div class='terminal_cmd'>sha256sum cryptostorage-<i>[version]</i>.zip</div></p>" + 
+								"<p>Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i></div></p>" + 
+								"<p>Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></p></li>");
+						verify1List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
+						answerDiv.append($("<p>Method #2: Verify the source code has been signed by woodser's PGP key.</p>"));
+						var verify2List = $("<ol>").appendTo(answerDiv);
+						verify2List.append("<li><p>Install <a target='_blank' href='https://www.openpgp.org/'>PGP software</a> on your device.</p></li>");
+						verify2List.append("<li><p>Download woodser’s public PGP key, \"woodser.asc\", from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>root of the GitHub source repository</a>.</p></li>");
+						verify2List.append("<li><p>Import woodser's PGP key:</p>" +
 								"<p><div class='terminal_cmd'>gpg --import woodser.asc<div></p></li>");
-						verify1List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p>")
-						verify1List.append("<li><p>Verify the signature of the source code zip file:</p>" +
-								"<p><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div><p>" +
+						verify2List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p>")
+						verify2List.append("<li><p>Verify the signature of the source code zip file:</p>" +
+								"<p><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div></p>" +
 								"<p>You should see output similar to this.  The RSA keys must match.</p>" +
-								"<p><div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser <woodser@users.noreply.github.com>\"</div><p>" +
-								"<p>The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.<p>" +
-								"<p>Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s pgp key, which is not necessary.<p></li>");
-						var verify2 = $("<li><p>Verify the source code has the correct checksum.</p></li>").appendTo(verifyList);
-						var verify2List = $("<ol>").appendTo(verify2);
-						verify2List.append("<li>Download cryptostorage-<i>[version]</i>.zip and checksum.txt from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</li>");
-						verify2List.append("<li><p>Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.</p>" +
-								"Linux: <div class='terminal_cmd'>sha256sum cryptostorage-<i>[version]</i>.zip</div><br>" + 
-								"Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i></div><br>" + 
-								"Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></li>");
-						verify2List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
+								"<p><div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser <woodser@users.noreply.github.com>\"</div></p>" +
+								"<p>The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.</p>" +
+								"<p>Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s pgp key, which is not necessary.</p></li>");
 						return answerDiv;
 					}
 				}, {
 					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this service?"; },
-					getAnswer: function() { return "Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed."; }
+					getAnswer: function() { return "<p>Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",
 					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
-					getAnswer: function() { return "No.  The public/private key pairs are generated only in your devices browser so they are never shared with a third party by design."; }
+					getAnswer: function() { return "<p>No.  The public/private key pairs are generated only in your devices browser so they are never shared with a third party by design.</p>"; }
 				}, {
 					id: "faq_split_keys",
 					getQuestion: function() { return "What does it mean to split private keys?"; },
@@ -624,11 +623,11 @@ function FaqController(div) {
 				}, {
 					id: "faq_online_to_recover",
 					getQuestion: function() { return "Do I need to be online to recover private keys?"; },
-					getAnswer: function() { return "No.  The application's source code has everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub."; }
+					getAnswer: function() { return "<p>No.  The application's source code has everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub.</p>"; }
 				}, {
 					id: "faq_send_funds",
 					getQuestion: function() { return "Can I send funds using cryptostorage.com?"; },
-					getAnswer: function() { return "Not currently. Cryptostorage.com is a public/private key generation and recovery service. It is expected that users will import private keys into the wallet of their choice after keys have been recovered using crypstorage.com."; }
+					getAnswer: function() { return "<p>Not currently. Cryptostorage.com is a public/private key generation and recovery service. It is expected that users will import private keys into the wallet of their choice after keys have been recovered using crypstorage.com.</p>"; }
 				}
 			];
 			

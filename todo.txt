@@ -1,5 +1,4 @@
 TODO
-prioritize checksum
 regenerate pgp key
 finish faq
 
