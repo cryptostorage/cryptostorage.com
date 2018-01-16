@@ -1257,6 +1257,7 @@ function FormController(div) {
 		currencyInputs.splice(idx, 1);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().remove();
+		updateBip38Checkbox();
 		validateCurrencyInputs();
 	}
 	
@@ -1473,6 +1474,7 @@ function FormController(div) {
 					defeaultSelectedIndex: null,
 					onSelected: function(selection) {
 						selectedPlugin = plugins[selection.selectedIndex];
+						if (!initializing && onCurrencyChanged) onCurrencyChanged(ticker);
 						validateCurrency();
 					}
 				});
@@ -1487,6 +1489,7 @@ function FormController(div) {
 					if (selectorData[i].text === name) {
 						selector.ddslick('select', {index: i});
 						selectedPlugin = plugins[i];
+						if (!initializing && onCurrencyChanged) onCurrencyChanged(ticker);
 						validateCurrency();
 						break;
 					}
