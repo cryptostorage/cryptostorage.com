@@ -4,7 +4,6 @@ expand collapse all faqs
 115, 253, 233 light blue
 form split wording still confusing + info tooltip
 back button works?
-split bitpay credit to include website
 regenerate pgp key
 prioritize checksum
 warning when running live should say "download from github then disconnect from the internet"
