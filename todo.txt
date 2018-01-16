@@ -1,10 +1,11 @@
 TODO
+prioritize checksum
+regenerate pgp key
+finish faq
+
 115, 253, 233 light blue
 form split wording still confusing + info tooltip
-faq paragraph formatting
 back button works?
-regenerate pgp key
-prioritize checksum
 warning when running live should say "download from github then disconnect from the internet"
 homepage content
 faq content

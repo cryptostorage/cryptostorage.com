@@ -472,7 +472,6 @@ input[type='checkbox'][disabled] +label {
 }
 
 .faq_arrow_div {
-	color: blue;
 	width: 35px;
 	font-size: 18px;
 	line-height: 30px;
@@ -502,12 +501,25 @@ input[type='checkbox'][disabled] +label {
 	margin-top: 20px;
 }
 
+.answer p {
+	margin-bottom: 20px;
+}
+
+.answer p:last-child {
+	margin-bottom: 0;
+}
+
 .answer ol, .answer ul {
-	padding-left: 22px;
+	padding-left: 21px;
 }
 
 .answer li {
-	padding: 10px 0px 0px 15px;
+	padding-left: 10px;
+	margin-bottom: 20px;
+}
+
+.answer li:last-child {
+	margin-bottom: 0px;
 }
 
 .form_links_div {
