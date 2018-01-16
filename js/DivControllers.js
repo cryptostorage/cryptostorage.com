@@ -2803,6 +2803,8 @@ function ExportController(div, window, config) {
 			paginator = $("<div id='paginator' class='flex_horizontal'>").appendTo(exportControls);
 			$("#paginator", exportHeader).pagination({
 				dataSource: paginatorSource,
+				showPrevious: false,
+				showNext: false,
 				pageSize: 1,
 				callback: function(data, pagination) {
 					if (config.pieceDivs) setVisiblePiece(config.pieceDivs, pagination.pageNumber - 1);
