@@ -842,26 +842,11 @@ input[type='checkbox'][disabled] +label {
 }
 
 .credit_left {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
+	
 }
 
 .credit_right {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-ms-flex-pack: end;
-	-webkit-justify-content: flex-end;
-	justify-content: flex-end;
+
 }
 
 .credit_left_img {
@@ -876,37 +861,8 @@ input[type='checkbox'][disabled] +label {
 	margin-left: 10px;
 }
 
-.credit_title_subtitle {
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
-}
-
-.credit_left_icon_title {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-}
-
 .credit_left_icon_title > *:first-child {
 	margin-left: 0;
-}
-
-.credit_right_icon_title {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-ms-flex-pack: end;
-	-webkit-justify-content: flex-end;
-	justify-content: flex-end;
 }
 
 .credit_right_icon_title > *:first-child {

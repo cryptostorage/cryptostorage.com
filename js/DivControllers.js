@@ -868,10 +868,10 @@ function DonateController(div, appController) {
 		}
 		
 		function renderLeft(div, credit, onDone) {
-			div.attr("class", "credit_left");
+			div.attr("class", "credit_left flex_horizontal");
 			var imgDiv = $("<div>").appendTo(div);
-			var titleSubtitleDiv = $("<div class='credit_title_subtitle'>").appendTo(div);
-			var iconTitleDiv = $("<div class='credit_left_icon_title'>").appendTo(titleSubtitleDiv);
+			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_start'>").appendTo(div);
+			var iconTitleDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(titleSubtitleDiv);
 			if (credit.icon) iconTitleDiv.append($("<img class='credit_icon' src='" + credit.icon.get(0).src + "'>"));
 			var titleDiv = $("<div class='credit_title'>").appendTo(iconTitleDiv);
 			titleDiv.append(credit.title);
@@ -894,9 +894,9 @@ function DonateController(div, appController) {
 		}
 		
 		function renderRight(div, credit, onDone) {
-			div.attr("class", "credit_right");
-			var titleSubtitleDiv = $("<div class='credit_title_subtitle'>").appendTo(div);
-			var iconTitleDiv = $("<div class='credit_right_icon_title'>").appendTo(titleSubtitleDiv);
+			div.attr("class", "credit_right flex_horizontal");
+			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_end'>").appendTo(div);
+			var iconTitleDiv = $("<div class='flex_horizontal flex_justify_end'>").appendTo(titleSubtitleDiv);
 			if (credit.icon) iconTitleDiv.append($("<img class='credit_icon' src='" + credit.icon.get(0).src + "'>"));
 			var titleDiv = $("<div class='credit_title'>").appendTo(iconTitleDiv);
 			titleDiv.append(credit.title);

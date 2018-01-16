@@ -2,7 +2,6 @@ TODO
 label "piece" in export zip
 expand collapse all faqs
 115, 253, 233 light blue
-credits are not vertially centered
 form split wording still confusing + info tooltip
 back button works?
 regenerate pgp key
