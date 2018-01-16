@@ -770,19 +770,19 @@ function DonateController(div, appController) {
 				var credits = [];
 				credits.push({
 					icon: AppUtils.getCryptoPlugin("ETH").getLogo(),
-					title: $("<a target='blank_' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a>"),
+					title: $("<span><a target='blank_' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a> - Ethereum<span>"),
 					subtitle: "0x5735bb7cec965e58d03dddd167d1f27321878c51",
 					subtitleIsAddress: true
 				});
 				credits.push({
 					icon: AppUtils.getCryptoPlugin("BTC").getLogo(),
-					title: $("<a target='blank_' href='https://bitaddress.org'>bitaddress.org</a>"),
+					title: $("<span><a target='blank_' href='https://bitaddress.org'>bitaddress.org</a> - Bitcoin</span>"),
 					subtitle: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN",
 					subtitleIsAddress: true
 				});
 				credits.push({
 					icon: AppUtils.getCryptoPlugin("XMR").getLogo(),
-					title: $("<a target='blank_' href='https://moneroaddress.org'>moneroaddress.org</a>"),
+					title: $("<span><a target='blank_' href='https://moneroaddress.org'>moneroaddress.org</a> - Monero</span>"),
 					subtitle: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW",
 					subtitleIsAddress: true
 				});
@@ -870,13 +870,13 @@ function DonateController(div, appController) {
 		function renderLeft(div, credit, onDone) {
 			div.attr("class", "credit_left");
 			var imgDiv = $("<div>").appendTo(div);
-			var titleSubtitleDiv = $("<div class='credit_label_address'>").appendTo(div);
-			var iconTitleDiv = $("<div class='credit_left_logo_label'>").appendTo(titleSubtitleDiv);
-			if (credit.icon) iconTitleDiv.append($("<img class='credit_logo' src='" + credit.icon.get(0).src + "'>"));
-			var titleDiv = $("<div class='credit_label'>").appendTo(iconTitleDiv);
+			var titleSubtitleDiv = $("<div class='credit_title_subtitle'>").appendTo(div);
+			var iconTitleDiv = $("<div class='credit_left_icon_title'>").appendTo(titleSubtitleDiv);
+			if (credit.icon) iconTitleDiv.append($("<img class='credit_icon' src='" + credit.icon.get(0).src + "'>"));
+			var titleDiv = $("<div class='credit_title'>").appendTo(iconTitleDiv);
 			titleDiv.append(credit.title);
 			if (credit.subtitle) {
-				var subtitleDiv = $("<div class='credit_left_address'>").appendTo(titleSubtitleDiv);
+				var subtitleDiv = $("<div class='credit_left_subtitle'>").appendTo(titleSubtitleDiv);
 				subtitleDiv.append(credit.subtitle);
 				if (credit.subtitleIsAddress) subtitleDiv.addClass("copyable");
 			}
@@ -895,13 +895,13 @@ function DonateController(div, appController) {
 		
 		function renderRight(div, credit, onDone) {
 			div.attr("class", "credit_right");
-			var titleSubtitleDiv = $("<div class='credit_label_address'>").appendTo(div);
-			var iconTitleDiv = $("<div class='credit_right_logo_label'>").appendTo(titleSubtitleDiv);
-			if (credit.icon) iconTitleDiv.append($("<img class='credit_logo' src='" + credit.icon.get(0).src + "'>"));
-			var titleDiv = $("<div class='credit_label'>").appendTo(iconTitleDiv);
+			var titleSubtitleDiv = $("<div class='credit_title_subtitle'>").appendTo(div);
+			var iconTitleDiv = $("<div class='credit_right_icon_title'>").appendTo(titleSubtitleDiv);
+			if (credit.icon) iconTitleDiv.append($("<img class='credit_icon' src='" + credit.icon.get(0).src + "'>"));
+			var titleDiv = $("<div class='credit_title'>").appendTo(iconTitleDiv);
 			titleDiv.append(credit.title);
 			if (credit.subtitle) {
-				var subtitleDiv = $("<div class='credit_right_address'>").appendTo(titleSubtitleDiv);
+				var subtitleDiv = $("<div class='credit_right_subtitle'>").appendTo(titleSubtitleDiv);
 				subtitleDiv.append(credit.subtitle);
 				if (credit.subtitleIsAddress) subtitleDiv.addClass("copyable");
 			}
