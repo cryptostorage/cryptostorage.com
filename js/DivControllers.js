@@ -581,7 +581,7 @@ function FaqController(div) {
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and has not been modified by an attacker.</p>");
-						answerDiv.append("<p><b>Verifying the source code is highly recommended but not required to use this site.<b></p>");
+						answerDiv.append("<p><b>Verifying the source code is highly recommended</b> but not required to use this site.</p>");
 						answerDiv.append("<p>The source code can be verified in two ways.  Either method is sufficient.");
 						answerDiv.append($("<p>Method #1: Verify the source code has the correct checksum.</p>"));
 						var verify1List = $("<ol>").appendTo(answerDiv);
@@ -591,19 +591,19 @@ function FaqController(div) {
 								"<p>Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i></div></p>" + 
 								"<p>Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></p></li>");
 						verify1List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
-						answerDiv.append($("<p>Method #2: Verify the source code has been signed by woodser's PGP key.</p>"));
+						answerDiv.append($("<p>Method #2: Verify the source code has been signed by the developer's PGP key.</p>"));
 						var verify2List = $("<ol>").appendTo(answerDiv);
 						verify2List.append("<li><p>Install <a target='_blank' href='https://www.openpgp.org/'>PGP software</a> on your device.</p></li>");
 						verify2List.append("<li><p>Download woodser’s public PGP key, \"woodser.asc\", from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>root of the GitHub source repository</a>.</p></li>");
 						verify2List.append("<li><p>Import woodser's PGP key:</p>" +
-								"<p><div class='terminal_cmd'>gpg --import woodser.asc<div></p></li>");
-						verify2List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p>")
+								"<p><div class='terminal_cmd'>gpg --import woodser.asc</div></p></li>");
+						verify2List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p></li>")
 						verify2List.append("<li><p>Verify the signature of the source code zip file:</p>" +
 								"<p><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div></p>" +
 								"<p>You should see output similar to this.  The RSA keys must match.</p>" +
-								"<p><div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser <woodser@users.noreply.github.com>\"</div></p>" +
+								"<p><div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser &lt;woodser@users.noreply.github.com&gt;\"</div></p>" +
 								"<p>The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.</p>" +
-								"<p>Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s pgp key, which is not necessary.</p></li>");
+								"<p>Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.</p></li>");
 						return answerDiv;
 					}
 				}, {
