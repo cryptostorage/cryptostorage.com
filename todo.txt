@@ -5,7 +5,6 @@ form select btc/bch enables bip38 option
 autolink piece by scroll
 lighter sample over homepage
 straight arrow and bullet points on home environment checks
-all pieces show on one page
 form split wording still confusing + info tooltip
 back button works?
 donation addresses clearly indicate currency
