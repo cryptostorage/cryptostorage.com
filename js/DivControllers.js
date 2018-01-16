@@ -2761,7 +2761,7 @@ function ExportController(div, window, config) {
 		savePublicButton.html("Save Public Addresses");
 		
 		// export checkboxes
-		var exportCheckboxes = $("<div class='export_checkboxes'>").appendTo(exportControls);
+		var exportCheckboxes = $("<div class='export_checkboxes flex_horizontal'>").appendTo(exportControls);
 		showPublicCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		var showPublicCheckboxLabel = $("<label class='export_checkbox_label' for='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		showPublicCheckboxLabel.html("Show public addresses");
@@ -2797,7 +2797,7 @@ function ExportController(div, window, config) {
 		// piece selection
 		var paginatorSource = getPaginatorSource(config.keyGenConfig, config.pieces);
 		if (paginatorSource) {
-			paginator = $("<div id='paginator'>").appendTo(exportControls);
+			paginator = $("<div id='paginator' class='flex_horizontal'>").appendTo(exportControls);
 			$("#paginator", exportHeader).pagination({
 				dataSource: paginatorSource,
 				pageSize: 1,

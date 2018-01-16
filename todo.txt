@@ -1,5 +1,4 @@
 TODO
-export header heights like master
 form select btc/bch enables bip38 option
 115, 253, 233 light blue
 autolink piece by scroll

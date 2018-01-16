@@ -1308,12 +1308,13 @@ input[type='checkbox'][disabled] +label {
 .export_controls {
 	padding: 12px;
 	margin-top: 2px;	/* fix mobile safari border showing */
+	padding: 20px;
 }
 
 .export_buttons {
 	-ms-flex-pack: center;
 	justify-content: center;
-	margin-top: 5px;
+	margin-top: 0px;
 }
 
 .export_button {
@@ -1354,18 +1355,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .export_checkboxes {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center; -ms-flex-pack : center;
-	justify-content : center;
-	margin-top: 10px;
-	-ms-flex-pack: center;
-	justify-content: center;
+	margin-top: 15px;
 }
 
 .export_checkbox {
@@ -1384,18 +1374,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 #paginator {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center; -ms-flex-pack : center;
-	justify-content : center;
-	margin-top: 10px;
-	-ms-flex-pack: center;
-	justify-content: center;
+	margin-top: 15px;
 }
 
 .export_piece_selection_label {
