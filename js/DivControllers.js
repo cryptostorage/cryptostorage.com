@@ -393,7 +393,7 @@ function HomeController(div) {
 			pageDiv.append("<div style='height: 70px'>");
 			pageDiv.append("<div class='home_label'>Export to printable and digital formats for long term storage</div>");
 			pageDiv.append("<div class='home_description'>Save keys to a file which can be stored securely on a flash drive, or print to paper to easily create paper wallets.</div>")
-			pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
+			pageDiv.append($("<img width=750px src='img/print_example.png'>"));
 			
 			// check environment section
 			pageDiv.append("<div style='height: 10px'>");
