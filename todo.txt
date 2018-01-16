@@ -1,7 +1,12 @@
 TODO
-sample label over frontpage
+form select btc/bch enables bip38 option
+115, 253, 233 light blue
+autolink piece by scroll
+lighter sample over homepage
+straight arrow and bullet points on home environment checks
+colored piece selector
+all pieces show on one page
 form split wording still confusing + info tooltip
-all pieces shown, connected to piece links
 back button works?
 donation addresses clearly indicate currency
 split bitpay credit to include website
