@@ -497,6 +497,7 @@ inheritsFrom(HomeController, DivController);
  */
 function FaqController(div) {
 	DivController.call(this, div);
+	var qaControllers;	// controls all question/answer pairs
 	this.render = function(onDone) {
 		
 		// load dependencies
@@ -628,8 +629,11 @@ function FaqController(div) {
 				}
 			];
 			
+			// expand and collapse controls
+			var expandCollapseDiv = $("<div class='faq_expand_collapse_div flex_horizontal flex_justify_end'>").appendTo(pageDiv);
+			
 			// collect question answer controllers
-			var qaControllers = [];
+			qaControllers = [];
 			for (var i = 0; i < questionsAnswers.length; i++) {
 				var questionAnswer = questionsAnswers[i];
 				assertInitialized(questionAnswer.id);
@@ -649,13 +653,19 @@ function FaqController(div) {
 			async.series(funcs, function(err) {
 				if (err) throw err;
 				
+				// render expand / collapse div
+				var expand = $("<div class='faq_expand_collapse_link'>Expand All</div>").appendTo(expandCollapseDiv);
+				expand.click(function() { expandAll(); });
+				var collapse = $("<div class='faq_expand_collapse_link' style='margin-left: 15px;'>Collapse All</div>").appendTo(expandCollapseDiv);
+				collapse.click(function() { collapseAll(); });
+				
 				// open referenced faq
 				openHash();
 				$(window).on('hashchange', function() { openHash(); });
 				function openHash() {
 					for (var i = 0; i < qaControllers.length; i++) {
 						if ("#" + qaControllers[i].getDiv().attr("id") === window.location.hash) {
-							qaControllers[i].showAnswer(true);
+							qaControllers[i].open();
 						}
 					}
 				}
@@ -664,6 +674,18 @@ function FaqController(div) {
 				if (onDone) onDone(div);
 			});
 		});
+	}
+	
+	function expandAll() {
+		for (var i = 0; i < qaControllers.length; i++) {
+			qaControllers[i].open();
+		}
+	}
+	
+	function collapseAll() {
+		for (var i = 0; i < qaControllers.length; i++) {
+			qaControllers[i].close();
+		}
 	}
 	
 	/**
@@ -710,16 +732,16 @@ function FaqController(div) {
 			if (onDone) onDone(div);
 		},
 		
-		this.showAnswer = function(bool) {
-			if (bool) {
-				answerDiv.show();
-				arrowDiv.html(downTriangle);
-			} else {
-				answerDiv.hide();
-				arrowDiv.html(rightTriangle);
-			}
-		}
+		this.open = function() {
+			answerDiv.show();
+			arrowDiv.html(downTriangle);
+		},
 		
+		this.close = function() {
+			answerDiv.hide();
+			arrowDiv.html(rightTriangle);
+		}
+
 		function toggle() {
 			answerDiv.toggle();
 			arrowDiv.html(answerDiv.is(":visible") ? downTriangle : rightTriangle);

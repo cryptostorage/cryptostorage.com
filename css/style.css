@@ -449,8 +449,22 @@ input[type='checkbox'][disabled] +label {
 	opacity: 0.5;
 }
 
+.faq_expand_collapse_div {
+	
+}
+
+.faq_expand_collapse_link {
+	color: blue;
+	font-size: 18px;
+}
+
+.faq_expand_collapse_link:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
 .question_answer_div {
-	margin-bottom: 20px;
+	margin-top: 20px;
 }
 
 .question_answer:last-child {
