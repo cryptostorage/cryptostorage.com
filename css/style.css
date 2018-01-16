@@ -1308,7 +1308,7 @@ input[type='checkbox'][disabled] +label {
 .export_controls {
 	padding: 12px;
 	margin-top: 2px;	/* fix mobile safari border showing */
-	padding: 20px;
+	padding: 15px;
 }
 
 .export_buttons {
