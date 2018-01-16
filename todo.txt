@@ -1,4 +1,5 @@
 TODO
+115, 253, 233 light blue
 autolink piece by scroll
 lighter sample over homepage
 straight arrow and bullet points on home environment checks
