@@ -483,7 +483,7 @@ var AppUtils = {
 		for (var i = 0; i < numPieces; i++) {
 			var piece = {};
 			if (numPieces > 1) piece.pieceNum = i + 1;
-			piece.version = "1.0";
+			piece.version = "0.0.1";
 			piece.keys = [];
 			pieces.push(piece);
 		}
