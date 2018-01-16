@@ -613,7 +613,7 @@ var AppUtils = {
 		// prepare zip
 		var zip = JSZip();
 		for (var i = 0; i < pieces.length; i++) {
-			var name = ticker + (pieces.length > 1 ? "_" + (i + 1) : "");
+			var name = "cryptostorage_" + ticker + (pieces.length > 1 ? "_piece_" + (i + 1) : "");
 			zip.file(name + ".json", AppUtils.pieceToJson(pieces[i]));
 		}
 		
