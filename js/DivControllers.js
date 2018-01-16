@@ -754,9 +754,10 @@ function DonateController(div, appController) {
 			for (var i = 0; i < plugins.length; i++) {
 				var plugin = plugins[i];
 				donations.push({
-					logo: plugin.getLogo(),
-					label: plugin.getName(),
-					address: plugin.getDonationAddress()
+					icon: plugin.getLogo(),
+					title: plugin.getName(),
+					subtitle: plugin.getDonationAddress(),
+					subtitleIsAddress: true,
 				});
 			}
 			renderCredits(donations, function(donationsDiv) {
@@ -768,26 +769,26 @@ function DonateController(div, appController) {
 				titleDiv.html("Special Thanks To");
 				var credits = [];
 				credits.push({
-					logo: AppUtils.getCryptoPlugin("ETH").getLogo(),
-					label: "UI design - github.com/gregdracoulis",
-					labelUrl: "https://github.com/gregdracoulis",
-					address: "0x5735bb7cec965e58d03dddd167d1f27321878c51"
+					icon: AppUtils.getCryptoPlugin("ETH").getLogo(),
+					title: $("<a target='blank_' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a>"),
+					subtitle: "0x5735bb7cec965e58d03dddd167d1f27321878c51",
+					subtitleIsAddress: true
 				});
 				credits.push({
-					logo: AppUtils.getCryptoPlugin("BTC").getLogo(),
-					label: "bitaddress.org",
-					labelUrl: "https://bitaddress.org",
-					address: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN"
+					icon: AppUtils.getCryptoPlugin("BTC").getLogo(),
+					title: $("<a target='blank_' href='https://bitaddress.org'>bitaddress.org</a>"),
+					subtitle: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN",
+					subtitleIsAddress: true
 				});
 				credits.push({
-					logo: AppUtils.getCryptoPlugin("XMR").getLogo(),
-					label: "moneroaddress.org",
-					labelUrl: "https://moneroaddress.org",
-					address: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW"
+					icon: AppUtils.getCryptoPlugin("XMR").getLogo(),
+					title: $("<a target='blank_' href='https://moneroaddress.org'>moneroaddress.org</a>"),
+					subtitle: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW",
+					subtitleIsAddress: true
 				});
 				credits.push({
-					label: "BitPay",
-					labelUrl: "https://bitpay.com",
+					title: "BitPay",
+					subtitle: $("<a target='blank_' href='https://bitpay.com'>www.bitpay.com</a>"),
 					image: $("<img src='img/bitpay.png'>")
 				});
 				
@@ -859,8 +860,8 @@ function DonateController(div, appController) {
 				return function(onDone) { renderRight(creditDiv, credit, onDone); }
 			}
 			
-			// render addresses in parallel
-			async.parallel(funcs, function(err, results) {
+			// render credits
+			async.series(funcs, function(err, results) {
 				if (err) throw err;
 				onDone(creditsDiv);
 			});
@@ -869,29 +870,23 @@ function DonateController(div, appController) {
 		function renderLeft(div, credit, onDone) {
 			div.attr("class", "credit_left");
 			var imgDiv = $("<div>").appendTo(div);
-			var labelAddressDiv = $("<div class='credit_label_address'>").appendTo(div);
-			var logoLabelDiv = $("<div class='credit_left_logo_label'>").appendTo(labelAddressDiv);
-			if (credit.logo) {
-				var logo = $("<img src='" + credit.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-				logo.attr("class", "credit_logo");
-			}
-			var labelDiv = $("<div class='credit_label'>").appendTo(logoLabelDiv);
-			if (credit.labelUrl) {
-				labelDiv.append($("<a target='_blank' href='" + credit.labelUrl + "'>" + credit.label + "</a>"));
-			} else {
-				labelDiv.append(credit.label);
-			}
-			if (credit.address) {
-				var addressDiv = $("<div class='credit_left_address copyable'>").appendTo(labelAddressDiv);
-				addressDiv.append(credit.address);
+			var titleSubtitleDiv = $("<div class='credit_label_address'>").appendTo(div);
+			var iconTitleDiv = $("<div class='credit_left_logo_label'>").appendTo(titleSubtitleDiv);
+			if (credit.icon) iconTitleDiv.append($("<img class='credit_logo' src='" + credit.icon.get(0).src + "'>"));
+			var titleDiv = $("<div class='credit_label'>").appendTo(iconTitleDiv);
+			titleDiv.append(credit.title);
+			if (credit.subtitle) {
+				var subtitleDiv = $("<div class='credit_left_address'>").appendTo(titleSubtitleDiv);
+				subtitleDiv.append(credit.subtitle);
+				if (credit.subtitleIsAddress) subtitleDiv.addClass("copyable");
 			}
 			if (credit.image) {
-				credit.image.attr("class", "credit_right_img");
+				credit.image.addClass("credit_left_img");
 				imgDiv.append(credit.image);
 				onDone();
-			} else {
-				AppUtils.renderQrCode(credit.address, null, function(img) {
-					img.attr("class", "credit_left_img");
+			} else if (credit.subtitleIsAddress){
+				AppUtils.renderQrCode(credit.subtitle, null, function(img) {
+					img.addClass("credit_left_img");
 					imgDiv.append(img);
 					onDone();
 				});
@@ -900,30 +895,24 @@ function DonateController(div, appController) {
 		
 		function renderRight(div, credit, onDone) {
 			div.attr("class", "credit_right");
-			var labelAddressDiv = $("<div class='credit_label_address'>").appendTo(div);
-			var logoLabelDiv = $("<div class='credit_right_logo_label'>").appendTo(labelAddressDiv);
-			if (credit.logo) {
-				var logo = $("<img src='" + credit.logo.get(0).src + "'>").appendTo(logoLabelDiv);
-				logo.attr("class", "credit_logo");
-			}
-			var labelDiv = $("<div class='credit_label'>").appendTo(logoLabelDiv);
-			if (credit.labelUrl) {
-				labelDiv.append($("<a target='_blank' href='" + credit.labelUrl + "'>" + credit.label + "</a>"));
-			} else {
-				labelDiv.append(credit.label);
-			}
-			if (credit.address) {
-				var addressDiv = $("<div class='credit_right_address copyable'>").appendTo(labelAddressDiv);
-				addressDiv.append(credit.address);
+			var titleSubtitleDiv = $("<div class='credit_label_address'>").appendTo(div);
+			var iconTitleDiv = $("<div class='credit_right_logo_label'>").appendTo(titleSubtitleDiv);
+			if (credit.icon) iconTitleDiv.append($("<img class='credit_logo' src='" + credit.icon.get(0).src + "'>"));
+			var titleDiv = $("<div class='credit_label'>").appendTo(iconTitleDiv);
+			titleDiv.append(credit.title);
+			if (credit.subtitle) {
+				var subtitleDiv = $("<div class='credit_right_address'>").appendTo(titleSubtitleDiv);
+				subtitleDiv.append(credit.subtitle);
+				if (credit.subtitleIsAddress) subtitleDiv.addClass("copyable");
 			}
 			var imgDiv = $("<div>").appendTo(div);
 			if (credit.image) {
-				credit.image.attr("class", "credit_right_img");
+				credit.image.addClass("credit_right_img");
 				imgDiv.append(credit.image);
 				onDone();
-			} else {
-				AppUtils.renderQrCode(credit.address, null, function(img) {
-					img.attr("class", "credit_right_img");
+			} else if (credit.subtitleIsAddress) {
+				AppUtils.renderQrCode(credit.subtitle, null, function(img) {
+					img.addClass("credit_right_img");
 					imgDiv.append(img);
 					onDone();
 				});
