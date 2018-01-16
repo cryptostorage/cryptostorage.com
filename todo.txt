@@ -1,6 +1,5 @@
 TODO
 115, 253, 233 light blue
-straight arrow and bullet points on home environment checks
 form split wording still confusing + info tooltip
 back button works?
 donation addresses clearly indicate currency
