@@ -3099,7 +3099,7 @@ function ExportController(div, window, config) {
 		// add piece divs if given
 		if (config.pieceDivs) {
 			assertInitialized(config.pieces);
-			setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
+			//setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(config.pieceDivs);
 			makePieceDivsCopyable(config.pieceDivs);
 			setPrintEnabled(true);
@@ -3114,7 +3114,7 @@ function ExportController(div, window, config) {
 			// render pieces if given
 			if (config.pieces) {
 				for (var i = 0; i < config.pieces.length; i++) config.pieceDivs.push($("<div>"));
-				setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
+				//setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(config.pieceDivs);
 				setPrintEnabled(false);
 				setControlsEnabled(true);
@@ -3177,7 +3177,7 @@ function ExportController(div, window, config) {
 	 */
 	function setVisiblePiece(pieceDivs, pieceIdx) {
 		window.location.hash = "";
-		window.location.hash = "export_piece_" + (pieceIdx + 1);		
+		window.location.hash = "export_piece_" + (pieceIdx + 1);	
 	}
 	
 	/**
