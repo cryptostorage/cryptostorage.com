@@ -797,19 +797,19 @@ function DonateController(div, appController) {
 				var credits = [];
 				credits.push({
 					icon: AppUtils.getCryptoPlugin("ETH").getLogo(),
-					title: $("<span><a target='blank_' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a> - Ethereum<span>"),
+					title: $("<span>Ethereum - <a target='blank_' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a><span>"),
 					subtitle: "0x5735bb7cec965e58d03dddd167d1f27321878c51",
 					subtitleIsAddress: true
 				});
 				credits.push({
 					icon: AppUtils.getCryptoPlugin("BTC").getLogo(),
-					title: $("<span><a target='blank_' href='https://bitaddress.org'>bitaddress.org</a> - Bitcoin</span>"),
+					title: $("<span>Bitcoin - <a target='blank_' href='https://bitaddress.org'>bitaddress.org</a></span>"),
 					subtitle: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN",
 					subtitleIsAddress: true
 				});
 				credits.push({
 					icon: AppUtils.getCryptoPlugin("XMR").getLogo(),
-					title: $("<span><a target='blank_' href='https://moneroaddress.org'>moneroaddress.org</a> - Monero</span>"),
+					title: $("<span>Monero - <a target='blank_' href='https://moneroaddress.org'>moneroaddress.org</a></span>"),
 					subtitle: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW",
 					subtitleIsAddress: true
 				});
