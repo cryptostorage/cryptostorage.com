@@ -1,5 +1,4 @@
 TODO
-piece.version 0.0.1 expected to be number
 finish faq
 form split wording still confusing + info tooltip
 back button works?
