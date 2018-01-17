@@ -16,6 +16,8 @@ var OperatingSystems = {
 var AppUtils = {
 		
 	// app constants
+	VERSION: "0.0.1",
+	VERSION_POSTFIX: "-alpha",
 	RUN_MIN_TESTS: true,
 	RUN_FULL_TESTS: false,
 	DEV_MODE: true,
@@ -290,6 +292,31 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Returns the version numbers from a string of the format NN.NN.NN.
+	 * 
+	 * @param str is the string to get the version numbers from
+	 * 
+	 * @returns int[3] with the three version numbers
+	 */
+	getVersionNumbers: function(str) {
+		var dotIdx1 = str.indexOf('.');
+		if (dotIdx1 < 0) throw new Error("Version does not have dot separator: " + str);
+		var dotIdx2 = str.indexOf('.', dotIdx1 + 1);
+		if (dotIdx2 < 0) throw new Error("Version does not have two dot separators: " + str);
+		if (str.indexOf('.', dotIdx2 + 1) >= 0) throw new Error("Version has more than 2 dot separators: " + str);
+		var nums = [];
+		nums.push(Number(str.substring(0, dotIdx1)));
+		nums.push(Number(str.substring(dotIdx1 + 1, dotIdx2)));
+		nums.push(Number(str.substring(dotIdx2 + 1)));
+		for (var i = 0; i < nums.length; i++) {
+			assertNumber(nums[i], "Version element " + i + " is not a number");
+			assertTrue(nums[i] >= 0, "Version element " + i + " + is negative");
+		}
+		assertTrue(nums[0] + nums[1] + nums[2] > 0, "Version does not have positive element: " + str);
+		return nums;
+	},
+	
+	/**
 	 * Determines the minimum pieces to reconstitute based on a possible split piece string.
 	 * 
 	 * Looks for 'XXXc' prefix in the given split piece where XXX is the minimum to reconstitute.
@@ -483,7 +510,7 @@ var AppUtils = {
 		for (var i = 0; i < numPieces; i++) {
 			var piece = {};
 			if (numPieces > 1) piece.pieceNum = i + 1;
-			piece.version = "0.0.1";
+			piece.version = AppUtils.VERSION;
 			piece.keys = [];
 			pieces.push(piece);
 		}
@@ -773,7 +800,12 @@ var AppUtils = {
 	 */
 	validatePiece: function(piece, allowMissingPublicXorPrivate) {
 		assertDefined(piece.version, "piece.version is not defined");
-		assertNumber(piece.version, "piece.version is not a number");
+		try {
+			AppUtils.getVersionNumbers(piece.version);
+		} catch (err) {
+			throw new Error("piece.version is invalid version string: " + piece.version);
+		}
+		
 		if (isDefined(piece.pieceNum)) {
 			assertInt(piece.pieceNum, "piece.pieceNum is not an integer");
 			assertTrue(piece.pieceNum > 0, "piece.pieceNum is not greater than 0");

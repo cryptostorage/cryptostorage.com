@@ -86,6 +86,26 @@ var Tests = {
 			assertTrue(AppUtils.isBase58("abcd"))
 			assertFalse(AppUtils.isBase58("abcd0"))
 			
+			// test valid versions
+			var validVersions = [[0, 0, 1], [12, 23, 4], [16, 1, 5]];
+			for (var i = 0; i < validVersions.length; i++) {
+				var versionNumbers = AppUtils.getVersionNumbers(validVersions[i][0] + "." + validVersions[i][1] + "." + validVersions[i][2]);
+				for (var j = 0; j < validVersions[0].length; j++) {
+					assertEquals(validVersions[i][j], versionNumbers[j], "Unexpected version number at [" + i + "][" + j + "]: " + validVersions[i][j] + " vs " + versionNumbers[j]);
+				}
+			}
+			
+			// test invalid versions
+			var invalidVersions = ["3.0.1.0", "3.0.-1", "3.0", "4", "asdf", "4.f.2", "0.0.0"];
+			for (var i = 0; i < invalidVersions.length; i++) {
+				try {
+					AppUtils.getVersionNumbers(invalidVersions[i]);
+					throw new Error("fail");
+				} catch (err) {
+					if (err.message === "fail") throw new Error("Should have thrown exception on version string: " + invalidVersions[i]);
+				}
+			}
+			
 			// test isBase58()
 			for (var i = 0; i < Tests.getTestCryptoPlugins().length; i++) {
 				var plugin = Tests.getTestCryptoPlugins()[i];
@@ -626,52 +646,52 @@ var Tests = {
 						namedPieces = [];
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
-						assertEquals("Invalid piece 'piece.json': piece.version is not a number", controller.getWarning());
+						assertEquals("Invalid piece 'piece.json': piece.version is invalid version string: asdf", controller.getWarning());
 						controller.startOver();
 						
-						piece = { version: 1.0, pieceNum: "asdf" };
+						piece = { version: "1.0.0", pieceNum: "asdf" };
 						namedPieces = [];
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.pieceNum is not an integer", controller.getWarning());
 						controller.startOver();
 						
-						piece = { version: 1.0, pieceNum: 0 };
+						piece = { version: "0.2.1", pieceNum: 0 };
 						namedPieces = [];
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.pieceNum is not greater than 0", controller.getWarning());
 						controller.startOver();
 						
-						piece = { version: 1.0 };
+						piece = { version: "1.2.3" };
 						namedPieces = [];
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.keys is not defined", controller.getWarning());
 						controller.startOver();
 						
-						piece = { version: 1.0, keys: "asdf"};
+						piece = { version: "2.4.0", keys: "asdf"};
 						namedPieces = [];
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.keys is not an array", controller.getWarning());
 						controller.startOver();
 						
-						piece = { version: 1.0, keys: []};
+						piece = { version: "0.0.1", keys: []};
 						namedPieces = [];
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.keys is empty", controller.getWarning());
 						controller.startOver();
 						
-						piece = { version: 1.0, keys: [{}]};
+						piece = { version: "2.3.1", keys: [{}]};
 						namedPieces = [];
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.keys[0].ticker is not defined", controller.getWarning());
 						controller.startOver();
 						
-						piece = { version: 1.0, keys: [{
+						piece = { version: "4.6.4", keys: [{
 							ticker: "BTC",
 							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
 							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",
@@ -682,7 +702,7 @@ var Tests = {
 						assertEquals("Invalid piece 'piece.json': piece.keys[0].encryption is not defined", controller.getWarning());
 						controller.startOver();
 						
-						piece = { version: 1.0, pieceNum: 1, keys: [{
+						piece = { version: "0.0.1", pieceNum: 1, keys: [{
 							ticker: "BTC",
 							address: "1PshW4gesSamVeZ5uP2C8AipMgsYeQu34X",
 							wif: "2c3XyNwGVqDqke6tgWd6RcZTHBW77X1SLrUnR2jGLai9e2hpC",
@@ -700,7 +720,7 @@ var Tests = {
 						controller.startOver();
 						
 						// valid piece
-						piece = { version: 1.0, keys: [{
+						piece = { version: "1.0.0", keys: [{
 							ticker: "BTC",
 							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
 							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",

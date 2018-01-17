@@ -137,6 +137,9 @@ function AppController(div) {
 			return div;
 		}
 		
+		// validate version
+		AppUtils.getVersionNumbers(AppUtils.VERSION);
+		
 		// slider has to be attached to the DOM and shown to work, so it's a special case and not part of HomeController
 		introDiv = $("<div class='intro_div'>").hide();
 		introDiv.appendTo(headerDiv);
@@ -434,7 +437,7 @@ function HomeController(div) {
 			var descriptionDiv = $("<div class='home_footer_description flex_vertical'>").appendTo(footerDiv);
 			descriptionDiv.append("<div><a href='./LICENSE.txt'>MIT licensed.</a></div>JavaScript copyrights included in the source. No warranty.");
 			var versionDiv = $("<div class='home_footer_version flex_horizontal flex_justify_end'>").appendTo(footerDiv);
-			versionDiv.append("<a href='./versions.txt' target='_blank'>version 0.0.1 alpha</a>");
+			versionDiv.append("<a href='./versions.txt' target='_blank'>version " + AppUtils.VERSION + AppUtils.VERSION_POSTFIX + "</a>");
 			
 			// done rendering
 			if (onDone) onDone(div);
@@ -1792,7 +1795,7 @@ function ImportFileController(div) {
 				AppUtils.validatePiece(namedPiece.piece, true);
 				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
 			} catch (err) {
-				if (AppUtils.DEV_MODE) console.log(err);
+				if (!AppUtils.DEV_MODE) console.log(err);
 				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.message);
 			}
 		}
@@ -2011,7 +2014,7 @@ function ImportFileController(div) {
 		try {
 			var keys = AppUtils.piecesToKeys(pieces);
 		} catch (err) {
-			if (AppUtils.DEV_MODE) console.log(err);
+			if (!AppUtils.DEV_MODE) console.log(err);
 			var img = err.message.indexOf("additional piece") > -1 ? $("<img src='img/files.png'>") : null;
 			that.setWarning(err.message, img);
 		}
