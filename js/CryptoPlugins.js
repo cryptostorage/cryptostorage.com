@@ -146,7 +146,7 @@ function BitcoinPlugin() {
 	this.getTicker = function() { return "BTC" };
 	this.getLogoPath = function() { return "img/bitcoin.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js"]; }
-	this.getDonationAddress = function() { return "1GzoPirZZUbEDf25gBN1vCYkWLDjDmrFBy"; }
+	this.getDonationAddress = function() { return "1ArmuyQfgM1Sd3tN1A242FzPhbePfCjbmE"; }
 	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS, AppUtils.EncryptionScheme.BIP38]; }
 	this.newKey = function(str) {
 		
@@ -225,7 +225,7 @@ function BitcoinCashPlugin() {
 	this.getName = function() { return "Bitcoin Cash"; }
 	this.getTicker = function() { return "BCH" };
 	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
-	this.getDonationAddress = function() { return "1Kr31Q4duiRFo4rwyoQmUd2T9LWJKsUpA7"; }
+	this.getDonationAddress = function() { return "15UL5qGptXxPnQKhhRCx1wLL3UAmbn61A2"; }
 }
 inheritsFrom(BitcoinCashPlugin, BitcoinPlugin);
 
@@ -237,7 +237,7 @@ function EthereumPlugin() {
 	this.getTicker = function() { return "ETH" };
 	this.getLogoPath = function() { return "img/ethereum.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/keythereum.js"]; }
-	this.getDonationAddress = function() { return "0xd3ab70e955b8a8db1461830d35377cc85cbb5fd8"; }
+	this.getDonationAddress = function() { return "0x8074da70e22a58a9e4a5dcecf968ea499d60e470"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -318,7 +318,7 @@ function EthereumClassicPlugin() {
 	this.getName = function() { return "Ethereum Classic"; }
 	this.getTicker = function() { return "ETC" };
 	this.getLogoPath = function() { return "img/ethereum_classic.png"; }
-	this.getDonationAddress = function() { return "0x341dbd32c3dc4f837c465df1336e570883063bfa"; }
+	this.getDonationAddress = function() { return "0xa3cbe053aebfee6860e82c3ad1415279d8c51503"; }
 }
 inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
 
@@ -330,7 +330,7 @@ function OmiseGoPlugin() {
 	this.getName = function() { return "OmiseGo"; }
 	this.getTicker = function() { return "OMG" };
 	this.getLogoPath = function() { return "img/omisego.png"; }
-	this.getDonationAddress = function() { return "0xb83e2f94264efd90edac7eec3ed16c29b0b29709"; }
+	this.getDonationAddress = function() { return "0x8b0391215e691c0bee419511e6ec77b1416e8593"; }
 }
 inheritsFrom(OmiseGoPlugin, EthereumPlugin);
 
@@ -342,7 +342,7 @@ function BasicAttentionTokenPlugin() {
 	this.getName = function() { return "Basic Attention Token"; }
 	this.getTicker = function() { return "BAT" };
 	this.getLogoPath = function() { return "img/bat.png"; }
-	this.getDonationAddress = function() { return "0x8318b3abd42902f3822d01e1b39ded59fcf0c896"; }
+	this.getDonationAddress = function() { return "0xf4537a85814e014e0fe31001ae5c5ed68082dbe1"; }
 }
 inheritsFrom(BasicAttentionTokenPlugin, EthereumPlugin);
 
@@ -354,7 +354,7 @@ function LitecoinPlugin() {
 	this.getTicker = function() { return "LTC" };
 	this.getLogoPath = function() { return "img/litecoin.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/litecore.js"]; }
-	this.getDonationAddress = function() { return "LRE5hwVKhr3RxVvkCXZNkyuoM2jMqvHcLR"; }
+	this.getDonationAddress = function() { return "LSRx2UwU5rjKGcmUXx8KDNTNXMBV1PudHB"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -406,7 +406,7 @@ function DashPlugin() {
 	this.getTicker = function() { return "DASH" };
 	this.getLogoPath = function() { return "img/dash.png"; }
 	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/dashcore.js"]; }
-	this.getDonationAddress = function() { return "XtruNtEHHqPTVCs89181M4waLiA973dcLM"; }
+	this.getDonationAddress = function() { return "XoK6AmEGxAh2WKMh2hkVycnkEdmi8zDaQR"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -458,7 +458,7 @@ function MoneroPlugin() {
 	this.getTicker = function() { return "XMR" };
 	this.getLogoPath = function() { return "img/monero.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/moneroaddress.js"]; }
-	this.getDonationAddress = function() { return "48GSfYKr2xLhR6AF2c9kpYX5uyLZEynaaXnHcoxxDP5e9SSD9NMp7UFg4wunhGZzn2N2voBycPvP6R6Gj7opiZZyFX2RmiD"; }
+	this.getDonationAddress = function() { return "42fuBvVfgPUWphR6C5XgsXDGfx2KVhbv4cjhJDm9Y87oU1ixpDnzF82RAWCbt8p81f26kx3kstGJCat1YEohwS1e1o27zWE"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -532,7 +532,7 @@ function ZcashPlugin() {
 	this.getTicker = function() { return "ZEC" };
 	this.getLogoPath = function() { return "img/zcash.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/zcashcore.js"]; }
-	this.getDonationAddress = function() { return "t1UBYiMn1fjYikbThxdbgn55o48NGp9SxsU"; }
+	this.getDonationAddress = function() { return "t1g1AQ8Q8yWbkBntunJaKADJ38YjxsDuJ3H"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
