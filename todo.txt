@@ -1,10 +1,8 @@
 TODO
 finish faq
-115, 253, 233 light blue
 form split wording still confusing + info tooltip
 back button works?
-homepage content
-faq content
+115, 253, 233 light blue
 github description page
 remove under development warning
 regenerate donate
