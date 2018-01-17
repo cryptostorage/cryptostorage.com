@@ -1,7 +1,8 @@
 TODO
+precede special thanks addresses with currency e.g. "Ethereum: 0x5735bb..."
 finish faq
-form split wording still confusing + info tooltip
 back button works?
+form split wording still confusing + info tooltip
 115, 253, 233 light blue
 github description page
 remove under development warning
