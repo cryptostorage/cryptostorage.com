@@ -1,4 +1,5 @@
 TODO
+notice tooltip max width
 precede special thanks addresses with currency e.g. "Ethereum: 0x5735bb..."
 finish faq
 back button works?

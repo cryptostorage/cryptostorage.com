@@ -521,7 +521,7 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is cryptostorage.com?"; },
-					getAnswer: function() { return "<p>Cryptostorage.com is an open-source application to generate public/private key pairs for multiple cryptocurrencies.  This site runs only in your device's browser.</p>"; }
+					getAnswer: function() { return "<p>Cryptostorage.com is an open-source tool to generate public/private key pairs for multiple cryptocurrencies.  This tool runs only in your device's browser.</p>"; }
 				}, {
 					id: "faq_key_pair",
 					getQuestion: function() { return "What is a public/private key pair?" },
@@ -532,11 +532,11 @@ function FaqController(div) {
 				}, {
 					id: "faq_safe_keys",
 					getQuestion: function() { return "How does cryptostorage.com help me keep my private keys safe and private?"; },
-					getAnswer: function() { return "<p>First, this application generates keys only in your device's browser.  Keys are never shared with a third party, including us, the site owners.</p>" + 
-						"<p>Second, this application lets you passphrase protect all generated private keys.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
-						"<p>Third, this application lets you split private keys into separate pieces which must be recombined in order to recover the private keys.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.</p>" +
-						"<p>Fourth, this application lets you save the generated keys to a digital file and printed paper for safe long term storage.</p>" +
-						"<p>Fifth, cryptostorage.com automatically recommends ways to improve the security of the environment the application is running in.</p>"; }
+					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys are never shared with a third party, including us, the site owners.</p>" + 
+						"<p>Second, this tool lets you passphrase protect all generated private keys.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
+						"<p>Third, this tool lets you split private keys into separate pieces which must be recombined in order to recover the private keys.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.</p>" +
+						"<p>Fourth, this tool lets you save the generated keys to a digital file and printed paper for safe long term storage.</p>" +
+						"<p>Last, cryptostorage.com automatically recommends ways to improve the security of the environment the tool is running in.</p>"; }
 				}, {
 					id: "faq_recommendations",
 					getQuestion: function() { return "What environment recommendations does cryptostorage.com make?"; },
@@ -556,7 +556,7 @@ function FaqController(div) {
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						var generateList = $("<ol>").appendTo(answerDiv);
-						generateList.append("<li>Download and verify cryptostorage.com-<i>[version]</i>.zip.  See \"<a href='#faq6'>How can I download and verify the source code?</a>\"</li>");
+						generateList.append("<li><a href='#faq_download_verify'>Download and verify</a> cryptostorage.com-<i>[version]</i>.zip.  See \"<a href='#faq6'>How can I download and verify the source code?</a>\"</li>");
 						var generateTransfer = $("<li><p>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-gapped computer using a flash drive.</p></li>").appendTo(generateList);
 						var generateTransferList = $("<ul>").appendTo(generateTransfer);
 						generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
@@ -575,7 +575,7 @@ function FaqController(div) {
 						generateKeysList.append("<li><p>Protecting your keys with a passphrase is <b>strongly recommended</b>.</p>");
 						generateKeysList.append("<li><p>Optionally split your keys for maximum security.</p></li>");
 						generateList.append("<li><p>Save the generated keys to a flash drive or printed paper for safe keeping.</p>" +
-								"<p>The keys can be imported at any time by relaunching the application in a secure environment.</p></li>");
+								"<p>The keys can be imported at any time by relaunching this tool in a secure environment.</p></li>");
 						return answerDiv;
 					}
 				}, {
@@ -583,7 +583,7 @@ function FaqController(div) {
 					getQuestion: function() { return "How can I download and verify the source code?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
-						answerDiv.append("<p>Downloading and verifying the source code will ensure you have a legitimate copy of the application that has been publicly reviewed and has not been modified by an attacker.</p>");
+						answerDiv.append("<p>Downloading and verifying the source code will ensure you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.</p>");
 						answerDiv.append("<p><b>Verifying the source code is highly recommended</b> but not required to use this site.</p>");
 						answerDiv.append("<p>The source code can be verified in two ways.  Either method is sufficient.");
 						answerDiv.append($("<p>Method #1: Verify the source code has the correct checksum.</p>"));
@@ -626,11 +626,11 @@ function FaqController(div) {
 				}, {
 					id: "faq_online_to_recover",
 					getQuestion: function() { return "Do I need to be online to recover private keys?"; },
-					getAnswer: function() { return "<p>No.  The application's source code has everything needed to import and recover the private keys.  A copy of this site can be saved for future use so it doesn't need to be downloaded from GitHub.</p>"; }
+					getAnswer: function() { return "<p>No.  This tool's source code has everything needed to import and recover the private keys.  A copy of this tool can be saved for future use so it doesn't need to be re-downloaded from GitHub.</p>"; }
 				}, {
 					id: "faq_send_funds",
 					getQuestion: function() { return "Can I send funds using cryptostorage.com?"; },
-					getAnswer: function() { return "<p>Not currently. Cryptostorage.com is a public/private key generation and recovery service. It is expected that users will import private keys into the wallet of their choice after keys have been recovered using crypstorage.com.</p>"; }
+					getAnswer: function() { return "<p>Not currently. Cryptostorage.com is a security-focused public/private key generation and recovery tool. It is expected that users will send funds using the wallet software of their choice after private keys have been recovered using this tool.</p>"; }
 				}
 			];
 			
@@ -664,21 +664,58 @@ function FaqController(div) {
 				var collapse = $("<div class='faq_expand_collapse_link' style='margin-left: 15px;'>Collapse All</div>").appendTo(expandCollapseDiv);
 				collapse.click(function() { collapseAll(); });
 				
+				// change internal link behavior
+				$("a", pageDiv).each(function(idx, a) {
+					a = $(a);
+					if (!a.attr("href") || !a.attr("href").startsWith("#faq_")) return;
+					a.unbind("click");
+					a.click(function(e) {
+						e.preventDefault();
+						goTo(a.attr("href"));
+						return false;
+					})
+				});
+				
+				// listen for hash change events
+				$(window).on('hashchange', function() {
+					if (AppUtils.IGNORE_HASH_CHANGE) return;
+					console.log("Hash changed!");
+					AppUtils.IGNORE_HASH_CHANGE = true;
+					goTo(window.location.hash, function() {
+						AppUtils.IGNORE_HASH_CHANGE = false;
+					});
+				});
+				
 				// open referenced faq
-				openHash();
-				$(window).on('hashchange', function() { openHash(); });
-				function openHash() {
-					for (var i = 0; i < qaControllers.length; i++) {
-						if ("#" + qaControllers[i].getDiv().attr("id") === window.location.hash) {
-							qaControllers[i].open();
-						}
-					}
-				}
+				if (window.location.hash) goTo(window.location.hash);
 				
 				// done rendering
 				if (onDone) onDone(div);
 			});
 		});
+	}
+	
+	function goTo(hash, onDone) {
+		
+		// open specified question
+		for (var i = 0; i < qaControllers.length; i++) {
+			if ("#" + qaControllers[i].getDiv().attr("id") === hash) {
+				qaControllers[i].open();
+			}
+		}
+		
+		// set hash
+		AppUtils.IGNORE_HASH_CHANGE = true;
+		setHashAsync(hash, function() {
+			AppUtils.IGNORE_HASH_CHANGE = false;
+		});
+	}
+	
+	function setHashAsync(hash, onDone) {
+		window.location.hash = "";
+		//if (history.replaceState) history.replaceState(null, null, hash);
+		window.location.hash = hash;
+		setImmediate(onDone);
 	}
 	
 	function expandAll() {
@@ -3451,14 +3488,14 @@ function NoticeController(div, config) {
 					} else if (check.state === "fail") {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Connect to the internet</div>");
-						content.append("<div class='notice_bar_center_minor'>Internet is required because the application is not running locally.  <a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
+						content.append("<div class='notice_bar_center_minor'>Internet is required because this tool is not running locally.  <a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.IS_LOCAL:
-					if (check.state === "pass") div.append("<div class='notice_bar_center_major'>Application is running locally</div>");
+					if (check.state === "pass") div.append("<div class='notice_bar_center_major'>This tool is running locally</div>");
 					else {
 						var content = $("<div>").appendTo(div);
-						content.append("<div class='notice_bar_center_major'>Application is not running locally</div>");
+						content.append("<div class='notice_bar_center_major'>This tool is not running locally</div>");
 						content.append("<div class='notice_bar_center_minor'><a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
 					}
 					break;
@@ -3471,7 +3508,7 @@ function NoticeController(div, config) {
 					}
 					break;
 				case AppUtils.EnvironmentCode.DEV_MODE:
-					if (check.state === "warn") div.append("Application is under development.  Not ready for use");
+					if (check.state === "warn") div.append("This tool is alpha software and should not be trusted with sigificant amounts until community reviewed");
 					break;
 				default:
 					throw new Error("Unrecognized environment code: " + check.code);
