@@ -555,7 +555,7 @@ function FaqController(div) {
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						var generateList = $("<ol>").appendTo(answerDiv);
-						generateList.append("<li><a href='#faq_download_verify'>Download and verify</a> cryptostorage.com-<i>[version]</i>.zip.  See \"<a href='#faq6'>How can I download and verify the source code?</a>\"</li>");
+						generateList.append("<li><a href='#faq_download_verify'>Download and verify</a> cryptostorage.com-<i>[version]</i>.zip.</li>");
 						var generateTransfer = $("<li><p>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-gapped computer using a flash drive.</p></li>").appendTo(generateList);
 						var generateTransferList = $("<ul>").appendTo(generateTransfer);
 						generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
