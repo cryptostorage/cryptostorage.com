@@ -3,7 +3,6 @@ finish faq
 form split wording still confusing + info tooltip
 115, 253, 233 light blue
 github description page
-remove under development warning
 final design review
 sanity tests
 get similar domains
