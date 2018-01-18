@@ -821,10 +821,8 @@ function DonateController(div, appController) {
 			for (var i = 0; i < plugins.length; i++) {
 				var plugin = plugins[i];
 				donations.push({
-					icon: plugin.getLogo(),
-					title: plugin.getName(),
-					subtitle: plugin.getDonationAddress(),
-					subtitleIsAddress: true,
+					currencyPlugin: plugin,
+					address: plugin.getDonationAddress(),
 				});
 			}
 			renderCredits(donations, function(donationsDiv) {
@@ -836,22 +834,19 @@ function DonateController(div, appController) {
 				titleDiv.html("Special Thanks To");
 				var credits = [];
 				credits.push({
-					icon: AppUtils.getCryptoPlugin("ETH").getLogo(),
-					title: $("<span>Ethereum - <a target='blank_' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a><span>"),
-					subtitle: "0x5735bb7cec965e58d03dddd167d1f27321878c51",
-					subtitleIsAddress: true
+					title: $("<a target='blank_' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a>"),
+					address: "0x5735bb7cec965e58d03dddd167d1f27321878c51",
+					currencyPlugin: AppUtils.getCryptoPlugin("ETH") 
 				});
 				credits.push({
-					icon: AppUtils.getCryptoPlugin("BTC").getLogo(),
-					title: $("<span>Bitcoin - <a target='blank_' href='https://bitaddress.org'>bitaddress.org</a></span>"),
-					subtitle: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN",
-					subtitleIsAddress: true
+					title: $("<a target='blank_' href='https://bitaddress.org'>bitaddress.org</a>"),
+					address: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN",
+					currencyPlugin: AppUtils.getCryptoPlugin("BTC") 
 				});
 				credits.push({
-					icon: AppUtils.getCryptoPlugin("XMR").getLogo(),
-					title: $("<span>Monero - <a target='blank_' href='https://moneroaddress.org'>moneroaddress.org</a></span>"),
-					subtitle: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW",
-					subtitleIsAddress: true
+					title: $("<a target='blank_' href='https://moneroaddress.org'>moneroaddress.org</a>"),
+					address: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW",
+					currencyPlugin: AppUtils.getCryptoPlugin("XMR") 
 				});
 				credits.push({
 					title: "BitPay",
@@ -935,55 +930,62 @@ function DonateController(div, appController) {
 		}
 		
 		function renderLeft(div, credit, onDone) {
-			div.attr("class", "credit_left flex_horizontal");
-			var imgDiv = $("<div>").appendTo(div);
+			div.attr("class", "donate_div flex_horizontal");
+
+			// append the title
 			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_start'>").appendTo(div);
-			var iconTitleDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(titleSubtitleDiv);
-			if (credit.icon) iconTitleDiv.append($("<img class='credit_icon' src='" + credit.icon.get(0).src + "'>"));
-			var titleDiv = $("<div class='credit_title'>").appendTo(iconTitleDiv);
-			titleDiv.append(credit.title);
-			if (credit.subtitle) {
-				var subtitleDiv = $("<div class='credit_left_subtitle'>").appendTo(titleSubtitleDiv);
-				subtitleDiv.append(credit.subtitle);
-				if (credit.subtitleIsAddress) subtitleDiv.addClass("copyable");
+			var titleDiv = $("<div class='donate_title'>").appendTo(titleSubtitleDiv);
+			if (credit.title) titleDiv.append(credit.title);
+			else titleDiv.append(getIconNameDiv(credit.currencyPlugin));
+			
+			// append the subtitle
+			if (credit.subtitle) titleSubtitleDiv.append(credit.subtitle);
+			else {
+				if (credit.title) titleSubtitleDiv.append(getIconNameDiv(credit.currencyPlugin));
+				titleSubtitleDiv.append($("<div class='donate_address copyable'>" + credit.address + "</div>"));
 			}
-			if (credit.image) {
-				credit.image.addClass("credit_left_img");
-				imgDiv.append(credit.image);
-				onDone();
-			} else if (credit.subtitleIsAddress){
-				AppUtils.renderQrCode(credit.subtitle, null, function(img) {
-					img.addClass("credit_left_img");
-					imgDiv.append(img);
-					onDone();
-				});
+			
+			// append the image
+			if (credit.image) setImage(credit.image);
+			else AppUtils.renderQrCode(credit.address, null, setImage);
+			function setImage(img) {
+				img.addClass("donate_img_left");
+				div.prepend(img);
+				if (onDone) onDone();
 			}
 		}
 		
 		function renderRight(div, credit, onDone) {
-			div.attr("class", "credit_right flex_horizontal");
+			div.attr("class", "donate_div flex_horizontal");
+			
+			// append the title
 			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_end'>").appendTo(div);
-			var iconTitleDiv = $("<div class='flex_horizontal flex_justify_end'>").appendTo(titleSubtitleDiv);
-			if (credit.icon) iconTitleDiv.append($("<img class='credit_icon' src='" + credit.icon.get(0).src + "'>"));
-			var titleDiv = $("<div class='credit_title'>").appendTo(iconTitleDiv);
-			titleDiv.append(credit.title);
-			if (credit.subtitle) {
-				var subtitleDiv = $("<div class='credit_right_subtitle'>").appendTo(titleSubtitleDiv);
-				subtitleDiv.append(credit.subtitle);
-				if (credit.subtitleIsAddress) subtitleDiv.addClass("copyable");
+			var titleDiv = $("<div class='donate_title'>").appendTo(titleSubtitleDiv);
+			if (credit.title) titleDiv.append(credit.title);
+			else titleDiv.append(getIconNameDiv(credit.currencyPlugin));
+			
+			// append the subtitle
+			if (credit.subtitle) titleSubtitleDiv.append(credit.subtitle);
+			else {
+				if (credit.title) titleSubtitleDiv.append(getIconNameDiv(credit.currencyPlugin));
+				titleSubtitleDiv.append($("<div class='donate_address copyable'>" + credit.address + "</div>"));
 			}
-			var imgDiv = $("<div>").appendTo(div);
-			if (credit.image) {
-				credit.image.addClass("credit_right_img");
-				imgDiv.append(credit.image);
-				onDone();
-			} else if (credit.subtitleIsAddress) {
-				AppUtils.renderQrCode(credit.subtitle, null, function(img) {
-					img.addClass("credit_right_img");
-					imgDiv.append(img);
-					onDone();
-				});
+			
+			// append the image
+			if (credit.image) setImage(credit.image);
+			else AppUtils.renderQrCode(credit.address, null, setImage);
+			function setImage(img) {
+				img.addClass("donate_img_right");
+				div.append(img);
+				if (onDone) onDone();
 			}
+		}
+		
+		function getIconNameDiv(plugin) {
+			var iconNameDiv = $("<div class='donate_icon_name flex_horizontal flex_justify_start'>");
+			iconNameDiv.append($("<img class='donate_icon' src='" + plugin.getLogo().get(0).src + "'>"));
+			iconNameDiv.append(plugin.getName());
+			return iconNameDiv;
 		}
 	}
 }
