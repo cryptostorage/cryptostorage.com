@@ -1602,6 +1602,9 @@ input[type='checkbox'][disabled] +label {
 	.export_content_div {
 		display: unset;
 	}
+	.alpha_warning {
+		display: none;
+	}
 	.export_progress_div {
 		display: none;
 	}
@@ -1812,4 +1815,23 @@ input[type='checkbox'][disabled] +label {
 
 .sample_key_pair_img {
 	width: 100%;
+}
+
+.alpha_warning {
+	background-color: orange;
+	padding: 5px 10px 5px 10px;
+	border-radius: 10px;
+	border:2px solid;
+	margin-top: 20px;
+	width: unset;
+}
+
+.alpha_warning * {
+	font-size:18px;
+}
+
+.alpha_icon {
+	width: 30px;
+	height: 30px;
+	margin-right: 3px;
 }

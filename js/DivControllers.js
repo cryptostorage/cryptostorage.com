@@ -1939,7 +1939,8 @@ function ImportFileController(div) {
 		new ExportController(storageDiv, window, {
 			keys: keys,
 			pieces: pieces,
-			pieceDivs: pieceDivs
+			pieceDivs: pieceDivs,
+			isInline: true
 		}).render();
 	}
 	
@@ -2380,7 +2381,8 @@ function ImportTextController(div, plugins) {
 		new ExportController(storageDiv, window, {
 			keys: keys,
 			pieces: pieces,
-			pieceDivs: pieceDivs
+			pieceDivs: pieceDivs,
+			isInline: true
 		}).render();
 	}
 	
@@ -2776,6 +2778,7 @@ inheritsFrom(TwoTabController, DivController);
  * 				config.confirmExit specifies if the window should confirm exit
  * 				config.showRegenerate specifies if the regenerate button should be shown
  * 				config.showNotices specifies if notices should be shown
+ * 				config.isInline specifies if this is inline imported storage
  */
 function ExportController(div, window, config) {
 	DivController.call(this, div);
@@ -2927,6 +2930,11 @@ function ExportController(div, window, config) {
 				
 				function renderAux() {
 					
+					// alpha warning
+					var alphaDiv = $("<div class='alpha_warning flex_horizontal'>").appendTo(div);
+					alphaDiv.append($("<img class='alpha_icon' src='img/warning.png'>"));
+					alphaDiv.append("<span style='text-align:center;'>Alpha version: Do not trust with significant amounts until community reviewed.");
+					
 					// progress bar
 					progressDiv = $("<div class='export_progress_div'>").appendTo(div);
 					progressDiv.hide();
@@ -3060,6 +3068,7 @@ function ExportController(div, window, config) {
 				transformedPieces.push(AppUtils.transformPiece(pieces[i], config));
 			}
 			
+			// save json or zip
 			saved = true;
 			var name = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
 			if (pieces.length === 1) {
@@ -3434,8 +3443,6 @@ function NoticeController(div, config) {
 						return getBrowserIcon(info);
 					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
 						return getOperatingSystemIcon(info);
-					case AppUtils.EnvironmentCode.DEV_MODE:
-						return $("<img class='notice_icon' style='width:35px; height:35px;' src='img/construction.png'>");
 					default:
 						throw new Error("Unrecognized environment code: " + check.code);
 				}

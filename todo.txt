@@ -1,5 +1,5 @@
 TODO
-alpha warning
+piece.version "1.0" no longer allowed
 finish faq
 form split wording still confusing + info tooltip
 115, 253, 233 light blue

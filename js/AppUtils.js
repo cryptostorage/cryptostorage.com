@@ -1536,7 +1536,6 @@ var AppUtils = {
 		IS_LOCAL: "IS_LOCAL",
 		RUNTIME_ERROR: "RUNTIME_ERROR",
 		OPEN_SOURCE: "OPEN_SOURCE",
-		DEV_MODE: "DEV_MODE"
 	},
 	
 	/**
@@ -1589,9 +1588,6 @@ var AppUtils = {
 			if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
 			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
 		}
-		
-		// dev mode warning
-		if (AppUtils.DEV_MODE) checks.push({state: "warn", code: AppUtils.EnvironmentCode.DEV_MODE});
 		
 		return checks;
 	},
