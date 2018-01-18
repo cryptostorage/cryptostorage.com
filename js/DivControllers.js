@@ -843,23 +843,23 @@ function DonateController(div, appController) {
 				titleDiv.html("Special Thanks To");
 				var credits = [];
 				credits.push({
-					title: $("<a target='blank_' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a>"),
+					title: $("<a target='_blank' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a>"),
 					address: "0x5735bb7cec965e58d03dddd167d1f27321878c51",
 					currencyPlugin: AppUtils.getCryptoPlugin("ETH") 
 				});
 				credits.push({
-					title: $("<a target='blank_' href='https://bitaddress.org'>bitaddress.org</a>"),
+					title: $("<a target='_blank' href='https://bitaddress.org'>bitaddress.org</a>"),
 					address: "1NiNja1bUmhSoTXozBRBEtR8LeF9TGbZBN",
 					currencyPlugin: AppUtils.getCryptoPlugin("BTC") 
 				});
 				credits.push({
-					title: $("<a target='blank_' href='https://moneroaddress.org'>moneroaddress.org</a>"),
+					title: $("<a target='_blank' href='https://moneroaddress.org'>moneroaddress.org</a>"),
 					address: "4AfUP827TeRZ1cck3tZThgZbRCEwBrpcJTkA1LCiyFVuMH4b5y59bKMZHGb9y58K3gSjWDCBsB4RkGsGDhsmMG5R2qmbLeW",
 					currencyPlugin: AppUtils.getCryptoPlugin("XMR") 
 				});
 				credits.push({
 					title: "BitPay",
-					subtitle: $("<a target='blank_' href='https://bitpay.com'>www.bitpay.com</a>"),
+					subtitle: $("<a target='_blank' href='https://bitpay.com'>www.bitpay.com</a>"),
 					image: $("<img src='img/bitpay.png'>")
 				});
 				
