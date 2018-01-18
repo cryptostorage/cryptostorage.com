@@ -84,6 +84,7 @@ DivController.prototype.onHide = function() { }
 function AppController(div) {
 	
 	var that = this;
+	var showFuncs;
 	var introDiv;
 	var introController;
 	var contentDiv;
@@ -93,6 +94,21 @@ function AppController(div) {
 	var faqLoader;
 	var donateLoader;
 	var currentPage;
+	var lastHash;
+	
+	/**
+	 * Navigates to the page/position identified by the given hash.
+	 */
+	function navigate(hash, onDone) {
+		if (!hash) hash = "#home";
+		lastHash = hash;
+		window.location.hash = hash;
+		if (hash.startsWith("#faq")) that.showFaq(onDone);
+		else if (hash === "#donate") that.showDonate(onDone);
+		else if (hash === "#import") that.showImport(onDone);
+		else if (hash === "#new") that.showForm(onDone);
+		else that.showHome(onDone);
+	}
 	
 	this.render = function(onDone) {
 		
@@ -118,18 +134,9 @@ function AppController(div) {
 		linksDiv.append(gitHubLink);
 		linksDiv.append(faqLink);
 		linksDiv.append(donateLink);
-		homeLink.click(function() {
-			window.location.href = "#home";
-			that.showHome();
-		});
-		faqLink.click(function() {
-			window.location.href = "#faq";
-			that.showFaq();
-		});
-		donateLink.click(function() {
-			window.location.href = "#donate";
-			that.showDonate();
-		});
+		homeLink.click(function() { navigate("#home"); });
+		faqLink.click(function() { navigate("#faq"); });
+		donateLink.click(function() { navigate("#donate"); });
 		
 		function getLinkDiv(label) {
 			var div = $("<div class='link_div'>");
@@ -156,7 +163,7 @@ function AppController(div) {
 		donateLoader = new LoadController(new DonateController($("<div>")), {enableScroll: true});
 		
 		// map pages to show functions
-		var showFuncs = {
+		showFuncs = {
 				"home": that.showHome,
 				"new": that.showForm,
 				"import": that.showImport,
@@ -164,18 +171,14 @@ function AppController(div) {
 				"donate": that.showDonate
 		}
 		
-		// get fragment identifier
-		var href = window.location.href;
-		var lastIdx = href.lastIndexOf("#");
-		var fragmentId = lastIdx === -1 ? null : href.substring(lastIdx + 1);
+		// navigate on browser navigation
+		$(window).on('popstate', function(e) {
+			if (window.location.hash === lastHash) return;
+			navigate(window.location.hash);
+		});
 		
-		// determine page
-		var page = fragmentId === null ? "home" : fragmentId;
-		if (page.startsWith("faq")) page = "faq";
-		else if (!showFuncs[page]) page = "home";
-		
-		// show first page
-		showFuncs[page](function() {
+		// navigate to first page
+		navigate(window.location.hash, function() {
 			
 			// load notice dependencies and start polling
 			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
@@ -191,7 +194,7 @@ function AppController(div) {
 					if (onDone) onDone();
 				});
 			});
-		}, page !== fragmentId ? fragmentId : null);
+		});
 	}
 	
 	this.showHome = function(onDone) {
@@ -220,17 +223,12 @@ function AppController(div) {
 		});
 	}
 	
-	this.showFaq = function(onDone, fragmentId) {
+	this.showFaq = function(onDone) {
 		if (AppUtils.DEV_MODE) console.log("showFaq()");
 		currentPage = "faq";
 		faqLoader.render(function() {
-			setImmediate(function() {
-				if (fragmentId) {
-					window.location.hash = "";	// makes location.hash work on all browsers
-					window.location.hash = "#" + fragmentId;
-				}
-				if (onDone) onDone();
-			});
+			faqLoader.getRenderer().goToQuestion(window.location.hash);
+			if (onDone) onDone();
 		}, function() {
 			introDiv.hide();
 			setContentDiv(faqLoader.getDiv());
@@ -268,13 +266,11 @@ function AppController(div) {
 	}
 	
 	function onSelectGenerate() {
-		window.location.href = "#new";
-		that.showForm();
+		navigate("#new");
 	}
 	
 	function onSelectImport() {
-		window.location.href = "#import";
-		that.showImport();
+		navigate("#import");
 	}
 }
 inheritsFrom(AppController, DivController);
@@ -500,7 +496,10 @@ inheritsFrom(HomeController, DivController);
  */
 function FaqController(div) {
 	DivController.call(this, div);
+	
+	var that = this;
 	var qaControllers;	// controls all question/answer pairs
+	
 	this.render = function(onDone) {
 		
 		// load dependencies
@@ -671,23 +670,11 @@ function FaqController(div) {
 					a.unbind("click");
 					a.click(function(e) {
 						e.preventDefault();
-						goTo(a.attr("href"));
+						if (a.attr("href") === window.location.hash) that.goToQuestion(a.attr("href"));	// hash will not change so handle locally
+						else window.location.hash = a.attr("href");																			// will cause app-level navigation
 						return false;
-					})
-				});
-				
-				// listen for hash change events
-				$(window).on('hashchange', function() {
-					if (AppUtils.IGNORE_HASH_CHANGE) return;
-					console.log("Hash changed!");
-					AppUtils.IGNORE_HASH_CHANGE = true;
-					goTo(window.location.hash, function() {
-						AppUtils.IGNORE_HASH_CHANGE = false;
 					});
 				});
-				
-				// open referenced faq
-				if (window.location.hash) goTo(window.location.hash);
 				
 				// done rendering
 				if (onDone) onDone(div);
@@ -695,27 +682,32 @@ function FaqController(div) {
 		});
 	}
 	
-	function goTo(hash, onDone) {
+	this.goToQuestion = function(hash, onDone) {
 		
-		// open specified question
+		// find specified question
+		var qaController;
 		for (var i = 0; i < qaControllers.length; i++) {
 			if ("#" + qaControllers[i].getDiv().attr("id") === hash) {
-				qaControllers[i].open();
+				qaController = qaControllers[i];
+				break;
 			}
 		}
 		
-		// set hash
-		AppUtils.IGNORE_HASH_CHANGE = true;
-		setHashAsync(hash, function() {
-			AppUtils.IGNORE_HASH_CHANGE = false;
-		});
-	}
-	
-	function setHashAsync(hash, onDone) {
-		window.location.hash = "";
-		//if (history.replaceState) history.replaceState(null, null, hash);
-		window.location.hash = hash;
-		setImmediate(onDone);
+		// open and jump to question
+		if (qaController) {
+			setImmediate(function() {
+				qaController.open();
+				var top = qaControllers[i].getQuestionDiv().get(0).offsetTop;
+				window.scrollTo(0, top);
+				if (onDone) onDone();
+			})
+		}
+		
+		// hide all questions if target not found
+		else {
+			for (var i = 0; i < qaControllers.length; i++) qaControllers[i].close();
+			if (onDone) onDone();
+		}
 	}
 	
 	function expandAll() {
@@ -737,8 +729,8 @@ function FaqController(div) {
 		DivController.call(this, div);
 		var rightTriangle = "►";
 		var downTriangle = "▼";
-		
 		var arrowDiv;
+		var questionDiv;
 		var answerDiv;
 		this.render = function(onDone) {
 			
@@ -756,14 +748,13 @@ function FaqController(div) {
 			var qaDiv = $("<div class='flex_vertical flex_align_start flex_justify_start'>").appendTo(div);
 			
 			// question div
-			var questionDiv = $("<div class='question'>").appendTo(qaDiv);
+			questionDiv = $("<a class='question'>").appendTo(qaDiv);
 			questionDiv.append(question);
 			questionDiv.click(function() {
+				toggle();
 				if (history.pushState) history.pushState(null, null, "#" + id);
-				else location.hash = "#" + id;
+				else window.location.hash = "#" + id;
 			});
-			
-			questionDiv.click(function() { toggle(); });
 			
 			// answer div
 			answerDiv = $("<div class='answer'>").appendTo(qaDiv);
@@ -782,6 +773,14 @@ function FaqController(div) {
 		this.close = function() {
 			answerDiv.hide();
 			arrowDiv.html(rightTriangle);
+		}
+		
+		this.getQuestionDiv = function() {
+			return questionDiv;
+		}
+		
+		this.getAnswerDiv = function() {
+			return answerDiv;
 		}
 
 		function toggle() {
