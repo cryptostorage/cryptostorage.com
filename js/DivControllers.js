@@ -3494,7 +3494,7 @@ function NoticeController(div, config) {
 					if (check.state === "pass") div.append("<div class='notice_bar_center_major'>This tool is running locally</div>");
 					else {
 						var content = $("<div>").appendTo(div);
-						content.append("<div class='notice_bar_center_major'>This tool is not running locally</div>");
+						content.append("<div class='notice_bar_center_major'>Tool is not running locally</div>");
 						content.append("<div class='notice_bar_center_minor'><a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
 					}
 					break;
@@ -3507,7 +3507,7 @@ function NoticeController(div, config) {
 					}
 					break;
 				case AppUtils.EnvironmentCode.DEV_MODE:
-					if (check.state === "warn") div.append("This tool is alpha software and should not be trusted with sigificant amounts until community reviewed");
+					if (check.state === "warn") div.append("This tool is alpha software and should not be trusted with sigificant amounts");
 					break;
 				default:
 					throw new Error("Unrecognized environment code: " + check.code);
