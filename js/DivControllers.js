@@ -3488,7 +3488,7 @@ function NoticeController(div, config) {
 					}
 					break;
 				case AppUtils.EnvironmentCode.IS_LOCAL:
-					if (check.state === "pass") div.append("<div class='notice_bar_center_major'>This tool is running locally</div>");
+					if (check.state === "pass") div.append("<div class='notice_bar_center_major'>Tool is running locally</div>");
 					else {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Tool is not running locally</div>");
@@ -3504,7 +3504,7 @@ function NoticeController(div, config) {
 					}
 					break;
 				case AppUtils.EnvironmentCode.DEV_MODE:
-					if (check.state === "warn") div.append("This tool is alpha software and should not be trusted with sigificant amounts");
+					if (check.state === "warn") div.append("Tool is alpha software and should not be trusted with sigificant amounts");
 					break;
 				default:
 					throw new Error("Unrecognized environment code: " + check.code);
