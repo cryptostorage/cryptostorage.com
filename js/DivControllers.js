@@ -3,6 +3,12 @@
  */
 var UiUtils = {
 	
+	/**
+	 * Renders a progress bar to the given div.
+	 * 
+	 * @param div is the div to render to
+	 * @returns a progress bar instance
+	 */
 	getProgressBar: function(div) {
 		return new ProgressBar.Line(div.get(0), {
 			strokeWidth: 2.5,
@@ -57,19 +63,14 @@ var UiUtils = {
 		});
 	},
 	
-	/**
-	 * Returns the maximum width for info tooltips.
-	 */
-	getInfoTooltipsMaxWidth: function() {
-		return "500px";
-	},
-	
-	/**
-	 * Returns the maximum width for notices.
-	 */
-	getNoticeTooltipsMaxWidth: function() {
-		return "700px";
-	}
+	// UI constants
+	FIREFOX_LINK: "<a target='_blank' href='https://www.mozilla.org/en-US/firefox/'>Firefox</a>",
+	CHROMIUM_LINK: "<a target='_blank' href='https://www.chromium.org/getting-involved/download-chromium'>Chromium</a>",
+	TAILS_LINK: "<a target='_blank' href='https://tails.boum.org'>Tails</a>",
+	UBUNTU_LINK: " <a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>",
+	RASPBIAN_LINK: "<a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>",
+	INFO_TOOLTIP_MAX_WIDTH: "500px",
+	NOTICE_TOOLTIP_MAX_WIDTH: "700px"
 }
 
 /**
@@ -547,10 +548,10 @@ function FaqController(div) {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>In order of importance:</p>");
 						var recommendationsList = $("<ol>").appendTo(answerDiv);
-						recommendationsList.append("<li>Download, verify, and run the source code offline, not from the cryptostorage.com domain.</li>");
-						recommendationsList.append("<li>Run the source code on a device that is disconnected from the internet and will ideally never be connected to the internet again.</li>");
-						recommendationsList.append("<li>Run the source code in an open-source browser like Firefox or Chromium.</li>");
-						recommendationsList.append("<li>Run the source code on an open-source operating system like Tails, Ubuntu, or Raspbian for the Raspberry Pi.</li>");
+						recommendationsList.append("<li><a href='#faq_download_verify'>Download and verify</a> then run the source code offline, not from the cryptostorage.com domain.</li>");
+						recommendationsList.append("<li>Run this tool on a device that is disconnected from the internet and will ideally never be connected to the internet again.</li>");
+						recommendationsList.append("<li>Run this tool in an open-source browser like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
+						recommendationsList.append("<li>Run this tool on an open-source operating system like " + UiUtils.TAILS_LINK + ", " + UiUtils.UBUNTU_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 						return answerDiv;
 					}
 				}, {
@@ -560,14 +561,14 @@ function FaqController(div) {
 						var answerDiv = $("<div>");
 						var generateList = $("<ol>").appendTo(answerDiv);
 						generateList.append("<li><a href='#faq_download_verify'>Download and verify</a> cryptostorage.com-<i>[version]</i>.zip.</li>");
-						var generateTransfer = $("<li><p>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure, air-gapped computer using a flash drive.</p></li>").appendTo(generateList);
+						var generateTransfer = $("<li><p>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure computer using a flash drive.</p></li>").appendTo(generateList);
 						var generateTransferList = $("<ul>").appendTo(generateTransfer);
-						generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again</li>");
-						generateTransferList.append("<li>An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi</li>");
+						generateTransferList.append("<li>The computer should be disconnected from the internet and ideally will never connect to the internet again.</li>");
+						generateTransferList.append("<li>An open-source operating system is recommended like " + UiUtils.TAILS_LINK + ", " + UiUtils.UBUNTU_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 						generateList.append("<li>Unzip cryptostorage.com-<i>[version]</i>.zip</li>");
 						var generateBrowser = $("<li><p>Open index.html in the unzipped folder in a browser.</p></li>").appendTo(generateList);
 						var generateBrowserList = $("<ul>").appendTo(generateBrowser);
-						generateBrowserList.append("<li>An open-source browser is recommended like Firefox or Chromium</li>");
+						generateBrowserList.append("<li>An open-source browser is recommended like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
 						var generateChecks = $("<li><p>Confirm that all environment checks pass.</p></li>").appendTo(generateList)
 						var generateChecksList = $("<ol>").appendTo(generateChecks);
 						generateChecksList.append("<li><p>Go to Generate New Keys from the homepage.</p></li>");
@@ -581,13 +582,20 @@ function FaqController(div) {
 								"<p>The keys can be imported at any time by relaunching this tool in a secure environment.</p></li>");
 						return answerDiv;
 					}
-				}, {
-					id: "faq_download_verify",
-					getQuestion: function() { return "How can I download and verify the source code?"; },
+				},{
+					id: "faq_why_verify",
+					getQuestion: function() { return "Why should I download and verify the source code?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>Downloading and verifying the source code will ensure you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.</p>");
-						answerDiv.append("<p><b>Verifying the source code is highly recommended</b> but not required to use this site.</p>");
+						answerDiv.append("<p>Verifying the source code is <b>highly recommended</b> but not required to use this tool.</p>");
+						return answerDiv;
+					}
+				}, {
+					id: "faq_download_verify",
+					getQuestion: function() { return "How do I download and verify the source code?"; },
+					getAnswer: function() {
+						var answerDiv = $("<div>");
 						answerDiv.append("<p>The source code can be verified in two ways.  Either method is sufficient.");
 						answerDiv.append($("<p>Method #1: Verify the source code has the correct checksum.</p>"));
 						var verify1List = $("<ol>").appendTo(answerDiv);
@@ -606,8 +614,8 @@ function FaqController(div) {
 						verify2List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p></li>")
 						verify2List.append("<li><p>Verify the signature of the source code zip file:</p>" +
 								"<p><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div></p>" +
-								"<p>You should see output similar to this.  The RSA keys must match.</p>" +
-								"<p><div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature from \"woodser &lt;woodser@users.noreply.github.com&gt;\"</div></p>" +
+								"<p>You should output with this RSA key:</p>" +
+								"<p><div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature ...</div></p>" +
 								"<p>The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.</p>" +
 								"<p>Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.</p></li>");
 						return answerDiv;
@@ -615,7 +623,8 @@ function FaqController(div) {
 				}, {
 					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this service?"; },
-					getAnswer: function() { return "<p>Cryptostorage.com is 100% open-source and verifiable.  Downloading and verifying the source code ensures you have a copy that has been publically reviewed.</p>"; }
+					getAnswer: function() { return "<p>Cryptostorage.com is 100% open-source which means everyone can review the source code.</p>" +
+						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publically reviewed.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",
 					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
@@ -1084,7 +1093,7 @@ function FormController(div) {
 				theme: 'error',
 				trigger: "manual",
 				multiple: 'false',
-				maxWidth: UiUtils.getInfoTooltipsMaxWidth(),
+				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
 				distance: 20,
 				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateX(250) translateY(-2px)',
 				offset: '-220, 0'
@@ -1121,7 +1130,7 @@ function FormController(div) {
 				theme: 'translucent',
 				trigger: "mouseenter",
 				multiple: 'false',
-				maxWidth: UiUtils.getInfoTooltipsMaxWidth(),
+				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
 				distance: 20,
 				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
 				offset: '0, 0'
@@ -1157,7 +1166,7 @@ function FormController(div) {
 				theme: 'translucent',
 				trigger: "mouseenter",
 				multiple: 'false',
-				maxWidth: UiUtils.getInfoTooltipsMaxWidth(),
+				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
 				distance: 20,
 				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
 				offset: '-180, 0'
@@ -3402,7 +3411,7 @@ function NoticeController(div, config) {
 				multiple: 'false',
 				distance: 20,
 				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-				maxWidth: UiUtils.getNoticeTooltipsMaxWidth(),
+				maxWidth: UiUtils.NOTICE_TOOLTIP_MAX_WIDTH,
 				onShow: function() {
 					for (var i = 0; i < tippies.length; i++) {
 						if (tippies[i] !== div) tippies[i].get(0)._tippy.hide();	// manually hide other tippy divs
@@ -3478,7 +3487,7 @@ function NoticeController(div, config) {
 						var content = $("<div>").appendTo(div);
 						if (check.state === "fail") content.append("<div class='notice_bar_center_major'>Browser is not supported (" + info.browser.name + " " + info.browser.version + ")</div>");
 						else content.append("<div class='notice_bar_center_major'>Browser is not open-source (" + info.browser.name + ")</div>");
-						content.append("<div class='notice_bar_center_minor'>Recommended browsers: <a target='_blank' href='https://www.mozilla.org/en-US/firefox/'>Firefox</a> or <a target='_blank' href='https://www.chromium.org/getting-involved/download-chromium'>Chromium</a>");
+						content.append("<div class='notice_bar_center_minor'>Recommended browsers: " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + "</div>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
@@ -3510,7 +3519,7 @@ function NoticeController(div, config) {
 					else {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Operating system is not open-source (" + info.os.name + ")</div>");
-						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: <a target='_blank' href='https://tails.boum.org'>Tails</a>, <a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>, or <a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>");
+						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: " + UiUtils.TAILS_LINK + ", " + UiUtils.UBUNTU_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.DEV_MODE:
