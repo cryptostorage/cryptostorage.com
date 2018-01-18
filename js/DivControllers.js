@@ -58,10 +58,17 @@ var UiUtils = {
 	},
 	
 	/**
-	 * Returns the maximum width for UI tooltips.
+	 * Returns the maximum width for info tooltips.
 	 */
 	getInfoTooltipsMaxWidth: function() {
 		return "500px";
+	},
+	
+	/**
+	 * Returns the maximum width for notices.
+	 */
+	getNoticeTooltipsMaxWidth: function() {
+		return "700px";
 	}
 }
 
@@ -3393,6 +3400,7 @@ function NoticeController(div, config) {
 				multiple: 'false',
 				distance: 20,
 				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+				maxWidth: UiUtils.getNoticeTooltipsMaxWidth(),
 				onShow: function() {
 					for (var i = 0; i < tippies.length; i++) {
 						if (tippies[i] !== div) tippies[i].get(0)._tippy.hide();	// manually hide other tippy divs

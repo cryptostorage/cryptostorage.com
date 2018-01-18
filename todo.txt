@@ -1,6 +1,5 @@
 TODO
 alpha warning
-notice tooltip max width
 precede special thanks addresses with currency e.g. "Ethereum: 0x5735bb..."
 finish faq
 form split wording still confusing + info tooltip
