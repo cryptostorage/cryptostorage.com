@@ -904,44 +904,6 @@ input[type='checkbox'][disabled] +label {
 	margin-left: 10px;
 }
 
-.credit_left_icon_title > *:first-child {
-	margin-left: 0;
-}
-
-.credit_right_icon_title > *:first-child {
-	margin-left: 0;
-}
-
-.credit_title {
-	margin-left: 7px;
-}
-
-.credit_title, .credit_title * {
-	font-weight: bold;
-	font-size: 22px;
-	text-decoration: none;
-}
-
-.credit_title > a:hover {
-	cursor: pointer;
-	text-decoration: underline;
-}
-
-.credit_left_subtitle {
-	font-size: 18px;
-	font-family: monospace;
-	word-break: break-all;
-	margin-top: 5px;
-}
-
-.credit_right_subtitle {
-	font-size: 18px;
-	font-family: monospace;
-	word-break: break-all;
-	margin-top: 5px;
-	text-align: right;
-}
-
 .import_page {
 	padding: 0;
 }
