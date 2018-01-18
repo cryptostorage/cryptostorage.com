@@ -1000,7 +1000,7 @@ input[type='checkbox'][disabled] +label {
 	font-size: 24px;
 	-ms-flex-pack: center;
 	justify-content: center;
-	word-break: break-all;
+	word-break: break-word;
 }
 
 .import_warning_div_icon {

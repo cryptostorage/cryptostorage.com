@@ -801,6 +801,7 @@ var AppUtils = {
 	 */
 	validatePiece: function(piece, allowMissingPublicXorPrivate) {
 		assertDefined(piece.version, "piece.version is not defined");
+		if (piece.version === "1.0") piece.version = "0.0.1";	// hack for backwards compatibility of pieces that already exist
 		try {
 			AppUtils.getVersionNumbers(piece.version);
 		} catch (err) {
