@@ -119,10 +119,7 @@ function AppController(div) {
 		// header logo
 		var headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
 		var logo = $("<img class='app_header_logo_img' src='img/cryptostorage_white.png'>").appendTo(headerTopDiv);
-		logo.click(function() {
-			window.location.href = "#home";
-			that.showHome();
-		});
+		logo.click(function() { navigate("#home"); });
 		
 		// header links
 		var linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
