@@ -1,6 +1,6 @@
 TODO
-alpha warning
 precede special thanks addresses with currency e.g. "Ethereum: 0x5735bb..."
+alpha warning
 finish faq
 form split wording still confusing + info tooltip
 115, 253, 233 light blue
