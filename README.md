@@ -33,6 +33,11 @@ Please see https://cryptostorage.com/#faq.
 # Submit Questions, Feedback, or Issues
 For questions, feedback, or issues, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
 
+# Contributing
+Contributions from the community are welcome and encouraged.
+
+All are welcome to develop and submit pull requests that make this project better.
+
 # Donate
 Donations may be voluntarily given and support this project.️
 
