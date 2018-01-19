@@ -28,7 +28,7 @@ Following a few recommendations can improve the security of your cryptocurrency.
 To generate cold storage as securely as possible, please see https://cryptostorage.com/#faq_generate_keys.
 
 # Other Frequently Asked Questions
-Please see https://cryptostorage.com/#faq
+Please see https://cryptostorage.com/#faq.
 
 # Submit Questions, Feedback, or Issues
 For questions, feedback, or issues, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
