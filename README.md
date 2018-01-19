@@ -22,7 +22,7 @@ Verifying the source code ensures you have a legitimate copy of this tool that h
 
 To download and verify the source code, please see instructions at https://cryptostorage.com/#faq_download_verify.
 
-# Generate storage as securely as possible
+# Generate cold storage as securely as possible
 Following a few recommendations can improve the security of your cryptocurrency.
 
 To generate cold storage as securely as possible, please see https://cryptostorage.com/#faq_generate_keys.
