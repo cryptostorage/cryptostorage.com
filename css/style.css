@@ -874,6 +874,7 @@ input[type='checkbox'][disabled] +label {
 
 .donate_icon_name {
 	width: unset;
+	margin: 2px 0 5px 0px;
 }
 
 .donate_icon_name > :first-child {
@@ -889,7 +890,6 @@ input[type='checkbox'][disabled] +label {
 	font-size: 18px;
 	font-family: monospace;
 	word-break: break-all;
-	margin-top: 5px;
 }
 
 .donate_img_left {
