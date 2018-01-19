@@ -13,15 +13,17 @@ cryptostorage.com is a security-focused, open-source, client-side tool to genera
 	- Encourages use of an open-source browser.
 	- Encourages use of an open-source operating system.
 
-# How to download and verify the source code
+# Download and verify the source code
 Downloading and verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
 
 Verifying the source code is **highly recommended** but not required to use this tool.
 
-Please see https://cryptostorage.com/#faq_download_verify for instructions to download and verify the source code.
+To download and verify the source code, please see instructions at https://cryptostorage.com/#faq_download_verify.
 
-# How to generate keys as securely as possible
-Please see https://cryptostorage.com/#faq_generate_keys
+# Generate storage as securely as possible
+Following a few simple recommendations can improve the security of your cryptocurrency.
+
+Please see instructions to generate storage securely at https://cryptostorage.com/#faq_generate_keys
 
 # Other Frequently Asked Questions
 Please see https://cryptostorage.com/#faq
