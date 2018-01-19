@@ -15,7 +15,7 @@ The tool runs only in your device's browser so funds are never entrusted to a th
 	- Encourages use of an open-source browser.
 	- Encourages use of an open-source operating system.
 	
-# Supported Currencies
+# Supported Tokens
 - Bitcoin
 - Bitcoin Cash
 - Ethereum
