@@ -1,28 +1,31 @@
 # Introduction
-cryptostorage.com is an open-source, client-side tool to securely generate public/private key pairs for multiple cryptocurrencies.
+cryptostorage.com is a security-focused, open-source, client-side tool to generate public/private key pairs for multiple cryptocurrencies.
 
 # Main Features
-- 100% open-source, client-side, and free to use.
 - Generate secure cold storage for leading cryptocurrencies.
+- 100% open-source, client-side, and free to use.
 - Keys are generated only in your browser and are never entrusted to a third party.
 - Easily create paper wallets or save to flash drive for long-term storage.
 - Passphrase protect and split private keys for maximum security.
 - Automated security checks encourage keys to be generated in a secure environment.
 	- Encourages application to be downloaded and run offline.
-	- Encourages disconnection from internet while generating keys.
-	- Encourages use of an open source operating system.
-	- Encourages use of an open source browser.
-
-# How to generate keys as securely as possible
-See https://cryptostorage.com/#faq_generate_keys
+	- Encourages internet to be disconnected.
+	- Encourages use of an open-source browser.
+	- Encourages use of an open-source operating system.
 
 # How to download and verify the source code
-See https://cryptostorage.com/#faq_download_verify
+Please see https://cryptostorage.com/#faq_download_verify
 
-# All Frequently Asked Questions
-See https://cryptostorage.com/#faq
+# How to generate keys as securely as possible
+Please see https://cryptostorage.com/#faq_generate_keys
+
+# Other Frequently Asked Questions
+Please see https://cryptostorage.com/#faq
+
+# Submit Feedback or an Issue
+For questions, feedback, or issues, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
 
 # Donate
-Donations may be voluntarily given to support the project. ❤️
+Donations are voluntary and support this project. ❤️
 
-See https://cryptostorage.com/#donate for donation addresses.
+Please see https://cryptostorage.com/#donate for donation addresses.
