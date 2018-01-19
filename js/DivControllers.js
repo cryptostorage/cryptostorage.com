@@ -572,7 +572,7 @@ function FaqController(div) {
 						var generateChecks = $("<li><p>Confirm that all environment checks pass.</p></li>").appendTo(generateList)
 						var generateChecksList = $("<ol>").appendTo(generateChecks);
 						generateChecksList.append("<li><p>Go to Generate New Keys from the homepage.</p></li>");
-						generateChecksList.append("<li><p>The notice bar at the top should indicate that all checks pass:</p>" +
+						generateChecksList.append("<li><p>The notice bar at the top should indicate that all security checks pass:</p>" +
 								"<img style='width:100%;' src='img/notice_bar_pass.png'></img></li>");
 						var generateKeys = $("<li><p>Fill out the form and click Generate Keys.</p></li>").appendTo(generateList);
 						var generateKeysList = $("<ul>").appendTo(generateKeys);
