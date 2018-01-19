@@ -2513,7 +2513,6 @@ function ImportTextController(div, plugins) {
 			} catch (err) {
 				if (!warningSet) {
 					if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
-					else if (err.message.indexOf("Unrecognized private key") > -1) setWarning("Pieces do not combine to make valid private key");
 					else setWarning(err.message);
 				}
 			}

@@ -125,7 +125,11 @@ CryptoPlugin.prototype.combine = function(shares) {
 	}
 	
 	// combine shares and create key
-	return this.newKey(secrets.combine(nonPrefixedShares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
+	try {
+		return this.newKey(secrets.combine(nonPrefixedShares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
+	} catch (err) {
+		throw new Error("Pieces do not combine to make valid private key");
+	}
 }
 
 /**

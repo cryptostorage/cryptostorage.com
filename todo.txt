@@ -1,5 +1,4 @@
 TODO
-text import unhandled error when importing split pieces from different currencies
 text import select a currency accepted on submit
 finish faq
 form split wording still confusing + info tooltip
