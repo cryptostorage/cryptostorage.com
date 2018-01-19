@@ -39,6 +39,6 @@ Contributions from the community are welcome and encouraged.
 All are welcome to develop and submit pull requests that make this project better.
 
 # Donate
-Donations may be voluntarily given to support this project.️
+Donations are voluntary and support this project.️
 
-Please see https://cryptostorage.com/#donate for donation addresses. ❤
+Please see https://cryptostorage.com/#donate. ❤
