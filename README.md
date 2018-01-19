@@ -38,6 +38,9 @@ Contributions from the community are welcome and encouraged.
 
 All are welcome to develop and submit pull requests that make this project better.
 
+# License
+This project is licensed under MIT.
+
 # Donate
 Donations are voluntary and support this project.️
 
