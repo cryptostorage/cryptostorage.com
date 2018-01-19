@@ -16,7 +16,7 @@ cryptostorage.com is a security-focused, open-source, client-side tool to genera
 # How to download and verify the source code
 Downloading and verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
 
-Verifying the source code is *highly recommended* but not required to use this tool.
+Verifying the source code is **highly recommended** but not required to use this tool.
 
 Please see https://cryptostorage.com/#faq_download_verify for instructions to download and verify the source code.
 
