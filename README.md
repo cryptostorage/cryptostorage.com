@@ -4,7 +4,7 @@
 The tool runs only in your device's browser so funds are never entrusted to a third party by design.
 
 # Main Features
-- Generate secure cold storage for leading cryptocurrencies.
+- Generate secure cold storage for multiple cryptocurrencies.
 - 100% open-source, client-side, and free to use.
 - Keys are generated only in your browser and are never entrusted to a third party.
 - Easily create paper wallets or save to flash drive for safe, long-term storage.
@@ -14,6 +14,18 @@ The tool runs only in your device's browser so funds are never entrusted to a th
 	- Encourages internet to be disconnected.
 	- Encourages use of an open-source browser.
 	- Encourages use of an open-source operating system.
+	
+# Supported Currencies
+- Bitcoin
+- Bitcoin Cash
+- Ethereum
+- Monero
+- Litecoin
+- Dash
+- Zcash
+- Ethereum Classic
+- Basic Attention Token
+- OmiseGo
 
 # Download and verify the source code
 Download and verifying the source code is **highly recommended** but not required to use this tool.
