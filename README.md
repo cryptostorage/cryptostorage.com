@@ -1,5 +1,5 @@
 # Introduction
-[cryptostorage.com](https://cryptostorage.com) is an open-source, client-side tool to securely generate public/private key pairs for multiple cryptocurrencies.
+[cryptostorage.com](https://cryptostorage.com) is an open-source, client-side tool to generate public/private key pairs for multiple cryptocurrencies securely.
 
 The tool runs only in your device's browser so funds are never entrusted to a third party by design.
 
@@ -54,6 +54,6 @@ All are welcome to develop and submit pull requests that make this project bette
 This project is licensed under [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt).
 
 # Donate
-Donations are voluntary and support this project.️
+Donations may be voluntarily given and support this project.
 
 Please see https://cryptostorage.com/#donate for donation addresses. ❤
