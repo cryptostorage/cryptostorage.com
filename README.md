@@ -68,10 +68,17 @@ The source code can be verified in two ways. Either method is sufficient.
 2. Transfer cryptostorage.com-*[version]*.zip to a secure computer using a flash drive.
     - The computer should be disconnected from the internet and ideally will never connect to the internet again.
     - An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi.
-
-Following a few recommendations can improve the security of your cryptocurrency.
-
-To generate cold storage as securely as possible, please see https://cryptostorage.com/#faq_generate_keys.
+3. Unzip cryptostorage.com-*[version]*.zip.
+4. Open index.html in the unzipped folder in a browser.
+    - An open-source browser is recommended like Firefox or Chromium.
+5. Confirm that all environment checks pass.
+    1. Go to Generate New Keys from the homepage.
+    2. The notice bar at the top should indicate that all security checks pass.
+6. Fill out the form and click Generate Keys.
+    - Protecting your keys with a passphrase is **highly recommended**.  Otherwise anyone in possession of the unencrypted keys can access the funds.
+    - Optionally split your keys for maximum security.
+7. Save the generated keys to a flash drive or printed paper for safe keeping.<br><br>
+    The keys can be imported at any time by relaunching this tool in a secure environment.
 
 # Other Frequently Asked Questions
 Please see https://cryptostorage.com/#faq.

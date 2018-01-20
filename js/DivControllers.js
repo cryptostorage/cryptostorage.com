@@ -576,7 +576,7 @@ function FaqController(div) {
 								"<img style='width:100%;' src='img/notice_bar_pass.png'></img></li>");
 						var generateKeys = $("<li><p>Fill out the form and click Generate Keys.</p></li>").appendTo(generateList);
 						var generateKeysList = $("<ul>").appendTo(generateKeys);
-						generateKeysList.append("<li><p>Protecting your keys with a passphrase is <b>strongly recommended</b>.</p>");
+						generateKeysList.append("<li><p>Protecting your keys with a passphrase is <b>highly recommended</b>.  Otherwise anyone in possession of the unencrypted keys can access the funds.</p>");
 						generateKeysList.append("<li><p>Optionally split your keys for maximum security.</p></li>");
 						generateList.append("<li><p>Save the generated keys to a flash drive or printed paper for safe keeping.</p>" +
 								"<p>The keys can be imported at any time by relaunching this tool in a secure environment.</p></li>");
