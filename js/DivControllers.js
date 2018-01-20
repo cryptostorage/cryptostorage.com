@@ -532,18 +532,18 @@ function FaqController(div) {
 					getAnswer: function() { return "<p>A public/private key pair is a public address and a private key.  For example:</p>" +
 						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
 						"<p>The public address is used to receive funds.  It can be shared with anyone.</p>" + 
-						"<p>The private key authorizes funds sent to its public address to be moved.  Anyone with the private key can access the funds, so it's critical to keep private keys safe and private.</p>"; }
+						"<p>The private key authorizes received funds to be spent, so it's critical to keep your private keys safe and secure.</p>"; }
 				}, {
 					id: "faq_safe_keys",
-					getQuestion: function() { return "How does cryptostorage.com help me keep my private keys safe and private?"; },
-					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys are never shared with a third party, including us, the site owners.</p>" + 
-						"<p>Second, this tool lets you passphrase protect all generated private keys.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
-						"<p>Third, this tool lets you split private keys into separate pieces which must be recombined in order to recover the private keys.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.</p>" +
-						"<p>Fourth, this tool lets you save the generated keys to a digital file and printed paper for safe long term storage.</p>" +
-						"<p>Last, cryptostorage.com automatically recommends ways to improve the security of the environment the tool is running in.</p>"; }
+					getQuestion: function() { return "How does cryptostorage.com help me keep my private keys safe and secure?"; },
+					getAnswer: function() { return "<p>First, keys are generated only in your device's browser.  Keys are never shared with a third party, including us, the site owners.</p>" + 
+						"<p>Second, private keys may be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
+						"<p>Third, private keys storage may be split into separate pieces which must be recombined in order to recover the private keys and access funds.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.</p>" +
+						"<p>Fourth, keys may be saved to a digital file or printed paper for long-term storage.</p>" +
+						"<p>Finally, this tool <a href='#faq_recommendations'>automatically recommends</a> ways to improve the security of the its environment.</p>"; }
 				}, {
 					id: "faq_recommendations",
-					getQuestion: function() { return "What environment recommendations does cryptostorage.com make?"; },
+					getQuestion: function() { return "What security recommendations does cryptostorage.com make?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>In order of importance:</p>");
@@ -587,13 +587,13 @@ function FaqController(div) {
 					getQuestion: function() { return "Why should I download and verify the source code?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
-						answerDiv.append("<p>Downloading and verifying the source code will ensure you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.</p>");
+						answerDiv.append("<p>Downloading and verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.</p>");
 						answerDiv.append("<p>Verifying the source code is <b>highly recommended</b> but not required to use this tool.</p>");
 						return answerDiv;
 					}
 				}, {
 					id: "faq_download_verify",
-					getQuestion: function() { return "How do I download and verify the source code?"; },
+					getQuestion: function() { return "How can I download and verify the source code?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>The source code can be verified in two ways.  Either method is sufficient.");
@@ -609,12 +609,12 @@ function FaqController(div) {
 						var verify2List = $("<ol>").appendTo(answerDiv);
 						verify2List.append("<li><p>Install <a target='_blank' href='https://www.openpgp.org/'>PGP software</a> on your device.</p></li>");
 						verify2List.append("<li><p>Download the developer’s public PGP key, \"woodser.asc\", from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>root of the GitHub source repository</a>.</p></li>");
-						verify2List.append("<li><p>Import woodser's PGP key:</p>" +
+						verify2List.append("<li><p>Import the PGP key:</p>" +
 								"<p><div class='terminal_cmd'>gpg --import woodser.asc</div></p></li>");
 						verify2List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p></li>")
 						verify2List.append("<li><p>Verify the signature of cryptostorage-<i>[version]</i>.zip:</p>" +
 								"<p><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div></p>" +
-								"<p>You should output with this RSA key:</p>" +
+								"<p>You should see output with this RSA key:</p>" +
 								"<p><div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature ...</div></p>" +
 								"<p>The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.</p>" +
 								"<p>Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.</p></li>");
