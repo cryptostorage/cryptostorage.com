@@ -1,7 +1,7 @@
 # Introduction
 [cryptostorage.com](https://cryptostorage.com) is a security-focused, open-source, client-side tool to generate public/private key pairs for multiple cryptocurrencies.
 
-The tool runs only in your device's browser so funds are never entrusted to a third party by design, including the site and project owners.
+The tool runs only in your device's browser so funds are never entrusted to a third party by design.
 
 # Main Features
 - Generate secure cold storage for multiple cryptocurrencies.
