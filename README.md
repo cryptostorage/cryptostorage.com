@@ -67,18 +67,17 @@ The source code can be verified in two ways. Either method is sufficient.
 1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code)
 2. Transfer cryptostorage.com-*[version]*.zip to a secure computer using a flash drive.
     - The computer should be disconnected from the internet and ideally will never connect to the internet again.
-    - An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi.
+    - An open-source operating system is recommended like [Tails](https://tails.boum.org), [Ubuntu](https://www.ubuntu.com/download/desktop), or [Raspbian for the Raspberry Pi](https://www.raspberrypi.org).
 3. Unzip cryptostorage.com-*[version]*.zip.
 4. Open index.html in the unzipped folder in a browser.
-    - An open-source browser is recommended like Firefox or Chromium.
+    - An open-source browser is recommended like [Firefox](https://www.mozilla.org/en-US/firefox/) or [Chromium](https://www.chromium.org/getting-involved/download-chromium).
 5. Confirm that all environment checks pass.
     1. Go to Generate New Keys from the homepage.
     2. The notice bar at the top should indicate that all security checks pass.
 6. Fill out the form and click Generate Keys.
     - Protecting your keys with a passphrase is **highly recommended**.  Otherwise anyone in possession of the unencrypted keys can access the funds.
     - Optionally split your keys for maximum security.
-7. Save the generated keys to a flash drive or printed paper for safe keeping.<br><br>
-    The keys can be imported at any time by relaunching this tool in a secure environment.
+7. Save the generated keys to a flash drive or printed paper for safe keeping.  The keys can be imported at any time by relaunching this tool in a secure environment.
 
 # Other Frequently Asked Questions
 Please see https://cryptostorage.com/#faq.
@@ -87,14 +86,14 @@ Please see https://cryptostorage.com/#faq.
 For questions, feedback, or issues, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
 
 # Contributing
-Contributions from the community are welcome and encouraged.
+All contributions from the community are welcome.
 
-All are welcome to develop and submit pull requests that make this project better.
+Anyone may develop and submit pull requests to make this project better.
 
 # License
-This project is licensed under [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt).
+This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt) licensed.
 
-# Donate
-Donations may be voluntarily given and support this project.
+# Donate ❤
+Donations may be voluntarily given to support this project.
 
-Please see https://cryptostorage.com/#donate for donation addresses. ❤
+See https://cryptostorage.com/#donate for donation addresses.
