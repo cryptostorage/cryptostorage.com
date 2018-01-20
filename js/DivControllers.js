@@ -525,16 +525,14 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is cryptostorage.com?"; },
-					
-					
-					getAnswer: function() { return "<p>cryptostorage.com is an open-source tool to create cold storage for multiple cryptocurrencies.</p>" +
-						"<p>\"Cold storage\" is a method of storing cryptocurrency on key pairs that are securely generated and kept offline.</p>" +
-						"<p>The tool runs only in your device's browser so funds are never entrusted to a third party by design.</p>";
+					getAnswer: function() { return "<p>cryptostorage.com is an open-source tool to help users store their cryptocurrency securely.</p>" +
+						"<p>This tool generates public/private key pairs for multiple cryptocurrencies which may be used to store cryptocurrency offline without exposing private keys to an internet-connected device.  This is commonly referred to as \"cold storage\".</p>" +
+						"<p>This tool runs only in your device's browser so funds are never entrusted to a third party by design.</p>";
 					}
 				}, {
 					id: "faq_key_pair",
-					getQuestion: function() { return "What's a cryptocurrency key pair?" },
-					getAnswer: function() { return "<p>A cryptocurrency key pair is a public address and a private key.  For example:</p>" +
+					getQuestion: function() { return "What's a cryptocurrency public/private key pair?" },
+					getAnswer: function() { return "<p>A cryptocurrency public/private key pair is a public address and a private key.  For example:</p>" +
 						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
 						"<p>The public address is used to receive funds.  It can be publicly shared with anyone.</p>" + 
 						"<p>The private key authorizes received funds to be spent, so it's critical to keep your private keys secure and private.</p>"; }

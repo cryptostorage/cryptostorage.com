@@ -1,11 +1,9 @@
 # Introduction
-[cryptostorage.com](https://cryptostorage.com) is an open-source tool to generate key pairs for multiple cryptocurrencies.
+[cryptostorage.com](https://cryptostorage.com) is an open-source tool to help users store their cryptocurrency securely.
 
-Keys generated from this tool can be used to securely store cryptocurrency offline.  This is commonly referred to as \"cold storage\".
+This tool generates public/private key pairs for multiple cryptocurrencies which may be used to store cryptocurrency offline without exposing private keys to an internet-connected device.  This is commonly referred to as \"cold storage\".
 
-The purpose of this tool is to help users store their cryptocurrency safely and securely.
-
-The tool runs only in your device's browser so funds are never entrusted to a third party by design.
+This tool runs only in your device's browser so funds are never entrusted to a third party by design.
 
 # Main Features
 - Generate secure cold storage for multiple cryptocurrencies.
