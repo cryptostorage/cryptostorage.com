@@ -37,10 +37,9 @@ The source code can be verified in two ways. Either method is sufficient.
 Method #1: Verify the source code has the correct checksum.
 
 1. Download cryptostorage-*[version]*.zip and checksum.txt from the [latest release on GitHub](https://github.com/cryptostorage/cryptostorage.com/releases).
-2. Determine the SHA256 hash of the zip file.
- Instructions depend on your operating system.
- Linux: sha256sum cryptostorage-*[version]*.zip
- Mac: openssl sha -sha256 cryptostorage-*[version]*.zip
+2. Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.<br><br>
+ Linux: sha256sum cryptostorage-*[version]*.zip<br><br>
+ Mac: openssl sha -sha256 cryptostorage-*[version]*.zip<br><br>
  Windows: certUtil -hashfile cryptostorage-*[version]*.zip SHA256
 3. Verify that the checksum matches the contents of the downloaded checksum.txt.
 
