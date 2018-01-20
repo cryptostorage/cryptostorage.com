@@ -66,7 +66,7 @@ The source code can be verified in two ways. Either method is sufficient.
 
 Following a few recommendations can improve the security of your cryptocurrency.
 
-To use this tool as securely as possible:
+The following procedure is recommended to use this tool as securely as possible:
 
 1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code)
 2. Transfer cryptostorage.com-*[version]*.zip to a secure computer using a flash drive.
