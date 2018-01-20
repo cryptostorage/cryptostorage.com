@@ -50,7 +50,7 @@ Method #2: Verify the source code has been signed by the developer's PGP key.
 3. Import the PGP key: `gpg --import woodser.asc`
 4. Download cryptostorage-*[version]*.zip, cryptostorage-*[version]*.sig, and woodser-pgp-fingerprint.txt from the [latest release on GitHub](https://github.com/cryptostorage/cryptostorage.com/releases).
 5. Verify the signature of the source code zip file:<br><br>
-	`gpg --verify cryptostorage-[version].sig cryptostorage-[version].zip`
+	```gpg --verify cryptostorage-[version].sig cryptostorage-[version].zip```
 	<br>You should see output with this RSA key:<br>
 	```
 	gpg: Signature made Fri Jan 12 09:22:37 2018 EST
