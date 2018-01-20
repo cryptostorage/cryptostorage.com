@@ -34,7 +34,7 @@ This is the first release of this software.  It should not be trusted with signf
 
 # Using This Tool as Securely as Possible
 
-Security is a spectrum.  Following a few recommendations can improve the security of your cryptocurrency.
+Security is a spectrum.  Following a few recommendations will improve the security of your cryptocurrency.
 
 The following procedure is recommended to use this tool as securely as possible:
 
