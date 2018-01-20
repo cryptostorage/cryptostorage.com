@@ -5,9 +5,6 @@ This tool generates public/private key pairs for multiple cryptocurrencies which
 
 This tool runs only in your device's browser so funds are never entrusted to a third party by design.
 
-# ⚠ First Release
-This is the first release of this software.  It should not be trusted with signficant amounts until it's reviewed by the community.
-
 # Main Features
 - Generate secure cold storage for multiple cryptocurrencies.
 - 100% open-source, client-side, and free to use.
@@ -31,6 +28,9 @@ This is the first release of this software.  It should not be trusted with signf
 - Ethereum Classic
 - Basic Attention Token
 - OmiseGo
+
+# ⚠ First Release
+This is the first release of this software.  It should not be trusted with signficant amounts until it's reviewed by the community.
 
 # Using This Tool as Securely as Possible
 
