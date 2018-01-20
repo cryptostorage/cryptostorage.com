@@ -63,6 +63,9 @@ The source code can be verified in two ways. Either method is sufficient.
     Note: You will probably also see a warning that the key is not certified with a trusted signature. This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.
 	
 # Generate cold storage as securely as possible
+
+1. [Download and verifycryptostorage.com-[version].zip.](#download-and-verify-the-source-code) 
+
 Following a few recommendations can improve the security of your cryptocurrency.
 
 To generate cold storage as securely as possible, please see https://cryptostorage.com/#faq_generate_keys.
