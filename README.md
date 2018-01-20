@@ -28,7 +28,7 @@ The tool runs only in your device's browser so funds are never entrusted to a th
 - OmiseGo
 
 # Download and verify the source code
-Download and verifying the source code is **highly recommended** but not required to use this tool.
+Downloading and verifying the source code is **highly recommended** but not required to use this tool.
 
 Verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
 
@@ -62,7 +62,7 @@ The source code can be verified in two ways. Either method is sufficient.
     The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.<br><br>
     Note: You will probably also see a warning that the key is not certified with a trusted signature. This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.
 	
-# Generate cold storage as securely as possible
+# Using this tool as securely as possible
 
 Following a few recommendations can improve the security of your cryptocurrency.
 
