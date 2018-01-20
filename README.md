@@ -32,6 +32,27 @@ This tool runs only in your device's browser so funds are never entrusted to a t
 # ⚠ First Release
 This is the first release of this software.  It should not be trusted with signficant amounts until it's reviewed by the community.
 
+# Using This Tool as Securely as Possible
+
+Security is a spectrum.  Following a few recommendations can improve the security of your cryptocurrency.
+
+The following procedure is recommended to use this tool as securely as possible:
+
+1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code)
+2. Transfer cryptostorage.com-*[version]*.zip to a secure computer using a flash drive.
+    - The computer should be disconnected from the internet and ideally will never connect to the internet again.
+    - An open-source operating system is recommended like [Tails](https://tails.boum.org), [Ubuntu](https://www.ubuntu.com/download/desktop), or [Raspbian for the Raspberry Pi](https://www.raspberrypi.org).
+3. Unzip cryptostorage.com-*[version]*.zip.
+4. Open index.html in the unzipped folder in a browser.
+    - An open-source browser is recommended like [Firefox](https://www.mozilla.org/en-US/firefox/) or [Chromium](https://www.chromium.org/getting-involved/download-chromium).
+5. Confirm that all environment checks pass.
+    1. Go to Generate New Keys from the homepage.
+    2. The notice bar at the top should indicate that all security checks pass.
+6. Fill out the form and click Generate Keys.
+    - Protecting your keys with a passphrase is **highly recommended**.  Otherwise anyone in possession of the unencrypted keys can access the funds.
+    - Optionally split your keys for maximum security.
+7. Save the generated keys to a flash drive or printed paper for safe keeping.  The keys can be imported at any time by relaunching this tool in a secure environment.
+
 # Download and Verify the Source Code
 Verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
 
@@ -66,27 +87,6 @@ The source code can be verified in two ways. Either method is sufficient.
     ```
     The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.<br><br>
     Note: You will probably also see a warning that the key is not certified with a trusted signature. This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.
-	
-# Using This Tool as Securely as Possible
-
-Following a few recommendations can improve the security of your cryptocurrency.
-
-The following procedure is recommended to use this tool as securely as possible:
-
-1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code)
-2. Transfer cryptostorage.com-*[version]*.zip to a secure computer using a flash drive.
-    - The computer should be disconnected from the internet and ideally will never connect to the internet again.
-    - An open-source operating system is recommended like [Tails](https://tails.boum.org), [Ubuntu](https://www.ubuntu.com/download/desktop), or [Raspbian for the Raspberry Pi](https://www.raspberrypi.org).
-3. Unzip cryptostorage.com-*[version]*.zip.
-4. Open index.html in the unzipped folder in a browser.
-    - An open-source browser is recommended like [Firefox](https://www.mozilla.org/en-US/firefox/) or [Chromium](https://www.chromium.org/getting-involved/download-chromium).
-5. Confirm that all environment checks pass.
-    1. Go to Generate New Keys from the homepage.
-    2. The notice bar at the top should indicate that all security checks pass.
-6. Fill out the form and click Generate Keys.
-    - Protecting your keys with a passphrase is **highly recommended**.  Otherwise anyone in possession of the unencrypted keys can access the funds.
-    - Optionally split your keys for maximum security.
-7. Save the generated keys to a flash drive or printed paper for safe keeping.  The keys can be imported at any time by relaunching this tool in a secure environment.
 
 # Frequently Asked Questions
 Please see https://cryptostorage.com/#faq.
