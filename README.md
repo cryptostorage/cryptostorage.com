@@ -1,15 +1,15 @@
 # Introduction
-[cryptostorage.com](https://cryptostorage.com) is an open-source, client-side tool to generate public/private key pairs for multiple cryptocurrencies securely.
+[cryptostorage.com](https://cryptostorage.com) is a security-focused, open-source, client-side tool to generate public/private key pairs for multiple cryptocurrencies.
 
-The tool runs only in your device's browser so funds are never entrusted to a third party by design.
+The tool runs only in your device's browser so funds are never entrusted to a third party by design, including the site and project owners.
 
 # Main Features
 - Generate secure cold storage for multiple cryptocurrencies.
 - 100% open-source, client-side, and free to use.
 - Keys are generated only in your browser and are never entrusted to a third party.
-- Easily create paper wallets or save to flash drive for safe, long-term storage.
+- Create paper wallets or save to flash drive for safe, long-term storage.
 - Passphrase protect and split private keys for maximum security.
-- Automated security checks encourage keys to be generated in a secure environment.
+- Automatic security checks encourage keys to be generated in a secure environment.
 	- Encourages application to be downloaded and run offline.
 	- Encourages internet to be disconnected.
 	- Encourages use of an open-source browser.
@@ -83,21 +83,21 @@ To use this tool as securely as possible:
     - Optionally split your keys for maximum security.
 7. Save the generated keys to a flash drive or printed paper for safe keeping.  The keys can be imported at any time by relaunching this tool in a secure environment.
 
-# Other Frequently Asked Questions
+# Frequently Asked Questions
 Please see https://cryptostorage.com/#faq.
 
 # Submit Questions, Feedback, or Issues
 For questions, feedback, or issues, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
 
 # Contributing
-All contributions from the community are welcome.
-
 Anyone may develop and submit pull requests to make this project better.
+
+All contributions from the community are welcome.
 
 # License
 This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt) licensed.
 
-# Donate ❤
-Donations may be voluntarily given to support this project.
+# Donate
+Donations may be voluntarily given to support this project. ❤
 
 See https://cryptostorage.com/#donate for donation addresses.

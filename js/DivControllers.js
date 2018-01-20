@@ -304,7 +304,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png'>"), "Passphrase protect and split private keys for maximum security.").appendTo(sliderDiv);
-			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automated environment checks.").appendTo(sliderDiv);
+			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automatic environment checks.").appendTo(sliderDiv);
 			
 			function getSlide(img, text) {
 				var slide = $("<div class='slide'>");
@@ -401,7 +401,7 @@ function HomeController(div) {
 			
 			// check environment section
 			pageDiv.append("<div style='height: 10px'>");
-			pageDiv.append("<div class='home_label'>Generate keys securely with automated environment checks</div>");
+			pageDiv.append("<div class='home_label'>Generate keys securely with automatic environment checks</div>");
 			pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Automatic environment checks encourage keys to be generated in a secure environment.</div>")
 			pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
 			
