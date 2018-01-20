@@ -64,7 +64,7 @@ The source code can be verified in two ways. Either method is sufficient.
 	
 # Generate cold storage as securely as possible
 
-1. [Download and verifycryptostorage.com-[version].zip.](#download-and-verify-the-source-code) 
+1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code) 
 
 Following a few recommendations can improve the security of your cryptocurrency.
 
