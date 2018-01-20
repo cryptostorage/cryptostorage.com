@@ -608,7 +608,7 @@ function FaqController(div) {
 						answerDiv.append($("<p>Method #2: Verify the source code has been signed by the developer's PGP key.</p>"));
 						var verify2List = $("<ol>").appendTo(answerDiv);
 						verify2List.append("<li><p>Install <a target='_blank' href='https://www.openpgp.org/'>PGP software</a> on your device.</p></li>");
-						verify2List.append("<li><p>Download woodser’s public PGP key, \"woodser.asc\", from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>root of the GitHub source repository</a>.</p></li>");
+						verify2List.append("<li><p>Download the developer’s public PGP key, \"woodser.asc\", from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'>root of the GitHub source repository</a>.</p></li>");
 						verify2List.append("<li><p>Import woodser's PGP key:</p>" +
 								"<p><div class='terminal_cmd'>gpg --import woodser.asc</div></p></li>");
 						verify2List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p></li>")

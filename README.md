@@ -45,17 +45,16 @@ Method #1: Verify the source code has the correct checksum.
 
 Method #2: Verify the source code has been signed by the developer's PGP key.
 
-1. Install PGP software on your device.
-2. Download woodser’s public PGP key, "woodser.asc", from the root of the GitHub source repository.
-3. Import woodser's PGP key: gpg --import woodser.asc.
+1. Install [PGP software](https://www.openpgp.org/) on your device.
+2. Download the developer's public PGP key, "woodser.asc", from the [root of the GitHub source repository](https://github.com/cryptostorage/cryptostorage.com).
+3. Import the PGP key: `gpg --import woodser.asc`
 4. Download cryptostorage-*[version]*.zip, cryptostorage-*[version]*.sig, and woodser-pgp-fingerprint.txt from the [latest release on GitHub](https://github.com/cryptostorage/cryptostorage.com/releases).
-5. Verify the signature of the source code zip file:
-	gpg --verify cryptostorage-*[version]*.sig cryptostorage-*[version]*.zip
-	You should see output with this RSA key:
-	gpg: Signature made Fri Jan 12 09:22:37 2018 EST
+5. Verify the signature of the source code zip file: `gpg --verify cryptostorage-[version].sig cryptostorage-[version].zip`<br>
+	You should see output with this RSA key:<br>
+	```gpg: Signature made Fri Jan 12 09:22:37 2018 EST
 	gpg: using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF
-	gpg: Good signature ...
-	The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.
+	gpg: Good signature ...```<br>
+	The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.<br>
 	Note: You will probably also see a warning that the key is not certified with a trusted signature. This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.
 
 # Generate cold storage as securely as possible
