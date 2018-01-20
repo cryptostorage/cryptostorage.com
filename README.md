@@ -29,8 +29,8 @@ This tool runs only in your device's browser so funds are never entrusted to a t
 - Basic Attention Token
 - OmiseGo
 
-# First Release Warning
-This is the first release of this software.  It should not be trusted with signficant amounts until community reviewed.
+# ⚠ First Release Warning
+This is the first release of this software.  It should not be trusted with signficant amounts until it's reviewed by the community.
 
 # Download and Verify the Source Code
 Verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
