@@ -602,7 +602,7 @@ function FaqController(div) {
 						verify1List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip and checksum.txt from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p></li>");
 						verify1List.append("<li><p>Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.</p>" +
 								"</p>Linux: <div class='terminal_cmd'>sha256sum cryptostorage-<i>[version]</i>.zip</div></p>" + 
-								"<p>Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i></div></p>" + 
+								"<p>Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i>.zip</div></p>" + 
 								"<p>Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></p></li>");
 						verify1List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
 						answerDiv.append($("<p>Method #2: Verify the source code has been signed by the developer's PGP key.</p>"));
