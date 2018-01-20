@@ -64,7 +64,10 @@ The source code can be verified in two ways. Either method is sufficient.
 	
 # Generate cold storage as securely as possible
 
-1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code) 
+1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code)
+2. Transfer cryptostorage.com-*[version]*.zip to a secure computer using a flash drive.
+    - The computer should be disconnected from the internet and ideally will never connect to the internet again.
+    - An open-source operating system is recommended like Tails, Ubuntu, or Raspbian for the Raspberry Pi.
 
 Following a few recommendations can improve the security of your cryptocurrency.
 
