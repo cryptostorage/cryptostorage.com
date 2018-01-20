@@ -612,7 +612,7 @@ function FaqController(div) {
 						verify2List.append("<li><p>Import woodser's PGP key:</p>" +
 								"<p><div class='terminal_cmd'>gpg --import woodser.asc</div></p></li>");
 						verify2List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip, cryptostorage-<i>[version]</i>.sig, and woodser-pgp-fingerprint.txt from the <a target='blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p></li>")
-						verify2List.append("<li><p>Verify the signature of the source code zip file:</p>" +
+						verify2List.append("<li><p>Verify the signature of cryptostorage-<i>[version]</i>.zip:</p>" +
 								"<p><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div></p>" +
 								"<p>You should output with this RSA key:</p>" +
 								"<p><div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature ...</div></p>" +

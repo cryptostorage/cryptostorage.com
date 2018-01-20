@@ -34,7 +34,7 @@ Verifying the source code ensures you have a legitimate copy of this tool that h
 
 The source code can be verified in two ways. Either method is sufficient.
 
-Method #1: Verify the source code has the correct checksum.
+## Method #1: Verify the source code has the correct checksum.
 
 1. Download cryptostorage-*[version]*.zip and checksum.txt from the [latest release on GitHub](https://github.com/cryptostorage/cryptostorage.com/releases).
 2. Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.<br>
@@ -43,14 +43,14 @@ Method #1: Verify the source code has the correct checksum.
  Windows: `certUtil -hashfile cryptostorage-[version].zip SHA256`
 3. Verify that the checksum matches the contents of the downloaded checksum.txt.
 
-Method #2: Verify the source code has been signed by the developer's PGP key.
+## Method #2: Verify the source code has been signed by the developer's PGP key.
 
 1. Install [PGP software](https://www.openpgp.org/) on your device.
 2. Download the developer's public PGP key, "woodser.asc", from the [root of the GitHub source repository](https://github.com/cryptostorage/cryptostorage.com).
 3. Import the PGP key: `gpg --import woodser.asc`
 4. Download cryptostorage-*[version]*.zip, cryptostorage-*[version]*.sig, and woodser-pgp-fingerprint.txt from the [latest release on GitHub](https://github.com/cryptostorage/cryptostorage.com/releases).
-5. Verify the signature of the source code zip file:
-    ```sh
+5. Verify the signature of cryptostorage-*[version]*.zip:
+    ```
     gpg --verify cryptostorage-[version].sig cryptostorage-[version].zip
     ```
     You should see output with this RSA key:<br>
