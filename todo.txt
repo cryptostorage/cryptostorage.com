@@ -1,5 +1,4 @@
 TODO
-finish faq
 form split wording still confusing + info tooltip
 115, 253, 233 light blue
 sanity tests

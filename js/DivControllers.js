@@ -525,17 +525,22 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is cryptostorage.com?"; },
-					getAnswer: function() { return "<p>Cryptostorage.com is an open-source tool to generate public/private key pairs for multiple cryptocurrencies.  This tool runs only in your device's browser.</p>"; }
+					
+					
+					getAnswer: function() { return "<p>cryptostorage.com is an open-source tool to create cold storage for multiple cryptocurrencies.</p>" +
+						"<p>\"Cold storage\" is a method of storing cryptocurrency on key pairs that are securely generated and kept offline.</p>" +
+						"<p>The tool runs only in your device's browser so funds are never entrusted to a third party by design.</p>";
+					}
 				}, {
 					id: "faq_key_pair",
-					getQuestion: function() { return "What is a public/private key pair?" },
-					getAnswer: function() { return "<p>A public/private key pair is a public address and a private key.  For example:</p>" +
+					getQuestion: function() { return "What's a cryptocurrency key pair?" },
+					getAnswer: function() { return "<p>A cryptocurrency key pair is a public address and a private key.  For example:</p>" +
 						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
-						"<p>The public address is used to receive funds.  It can be shared with anyone.</p>" + 
-						"<p>The private key authorizes received funds to be spent, so it's critical to keep your private keys safe and secure.</p>"; }
+						"<p>The public address is used to receive funds.  It can be publicly shared with anyone.</p>" + 
+						"<p>The private key authorizes received funds to be spent, so it's critical to keep your private keys secure and private.</p>"; }
 				}, {
 					id: "faq_safe_keys",
-					getQuestion: function() { return "How does cryptostorage.com help me keep my private keys safe and secure?"; },
+					getQuestion: function() { return "How does cryptostorage.com help me keep my cryptocurrency safe and secure?"; },
 					getAnswer: function() { return "<p>First, keys are generated only in your device's browser.  Keys are never shared with a third party, including us, the site owners.</p>" + 
 						"<p>Second, private keys may be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
 						"<p>Third, private keys storage may be split into separate pieces which must be recombined in order to recover the private keys and access funds.  For example, a Bitcoin private key can be split into 3 pieces where 2 pieces are required to recover the private key.  These pieces can be geographically separated to prevent access at any one point.</p>" +
@@ -624,7 +629,7 @@ function FaqController(div) {
 					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this service?"; },
 					getAnswer: function() { return "<p>Cryptostorage.com is 100% open-source which means everyone can review the source code.</p>" +
-						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publically reviewed.</p>"; }
+						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publicly reviewed.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",
 					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
@@ -642,7 +647,7 @@ function FaqController(div) {
 				}, {
 					id: "faq_send_funds",
 					getQuestion: function() { return "Can I send funds using cryptostorage.com?"; },
-					getAnswer: function() { return "<p>Not currently. Cryptostorage.com is a security-focused public/private key generation and recovery tool. It is expected that users will send funds using the wallet software of their choice after private keys have been recovered using this tool.</p>"; }
+					getAnswer: function() { return "<p>Not currently.  It is expected that users will send funds using the wallet software of their choice after private keys have been recovered using this tool.</p>"; }
 				}
 			];
 			
