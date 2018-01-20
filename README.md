@@ -29,7 +29,10 @@ This tool runs only in your device's browser so funds are never entrusted to a t
 - Basic Attention Token
 - OmiseGo
 
-# Download and verify the source code
+# First Release Warning
+This is the first release of this software.  It should not be trusted with signficant amounts until community reviewed.
+
+# Download and Verify the Source Code
 Verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
 
 Downloading and verifying the source code is **highly recommended** but not required to use this tool.
@@ -64,7 +67,7 @@ The source code can be verified in two ways. Either method is sufficient.
     The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.<br><br>
     Note: You will probably also see a warning that the key is not certified with a trusted signature. This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.
 	
-# Using this tool as securely as possible
+# Using This Tool as Securely as Possible
 
 Following a few recommendations can improve the security of your cryptocurrency.
 
