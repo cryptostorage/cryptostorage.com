@@ -28,9 +28,9 @@ The tool runs only in your device's browser so funds are never entrusted to a th
 - OmiseGo
 
 # Download and verify the source code
-Downloading and verifying the source code is **highly recommended** but not required to use this tool.
-
 Verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
+
+Downloading and verifying the source code is **highly recommended** but not required to use this tool.
 
 The source code can be verified in two ways. Either method is sufficient.
 
