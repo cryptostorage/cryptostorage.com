@@ -1,7 +1,6 @@
 TODO
 license notices in code
 social media
-sanity tests
 get similar domains
 hosting
 115, 253, 233 light blue
