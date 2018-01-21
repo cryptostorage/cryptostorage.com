@@ -105,6 +105,4 @@ Donations may be voluntarily given to support this project.
 
 See https://cryptostorage.com/#donate for donation addresses.
 
-Following a few recommendations will improve the security of your cryptocurrency.
-
 ❤
