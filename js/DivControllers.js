@@ -69,7 +69,7 @@ var UiUtils = {
 	TAILS_LINK: "<a target='_blank' href='https://tails.boum.org'>Tails</a>",
 	UBUNTU_LINK: " <a target='_blank' href='https://www.ubuntu.com/download/desktop'>Ubuntu</a>",
 	RASPBIAN_LINK: "<a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>",
-	INFO_TOOLTIP_MAX_WIDTH: "500px",
+	INFO_TOOLTIP_MAX_WIDTH: "600px",
 	NOTICE_TOOLTIP_MAX_WIDTH: "700px"
 }
 
@@ -1124,7 +1124,7 @@ function FormController(div) {
 			var bip38Info = $("<img src='img/information.png' class='information_img'>").appendTo(bip38CheckboxDiv);
 			var bip38Tooltip = $("<div>");
 			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys with a passphrase.<br><br>");
-			bip38Tooltip.append("BIP38 takes longer to encrypt and decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default), which makes it more difficult crack with brute force.");
+			bip38Tooltip.append("BIP38 requires significantly more time and energy to encrypt/decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default encryption scheme), which makes it more secure against brute-force attacks.");
 			tippy(bip38Info.get(0), {
 				arrow: true,
 				html: bip38Tooltip.get(0),
@@ -1158,9 +1158,9 @@ function FormController(div) {
 			// split checkbox tooltip
 			var splitInfo = $("<img src='img/information.png' class='information_img'>").appendTo(splitCheckboxDiv);
 			var splitTooltip = $("<div>");
-			splitTooltip.append("Splits the generated keys into separate pieces using <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a>.  The pieces must be recombined in order to recover all private keys.<br><br>");
-			splitTooltip.append("For example, 20 key pairs can be split into 3 pieces. Each piece will contain 20 key  pairs, but 2 of the 3 pieces are necessary to recover the private keys.<br><br>");
-			splitTooltip.append("This is useful for geographically splitting your cold storage so the funds cannot be accessed until the pieces are physically recombined.");
+			splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
+			splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
+			splitTooltip.append("For example, 10 key pairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 key pairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
 			tippy(splitInfo.get(0), {
 				arrow: true,
 				html: splitTooltip.get(0),
