@@ -273,7 +273,7 @@ body {
 .page_div {
 	width: 875px;
 	background-color: white;
-	padding: 25px;
+	padding: 40px 25px 40px 25px;
 	min-height: 550px;
 }
 
