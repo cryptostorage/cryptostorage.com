@@ -1,5 +1,4 @@
 TODO
-license notices in code
 social media
 get similar domains
 hosting
