@@ -93,9 +93,9 @@ Please see https://cryptostorage.com/#faq.
 For questions, feedback, or issues, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
 
 # Contributing
-Anyone may develop and submit pull requests to make this project better.
+Anyone may develop and submit pull requests to improve this project.
 
-All contributions from the community are welcome.
+All contributions are welcome.
 
 # License
 This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt) licensed.
@@ -104,3 +104,7 @@ This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/ma
 Donations may be voluntarily given to support this project.
 
 See https://cryptostorage.com/#donate for donation addresses.
+
+Following a few recommendations will improve the security of your cryptocurrency.
+
+❤
