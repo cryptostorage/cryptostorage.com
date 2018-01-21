@@ -1,10 +1,10 @@
 TODO
-115, 253, 233 light blue
 sanity tests
 get similar domains
-final design review
-sign code
 hosting
+115, 253, 233 light blue
+final design review
+release
 announce
 
 designer:
