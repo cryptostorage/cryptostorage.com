@@ -525,23 +525,24 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is cryptostorage.com?"; },
-					getAnswer: function() { return "<p>cryptostorage.com is an open-source tool to generate secure storage for multiple cryptocurrencies.</p>" +
-						"<p>This tool generates public/private key pairs for multiple cryptocurrencies which may be used to store cryptocurrency offline.  This is commonly referred to as \"cold storage\".</p>" +
+					getAnswer: function() { return "<p>cryptostorage.com is an open-source, offline wallet generator which supports multiple cryptocurrencies.</p>" +
+						"<p>This tool generates cryptocurrency key pairs which may be used to store cryptocurrency offline.  This is commonly referred to as \"cold storage\".</p>" +
 						"<p>This tool runs only in your device's browser so funds are never entrusted to a third party by design.</p>";
 					}
 				}, {
 					id: "faq_key_pair",
-					getQuestion: function() { return "What's a cryptocurrency public/private key pair?" },
-					getAnswer: function() { return "<p>A cryptocurrency public/private key pair is a <b>public address</b> and a <b>private key</b>.  For example:</p>" +
+					getQuestion: function() { return "What is a cryptocurrency key pair?" },
+					getAnswer: function() { return "<p>A cryptocurrency key pair is like an account that can send and receive a specific cryptocurrency.</p>" +
+						"<p>It is comprised of a public address and a private key.  For example, this is a Bitcoin key pair:</p>" +
 						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
-						"<p>The <b>public address</b> is used to receive funds.  It can be publicly shared with anyone.</p>" + 
-						"<p>The <b>private key</b> authorizes received funds to be spent.  <span style='color:red'>It is critical to keep your private keys secure and private.</span></p>"; }
+						"<p>The public address is used to receive funds.  It can be publicly shared with anyone.</p>" + 
+						"<p>The private key authorizes received funds to be spent.  <span style='color:red'>The private key must remain private or all funds can be stolen.</span></p>"; }
 				}, {
 					id: "faq_safe_keys",
 					getQuestion: function() { return "How does cryptostorage.com help keep my cryptocurrency safe and secure?"; },
 					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys are never shared with a third party, including us, the site owners.</p>" + 
 						"<p>Second, private keys may be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
-						"<p>Third, generated storage may be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one physical location.</p>" +
+						"<p>Third, private keys may be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one physical location.</p>" +
 						"<p>Fourth, keys may be saved to a digital file or printed paper for long-term storage.</p>" +
 						"<p>Finally, this tool <a href='#faq_recommendations'>automatically detects and recommends</a> ways to improve the security of the its environment.</p>"; }
 				}, {
@@ -552,7 +553,7 @@ function FaqController(div) {
 						answerDiv.append("<p>In order of importance:</p>");
 						var recommendationsList = $("<ol>").appendTo(answerDiv);
 						recommendationsList.append("<li><a href='#faq_download_verify'>Download and verify</a> then run the source code offline, not from the cryptostorage.com domain.</li>");
-						recommendationsList.append("<li>Run this tool on a device that is disconnected from the internet.  For maximum security, the device should never connect to the internet again after generating cryptocurrency storage.</li>");
+						recommendationsList.append("<li>Run this tool on a device that is disconnected from the internet.  For maximum security, the device should never connect to the internet again after generating high-value storage.</li>");
 						recommendationsList.append("<li>Run this tool in an open-source browser like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
 						recommendationsList.append("<li>Run this tool on an open-source operating system like " + UiUtils.TAILS_LINK + ", " + UiUtils.UBUNTU_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 						return answerDiv;
@@ -626,7 +627,7 @@ function FaqController(div) {
 				}, {
 					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this service?"; },
-					getAnswer: function() { return "<p>Cryptostorage.com is 100% open-source which means everyone can review the source code.</p>" +
+					getAnswer: function() { return "<p>Cryptostorage.com is 100% open-source which means anyone can review the source code.</p>" +
 						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publicly reviewed.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",
@@ -635,7 +636,7 @@ function FaqController(div) {
 				}, {
 					id: "faq_split_keys",
 					getQuestion: function() { return "What does it mean to split private keys?"; },
-					getAnswer: function() { return "<p>Generated storage may be split separate pieces where some of the pieces must be combined in order to access funds.</p>" +
+					getAnswer: function() { return "<p>Generated storage may be split into separate pieces where some of the pieces must be combined in order to access funds.</p>" +
 						"<p>This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.</p>" +
 						"<p>For example, 10 key pairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 key pairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.</p>" +
 						"<p>In this example, one might choose to keep one piece, put one in a bank, and give one to a trusted family member.</p>"; }
