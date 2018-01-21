@@ -30,13 +30,11 @@ This tool runs only in your device's browser so funds are never entrusted to a t
 - OmiseGo
 
 # ⚠ First Release
-This is the first release of this software.  It should not be trusted with signficant amounts until it's reviewed by the community.
+This is the first release of this software.  It should not be trusted with signficant amounts until it is reviewed by the community.
 
-# Using This Tool as Securely as Possible
+# Using this Tool as Securely as Possible
 
-Security is a spectrum.  Following a few recommendations will improve the security of your cryptocurrency.
-
-The following procedure is recommended to use this tool as securely as possible:
+Security is a spectrum.  The following procedure is recommended to use this tool as securely as possible:
 
 1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code)
 2. Transfer cryptostorage.com-*[version]*.zip to a secure computer using a flash drive.
@@ -103,6 +101,6 @@ All contributions from the community are welcome.
 This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt) licensed.
 
 # Donate
-Donations may be voluntarily given to support this project. ❤
+Donations may be voluntarily given to support this project.
 
 See https://cryptostorage.com/#donate for donation addresses.

@@ -535,7 +535,7 @@ function FaqController(div) {
 					getAnswer: function() { return "<p>A cryptocurrency public/private key pair is a <b>public address</b> and a <b>private key</b>.  For example:</p>" +
 						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
 						"<p>The <b>public address</b> is used to receive funds.  It can be publicly shared with anyone.</p>" + 
-						"<p>The <b>private key</b> authorizes received funds to be spent.  <span style='color:red'>It's critical to keep your private keys secure and private.</span></p>"; }
+						"<p>The <b>private key</b> authorizes received funds to be spent.  <span style='color:red'>It is critical to keep your private keys secure and private.</span></p>"; }
 				}, {
 					id: "faq_safe_keys",
 					getQuestion: function() { return "How does cryptostorage.com help keep my cryptocurrency safe and secure?"; },
@@ -2936,7 +2936,7 @@ function ExportController(div, window, config) {
 					// alpha warning
 					var alphaDiv = $("<div class='alpha_warning flex_horizontal'>").appendTo(div);
 					alphaDiv.append($("<img class='alpha_icon' src='img/warning.png'>"));
-					alphaDiv.append("<span style='text-align:center;'>Alpha version: Do not trust with significant amounts until community reviewed.");
+					alphaDiv.append("<span style='text-align:center;'>First Release: Do not trust with significant amounts until community reviewed.");
 					
 					// progress bar
 					progressDiv = $("<div class='export_progress_div'>").appendTo(div);
