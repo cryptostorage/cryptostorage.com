@@ -1,4 +1,5 @@
 TODO
+social media
 sanity tests
 get similar domains
 hosting
