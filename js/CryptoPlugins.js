@@ -263,7 +263,7 @@ function EthereumPlugin() {
 	this.getName = function() { return "Ethereum"; }
 	this.getTicker = function() { return "ETH" };
 	this.getLogoPath = function() { return "img/ethereum.png"; }
-	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/keythereum.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/keythereum.js", "lib/ethereumjs-util.js"]; }
 	this.getDonationAddress = function() { return "0x8074da70e22a58a9e4a5dcecf968ea499d60e470"; }
 	this.newKey = function(str) {
 		
@@ -279,7 +279,7 @@ function EthereumPlugin() {
 			if (str.length >= 63 && str.length <= 65) {
 				state.hex = str;
 				state.wif = str;
-				state.address = keythereum.privateKeyToAddress(state.hex);
+				state.address = ethereumjsutil.toChecksumAddress(keythereum.privateKeyToAddress(state.hex));
 				state.encryption = null;
 				return new CryptoKey(this, state);
 			}
@@ -305,34 +305,9 @@ function EthereumPlugin() {
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
 	}
+	
 	this.isAddress = function(str) {
-		return isAddress(str);
-		
-		// Source: https://ethereum.stackexchange.com/questions/1374/how-can-i-check-if-an-ethereum-address-is-valid
-		function isAddress(address) {
-			if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
-		        // check if it has the basic requirements of an address
-		        return false;
-		    } else if (/^(0x)?[0-9a-f]{40}$/.test(address) || /^(0x)?[0-9A-F]{40}$/.test(address)) {
-		        // If it's all small caps or all all caps, return true
-		        return true;
-		    } else {
-		        // Otherwise check each case
-		        return isChecksumAddress(address);
-		    }
-		}
-		function isChecksumAddress(address) {
-		    // Check each case
-		    address = address.replace('0x','');
-		    var addressHash = sha3(address.toLowerCase());
-		    for (var i = 0; i < 40; i++ ) {
-		        // the nth letter should be uppercase if the nth digit of casemap is 1
-		        if ((parseInt(addressHash[i], 16) > 7 && address[i].toUpperCase() !== address[i]) || (parseInt(addressHash[i], 16) <= 7 && address[i].toLowerCase() !== address[i])) {
-		            return false;
-		        }
-		    }
-		    return true;
-		}
+		return ethereumjsutil.isValidChecksumAddress(str);
 	}
 }
 inheritsFrom(EthereumPlugin, CryptoPlugin);
