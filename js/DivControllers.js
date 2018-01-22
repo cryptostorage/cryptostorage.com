@@ -323,7 +323,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			
 			// intro slider
 			sliderDiv = $("<div class='slider_div'>").appendTo(div);
-			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
+			getSlide($(mixImg), "Create offline wallets for multiple cryptocurrencies.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
