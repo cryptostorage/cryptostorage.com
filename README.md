@@ -50,8 +50,8 @@ Security is a spectrum.  The following procedure is recommended to use this tool
     - Protecting your keys with a passphrase is **highly recommended**.  Otherwise anyone in possession of the unencrypted keys can access the funds.
     - Optionally split your keys for maximum security.
 7. Save the generated keys to a flash drive or printed paper for safe keeping.  Geographic redundancy is highly recommended so if one location is lost due to fire, flood, theft, etc, there are backup copies at other locations.<br>
-  The keys can be imported at any time by relaunching this tool in a secure environment.<br>
-  **Do not lose the generated keys or all funds will be permanently lost.**
+ The keys can be imported at any time by relaunching this tool in a secure environment.<br>
+ **Do not lose the generated keys or all funds will be permanently lost.**
 
 # Download and Verify the Source Code
 Verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
