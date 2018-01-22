@@ -1,4 +1,5 @@
 TODO
+redo example print
 social media
 get similar domains
 hosting
