@@ -1,4 +1,5 @@
 TODO
+warnings to keep keys safe or all funds will be lost
 redo example print
 social media
 get similar domains
