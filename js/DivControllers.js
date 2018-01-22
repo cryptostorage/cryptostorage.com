@@ -452,6 +452,7 @@ function HomeController(div) {
 			var mitImg = $().appendTo(licenseDiv);
 			licenseDiv.append("<a href='./LICENSE.txt'><img src='img/mit.png' class='license_img'></a>");
 			licenseDiv.append("<a href='https://github.com/cryptostorage/cryptostorage.com'><img src='img/github.png' class='license_img'></a>");
+			licenseDiv.append("<a href='https://reddit.com/r/cryptostorage'><img src='img/reddit.png' class='license_img'></a>");
 			pageDiv.append("<div style='height: 20px;'>");
 			var downloadBtn = $("<a class='light_green_btn' href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>").appendTo(pageDiv);
 			downloadBtn.append("Download Now (zip)");
