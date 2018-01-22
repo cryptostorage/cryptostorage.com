@@ -605,10 +605,11 @@ function FaqController(div) {
 								"<img style='width:100%;' src='img/notice_bar_pass.png'></img></li>");
 						var generateKeys = $("<li><p>Fill out the form and click Generate Keys.</p></li>").appendTo(generateList);
 						var generateKeysList = $("<ul>").appendTo(generateKeys);
-						generateKeysList.append("<li><p>Protecting your keys with a passphrase is <b>highly recommended</b>.  Otherwise anyone in possession of the unencrypted keys can access the funds.</p>");
+						generateKeysList.append("<li><p>Protecting your keys with a passphrase is <i>highly recommended</i>.  Otherwise anyone in possession of the unencrypted keys can access the funds.</p>");
 						generateKeysList.append("<li><p>Optionally split your keys for maximum security.</p></li>");
-						generateList.append("<li><p>Save the generated keys to a flash drive or printed paper for safe keeping.</p>" +
-								"<p>The keys can be imported at any time by relaunching this tool in a secure environment.</p></li>");
+						generateList.append("<li><p>Save the generated keys to a flash drive or printed paper for safe keeping.  Geographic redundancy is <i>highly recommended</i> so if one location is lost due to fire, flood, theft, etc, there are backup copies at other locations.</p>" +
+							"<p>The keys can be imported at any time by relaunching this tool in a secure environment.</p>" +
+								"<p><span style='color:red'>Do not lose the generated keys or all funds will be permanently lost.</span></p></li>");
 						return answerDiv;
 					}
 				},{
@@ -617,7 +618,7 @@ function FaqController(div) {
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>Downloading and verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.</p>");
-						answerDiv.append("<p>Verifying the source code is <b>highly recommended</b> but not required to use this tool.</p>");
+						answerDiv.append("<p>Verifying the source code is <i>highly recommended</i> but not required to use this tool.</p>");
 						return answerDiv;
 					}
 				}, {
@@ -1109,7 +1110,7 @@ function FormController(div) {
 			// passphrase input
 			passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
 			var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
-			passphraseWarnDiv.append("This passphrase is required to access funds later on.  <b>Don’t lose it.</b>");
+			passphraseWarnDiv.append("This passphrase is required to access funds later on.  <b>Do not lose it.</b>");
 			passphraseInputDiv.append("Passphrase");
 			passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
 			passphraseInput.on("input", function(e) { setPassphraseError(false); });
