@@ -1,5 +1,4 @@
 TODO
-update ethereum donation address with checksum
 social media
 get similar domains
 hosting

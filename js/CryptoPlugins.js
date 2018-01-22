@@ -264,7 +264,7 @@ function EthereumPlugin() {
 	this.getTicker = function() { return "ETH" };
 	this.getLogoPath = function() { return "img/ethereum.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/keythereum.js", "lib/ethereumjs-util.js"]; }
-	this.getDonationAddress = function() { return "0x8074da70e22a58a9e4a5dcecf968ea499d60e470"; }
+	this.getDonationAddress = function() { return "0x8074da70E22a58A9E4a5DCeCf968Ea499D60e470"; }
 	this.newKey = function(str) {
 		
 		// create key if not given
