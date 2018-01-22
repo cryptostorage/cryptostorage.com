@@ -105,8 +105,6 @@ All contributions are welcome.
 This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt) licensed.
 
 # Donate
-Donations may be voluntarily given to support this project.
+Donations may be voluntarily given to support this project. ❤
 
 See https://cryptostorage.com/#donate for donation addresses.
-
-❤
