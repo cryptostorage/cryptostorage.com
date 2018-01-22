@@ -1,7 +1,7 @@
 TODO
+redo example print
 update ethereum donation address with checksum
 warnings to keep keys safe or all funds will be lost
-redo example print
 social media
 get similar domains
 hosting
