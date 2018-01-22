@@ -23,6 +23,7 @@ refresh image on regenerate button
 new window dependencies are not reliably cached
 link back to cryptostorage home from export window
 better way to design credits?
+design to sign/send
 
 low priority:
 ddslick animation could be cleaner
