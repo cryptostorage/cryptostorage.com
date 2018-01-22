@@ -53,7 +53,7 @@ Security is a spectrum.  The following procedure is recommended to use this tool
 
 The keys can be imported at any time by relaunching this tool in a secure environment.
  
-⚠ ** *Do not lose the generated keys or the password or the funds will be permanently lost.***
+⚠ ***Do not lose the generated keys or the password or the funds will be permanently lost.***
 
 # Download and Verify the Source Code
 Verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
