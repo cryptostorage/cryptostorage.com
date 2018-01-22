@@ -307,7 +307,7 @@ function EthereumPlugin() {
 	}
 	
 	this.isAddress = function(str) {
-		return ethereumjsutil.isValidChecksumAddress(str);
+		return ethereumjsutil.isValidAddress(str);
 	}
 }
 inheritsFrom(EthereumPlugin, CryptoPlugin);
