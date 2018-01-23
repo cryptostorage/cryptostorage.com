@@ -674,6 +674,12 @@ function FaqController(div) {
 					id: "faq_send_funds",
 					getQuestion: function() { return "Can I send funds using cryptostorage.com?"; },
 					getAnswer: function() { return "<p>Not currently.  It is expected that users will send funds using wallet software of their choice after private keys have been recovered using this tool.</p>"; }
+				}, {
+					id: "faq_contact",
+					getQuestion: function() { return "I still need help.  Who can I contact?"; },
+					getAnswer: function() { return "<p>For issues specific to the cryptostorage.com tool, please submit a new issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
+						"<p>For all other discussion, please join the conversation at <a href='https://reddit.com/r/cryptostorage'>reddit.com/r/cryptostorage</a>.</p>"
+					}
 				}
 			];
 			
