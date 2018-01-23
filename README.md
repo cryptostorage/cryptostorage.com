@@ -93,8 +93,10 @@ The source code can be verified in two ways. Either method is sufficient.
 # Frequently Asked Questions
 Please see https://cryptostorage.com/#faq.
 
-# Submit Questions, Feedback, or Issues
-For questions, feedback, or issues, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
+# Questions, Feedback, or Issues
+For issues specific to the cryptostorage.com tool, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
+
+For all other discussion, please join the conversation at reddit.com/r/cryptostorage.
 
 # Contributing
 Anyone may develop and submit pull requests to improve this project.
