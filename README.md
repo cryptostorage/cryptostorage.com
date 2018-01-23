@@ -1,5 +1,5 @@
 # Introduction
-[cryptostorage.com](https://cryptostorage.com) is an open-source, offline wallet generator which supports multiple cryptocurrencies.
+[cryptostorage.com](https://cryptostorage.com) is an open-source, offline wallet generator for multiple cryptocurrencies.
 
 This tool generates key pairs which can store cryptocurrency offline. This is commonly referred to as "cold storage".
 
