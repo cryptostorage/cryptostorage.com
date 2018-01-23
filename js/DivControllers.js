@@ -550,7 +550,7 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is cryptostorage.com?"; },
-					getAnswer: function() { return "<p>cryptostorage.com is an open-source, offline wallet generator which supports multiple cryptocurrencies.</p>" +
+					getAnswer: function() { return "<p>cryptostorage.com is an open-source, offline wallet generator for multiple cryptocurrencies.</p>" +
 						"<p>This tool generates cryptocurrency key pairs which can store cryptocurrency offline.  This is commonly referred to as \"cold storage\".</p>" +
 						"<p>This tool runs only in your device's browser so funds are never entrusted to a third party by design.</p>";
 					}
