@@ -1,7 +1,5 @@
 TODO
-hosting
 115, 253, 233 light blue
-
 final design review
 release
 social media
