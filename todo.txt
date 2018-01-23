@@ -1,5 +1,4 @@
 TODO
-add some space afer page div with background
 social media
 get similar domains
 hosting
