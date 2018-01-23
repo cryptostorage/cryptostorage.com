@@ -39,7 +39,7 @@ Security is a spectrum.  The following procedure is recommended to use this tool
 1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code)
 2. Transfer cryptostorage.com-*[version]*.zip to a secure computer using a flash drive.
     - The computer should be disconnected from the internet and ideally will never connect to the internet again.
-    - An open-source operating system is recommended like [Tails](https://tails.boum.org), [Ubuntu](https://www.ubuntu.com/download/desktop), or [Raspbian for the Raspberry Pi](https://www.raspberrypi.org).
+    - An open-source operating system is recommended like [Tails](https://tails.boum.org), [Debian](https://www.debian.org/), or [Raspbian for the Raspberry Pi (https://www.raspberrypi.org).
 3. Unzip cryptostorage.com-*[version]*.zip.
 4. Open index.html in the unzipped folder in a browser.
     - An open-source browser is recommended like [Firefox](https://www.mozilla.org/en-US/firefox/) or [Chromium](https://www.chromium.org/getting-involved/download-chromium).
