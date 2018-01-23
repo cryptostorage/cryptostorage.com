@@ -1,0 +1,30 @@
+<ifModule mod_headers.c>
+Header set Connection keep-alive
+</ifModule>
+<IfModule mod_expires.c>
+ExpiresActive On
+AddType application/vnd.ms-fontobject .eot
+AddType application/x-font-ttf .ttf
+AddType application/x-font-opentype .otf
+AddType application/x-font-woff .woff
+AddType image/svg+xml .svg
+ExpiresByType application/vnd.ms-fontobject "access 1 day"
+ExpiresByType application/x-font-ttf "access 1 day"
+ExpiresByType application/x-font-opentype "access 1 day"
+ExpiresByType application/x-font-woff "access 1 day"
+ExpiresByType image/svg+xml "access 1 day"
+ExpiresByType text/html "access 1 day"
+ExpiresByType text/css "access 1 day"
+ExpiresByType text/x-javascript "access 1 day"
+ExpiresByType application/javascript "access 1 day"
+ExpiresByType application/x-javascript "access 1 day"
+ExpiresByType image/gif "access 1 day"
+ExpiresByType image/png "access 1 day"
+ExpiresByType image/jpg "access 1 day"
+ExpiresByType image/jpeg "access 1 day"
+ExpiresByType image/gif "access 1 day"
+ExpiresByType application/pdf "access 1 day"
+ExpiresByType application/x-shockwave-flash "access 1 day"
+ExpiresByType image/x-icon "access 1 year"
+ExpiresDefault "access 1 day"
+</IfModule>
