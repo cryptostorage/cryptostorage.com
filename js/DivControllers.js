@@ -676,8 +676,10 @@ function FaqController(div) {
 				}, {
 					id: "faq_contact",
 					getQuestion: function() { return "I still need help.  Who can I contact?"; },
-					getAnswer: function() { return "<p>For issues specific to the cryptostorage.com tool, please submit a new issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
-						"<p>For all other discussion, please join the conversation at <a href='https://reddit.com/r/cryptostorage'>reddit.com/r/cryptostorage</a>.</p>"
+					getAnswer: function() { return "<p>Report a bug: <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a></p>" +
+						"<p>Discuss with the community: <a href='https://reddit.com/r/cryptostorage'>https://reddit.com/r/cryptostorage</a></p>" +
+						"<p>Email (answered on a best-effort basis only): <a href='support@cryptostorage.com'>support@cryptostorage.com</a></p>" +
+						"<p><i>No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost.</i></p>"
 					}
 				}
 			];
