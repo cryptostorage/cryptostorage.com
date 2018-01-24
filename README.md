@@ -91,13 +91,13 @@ The source code can be verified in two ways. Either method is sufficient.
 # Frequently Asked Questions
 Please see https://cryptostorage.com/#faq.
 
-# Support
+# Contact
 
 Report a bug: https://github.com/cryptostorage/cryptostorage.com/issues
 
-Discuss with the community: reddit.com/r/cryptostorage
+Discuss with the community: https://reddit.com/r/cryptostorage
 
-Email (answered on a best-effort basis): support@cryptostorage.com
+Email (answered on a best-effort basis only): support@cryptostorage.com
 
 *No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost*.
 
