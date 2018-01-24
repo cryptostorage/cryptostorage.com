@@ -91,10 +91,15 @@ The source code can be verified in two ways. Either method is sufficient.
 # Frequently Asked Questions
 Please see https://cryptostorage.com/#faq.
 
-# Questions, Feedback, or Issues
-For issues specific to the cryptostorage.com tool, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
+# Support
 
-For all other discussion, please join the conversation at reddit.com/r/cryptostorage.
+Report a bug: https://github.com/cryptostorage/cryptostorage.com/issues
+
+Discuss with the community: reddit.com/r/cryptostorage
+
+Email (answered on a best-effort basis): support@cryptostorage.com
+
+*No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost*.
 
 # Contributing
 Anyone may develop and submit pull requests to improve this project.
