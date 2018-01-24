@@ -1,5 +1,7 @@
 TODO
-115, 253, 233 light blue
+test caching and window enabled
+validation application
+final touches: wording, 115, 253, 233 light blue
 final design review
 release
 social media
