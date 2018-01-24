@@ -99,7 +99,7 @@ var AppUtils = {
 			"lib/slick.js",
 			"css/slick.css",
 			"img/cryptostorage_white.png",
-			"img/mix.png",
+			"img/cryptocurrency.png",
 			"img/printer.png",
 			"img/security.png",
 			"img/microscope.png",

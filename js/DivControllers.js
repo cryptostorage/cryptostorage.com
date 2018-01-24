@@ -360,7 +360,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			sliderDiv.on("init", function() { if (onDone) onDone(); });
 			sliderDiv.slick({autoplay:true, arrows:false, dots:true, pauseOnHover:false, autoplaySpeed:AppUtils.SLIDER_RATE});
 		}
-		mixImg.src = "img/mix.png";
+		mixImg.src = "img/cryptocurrency.png";
 	}
 }
 inheritsFrom(IntroController, DivController);
