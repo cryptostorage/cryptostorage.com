@@ -550,18 +550,17 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is cryptostorage.com?"; },
-					getAnswer: function() { return "<p>cryptostorage.com is an open-source, offline wallet generator for multiple cryptocurrencies.</p>" +
-						"<p>This tool generates cryptocurrency key pairs which can store cryptocurrency offline.  This is commonly referred to as \"cold storage\".</p>" +
-						"<p>This tool runs only in your device's browser so funds are never entrusted to a third party by design.</p>";
+					getAnswer: function() { return "<p>cryptostorage.com is an open-source tool to generate cryptocurrency storage.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency offline (i.e. without exposing private keys to an internet-connected device).  Generated key pairs can be printed to paper or saved to file for long-term \"cold\" storage.</p>" +
+						"<p>This tool is security-focused.  Keys are generated only in your device's browser so funds are never entrusted to a third party.  Keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations are automatically provided</a> to improve the security of the tool's environment.</p>";
 					}
 				}, {
 					id: "faq_key_pair",
 					getQuestion: function() { return "What is a cryptocurrency key pair?" },
-					getAnswer: function() { return "<p>A cryptocurrency key pair is like an account that can send and receive a specific cryptocurrency.</p>" +
+					getAnswer: function() { return "<p>A cryptocurrency key pair is like an account that can send and receive a cryptocurrency.</p>" +
 						"<p>It is comprised of a public address and a private key.  For example, this is a Bitcoin key pair:</p>" +
 						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
 						"<p>The public address is used to receive funds.  It can be publicly shared with anyone.</p>" + 
-						"<p>The private key authorizes received funds to be spent.  <span style='color:red'>The private key must remain private or all funds can be stolen.</span></p>"; }
+						"<p>The private key authorizes received funds to be spent.  <span style='color:red'>The private key must remain private or all funds can be lost.</span></p>"; }
 				}, {
 					id: "faq_safe_keys",
 					getQuestion: function() { return "How does cryptostorage.com help keep my cryptocurrency safe and secure?"; },
@@ -609,7 +608,7 @@ function FaqController(div) {
 						generateKeysList.append("<li><p>Optionally split your keys for maximum security.</p></li>");
 						generateList.append("<li><p>Save the generated keys to a flash drive or printed paper for safe keeping.  Geographic redundancy is <i>highly recommended</i> so if one location is lost due to fire, flood, theft, etc, there are backup copies at other locations.</p>" +
 							"<p>The keys can be imported at any time by relaunching this tool in a secure environment.</p>" +
-								"<p><span style='color:red'>Do not lose the generated keys or all funds will be lost.</span></p></li>");
+								"<p><span style='color:red'>Do not lose the generated keys or the password or all funds will be lost.</span></p></li>");
 						return answerDiv;
 					}
 				},{
