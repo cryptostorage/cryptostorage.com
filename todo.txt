@@ -1,5 +1,4 @@
 TODO
-sitemap
 validation application
 final touches: 115, 253, 233 light blue
 final design review
