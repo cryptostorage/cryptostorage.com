@@ -914,7 +914,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_div {
-	
+	background-color: rgb(17, 119, 184);
 }
 
 .import_tabs_div {
@@ -932,7 +932,7 @@ input[type='checkbox'][disabled] +label {
 	padding: 20px;
 	color: white;
 	font-size: 24px;
-	background-color: rgb(28, 171, 214, 0.8);
+	background-color: rgb(78, 188, 223);
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -948,7 +948,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_content_div {
-	background-color: rgb(17, 119, 184);
+
 }
 
 .import_input_div {
