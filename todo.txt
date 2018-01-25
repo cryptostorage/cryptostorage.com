@@ -1,4 +1,6 @@
 TODO
+ethereumjs-util ie11
+DivController.js not formatted in github
 final design review
 release
 social media
