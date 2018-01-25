@@ -1,5 +1,4 @@
 TODO
-wording: describe intended purpose: Create cold storage as easily and securely as possible, cryptostorage.com vs CryptoStorage
 final design review
 release
 social media
