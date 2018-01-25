@@ -1,6 +1,5 @@
 TODO
 describe intended purpose: Create cold storage as easily and securely as possible.
-final touches: 115, 253, 233 light blue
 final design review
 release
 social media
