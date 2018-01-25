@@ -549,21 +549,20 @@ function FaqController(div) {
 			var questionsAnswers = [
 				{
 					id: "faq_what_is_cryptostorage",
-					getQuestion: function() { return "What is cryptostorage.com?"; },
-					getAnswer: function() { return "<p>cryptostorage.com is an open-source tool to generate cryptocurrency storage.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency offline (i.e. without exposing private keys to an internet-connected device).  Generated key pairs can be printed to paper or saved to file for long-term \"cold\" storage.</p>" +
+					getQuestion: function() { return "What is CryptoStorage?"; },
+					getAnswer: function() { return "<p>CryptoStorage is an open-source tool to generate cryptocurrency storage easily and securely.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency offline (i.e. without exposing private keys to an internet-connected device).  Generated key pairs can be printed to paper or saved to file for long-term \"cold\" storage.</p>" +
 						"<p>This tool is security-focused.  Keys are generated only in your device's browser so funds are never entrusted to a third party.  Keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations are automatically provided</a> to improve the security of the tool's environment.</p>";
 					}
 				}, {
 					id: "faq_key_pair",
 					getQuestion: function() { return "What is a cryptocurrency key pair?" },
-					getAnswer: function() { return "<p>A cryptocurrency key pair is like an account that can send and receive a cryptocurrency.</p>" +
-						"<p>It is comprised of a public address and a private key.  For example, this is a Bitcoin key pair:</p>" +
+					getAnswer: function() { return "<p>A cryptocurrency key pair is like an account that can send and receive cryptocurrency.  It is comprised of a public address and a private key.  For example, this is a Bitcoin key pair:</p>" +
 						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
 						"<p>The public address is used to receive funds.  It can be publicly shared with anyone.</p>" + 
 						"<p>The private key authorizes received funds to be spent.  <span style='color:red'>The private key must remain private or all funds can be lost.</span></p>"; }
 				}, {
 					id: "faq_safe_keys",
-					getQuestion: function() { return "How does cryptostorage.com help keep my cryptocurrency safe and secure?"; },
+					getQuestion: function() { return "How does CryptoStorage help keep my cryptocurrency safe and secure?"; },
 					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys are never shared with a third party, including us, the site owners.</p>" + 
 						"<p>Second, private keys may be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
 						"<p>Third, private keys may be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one physical location.</p>" +
@@ -571,7 +570,7 @@ function FaqController(div) {
 						"<p>Finally, this tool <a href='#faq_recommendations'>automatically detects and recommends</a> ways to improve the security of the its environment.</p>"; }
 				}, {
 					id: "faq_recommendations",
-					getQuestion: function() { return "What security recommendations does cryptostorage.com make?"; },
+					getQuestion: function() { return "What security recommendations does CryptoStorage make?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>In order of importance:</p>");
@@ -584,7 +583,7 @@ function FaqController(div) {
 					}
 				}, {
 					id: "faq_generate_keys",
-					getQuestion: function() { return "How can I generate keys as securely as possible using cryptostorage.com?"; },
+					getQuestion: function() { return "How can I generate keys as securely as possible using CryptoStorage?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						var generateList = $("<ol>").appendTo(answerDiv);
@@ -616,7 +615,7 @@ function FaqController(div) {
 					getQuestion: function() { return "Why should I download and verify the source code?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
-						answerDiv.append("<p>Downloading and verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.</p>");
+						answerDiv.append("<p>Downloading and verifying the source code ensures you have a copy of this tool that has been publicly reviewed and has not been modified by an attacker.</p>");
 						answerDiv.append("<p>Verifying the source code is <i>highly recommended</i> but not required to use this tool.</p>");
 						return answerDiv;
 					}
@@ -651,8 +650,8 @@ function FaqController(div) {
 					}
 				}, {
 					id: "faq_trust",
-					getQuestion: function() { return "How can I trust this service?"; },
-					getAnswer: function() { return "<p>Cryptostorage.com is 100% open-source which means anyone can review the source code.</p>" +
+					getQuestion: function() { return "How can I trust this tool?"; },
+					getAnswer: function() { return "<p>CryptoStorage is 100% open-source which means anyone can review the source code.</p>" +
 						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publicly reviewed.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",
@@ -671,14 +670,14 @@ function FaqController(div) {
 					getAnswer: function() { return "<p>No.  This tool's source code has everything needed to import and recover the private keys.  A copy of this tool can be saved for future use so it doesn't need to be re-downloaded from GitHub.</p>"; }
 				}, {
 					id: "faq_send_funds",
-					getQuestion: function() { return "Can I send funds using cryptostorage.com?"; },
+					getQuestion: function() { return "Can I send funds using CryptoStorage?"; },
 					getAnswer: function() { return "<p>Not currently.  It is expected that users will send funds using wallet software of their choice after private keys have been recovered using this tool.</p>"; }
 				}, {
 					id: "faq_contact",
 					getQuestion: function() { return "I still need help.  Who can I contact?"; },
-					getAnswer: function() { return "<p>Report a bug: <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a></p>" +
-						"<p>Discuss with the community: <a href='https://reddit.com/r/cryptostorage'>https://reddit.com/r/cryptostorage</a></p>" +
-						"<p>Email (answered on a best-effort basis only): <a href='mailto:support@cryptostorage.com'>support@cryptostorage.com</a></p>" +
+					getAnswer: function() { return "<p>To report a bug, please submit an issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
+						"<p>For community discussion, please join the conversation on Reddit at <a href='https://reddit.com/r/cryptostorage'>https://reddit.com/r/cryptostorage</a>.</p>" +
+						"<p>For email support, please email <a href='mailto:support@cryptostorage.com'>support@cryptostorage.com</a>.  Emails are answered on a best-effort basis only.</p>" +
 						"<p><i>No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost.</i></p>"
 					}
 				}
