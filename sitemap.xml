@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+	<url>
+		<loc>https://cryptostorage.com/#home</loc>
+		<lastmod>2018-01-30</lastmod>
+		<priority>1.0</priority>
+		<changefreq>monthly</changefreq>
+		<image:image>
+			<image:loc>https://cryptostorage.com/img/cryptostorage_export.png</image:loc>
+			<image:title>cryptostorage logo</image:title>
+		</image:image>
+		<image:image>
+			<image:loc>https://cryptostorage.com/img/cryptocurrency.png</image:loc>
+			<image:title>cryptocurrency</image:title>
+		</image:image>
+		<image:image>
+			<image:loc>https://cryptostorage.com/img/print_example.png</image:loc>
+			<image:title>cryptostorage print example</image:title>
+		</image:image>
+		<image:image>
+			<image:loc>https://cryptostorage.com/img/notice_bars.png</image:loc>
+			<image:title>cryptostorage security recommendations</image:title>
+		</image:image>
+		<image:image>
+			<image:loc>https://cryptostorage.com/img/split_input.png</image:loc>
+			<image:title>cryptostorage split keys</image:title>
+		</image:image>
+	</url>
+	<url>
+		<loc>https://cryptostorage.com/#faq</loc>
+		<lastmod>2018-01-30</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.9</priority>
+		<changefreq>monthly</changefreq>
+	</url>
+	<url>
+		<loc>https://cryptostorage.com/#new</loc>
+		<lastmod>2018-01-30</lastmod>
+		<priority>0.8</priority>
+		<changefreq>monthly</changefreq>
+	</url>
+	<url>
+		<loc>https://cryptostorage.com/#import</loc>
+		<lastmod>2018-01-30</lastmod>
+		<priority>0.8</priority>
+		<changefreq>monthly</changefreq>
+	</url>
+	<url>
+		<loc>https://cryptostorage.com/#donate</loc>
+		<lastmod>2018-01-30</lastmod>
+		<priority>0.6</priority>
+		<changefreq>monthly</changefreq>
+	</url>
+</urlset>

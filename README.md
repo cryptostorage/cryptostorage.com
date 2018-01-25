@@ -51,7 +51,7 @@ Security is a spectrum.  The following procedure is recommended to use this tool
 
 The keys can be imported at any time by relaunching this tool in a secure environment.
  
-⚠ **Do not lose the generated keys or the password or the funds will be permanently lost.**
+⚠ **Do not lose the generated keys or the password or the funds will be lost.**
 
 # Download and Verify the Source Code
 Verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
@@ -91,10 +91,15 @@ The source code can be verified in two ways. Either method is sufficient.
 # Frequently Asked Questions
 Please see https://cryptostorage.com/#faq.
 
-# Questions, Feedback, or Issues
-For issues specific to the cryptostorage.com tool, please submit a new issue to https://github.com/cryptostorage/cryptostorage.com/issues.
+# Contact
 
-For all other discussion, please join the conversation at reddit.com/r/cryptostorage.
+Report a bug: https://github.com/cryptostorage/cryptostorage.com/issues
+
+Discuss with the community: https://reddit.com/r/cryptostorage
+
+Email (answered on a best-effort basis only): support@cryptostorage.com
+
+*No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost*.
 
 # Contributing
 Anyone may develop and submit pull requests to improve this project.
