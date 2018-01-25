@@ -234,7 +234,7 @@ body {
 	color: white;
 	font-size:24px;
 	margin-bottom: 10px;
-	background-color: rgb(55, 218, 44);
+	background-color: rgb(76, 213, 67);
 	-ms-flex-pack: center;
 	justify-content: center;
 	-webkit-user-select: none;
@@ -246,11 +246,11 @@ body {
 
 .light_green_btn:hover {
 	cursor: pointer;
-	background-color: rgb(60, 240, 60);
+	background-color: rgb(66, 233, 55);
 }
 
 .light_green_btn:active {
-	background-color: rgb(40, 200, 40);
+	background-color: rgb(68, 183, 61);
 }
 
 .btn_import {
@@ -804,7 +804,7 @@ input[type='checkbox'][disabled] +label {
 	height: 70px;
 	min-width: 225px;
 	padding: 20px;
-	background-color: rgb(76, 178, 29);
+	background-color: rgb(76, 213, 67);
 	color: white;
 	font-size:24px;
 	-ms-flex-pack: center;
@@ -817,11 +817,11 @@ input[type='checkbox'][disabled] +label {
 
 .dark_green_btn:hover {
 	cursor: pointer;
-	background-color: rgb(90, 215, 50);
+	background-color: rgb(66, 233, 55);
 }
 
 .dark_green_btn:active {
-	background-color: rgb(55, 160, 30);
+	background-color: rgb(68, 183, 61);
 }
 
 .dark_green_btn_disabled {
@@ -914,7 +914,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_div {
-	background-color: rgb(17, 119, 184);
+	
 }
 
 .import_tabs_div {
@@ -932,7 +932,7 @@ input[type='checkbox'][disabled] +label {
 	padding: 20px;
 	color: white;
 	font-size: 24px;
-	background-color: rgb(122, 213, 229);
+	background-color: rgb(28, 171, 214, 0.8);
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
@@ -948,7 +948,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_content_div {
-	
+	background-color: rgb(17, 119, 184);
 }
 
 .import_input_div {
@@ -1111,7 +1111,7 @@ input[type='checkbox'][disabled] +label {
 	height: 50px;
 	font-size: 28px;
 	color: white;
-	background-color: rgb(55, 218, 44);
+	background-color: rgb(76, 213, 67);
 	border: 2.5px solid black;
 	-ms-flex-pack: center;
 	justify-content: center;
@@ -1123,11 +1123,11 @@ input[type='checkbox'][disabled] +label {
 
 .import_button:hover, .import_view_button:hover {
 	cursor: pointer;
-	background-color: rgb(60, 240, 60);
+	background-color: rgb(66, 233, 55);
 }
 
 .import_button:active, .import_view_button:active {
-	background-color: rgb(40, 200, 40);
+	background-color: rgb(68, 183, 61);
 }
 
 .import_view_button {
