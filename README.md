@@ -1,5 +1,5 @@
 # Introduction
-[cryptostorage.com](https://cryptostorage.com) is an open-source tool to generate cryptocurrency storage.  This tool generates [key pairs](https://cryptostorage.com/#faq_key_pair) in your device's browser which can store cryptocurrency offline (i.e. without exposing private keys to an internet-connected device).  Generated key pairs can be printed to paper or saved to file for long-term "cold" storage.
+CryptoStorage is an open-source tool to generate cryptocurrency storage easily and securely.  This tool generates [key pairs](https://cryptostorage.com/#faq_key_pair) in your device's browser which can store cryptocurrency offline (i.e. without exposing private keys to an internet-connected device).  Generated key pairs can be printed to paper or saved to file for long-term "cold" storage.
 
 This tool is security-focused. Keys are generated only in your device's browser so funds are never entrusted to a third party.  Keys can be passphrase-protected and [split into pieces](https://cryptostorage.com/#faq_split_keys) which can be geographically separated so funds are not accessible at any one location.  [Recommendations are automatically provided](https://cryptostorage.com/#faq_recommendations) to improve the security of the tool's environment.
 
@@ -54,7 +54,7 @@ The keys can be imported at any time by relaunching this tool in a secure enviro
 ⚠ **Do not lose the generated keys or the password or the funds will be lost.**
 
 # Download and Verify the Source Code
-Verifying the source code ensures you have a legitimate copy of this tool that has been publicly reviewed and has not been modified by an attacker.
+Verifying the source code ensures you have a copy of this tool that has been publicly reviewed and has not been modified by an attacker.
 
 Downloading and verifying the source code is *highly recommended* but not required to use this tool.
 
@@ -93,13 +93,13 @@ Please see https://cryptostorage.com/#faq.
 
 # Contact
 
-Report a bug: https://github.com/cryptostorage/cryptostorage.com/issues
+To report a bug, please submit an issue to https://github.com/cryptostorage/cryptostorage.com/issues.
 
-Discuss with the community: https://reddit.com/r/cryptostorage
+For community discussion, please join the conversation on Reddit at https://reddit.com/r/cryptostorage.
 
-Email (answered on a best-effort basis only): support@cryptostorage.com
+For email support, please email support@cryptostorage.com.  Emails are answered on a best-effort basis only.
 
-*No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost*.
+*No one can recover lost keys or passwords for you. Do not lose these or your funds will be lost.*
 
 # Contributing
 Anyone may develop and submit pull requests to improve this project.
