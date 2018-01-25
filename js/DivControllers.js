@@ -323,7 +323,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			
 			// intro slider
 			sliderDiv = $("<div class='slider_div'>").appendTo(div);
-			getSlide($(mixImg), "Create offline wallets for multiple cryptocurrencies.").appendTo(sliderDiv);
+			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
@@ -420,7 +420,7 @@ function HomeController(div) {
 			// sample page section
 			pageDiv.append("<div style='height: 70px'>");
 			pageDiv.append("<div class='home_label'>Export to printable and digital formats for long term storage</div>");
-			pageDiv.append("<div class='home_description'>Save keys to a file which can be stored securely on a flash drive, or print to paper to easily create paper wallets.</div>")
+			pageDiv.append("<div class='home_description'>Save keys to a file which can be stored on a flash drive, or print to paper to easily create paper wallets.</div>")
 			pageDiv.append($("<img width=750px src='img/print_example.png'>"));
 			
 			// check environment section
