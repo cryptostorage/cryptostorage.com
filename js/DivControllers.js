@@ -440,7 +440,7 @@ function HomeController(div) {
 			pageDiv.append("<div style='height:70px'>");
 			var hFlex = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 			hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
-			var vFlex = $("<div class='flex_vertical'>").appendTo(hFlex);
+			var vFlex = $("<div class='flex_vertical width_100'>").appendTo(hFlex);
 			vFlex.append("<div class='home_label'>Strong cryptography</div>");
 			vFlex.append("<div class='home_description'>Uses the latest window.crypto API available in browsers, which gives access to a cryptographically secure random number generator. This allows generation of random values as seeds for your keys.</div>");
 			

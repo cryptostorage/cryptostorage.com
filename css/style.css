@@ -1364,7 +1364,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .export_content_div {
-	
+	width: 100%;
 }
 
 .export_pieces_div {
