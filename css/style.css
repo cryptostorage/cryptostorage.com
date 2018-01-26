@@ -10,8 +10,11 @@ body {
 	margin: 0;
 }
 
-.flex_horizontal {
+.width_100 {
 	width: 100%;
+}
+
+.flex_horizontal {
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -25,7 +28,6 @@ body {
 }
 
 .flex_vertical {
-	width: 100%;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -888,6 +890,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .donate_address {
+	max-width: 100%;
 	font-size: 18px;
 	font-family: monospace;
 	word-break: break-all;

@@ -979,7 +979,7 @@ function DonateController(div, appController) {
 			div.attr("class", "donate_div flex_horizontal");
 
 			// append the title
-			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_start'>").appendTo(div);
+			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_start width_100'>").appendTo(div);
 			var titleDiv = $("<div class='donate_title'>").appendTo(titleSubtitleDiv);
 			if (credit.title) titleDiv.append(credit.title);
 			else titleDiv.append(getIconNameDiv(credit.currencyPlugin));
@@ -1005,7 +1005,7 @@ function DonateController(div, appController) {
 			div.attr("class", "donate_div flex_horizontal");
 			
 			// append the title
-			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_end'>").appendTo(div);
+			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_end width_100'>").appendTo(div);
 			var titleDiv = $("<div class='donate_title'>").appendTo(titleSubtitleDiv);
 			if (credit.title) titleDiv.append(credit.title);
 			else titleDiv.append(getIconNameDiv(credit.currencyPlugin));
