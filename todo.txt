@@ -1,7 +1,4 @@
 TODO
-ethereumjs-util with es6 code
-moneroplugin broken with Object.assign
-minimum test failure does not bubble to top
 DivController.js not formatted in github
 final design review
 release
