@@ -1,4 +1,5 @@
 TODO
+dynamic json and text content types
 DivController.js not formatted in github
 final design review
 release
