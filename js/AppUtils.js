@@ -1765,13 +1765,18 @@ var AppUtils = {
 			numKeys: 1,
 			encryption: AppUtils.EncryptionScheme.CRYPTOJS
 		});
+		config.currencies.push({
+			ticker: AppUtils.getCryptoPlugin("ETH").getTicker(),
+			numKeys: 1,
+			encryption: AppUtils.EncryptionScheme.CRYPTOJS
+		});
 		
 		// generate keys and test
 		AppUtils.generateKeys(config, null, function(err, keys, pieces, pieceDivs) {
 			if (err) onDone(err);
 			else {
 				try {
-					assertEquals(2, keys.length);
+					assertEquals(3, keys.length);
 					assertEquals(3, pieces.length);
 					assertEquals(3, pieceDivs.length);
 					onDone(null);
