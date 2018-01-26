@@ -15,6 +15,7 @@ body {
 }
 
 .flex_horizontal {
+	max-width: 100%;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -28,6 +29,7 @@ body {
 }
 
 .flex_vertical {
+	max-width: 100%;
 	display: -webkit-flex;
 	display: -ms-flexbox;
 	display: -moz-flex;
@@ -497,7 +499,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .answer {
-
+	width: 100%;
 }
 
 .answer p {

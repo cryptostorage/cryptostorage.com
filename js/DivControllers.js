@@ -795,7 +795,7 @@ function FaqController(div) {
 			arrowDiv.click(function() { toggle(); });
 			
 			// question and answer
-			var qaDiv = $("<div class='flex_vertical flex_align_start flex_justify_start'>").appendTo(div);
+			var qaDiv = $("<div class='flex_vertical flex_align_start flex_justify_start width_100'>").appendTo(div);
 			
 			// question div
 			questionDiv = $("<a class='question'>").appendTo(qaDiv);
