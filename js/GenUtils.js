@@ -120,23 +120,6 @@ function isObject(arg, obj) {
 }
 
 /**
- * Polyfill for Object.assign([{...}, ...]).
- * 
- * @returns the merged object of the given arguments
- */
-function objectAssign() {
-	var objs = Array.prototype.slice.call(arguments);
-	objs.removeVal(undefined);
-	objs.removeVal(null);
-	return objs.reduce(function (r, o) {
-		Object.keys(o).forEach(function (k) {
-			r[k] = o[k];
-		});
-		return r;
-	}, {});
-}
-
-/**
  * Indicates if the given argument is a hexidemal string.
  * 
  * Credit: https://github.com/roryrjb/is-hex/blob/master/is-hex.js.
@@ -875,5 +858,44 @@ function getImages(paths, onDone) {
 			img.onerror = function() { onDone(new Error("Cannot load image: " + path)); }
 			img.src = path;
 		}
+	}
+}
+
+
+/**
+ * Inits polyfills.
+ */
+initPolyfills();
+function initPolyfills() {
+	
+	// Credit: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
+	if (typeof Object.assign != 'function') {
+	  // Must be writable: true, enumerable: false, configurable: true
+	  Object.defineProperty(Object, "assign", {
+	    value: function assign(target, varArgs) { // .length of function is 2
+	      'use strict';
+	      if (target == null) { // TypeError if undefined or null
+	        throw new TypeError('Cannot convert undefined or null to object');
+	      }
+
+	      var to = Object(target);
+
+	      for (var index = 1; index < arguments.length; index++) {
+	        var nextSource = arguments[index];
+
+	        if (nextSource != null) { // Skip over if undefined or null
+	          for (var nextKey in nextSource) {
+	            // Avoid bugs when hasOwnProperty is shadowed
+	            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+	              to[nextKey] = nextSource[nextKey];
+	            }
+	          }
+	        }
+	      }
+	      return to;
+	    },
+	    writable: true,
+	    configurable: true
+	  });
 	}
 }

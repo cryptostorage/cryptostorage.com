@@ -396,7 +396,7 @@ var AppUtils = {
 	renderQrCode: function(text, config, callback) {
 		
 		// merge configs
-		config = objectAssign({}, AppUtils.DefaultQrConfig, config);
+		config = Object.assign({}, AppUtils.DefaultQrConfig, config);
 
 		// generate QR code
 		var segments = [{data: text, mode: 'byte'}];	// manually specify mode
@@ -422,7 +422,7 @@ var AppUtils = {
 	applyKeyConfig: function(keys, config) {
 		
 		// merge config with default
-		config = objectAssign({}, getDefaultConfig(), config);
+		config = Object.assign({}, getDefaultConfig(), config);
 		function getDefaultConfig() {
 			return {
 				includePublic: true,
@@ -780,7 +780,7 @@ var AppUtils = {
 	 * @returns a new piece with the given configuration applied
 	 */
 	transformPiece: function(piece, config) {
-		config = objectAssign(getDefaultConfig(), config);
+		config = Object.assign(getDefaultConfig(), config);
 		var copy = JSON.parse(JSON.stringify(piece));
 		for (var i = 0; i < copy.keys.length; i++) {
 			var key = copy.keys[i];
@@ -1059,44 +1059,48 @@ var AppUtils = {
 	 * @param onDone(err, encryptedKey) is invoked when done (optional)
 	 */
 	encryptKey: function(key, scheme, passphrase, onProgress, onDone) {
+		
+		// validate input
 		try {
 			if (!scheme) throw new Error("Scheme must be initialized");
 			if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 			if (!passphrase) throw new Error("Passphrase must be initialized");
-			switch (scheme) {
-				case AppUtils.EncryptionScheme.CRYPTOJS:
-					try {
-						var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
-						key.setState(objectAssign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
-						if (onProgress) onProgress(1);
-						if (onDone) onDone(null, key);
-					} catch (err) {
-						if (onDone) onDone(err);
-					}
-					break;
-				case AppUtils.EncryptionScheme.BIP38:
-					try {
-						var decoded = bitcoinjs.decode(key.getWif());
-						bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
-							if (onProgress) onProgress(progress.percent / 100);
-						}, null, function(err, encryptedWif) {
-							try {
-								if (err) throw err;
-								key.setState(objectAssign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
-								if (onDone) onDone(null, key);
-							} catch (err) {
-								if (onDone) onDone(err);
-							}
-						});
-					} catch (err) {
-						if (onDone) onDone(err);
-					}
-					break;
-				default:
-					throw new Error("Encryption scheme '" + scheme + "' not supported");
-			}
 		} catch (err) {
 			if (onDone) onDone(err);
+		}
+		
+		// handle encryption scheme
+		switch (scheme) {
+			case AppUtils.EncryptionScheme.CRYPTOJS:
+				try {
+					var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
+					key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
+					if (onProgress) onProgress(1);
+					if (onDone) onDone(null, key);
+				} catch (err) {
+					if (onDone) onDone(err);
+				}
+				break;
+			case AppUtils.EncryptionScheme.BIP38:
+				try {
+					var decoded = bitcoinjs.decode(key.getWif());
+					bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
+						if (onProgress) onProgress(progress.percent / 100);
+					}, null, function(err, encryptedWif) {
+						try {
+							if (err) throw err;
+							key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
+							if (onDone) onDone(null, key);
+						} catch (err) {
+							if (onDone) onDone(err);
+						}
+					});
+				} catch (err) {
+					if (onDone) onDone(err);
+				}
+				break;
+			default:
+				if (onDone) onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
 		}
 	},
 	
@@ -1198,9 +1202,12 @@ var AppUtils = {
 				key.encrypt(scheme, passphrase, function(percent) {
 					if (onProgress) onProgress((doneWeight +  AppUtils.getWeightEncryptKey(scheme) * percent) / totalWeight, "Encrypting");
 				}, function(err, key) {
-					doneWeight += AppUtils.getWeightEncryptKey(scheme);
-					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
-					setImmediate(function() { onDone(err, key); });	// let UI breath
+					if (err) onDone(err);
+					else {
+						doneWeight += AppUtils.getWeightEncryptKey(scheme);
+						if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
+						setImmediate(function() { onDone(null, key); });	// let UI breath
+					}
 				});
 			}
 		}
@@ -1217,48 +1224,52 @@ var AppUtils = {
 	 * @param onDone(err, decryptedKey) is invoked when done (optional)
 	 */
 	decryptKey: function(key, passphrase, onProgress, onDone) {
+		
+		// validate input
 		try {
 			if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 			if (!passphrase) throw new Error("Passphrase must be initialized");
 			assertTrue(key.isEncrypted());
-			switch (key.getEncryptionScheme()) {
-				case AppUtils.EncryptionScheme.CRYPTOJS:
+		} catch (err) {
+			if (onDone) onDone(err);
+		}
+		
+		// handle encryption scheme
+		switch (key.getEncryptionScheme()) {
+			case AppUtils.EncryptionScheme.CRYPTOJS:
+				try {
+					var hex;
 					try {
-						var hex;
-						try {
-							hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
-						} catch (err) { }
-						if (!hex) throw new Error("Incorrect passphrase");
-						try {
-							key.setPrivateKey(hex);
-							if (onProgress) onProgress(1)
-							if (onDone) onDone(null, key);
-						} catch (err) {
-							throw new Error("Incorrect passphrase");
-						}
+						hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
+					} catch (err) { }
+					if (!hex) throw new Error("Incorrect passphrase");
+					try {
+						key.setPrivateKey(hex);
+						if (onProgress) onProgress(1)
+						if (onDone) onDone(null, key);
+					} catch (err) {
+						throw new Error("Incorrect passphrase");
+					}
+				} catch (err) {
+					if (onDone) onDone(err);
+				}
+				break;
+			case AppUtils.EncryptionScheme.BIP38:
+				bitcoinjs.decrypt(key.getWif(), passphrase, function(progress) {
+					if (onProgress) onProgress(progress.percent / 100);
+				}, null, function(err, decrypted) {
+					try {
+						if (err) throw new Error("Incorrect passphrase");
+						var privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
+						key.setPrivateKey(privateKey);
+						if (onDone) onDone(null, key);
 					} catch (err) {
 						if (onDone) onDone(err);
 					}
-					break;
-				case AppUtils.EncryptionScheme.BIP38:
-					bitcoinjs.decrypt(key.getWif(), passphrase, function(progress) {
-						if (onProgress) onProgress(progress.percent / 100);
-					}, null, function(err, decrypted) {
-						try {
-							if (err) throw new Error("Incorrect passphrase");
-							var privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
-							key.setPrivateKey(privateKey);
-							if (onDone) onDone(null, key);
-						} catch (err) {
-							if (onDone) onDone(err);
-						}
-					});
-					break;
-				default:
-					throw new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported");
-			}
-		} catch (err) {
-			if (onDone) onDone(err);
+				});
+				break;
+			default:
+				if (onDone) onDone(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
 		}
 	},
 	
@@ -1529,7 +1540,7 @@ var AppUtils = {
 		info.isLocal = AppUtils.isLocal();
 		info.runtimeError = AppUtils.RUNTIME_ERROR;
 		info.dependencyError = AppUtils.DEPENDENCY_ERROR;
-		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = objectAssign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
+		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = Object.assign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
 		info.checks = AppUtils.getEnvironmentChecks(info);
 		return info;
 	},
@@ -1545,7 +1556,7 @@ var AppUtils = {
 		AppUtils.isOnline(function(online) {
 			var info = AppUtils.getEnvironmentSync();
 			info.isOnline = online;
-			if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = objectAssign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
+			if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = Object.assign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
 			info.checks = AppUtils.getEnvironmentChecks(info);
 			if (onDone) onDone(info);
 		});

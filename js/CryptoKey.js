@@ -48,7 +48,7 @@ function CryptoKey(plugin, state) {
 	}
 	
 	this.setState = function(state) {
-		this.state = objectAssign({}, state);
+		this.state = Object.assign({}, state);
 	}
 	
 	this.random = function() {

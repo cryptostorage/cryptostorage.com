@@ -42,7 +42,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 	this.render = function(onProgress, onDone) {
 		
 		// merge default config with given confi
-		config = objectAssign({}, PieceRenderer.defaultConfig, config);
+		config = Object.assign({}, PieceRenderer.defaultConfig, config);
 		
 		// initialize divs if they weren't given
 		if (pieceDivs) assertEquals(pieceDivs.length, pieces.length);
@@ -103,7 +103,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		pieceDiv.addClass("piece_div");
 		
 		// merge configs
-		config = objectAssign({}, PieceRenderer.defaultConfig, config);
+		config = Object.assign({}, PieceRenderer.defaultConfig, config);
 
 		// setup pages and collect functions to render keys
 		var pageDiv;
@@ -295,7 +295,7 @@ PieceRenderer.defaultConfig = {
 PieceRenderer.getWeight = function(numKeys, numPieces, config) {
 	
 	// merge configs
-	config = objectAssign({}, PieceRenderer.defaultConfig, config);
+	config = Object.assign({}, PieceRenderer.defaultConfig, config);
 	
 	// get number of qr codes
 	var numQrs = numKeys * numPieces * 2;

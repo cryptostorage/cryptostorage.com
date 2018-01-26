@@ -74,7 +74,7 @@ var UiUtils = {
 	openStorage: function(browserTabName, config) {
 		
 		// deep copy config
-		config = objectAssign({}, config);
+		config = Object.assign({}, config);
 		
 		// default config
 		if (!isInitialized(config.showNotices)) config.showNotices = true;
@@ -3336,7 +3336,7 @@ function NoticeController(div, config) {
 	this.render = function(onDone) {
 		
 		// merge configs
-		config = objectAssign({}, getDefaultConfig(), config);
+		config = Object.assign({}, getDefaultConfig(), config);
 		
 		// listen for environment
 		var first = true;
