@@ -876,7 +876,6 @@ input[type='checkbox'][disabled] +label {
 }
 
 .donate_icon_name {
-	width: unset;
 	margin: 2px 0 5px 0px;
 }
 
