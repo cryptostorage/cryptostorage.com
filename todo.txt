@@ -1,6 +1,4 @@
 TODO
-flex not 100% width by default
-cross browser testing
 DivController.js not formatted in github
 final design review
 release
