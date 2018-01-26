@@ -3109,8 +3109,10 @@ function ExportController(div, window, config) {
 			var name = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
 			if (pieces.length === 1) {
 				var jsonStr = AppUtils.pieceToJson(transformedPieces[0]);
-				saveAs(new Blob([jsonStr]), name + ".json");
+				saveAs(new Blob([jsonStr], {type: "text/plain;charset=utf-8"}), name + ".json");
 			} else {
+				// TODO: cannot be async so must pre-load
+				// TODO: set content-type of blob to application/zip
 				AppUtils.piecesToZip(transformedPieces, function(blob) {
 					saveAs(blob, name + ".zip");
 				});
@@ -3122,7 +3124,7 @@ function ExportController(div, window, config) {
 		assertInitialized(config.pieces);
 		assertTrue(config.pieces.length > 0);
 		var publicAddressesStr = AppUtils.pieceToAddresses(config.pieces[0]);
-		saveAs(new Blob([publicAddressesStr]), "cryptostorage_" + AppUtils.getCommonTicker(config.pieces[0]).toLowerCase() + "_public_addresses.txt");
+		saveAs(new Blob([publicAddressesStr], {type: "text/plain;charset=utf-8"}), "cryptostorage_" + AppUtils.getCommonTicker(config.pieces[0]).toLowerCase() + "_public_addresses.txt");
 	}
 	
 	/**
