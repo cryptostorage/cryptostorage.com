@@ -2840,6 +2840,8 @@ function ExportController(div, window, config) {
 	var publicAvailable;
 	var privateAvailable;
 	var quickGenerate = isQuickGenerate();	// only show notice bar and key pair when completely done if quick generate
+	var saveBlob;	// cached blob to save when Save All clicked
+	var saveName;	// cached name to save when Save All clicked
 	
 	// confirm exit if storage not saved or printed
 	if (config.confirmExit) {
@@ -2939,6 +2941,8 @@ function ExportController(div, window, config) {
 		});
 	}
 	
+	// --------------------------------- PRIVATE --------------------------------
+	
 	/**
 	 * Internal renderer for export content.
 	 */
@@ -3025,8 +3029,6 @@ function ExportController(div, window, config) {
 	}
 	inheritsFrom(ExportContentController, DivController);
 	
-	// --------------------------------- PRIVATE --------------------------------
-	
 	function sortPieces() {
 		if (!config.pieces) return;
 		
@@ -3092,31 +3094,40 @@ function ExportController(div, window, config) {
 		}
 	}
 	
-	function saveAll(pieces) {
+	/**
+	 * Prepares to save all pieces.
+	 * 
+	 * @param pieces are the pieces to transform and save per the configuration
+	 * @param onDone(saveBlob, saveName) is invoked when ready
+	 */
+	function prepareSaveAll(pieces, onDone) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
+		
+		// transform pieces according to export config
+		var transformedPieces = [];
+		var config = getExportConfig();
+		for (var i = 0; i < pieces.length; i++) {
+			transformedPieces.push(AppUtils.transformPieces(pieces[i], config));
+		}
+		
+		// generate json or zip for save button
+		var saveName = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
+		if (pieces.length === 1) {
+			onDone(new Blob([AppUtils.pieceToJson(transformedPieces[0])], {type: "text/plain;charset=utf-8"}), saveName + ".json");
+		} else {
+			AppUtils.piecesToZip(transformedPieces, function(blob) {
+				onDone(blob, saveName + ".zip");
+			});
+		}
+	}
+	
+	/**
+	 * Saves all pieces.
+	 */
+	function saveAll() {
 		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this saved file because the private keys are not included.\n\nContinue?")) {
-			
-			// transform pieces according to export config
-			var transformedPieces = [];
-			var config = getExportConfig();
-			for (var i = 0; i < pieces.length; i++) {
-				transformedPieces.push(AppUtils.transformPiece(pieces[i], config));
-			}
-			
-			// save json or zip
-			saved = true;
-			var name = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
-			if (pieces.length === 1) {
-				var jsonStr = AppUtils.pieceToJson(transformedPieces[0]);
-				saveAs(new Blob([jsonStr], {type: "text/plain;charset=utf-8"}), name + ".json");
-			} else {
-				// TODO: cannot be async so must pre-load
-				// TODO: set content-type of blob to application/zip
-				AppUtils.piecesToZip(transformedPieces, function(blob) {
-					saveAs(blob, name + ".zip");
-				});
-			}
+			saveAs(saveBlob, saveName);
 		}
 	}
 	
@@ -3143,7 +3154,7 @@ function ExportController(div, window, config) {
 			showLogosCheckbox.removeAttr("disabled");
 			saveButton.addClass("export_button");
 			saveButton.removeClass("export_button_disabled");
-			saveButton.click(function() { saveAll(config.pieces); });
+			saveButton.click(function() { saveAll(); });
 			if (publicAvailable) {
 				savePublicButton.addClass("export_button");
 				savePublicButton.removeClass("export_button_disabled");
