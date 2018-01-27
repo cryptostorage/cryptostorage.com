@@ -2820,7 +2820,6 @@ function ExportController(div, window, config) {
 	DivController.call(this, div);
 	
 	// global variables
-	var saved = false;
 	var progressDiv;
 	var progressBar;
 	var progressLabel;
@@ -2833,8 +2832,6 @@ function ExportController(div, window, config) {
 	var paginator;
 	var piecesDiv;
 	var piecesLabel;
-	var controlsEnabled;
-	var printEnabled;
 	var lastRenderer;
 	var regenerateDiv;
 	var publicAvailable;
@@ -2842,6 +2839,7 @@ function ExportController(div, window, config) {
 	var quickGenerate = isQuickGenerate();	// only show notice bar and key pair when completely done if quick generate
 	var saveBlob;	// cached blob to save when Save All clicked
 	var saveName;	// cached name to save when Save All clicked
+	var controlState;
 	
 	// confirm exit if storage not saved or printed
 	if (config.confirmExit) {
@@ -2932,8 +2930,8 @@ function ExportController(div, window, config) {
 		}
 		
 		// controls disabled until ready
-		setControlsEnabled(false);
-		setPrintEnabled(false);
+		controlState = Object.assign({}, getControlsDisabledState());
+		setControlState(controlState);
 		
 		// load export content controller
 		new LoadController(new ExportContentController($("<div class='export_content_div flex_vertical'>").appendTo(div))).render(function() {
@@ -3087,7 +3085,7 @@ function ExportController(div, window, config) {
 	}
 	
 	function printAll() {
-		if (!printEnabled) return;
+		if (!controlState.printAll) return;
 		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this printed document because the private keys are not included.\n\nContinue?")) {
 			saved = true;
 			window.print();
@@ -3126,36 +3124,74 @@ function ExportController(div, window, config) {
 	 * Saves all pieces.
 	 */
 	function saveAll() {
+		if (!controlState.saveAll) return;
 		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this saved file because the private keys are not included.\n\nContinue?")) {
+			saved = true;
 			saveAs(saveBlob, saveName);
 		}
 	}
 	
+	/**
+	 * Save all public addresses.
+	 */
 	function savePublicAddresses() {
+		if (!controlState.savePublic) return;
 		assertInitialized(config.pieces);
 		assertTrue(config.pieces.length > 0);
 		var publicAddressesStr = AppUtils.pieceToAddresses(config.pieces[0]);
 		saveAs(new Blob([publicAddressesStr], {type: "text/plain;charset=utf-8"}), "cryptostorage_" + AppUtils.getCommonTicker(config.pieces[0]).toLowerCase() + "_public_addresses.txt");
 	}
 	
+	function getControlsDisabledState() {
+		return {
+			saveAll: false,
+			printAll: false,
+			savePublic: false,
+			checkboxes: false,
+			paginator: false
+		};
+	}
+	
 	/**
-	 * Enables or disables export controls.
+	 * Updates the control elements to be enabled/disabled.
 	 * 
-	 * Does not affect the print button which is controlled separately.
+	 * @param state specifies which control elements to enable/disable
 	 */
-	function setControlsEnabled(enabled) {
-		controlsEnabled = enabled;
-		saveButton.unbind("click");
-		savePublicButton.unbind("click");
-		updateHeaderCheckboxes();
-		if (paginator) paginator.pagination(enabled ? "enable" : "disable");
-		if (enabled) {
-			if (piecesLabel) piecesLabel.removeClass("disabled");
-			showLogosCheckbox.removeAttr("disabled");
-			saveButton.addClass("export_button");
-			saveButton.removeClass("export_button_disabled");
-			saveButton.click(function() { saveAll(); });
-			if (publicAvailable) {
+	function setControlsEnabled(state) {
+		
+		// merge configs
+		controlState = Object.assign(controlState, state);
+		
+		// save all button
+		if (isInitialized(state.saveAll)) {
+			saveButton.unbind("click");
+			if (state.saveAll) {
+				saveButton.addClass("export_button");
+				saveButton.removeClass("export_button_disabled");
+				saveButton.click(function() { saveAll(); });
+			} else {
+				saveButton.addClass("export_button_disabled");
+				saveButton.removeClass("export_button");
+			}
+		}
+		
+		// print all button
+		if (isInitialized(state.printAll)) {
+			printButton.unbind("click");
+			if (state.printAll) {
+				printButton.addClass("export_button");
+				printButton.removeClass("export_button_disabled");
+				printButton.click(function() { printAll(); });
+			} else {
+				printButton.addClass("export_button_disabled");
+				printButton.removeClass("export_button");
+			}
+		}
+		
+		// save public button
+		if (isInitialized(state.savePublic)) {
+			savePublicButton.unbind("click");
+			if (state.savePublic && publicAvailable) {
 				savePublicButton.addClass("export_button");
 				savePublicButton.removeClass("export_button_disabled");
 				savePublicButton.click(function() { savePublicAddresses(); });
@@ -3163,48 +3199,40 @@ function ExportController(div, window, config) {
 				savePublicButton.addClass("export_button_disabled");
 				savePublicButton.removeClass("export_button");
 			}
-		} else {
-			if (piecesLabel) piecesLabel.addClass("disabled");
-			saveButton.addClass("export_button_disabled");
-			saveButton.removeClass("export_button");
-			savePublicButton.addClass("export_button_disabled");
-			savePublicButton.removeClass("export_button");
-			showPublicCheckbox.attr("disabled", "disabled");
-			showPrivateCheckbox.attr("disabled", "disabled");
-			showLogosCheckbox.attr("disabled", "disabled");
 		}
-	}
-	
-	function setPrintEnabled(bool) {
-		printButton.unbind("click");
-		printEnabled = bool;
-		if (bool) {
-			printButton.addClass("export_button");
-			printButton.removeClass("export_button_disabled");
-			printButton.click(function() { printAll(); });
-		} else {
-			printButton.addClass("export_button_disabled");
-			printButton.removeClass("export_button");
+		
+		// paginator
+		if (isInitialized(state.paginator)) {
+			if (paginator) {
+				if (state.paginator) {
+					paginator.pagination("enable");
+					piecesLabel.removeClass("disabled");
+				} else {
+					paginator.pagination("disable");
+					piecesLabel.addClass("disabled");
+				}
+			}
 		}
-	}
-	
-	function updateHeaderCheckboxes() {
-		if (controlsEnabled) {
-			if (showPrivateCheckbox.prop('checked')) {
-				if (publicAvailable) showPublicCheckbox.removeAttr('disabled');
+		
+		// checkboxes
+		if (isInitialized(state.checkboxes)) {
+			if (state.checkboxes) {
+				if (showPrivateCheckbox.prop('checked')) {
+					if (publicAvailable) showPublicCheckbox.removeAttr('disabled');
+				} else {
+					showPublicCheckbox.attr('disabled', 'disabled')
+				}
+				if (showPublicCheckbox.prop('checked')) {
+					if (privateAvailable) showPrivateCheckbox.removeAttr('disabled');
+				} else {
+					showPrivateCheckbox.attr('disabled', 'disabled');
+				}
+				showLogosCheckbox.removeAttr('disabled');
 			} else {
-				showPublicCheckbox.attr('disabled', 'disabled')
+				showPublicCheckbox.attr('disabled');
+				showPrivateCheckbox.attr('disabled');
+				showLogosCheckbox.attr('disabled');
 			}
-			if (showPublicCheckbox.prop('checked')) {
-				if (privateAvailable) showPrivateCheckbox.removeAttr('disabled');
-			} else {
-				showPrivateCheckbox.attr('disabled', 'disabled');
-			}
-			showLogosCheckbox.removeAttr('disabled');
-		} else {
-			showPublicCheckbox.attr('disabled');
-			showPrivateCheckbox.attr('disabled');
-			showLogosCheckbox.attr('disabled');
 		}
 	}
 	
