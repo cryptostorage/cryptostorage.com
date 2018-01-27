@@ -3142,24 +3142,34 @@ function ExportController(div, window, config) {
 	}
 	
 	/**
+	 * Returns a control state that is completely enabled/disabled depending on the given boolean.
+	 * 
+	 * @param bool specifies if all states are enabled or disabled
+	 */
+	function getControlState(bool) {
+		return {
+			saveAll: bool,
+			printAll: bool,
+			savePublic: bool,
+			checkboxes: bool,
+			paginator: bool
+		};
+	}
+	
+	/**
 	 * Updates the control elements to be enabled/disabled.
 	 * 
 	 * @param state can be a boolean or object specifying which elements to enable/disable
 	 */
 	function setControlsEnabled(state) {
 		
+		console.log("setControlsEnabled()");
+		console.log(state);
+		
 		// set all states if boolean
 		if (isBoolean(state)) {
-			controlState = getControlState(state);			
-			function getControlState(bool) {
-				return {
-					saveAll: bool,
-					printAll: bool,
-					savePublic: bool,
-					checkboxes: bool,
-					paginator: bool
-				};
-			}
+			state = getControlState(state);
+			controlState = state;			
 		}
 		
 		// otherwise merge states
@@ -3280,14 +3290,18 @@ function ExportController(div, window, config) {
 				for (var i = 0; i < config.pieces.length; i++) config.pieceDivs.push($("<div>"));
 				//setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 				setPieceDivs(config.pieceDivs);
-				setPrintEnabled(false);
-				setControlsEnabled(true);
+				var state = getControlState(true);
+				state.printAll = false;
+				state.paginator = false;
+				console.log(state);
+				setControlsEnabled(state);
 				if (lastRenderer) lastRenderer.cancel();
 				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getExportConfig());
 				lastRenderer.render(null, function(err, pieceDivs) {
-					makePieceDivsCopyable(pieceDivs);
-					setPrintEnabled(true);
-					if (onDone) onDone();
+					update(config.pieceDivs, onDone);
+//					makePieceDivsCopyable(pieceDivs);
+//					setPrintEnabled(true);
+//					if (onDone) onDone();
 				});
 			}
 			
