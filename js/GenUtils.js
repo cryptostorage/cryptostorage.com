@@ -106,6 +106,16 @@ function isString(arg) {
 }
 
 /**
+ * Determines if the given argument is a boolean.
+ * 
+ * @param arg is the argument to test as being a boolean
+ * @returns true if the argument is a boolean, false otherwise
+ */
+function isBoolean(arg) {
+	return typeof(arg) == typeof(true);
+}
+
+/**
  * Indicates if the given argument is an object and optionally if it has the given constructor name.
  * 
  * @param arg is the argument to test

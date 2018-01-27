@@ -2930,8 +2930,7 @@ function ExportController(div, window, config) {
 		}
 		
 		// controls disabled until ready
-		controlState = Object.assign({}, getControlsDisabledState());
-		setControlState(controlState);
+		setControlsEnabled(false);
 		
 		// load export content controller
 		new LoadController(new ExportContentController($("<div class='export_content_div flex_vertical'>").appendTo(div))).render(function() {
@@ -3142,25 +3141,31 @@ function ExportController(div, window, config) {
 		saveAs(new Blob([publicAddressesStr], {type: "text/plain;charset=utf-8"}), "cryptostorage_" + AppUtils.getCommonTicker(config.pieces[0]).toLowerCase() + "_public_addresses.txt");
 	}
 	
-	function getControlsDisabledState() {
-		return {
-			saveAll: false,
-			printAll: false,
-			savePublic: false,
-			checkboxes: false,
-			paginator: false
-		};
-	}
-	
 	/**
 	 * Updates the control elements to be enabled/disabled.
 	 * 
-	 * @param state specifies which control elements to enable/disable
+	 * @param state can be a boolean or object specifying which elements to enable/disable
 	 */
 	function setControlsEnabled(state) {
 		
-		// merge configs
-		controlState = Object.assign(controlState, state);
+		// set all states if boolean
+		if (isBoolean(state)) {
+			controlState = getControlState(state);			
+			function getControlState(bool) {
+				return {
+					saveAll: bool,
+					printAll: bool,
+					savePublic: bool,
+					checkboxes: bool,
+					paginator: bool
+				};
+			}
+		}
+		
+		// otherwise merge states
+		else {
+			controlState = Object.assign(controlState, state);
+		}
 		
 		// save all button
 		if (isInitialized(state.saveAll)) {
@@ -3253,7 +3258,7 @@ function ExportController(div, window, config) {
 	}
 	
 	function update(_pieceDivs, onDone) {
-		updateHeaderCheckboxes();
+		setControlsEnabled({checkboxes: controlState.checkboxes});	// update control checkboxes
 		config.pieceDivs = _pieceDivs;
 		
 		// add piece divs if given
@@ -3262,7 +3267,6 @@ function ExportController(div, window, config) {
 			//setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(config.pieceDivs);
 			makePieceDivsCopyable(config.pieceDivs);
-			setPrintEnabled(true);
 			setControlsEnabled(true);
 			if (onDone) onDone();
 		}
