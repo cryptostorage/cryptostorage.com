@@ -3278,8 +3278,10 @@ function ExportController(div, window, config) {
 			//setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(config.pieceDivs);
 			makePieceDivsCopyable(config.pieceDivs);
-			setControlsEnabled(true);
-			if (onDone) onDone();
+			prepareSaveAll(config.pieces, function() {
+				setControlsEnabled(true);
+				if (onDone) onDone();
+			});
 		}
 		
 		// else render from config.pieces
@@ -3296,13 +3298,15 @@ function ExportController(div, window, config) {
 				state.paginator = false;
 				console.log(state);
 				setControlsEnabled(state);
-				if (lastRenderer) lastRenderer.cancel();
-				lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getExportConfig());
-				lastRenderer.render(null, function(err, pieceDivs) {
-					update(config.pieceDivs, onDone);
-//					makePieceDivsCopyable(pieceDivs);
-//					setPrintEnabled(true);
-//					if (onDone) onDone();
+				prepareSaveAll(config.pieces, function() {
+					if (lastRenderer) lastRenderer.cancel();
+					lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getExportConfig());
+					lastRenderer.render(null, function(err, pieceDivs) {
+						update(config.pieceDivs, onDone);
+//						makePieceDivsCopyable(pieceDivs);
+//						setPrintEnabled(true);
+//						if (onDone) onDone();
+					});
 				});
 			}
 			
