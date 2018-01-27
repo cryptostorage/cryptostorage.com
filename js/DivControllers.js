@@ -3093,10 +3093,10 @@ function ExportController(div, window, config) {
 	}
 	
 	/**
-	 * Prepares to save all pieces.
+	 * Caches the file and name for Save All.
 	 * 
 	 * @param pieces are the pieces to transform and save per the configuration
-	 * @param onDone(saveBlob, saveName) is invoked when ready
+	 * @param onDone() is invoked when ready
 	 */
 	function prepareSaveAll(pieces, onDone) {
 		assertInitialized(pieces);
@@ -3106,16 +3106,20 @@ function ExportController(div, window, config) {
 		var transformedPieces = [];
 		var config = getExportConfig();
 		for (var i = 0; i < pieces.length; i++) {
-			transformedPieces.push(AppUtils.transformPieces(pieces[i], config));
+			transformedPieces.push(AppUtils.transformPiece(pieces[i], config));
 		}
 		
 		// generate json or zip for save button
-		var saveName = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
+		saveName = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
 		if (pieces.length === 1) {
-			onDone(new Blob([AppUtils.pieceToJson(transformedPieces[0])], {type: "text/plain;charset=utf-8"}), saveName + ".json");
+			saveBlob = new Blob([AppUtils.pieceToJson(transformedPieces[0])], {type: "text/plain;charset=utf-8"});
+			saveName = saveName + ".json";
+			onDone();
 		} else {
 			AppUtils.piecesToZip(transformedPieces, function(blob) {
-				onDone(blob, saveName + ".zip");
+				saveBlob = blob;
+				saveName = saveName + ".zip";
+				onDone();
 			});
 		}
 	}
@@ -3163,9 +3167,6 @@ function ExportController(div, window, config) {
 	 * @param state can be a boolean or object specifying which elements to enable/disable
 	 */
 	function setControlsEnabled(state) {
-		
-		console.log("setControlsEnabled()");
-		console.log(state);
 		
 		// set all states if boolean
 		if (isBoolean(state)) {
