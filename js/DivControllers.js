@@ -2820,6 +2820,7 @@ function ExportController(div, window, config) {
 	DivController.call(this, div);
 	
 	// global variables
+	var saved = false;
 	var progressDiv;
 	var progressBar;
 	var progressLabel;
@@ -2837,9 +2838,9 @@ function ExportController(div, window, config) {
 	var publicAvailable;
 	var privateAvailable;
 	var quickGenerate = isQuickGenerate();	// only show notice bar and key pair when completely done if quick generate
-	var saveBlob;	// cached blob to save when Save All clicked
-	var saveName;	// cached name to save when Save All clicked
-	var controlState;
+	var saveBlob;														// cached blob to save when Save All clicked
+	var saveName;														// cached name to save when Save All clicked
+	var controlState;												// tracks enable/disable state of control elements
 	
 	// confirm exit if storage not saved or printed
 	if (config.confirmExit) {
@@ -3244,9 +3245,9 @@ function ExportController(div, window, config) {
 				}
 				showLogosCheckbox.removeAttr('disabled');
 			} else {
-				showPublicCheckbox.attr('disabled');
-				showPrivateCheckbox.attr('disabled');
-				showLogosCheckbox.attr('disabled');
+				showPublicCheckbox.attr('disabled', 'disabled');
+				showPrivateCheckbox.attr('disabled', 'disabled');
+				showLogosCheckbox.attr('disabled', 'disabled');
 			}
 		}
 	}
