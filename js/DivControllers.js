@@ -3297,16 +3297,12 @@ function ExportController(div, window, config) {
 				var state = getControlState(true);
 				state.printAll = false;
 				state.paginator = false;
-				console.log(state);
 				setControlsEnabled(state);
 				prepareSaveAll(config.pieces, function() {
 					if (lastRenderer) lastRenderer.cancel();
 					lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getExportConfig());
 					lastRenderer.render(null, function(err, pieceDivs) {
 						update(config.pieceDivs, onDone);
-//						makePieceDivsCopyable(pieceDivs);
-//						setPrintEnabled(true);
-//						if (onDone) onDone();
 					});
 				});
 			}

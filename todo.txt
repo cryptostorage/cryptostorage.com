@@ -1,5 +1,4 @@
 TODO
-dynamic json and text content types
 final design review
 release
 social media
