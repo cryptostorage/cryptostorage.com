@@ -51,12 +51,12 @@ var AppUtils = {
 	MIN_PASSWORD_LENGTH: 7,
 	CRYPTOSTORAGE_URL: "https://cryptostorage.com",
 	ONLINE_IMAGE_URL: "https://cryptostorage.com/favicon.ico",
-	ENVIRONMENT_REFRESH_RATE: 8000,	// environment refresh rate in milliseconds
-	ONLINE_DETECTION_TIMEOUT: 8000,	// timeout to detect if online
-	SLIDER_RATE: 4000,							// rate of slider transitions
-	NO_INTERNET_CAN_BE_ERROR: true,	// lack of internet can be critical error if running remotely
-	SIMULATED_LOAD_TIME: null,			// simulate slow load times in ms, disabled if null
-	IGNORE_HASH_CHANGE: false,			// specifies that the browser should ignore hash changes
+	ENVIRONMENT_REFRESH_RATE: 8000,		// environment refresh rate in milliseconds
+	ONLINE_DETECTION_TIMEOUT: 8000,		// timeout to detect if online
+	SLIDER_RATE: 4000,								// rate of slider transitions
+	NO_INTERNET_CAN_BE_ERROR: false,	// lack of internet can be critical error if running remotely
+	SIMULATED_LOAD_TIME: null,				// simulate slow load times in ms, disabled if null
+	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	
 	/**
 	 * Mock environment checks.
@@ -227,6 +227,7 @@ var AppUtils = {
 			"lib/clipboard.js",
 			"js/CryptoKey.js",
 			"js/Tests.js",
+			"js/BodyExporter.js",
 			"lib/jquery.ddslick.js",
 			"img/loading.gif",
 			"img/information.png",
@@ -244,6 +245,7 @@ var AppUtils = {
 		// add dependencies
 		dependencies = dependencies.concat(AppUtils.getCryptoDependencies());
 		dependencies = dependencies.concat(AppUtils.getNoticeDependencies());
+		dependencies = dependencies.concat(AppUtils.getExportDependencies());
 		
 		// return unique array
 		return toUniqueArray(dependencies);

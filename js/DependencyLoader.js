@@ -98,7 +98,7 @@ function DependencyLoader() {
 		function getImagesFunc(paths) {
 			return function(onDone) {
 				getImages(paths, function(err) {
-					if (err) onDone(err);
+					if (err) onDone(new Error("Failed to load images: " + paths));
 					else {
 						loadedImages = loadedImages.concat(paths);
 						onDone();
