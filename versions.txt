@@ -7,5 +7,6 @@ cryptostorage.com-v0.0.1-alpha
 - Print paper wallets for long term storage.
 - Runs 100% in your browser so funds are never entrusted to a third party.
 - 100% open-source and free to use.  No account necessary.
-- Passphrase protect and split private keys for maximum security.
+- Passphrase-protect and split private keys for maximum security.
+- Supports BIP38 encryption for Bitcoin and Bitcoin Cash.
 - Generate keys securely with automated environment checks.
