@@ -18,8 +18,8 @@ all checks pass design
 blue link against red notice is hard to read
 refresh image on regenerate button
 new window dependencies are not reliably cached
-link back to cryptostorage home from export window
 credits design
+link back to import / homepage from export
 
 low priority:
 ddslick animation could be cleaner
