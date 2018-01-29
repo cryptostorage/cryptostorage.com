@@ -1,11 +1,11 @@
 Full source code history: https://github.com/cryptostorage/cryptostorage.com
 
-01/20/2018
+01/31/2018
 cryptostorage.com-v0.0.1-alpha
 - First release!
 - Create cold storage for multiple cryptocurrencies.
 - Print paper wallets for long term storage.
 - Runs 100% in your browser so funds are never entrusted to a third party.
-- 100% open source and free to use.  No account necessary.
+- 100% open-source and free to use.  No account necessary.
 - Passphrase protect and split private keys for maximum security.
 - Generate keys securely with automated environment checks.
