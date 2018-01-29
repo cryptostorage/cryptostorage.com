@@ -8,10 +8,11 @@ This tool is security-focused. Keys are generated only in your device's browser 
 - 100% open-source, client-side, and free to use.
 - Keys are generated only in your browser and are never entrusted to a third party.
 - Create paper wallets or save to flash drive for safe, long-term storage.
-- Passphrase protect and split private keys for maximum security.
+- Passphrase-protect and split private keys for maximum security.
+- Supports BIP38 encryption for Bitcoin and Bitcoin Cash.
 - Automatic security checks encourage keys to be generated in a secure environment.
-	- Encourages application to be downloaded and run offline.
 	- Encourages internet to be disconnected.
+	- Encourages tool to be downloaded and run offline.
 	- Encourages use of an open-source browser.
 	- Encourages use of an open-source operating system.
 	
@@ -93,7 +94,7 @@ Please see https://cryptostorage.com/#faq.
 
 # Contact
 
-To report a bug, please submit an issue to https://github.com/cryptostorage/cryptostorage.com/issues.
+To report a bug or request a feature, please submit an issue to https://github.com/cryptostorage/cryptostorage.com/issues.
 
 For community discussion, please join the conversation on Reddit at https://reddit.com/r/cryptostorage.
 

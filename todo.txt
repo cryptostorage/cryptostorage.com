@@ -1,6 +1,4 @@
 TODO
-export buttons no word wrap
-final design review
 release
 social media
 announce

@@ -1262,7 +1262,7 @@ input[type='checkbox'][disabled] +label {
 
 .export_div {
 	align-items: center;
-	min-width: 750px;
+	min-width: 775px;
 	-webkit-text-size-adjust: 100%;
 	background-color: white;
 }
@@ -1298,6 +1298,7 @@ input[type='checkbox'][disabled] +label {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	white-space: nowrap;
 }
 
 .export_button:hover {

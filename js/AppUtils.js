@@ -1605,16 +1605,16 @@ var AppUtils = {
 			}
 		}
 		
-		// check if local
-		if (isInitialized(info.isLocal)) {
-			if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
-			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
-		}
-		
 		// check if online
 		if (!internetRequiredError && !info.dependencyError && isInitialized(info.isOnline)) {
 			if (!info.isOnline) checks.push({state: "pass", code: AppUtils.EnvironmentCode.INTERNET});
 			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.INTERNET});
+		}
+		
+		// check if local
+		if (isInitialized(info.isLocal)) {
+			if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
 		}
 		
 		// check open-source browser

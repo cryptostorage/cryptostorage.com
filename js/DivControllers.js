@@ -324,10 +324,10 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			// intro slider
 			sliderDiv = $("<div class='slider_div'>").appendTo(div);
 			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
-			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long term storage.").appendTo(sliderDiv);
+			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long-term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
-			getSlide($("<img src='img/keys.png'>"), "Split and passphrase protect private keys for maximum security.").appendTo(sliderDiv);
+			getSlide($("<img src='img/keys.png'>"), "Passphrase-protect and split private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automatic environment checks.").appendTo(sliderDiv);
 			
 			function getSlide(img, text) {
@@ -419,22 +419,22 @@ function HomeController(div) {
 			
 			// sample page section
 			pageDiv.append("<div style='height: 70px'>");
-			pageDiv.append("<div class='home_label'>Export to printable and digital formats for long term storage</div>");
+			pageDiv.append("<div class='home_label'>Export to printable and digital formats for long-term storage</div>");
 			pageDiv.append("<div class='home_description'>Save keys to a file which can be stored on a flash drive, or print to paper to easily create paper wallets.</div>")
 			pageDiv.append($("<img width=750px src='img/print_example.png'>"));
 			
-			// check environment section
+			// split and passphrase section
 			pageDiv.append("<div style='height: 10px'>");
+			pageDiv.append("<div class='home_label'>Passphrase-protect and split private keys for maximum security</div>");
+			pageDiv.append("<div class='home_description'>Encrypt private keys with a passphrase or split them into pieces so funds are not accessible at any one location.  Set how many pieces are needed to recover the keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
+			pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
+			pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
+			
+			// check environment section
+			pageDiv.append("<div style='height: 70px'>");
 			pageDiv.append("<div class='home_label'>Generate keys securely with automatic environment checks</div>");
 			pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Automatic environment checks encourage keys to be generated in a secure environment.</div>")
 			pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
-			
-			// split and passphrase section
-			pageDiv.append("<div style='height: 70px'>");
-			pageDiv.append("<div class='home_label'>Split and passphrase protect private keys for maximum security</div>");
-			pageDiv.append("<div class='home_description'>Split storage into multiple pieces which can be stored independently.  Set how many pieces are needed to recover the keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
-			pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
-			pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
 			
 			// cryptography section
 			pageDiv.append("<div style='height:70px'>");
@@ -675,7 +675,7 @@ function FaqController(div) {
 				}, {
 					id: "faq_contact",
 					getQuestion: function() { return "I still need help.  Who can I contact?"; },
-					getAnswer: function() { return "<p>To report a bug, please submit an issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
+					getAnswer: function() { return "<p>To report a bug or request a feature, please submit an issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
 						"<p>For community discussion, please join the conversation on Reddit at <a href='https://reddit.com/r/cryptostorage'>https://reddit.com/r/cryptostorage</a>.</p>" +
 						"<p>For email support, please email <a href='mailto:support@cryptostorage.com'>support@cryptostorage.com</a>.  Emails are answered on a best-effort basis only.</p>" +
 						"<p><i>No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost.</i></p>"
@@ -881,7 +881,7 @@ function DonateController(div, appController) {
 				var credits = [];
 				credits.push({
 					title: $("<a target='_blank' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a>"),
-					address: "0x5735bb7cec965e58d03dddd167d1f27321878c51",
+					address: "0xD941B9c22ebF54Af09996e6aad41D08aFD8dd85a",
 					currencyPlugin: AppUtils.getCryptoPlugin("ETH") 
 				});
 				credits.push({
