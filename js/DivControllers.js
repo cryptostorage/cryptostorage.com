@@ -881,7 +881,7 @@ function DonateController(div, appController) {
 				var credits = [];
 				credits.push({
 					title: $("<a target='_blank' href='https://github.com/gregdracoulis'>UI design - github.com/gregdracoulis</a>"),
-					address: "0x5735bb7cec965e58d03dddd167d1f27321878c51",
+					address: "0xD941B9c22ebF54Af09996e6aad41D08aFD8dd85a",
 					currencyPlugin: AppUtils.getCryptoPlugin("ETH") 
 				});
 				credits.push({
