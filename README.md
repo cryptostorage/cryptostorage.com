@@ -93,7 +93,7 @@ Please see https://cryptostorage.com/#faq.
 
 # Contact
 
-To report a bug, please submit an issue to https://github.com/cryptostorage/cryptostorage.com/issues.
+To report a bug or request a feature, please submit an issue to https://github.com/cryptostorage/cryptostorage.com/issues.
 
 For community discussion, please join the conversation on Reddit at https://reddit.com/r/cryptostorage.
 
