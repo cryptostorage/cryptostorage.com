@@ -1797,6 +1797,7 @@ function ImportFileController(div) {
 	var warningDiv;
 	var warningMsg;
 	var fileInputDiv;							// drag and drop and imported pieces
+	var inputFiles;
 	var decryptionDiv;						// password input and decryption
 	var importedNamedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
 	var importedPiecesDiv;				// shows imported items
@@ -1835,7 +1836,7 @@ function ImportFileController(div) {
 		dragDropBrowse.append("or click to browse");
 		
 		// register browse link with hidden input
-		var inputFiles = $("<input type='file' multiple accept='.json,.zip'>").appendTo(dragDropDiv);
+		inputFiles = $("<input type='file' multiple accept='.json,.zip'>").appendTo(dragDropDiv);
 		inputFiles.change(function() { onFilesImported($(this).get(0).files); });
 		inputFiles.hide();
 		dragDropBrowse.click(function() {
@@ -1897,6 +1898,7 @@ function ImportFileController(div) {
 	
 	this.startOver = function() {
 		that.setWarning("");
+		inputFiles.val("");
 		importedStorageDiv.hide();
 		importInputDiv.show();
 		fileInputDiv.show();
