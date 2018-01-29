@@ -1262,7 +1262,7 @@ input[type='checkbox'][disabled] +label {
 
 .export_div {
 	align-items: center;
-	min-width: 875px;
+	min-width: 775px;
 	-webkit-text-size-adjust: 100%;
 	background-color: white;
 }
