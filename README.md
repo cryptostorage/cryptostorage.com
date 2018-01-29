@@ -13,8 +13,8 @@ This tool is security-focused. Keys are generated only in your device's browser 
 - Automatic security checks encourage keys to be generated in a secure environment.
 	- Encourages internet to be disconnected.
 	- Encourages tool to be downloaded and run offline.
-	- Encourages use of an open-source browser.
-	- Encourages use of an open-source operating system.
+	- Encourages using an open-source browser.
+	- Encourages using an open-source operating system.
 	
 # Supported Tokens
 - Bitcoin
