@@ -2881,15 +2881,15 @@ function ExportController(div, window, config) {
 		var exportCheckboxes = $("<div class='export_checkboxes flex_horizontal'>").appendTo(exportControls);
 		showPublicCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
 		var showPublicCheckboxLabel = $("<label class='export_checkbox_label' for='showPublicCheckbox'>").appendTo(exportCheckboxes);
-		showPublicCheckboxLabel.html("Show public addresses");
+		showPublicCheckboxLabel.html("Include public addresses");
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
 		showPrivateCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
 		var showPrivateCheckboxLabel = $("<label class='export_checkbox_label' for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
-		showPrivateCheckboxLabel.html("Show private keys");
+		showPrivateCheckboxLabel.html("Include private keys");
 		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
 		showLogosCheckbox = $("<input type='checkbox' class='export_checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
 		var showLogosCheckboxLabel = $("<label class='export_checkbox_label' for='showLogosCheckbox'>").appendTo(exportCheckboxes);
-		showLogosCheckboxLabel.html("Show logos");
+		showLogosCheckboxLabel.html("Include logos");
 		
 		// apply default checkbox state
 		publicAvailable = (!config.keys && !config.pieces) || isPublicAvailable(config.keys, config.pieces);
