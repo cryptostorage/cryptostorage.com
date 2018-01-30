@@ -1,20 +1,21 @@
 # Introduction
-CryptoStorage is an open-source tool to generate offline storage for multiple cryptocurrencies.  This tool generates [key pairs](https://cryptostorage.com/#faq_key_pair) in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be saved to file or printed to paper for long-term "cold" storage.
+CryptoStorage is an open-source tool to generate offline storage for multiple cryptocurrencies as securely and easily as possible.  This tool generates [key pairs](https://cryptostorage.com/#faq_key_pair) in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be printed to paper or saved to file for long-term "cold" storage.
 
-This tool is security-focused. Keys are generated only in your device's browser so funds are never entrusted to a third party.  Keys can be passphrase-protected and [split into pieces](https://cryptostorage.com/#faq_split_keys) which can be geographically separated so funds are not accessible at any one location.  [Recommendations](https://cryptostorage.com/#faq_recommendations) are automatically provided to improve the security of the tool's environment.
+This tool is security-focused.  Keys are generated only in your device's browser so funds are never entrusted to a third party.  Keys can be passphrase-protected and [split into pieces](https://cryptostorage.com/#faq_split_keys) which can be geographically separated so funds are not accessible at any one location.  [Recommendations](https://cryptostorage.com/#faq_recommendations) are automatically provided to improve the security of the tool's environment.
 
 # Main Features
-- Generate secure cold storage for multiple cryptocurrencies.
+- Securely generate offline storage for multiple cryptocurrencies.
+- Keys are generated only in your browser so funds are never entrusted to a third party by design.
 - 100% open-source, client-side, and free to use.
-- Keys are generated only in your browser and are never entrusted to a third party.
+- Passphrase-protect all private keys.
+- Encrypt Bitcoin and Bitcoin Cash private keys with BIP38.
+- Split storage into pieces which can be geographically separated so funds are not accessible at any one location.
 - Create paper wallets or save to flash drive for long-term storage.
-- Passphrase-protect and split private keys for maximum security.
-- Supports BIP38 encryption for Bitcoin and Bitcoin Cash.
-- Automatic security checks encourage keys to be generated in a secure environment.
-	- Encourages internet to be disconnected.
-	- Encourages tool to be downloaded and run offline.
-	- Encourages using an open-source browser.
-	- Encourages using an open-source operating system.
+- Follow security recommendations to improve the security of the tool's environment:
+	- Checks if the internet connection is active
+	- Checks if the tool is downloaded and running locally
+	- Checks if the browser is open-source
+	- Checks if the operating system is open-source
 	
 # Supported Tokens
 - Bitcoin
