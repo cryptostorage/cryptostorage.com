@@ -259,11 +259,13 @@ function BitcoinCashPlugin() {
 	this.newKey = function(str) {
 		var key = bitcoinPlugin.newKey(str);
 		key.setPlugin(this);
+		if (!key.getAddress()) return key;
 		var address = bchaddr.toCashAddress(key.getAddress());
-		key.setAddress(address.substring(address.indexOf(':') + 1), true);	// override address
-		return key;		
+		key.setAddress(address.substring(address.indexOf(':') + 1), true);	// override address with CashAddr format
+		return key;
 	}
 	this.isAddress = function(str) {
+		if (bitcoinPlugin.isAddress(str)) return true;
 		try {
 			return bchaddr.isCashAddress(str);
 		} catch (err) {
