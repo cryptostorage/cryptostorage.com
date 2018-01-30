@@ -185,6 +185,7 @@ var AppUtils = {
 			"lib/progressbar.js",
 			"lib/bitaddress.js",
 			"lib/clipboard.js",
+			"lib/polyfill.js",
 			"js/CryptoKey.js",
 			"lib/setImmediate.js",
 			"img/cryptostorage_export.png",
