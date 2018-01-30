@@ -10,7 +10,7 @@ This tool is security-focused.  Keys are generated only in your device's browser
 - Passphrase-protect all private keys.
 - Encrypt Bitcoin and Bitcoin Cash private keys with BIP38.
 - Split storage into pieces which can be geographically separated so funds are not accessible at any one location.
-- Create paper wallets or save to flash drive for long-term storage.
+- Create paper wallets or save to file for long-term storage.
 - Follow security recommendations to improve the security of the tool's environment:
 	- Checks if the internet connection is active
 	- Checks if the tool is downloaded and running locally
