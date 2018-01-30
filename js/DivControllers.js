@@ -627,12 +627,12 @@ function FaqController(div) {
 						answerDiv.append("<p>The source code can be verified in two ways.  Either method is sufficient.");
 						answerDiv.append($("<p>Method #1: Verify the source code has the correct checksum.</p>"));
 						var verify1List = $("<ol>").appendTo(answerDiv);
-						verify1List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip and checksum.txt from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p></li>");
+						verify1List.append("<li><p>Download cryptostorage-<i>[version]</i>.zip and cryptostorage-<i>[version]</i>-checksum.txt from the <a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com/releases'>latest release on GitHub</a>.</p></li>");
 						verify1List.append("<li><p>Determine the SHA256 hash of the zip file.  Instructions depend on your operating system.</p>" +
 								"</p>Linux: <div class='terminal_cmd'>sha256sum cryptostorage-<i>[version]</i>.zip</div></p>" + 
 								"<p>Mac: <div class='terminal_cmd'>openssl sha -sha256 cryptostorage-<i>[version]</i>.zip</div></p>" + 
 								"<p>Windows: <div class='terminal_cmd'>certUtil -hashfile cryptostorage-<i>[version]</i>.zip SHA256</div></p></li>");
-						verify1List.append("<li>Verify that the checksum matches the contents of the downloaded checksum.txt.</li>");
+						verify1List.append("<li>Verify that the checksum matches the contents of the previously downloaded cryptostorage-<i>[version]</i>-checksum.txt.</li>");
 						answerDiv.append($("<p>Method #2: Verify the source code has been signed by the developer's PGP key.</p>"));
 						var verify2List = $("<ol>").appendTo(answerDiv);
 						verify2List.append("<li><p>Install <a target='_blank' href='https://www.openpgp.org/'>PGP software</a> on your device.</p></li>");
@@ -644,7 +644,7 @@ function FaqController(div) {
 								"<p><div class='terminal_cmd'>gpg --verify cryptostorage-<i>[version]</i>.sig cryptostorage-<i>[version]</i>.zip</div></p>" +
 								"<p>You should see output with this RSA key:</p>" +
 								"<p><div class='terminal_cmd'>gpg: Signature made Fri Jan 12 09:22:37 2018 EST<br>gpg:                using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF<br>gpg: Good signature ...</div></p>" +
-								"<p>The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.</p>" +
+								"<p>The RSA key will also match the contents of the previously downloaded woodser-pgp-fingerprint.txt.</p>" +
 								"<p>Note: You will probably also see a warning that the key is not certified with a trusted signature.  This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.</p></li>");
 						return answerDiv;
 					}

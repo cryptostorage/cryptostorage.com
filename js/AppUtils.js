@@ -41,7 +41,7 @@ var AppUtils = {
 		
 	// app constants
 	VERSION: "0.0.1",
-	VERSION_POSTFIX: "-alpha",
+	VERSION_POSTFIX: "",
 	RUN_MIN_TESTS: true,
 	RUN_FULL_TESTS: false,
 	DEV_MODE: true,
