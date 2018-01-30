@@ -86,7 +86,7 @@ The source code can be verified in two ways. Either method is sufficient.
     gpg: using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF
     gpg: Good signature ...
     ```
-    The RSA key will also match the contents of the downloaded woodser-pgp-fingerprint.txt.<br><br>
+    The RSA key will also match the contents of the previously downloaded woodser-pgp-fingerprint.txt.<br><br>
     Note: You will probably also see a warning that the key is not certified with a trusted signature. This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.
 
 # Frequently Asked Questions
