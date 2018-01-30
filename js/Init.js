@@ -60,10 +60,10 @@ $(document).ready(function() {
 				
 				// run full tests
 				if (AppUtils.RUN_FULL_TESTS) {
-					console.log("Running tests...");
+					console.log("Running test suite...");
 					Tests.runTests(function(err) {
 						if (err) throw error;
-						console.log("All tests pass");
+						console.log("Test suite passes");
 					});
 				}
 			});
