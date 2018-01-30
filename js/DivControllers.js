@@ -442,7 +442,7 @@ function HomeController(div) {
 			hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
 			var vFlex = $("<div class='flex_vertical width_100'>").appendTo(hFlex);
 			vFlex.append("<div class='home_label'>Strong cryptography</div>");
-			vFlex.append("<div class='home_description'>Uses the latest window.crypto API available in browsers, which gives access to a cryptographically secure random number generator. This allows generation of random values as seeds for your keys.</div>");
+			vFlex.append("<div class='home_description'>Uses the latest window.crypto API available in browsers which provides access to a cryptographically secure random number generator. This allows generation of random values as seeds for your keys.</div>");
 			
 			// download section
 			pageDiv.append("<div style='height: 70px'>");
@@ -550,8 +550,8 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is CryptoStorage?"; },
-					getAnswer: function() { return "<p>CryptoStorage is an open-source tool to generate cryptocurrency storage easily and securely.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency offline (i.e. without exposing private keys to an internet-connected device).  Generated key pairs can be printed to paper or saved to file for long-term \"cold\" storage.</p>" +
-						"<p>This tool is security-focused.  Keys are generated only in your device's browser so funds are never entrusted to a third party.  Keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations are automatically provided</a> to improve the security of the tool's environment.</p>";
+					getAnswer: function() { return "<p>CryptoStorage is an open-source tool to generate cryptocurrency storage easily and securely.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency offline (i.e. without exposing private keys to an internet-connected device).  Generated key pairs can be saved to file or printed to paper for long-term \"cold\" storage.</p>" +
+						"<p>This tool is security-focused.  Keys are generated only in your device's browser so funds are never entrusted to a third party.  Keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations </a> are automatically provided to improve the security of the tool's environment.</p>";
 					}
 				}, {
 					id: "faq_key_pair",
