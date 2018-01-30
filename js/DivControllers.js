@@ -567,7 +567,7 @@ function FaqController(div) {
 						"<p>Second, private keys may be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
 						"<p>Third, private keys may be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one physical location.</p>" +
 						"<p>Fourth, keys may be saved to a digital file or printed paper for long-term storage.</p>" +
-						"<p>Finally, this tool <a href='#faq_recommendations'>automatically detects and recommends</a> ways to improve the security of the its environment.</p>"; }
+						"<p>Finally, this tool <a href='#faq_recommendations'>automatically detects and recommends</a> ways to improve the security of its environment.</p>"; }
 				}, {
 					id: "faq_recommendations",
 					getQuestion: function() { return "What security recommendations does CryptoStorage make?"; },
@@ -652,7 +652,7 @@ function FaqController(div) {
 					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this tool?"; },
 					getAnswer: function() { return "<p>CryptoStorage is 100% open-source which means anyone can review the source code.</p>" +
-						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publicly reviewed.</p>"; }
+						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publicly reviewed and has not been modified by an attacker.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",
 					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
@@ -675,7 +675,7 @@ function FaqController(div) {
 				}, {
 					id: "faq_contact",
 					getQuestion: function() { return "I still need help.  Who can I contact?"; },
-					getAnswer: function() { return "<p>To report a bug or request a feature, please submit an issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
+					getAnswer: function() { return "<p>For bug reports and feature requests, please submit an issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
 						"<p>For community discussion, please join the conversation on Reddit at <a href='https://reddit.com/r/cryptostorage'>https://reddit.com/r/cryptostorage</a>.</p>" +
 						"<p>For email support, please email <a href='mailto:support@cryptostorage.com'>support@cryptostorage.com</a>.  Emails are answered on a best-effort basis only.</p>" +
 						"<p><i>No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost.</i></p>"
