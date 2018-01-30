@@ -323,7 +323,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			
 			// intro slider
 			sliderDiv = $("<div class='slider_div'>").appendTo(div);
-			getSlide($(mixImg), "Create cold storage for multiple cryptocurrencies.").appendTo(sliderDiv);
+			getSlide($(mixImg), "Create offline storage for multiple cryptocurrencies.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets for long-term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
@@ -550,7 +550,7 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is CryptoStorage?"; },
-					getAnswer: function() { return "<p>CryptoStorage is an open-source tool to generate offline storage for multiple cryptocurrencies as securely and easily as possible.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be printed to paper or saved to file for long-term \"cold\" storage.</p>" +
+					getAnswer: function() { return "<p>CryptoStorage is an open-source tool to create offline storage for multiple cryptocurrencies as securely and easily as possible.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be printed to paper or saved to file for long-term \"cold\" storage.</p>" +
 						"<p>This tool is security-focused.  Keys are generated only in your device's browser so funds are never entrusted to a third party.  Keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations </a> are automatically provided to improve the security of the tool's environment.</p>";
 					}
 				}, {
