@@ -254,7 +254,7 @@ function BitcoinCashPlugin() {
 	this.getTicker = function() { return "BCH" };
 	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/bchaddrjs-0.1.4.js"]; }
-	this.getDonationAddress = function() { return "15UL5qGptXxPnQKhhRCx1wLL3UAmbn61A2"; }
+	this.getDonationAddress = function() { return "qqcsh20ltcnxxw2wqd3m7j8j8qeh46qwuv5s93987x"; }
 	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS, AppUtils.EncryptionScheme.BIP38]; }
 	this.newKey = function(str) {
 		var key = bitcoinPlugin.newKey(str);
