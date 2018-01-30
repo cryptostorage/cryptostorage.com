@@ -30,6 +30,10 @@
  */
 function CryptoKey(plugin, state) {
 	
+	this.setPlugin = function(plugin) {
+		this.plugin = plugin;
+	}
+	
 	this.copy = function() {
 		return new CryptoKey(this.plugin, this.state);
 	}
@@ -63,16 +67,20 @@ function CryptoKey(plugin, state) {
 		return this.state.address;
 	}
 	
-	this.setAddress = function(address) {
-		if (this.hasPrivateKey()) {
-			if (this.isEncrypted()) {
-				if (!this.plugin.isAddress(address)) throw new Error("Address is invalid: " + address);
-				this.state.address = address;
-			} else {
-				if (this.state.address !== address) throw new Error("Cannot change address of unencrypted key");
-			}
-		} else {
+	/**
+	 * Sets the address of this key pair.
+	 * 
+	 * Can only set the address if unencrypted private key is unknown or override is true.
+	 * 
+	 * @param address is the address to set
+	 * @param override specifies if the address should be set even if an address already exists
+	 */
+	this.setAddress = function(address, override) {
+		if (!this.plugin.isAddress(address)) throw new Error("Address is invalid: " + address);
+		if (override || !this.hasPrivateKey() || this.isEncrypted()) {
 			this.state.address = address;
+		} else if (this.state.address !== address) {
+			throw new Error("Cannot change address of unencrypted private key");
 		}
 	}
 	
@@ -111,13 +119,14 @@ function CryptoKey(plugin, state) {
 	}
 	
 	// initialize
-	if (!isObject(plugin, CryptoPlugin)) throw new Error("Must provide crypto plugin");
-	this.plugin = plugin;
 	var that = this;
+	if (!isObject(plugin, CryptoPlugin)) throw new Error("Must provide crypto plugin");
+	this.setPlugin(plugin);
 	this.state = {};
 	if (state) {
 		if (isObject(state)) this.setState(state);
 		else this.setPrivateKey(state);
+	} else {
+		this.random();
 	}
-	else this.random();
 }

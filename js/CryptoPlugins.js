@@ -1,4 +1,28 @@
 /**
+ * MIT License
+ * 
+ * Copyright (c) 2018 cryptostorage
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
  * Base plugin that each currency must implement.
  */
 function CryptoPlugin() { }
@@ -222,39 +246,32 @@ function BitcoinPlugin() {
 inheritsFrom(BitcoinPlugin, CryptoPlugin);
 
 /**
- * Bitcoin cash plugin.
+ * Bitcoin Cash plugin.
  */
 function BitcoinCashPlugin() {
-	BitcoinPlugin.call(this);
+	var bitcoinPlugin = new BitcoinPlugin();
 	this.getName = function() { return "Bitcoin Cash"; }
 	this.getTicker = function() { return "BCH" };
 	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/bchaddrjs-0.1.4.js"]; }
 	this.getDonationAddress = function() { return "15UL5qGptXxPnQKhhRCx1wLL3UAmbn61A2"; }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS, AppUtils.EncryptionScheme.BIP38]; }
+	this.newKey = function(str) {
+		var key = bitcoinPlugin.newKey(str);
+		key.setPlugin(this);
+		var address = bchaddr.toCashAddress(key.getAddress());
+		key.setAddress(address.substring(address.indexOf(':') + 1), true);	// override address
+		return key;		
+	}
+	this.isAddress = function(str) {
+		try {
+			return bchaddr.isCashAddress(str);
+		} catch (err) {
+			return false;
+		}
+	}
 }
-inheritsFrom(BitcoinCashPlugin, BitcoinPlugin);
-/**
- * MIT License
- * 
- * Copyright (c) 2018 cryptostorage
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+inheritsFrom(BitcoinCashPlugin, CryptoPlugin);
 
 /**
  * Ethereum plugin.
