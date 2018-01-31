@@ -551,7 +551,7 @@ function FaqController(div) {
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is CryptoStorage?"; },
 					getAnswer: function() { return "<p>CryptoStorage is an open-source tool to generate offline storage for multiple cryptocurrencies.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be easily printed and saved to digital files for long-term storage.</p>" +
-						"<p>This tool is security-focused.  Funds are never entrusted to a third party including the site owners.  Private keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
+						"<p>This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
 					}
 				}, {
 					id: "faq_key_pair",
@@ -563,7 +563,7 @@ function FaqController(div) {
 				}, {
 					id: "faq_safe_keys",
 					getQuestion: function() { return "How does CryptoStorage help keep my cryptocurrency safe and secure?"; },
-					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys are never shared with a third party including the site owners.</p>" + 
+					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys are never shared with a third party including us, the site owners.</p>" + 
 						"<p>Second, private keys can be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
 						"<p>Third, private keys can be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one location.</p>" +
 						"<p>Fourth, keys can printed and saved to digital files for long-term storage.</p>" +
