@@ -450,9 +450,9 @@ function HomeController(div) {
 			pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open-source, so the community can maintain it indefinitely.</div>")
 			var licenseDiv = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 			var mitImg = $().appendTo(licenseDiv);
-			licenseDiv.append("<a href='./LICENSE.txt'><img src='img/mit.png' class='license_img'></a>");
-			licenseDiv.append("<a href='https://github.com/cryptostorage/cryptostorage.com'><img src='img/github.png' class='license_img'></a>");
-			licenseDiv.append("<a href='https://reddit.com/r/cryptostorage'><img src='img/reddit.png' class='license_img'></a>");
+			licenseDiv.append("<a target='_blank' href='./LICENSE.txt'><img src='img/mit.png' class='license_img'></a>");
+			licenseDiv.append("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'><img src='img/github.png' class='license_img'></a>");
+			licenseDiv.append("<a target='_blank' href='https://reddit.com/r/cryptostorage'><img src='img/reddit.png' class='license_img'></a>");
 			pageDiv.append("<div style='height: 20px;'>");
 			var downloadBtn = $("<a class='light_green_btn' href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>").appendTo(pageDiv);
 			downloadBtn.append("Download Now (zip)");
