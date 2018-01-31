@@ -565,7 +565,7 @@ function FaqController(div) {
 					getQuestion: function() { return "How does CryptoStorage help keep my cryptocurrency safe and secure?"; },
 					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys are never shared with a third party including the site owners.</p>" + 
 						"<p>Second, private keys can be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
-						"<p>Third, private keys can be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one physical location.</p>" +
+						"<p>Third, private keys can be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one location.</p>" +
 						"<p>Fourth, keys can printed and saved to digital files for long-term storage.</p>" +
 						"<p>Finally, this tool <a href='#faq_recommendations'>automatically detects and recommends</a> ways to improve the security of its environment.</p>"; }
 				}, {
