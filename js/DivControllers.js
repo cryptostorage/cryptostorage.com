@@ -550,8 +550,8 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is CryptoStorage?"; },
-					getAnswer: function() { return "<p>CryptoStorage is an open-source tool to generate offline storage for multiple cryptocurrencies.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be easily printed or saved to digital files for long-term storage.</p>" +
-						"<p>This tool is security-focused.  Funds are never entrusted to a third party including us, the site owners, by design.  Private keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
+					getAnswer: function() { return "<p>CryptoStorage is an open-source tool to generate offline storage for multiple cryptocurrencies.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be easily printed and saved to digital files for long-term storage.</p>" +
+						"<p>This tool is security-focused.  Funds are never entrusted to a third party including the site owners.  Private keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
 					}
 				}, {
 					id: "faq_key_pair",
@@ -563,10 +563,10 @@ function FaqController(div) {
 				}, {
 					id: "faq_safe_keys",
 					getQuestion: function() { return "How does CryptoStorage help keep my cryptocurrency safe and secure?"; },
-					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys are never shared with a third party, including us, the site owners.</p>" + 
-						"<p>Second, private keys may be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
-						"<p>Third, private keys may be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one physical location.</p>" +
-						"<p>Fourth, keys may be saved to a digital file or printed paper for long-term storage.</p>" +
+					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys are never shared with a third party including the site owners.</p>" + 
+						"<p>Second, private keys can be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
+						"<p>Third, private keys can be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one physical location.</p>" +
+						"<p>Fourth, keys can printed and saved to digital files for long-term storage.</p>" +
 						"<p>Finally, this tool <a href='#faq_recommendations'>automatically detects and recommends</a> ways to improve the security of its environment.</p>"; }
 				}, {
 					id: "faq_recommendations",
@@ -660,7 +660,7 @@ function FaqController(div) {
 				}, {
 					id: "faq_split_keys",
 					getQuestion: function() { return "What does it mean to split private keys?"; },
-					getAnswer: function() { return "<p>Generated storage may be split into separate pieces where some of the pieces must be combined in order to access funds.</p>" +
+					getAnswer: function() { return "<p>Generated storage can be split into separate pieces where some of the pieces must be combined in order to access funds.</p>" +
 						"<p>This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.</p>" +
 						"<p>For example, 10 key pairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 key pairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.</p>" +
 						"<p>In this example, one might choose to keep one piece, put one in a bank, and give one to a trusted family member.</p>"; }
@@ -861,7 +861,7 @@ function DonateController(div, appController) {
 
 			// build donate section
 			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
-			titleDiv.html("Donate");
+			titleDiv.html("Donate️");
 			var donations = [];
 			var plugins = AppUtils.getCryptoPlugins();
 			for (var i = 0; i < plugins.length; i++) {
