@@ -4,7 +4,7 @@ Full source code history: https://github.com/cryptostorage/cryptostorage.com
 cryptostorage.com-v0.0.1
 - First release!
 - Generate offline storage for multiple cryptocurrencies.
-- Keys are generated only in your device's browser so funds are never untrusted to a third party by design.
+- Keys are generated only in your device's browser so funds are never entrusted to a third party by design.
 - 100% open-source, client-side, and free to use.  No account necessary.
 - Private keys can be passphrase-protected using CryptoJS.  Also supports BIP38 for Bitcoin and Bitcoin Cash.
 - Storage can be split into pieces which can be geographically separated so funds are not accessible at any one location.
