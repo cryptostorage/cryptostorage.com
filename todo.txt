@@ -1,6 +1,7 @@
 first release feedback:
 banner is pretty big on low resolution / landscape
 ensure every dependency is properly licensed
+moneroaddress.org missing licenses at top of source html
 
 designer:
 ability to view balance and sign/send transaction
