@@ -2977,7 +2977,7 @@ function ExportController(div, window, config) {
 				
 				function renderAux() {
 					
-					// alpha warning
+					// first release warning
 					var alphaDiv = $("<div class='alpha_warning flex_horizontal'>").appendTo(div);
 					alphaDiv.append($("<img class='alpha_icon' src='img/warning.png'>"));
 					alphaDiv.append("<span style='text-align:center;'>First Release: Do not trust with significant amounts until community reviewed.");
@@ -3635,7 +3635,7 @@ function NoticeController(div, config) {
 					}
 					break;
 				case AppUtils.EnvironmentCode.DEV_MODE:
-					if (check.state === "warn") div.append("Tool is alpha software and should not be trusted with sigificant amounts");
+					if (check.state === "warn") div.append("Tool is under development and should not be trusted with sigificant amounts");
 					break;
 				default:
 					throw new Error("Unrecognized environment code: " + check.code);
