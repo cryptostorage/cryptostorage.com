@@ -1,3 +1,7 @@
+first release feedback:
+banner is pretty big on low resolution / landscape
+ensure every dependency is properly licensed
+
 designer:
 ability to view balance and sign/send transaction
 ability to import keys and re-export
@@ -15,7 +19,6 @@ credits design
 link back to import / homepage from export
 
 low priority:
-banner is pretty big on low resolution / landscape
 firefox cache stops working after 3 loads, only shows error in export console
 ddslick animation could be cleaner
 mobile brave/firefox window.open returns null
