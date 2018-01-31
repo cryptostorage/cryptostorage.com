@@ -7,7 +7,7 @@ This tool is security-focused.  All private keys can be passphrase-protected and
 - Generate offline storage for multiple cryptocurrencies.
 - Keys are generated only in your device's browser so funds are never untrusted to a third party by design.
 - 100% open-source, client-side, and free to use.  No account necessary.
-- Private keys can be passphrase-protected using [CryptoJS](https://github.com/brix/crypto-js).  Also supports [BIP38](https://github.com/bitcoinjs/bip38) for Bitcoin and Bitcoin Cash.
+- Private keys can be passphrase-protected using [CryptoJS](https://github.com/brix/crypto-js).  Also supports [BIP38](https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki) for Bitcoin and Bitcoin Cash.
 - Storage can be split into pieces which can be geographically separated so funds are not accessible at any one location.
 - Print or save to digital file for long-term storage.
 - Recommendations are automatically provided to improve the security of the tool's environment:
