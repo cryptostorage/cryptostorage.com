@@ -15,6 +15,7 @@ credits design
 link back to import / homepage from export
 
 low priority:
+firefox cache stops working after 3 loads, only shows error in export console
 ddslick animation could be cleaner
 mobile brave/firefox window.open returns null
 cryptostorage.com/faq, etc
