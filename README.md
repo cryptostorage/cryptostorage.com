@@ -1,11 +1,11 @@
 # Introduction
-CryptoStorage is an open-source tool to generate offline storage for multiple cryptocurrencies.  This tool generates [key pairs](https://cryptostorage.com/#faq_key_pair) in your device's browser which can store cryptocurrency without trusting a third party.  Generated key pairs can be printed or saved to digital files for easy, long-term storage.
+CryptoStorage is an open-source tool to generate offline storage for multiple cryptocurrencies.  This tool generates [key pairs](https://cryptostorage.com/#faq_key_pair) in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be easily printed or saved to digital files for long-term storage.
 
-This tool is security-focused.  Private keys can be generated offline, passphrase-protected, and [split into pieces](https://cryptostorage.com/#faq_split_keys) which can be geographically separated so funds are not accessible at any one location.  Recommendations are automatically provided to improve the security of the tool's environment.
+This tool is security-focused.  Funds are never entrusted to a third party including us, the site owners, by design.  Private keys can be passphrase-protected and [split into pieces](https://cryptostorage.com/#faq_split_keys) which can be geographically separated so funds are not accessible at any one location.  Recommendations are automatically provided to improve the security of the tool's environment.
 
 # Main Features
 - Generate offline storage for multiple cryptocurrencies.
-- Keys are generated only in your device's browser so funds are never untrusted to a third party by design.
+- Keys are generated only in your device's browser so funds are never untrusted to a third party.
 - 100% open-source, client-side, and free to use.  No account necessary.
 - Private keys can be passphrase-protected using [CryptoJS](https://github.com/brix/crypto-js).  Also supports [BIP38](https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki) for Bitcoin and Bitcoin Cash.
 - Storage can be split into pieces which can be geographically separated so funds are not accessible at any one location.
