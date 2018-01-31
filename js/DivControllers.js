@@ -861,7 +861,7 @@ function DonateController(div, appController) {
 
 			// build donate section
 			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
-			titleDiv.html("Donate️");
+			titleDiv.html("Donate");
 			var donations = [];
 			var plugins = AppUtils.getCryptoPlugins();
 			for (var i = 0; i < plugins.length; i++) {
