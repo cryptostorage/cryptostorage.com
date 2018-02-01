@@ -270,6 +270,7 @@ var AppUtils = {
 			AppUtils.plugins.push(new ZcashPlugin());
 			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
 			AppUtils.plugins.push(new EthereumClassicPlugin());
+			AppUtils.plugins.push(new UbiqPlugin());
 		}
 		return AppUtils.plugins;
 	},
