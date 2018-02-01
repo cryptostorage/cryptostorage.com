@@ -1,4 +1,5 @@
 cannot go back from reddit
+remove email
 
 designer:
 ability to view balance and sign/send transaction
