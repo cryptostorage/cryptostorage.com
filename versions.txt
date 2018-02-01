@@ -14,3 +14,7 @@ cryptostorage.com-v0.1.0-beta
 	- Checks if the tool is downloaded and running locally
 	- Checks if the browser is open-source
 	- Checks if the operating system is open-source
+	
+01/31/2018
+cryptostorage.com-v0.1.1-beta
+- Added licenses to dependencies.
