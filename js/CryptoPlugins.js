@@ -375,7 +375,7 @@ function UbiqPlugin() {
 	this.getName = function() { return "Ubiq"; }
 	this.getTicker = function() { return "UBQ" };
 	this.getLogoPath = function() { return "img/ubiq.png"; }
-	this.getDonationAddress = function() { return "0x61f51c0bc7b9b8164630c430e8ae67cb46fef927"; }
+	this.getDonationAddress = function() { return "0x48E8acA18D49629c86C5Ab655327F1C2eC744Db2"; }
 }
 inheritsFrom(UbiqPlugin, EthereumPlugin);
 
