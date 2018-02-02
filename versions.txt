@@ -1,7 +1,7 @@
 Full source code history: https://github.com/cryptostorage/cryptostorage.com
 
 01/31/2018
-cryptostorage.com-v0.1.0-beta
+cryptostorage-v0.1.0-beta
 - First release!
 - Generate offline storage for multiple cryptocurrencies.
 - Keys are generated only in your device's browser so funds are never entrusted to a third party by design.
@@ -16,11 +16,11 @@ cryptostorage.com-v0.1.0-beta
 	- Checks if the operating system is open-source
 	
 01/31/2018
-cryptostorage.com-v0.1.1-beta
+cryptostorage-v0.1.1-beta
 - Added licenses to dependencies.
 
 02/02/2018
-cryptostorage.com-v0.1.2-beta
+cryptostorage-v0.1.2-beta
 - Add support for Ubiq
 - Fix back button loop when site visited
 - Minor cleanup
