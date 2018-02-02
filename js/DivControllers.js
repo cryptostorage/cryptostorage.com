@@ -130,11 +130,14 @@ function AppController(div) {
 	
 	/**
 	 * Navigates to the page/position identified by the given hash.
+	 * 
+	 * @param hash identifies the page within the application
+	 * @param onDone() is invoked when done
 	 */
 	function navigate(hash, onDone) {
-		if (!hash) hash = "#home";
+		if (hash === lastHash) return;
 		lastHash = hash;
-		window.location.hash = hash;
+		if (hash) window.location.hash = hash;
 		if (hash.startsWith("#faq")) that.showFaq(onDone);
 		else if (hash === "#donate") that.showDonate(onDone);
 		else if (hash === "#import") that.showImport(onDone);
@@ -202,7 +205,6 @@ function AppController(div) {
 		
 		// navigate on browser navigation
 		$(window).on('popstate', function(e) {
-			if (window.location.hash === lastHash) return;
 			navigate(window.location.hash);
 		});
 		
