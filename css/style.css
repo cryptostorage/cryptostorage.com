@@ -379,6 +379,7 @@ body {
 .currency_row_label_minor {
 	font-size: 20px;
 	text-align: center;
+	width: 100%;
 }
 
 .home_more_label {
