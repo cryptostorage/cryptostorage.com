@@ -27,6 +27,7 @@ This tool is security-focused.  Funds are never entrusted to a third party.  Pri
 - Ethereum Classic
 - Basic Attention Token
 - OmiseGo
+- Ubiq
 
 # ⚠ First Release
 This is the first release of this software.  It should not be trusted with signficant amounts until it is reviewed by the community.
