@@ -102,9 +102,9 @@ For community discussion, please join the conversation on Reddit at https://redd
 *No one can recover lost keys or passwords for you. Do not lose these or your funds will be lost.*
 
 # Contributing
-Anyone may develop and submit pull requests to improve this project.
+All contributions are welcome to make this project better.
 
-All contributions are welcome.
+Please note cryptostorage.com will retain ownership of donation addresses for supported coins.
 
 # License
 This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt) licensed.
