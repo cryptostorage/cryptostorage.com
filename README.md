@@ -98,8 +98,6 @@ For bug reports and feature requests, please submit an issue to https://github.c
 
 For community discussion, please join the conversation on Reddit at https://reddit.com/r/cryptostorage.
 
-For email support, please email support@cryptostorage.com.  Emails are answered on a best-effort basis only.
-
 *No one can recover lost keys or passwords for you. Do not lose these or your funds will be lost.*
 
 # Contributing

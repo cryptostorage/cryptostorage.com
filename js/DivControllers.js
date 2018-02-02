@@ -677,7 +677,6 @@ function FaqController(div) {
 					getQuestion: function() { return "I still need help.  Who can I contact?"; },
 					getAnswer: function() { return "<p>For bug reports and feature requests, please submit an issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
 						"<p>For community discussion, please join the conversation on Reddit at <a href='https://reddit.com/r/cryptostorage'>https://reddit.com/r/cryptostorage</a>.</p>" +
-						"<p>For email support, please email <a href='mailto:support@cryptostorage.com'>support@cryptostorage.com</a>.  Emails are answered on a best-effort basis only.</p>" +
 						"<p><i>No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost.</i></p>"
 					}
 				}
