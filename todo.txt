@@ -1,3 +1,5 @@
+form show password home form flow shows password when it's not checked
+
 designer:
 ability to view balance and sign/send transaction
 ability to import keys and re-export
