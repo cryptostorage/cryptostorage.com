@@ -23,4 +23,5 @@ cryptostorage-v0.1.1-beta
 cryptostorage-v0.1.2-beta
 - Add support for Ubiq
 - Fix back button loop when site visited
+- Homepage wording
 - Minor cleanup
