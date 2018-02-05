@@ -625,17 +625,26 @@ function RipplePlugin() {
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
 		
-		// unencrypted
+		// unencrypted wif
 		if (str.length === 29 && AppUtils.isBase58(str)) {
-			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(str).publicKey);
 			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
 		
-		// hex cryptojs
-		else if (isHex(str) && str.length > 100) {
+		// unencrypted hex
+		else if (str.length === 44 && isHex(str)) {
+			state.hex = str;
+			state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
+			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(state.wif).publicKey);			
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// cryptojs hex
+		else if (str.length > 100 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
@@ -643,7 +652,7 @@ function RipplePlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// wif cryptojs
+		// cryptojs wif
 		else if (AppUtils.isWifCryptoJs(str)) {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
@@ -655,7 +664,7 @@ function RipplePlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
-		return isString(str) && str.length === 34 && AppUtils.isBase58(str);
+		return isString(str) && (str.length === 33  || str.length === 34) && AppUtils.isBase58(str);
 	}
 }
 inheritsFrom(RipplePlugin, CryptoPlugin);

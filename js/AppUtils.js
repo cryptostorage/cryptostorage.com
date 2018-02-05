@@ -302,7 +302,7 @@ var AppUtils = {
 	 * Determines if the given string is a valid CryptoJS WIF private key.
 	 */
 	isWifCryptoJs: function(str) {
-		return str.startsWith("U2") && (str.length === 128 || str.length === 108) && !hasWhitespace(str);
+		return str.startsWith("U2") && (str.length === 88 || str.length === 108 || str.length === 128) && !hasWhitespace(str);
 	},
 	
 	/**
@@ -315,12 +315,12 @@ var AppUtils = {
 	/**
 	 * Determines if the given string is a possible split piece of a private key (cannot be excluded as one).
 	 * 
-	 * A piece must be at least 47 characters and base58 encoded.
+	 * A piece must be at least 36 characters and base58 encoded.
 	 * 
 	 * @returns true if the given string meets the minimum requirements to be a split piece
 	 */
 	isPossibleSplitPiece: function(str) {
-		return isString(str) && str.length >= 47 && AppUtils.isBase58(str) && isNumber(AppUtils.getMinPieces(str));
+		return isString(str) && str.length >= 36 && AppUtils.isBase58(str) && isNumber(AppUtils.getMinPieces(str));
 	},
 	
 	/**

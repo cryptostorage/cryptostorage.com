@@ -118,6 +118,10 @@ function CryptoKey(plugin, state) {
 		return this.state.encryption;
 	}
 	
+	this.toString = function() {
+		return JSON.stringify(state);
+	}
+	
 	// initialize
 	var that = this;
 	if (!isObject(plugin, CryptoPlugin)) throw new Error("Must provide crypto plugin");

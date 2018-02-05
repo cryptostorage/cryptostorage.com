@@ -77,10 +77,10 @@ var Tests = {
 				testParseKey(plugins);
 				
 				// test split and combine
-				for (var i = 0; i < plugins.length;i ++) testSplitAndCombine(plugins[i]);
+				for (var i = 0; i < plugins.length; i++) testSplitAndCombine(plugins[i]);
 				
 				// test invalid pieces
-				if (plugins.length >= 2) testInvalidPiecesToKeys(plugins);
+				if (plugins.length > 1) testInvalidPiecesToKeys(plugins);
 				
 				// test key generation
 				testGenerateKeys(plugins, function(err) {
@@ -336,7 +336,14 @@ var Tests = {
 				if (max < 1) continue;
 				var keys = [];
 				for (var j = 0; j < max; j++) keys.push(plugin.newKey());
-				funcs.push(function(onDone) { testEncryptKeys(keys, scheme, Tests.PASSPHRASE, onDone); });
+				funcs.push(testEncryptKeysFunc(keys, scheme, Tests.PASSPHRASE));
+			}
+			
+			// callback function to test encryption
+			function testEncryptKeysFunc(keys, scheme, passphrase) {
+				return function(onDone) {
+					testEncryptKeys(keys, scheme, passphrase, onDone);
+				}
 			}
 			
 			// execute encryption tests
@@ -586,7 +593,6 @@ var Tests = {
 		}
 
 		function testInvalidPiecesToKeys(plugins) {
-			assertTrue(plugins.length >= 2);
 			
 			// collect keys for different currencies
 			var keys1 = [];
@@ -650,7 +656,7 @@ var Tests = {
 				// collect test functions
 				var funcs = [];
 				funcs.push(testOnePieceValidity());
-				funcs.push(testIncompatiblePieces());
+				if (plugins.length > 1) funcs.push(testIncompatiblePieces());
 				funcs.push(testAdditionalPiecesNeeded());
 				
 				// run test functions
@@ -765,7 +771,7 @@ var Tests = {
 				function testIncompatiblePieces() {
 					return function(onDone) {
 
-						// tests assume more than one plugin
+						// this test assume more than one plugin
 						assertTrue(plugins.length > 1);
 
 						var pieces1 = getPieces(plugins, 1, 3, 2);
