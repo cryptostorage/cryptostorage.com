@@ -615,29 +615,21 @@ inheritsFrom(ZcashPlugin, CryptoPlugin);
 function RipplePlugin() {
 	this.getName = function() { return "Ripple"; }
 	this.getTicker = function() { return "XRP" };
-	this.getLogoPath = function() { return "img/zcash.png"; }
+	this.getLogoPath = function() { return "img/ripple.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/ripple_key_pairs.js"]; }
 	this.getDonationAddress = function() { return "TODO"; }
 	this.newKey = function(str) {
 		
-		var seed = ripple_key_pairs.generateSeed();
-		var pair = ripple_key_pairs.deriveKeypair(seed);
-		var address = ripple_key_pairs.deriveAddress(pair.publicKey);
-		console.log(pair);
-		console.log(seed);
-		console.log(address);
-		
 		// generate seed if not given
-		if (!str) str = new zcashcore.PrivateKey().toString();
+		if (!str) str = ripple_key_pairs.generateSeed();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
 		
 		// unencrypted
-		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// zcashcore says 'ab' is valid?
-			var key = new zcashcore.PrivateKey(str);
-			state.hex = key.toString();
-			state.wif = key.toWIF();
-			state.address = key.toAddress().toString();
+		if (str.length === 29 && AppUtils.isBase58(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(str).publicKey);
 			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
@@ -663,7 +655,7 @@ function RipplePlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
-		return zcashcore.Address.isValid(str);
+		return isString(str) && str.length === 34 && AppUtils.isBase58(str);
 	}
 }
 inheritsFrom(RipplePlugin, CryptoPlugin);
