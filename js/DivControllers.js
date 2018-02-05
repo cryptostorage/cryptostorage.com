@@ -374,7 +374,7 @@ inheritsFrom(IntroController, DivController);
  */
 function HomeController(div) {
 	DivController.call(this, div);
-	var moreLink = false;
+	var moreLink = true;
 	this.render = function(onDone) {
 		
 		// load home dependencies
@@ -391,13 +391,14 @@ function HomeController(div) {
 			var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
 			
 			// supported currencies
+			var numVisible = 11;
 			pageDiv.append($("<div class='home_label'>Supports these tokens</div>"));
 			var plugins = AppUtils.getCryptoPlugins();
 			pageDiv.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));
 			var moreDiv = null;
 			for (var i = 3; i < plugins.length; i += 4) {
 				var row = getCurrencyRow(plugins.slice(i, i + 4), false, onCurrencyClicked);
-				if (i >= 7 && !moreDiv) {
+				if (i >= numVisible && !moreDiv) {
 					moreDiv = $("<div>").appendTo(pageDiv);
 					moreDiv.hide();
 				}
@@ -406,7 +407,7 @@ function HomeController(div) {
 			}
 			if (moreDiv) {
 				var moreLabel = $("<div class='home_more_label'>").appendTo(pageDiv);
-				moreLabel.append("and " + (plugins.length - 7) + " more...");
+				moreLabel.append("and " + (plugins.length - numVisible) + " more...");
 				moreLabel.click(function() {
 					moreLabel.hide();
 					moreDiv.show();
