@@ -3,12 +3,12 @@ Full source code history: https://github.com/cryptostorage/cryptostorage.com
 01/31/2018
 cryptostorage-v0.1.0-beta
 - First release!
-- Generate offline storage for multiple cryptocurrencies.
-- Keys are generated only in your device's browser so funds are never entrusted to a third party by design.
-- 100% open-source, client-side, and free to use.  No account necessary.
-- Private keys can be passphrase-protected using CryptoJS.  Also supports BIP38 for Bitcoin and Bitcoin Cash.
-- Storage can be split into pieces which can be geographically separated so funds are not accessible at any one location.
-- Print or save to digital file for long-term storage.
+- Generate offline storage for multiple cryptocurrencies
+- Keys are generated only in your device's browser so funds are never entrusted to a third party by design
+- 100% open-source, client-side, and free to use.  No account necessary
+- Private keys can be passphrase-protected using CryptoJS.  Also supports BIP38 for Bitcoin and Bitcoin Cash
+- Storage can be split into pieces which can be geographically separated so funds are not accessible at any one location
+- Print or save to digital file for long-term storage
 - Recommendations are automatically provided to improve the security of the tool's environment:
 	- Checks if the internet connection is active
 	- Checks if the tool is downloaded and running locally
@@ -17,11 +17,16 @@ cryptostorage-v0.1.0-beta
 	
 01/31/2018
 cryptostorage-v0.1.1-beta
-- Added licenses to dependencies.
+- Added licenses to dependencies
 
 02/02/2018
 cryptostorage-v0.1.2-beta
-- Add support for Ubiq
+- Add support for Ubiq.
 - Fix back button loop when site visited
 - Homepage wording
 - Minor cleanup
+
+02/05/2018
+cryptostorage-v0.1.3-beta
+- Add support for Ripple
+- Fix bug in tests which caused BIP38 to be tested even when disabled
