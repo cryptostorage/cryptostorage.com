@@ -271,6 +271,7 @@ var AppUtils = {
 			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
 			AppUtils.plugins.push(new UbiqPlugin());
 			AppUtils.plugins.push(new EthereumClassicPlugin());
+			AppUtils.plugins.push(new RipplePlugin());
 		}
 		return AppUtils.plugins;
 	},

@@ -569,7 +569,7 @@ function ZcashPlugin() {
 	this.newKey = function(str) {
 		
 		// create key if not given
-		if (!str) str = new zcashcore.PrivateKey().toString();		
+		if (!str) str = new zcashcore.PrivateKey().toString();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
 		
@@ -608,3 +608,62 @@ function ZcashPlugin() {
 	}
 }
 inheritsFrom(ZcashPlugin, CryptoPlugin);
+
+/**
+ * Ripple plugin.
+ */
+function RipplePlugin() {
+	this.getName = function() { return "Ripple"; }
+	this.getTicker = function() { return "XRP" };
+	this.getLogoPath = function() { return "img/zcash.png"; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/ripple_key_pairs.js"]; }
+	this.getDonationAddress = function() { return "TODO"; }
+	this.newKey = function(str) {
+		
+		var seed = ripple_key_pairs.generateSeed();
+		var pair = ripple_key_pairs.deriveKeypair(seed);
+		var address = ripple_key_pairs.deriveAddress(pair.publicKey);
+		console.log(pair);
+		console.log(seed);
+		console.log(address);
+		
+		// generate seed if not given
+		if (!str) str = new zcashcore.PrivateKey().toString();
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
+		
+		// unencrypted
+		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// zcashcore says 'ab' is valid?
+			var key = new zcashcore.PrivateKey(str);
+			state.hex = key.toString();
+			state.wif = key.toWIF();
+			state.address = key.toAddress().toString();
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// hex cryptojs
+		else if (isHex(str) && str.length > 100) {
+			state.hex = str;
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// wif cryptojs
+		else if (AppUtils.isWifCryptoJs(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// otherwise key is not recognized
+		throw new Error("Unrecognized private key: " + str);
+	}
+	this.isAddress = function(str) {
+		return zcashcore.Address.isValid(str);
+	}
+}
+inheritsFrom(RipplePlugin, CryptoPlugin);
