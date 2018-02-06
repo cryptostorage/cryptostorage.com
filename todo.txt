@@ -4,6 +4,9 @@ form show password home form flow shows password when it's not checked
 support json as text input
 link window.crypto API on homepage
 
+v0.1.4
+passphrase-protect/split arbitrary text
+
 designer:
 ability to view balance and sign/send transaction
 ability to import keys and re-export
