@@ -103,7 +103,7 @@ For community discussion, please join the conversation on Reddit at https://redd
 
 *No one can recover lost keys or passwords for you. Do not lose these or your funds will be lost.*
 
-# Contributing
+# Contribute
 All contributions are welcome to make this project better.
 
 Please note cryptostorage.com will retain ownership of donation addresses for supported coins.
