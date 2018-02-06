@@ -616,7 +616,7 @@ function RipplePlugin() {
 	this.getName = function() { return "Ripple"; }
 	this.getTicker = function() { return "XRP" };
 	this.getLogoPath = function() { return "img/ripple.png"; }
-	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/ripple_key_pairs.js"]; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/ripple-key-pairs.js"]; }
 	this.getDonationAddress = function() { return "TODO"; }
 	this.newKey = function(str) {
 		
