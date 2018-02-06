@@ -684,26 +684,31 @@ function StellarPlugin() {
 //		var keyPair = StellarBase.Keypair.random();
 //		var address = keyPair.publicKey();
 //		var secret = keyPair.secret();
-		
+				
 		// generate seed if not given
 		if (!str) str = StellarBase.Keypair.random().secret();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
 		
+		console.log("Hello");
+		
 		// unencrypted wif
-		if (str.length === 56 && AppUtils.isBase64(str)) {
-			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-			state.wif = str;
-			state.address = StellarBase.Keypair.fromSecret(state.wif).publicKey();
+		if (str.length === 56 && isUpperCase(str) && AppUtils.isBase64(str)) {	// TODO: base32
+			var keypair = StellarBase.Keypair.fromSecret(str);
+			state.hex = keypair.rawSecretKey().toString('hex');
+			state.wif = str;			
+			state.address = keypair.publicKey();
 			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
 		
 		// unencrypted hex
-		else if (str.length === 44 && isHex(str)) {
+		else if (str.length === 64 && isHex(str)) {
+			var rawSecret = new Uint8Array(Crypto.util.hexToBytes(str));
+			var keypair = StellarBase.Keypair.fromRawEd25519Seed(rawSecret);
 			state.hex = str;
-			state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
-			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(state.wif).publicKey);			
+			state.wif = keypair.secret();
+			state.address = keypair.publicKey();
 			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
@@ -729,7 +734,7 @@ function StellarPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
-		return isString(str) && (str.length === 33  || str.length === 34) && AppUtils.isBase58(str);
+		return isString(str) && str.length === 56 && AppUtils.isBase64(str) && isUpperCase(str);
 	}
 }
 inheritsFrom(StellarPlugin, CryptoPlugin);

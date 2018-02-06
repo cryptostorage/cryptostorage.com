@@ -130,6 +130,26 @@ function isObject(arg, obj) {
 }
 
 /**
+ * Determines if all alphabet characters in the given string are upper case.
+ * 
+ * @param str is the string to test
+ * @returns true if the string is upper case, false otherwise
+ */
+function isUpperCase(str) {
+	return str.toUpperCase() === str;
+}
+
+/**
+ * Determines if all alphabet characters in the given string are lower case.
+ * 
+ * @param str is the string to test
+ * @param true if the string is lower case, false otherwise
+ */
+function isLowerCase(str) {
+	return str.toLowerCase() === str;
+}
+
+/**
  * Indicates if the given argument is a hexidemal string.
  * 
  * Credit: https://github.com/roryrjb/is-hex/blob/master/is-hex.js.
