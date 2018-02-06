@@ -14,6 +14,17 @@ cryptostorage-v0.1.0-beta
 	- Checks if the tool is downloaded and running locally
 	- Checks if the browser is open-source
 	- Checks if the operating system is open-source
+- Supported tokens:
+	- Bitcoin
+	- Bitcoin Cash
+	- Ethereum
+	- Monero
+	- Litecoin
+	- Dash
+	- Zcash
+	- OmiseGo
+	- Basic Attention Token
+	- Ethereum Classic
 	
 01/31/2018
 cryptostorage-v0.1.1-beta
