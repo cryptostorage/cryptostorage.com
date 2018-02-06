@@ -26,8 +26,8 @@ cryptostorage-v0.1.2-beta
 - Homepage wording
 - Minor cleanup
 
-02/05/2018
+02/07/2018
 cryptostorage-v0.1.3-beta
 - Add support for Ripple
 - Add support for Stellar
-- Fix bug in tests which caused BIP38 to be tested even when disabled
+- Minor cleanup
