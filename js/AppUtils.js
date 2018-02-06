@@ -272,6 +272,7 @@ var AppUtils = {
 			AppUtils.plugins.push(new OmiseGoPlugin());
 			AppUtils.plugins.push(new EthereumClassicPlugin());
 			AppUtils.plugins.push(new UbiqPlugin());
+			AppUtils.plugins.push(new StellarPlugin());
 		}
 		return AppUtils.plugins;
 	},

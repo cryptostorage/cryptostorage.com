@@ -668,3 +668,68 @@ function RipplePlugin() {
 	}
 }
 inheritsFrom(RipplePlugin, CryptoPlugin);
+
+/**
+ * Stellar plugin.
+ */
+function StellarPlugin() {
+	this.getName = function() { return "Stellar"; }
+	this.getTicker = function() { return "XLM" };
+	this.getLogoPath = function() { return "img/ripple.png"; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/stellar-base.js"]; }
+	this.getDonationAddress = function() { return "TODO"; }
+	this.newKey = function(str) {
+		
+		// STELLAR
+		var keyPair = StellarBase.Keypair.random();
+		var address = keyPair.publicKey();
+		var secret = keyPair.secret();
+		
+		// generate seed if not given
+		if (!str) str = ripple_key_pairs.generateSeed();
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
+		
+		// unencrypted wif
+		if (str.length === 29 && AppUtils.isBase58(str)) {
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			state.wif = str;
+			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(str).publicKey);
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// unencrypted hex
+		else if (str.length === 44 && isHex(str)) {
+			state.hex = str;
+			state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
+			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(state.wif).publicKey);			
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// cryptojs hex
+		else if (str.length > 100 && isHex(str)) {
+			state.hex = str;
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// cryptojs wif
+		else if (AppUtils.isWifCryptoJs(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// otherwise key is not recognized
+		throw new Error("Unrecognized private key: " + str);
+	}
+	this.isAddress = function(str) {
+		return isString(str) && (str.length === 33  || str.length === 34) && AppUtils.isBase58(str);
+	}
+}
+inheritsFrom(StellarPlugin, CryptoPlugin);
