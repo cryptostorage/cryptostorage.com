@@ -1,4 +1,5 @@
 v0.1.3
+info box on currencies
 form show password home form flow shows password when it's not checked
 
 designer:
@@ -27,7 +28,6 @@ es6 with modules
 loading gif resets on init of other renderers
 let UI breath during bip38
 1px border on mobile safari import print
-mobile safari tooltip line
 disable import new tabs if environment error
 file import loading - see spec, only show if minimum file size
 transition all css flex to common flex classes
