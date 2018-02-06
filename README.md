@@ -36,7 +36,7 @@ This is the first release of this software.  It should not be trusted with signf
 
 Security is a spectrum.  The following procedure is recommended to use this tool as securely as possible:
 
-1. [Download and verify cryptostorage.com-*[version]*.zip.](#download-and-verify-the-source-code)
+1. [Download and verify the source code.](#download-and-verify-the-source-code)
 2. Transfer cryptostorage.com-*[version]*.zip to a secure computer using a flash drive.
     - The computer should be disconnected from the internet and ideally will never connect to the internet again.
     - An open-source operating system is recommended like [Tails](https://tails.boum.org), [Debian](https://www.debian.org/), or [Raspbian for the Raspberry Pi](https://www.raspberrypi.org).
