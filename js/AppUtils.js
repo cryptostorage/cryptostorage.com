@@ -267,12 +267,12 @@ var AppUtils = {
 			AppUtils.plugins.push(new LitecoinPlugin());
 			AppUtils.plugins.push(new DashPlugin());
 			AppUtils.plugins.push(new ZcashPlugin());
-			AppUtils.plugins.push(new RipplePlugin());
-			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
-			AppUtils.plugins.push(new OmiseGoPlugin());
-			AppUtils.plugins.push(new EthereumClassicPlugin());
-			AppUtils.plugins.push(new UbiqPlugin());
 			AppUtils.plugins.push(new StellarPlugin());
+			AppUtils.plugins.push(new RipplePlugin());
+			AppUtils.plugins.push(new EthereumClassicPlugin());
+			AppUtils.plugins.push(new OmiseGoPlugin());
+			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
+			AppUtils.plugins.push(new UbiqPlugin());
 		}
 		return AppUtils.plugins;
 	},
@@ -311,6 +311,17 @@ var AppUtils = {
 	 */
 	isBase58: function(str) {
 		return /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(str)
+	},
+	
+	/**
+	 * Determines if the given string is base64.
+	 */
+	isBase64: function(str) {
+		try {
+			return btoa(atob(str)) == str;
+		} catch (err) {
+			return false;
+		}
 	},
 	
 	/**

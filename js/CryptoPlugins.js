@@ -675,26 +675,26 @@ inheritsFrom(RipplePlugin, CryptoPlugin);
 function StellarPlugin() {
 	this.getName = function() { return "Stellar"; }
 	this.getTicker = function() { return "XLM" };
-	this.getLogoPath = function() { return "img/ripple.png"; }
+	this.getLogoPath = function() { return "img/stellar.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/stellar-base.js"]; }
 	this.getDonationAddress = function() { return "TODO"; }
 	this.newKey = function(str) {
 		
 		// STELLAR
-		var keyPair = StellarBase.Keypair.random();
-		var address = keyPair.publicKey();
-		var secret = keyPair.secret();
+//		var keyPair = StellarBase.Keypair.random();
+//		var address = keyPair.publicKey();
+//		var secret = keyPair.secret();
 		
 		// generate seed if not given
-		if (!str) str = ripple_key_pairs.generateSeed();
+		if (!str) str = StellarBase.Keypair.random().secret();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
 		
 		// unencrypted wif
-		if (str.length === 29 && AppUtils.isBase58(str)) {
-			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+		if (str.length === 56 && AppUtils.isBase64(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
-			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(str).publicKey);
+			state.address = StellarBase.Keypair.fromSecret(state.wif).publicKey();
 			state.encryption = null;
 			return new CryptoKey(this, state);
 		}

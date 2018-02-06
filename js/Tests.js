@@ -48,6 +48,7 @@ var Tests = {
 		plugins.push(new LitecoinPlugin());
 		plugins.push(new ZcashPlugin());
 		plugins.push(new RipplePlugin());
+		plugins.push(new StellarPlugin());
 		return plugins;
 	},
 	
