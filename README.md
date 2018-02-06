@@ -32,7 +32,7 @@ This tool is security-focused.  Funds are never entrusted to a third party.  Pri
 - Ubiq
 
 # ⚠ First Release
-This is the first release of this software.  It should not be trusted with signficant amounts until it is reviewed by the community.
+This is the first release of this software.  It should not be used with signficant amounts until it is reviewed by the community.
 
 # Using this Tool as Securely as Possible
 
