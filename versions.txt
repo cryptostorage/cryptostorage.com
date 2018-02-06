@@ -21,7 +21,7 @@ cryptostorage-v0.1.1-beta
 
 02/02/2018
 cryptostorage-v0.1.2-beta
-- Add support for Ubiq.
+- Add support for Ubiq
 - Fix back button loop when site visited
 - Homepage wording
 - Minor cleanup
@@ -29,4 +29,5 @@ cryptostorage-v0.1.2-beta
 02/05/2018
 cryptostorage-v0.1.3-beta
 - Add support for Ripple
+- Add support for Stellar
 - Fix bug in tests which caused BIP38 to be tested even when disabled
