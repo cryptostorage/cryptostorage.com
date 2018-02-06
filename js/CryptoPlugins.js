@@ -679,18 +679,11 @@ function StellarPlugin() {
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/stellar-base.js"]; }
 	this.getDonationAddress = function() { return "TODO"; }
 	this.newKey = function(str) {
-		
-		// STELLAR
-//		var keyPair = StellarBase.Keypair.random();
-//		var address = keyPair.publicKey();
-//		var secret = keyPair.secret();
 				
 		// generate seed if not given
 		if (!str) str = StellarBase.Keypair.random().secret();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
-		
-		console.log("Hello");
 		
 		// unencrypted wif
 		if (str.length === 56 && isUpperCase(str) && AppUtils.isBase64(str)) {	// TODO: base32
