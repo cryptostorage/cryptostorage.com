@@ -2982,7 +2982,7 @@ function ExportController(div, window, config) {
 					// first release warning
 					var alphaDiv = $("<div class='alpha_warning flex_horizontal'>").appendTo(div);
 					alphaDiv.append($("<img class='alpha_icon' src='img/warning.png'>"));
-					alphaDiv.append("<span style='text-align:center;'>First Release: Do not trust with significant amounts until community reviewed.");
+					alphaDiv.append("<span style='text-align:center;'>First Release: Do not use with significant amounts until community reviewed.");
 					
 					// progress bar
 					progressDiv = $("<div class='export_progress_div'>").appendTo(div);
