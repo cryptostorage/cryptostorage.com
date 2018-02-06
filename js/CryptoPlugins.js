@@ -734,7 +734,7 @@ function StellarPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
-		return isString(str) && str.length === 56 && AppUtils.isBase64(str) && isUpperCase(str);
+		return isString(str) && isUpperCase(str) && str.length === 56 && AppUtils.isBase64(str);	// TODO: base32
 	}
 }
 inheritsFrom(StellarPlugin, CryptoPlugin);
