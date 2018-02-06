@@ -617,7 +617,7 @@ function RipplePlugin() {
 	this.getTicker = function() { return "XRP" };
 	this.getLogoPath = function() { return "img/ripple.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/ripple-key-pairs.js"]; }
-	this.getDonationAddress = function() { return "TODO"; }
+	this.getDonationAddress = function() { return "r9AWMe2aSjTaj9aWpGrXQAHruodTDnHfaK"; }
 	this.newKey = function(str) {
 		
 		// generate seed if not given
@@ -677,7 +677,7 @@ function StellarPlugin() {
 	this.getTicker = function() { return "XLM" };
 	this.getLogoPath = function() { return "img/stellar.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/stellar-base.js"]; }
-	this.getDonationAddress = function() { return "TODO"; }
+	this.getDonationAddress = function() { return "GBZBQUK27UKX76JMIURN5ESMJ3EEIAWQONM7HKCIUIRG66ZKLPVKT5Y6"; }
 	this.newKey = function(str) {
 				
 		// generate seed if not given
