@@ -686,7 +686,7 @@ function StellarPlugin() {
 		var state = {};
 		
 		// unencrypted wif
-		if (str.length === 56 && isUpperCase(str) && AppUtils.isBase64(str)) {	// TODO: base32
+		if (str.length === 56 && isUpperCase(str) && AppUtils.isBase32(str)) {
 			var keypair = StellarBase.Keypair.fromSecret(str);
 			state.hex = keypair.rawSecretKey().toString('hex');
 			state.wif = str;			
@@ -727,7 +727,7 @@ function StellarPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
-		return isString(str) && isUpperCase(str) && str.length === 56 && AppUtils.isBase64(str);	// TODO: base32
+		return isString(str) && isUpperCase(str) && str.length === 56 && AppUtils.isBase32(str);
 	}
 }
 inheritsFrom(StellarPlugin, CryptoPlugin);

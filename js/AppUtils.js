@@ -307,10 +307,17 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Determines if the given string is base32.
+	 */
+	isBase32: function(str) {
+		return /^[ABCDEFGHIJKLMNOPQRSTUVWXYZ234567]+$/.test(str);
+	},
+	
+	/**
 	 * Determines if the given string is base58.
 	 */
 	isBase58: function(str) {
-		return /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(str)
+		return /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(str);
 	},
 	
 	/**
