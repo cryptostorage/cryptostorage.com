@@ -41,4 +41,5 @@ cryptostorage-v0.1.2-beta
 cryptostorage-v0.1.3-beta
 - Added support for Ripple
 - Added support for Stellar
+- Fix test which tested BIP38 even when disabled
 - Minor cleanup
