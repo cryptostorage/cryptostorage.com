@@ -24,6 +24,8 @@ This tool is security-focused.  Funds are never entrusted to a third party.  Pri
 - Litecoin
 - Dash
 - Zcash
+- Stellar
+- Ripple
 - Ethereum Classic
 - Basic Attention Token
 - OmiseGo
