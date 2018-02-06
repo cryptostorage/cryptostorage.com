@@ -267,10 +267,10 @@ var AppUtils = {
 			AppUtils.plugins.push(new LitecoinPlugin());
 			AppUtils.plugins.push(new DashPlugin());
 			AppUtils.plugins.push(new ZcashPlugin());
-			AppUtils.plugins.push(new StellarPlugin());
-			AppUtils.plugins.push(new RipplePlugin());
 			AppUtils.plugins.push(new EthereumClassicPlugin());
 			AppUtils.plugins.push(new OmiseGoPlugin());
+			AppUtils.plugins.push(new StellarPlugin());
+			AppUtils.plugins.push(new RipplePlugin());
 			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
 			AppUtils.plugins.push(new UbiqPlugin());
 		}
