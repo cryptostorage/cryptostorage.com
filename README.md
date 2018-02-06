@@ -112,6 +112,6 @@ Please note cryptostorage.com will retain ownership of donation addresses for su
 This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt) licensed.
 
 # Donate
-Donations can be voluntarily given to support this project.
+Donations are gratefully accepted to support this project.
 
-See https://cryptostorage.com/#donate for donation addresses ❤.
+Please see https://cryptostorage.com/#donate for donation addresses ❤. 
