@@ -1,6 +1,3 @@
-v0.1.3
-link window.crypto API on homepage
-
 v0.1.4
 passphrase-protect/split arbitrary text
 support json as text input

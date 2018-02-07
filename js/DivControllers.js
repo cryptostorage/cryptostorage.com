@@ -445,7 +445,7 @@ function HomeController(div) {
 			hFlex.append("<img style='height:175px; margin-right:20px;' src='img/key.png'>");
 			var vFlex = $("<div class='flex_vertical width_100'>").appendTo(hFlex);
 			vFlex.append("<div class='home_label'>Strong cryptography</div>");
-			vFlex.append("<div class='home_description'>Uses the latest window.crypto API available in browsers which provides access to a cryptographically secure random number generator. This allows generation of random values as seeds for your keys.</div>");
+			vFlex.append("<div class='home_description'>Uses the latest <a target='_blank' href='https://www.w3.org/TR/WebCryptoAPI/#dfn-GlobalCrypto'>window.crypto</a> API available in browsers which provides access to a cryptographically secure random number generator. This allows generation of random values as seeds for your keys.</div>");
 			
 			// download section
 			pageDiv.append("<div style='height: 70px'>");
