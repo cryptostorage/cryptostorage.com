@@ -1112,13 +1112,7 @@ function FormController(div) {
 					passphraseInputDiv.show();
 					passphraseInput.focus();
 				} else {
-					passphraseInput.get(0)._tippy.hide(0);
-					passphraseInput.val("");
-					passphraseInput.attr("type", "password");
-					showPassphraseCheckbox.prop('checked', false);
-					bip38Checkbox.prop('checked', false);
-					passphraseInputDiv.hide();
-					setPassphraseError(false);
+					resetPassphrase();
 				}
 			});
 			
@@ -1284,11 +1278,7 @@ function FormController(div) {
 		addCurrency();
 		
 		// reset passphrase
-		passphraseCheckbox.prop('checked', false);
-		passphraseInputDiv.hide();
-		showPassphraseCheckbox.prop('checked', false);
-		passphraseInput.val("");
-		bip38Checkbox.prop('checked', false);
+		resetPassphrase();
 		
 		// reset split
 		splitCheckbox.prop('checked', false);
@@ -1388,6 +1378,17 @@ function FormController(div) {
 		}
 		validateCurrencyInputs();
 		updateBip38Checkbox();
+	}
+	
+	function resetPassphrase() {
+		passphraseCheckbox.prop('checked', false);
+		passphraseInput.get(0)._tippy.hide(0);
+		passphraseInput.val("");
+		passphraseInput.attr("type", "password");
+		showPassphraseCheckbox.prop('checked', false);
+		bip38Checkbox.prop('checked', false);
+		passphraseInputDiv.hide();
+		setPassphraseError(false);
 	}
 	
 	function updateBip38Checkbox() {
