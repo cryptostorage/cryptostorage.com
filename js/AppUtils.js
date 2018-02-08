@@ -273,6 +273,7 @@ var AppUtils = {
 			AppUtils.plugins.push(new RipplePlugin());
 			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
 			AppUtils.plugins.push(new UbiqPlugin());
+			AppUtils.plugins.push(new BIP39Plugin());
 		}
 		return AppUtils.plugins;
 	},

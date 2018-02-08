@@ -731,3 +731,36 @@ function StellarPlugin() {
 	}
 }
 inheritsFrom(StellarPlugin, CryptoPlugin);
+
+/**
+ * BIP39 plugin.
+ */
+function BIP39Plugin() {
+	this.getName = function() { return "BIP39"; }
+	this.getTicker = function() { return "BIP39" };
+	this.getLogoPath = function() { return "img/zcash.png"; }
+	this.getDependencies = function() { return ["lib/jsbip39.js", "lib/wordlist_english.js", "lib/sjcl-bip39.js"]; }
+	this.getDonationAddress = function() { return "GBZBQUK27UKX76JMIURN5ESMJ3EEIAWQONM7HKCIUIRG66ZKLPVKT5Y6"; }
+	this.newKey = function(str) {
+				
+		// generate seed if not given
+		if (!str) str = "abcdefg";
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
+		
+		var numWords = 24;
+		var strength = numWords / 3 * 32;
+		var buffer = new Uint8Array(strength / 8);
+		var data = window.crypto.getRandomValues(buffer);
+		var mnemonic = new Mnemonic("english");
+		var words = mnemonic.toMnemonic(data);
+		
+		console.log(words);
+		
+		throw new Error("Not yet implemented");
+	}
+	this.isAddress = function(str) {
+		return isString(str) && isUpperCase(str) && str.length === 56 && AppUtils.isBase32(str);
+	}
+}
+inheritsFrom(BIP39Plugin, CryptoPlugin);
