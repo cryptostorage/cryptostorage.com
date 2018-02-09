@@ -748,14 +748,23 @@ function BIP39Plugin() {
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
 		
+		var passphrase = "";
 		var numWords = 24;
 		var strength = numWords / 3 * 32;
 		var buffer = new Uint8Array(strength / 8);
 		var data = window.crypto.getRandomValues(buffer);
 		var mnemonic = new Mnemonic("english");
 		var words = mnemonic.toMnemonic(data);
+		var seed = mnemonic.toSeed(words, passphrase);
 		
 		console.log(words);
+		console.log(seed);
+		
+		var rebuilt = mnemonic.fromSeed(seed);
+		console.log(rebuilt);
+		
+		// split key into shares
+		var shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
 		
 		throw new Error("Not yet implemented");
 	}
