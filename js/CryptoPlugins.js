@@ -739,7 +739,7 @@ function BIP39Plugin() {
 	this.getName = function() { return "BIP39"; }
 	this.getTicker = function() { return "BIP39" };
 	this.getLogoPath = function() { return "img/zcash.png"; }
-	this.getDependencies = function() { return ["lib/jsbip39.js", "lib/wordlist_english.js", "lib/sjcl-bip39.js"]; }
+	this.getDependencies = function() { return ["lib/jsbip39.js", "lib/wordlist_english.js", "lib/sjcl-bip39.js", "lib/shamir39.js"]; }
 	this.getDonationAddress = function() { return "GBZBQUK27UKX76JMIURN5ESMJ3EEIAWQONM7HKCIUIRG66ZKLPVKT5Y6"; }
 	this.newKey = function(str) {
 				
@@ -753,8 +753,8 @@ function BIP39Plugin() {
 		console.log(words);
 		console.log(mnemonic.check(words));
 		var shamir39 = new Shamir39();
-
-		
+		var shares = shamir39.split(mnemonic.splitWords(words), WORDLISTS["english"], 2, 3);
+		console.log(shares);
 		
 		// split key into shares
 		var shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
