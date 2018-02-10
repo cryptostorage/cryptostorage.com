@@ -736,9 +736,9 @@ inheritsFrom(StellarPlugin, CryptoPlugin);
  * BIP39 plugin.
  */
 function BIP39Plugin() {
-	this.getName = function() { return "BIP39"; }
+	this.getName = function() { return "BIP39 Mnemonic"; }
 	this.getTicker = function() { return "BIP39" };
-	this.getLogoPath = function() { return "img/zcash.png"; }
+	this.getLogoPath = function() { return "img/usb.png"; }
 	this.getDependencies = function() { return ["lib/jsbip39.js", "lib/wordlist_english.js", "lib/sjcl-bip39.js", "lib/shamir39.js"]; }
 	this.getDonationAddress = function() { return null; }
 	this.newKey = function(str) {
@@ -792,17 +792,15 @@ function BIP39Plugin() {
 		// unrecognized bip39 wif or hex phrase
 		throw new Error("Unrecognized bip39 seed: " + str);
 		
-		//----------------
-		
-		var mnemonic = new Mnemonic("english");
-		var words = mnemonic.generate(256);
-		console.log(words);
-		console.log(mnemonic.check(words));
-		var shamir39 = new Shamir39();
-		var shares = shamir39.split(mnemonic.splitWords(words), WORDLISTS["english"], 2, 3);
-		console.log(shares);
-		var combined = shamir39.combine(shares.mnemonics, WORDLISTS["english"]);
-		console.log(combined);
+//		var mnemonic = new Mnemonic("english");
+//		var words = mnemonic.generate(256);
+//		console.log(words);
+//		console.log(mnemonic.check(words));
+//		var shamir39 = new Shamir39();
+//		var shares = shamir39.split(mnemonic.splitWords(words), WORDLISTS["english"], 2, 3);
+//		console.log(shares);
+//		var combined = shamir39.combine(shares.mnemonics, WORDLISTS["english"]);
+//		console.log(combined);
 	}
 	this.isAddress = function(str) {
 		return str === "n/a";
