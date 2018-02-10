@@ -765,7 +765,7 @@ function BIP39Plugin() {
 		throw new Error("Not yet implemented");
 	}
 	this.isAddress = function(str) {
-		return isString(str) && isUpperCase(str) && str.length === 56 && AppUtils.isBase32(str);
+		return str === "n/a";
 	}
 }
 inheritsFrom(BIP39Plugin, CryptoPlugin);
