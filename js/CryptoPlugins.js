@@ -752,9 +752,9 @@ function BIP39Plugin() {
 		var words = mnemonic.generate();
 		console.log(words);
 		console.log(mnemonic.check(words));
-		var passphrase = "";
-		var bip32Seed = mnemonic.toSeed(words, passphrase);
-		console.log(bip32Seed);
+		var shamir39 = new Shamir39();
+
+		
 		
 		// split key into shares
 		var shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
