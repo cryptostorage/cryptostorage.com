@@ -767,22 +767,23 @@ function BIP39Plugin() {
 		// unencrypted hex
 		else if (str.length === 66 && isHex(str)) {
 			state.hex = str;
-			state.wif = null;	// TODO
+			state.wif = mnemonic.joinWords(shamir39.getWordsFromHex(str, wordlist));
 			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
 		
 		// cryptojs hex
-		else if (str.length === 84 && isHex(str)) {	// TODO: string length
+		else if (str.length === 192 && isHex(str)) {
 			state.hex = str;
-			state.wif = null;	// TODO
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
 		
 		// cryptojs wif
-		else if (false) {	// TODO
-			state.hex = null;	// TODO
+		else if (AppUtils.isWifCryptoJs(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			console.log(state.hex);
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
