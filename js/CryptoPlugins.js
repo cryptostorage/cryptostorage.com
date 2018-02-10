@@ -749,12 +749,15 @@ function BIP39Plugin() {
 		var state = {};
 		
 		var mnemonic = new Mnemonic("english");
-		var words = mnemonic.generate();
+		var words = mnemonic.generate(256);
 		console.log(words);
 		console.log(mnemonic.check(words));
 		var shamir39 = new Shamir39();
 		var shares = shamir39.split(mnemonic.splitWords(words), WORDLISTS["english"], 2, 3);
 		console.log(shares);
+		var combined = shamir39.combine(shares.mnemonics, WORDLISTS["english"]);
+		console.log(combined);
+		
 		
 		// split key into shares
 		var shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
