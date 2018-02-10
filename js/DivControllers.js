@@ -868,6 +868,7 @@ function DonateController(div, appController) {
 			var plugins = AppUtils.getCryptoPlugins();
 			for (var i = 0; i < plugins.length; i++) {
 				var plugin = plugins[i];
+				if (!plugin.getDonationAddress()) continue;
 				donations.push({
 					currencyPlugin: plugin,
 					address: plugin.getDonationAddress(),
