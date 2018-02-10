@@ -740,13 +740,58 @@ function BIP39Plugin() {
 	this.getTicker = function() { return "BIP39" };
 	this.getLogoPath = function() { return "img/zcash.png"; }
 	this.getDependencies = function() { return ["lib/jsbip39.js", "lib/wordlist_english.js", "lib/sjcl-bip39.js", "lib/shamir39.js"]; }
-	this.getDonationAddress = function() { return "GBZBQUK27UKX76JMIURN5ESMJ3EEIAWQONM7HKCIUIRG66ZKLPVKT5Y6"; }
+	this.getDonationAddress = function() { return null; }	// TODO: this will break stuff probably
 	this.newKey = function(str) {
-				
-		// generate seed if not given
-		if (!str) str = "abcdefg";
+		
+		// initialize
+		var language = "english";
+		var wordlist = WORDLISTS[language];
+		var shamir39 = new Shamir39();
+		var mnemonic = new Mnemonic(language);
+
+		// generate phrase if not given
+		if (!str) str = mnemonic.generate(256); 
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		var state = {};
+		
+		// initialize state
+		var state = {address: "n/a"};
+		
+		// unencrypted wif
+		if (mnemonic.check(str)) {
+			state.hex = shamir39.getHexFromWords(mnemonic.splitWords(str), wordlist);
+			state.wif = str;
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// unencrypted hex
+		else if (str.length === 66 && isHex(str)) {
+			state.hex = str;
+			state.wif = null;	// TODO
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// cryptojs hex
+		else if (str.length === 84 && isHex(str)) {	// TODO: string length
+			state.hex = str;
+			state.wif = null;	// TODO
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// cryptojs wif
+		else if (false) {	// TODO
+			state.hex = null;	// TODO
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// unrecognized bip39 wif or hex phrase
+		throw new Error("Unrecognized bip39 seed: " + str);
+		
+		//----------------
 		
 		var mnemonic = new Mnemonic("english");
 		var words = mnemonic.generate(256);
@@ -757,12 +802,6 @@ function BIP39Plugin() {
 		console.log(shares);
 		var combined = shamir39.combine(shares.mnemonics, WORDLISTS["english"]);
 		console.log(combined);
-		
-		
-		// split key into shares
-		var shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
-		
-		throw new Error("Not yet implemented");
 	}
 	this.isAddress = function(str) {
 		return str === "n/a";
