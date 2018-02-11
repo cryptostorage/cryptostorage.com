@@ -1548,7 +1548,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .key_div_right_value {
-	padding-left: 5px;
+	margin-left: 5px;
 	font-size: 13px;
 	text-align: right;
 	font-family: monospace;

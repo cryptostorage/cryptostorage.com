@@ -172,6 +172,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			if (isCancelled) return;
 			
 			var pieceKey = piece.keys[index];
+			var plugin = AppUtils.getCryptoPlugin(pieceKey.ticker);
 			var isSplit = isInitialized(piece.pieceNum);
 			var addressApplicable = pieceKey.address !== AppUtils.NA;
 			
@@ -180,10 +181,10 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			var leftLabel = "\u25C4 Public Address";
 			var leftValue = (!pieceKey.address && pieceKey.encryption) ? "(decrypt to view)" : config.showPublic ? pieceKey.address : "(not shown)";
 			var leftCopyable = config.showPublic && pieceKey.address && addressApplicable;
-			var rightLabel = "Private Key" + (pieceKey.wif && config.showPrivate ? (isSplit ? " (split)" : pieceKey.encryption ? " (encrypted)" : " (unencrypted)") : "") + " \u25ba";
+			var rightLabel = plugin.getTicker() === "BIP39" ? "Mnemonic" : plugin.getTicker() === "XMR" ? "Mnemonic" : "Private Key";
+			rightLabel += " " + (pieceKey.wif && config.showPrivate ? (isSplit ? "(split)" : pieceKey.encryption ? "(encrypted)" : "(unencrypted)") : "") + " \u25ba";
 			var rightValue = pieceKey.wif && config.showPrivate ? pieceKey.wif : "(not shown)";
 			var rightCopyable = pieceKey.wif && config.showPrivate;
-			var plugin = AppUtils.getCryptoPlugin(pieceKey.ticker);
 			var currencyLogo = plugin.getLogo();
 			currencyLogo.attr("width", "100%");
 			currencyLogo.attr("height", "100%");
@@ -225,17 +226,20 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			var keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivCenter);
 			keyDivRightLabel.html(rightLabel);
 			var keyDivRightValue = $("<div class='key_div_right_value'>").appendTo(keyDivCenter);
+			if (!addressApplicable) keyDivRightValue.css("margin-left", "-90px");
 			if (!hasWhitespace(rightValue)) keyDivRightValue.css("word-break", "break-all");
 			keyDivRightValue.html(rightValue);
 			if (rightCopyable) keyDivRightValue.addClass("copyable");
 			
 			// collapse spacing for long keys
-			if (leftValue.length > 71) {
-				keyDivCurrency.css("margin-top", "-15px");
-			}
-			if (rightValue.length > 140) {
-				keyDivCurrency.css("margin-top", "-10px");
-				keyDivRightLabel.css("margin-top", "-15px");
+			if (addressApplicable) {
+				if (leftValue.length > 71) {
+					keyDivCurrency.css("margin-top", "-15px");
+				}
+				if (rightValue.length > 140) {
+					keyDivCurrency.css("margin-top", "-10px");
+					keyDivRightLabel.css("margin-top", "-15px");
+				}
 			}
 			
 			// right qr code
