@@ -754,7 +754,7 @@ function BIP39Plugin() {
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		
 		// initialize state
-		var state = {address: "n/a"};
+		var state = {address: AppUtils.NA};
 		
 		// unencrypted wif
 		if (mnemonic.check(str)) {
@@ -803,7 +803,7 @@ function BIP39Plugin() {
 //		console.log(combined);
 	}
 	this.isAddress = function(str) {
-		return str === "n/a";
+		return str === AppUtils.NA;
 	}
 }
 inheritsFrom(BIP39Plugin, CryptoPlugin);

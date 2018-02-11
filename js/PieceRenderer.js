@@ -173,12 +173,13 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			
 			var pieceKey = piece.keys[index];
 			var isSplit = isInitialized(piece.pieceNum);
+			var addressApplicable = pieceKey.address !== AppUtils.NA;
 			
 			// content to render
 			var title = piece.keys.length > 1 ? "#" + (index + 1) : "";
 			var leftLabel = "\u25C4 Public Address";
 			var leftValue = (!pieceKey.address && pieceKey.encryption) ? "(decrypt to view)" : config.showPublic ? pieceKey.address : "(not shown)";
-			var leftCopyable = config.showPublic && pieceKey.address;
+			var leftCopyable = config.showPublic && pieceKey.address && addressApplicable;
 			var rightLabel = "Private Key" + (pieceKey.wif && config.showPrivate ? (isSplit ? " (split)" : pieceKey.encryption ? " (encrypted)" : " (unencrypted)") : "") + " \u25ba";
 			var rightValue = pieceKey.wif && config.showPrivate ? pieceKey.wif : "(not shown)";
 			var rightCopyable = pieceKey.wif && config.showPrivate;
@@ -198,15 +199,18 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			// title
 			var keyDivCenter = $("<div class='key_div_center'>").appendTo(div);
 			var titleDiv = $("<div class='key_div_center_title'>").appendTo(keyDivCenter);
+			if (addressApplicable) titleDiv.css("position", "absolute");
 			titleDiv.html(title);
 			
 			// left label and value
-			var keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivCenter);
-			keyDivLeftLabel.html(leftLabel);
-			var keyDivLeftValue = $("<div class='key_div_left_value'>").appendTo(keyDivCenter);
-			if (!hasWhitespace(leftValue)) keyDivLeftValue.css("word-break", "break-all");
-			keyDivLeftValue.html(leftValue);
-			if (leftCopyable) keyDivLeftValue.addClass("copyable");
+			if (addressApplicable) {
+				var keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivCenter);
+				keyDivLeftLabel.html(leftLabel);
+				var keyDivLeftValue = $("<div class='key_div_left_value'>").appendTo(keyDivCenter);
+				if (!hasWhitespace(leftValue)) keyDivLeftValue.css("word-break", "break-all");
+				keyDivLeftValue.html(leftValue);
+				if (leftCopyable) keyDivLeftValue.addClass("copyable");
+			}
 			
 			// center currency
 			var keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
@@ -246,8 +250,10 @@ function PieceRenderer(pieces, pieceDivs, config) {
 					addPrivateQr();
 				});
 			} else {
-				var omitted = $("<div class='key_div_qr_omitted flex_horizontal'>").appendTo(keyDivLeft);
-				omitted.append($("<img src='img/restricted.png' class='key_div_qr_omitted_img'>"));
+				if (addressApplicable) {
+					var omitted = $("<div class='key_div_qr_omitted flex_horizontal'>").appendTo(keyDivLeft);
+					omitted.append($("<img src='img/restricted.png' class='key_div_qr_omitted_img'>"));
+				}
 				addPrivateQr();
 			}
 			function addPrivateQr() {

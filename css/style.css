@@ -1474,6 +1474,7 @@ input[type='checkbox'][disabled] +label {
 	-webkit-justify-content: center;
 	-ms-flex-pack: center;
 	justify-content: center;
+	width:90px;
 }
 
 .key_div_center {
@@ -1494,7 +1495,6 @@ input[type='checkbox'][disabled] +label {
 
 .key_div_center_title {
 	font-size: 13px;
-	position: absolute;
 	left: 0;
 	right: 0;
 	text-align: center;
