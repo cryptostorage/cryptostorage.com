@@ -776,6 +776,7 @@ function BIP39Plugin() {
 		else if (str.length === 192 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
@@ -783,7 +784,6 @@ function BIP39Plugin() {
 		// cryptojs wif
 		else if (AppUtils.isWifCryptoJs(str)) {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-			console.log(state.hex);
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);

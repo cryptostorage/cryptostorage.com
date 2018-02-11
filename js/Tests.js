@@ -49,6 +49,7 @@ var Tests = {
 		plugins.push(new ZcashPlugin());
 		plugins.push(new RipplePlugin());
 		plugins.push(new StellarPlugin());
+		plugins.push(new BIP39Plugin());
 		return plugins;
 	},
 	
@@ -438,11 +439,11 @@ var Tests = {
 					
 					// test new key from encrypted hex and wif
 					var key2 = new CryptoKey(key.getPlugin(), key.getHex());
-					assertUndefined(key2.getAddress());
+					if (key2.getAddress() !== AppUtils.NA) assertUndefined(key2.getAddress());
 					key2.setAddress(key.getAddress());
 					assertTrue(key.equals(key2));
 					key2 = new CryptoKey(key.getPlugin(), key.getWif());
-					assertUndefined(key2.getAddress());
+					if (key2.getAddress() !== AppUtils.NA) assertUndefined(key2.getAddress());
 					key2.setAddress(key.getAddress());
 					assertTrue(key.equals(key2));
 					
