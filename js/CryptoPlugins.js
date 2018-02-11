@@ -736,7 +736,7 @@ inheritsFrom(StellarPlugin, CryptoPlugin);
  * BIP39 plugin.
  */
 function BIP39Plugin() {
-	this.getName = function() { return "BIP39 Mnemonic"; }
+	this.getName = function() { return "BIP39"; }
 	this.getTicker = function() { return "BIP39" };
 	this.getLogoPath = function() { return "img/usb.png"; }
 	this.getDependencies = function() { return ["lib/bip39.js"]; }
