@@ -57,7 +57,7 @@ var AppUtils = {
 	NO_INTERNET_CAN_BE_ERROR: false,	// lack of internet can be critical error if running remotely
 	SIMULATED_LOAD_TIME: null,				// simulate slow load times in ms, disabled if null
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
-	NA: "n/a",												// "not applicable" constant
+	NA: "Not applicable",							// "not applicable" constant
 	
 	/**
 	 * Mock environment checks.
