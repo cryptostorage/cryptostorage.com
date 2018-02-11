@@ -739,7 +739,7 @@ function BIP39Plugin() {
 	this.getName = function() { return "BIP39 Mnemonic"; }
 	this.getTicker = function() { return "BIP39" };
 	this.getLogoPath = function() { return "img/usb.png"; }
-	this.getDependencies = function() { return ["lib/jsbip39.js", "lib/wordlist_english.js", "lib/sjcl-bip39.js", "lib/shamir39.js"]; }
+	this.getDependencies = function() { return ["lib/bip39.js"]; }
 	this.getDonationAddress = function() { return null; }
 	this.newKey = function(str) {
 		
