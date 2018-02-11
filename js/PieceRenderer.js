@@ -229,7 +229,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			if (leftValue.length > 71) {
 				keyDivCurrency.css("margin-top", "-15px");
 			}
-			if (rightValue.length > 150) {
+			if (rightValue.length > 140) {
 				keyDivCurrency.css("margin-top", "-10px");
 				keyDivRightLabel.css("margin-top", "-15px");
 			}
