@@ -1500,7 +1500,7 @@ input[type='checkbox'][disabled] +label {
 	.export_content_div {
 		display: unset;
 	}
-	.alpha_warning {
+	.beta_warning {
 		display: none;
 	}
 	.export_progress_div {
@@ -1715,7 +1715,7 @@ input[type='checkbox'][disabled] +label {
 	width: 100%;
 }
 
-.alpha_warning {
+.beta_warning {
 	background-color: orange;
 	padding: 5px 10px 5px 10px;
 	border-radius: 10px;
@@ -1724,11 +1724,11 @@ input[type='checkbox'][disabled] +label {
 	width: unset;
 }
 
-.alpha_warning * {
+.beta_warning * {
 	font-size:18px;
 }
 
-.alpha_icon {
+.beta_icon {
 	width: 30px;
 	height: 30px;
 	margin-right: 3px;
