@@ -663,50 +663,18 @@ input[type='checkbox'][disabled] +label {
 }
 
 .passphrase_config_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
 	padding: 7px 0px 7px 0px;
 }
 
 .bip38_checkbox_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
 }
 
 .show_passphrase_checkbox_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
 	margin-left: auto;
 }
 
 .split_input_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center; -ms-flex-pack : center;
-	justify-content : center;
 	margin: 20px 20px 0px 20px;
-	-ms-flex-pack: center;
-	justify-content: center;
 }
 
 .split_qr {

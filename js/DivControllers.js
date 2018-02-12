@@ -1141,12 +1141,12 @@ function FormController(div) {
 			});
 			
 			// passphrase config
-			var passphraseConfigDiv = $("<div class='passphrase_config_div'>").appendTo(passphraseInputDiv);
-			bip38CheckboxDiv = $("<div class='bip38_checkbox_div'>").appendTo(passphraseConfigDiv);
+			var passphraseConfigDiv = $("<div class='passphrase_config_div flex_horizontal'>").appendTo(passphraseInputDiv);
+			bip38CheckboxDiv = $("<div class='bip38_checkbox_div flex_horizontal'>").appendTo(passphraseConfigDiv);
 			bip38Checkbox = $("<input type='checkbox' id='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
 			var bip38CheckboxLabel = $("<label for='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
 			bip38CheckboxLabel.html("Use BIP38 for Bitcoin and Bitcoin Cash");
-			var showPassphraseCheckboxDiv = $("<div class='show_passphrase_checkbox_div'>").appendTo(passphraseConfigDiv);
+			var showPassphraseCheckboxDiv = $("<div class='show_passphrase_checkbox_div flex_horizontal'>").appendTo(passphraseConfigDiv);
 			showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 			var showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
 			showPassphraseCheckboxLabel.html("Show passphrase");
@@ -1214,7 +1214,7 @@ function FormController(div) {
 			});
 			
 			// split input
-			splitInputDiv = $("<div class='split_input_div'>").appendTo(splitDiv);
+			splitInputDiv = $("<div class='split_input_div flex_horizontal'>").appendTo(splitDiv);
 			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitInputDiv);
 			var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
 			var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
@@ -1229,7 +1229,7 @@ function FormController(div) {
 			splitMinLabelTop.html("Require");
 			minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
 			var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
-			splitMinLabelBottom.html("To Recover");	
+			splitMinLabelBottom.html("To Recover");
 			numPiecesInput.on("input", function(e) { validateSplit(false); });
 			numPiecesInput.on("focusout", function(e) { validateSplit(true); });
 			minPiecesInput.on("input", function(e) { validateSplit(false); });
