@@ -906,23 +906,12 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_warning_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center; -ms-flex-pack : center;
-	justify-content : center;
 	padding: 8px;
 	margin-bottom: 15px;
 	text-align: center;
 	background-color: rgb(247, 185, 43);
 	border: 2.5px solid black;
 	font-size: 24px;
-	-ms-flex-pack: center;
-	justify-content: center;
 	word-break: break-word;
 }
 
@@ -933,20 +922,9 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_drag_drop {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center; -ms-flex-pack : center;
-	justify-content : center;
 	background-color: white;
 	padding: 30px;
 	border: 2.5px solid black;
-	-ms-flex-pack: center;
-	justify-content: center;
 }
 
 .inner_outline {
@@ -961,17 +939,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .drag_drop_text {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-flex-direction: column;
-	-moz-flex-direction: column;
-	-ms-flex-direction: column;
-	flex-direction: column;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
+
 }
 
 .drag_drop_label {

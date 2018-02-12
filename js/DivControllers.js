@@ -1822,7 +1822,7 @@ function ImportFileController(div) {
 		importInputDiv = $("<div class='import_input_div'>").appendTo(div);
 		
 		// warning div
-		warningDiv = $("<div class='import_warning_div'>").appendTo(importInputDiv);
+		warningDiv = $("<div class='import_warning_div flex_horizontal'>").appendTo(importInputDiv);
 		warningDiv.hide();
 		
 		// all file importing
@@ -1833,9 +1833,9 @@ function ImportFileController(div) {
 		decryptionDiv.hide();
 		
 		// drag and drop div
-		var dragDropDiv = $("<div class='import_drag_drop'>").appendTo(fileInputDiv);
+		var dragDropDiv = $("<div class='import_drag_drop flex_horizontal'>").appendTo(fileInputDiv);
 		var dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
-		var dragDropText = $("<div class='drag_drop_text'>").appendTo(dragDropDiv);
+		var dragDropText = $("<div class='drag_drop_text flex_vertical flex_justify_start'>").appendTo(dragDropDiv);
 		var dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
 		dragDropLabel.append("Drag and Drop Files To Import");
 		var dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
@@ -2254,7 +2254,7 @@ function ImportTextController(div, plugins) {
 		importInputDiv = $("<div class='import_input_div'>").appendTo(div);
 		
 		// warning div
-		warningDiv = $("<div class='import_warning_div'>").appendTo(importInputDiv);
+		warningDiv = $("<div class='import_warning_div flex_horizontal'>").appendTo(importInputDiv);
 		warningDiv.hide();
 		
 		// all text importing
