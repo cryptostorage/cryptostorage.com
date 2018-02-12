@@ -1118,7 +1118,7 @@ function FormController(div) {
 			});
 			
 			// passphrase input
-			passphraseInputDiv = $("<div class='passphrase_input_div'>").appendTo(passphraseDiv);
+			passphraseInputDiv = $("<div class='passphrase_input_div flex_vertical flex_align_start flex_justify_start'>").appendTo(passphraseDiv);
 			var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
 			passphraseWarnDiv.append("This passphrase is required to access funds later on.  <b>Do not lose it.</b>");
 			passphraseInputDiv.append("Passphrase");
