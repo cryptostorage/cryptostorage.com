@@ -1141,7 +1141,7 @@ function FormController(div) {
 			});
 			
 			// passphrase config
-			var passphraseConfigDiv = $("<div class='passphrase_config_div flex_horizontal'>").appendTo(passphraseInputDiv);
+			var passphraseConfigDiv = $("<div class='passphrase_config_div flex_horizontal flex_justify_start'>").appendTo(passphraseInputDiv);
 			bip38CheckboxDiv = $("<div class='bip38_checkbox_div flex_horizontal'>").appendTo(passphraseConfigDiv);
 			bip38Checkbox = $("<input type='checkbox' id='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
 			var bip38CheckboxLabel = $("<label for='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
