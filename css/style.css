@@ -706,17 +706,6 @@ input[type='checkbox'][disabled] +label {
 }
 
 .split_min_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-flex-direction: column;
-	-moz-flex-direction: column;
-	-ms-flex-direction: column;
-	flex-direction: column;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
 	margin: 10px;
 	width: 115px;
 }
@@ -732,38 +721,16 @@ input[type='checkbox'][disabled] +label {
 }
 
 .form_generate_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center; -ms-flex-pack : center;
-	justify-content : center;
 	width: 100%;
-	-ms-flex-pack: center;
-	justify-content: center;
 }
 
 .dark_green_btn {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center; -ms-flex-pack : center;
-	justify-content : center;
 	height: 70px;
 	min-width: 225px;
 	padding: 20px;
 	background-color: rgb(76, 213, 67);
 	color: white;
 	font-size:24px;
-	-ms-flex-pack: center;
-	justify-content: center;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;

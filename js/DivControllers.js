@@ -1224,7 +1224,7 @@ function FormController(div) {
 			var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
 			splitNumLabelBottom.html("Pieces");
 			var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitInputDiv);
-			var splitMinDiv = $("<div class='split_min_div'>").appendTo(splitInputDiv);
+			var splitMinDiv = $("<div class='split_min_div flex_vertical flex_justify_start'>").appendTo(splitInputDiv);
 			var splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
 			splitMinLabelTop.html("Require");
 			minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
@@ -1243,8 +1243,8 @@ function FormController(div) {
 			splitInputDiv.hide();
 			
 			// add generate button
-			var generateDiv = $("<div class='form_generate_div'>").appendTo(pageDiv);
-			btnGenerate = $("<div class='dark_green_btn'>").appendTo(generateDiv);
+			var generateDiv = $("<div class='form_generate_div flex_horizontal'>").appendTo(pageDiv);
+			btnGenerate = $("<div class='dark_green_btn flex_horizontal'>").appendTo(generateDiv);
 			btnGenerate.append("Generate Keys");
 			
 			// start over
@@ -3009,7 +3009,7 @@ function ExportController(div, window, config) {
 						// regenerate button
 						if (config.showRegenerate) {
 							regenerateDiv = $("<div class='export_regenerate_div'>").appendTo(div);
-							btnRegenerate = $("<div class='dark_green_btn'>").appendTo(regenerateDiv);
+							btnRegenerate = $("<div class='dark_green_btn flex_horizontal'>").appendTo(regenerateDiv);
 							btnRegenerate.append("Regenerate");
 							var refreshImg = $("<img src='img/refresh.png' class='refresh_img rotate2'>").appendTo(btnRegenerate);
 							btnRegenerate.click(function() {
