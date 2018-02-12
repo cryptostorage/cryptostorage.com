@@ -1217,7 +1217,7 @@ function FormController(div) {
 			splitInputDiv = $("<div class='split_input_div flex_horizontal'>").appendTo(splitDiv);
 			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitInputDiv);
 			var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
-			var splitNumDiv = $("<div class='split_num_div'>").appendTo(splitInputDiv);
+			var splitNumDiv = $("<div class='split_num_div flex_vertical flex_justify_start'>").appendTo(splitInputDiv);
 			var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
 			splitNumLabelTop.html("Split Each Key Into");
 			numPiecesInput = $("<input type='tel' value='3' min='2'>").appendTo(splitNumDiv);

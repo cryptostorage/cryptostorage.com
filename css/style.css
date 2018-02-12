@@ -683,17 +683,6 @@ input[type='checkbox'][disabled] +label {
 }
 
 .split_num_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-flex-direction: column;
-	-moz-flex-direction: column;
-	-ms-flex-direction: column;
-	flex-direction: column;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
 	margin: 10px;
 	max-width: 115px;
 }
