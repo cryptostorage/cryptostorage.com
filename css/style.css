@@ -670,6 +670,12 @@ input[type='checkbox'][disabled] +label {
 	margin: 20px 20px 0px 20px;
 }
 
+.split_warn_div {
+	width: 100%;
+	text-align: center;
+	margin-bottom: 15px;
+}
+
 .split_qr {
 	width: 100px;
 	height: 100px;

@@ -1214,17 +1214,20 @@ function FormController(div) {
 			});
 			
 			// split input
-			splitInputDiv = $("<div class='split_input_div flex_horizontal'>").appendTo(splitDiv);
-			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitInputDiv);
-			var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitInputDiv);
-			var splitNumDiv = $("<div class='split_num_div flex_vertical flex_justify_start'>").appendTo(splitInputDiv);
+			splitInputDiv = $("<div class='split_input_div flex_vertical'>").appendTo(splitDiv);
+			var splitWarnDiv = $("<div class='passphrase_warn_div flex_horizontal'>").appendTo(splitInputDiv);
+			splitWarnDiv.append("Split storage may not be interoperable with other tools.");
+			var splitConfigDiv = $("<div class='flex_horizontal'>").appendTo(splitInputDiv);
+			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitConfigDiv);
+			var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitConfigDiv);
+			var splitNumDiv = $("<div class='split_num_div flex_vertical flex_justify_start'>").appendTo(splitConfigDiv);
 			var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
 			splitNumLabelTop.html("Split Each Key Into");
 			numPiecesInput = $("<input type='tel' value='3' min='2'>").appendTo(splitNumDiv);
 			var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
 			splitNumLabelBottom.html("Pieces");
-			var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitInputDiv);
-			var splitMinDiv = $("<div class='split_min_div flex_vertical flex_justify_start'>").appendTo(splitInputDiv);
+			var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitConfigDiv);
+			var splitMinDiv = $("<div class='split_min_div flex_vertical flex_justify_start'>").appendTo(splitConfigDiv);
 			var splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
 			splitMinLabelTop.html("Require");
 			minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
@@ -1234,6 +1237,24 @@ function FormController(div) {
 			numPiecesInput.on("focusout", function(e) { validateSplit(true); });
 			minPiecesInput.on("input", function(e) { validateSplit(false); });
 			minPiecesInput.on("focusout", function(e) { validateSplit(true); });
+			
+			// split warn information tooltip
+			var splitWarnInfo = $("<img src='img/information.png' class='information_img'>").appendTo(splitWarnDiv);
+			var splitWarnTooltip = $("<div>");
+			splitWarnTooltip.append("There is currently no standardized way of splitting cryptocurrency keys.  As a result, split storage generated from this tool may not be interoperable with other tools.  Saving a copy of this tool for future use is recommended if using the split feature.");
+			tippy(splitWarnInfo.get(0), {
+				arrow: true,
+				html: splitWarnTooltip.get(0),
+				interactive: true,
+				placement: 'bottom',
+				theme: 'translucent',
+				trigger: "mouseenter",
+				multiple: 'false',
+				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
+				distance: 20,
+				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+				offset: '-180, 0'
+			});
 			
 			// apply default configuration
 			passphraseCheckbox.prop('checked', false);
