@@ -1216,7 +1216,7 @@ function FormController(div) {
 			// split input
 			splitInputDiv = $("<div class='split_input_div flex_vertical'>").appendTo(splitDiv);
 			var splitWarnDiv = $("<div class='passphrase_warn_div flex_horizontal'>").appendTo(splitInputDiv);
-			splitWarnDiv.append("Split storage may not be interoperable with other tools.");
+			splitWarnDiv.append("Split storage will not be interoperable with other tools.");
 			var splitConfigDiv = $("<div class='flex_horizontal'>").appendTo(splitInputDiv);
 			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitConfigDiv);
 			var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitConfigDiv);
@@ -1241,7 +1241,7 @@ function FormController(div) {
 			// split warn information tooltip
 			var splitWarnInfo = $("<img src='img/information.png' class='information_img'>").appendTo(splitWarnDiv);
 			var splitWarnTooltip = $("<div>");
-			splitWarnTooltip.append("There is currently no standardized way of splitting cryptocurrency keys.  As a result, split storage generated from this tool may not be interoperable with other tools.  Saving a copy of this tool for future use is recommended if using the split feature.");
+			splitWarnTooltip.append("There is currently no standardized way of splitting cryptocurrency keys.  As a result, split storage generated from this tool will likely not be interoperable with other tools.  Saving a copy of this tool for future use is recommended if using the split feature.");
 			tippy(splitWarnInfo.get(0), {
 				arrow: true,
 				html: splitWarnTooltip.get(0),
