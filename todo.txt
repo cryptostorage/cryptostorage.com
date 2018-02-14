@@ -1,7 +1,6 @@
 v0.1.4
-bip39
-split convention disclaimer
 passphrase-protect/split arbitrary text
+re-encrypt / split imported storage
 support json as text input
 info box on currencies
 
