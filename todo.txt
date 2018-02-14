@@ -1,6 +1,7 @@
 v0.1.4
 passphrase-protect/split arbitrary text
 re-encrypt / split imported storage
+only one "not applicable" for save public addresses txt
 support json as text input
 info box on currencies
 
