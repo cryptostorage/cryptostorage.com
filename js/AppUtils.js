@@ -275,6 +275,7 @@ var AppUtils = {
 			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
 			AppUtils.plugins.push(new UbiqPlugin());
 			AppUtils.plugins.push(new BIP39Plugin());
+			AppUtils.plugins.push(new WavesPlugin());
 		}
 		return AppUtils.plugins;
 	},

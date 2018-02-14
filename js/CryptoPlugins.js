@@ -807,3 +807,73 @@ function BIP39Plugin() {
 	}
 }
 inheritsFrom(BIP39Plugin, CryptoPlugin);
+
+/**
+ * Waves plugin.
+ */
+function WavesPlugin() {
+	this.getName = function() { return "Waves"; }
+	this.getTicker = function() { return "WAVES" };
+	this.getLogoPath = function() { return "img/zcash.png"; }
+	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/waves-api.js"]; }
+	this.getDonationAddress = function() { return "TODO"; }
+	this.newKey = function(str) {
+		
+		// here we go
+		var Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+		var seed = Waves.Seed.create();
+		console.log(seed);
+		console.log(seed.phrase);
+		console.log(seed.address);
+				
+		// generate seed if not given
+		if (!str) str = StellarBase.Keypair.random().secret();
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
+		
+		// unencrypted wif
+		if (str.length === 56 && isUpperCase(str) && AppUtils.isBase32(str)) {
+			var keypair = StellarBase.Keypair.fromSecret(str);
+			state.hex = keypair.rawSecretKey().toString('hex');
+			state.wif = str;			
+			state.address = keypair.publicKey();
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// unencrypted hex
+		else if (str.length === 64 && isHex(str)) {
+			var rawSecret = new Uint8Array(Crypto.util.hexToBytes(str));
+			var keypair = StellarBase.Keypair.fromRawEd25519Seed(rawSecret);
+			state.hex = str;
+			state.wif = keypair.secret();
+			state.address = keypair.publicKey();
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// cryptojs hex
+		else if (str.length > 100 && isHex(str)) {
+			state.hex = str;
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// cryptojs wif
+		else if (AppUtils.isWifCryptoJs(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// otherwise key is not recognized
+		throw new Error("Unrecognized private key: " + str);
+	}
+	this.isAddress = function(str) {
+		return isString(str) && isUpperCase(str) && str.length === 56 && AppUtils.isBase32(str);
+	}
+}
+inheritsFrom(WavesPlugin, CryptoPlugin);
