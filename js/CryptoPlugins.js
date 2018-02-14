@@ -499,8 +499,17 @@ function MoneroPlugin() {
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
 		
+		// wif unencrypted
+		if (str.indexOf(' ') !== -1) {
+			state.hex = mn_decode(str);
+			state.wif = str;
+			state.address = cnUtil.create_address(state.hex).public_addr;
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
 		// handle hex
-		if (isHex(str)) {
+		else if (isHex(str)) {
 			
 			// unencrypted
 			if (str.length >= 63 && str.length <= 65) {
@@ -516,7 +525,7 @@ function MoneroPlugin() {
 			}
 			
 			// hex cryptojs
-			if (str.length > 100) {
+			else if (str.length > 100) {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 				if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
@@ -526,19 +535,10 @@ function MoneroPlugin() {
 		}
 		
 		// wif cryptojs
-		if (AppUtils.isWifCryptoJs(str)) {
+		else if (AppUtils.isWifCryptoJs(str)) {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-			return new CryptoKey(this, state);
-		}
-		
-		// wif unencrypted
-		if (str.indexOf(' ') !== -1) {
-			state.hex = mn_decode(str);
-			state.wif = str;
-			state.address = cnUtil.create_address(state.hex).public_addr;
-			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
 		
@@ -825,6 +825,7 @@ function WavesPlugin() {
 		console.log(seed);
 		console.log(seed.phrase);
 		console.log(seed.address);
+		console.log(Waves.tools.base58.decode(seed.address));
 				
 		// generate seed if not given
 		if (!str) str = StellarBase.Keypair.random().secret();
