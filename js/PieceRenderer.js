@@ -181,7 +181,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			var leftLabel = "\u25C4 Public Address";
 			var leftValue = (!pieceKey.address && pieceKey.encryption) ? "(decrypt to view)" : config.showPublic ? pieceKey.address : "(not shown)";
 			var leftCopyable = config.showPublic && pieceKey.address && addressApplicable;
-			var rightLabel = plugin.getTicker() === "BIP39" ? "Mnemonic" : plugin.getTicker() === "XMR" ? "Mnemonic" : "Private Key";
+			var rightLabel = (plugin.getTicker() === "BIP39" || plugin.getTicker() === "XMR" || plugin.getTicker() === "WAVES") ? "Mnemonic" : "Private Key";	// TODO: move to CryptoPlugin
 			rightLabel += " " + (pieceKey.wif && config.showPrivate ? (isSplit ? "(split)" : pieceKey.encryption ? "(encrypted)" : "(unencrypted)") : "") + " \u25ba";
 			var rightValue = pieceKey.wif && config.showPrivate ? pieceKey.wif : "(not shown)";
 			var rightCopyable = pieceKey.wif && config.showPrivate;
