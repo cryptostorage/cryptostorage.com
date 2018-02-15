@@ -825,6 +825,12 @@ function WavesPlugin() {
 		console.log(seed);
 		console.log(seed.phrase);
 		console.log(seed.address);
+		var hex = Waves.Seed.phraseToHex(seed.phrase);
+		console.log(hex);
+		var convertedPhrase = Waves.Seed.hexToPhrase(hex);
+		console.log(convertedPhrase);
+		assertEquals(seed.phrase, convertedPhrase);
+		
 		console.log(Waves.tools.base58.decode(seed.address));
 				
 		// generate seed if not given
