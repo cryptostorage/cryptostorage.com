@@ -374,7 +374,7 @@ inheritsFrom(IntroController, DivController);
  */
 function HomeController(div) {
 	DivController.call(this, div);
-	var moreLink = false;
+	var moreLink = true;
 	this.render = function(onDone) {
 		
 		// load home dependencies
@@ -391,7 +391,7 @@ function HomeController(div) {
 			var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
 			
 			// supported currencies
-			var numVisible = 11;
+			var numVisible = 15;
 			pageDiv.append($("<div class='home_label'>Supports these tokens</div>"));
 			var plugins = AppUtils.getCryptoPlugins();
 			pageDiv.append(getCurrencyRow(plugins.slice(0, 3), true, onCurrencyClicked));

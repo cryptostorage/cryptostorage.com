@@ -28,7 +28,7 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 10,
+	REPEAT_LONG: 100,
 	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
@@ -50,6 +50,7 @@ var Tests = {
 		plugins.push(new RipplePlugin());
 		plugins.push(new StellarPlugin());
 		plugins.push(new WavesPlugin());
+		plugins.push(new NeoPlugin());
 		plugins.push(new BIP39Plugin());
 		return plugins;
 	},

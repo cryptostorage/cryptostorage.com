@@ -843,6 +843,73 @@ function WavesPlugin() {
 		else if (str.length === 128 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized wif or hex: " + str);
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// cryptojs wif
+		else if (AppUtils.isWifCryptoJs(str)) {
+			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// unrecognized wif or hex
+		throw new Error("Unrecognized wif or hex: " + str);
+	}
+	this.isAddress = function(str) {
+		var Waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
+		try {
+			return Waves.crypto.isValidAddress(str);
+		} catch (err) {
+			return false;;
+		}
+	}
+}
+inheritsFrom(WavesPlugin, CryptoPlugin);
+
+/**
+ * Neo plugin.
+ */
+function NeoPlugin() {
+	this.getName = function() { return "Neo"; }
+	this.getTicker = function() { return "NEO" };
+	this.getLogoPath = function() { return "img/neo.png"; }
+	this.getDependencies = function() { return ["lib/neon.js"]; }
+	this.getDonationAddress = function() { return "TODO"; }
+	this.newKey = function(str) {
+
+		// generate phrase if not given
+		if (!str) str = Neon.wallet.generatePrivateKey();
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		
+		// initialize state
+		var state = {};
+		
+		// unencrypted wif
+		if (Neon.wallet.isWIF(str)) {
+			state.hex = Neon.wallet.getPrivateKeyFromWIF(str);
+			state.wif = str;
+			state.address = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(state.hex)));
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// unencrypted hex
+		else if (str.length === 64 && isHex(str)) {
+			state.hex = str;
+			state.wif = Neon.wallet.getWIFFromPrivateKey(state.hex);
+			state.address = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(state.hex)));
+			state.encryption = null;
+			return new CryptoKey(this, state);
+		}
+		
+		// cryptojs hex
+		else if (str.length === 128 && isHex(str)) {
+			state.hex = str;
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
@@ -856,16 +923,11 @@ function WavesPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// unrecognized waves wif or hex phrase
-		throw new Error("Unrecognized Waves phrase: " + str);
+		// unrecognized wif or hex
+		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
-		var Waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
-		try {
-			return Waves.crypto.isValidAddress(str);
-		} catch (err) {
-			return false;;
-		}
+		return Neon.wallet.isAddress(str);
 	}
 }
-inheritsFrom(WavesPlugin, CryptoPlugin);
+inheritsFrom(NeoPlugin, CryptoPlugin);
