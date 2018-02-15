@@ -43,3 +43,10 @@ cryptostorage-v0.1.3-beta
 - Added support for Stellar
 - Fix test which tested BIP38 even when disabled
 - Minor cleanup
+
+02/16/2018
+cryptostorage-v0.1.4-beta
+- Added support for BIP39
+- Added support for Waves
+- Added disclaimer that split feature will not be interoperable with other tools
+- CSS and other minor cleanup
