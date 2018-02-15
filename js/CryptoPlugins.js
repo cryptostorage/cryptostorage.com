@@ -806,26 +806,13 @@ function WavesPlugin() {
 	this.getTicker = function() { return "WAVES" };
 	this.getLogoPath = function() { return "img/waves.png"; }
 	this.getDependencies = function() { return ["lib/bip39.js", "lib/waves-api.js"]; }
-	this.getDonationAddress = function() { return null; }
+	this.getDonationAddress = function() { return "3P2xXtsfe4FUnQmu2iuKwXLshYYc2CjnXQH"; }
 	this.newKey = function(str) {
 		
 		// initialize
 		var Waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
 		var wordlist = Waves.Seed.getSeedDictionary();
 		var shamir39 = new Shamir39();
-		
-//		// here we go
-//		var shamir39 = new Shamir39();
-//		var Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
-//		var seed = Waves.Seed.create();
-//		console.log(seed);
-//		console.log(seed.phrase);
-//		console.log(seed.address);
-//		var hex = shamir39.getHexFromWords(seed.phrase.split(' '), Waves.Seed.getSeedDictionary());
-//		console.log(hex);
-//		var convertedPhrase = shamir39.getWordsFromHex(hex, Waves.Seed.getSeedDictionary()).join(' ');
-//		console.log(convertedPhrase);
-//		assertEquals(seed.phrase, convertedPhrase);
 
 		// generate phrase if not given
 		if (!str) str = Waves.Seed.create().phrase;
