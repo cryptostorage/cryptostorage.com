@@ -805,7 +805,7 @@ function WavesPlugin() {
 	this.getName = function() { return "Waves"; }
 	this.getTicker = function() { return "WAVES" };
 	this.getLogoPath = function() { return "img/waves.png"; }
-	this.getDependencies = function() { return ["lib/bip39.js", "lib/waves-api.js"]; }
+	this.getDependencies = function() { return ["lib/bip39.js", "lib/polyfill.js", "lib/waves-api.js"]; }
 	this.getDonationAddress = function() { return "3P2xXtsfe4FUnQmu2iuKwXLshYYc2CjnXQH"; }
 	this.newKey = function(str) {
 		
