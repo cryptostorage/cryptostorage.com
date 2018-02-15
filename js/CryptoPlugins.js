@@ -907,7 +907,7 @@ function NeoPlugin() {
 		}
 		
 		// cryptojs hex
-		else if (str.length === 128 && isHex(str)) {
+		else if (str.length === 192 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
