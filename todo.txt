@@ -1,4 +1,5 @@
 v0.1.4
+private component name part of plugins
 passphrase-protect/split arbitrary text
 re-encrypt / split imported storage
 only one "not applicable" for save public addresses txt

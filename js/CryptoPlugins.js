@@ -791,16 +791,6 @@ function BIP39Plugin() {
 		
 		// unrecognized bip39 wif or hex phrase
 		throw new Error("Unrecognized bip39 seed: " + str);
-		
-//		var mnemonic = new Mnemonic("english");
-//		var words = mnemonic.generate(256);
-//		console.log(words);
-//		console.log(mnemonic.check(words));
-//		var shamir39 = new Shamir39();
-//		var shares = shamir39.split(mnemonic.splitWords(words), WORDLISTS["english"], 2, 3);
-//		console.log(shares);
-//		var combined = shamir39.combine(shares.mnemonics, WORDLISTS["english"]);
-//		console.log(combined);
 	}
 	this.isAddress = function(str) {
 		return str === AppUtils.NA;
@@ -814,53 +804,56 @@ inheritsFrom(BIP39Plugin, CryptoPlugin);
 function WavesPlugin() {
 	this.getName = function() { return "Waves"; }
 	this.getTicker = function() { return "WAVES" };
-	this.getLogoPath = function() { return "img/zcash.png"; }
-	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/waves-api.js"]; }
-	this.getDonationAddress = function() { return "TODO"; }
+	this.getLogoPath = function() { return "img/waves.png"; }
+	this.getDependencies = function() { return ["lib/bip39.js", "lib/waves-api.js"]; }
+	this.getDonationAddress = function() { return null; }
 	this.newKey = function(str) {
 		
-		// here we go
-		var Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
-		var seed = Waves.Seed.create();
-		console.log(seed);
-		console.log(seed.phrase);
-		console.log(seed.address);
-		var hex = Waves.Seed.phraseToHex(seed.phrase);
-		console.log(hex);
-		var convertedPhrase = Waves.Seed.hexToPhrase(hex);
-		console.log(convertedPhrase);
-		assertEquals(seed.phrase, convertedPhrase);
+		// initialize
+		var Waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
+		var wordlist = Waves.Seed.getSeedDictionary();
+		var shamir39 = new Shamir39();
 		
-		console.log(Waves.tools.base58.decode(seed.address));
-				
-		// generate seed if not given
-		if (!str) str = StellarBase.Keypair.random().secret();
+//		// here we go
+//		var shamir39 = new Shamir39();
+//		var Waves = WavesAPI.create(WavesAPI.TESTNET_CONFIG);
+//		var seed = Waves.Seed.create();
+//		console.log(seed);
+//		console.log(seed.phrase);
+//		console.log(seed.address);
+//		var hex = shamir39.getHexFromWords(seed.phrase.split(' '), Waves.Seed.getSeedDictionary());
+//		console.log(hex);
+//		var convertedPhrase = shamir39.getWordsFromHex(hex, Waves.Seed.getSeedDictionary()).join(' ');
+//		console.log(convertedPhrase);
+//		assertEquals(seed.phrase, convertedPhrase);
+
+		// generate phrase if not given
+		if (!str) str = Waves.Seed.create().phrase;
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		
+		// initialize state
 		var state = {};
 		
 		// unencrypted wif
-		if (str.length === 56 && isUpperCase(str) && AppUtils.isBase32(str)) {
-			var keypair = StellarBase.Keypair.fromSecret(str);
-			state.hex = keypair.rawSecretKey().toString('hex');
-			state.wif = str;			
-			state.address = keypair.publicKey();
+		if (str.indexOf(' ') !== -1 && str.split(' ').length === 15) {
+			state.hex = shamir39.getHexFromWords(str.split(' '), wordlist);
+			state.wif = str;
+			state.address = Waves.Seed.fromExistingPhrase(state.wif).address;
 			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
 		
 		// unencrypted hex
-		else if (str.length === 64 && isHex(str)) {
-			var rawSecret = new Uint8Array(Crypto.util.hexToBytes(str));
-			var keypair = StellarBase.Keypair.fromRawEd25519Seed(rawSecret);
+		else if (str.length === 66 && isHex(str)) {
 			state.hex = str;
-			state.wif = keypair.secret();
-			state.address = keypair.publicKey();
+			state.wif = shamir39.getWordsFromHex(str, wordlist).join(' ');
+			state.address = Waves.Seed.fromExistingPhrase(state.wif).address;
 			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
 		
 		// cryptojs hex
-		else if (str.length > 100 && isHex(str)) {
+		else if (str.length === 192 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
@@ -876,11 +869,12 @@ function WavesPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// otherwise key is not recognized
-		throw new Error("Unrecognized private key: " + str);
+		// unrecognized bip39 wif or hex phrase
+		throw new Error("Unrecognized Waves phrase: " + str);
 	}
 	this.isAddress = function(str) {
-		return isString(str) && isUpperCase(str) && str.length === 56 && AppUtils.isBase32(str);
+		var Waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
+		return Waves.crypto.isValidAddress(str);
 	}
 }
 inheritsFrom(WavesPlugin, CryptoPlugin);
