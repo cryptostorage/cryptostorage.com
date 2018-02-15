@@ -342,7 +342,7 @@ var AppUtils = {
 	 * @returns true if the given string meets the minimum requirements to be a split piece
 	 */
 	isPossibleSplitPiece: function(str) {
-		return isString(str) && str.length >= 36 && AppUtils.isBase58(str) && isNumber(AppUtils.getMinPieces(str));
+		return isString(str) && str.length >= 34 && AppUtils.isBase58(str) && isNumber(AppUtils.getMinPieces(str));
 	},
 	
 	/**

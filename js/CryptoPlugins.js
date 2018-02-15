@@ -844,7 +844,7 @@ function WavesPlugin() {
 		}
 		
 		// unencrypted hex
-		else if (str.length === 66 && isHex(str)) {
+		else if (str.length === 42 && isHex(str)) {
 			state.hex = str;
 			state.wif = shamir39.getWordsFromHex(str, wordlist).join(' ');
 			state.address = Waves.Seed.fromExistingPhrase(state.wif).address;
@@ -853,7 +853,7 @@ function WavesPlugin() {
 		}
 		
 		// cryptojs hex
-		else if (str.length === 192 && isHex(str)) {
+		else if (str.length === 128 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
@@ -874,7 +874,11 @@ function WavesPlugin() {
 	}
 	this.isAddress = function(str) {
 		var Waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
-		return Waves.crypto.isValidAddress(str);
+		try {
+			return Waves.crypto.isValidAddress(str);
+		} catch (err) {
+			return false;;
+		}
 	}
 }
 inheritsFrom(WavesPlugin, CryptoPlugin);

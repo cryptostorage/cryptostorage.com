@@ -49,6 +49,7 @@ var Tests = {
 		plugins.push(new ZcashPlugin());
 		plugins.push(new RipplePlugin());
 		plugins.push(new StellarPlugin());
+		plugins.push(new WavesPlugin());
 		plugins.push(new BIP39Plugin());
 		return plugins;
 	},
