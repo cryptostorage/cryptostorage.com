@@ -878,7 +878,7 @@ function NeoPlugin() {
 	this.getTicker = function() { return "NEO" };
 	this.getLogoPath = function() { return "img/neo.png"; }
 	this.getDependencies = function() { return ["lib/neon.js"]; }
-	this.getDonationAddress = function() { return "TODO"; }
+	this.getDonationAddress = function() { return "AXi7Y5cKG6BWXwUcA5hbCmrExxwbA2yK32"; }
 	this.newKey = function(str) {
 
 		// generate phrase if not given
