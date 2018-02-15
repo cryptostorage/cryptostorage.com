@@ -856,7 +856,7 @@ function WavesPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// unrecognized bip39 wif or hex phrase
+		// unrecognized waves wif or hex phrase
 		throw new Error("Unrecognized Waves phrase: " + str);
 	}
 	this.isAddress = function(str) {
