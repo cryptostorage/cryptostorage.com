@@ -16,20 +16,23 @@ This tool is security-focused.  Funds are never entrusted to a third party.  Pri
 	- Checks if the browser is open-source
 	- Checks if the operating system is open-source
 	
-# Supported Tokens
+# Supported Storage
 - Bitcoin
 - Bitcoin Cash
 - Ethereum
 - Monero
 - Litecoin
+- Neo
 - Dash
 - Zcash
+- Waves
 - Stellar
 - Ripple
 - Ethereum Classic
 - Basic Attention Token
 - OmiseGo
 - Ubiq
+- BIP39
 
 # ⚠ First Release
 This is the first release of this software.  It should not be used with signficant amounts until it is reviewed by the community.
