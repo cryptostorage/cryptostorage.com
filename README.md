@@ -34,8 +34,8 @@ This tool is security-focused.  Funds are never entrusted to a third party.  Pri
 - Ubiq
 - BIP39
 
-# ⚠ First Release
-This is the first release of this software.  It should not be used with signficant amounts until it is reviewed by the community.
+# ⚠ Beta Release
+This software is in beta.  It should not be used with signficant amounts until it is reviewed by the community.
 
 # Using this Tool as Securely as Possible
 
