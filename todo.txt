@@ -1,5 +1,4 @@
-v0.1.5
-seo
+v0.1.6
 private component name part of plugins
 passphrase-protect/split arbitrary text
 re-encrypt / split imported storage

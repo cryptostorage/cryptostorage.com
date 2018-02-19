@@ -51,3 +51,7 @@ cryptostorage-v0.1.4-beta
 - Added support for Waves
 - Added disclaimer that split feature will not be interoperable with other tools
 - CSS and other minor cleanup
+
+02/19/2018
+cryptostorage-v0.1.5-beta
+- Update wording and add meta description for search engine optimization
