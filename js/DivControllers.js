@@ -325,9 +325,9 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			
 			// intro slider
 			sliderDiv = $("<div class='slider_div'>").appendTo(div);
-			getSlide($(mixImg), "Store cryptocurrency securely.  No trusted third parties.").appendTo(sliderDiv);
-			getSlide($("<img src='img/printer.png'>"), "Print paper wallets or save digital files for long-term storage.").appendTo(sliderDiv);
-			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never shared with a third party.").appendTo(sliderDiv);
+			getSlide($(mixImg), "Generate offline wallets for major cryptocurrencies.").appendTo(sliderDiv);
+			getSlide($("<img src='img/printer.png'>"), "Print paper wallets or save keys to a file for long-term storage.").appendTo(sliderDiv);
+			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png'>"), "Passphrase-protect and split private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automatic environment checks.").appendTo(sliderDiv);
