@@ -55,3 +55,4 @@ cryptostorage-v0.1.4-beta
 02/19/2018
 cryptostorage-v0.1.5-beta
 - Update wording and add meta description for search engine optimization
+- Remove duplicate tag in sitemap.xml
