@@ -1086,7 +1086,7 @@ var AppUtils = {
 	 * @param scheme is the scheme to encrypt the key
 	 * @param passphrase is the passphrase to encrypt with
 	 * @param onProgress(percent) is invoked as progress as made (optional)
-	 * @param onDone(err, encryptedKey) is invoked when done (optional)
+	 * @param onDone(err, encryptedKey) is invoked when done
 	 */
 	encryptKey: function(key, scheme, passphrase, onProgress, onDone) {
 		
@@ -1095,97 +1095,180 @@ var AppUtils = {
 			if (!scheme) throw new Error("Scheme must be initialized");
 			if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
 			if (!passphrase) throw new Error("Passphrase must be initialized");
+			assertInitialized(onDone);
 		} catch (err) {
 			if (onDone) onDone(err);
 		}
 		
-		// handle encryption scheme
-		switch (scheme) {
-			case AppUtils.EncryptionScheme.CRYPTOJS:
+		// encrypt key according to scheme
+		var encryptFunc;
+		if (scheme === AppUtils.EncryptionScheme.CRYPTOJS) encryptFunc = encryptKeyCryptoJsDefault;
+		else if (scheme === AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2) encryptFunc = encryptKeyCryptoJsPbkdf2;
+		else if (scheme === AppUtils.EncryptionScheme.BIP38) encryptFunc = encryptKeyBip38;
+		else {
+			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+			return;
+		}
+		encryptFunc(key, scheme, passphrase, onProgress, onDone);
+		
+		function encryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {
+			
+			console.log("Unencrypted hex: " + key.getHex());
+			
+			// constants
+			var PBKDF_ITER = 10000;
+			var KEY_SIZE = 256;
+			var RANDOM_SIZE = 16;
+			
+			// derive key for encryption
+			var salt = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
+			var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+	      keySize: KEY_SIZE / 32,
+	      iterations: PBKDF_ITER
+	    });
+			
+			// encrypt
+			var iv = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
+			var encrypted = CryptoJS.AES.encrypt(key.getHex(), passphraseKey, { 
+		    iv: iv, 
+		    padding: CryptoJS.pad.Pkcs7,
+		    mode: CryptoJS.mode.CBC
+		  });
+			
+			// get representations
+			var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
+			var encryptedHex = salt.toString() + iv.toString() + ctHex;
+			var encryptedB64 = CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64);
+			var encryptedB58 = Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex));
+//			console.log("ct hex: " + ctHex);
+//			console.log("Encrypted hex: " + encryptedHex);
+//			console.log("Encrypted b64: " + encryptedB64);
+//			console.log("Encrypted b58: " + encryptedB58);
+			
+			// get passphrase key
+			var salt = CryptoJS.enc.Hex.parse(encryptedHex.substr(0, 32));
+		  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+		  	keySize: KEY_SIZE / 32,
+		  	iterations: PBKDF_ITER
+		  });
+		  
+		  // decrypt
+		  var iv = CryptoJS.enc.Hex.parse(encryptedHex.substr(32, 32))
+		  var ctHex = encryptedHex.substring(64);
+		  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
+		  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
+		  	iv: iv, 
+		    padding: CryptoJS.pad.Pkcs7,
+		    mode: CryptoJS.mode.CBC
+		  });
+		  
+		  // get representations
+		  console.log(decrypted.toString(CryptoJS.enc.Utf8));
+		  console.log("That should be it");
+		  throw new Error("Not implemented");
+		}
+		
+		function encryptKeyCryptoJsDefault(key, scheme, passphrase, onProgress, onDone) {
+			try {
+				var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
+				key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
+				if (onProgress) onProgress(1);
+				if (onDone) onDone(null, key);
+			} catch (err) {
+				if (onDone) onDone(err);
+			}
+		}
+		
+		function encryptKeyBip38(key, scheme, passphrase, onProgress, onDone) {
+			try {
+				var decoded = bitcoinjs.decode(key.getWif());
+				bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
+					if (onProgress) onProgress(progress.percent / 100);
+				}, null, function(err, encryptedWif) {
+					try {
+						if (err) throw err;
+						key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
+						if (onDone) onDone(null, key);
+					} catch (err) {
+						if (onDone) onDone(err);
+					}
+				});
+			} catch (err) {
+				if (onDone) onDone(err);
+			}
+		}
+	},
+	
+	/**
+	 * Decrypts the given key with the given passphrase.
+	 * 
+	 * Requires bitcoin.js and crypto-js.js.
+	 * 
+	 * @param key is the key to decrypt
+	 * @param passphrase is the passphrase to decrypt the key
+	 * @param onProgress(percent) is invoked as progress is made (optional)
+	 * @param onDone(err, decryptedKey) is invoked when done
+	 */
+	decryptKey: function(key, passphrase, onProgress, onDone) {
+		
+		// validate input
+		try {
+			if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+			if (!passphrase) throw new Error("Passphrase must be initialized");
+			assertTrue(key.isEncrypted());
+			assertInitialized(onDone)
+		} catch (err) {
+			if (onDone) onDone(err);
+		}
+		
+		// decrypt key according to scheme
+		var decryptFunc;
+		var scheme = key.getEncryptionScheme();
+		if (scheme === AppUtils.EncryptionScheme.CRYPTOJS) decryptFunc = decryptKeyCryptoJsDefault;
+		else if (scheme === AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2) decryptFunc = decryptKeyCryptoJsPbkdf2;
+		else if (scheme === AppUtils.EncryptionScheme.BIP38) decryptFunc = decryptKeyBip38;
+		else {
+			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+			return;
+		}
+		decryptFunc(key, scheme, passphrase, onProgress, onDone);
+		
+		function decryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {
+			onDone(new Error("decryptKeyCryptoJsPbkdf2() Not implemented"));
+		}
+		
+		function decryptKeyCryptoJsDefault(key, scheme, passphrase, onProgress, onDone) {
+			try {
+				var hex;
 				try {
-					
-					console.log("Unencrypted hex: " + key.getHex());
-					
-					// constants
-					var PBKDF_ITER = 10000;
-					var KEY_SIZE = 256;
-					var RANDOM_SIZE = 16;
-					
-					// derive key for encryption
-					var salt = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
-					var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-			      keySize: KEY_SIZE / 32,
-			      iterations: PBKDF_ITER
-			    });
-					
-					// encrypt
-					var iv = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
-					var encrypted = CryptoJS.AES.encrypt(key.getHex(), passphraseKey, { 
-				    iv: iv, 
-				    padding: CryptoJS.pad.Pkcs7,
-				    mode: CryptoJS.mode.CBC
-				  });
-					
-					// get representations
-					var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
-					var encryptedHex = salt.toString() + iv.toString() + ctHex;
-					var encryptedB64 = CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64);
-					var encryptedB58 = Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex));
-//					console.log("ct hex: " + ctHex);
-//					console.log("Encrypted hex: " + encryptedHex);
-//					console.log("Encrypted b64: " + encryptedB64);
-//					console.log("Encrypted b58: " + encryptedB58);
-					
-					// get passphrase key
-					var salt = CryptoJS.enc.Hex.parse(encryptedHex.substr(0, 32));
-				  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-				  	keySize: KEY_SIZE / 32,
-				  	iterations: PBKDF_ITER
-				  });
-				  
-				  // decrypt
-				  var iv = CryptoJS.enc.Hex.parse(encryptedHex.substr(32, 32))
-				  var ctHex = encryptedHex.substring(64);
-				  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
-				  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
-				  	iv: iv, 
-				    padding: CryptoJS.pad.Pkcs7,
-				    mode: CryptoJS.mode.CBC
-				  });
-				  
-				  // get representations
-				  console.log(decrypted.toString(CryptoJS.enc.Utf8));
-				  console.log("That should be it");
-					
-					
-					var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
-					key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
-					if (onProgress) onProgress(1);
+					hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
+				} catch (err) { }
+				if (!hex) throw new Error("Incorrect passphrase");
+				try {
+					key.setPrivateKey(hex);
+					if (onProgress) onProgress(1)
+					if (onDone) onDone(null, key);
+				} catch (err) {
+					throw new Error("Incorrect passphrase");
+				}
+			} catch (err) {
+				if (onDone) onDone(err);
+			}
+		}
+		
+		function decryptKeyBip38(key, scheme, passphrase, onProgress, onDone) {
+			bitcoinjs.decrypt(key.getWif(), passphrase, function(progress) {
+				if (onProgress) onProgress(progress.percent / 100);
+			}, null, function(err, decrypted) {
+				try {
+					if (err) throw new Error("Incorrect passphrase");
+					var privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
+					key.setPrivateKey(privateKey);
 					if (onDone) onDone(null, key);
 				} catch (err) {
 					if (onDone) onDone(err);
 				}
-				break;
-			case AppUtils.EncryptionScheme.BIP38:
-				try {
-					var decoded = bitcoinjs.decode(key.getWif());
-					bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
-						if (onProgress) onProgress(progress.percent / 100);
-					}, null, function(err, encryptedWif) {
-						try {
-							if (err) throw err;
-							key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
-							if (onDone) onDone(null, key);
-						} catch (err) {
-							if (onDone) onDone(err);
-						}
-					});
-				} catch (err) {
-					if (onDone) onDone(err);
-				}
-				break;
-			default:
-				if (onDone) onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+			});
 		}
 	},
 	
@@ -1295,66 +1378,6 @@ var AppUtils = {
 					}
 				});
 			}
-		}
-	},
-	
-	/**
-	 * Decrypts the given key with the given passphrase.
-	 * 
-	 * Requires bitcoin.js and crypto-js.js.
-	 * 
-	 * @param key is the key to decrypt
-	 * @param passphrase is the passphrase to decrypt the key
-	 * @param onProgress(percent) is invoked as progress is made (optional)
-	 * @param onDone(err, decryptedKey) is invoked when done (optional)
-	 */
-	decryptKey: function(key, passphrase, onProgress, onDone) {
-		
-		// validate input
-		try {
-			if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-			if (!passphrase) throw new Error("Passphrase must be initialized");
-			assertTrue(key.isEncrypted());
-		} catch (err) {
-			if (onDone) onDone(err);
-		}
-		
-		// handle encryption scheme
-		switch (key.getEncryptionScheme()) {
-			case AppUtils.EncryptionScheme.CRYPTOJS:
-				try {
-					var hex;
-					try {
-						hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
-					} catch (err) { }
-					if (!hex) throw new Error("Incorrect passphrase");
-					try {
-						key.setPrivateKey(hex);
-						if (onProgress) onProgress(1)
-						if (onDone) onDone(null, key);
-					} catch (err) {
-						throw new Error("Incorrect passphrase");
-					}
-				} catch (err) {
-					if (onDone) onDone(err);
-				}
-				break;
-			case AppUtils.EncryptionScheme.BIP38:
-				bitcoinjs.decrypt(key.getWif(), passphrase, function(progress) {
-					if (onProgress) onProgress(progress.percent / 100);
-				}, null, function(err, decrypted) {
-					try {
-						if (err) throw new Error("Incorrect passphrase");
-						var privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
-						key.setPrivateKey(privateKey);
-						if (onDone) onDone(null, key);
-					} catch (err) {
-						if (onDone) onDone(err);
-					}
-				});
-				break;
-			default:
-				if (onDone) onDone(new Error("Encryption scheme '" + key.getEncryptionScheme() + "' not supported"));
 		}
 	},
 	
