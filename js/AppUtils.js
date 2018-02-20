@@ -1127,7 +1127,7 @@ var AppUtils = {
 				  });
 					
 					// get representations
-					var ctHex = encrypted.toString();
+					var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
 					var encryptedHex = salt.toString() + iv.toString() + ctHex;
 					var encryptedB64 = CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64);
 					var encryptedB58 = Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex));
@@ -1138,7 +1138,6 @@ var AppUtils = {
 					
 					// get passphrase key
 					var salt = CryptoJS.enc.Hex.parse(encryptedHex.substr(0, 32));
-				  var ctHex = encryptedHex.substring(64);
 				  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
 				  	keySize: KEY_SIZE / 32,
 				  	iterations: PBKDF_ITER
@@ -1146,7 +1145,9 @@ var AppUtils = {
 				  
 				  // decrypt
 				  var iv = CryptoJS.enc.Hex.parse(encryptedHex.substr(32, 32))
-				  var decrypted = CryptoJS.AES.decrypt(ctHex, passphraseKey, {
+				  var ctHex = encryptedHex.substring(64);
+				  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
+				  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
 				  	iv: iv, 
 				    padding: CryptoJS.pad.Pkcs7,
 				    mode: CryptoJS.mode.CBC
