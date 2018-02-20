@@ -60,9 +60,9 @@ CryptoPlugin.prototype.getDependencies = function() { throw new Error("Subclass 
 CryptoPlugin.prototype.getDonationAddress = function() { throw new Error("Subclass must implement"); }
 
 /**
- * Returns the supported encryption schemes.  All support CryptoJS by default.
+ * Returns the supported encryption schemes.
  */
-CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS]; }
+CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
 
 /**
  * Encrypts the given key with the given scheme and passphrase.

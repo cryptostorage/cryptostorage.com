@@ -299,7 +299,8 @@ var AppUtils = {
 	 */
 	EncryptionScheme: {
 		BIP38: "BIP38",
-		CRYPTOJS: "CryptoJS",
+		CRYPTOJS: "CRYPTOJS",
+		CRYPTOJS_PBKDF2: "CRYPTOJS_PBKDF2",
 		SJCL: "SJCL"
 	},
 	
@@ -1473,6 +1474,8 @@ var AppUtils = {
 				return 4187;
 			case AppUtils.EncryptionScheme.CRYPTOJS:
 				return 10;
+			case AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2:
+				return 1000;	// TODO: derive through experimentation
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
@@ -1505,6 +1508,8 @@ var AppUtils = {
 				return 4581;
 			case AppUtils.EncryptionScheme.CRYPTOJS:
 				return 100;
+			case AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2:
+				return 1000;	// TODO: derive through experimentation
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
@@ -1884,7 +1889,7 @@ var AppUtils = {
 		config.currencies.push({
 			ticker: AppUtils.getCryptoPlugin("XMR").getTicker(),
 			numKeys: 1,
-			encryption: AppUtils.EncryptionScheme.CRYPTOJS
+			encryption: AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2
 		});
 		config.currencies.push({
 			ticker: AppUtils.getCryptoPlugin("ETH").getTicker(),
