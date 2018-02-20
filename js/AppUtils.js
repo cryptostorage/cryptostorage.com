@@ -1103,6 +1103,67 @@ var AppUtils = {
 		switch (scheme) {
 			case AppUtils.EncryptionScheme.CRYPTOJS:
 				try {
+					
+					// constants
+					var PBKDF_ITER = 10000;
+					var KEY_SIZE = 256;
+					var RANDOM_SIZE = 16;
+					
+					// derive key for encryption
+					var salt = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
+					console.log("Salt: " + salt);
+					var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+			      keySize: KEY_SIZE / 32,
+			      iterations: PBKDF_ITER
+			    });
+					console.log(passphraseKey);
+					
+					// encrypt
+					console.log("Unencrypted hex: " + key.getHex());
+					var iv = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
+					console.log("iv: " + iv);
+					var encrypted = CryptoJS.AES.encrypt(key.getHex(), passphraseKey, { 
+				    iv: iv, 
+				    padding: CryptoJS.pad.Pkcs7,
+				    mode: CryptoJS.mode.CBC
+				  });
+					
+					// get representations
+					var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
+					var encryptedHex = salt.toString() + iv.toString() + ctHex;
+					var encryptedB64 = CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64);
+					var encryptedB58 = Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex));
+					console.log("ct hex: " + ctHex);
+					console.log("Encrypted hex: " + encryptedHex);
+					console.log("Encrypted b64: " + encryptedB64);
+					console.log("Encrypted b58: " + encryptedB58);
+					
+					// get passphrase key
+					var salt = CryptoJS.enc.Hex.parse(encryptedHex.substr(0, 32));
+					console.log("Salt: " + salt);
+				  var ctHex = encryptedHex.substring(64);
+				  console.log("ct hex: " + ctHex);
+				  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+				  	keySize: KEY_SIZE / 32,
+				  	iterations: PBKDF_ITER
+				  });
+				  console.log(passphraseKey);
+				  
+				  // decrypt
+				  var iv = CryptoJS.enc.Hex.parse(encryptedHex.substr(32, 32))
+				  console.log("iv: " + iv);
+				  var decrypted = CryptoJS.AES.decrypt(ctHex, passphraseKey, {
+				  	iv: iv, 
+				    padding: CryptoJS.pad.Pkcs7,
+				    mode: CryptoJS.mode.CBC
+				  });
+				  
+				  // get representations
+				  console.log(decrypted);
+				  console.log(decrypted.toString());
+				  console.log("That should be it");
+					
+					
 					var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
 					key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
 					if (onProgress) onProgress(1);

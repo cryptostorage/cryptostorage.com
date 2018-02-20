@@ -38,6 +38,13 @@ $(document).ready(function() {
 
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;
+	
+	// override Math.random() to use a cryptographically secure RNG
+	Math.random = function() {
+    var randArray = new Uint32Array(1);
+    window.crypto.getRandomValues(randArray);
+    return randArray[0] / Math.pow(2, 32);
+	}
 		
 	// delete window.crypto for testing
 	if (AppUtils.DELETE_WINDOW_CRYPTO) delete window.crypto;

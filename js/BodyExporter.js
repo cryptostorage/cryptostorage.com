@@ -52,6 +52,13 @@ window.exportToBody = function(window, config) {
 	// assign window.crypto (supports IE11)
 	window.crypto = window.crypto || window.msCrypto;
 	
+	// override Math.random() to use a cryptographically secure RNG
+	Math.random = function() {
+    var randArray = new Uint32Array(1);
+    window.crypto.getRandomValues(randArray);
+    return randArray[0] / Math.pow(2, 32);
+	}
+	
 	// pagination requires div attached to dom
 	var body = $("body", window.document);
 	
