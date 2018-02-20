@@ -40,7 +40,7 @@ var OperatingSystems = {
 var AppUtils = {
 		
 	// app constants
-	VERSION: "0.1.5",
+	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: true,
 	RUN_FULL_TESTS: false,
@@ -1098,6 +1098,7 @@ var AppUtils = {
 			assertInitialized(onDone);
 		} catch (err) {
 			if (onDone) onDone(err);
+			return;
 		}
 		
 		// encrypt key according to scheme
@@ -1219,6 +1220,7 @@ var AppUtils = {
 			assertInitialized(onDone)
 		} catch (err) {
 			if (onDone) onDone(err);
+			return;
 		}
 		
 		// decrypt key according to scheme
