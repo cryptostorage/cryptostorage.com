@@ -1131,10 +1131,10 @@ var AppUtils = {
 					var encryptedHex = salt.toString() + iv.toString() + ctHex;
 					var encryptedB64 = CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64);
 					var encryptedB58 = Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex));
-					console.log("ct hex: " + ctHex);
-					console.log("Encrypted hex: " + encryptedHex);
-					console.log("Encrypted b64: " + encryptedB64);
-					console.log("Encrypted b58: " + encryptedB58);
+//					console.log("ct hex: " + ctHex);
+//					console.log("Encrypted hex: " + encryptedHex);
+//					console.log("Encrypted b64: " + encryptedB64);
+//					console.log("Encrypted b58: " + encryptedB58);
 					
 					// get passphrase key
 					var salt = CryptoJS.enc.Hex.parse(encryptedHex.substr(0, 32));
@@ -1154,7 +1154,6 @@ var AppUtils = {
 				  });
 				  
 				  // get representations
-				  console.log(decrypted);
 				  console.log(decrypted.toString(CryptoJS.enc.Utf8));
 				  console.log("That should be it");
 					
