@@ -58,9 +58,9 @@ $(document).ready(function() {
 			// load dependencies
 			LOADER.load(AppUtils.getAppDependencies(), function(err) {
 				if (err) throw err;
-					
+				
 				// run minimum tests
-				if (AppUtils.RUN_MINIMUM_TESTS) {
+				if (AppUtils.RUN_MIN_TESTS) {
 					AppUtils.runMinimumTests(function(err) {
 						if (err) throw err;
 						console.log("Minimum tests pass");
