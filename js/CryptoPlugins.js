@@ -225,7 +225,7 @@ function BitcoinPlugin() {
 			else if (str.length > 100) {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 				return new CryptoKey(this, state);
 			}
@@ -307,7 +307,7 @@ function EthereumPlugin() {
 			else if (str.length > 100) {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 				return new CryptoKey(this, state);
 			}
@@ -409,7 +409,7 @@ function LitecoinPlugin() {
 		else if (isHex(str) && str.length > 100) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
@@ -461,7 +461,7 @@ function DashPlugin() {
 		else if (isHex(str) && str.length > 100) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
@@ -528,7 +528,7 @@ function MoneroPlugin() {
 			else if (str.length > 100) {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 				return new CryptoKey(this, state);
 			}
@@ -587,7 +587,7 @@ function ZcashPlugin() {
 		else if (isHex(str) && str.length > 100) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
@@ -647,7 +647,7 @@ function RipplePlugin() {
 		else if (str.length > 100 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
@@ -710,7 +710,7 @@ function StellarPlugin() {
 		else if (str.length > 100 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
@@ -776,7 +776,7 @@ function BIP39Plugin() {
 		else if (str.length === 192 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
@@ -843,7 +843,7 @@ function WavesPlugin() {
 		else if (str.length === 128 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized wif or hex: " + str);
+			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized wif or hex: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
@@ -910,7 +910,7 @@ function NeoPlugin() {
 		else if (str.length === 192 && isHex(str)) {
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!state.wif.startsWith("U2")) throw new Error("Unrecognized private key: " + str);
+			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 			return new CryptoKey(this, state);
 		}
