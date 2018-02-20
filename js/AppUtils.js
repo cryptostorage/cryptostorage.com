@@ -1114,60 +1114,37 @@ var AppUtils = {
 		encryptFunc(key, scheme, passphrase, onProgress, onDone);
 		
 		function encryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {
-			
-			console.log("Unencrypted hex: " + key.getHex());
-			
-			// constants
-			var PBKDF_ITER = 10000;
-			var KEY_SIZE = 256;
-			var RANDOM_SIZE = 16;
-			
-			// derive key for encryption
-			var salt = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
-			var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-	      keySize: KEY_SIZE / 32,
-	      iterations: PBKDF_ITER
-	    });
-			
-			// encrypt
-			var iv = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
-			var encrypted = CryptoJS.AES.encrypt(key.getHex(), passphraseKey, { 
-		    iv: iv, 
-		    padding: CryptoJS.pad.Pkcs7,
-		    mode: CryptoJS.mode.CBC
-		  });
-			
-			// get representations
-			var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
-			var encryptedHex = salt.toString() + iv.toString() + ctHex;
-			var encryptedB64 = CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64);
-			var encryptedB58 = Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex));
-//			console.log("ct hex: " + ctHex);
-//			console.log("Encrypted hex: " + encryptedHex);
-//			console.log("Encrypted b64: " + encryptedB64);
-//			console.log("Encrypted b58: " + encryptedB58);
-			
-			// get passphrase key
-			var salt = CryptoJS.enc.Hex.parse(encryptedHex.substr(0, 32));
-		  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-		  	keySize: KEY_SIZE / 32,
-		  	iterations: PBKDF_ITER
-		  });
-		  
-		  // decrypt
-		  var iv = CryptoJS.enc.Hex.parse(encryptedHex.substr(32, 32))
-		  var ctHex = encryptedHex.substring(64);
-		  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
-		  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
-		  	iv: iv, 
-		    padding: CryptoJS.pad.Pkcs7,
-		    mode: CryptoJS.mode.CBC
-		  });
-		  
-		  // get representations
-		  console.log(decrypted.toString(CryptoJS.enc.Utf8));
-		  console.log("That should be it");
-		  throw new Error("Not implemented");
+			try {
+				
+				// constants
+				var PBKDF_ITER = 10000;
+				var KEY_SIZE = 256;
+				var RANDOM_SIZE = 16;
+				
+				// derive key for encryption
+				var salt = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
+				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+		      keySize: KEY_SIZE / 32,
+		      iterations: PBKDF_ITER
+		    });
+				
+				// encrypt
+				var iv = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
+				var encrypted = CryptoJS.AES.encrypt(key.getHex(), passphraseKey, { 
+			    iv: iv, 
+			    padding: CryptoJS.pad.Pkcs7,
+			    mode: CryptoJS.mode.CBC
+			  });
+				
+				// encrypted hex = salt + iv + hex cipher text
+				var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
+				var encryptedHex = salt.toString() + iv.toString() + ctHex;
+				key.setState(Object.assign(key.getPlugin().newKey(encryptedHex).getState(), {address: key.getAddress()}));
+				if (onProgress) onProgress(1);
+				if (onDone) onDone(null, key);
+			} catch (err) {
+				onDone(err);
+			}
 		}
 		
 		function encryptKeyCryptoJsDefault(key, scheme, passphrase, onProgress, onDone) {
@@ -1237,7 +1214,39 @@ var AppUtils = {
 		decryptFunc(key, scheme, passphrase, onProgress, onDone);
 		
 		function decryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {
-			onDone(new Error("decryptKeyCryptoJsPbkdf2() Not implemented"));
+			try {
+				
+				// constants
+				var PBKDF_ITER = 10000;
+				var KEY_SIZE = 256;
+				var RANDOM_SIZE = 16;
+				
+				// get passphrase key
+				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(0, 32));
+			  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+			  	keySize: KEY_SIZE / 32,
+			  	iterations: PBKDF_ITER
+			  });
+			  
+			  // decrypt
+			  var iv = CryptoJS.enc.Hex.parse(key.getHex().substr(32, 32))
+			  var ctHex = key.getHex().substring(64);
+			  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
+			  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
+			  	iv: iv, 
+			    padding: CryptoJS.pad.Pkcs7,
+			    mode: CryptoJS.mode.CBC
+			  });
+			  var decryptedHex = decrypted.toString(CryptoJS.enc.Utf8);
+			  if (!decryptedHex) throw new Error("Incorrect passphrase");
+			  
+			  // update key
+			  key.setPrivateKey(decryptedHex);
+				if (onProgress) onProgress(1)
+				if (onDone) onDone(null, key);
+			} catch (err) {
+				onDone(err);
+			}
 		}
 		
 		function decryptKeyCryptoJsDefault(key, scheme, passphrase, onProgress, onDone) {

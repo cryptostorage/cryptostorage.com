@@ -1343,7 +1343,7 @@ function FormController(div) {
 		function getEncryptionScheme(currencyInput) {
 			if (currencyInput.getSelectedPlugin().getTicker() === "BTC" && bip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
 			if (currencyInput.getSelectedPlugin().getTicker() === "BCH" && bip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
-			return AppUtils.EncryptionScheme.CRYPTOJS;
+			return currencyInput.getSelectedPlugin().getEncryptionSchemes()[0];
 		}
 		
 		function verifyConfig(config) {
