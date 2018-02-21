@@ -1125,7 +1125,8 @@ var AppUtils = {
 				var salt = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
 				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
 		      keySize: KEY_SIZE / 32,
-		      iterations: PBKDF_ITER
+		      iterations: PBKDF_ITER,
+		      hasher: CryptoJS.algo.SHA512
 		    });
 				
 				// encrypt
@@ -1225,7 +1226,8 @@ var AppUtils = {
 				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(0, 32));
 			  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
 			  	keySize: KEY_SIZE / 32,
-			  	iterations: PBKDF_ITER
+			  	iterations: PBKDF_ITER,
+			  	hasher: CryptoJS.algo.SHA512
 			  });
 			  
 			  // decrypt
