@@ -529,7 +529,7 @@ function MoneroPlugin() {
 			else if (str.length === 224) {
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
-				// TODO: verify cryptojs pbkdf2 wif
+				if (!AppUtils.isWifCryptoJsPbkdf2(state.wif)) throw new Error("Unrecognized private key: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 				return new CryptoKey(this, state);
 			}
@@ -553,7 +553,7 @@ function MoneroPlugin() {
 		}
 		
 		// wif cryptojs pbkdf2
-		else if (str.length === 153 && AppUtils.isBase58(str)) {
+		else if (AppUtils.isWifCryptoJsPbkdf2(str)) {
 			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;

@@ -312,6 +312,13 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Determines if the given string is a valid CryptoJS PBKDF2 WIF private key.
+	 */
+	isWifCryptoJsPbkdf2: function(str) {
+		return AppUtils.isBase58(str) && str.length === 153;
+	},
+	
+	/**
 	 * Determines if the given string is base32.
 	 */
 	isBase32: function(str) {
