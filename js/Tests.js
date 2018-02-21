@@ -28,7 +28,7 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 10,
+	REPEAT_LONG: 2,
 	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
@@ -40,18 +40,18 @@ var Tests = {
 	 */
 	getTestCryptoPlugins: function() {
 		var plugins = [];
-		plugins.push(new BitcoinPlugin());
-		plugins.push(new BitcoinCashPlugin());
-		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
-		plugins.push(new DashPlugin());
+//		plugins.push(new BitcoinPlugin());
+//		plugins.push(new BitcoinCashPlugin());
+//		plugins.push(new EthereumPlugin());
+//		plugins.push(new MoneroPlugin());
+//		plugins.push(new DashPlugin());
 		plugins.push(new LitecoinPlugin());
-		plugins.push(new ZcashPlugin());
-		plugins.push(new RipplePlugin());
-		plugins.push(new StellarPlugin());
-		plugins.push(new WavesPlugin());
-		plugins.push(new NeoPlugin());
-		plugins.push(new BIP39Plugin());
+//		plugins.push(new ZcashPlugin());
+//		plugins.push(new RipplePlugin());
+//		plugins.push(new StellarPlugin());
+//		plugins.push(new WavesPlugin());
+//		plugins.push(new NeoPlugin());
+//		plugins.push(new BIP39Plugin());
 		return plugins;
 	},
 	
@@ -87,7 +87,8 @@ var Tests = {
 				if (plugins.length > 1) testInvalidPiecesToKeys(plugins);
 				
 				// test key generation
-				testGenerateKeys(plugins, function(err) {
+				testEndToEnd(plugins, function(err) {
+					console.log("Done testing end to end!");
 					if (err) throw err;
 					
 					// test individual plugins
@@ -243,7 +244,7 @@ var Tests = {
 					config.currencies.push({
 						ticker: plugin.getTicker(),
 						numKeys: numKeys,
-						encryption: AppUtils.EncryptionScheme.CRYPTOJS,
+						encryption: AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2,
 					});
 				}
 				return config;
@@ -481,51 +482,51 @@ var Tests = {
 					});
 				});
 			});
-		}
-		
-		function testDecryptKeys(keys, passphrase, onDone) {
-			assertTrue(keys.length > 0);
 			
-			// save originals for later
-			var originals = [];
-			for (var i = 0; i < keys.length; i++) originals.push(keys[i].copy());
-			
-			// decrypt keys
-			AppUtils.decryptKeys(keys, passphrase, null, null, function(err, decryptedKeys) {
-				if (err) {
-					onDone(err);
-					return;
-				}
+			function testDecryptKeys(keys, passphrase, onDone) {
+				assertTrue(keys.length > 0);
 				
-				// test state of each key
-				assertEquals(keys.length, decryptedKeys.length);
-				for (var i = 0; i < keys.length; i++) {
-					var key = keys[i];
-					
-					// test basic initialization
-					assertObject(key, CryptoKey);
-					assertTrue(key.equals(decryptedKeys[i]));
-					assertFalse(key.equals(originals[i]));
-					assertInitialized(key.getHex());
-					assertInitialized(key.getWif());
-					assertInitialized(key.getAddress());
-					assertNull(key.getEncryptionScheme());
-					assertTrue(key.equals(key.copy()));
-					
-					// test consistency
-					var parsed = new CryptoKey(key.getPlugin(), key.getHex());
-					assertEquals(key.getHex(), parsed.getHex());
-					assertEquals(key.getWif(), parsed.getWif());
-					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-					parsed = new CryptoKey(key.getPlugin(), key.getWif());
-					assertEquals(key.getHex(), parsed.getHex());
-					assertEquals(key.getWif(), parsed.getWif());
-					assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
-				}
+				// save originals for later
+				var originals = [];
+				for (var i = 0; i < keys.length; i++) originals.push(keys[i].copy());
 				
-				// done
-				onDone();
-			});
+				// decrypt keys
+				AppUtils.decryptKeys(keys, passphrase, null, null, function(err, decryptedKeys) {
+					if (err) {
+						onDone(err);
+						return;
+					}
+					
+					// test state of each key
+					assertEquals(keys.length, decryptedKeys.length);
+					for (var i = 0; i < keys.length; i++) {
+						var key = keys[i];
+						
+						// test basic initialization
+						assertObject(key, CryptoKey);
+						assertTrue(key.equals(decryptedKeys[i]));
+						assertFalse(key.equals(originals[i]));
+						assertInitialized(key.getHex());
+						assertInitialized(key.getWif());
+						assertInitialized(key.getAddress());
+						assertNull(key.getEncryptionScheme());
+						assertTrue(key.equals(key.copy()));
+						
+						// test consistency
+						var parsed = new CryptoKey(key.getPlugin(), key.getHex());
+						assertEquals(key.getHex(), parsed.getHex());
+						assertEquals(key.getWif(), parsed.getWif());
+						assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
+						parsed = new CryptoKey(key.getPlugin(), key.getWif());
+						assertEquals(key.getHex(), parsed.getHex());
+						assertEquals(key.getWif(), parsed.getWif());
+						assertEquals(key.getEncryptionScheme(), parsed.getEncryptionScheme());
+					}
+					
+					// done
+					onDone();
+				});
+			}
 		}
 		
 		function testDecryptWrongPassphrase(plugin, onDone) {
@@ -864,6 +865,87 @@ var Tests = {
 					return AppUtils.keysToPieces(keys, numPieces, minPieces);
 				}
 			});
+		}
+		
+		function testEndToEnd(plugins, onDone) {
+			
+			// test each plugin
+			var testFuncs = [];
+			for (var i = 0; i < plugins.length; i++) testFuncs.push(testEndToEndFunc(plugins[i]));
+			async.series(testFuncs, onDone);
+			function testEndToEndFunc(plugin) {
+				return function(onDone) {
+					return testEndToEndPlugin(plugin, onDone);
+				}
+			}
+			
+			// test one plugin
+			function testEndToEndPlugin(plugin, onDone) {
+				console.log("testEndToEnd(" + plugin.getTicker() + ")");
+				
+				// get generation config
+				var config = getGenerateConfig(plugin);
+				
+				// generate keys
+				var progressReported = true;
+				AppUtils.generateKeys(config, function(percent, label) {
+					assertTrue(percent >= 0 && percent <= 1);
+					lastProgress = percent;
+				}, function(err, keys, pieces, pieceDivs) {
+					
+						// check for error
+						if (err) {
+							onDone (err);
+							return;
+						}
+						
+						// ensure progress went to 100%
+						assertEquals(lastProgress, 1);
+						
+						// test key structure
+						var keyIdx = 0;
+						for (var i = 0; i < config.currencies.length; i++) {
+							for (var j = 0; j < config.currencies[i].numKeys; j++) {
+								var key = keys[keyIdx++];
+								assertTrue(plugin.isAddress(key.getAddress()));
+								assertEquals(config.currencies[i].encryption, key.getEncryptionScheme());
+							}
+						}
+						
+						// no failures
+						onDone();
+				});
+				
+				// build key generation configuration
+				function getGenerateConfig(plugin) {
+					var config = {};
+					config.currencies = [];
+					config.passphrase = Tests.PASSPHRASE;
+					config.verifyEncryption = true;
+					config.numPieces = Tests.NUM_PIECES;
+					config.minPieces = Tests.MIN_PIECES;
+					
+					// config no encryption
+					config.currencies.push({
+						ticker: plugin.getTicker(),
+						numKeys: Tests.REPEAT_LONG,
+						encryption: null
+					});
+					
+					// config encryption
+					for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
+						var scheme = plugin.getEncryptionSchemes()[i];
+						var repeat = scheme === AppUtils.EncryptionScheme.BIP38 ? Tests.REPEAT_SHORT : Tests.REPEAT_LONG;
+						config.currencies.push({
+							ticker: plugin.getTicker(),
+							numKeys: repeat,
+							encryption: scheme
+						})
+					}
+					
+					return config;
+				}
+			}
 		}
 	}
 }

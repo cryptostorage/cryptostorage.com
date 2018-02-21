@@ -43,8 +43,8 @@ var AppUtils = {
 	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: true,
-	RUN_FULL_TESTS: false,
-	DEV_MODE: false,
+	RUN_FULL_TESTS: true,
+	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
@@ -995,16 +995,18 @@ var AppUtils = {
 					if (err) throw err;
 					
 					// collect encryption schemes
+					var encryption = false;
 					var encryptionSchemes = [];
 					for (var i = 0; i < config.currencies.length; i++) {
 						var currency = config.currencies[i];
 						for (var j = 0; j < currency.numKeys; j++) {
-							if (currency.encryption) encryptionSchemes.push(currency.encryption);
+							if (currency.encryption) encryption = true;
+							encryptionSchemes.push(currency.encryption);
 						}
 					}
 					
 					// encrypt keys
-					if (encryptionSchemes.length > 0) {
+					if (encryption) {
 						assertEquals(keys.length, encryptionSchemes.length);
 						
 						// compute encryption + verification weight
@@ -1020,6 +1022,7 @@ var AppUtils = {
 						}, function(err, encryptedKeys) {
 							if (err) onDone(err);
 							else {
+								console.log(encryptionSchemes);
 								doneWeight += encryptWeight;
 								generatePieces(encryptedKeys, config);
 							}
