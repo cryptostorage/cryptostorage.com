@@ -42,7 +42,7 @@ var AppUtils = {
 	// app constants
 	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
-	RUN_MIN_TESTS: true,
+	RUN_MIN_TESTS: false,
 	RUN_FULL_TESTS: true,
 	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
@@ -994,20 +994,23 @@ var AppUtils = {
 					// check for error
 					if (err) throw err;
 					
-					// collect encryption schemes
-					var encryption = false;
+					// collect keys and schemes to encrypt
+					var keysToEncrypt = [];
 					var encryptionSchemes = [];
+					var keyIdx = 0;
 					for (var i = 0; i < config.currencies.length; i++) {
-						var currency = config.currencies[i];
-						for (var j = 0; j < currency.numKeys; j++) {
-							if (currency.encryption) encryption = true;
-							encryptionSchemes.push(currency.encryption);
+						for (var j = 0; j < config.currencies[i].numKeys; j++) {
+							if (config.currencies[i].encryption) {
+								keysToEncrypt.push(keys[keyIdx]);
+								encryptionSchemes.push(config.currencies[i].encryption);
+							}
+							keyIdx++;
 						}
 					}
-					
+										
 					// encrypt keys
-					if (encryption) {
-						assertEquals(keys.length, encryptionSchemes.length);
+					if (keysToEncrypt.length > 0) {
+						assertEquals(keysToEncrypt.length, encryptionSchemes.length);
 						
 						// compute encryption + verification weight
 						var encryptWeight = 0;
@@ -1017,13 +1020,13 @@ var AppUtils = {
 						
 						// start encryption
 						if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
-						AppUtils.encryptKeys(keys, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent, label) {
+						AppUtils.encryptKeys(keysToEncrypt, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent, label) {
 							if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
 						}, function(err, encryptedKeys) {
 							if (err) onDone(err);
 							else {
 								doneWeight += encryptWeight;
-								generatePieces(encryptedKeys, config);
+								generatePieces(keys, config);
 							}
 						});
 					}
