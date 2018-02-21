@@ -40,18 +40,18 @@ var Tests = {
 	 */
 	getTestCryptoPlugins: function() {
 		var plugins = [];
-//		plugins.push(new BitcoinPlugin());
-//		plugins.push(new BitcoinCashPlugin());
-//		plugins.push(new EthereumPlugin());
-//		plugins.push(new MoneroPlugin());
-//		plugins.push(new DashPlugin());
+		plugins.push(new BitcoinPlugin());
+		plugins.push(new BitcoinCashPlugin());
+		plugins.push(new EthereumPlugin());
+		plugins.push(new MoneroPlugin());
+		plugins.push(new DashPlugin());
 		plugins.push(new LitecoinPlugin());
-//		plugins.push(new ZcashPlugin());
-//		plugins.push(new RipplePlugin());
-//		plugins.push(new StellarPlugin());
-//		plugins.push(new WavesPlugin());
-//		plugins.push(new NeoPlugin());
-//		plugins.push(new BIP39Plugin());
+		plugins.push(new ZcashPlugin());
+		plugins.push(new RipplePlugin());
+		plugins.push(new StellarPlugin());
+		plugins.push(new WavesPlugin());
+		plugins.push(new NeoPlugin());
+		plugins.push(new BIP39Plugin());
 		return plugins;
 	},
 	
@@ -88,7 +88,6 @@ var Tests = {
 				
 				// test key generation
 				testGenerateKeys(plugins, function(err) {
-					console.log("Done testing end to end!");
 					if (err) throw err;
 					
 					// test individual plugins
@@ -175,11 +174,11 @@ function testGenerateKeys(plugins, onDone) {
 			
 			// test each plugin
 			var testFuncs = [];
-			for (var i = 0; i < plugins.length; i++) testFuncs.push(testGenerateKeysPlugin(plugins[i]));
+			for (var i = 0; i < plugins.length; i++) testFuncs.push(testGenerateKeysFunc(plugins[i]));
 			async.series(testFuncs, onDone);
-			function testEndToEndFunc(plugin) {
+			function testGenerateKeysFunc(plugin) {
 				return function(onDone) {
-					return testEndToEndPlugin(plugin, onDone);
+					return testGenerateKeysPlugin(plugin, onDone);
 				}
 			}
 			
@@ -199,7 +198,7 @@ function testGenerateKeys(plugins, onDone) {
 					
 						// check for error
 						if (err) {
-							onDone (err);
+							onDone(err);
 							return;
 						}
 						
