@@ -28,12 +28,12 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 5,
-	REPEAT_SHORT: 5,
+	REPEAT_LONG: 2,
+	REPEAT_SHORT: 500,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
-	TEST_PLUGINS: true,
+	TEST_PLUGINS: false,	// TODO: re-enable
 	
 	/**
 	 * Returns crypto plugins to test.
@@ -201,7 +201,6 @@ function testGenerateKeys(plugins, onDone) {
 					
 					// check for error
 					if (err) {
-						console.log("Error bro");
 						onDone(err);
 						return;
 					}

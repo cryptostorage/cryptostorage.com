@@ -1163,6 +1163,9 @@ var AppUtils = {
 				// encrypted hex = salt + iv + hex cipher text
 				var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
 				var encryptedHex = salt.toString() + iv.toString() + ctHex;
+				console.log(key);
+				console.log("Encrypted hex length: " + encryptedHex.length);
+				console.log("Encrypted hex: " + encryptedHex);
 				key.setState(Object.assign(key.getPlugin().newKey(encryptedHex).getState(), {address: key.getAddress()}));
 				if (onProgress) onProgress(1);
 				if (onDone) onDone(null, key);
