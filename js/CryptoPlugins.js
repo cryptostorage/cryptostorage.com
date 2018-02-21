@@ -62,7 +62,7 @@ CryptoPlugin.prototype.getDonationAddress = function() { throw new Error("Subcla
 /**
  * Returns the supported encryption schemes.
  */
-CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS]; }
+CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
 
 /**
  * Encrypts the given key with the given scheme and passphrase.
@@ -284,7 +284,6 @@ function EthereumPlugin() {
 	this.getLogoPath = function() { return "img/ethereum.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/keythereum.js", "lib/ethereumjs-util.js"]; }
 	this.getDonationAddress = function() { return "0x8074da70E22a58A9E4a5DCeCf968Ea499D60e470"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }	// TODO: all will support
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -308,7 +307,7 @@ function EthereumPlugin() {
 			else if (str.length === 224) {
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
-				if (!AppUtils.isWifCryptoJsPbkdf2(state.wif)) throw new Error("Unrecognized private key: " + str);
+				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 				return new CryptoKey(this, state);
 			}
@@ -332,7 +331,7 @@ function EthereumPlugin() {
 		}
 		
 		// wif cryptojs pbkdf2
-		else if (AppUtils.isWifCryptoJsPbkdf2(str)) {
+		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
 			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
@@ -406,7 +405,6 @@ function LitecoinPlugin() {
 	this.getLogoPath = function() { return "img/litecoin.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/litecore.js"]; }
 	this.getDonationAddress = function() { return "LSRx2UwU5rjKGcmUXx8KDNTNXMBV1PudHB"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }	// TODO: all will support
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -431,7 +429,7 @@ function LitecoinPlugin() {
 			if (str.length === 224) {
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
-				if (!AppUtils.isWifCryptoJsPbkdf2(state.wif)) throw new Error("Unrecognized private key: " + str);
+				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key 1: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 				return new CryptoKey(this, state);
 			}
@@ -440,7 +438,7 @@ function LitecoinPlugin() {
 			else if (str.length > 100) {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key 2: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 				return new CryptoKey(this, state);
 			}
@@ -455,7 +453,7 @@ function LitecoinPlugin() {
 		}
 		
 		// wif cryptojs pbkdf2
-		else if (AppUtils.isWifCryptoJsPbkdf2(str)) {
+		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
 			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
@@ -463,7 +461,7 @@ function LitecoinPlugin() {
 		}
 		
 		// otherwise key is not recognized
-		throw new Error("Unrecognized private key: " + str);
+		throw new Error("Unrecognized private key 3: " + str);
 	}
 	this.isAddress = function(str) {
 		return litecore.Address.isValid(str);
@@ -480,7 +478,6 @@ function DashPlugin() {
 	this.getLogoPath = function() { return "img/dash.png"; }
 	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/dashcore.js"]; }
 	this.getDonationAddress = function() { return "XoK6AmEGxAh2WKMh2hkVycnkEdmi8zDaQR"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }	// TODO: all will support
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -505,7 +502,7 @@ function DashPlugin() {
 			if (str.length === 224) {
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
-				if (!AppUtils.isWifCryptoJsPbkdf2(state.wif)) throw new Error("Unrecognized private key: " + str);
+				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 				return new CryptoKey(this, state);
 			}
@@ -529,7 +526,7 @@ function DashPlugin() {
 		}
 		
 		// wif cryptojs pbkdf2
-		else if (AppUtils.isWifCryptoJsPbkdf2(str)) {
+		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
 			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
@@ -554,7 +551,6 @@ function MoneroPlugin() {
 	this.getLogoPath = function() { return "img/monero.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/moneroaddress.js"]; }
 	this.getDonationAddress = function() { return "42fuBvVfgPUWphR6C5XgsXDGfx2KVhbv4cjhJDm9Y87oU1ixpDnzF82RAWCbt8p81f26kx3kstGJCat1YEohwS1e1o27zWE"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }	// TODO: all will support
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -591,7 +587,7 @@ function MoneroPlugin() {
 			else if (str.length === 224) {
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
-				if (!AppUtils.isWifCryptoJsPbkdf2(state.wif)) throw new Error("Unrecognized private key: " + str);
+				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 				return new CryptoKey(this, state);
 			}
@@ -615,7 +611,7 @@ function MoneroPlugin() {
 		}
 		
 		// wif cryptojs pbkdf2
-		else if (AppUtils.isWifCryptoJsPbkdf2(str)) {
+		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
 			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
@@ -663,13 +659,26 @@ function ZcashPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// hex cryptojs
-		else if (isHex(str) && str.length > 100) {
-			state.hex = str;
-			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-			return new CryptoKey(this, state);
+		// hex
+		if (isHex(str)) {
+			
+			// hex cryptojs pbkdf2
+			if (str.length === 224) {
+				state.hex = str;
+				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
+				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+				return new CryptoKey(this, state);
+			}
+			
+			// hex cryptojs
+			else if (isHex(str) && str.length > 100) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+				return new CryptoKey(this, state);
+			}
 		}
 		
 		// wif cryptojs
@@ -677,6 +686,14 @@ function ZcashPlugin() {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// wif cryptojs pbkdf2
+		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 			return new CryptoKey(this, state);
 		}
 		
@@ -714,22 +731,35 @@ function RipplePlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// unencrypted hex
-		else if (str.length === 44 && isHex(str)) {
-			state.hex = str;
-			state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
-			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(state.wif).publicKey);			
-			state.encryption = null;
-			return new CryptoKey(this, state);
-		}
-		
-		// cryptojs hex
-		else if (str.length > 100 && isHex(str)) {
-			state.hex = str;
-			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-			return new CryptoKey(this, state);
+		// hex
+		if (isHex(str)) {
+			
+			// unencrypted hex
+			if (str.length === 44) {
+				state.hex = str;
+				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
+				state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(state.wif).publicKey);			
+				state.encryption = null;
+				return new CryptoKey(this, state);
+			}
+			
+			// hex cryptojs pbkdf2
+			if (str.length === 160) {
+				state.hex = str;
+				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
+				if (!isWifCryptoJsPbkdf2Ripple(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+				return new CryptoKey(this, state);
+			}
+			
+			// cryptojs hex
+			else if (str.length > 100) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+				return new CryptoKey(this, state);
+			}
 		}
 		
 		// cryptojs wif
@@ -740,8 +770,20 @@ function RipplePlugin() {
 			return new CryptoKey(this, state);
 		}
 		
+		// wif cryptojs pbkdf2
+		else if (isWifCryptoJsPbkdf2Ripple(str)) {
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+			return new CryptoKey(this, state);
+		}
+		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
+		
+		function isWifCryptoJsPbkdf2Ripple(str) {
+			return AppUtils.isBase58(str) && str.length === 109 || str.length === 110;
+		}
 	}
 	this.isAddress = function(str) {
 		return isString(str) && (str.length === 33  || str.length === 34) && AppUtils.isBase58(str);
@@ -775,24 +817,36 @@ function StellarPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// unencrypted hex
-		else if (str.length === 64 && isHex(str)) {
-			var rawSecret = new Uint8Array(Crypto.util.hexToBytes(str));
-			var keypair = StellarBase.Keypair.fromRawEd25519Seed(rawSecret);
-			state.hex = str;
-			state.wif = keypair.secret();
-			state.address = keypair.publicKey();
-			state.encryption = null;
-			return new CryptoKey(this, state);
-		}
-		
-		// cryptojs hex
-		else if (str.length > 100 && isHex(str)) {
-			state.hex = str;
-			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-			return new CryptoKey(this, state);
+		if (isHex(str)) {
+			
+			// unencrypted hex
+			if (str.length === 64) {
+				var rawSecret = new Uint8Array(Crypto.util.hexToBytes(str));
+				var keypair = StellarBase.Keypair.fromRawEd25519Seed(rawSecret);
+				state.hex = str;
+				state.wif = keypair.secret();
+				state.address = keypair.publicKey();
+				state.encryption = null;
+				return new CryptoKey(this, state);
+			}
+			
+			// hex cryptojs pbkdf2
+			else if (str.length === 224) {
+				state.hex = str;
+				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
+				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+				return new CryptoKey(this, state);
+			}
+			
+			// cryptojs hex
+			else if (str.length > 100) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+				return new CryptoKey(this, state);
+			}
 		}
 		
 		// cryptojs wif
@@ -800,6 +854,14 @@ function StellarPlugin() {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// wif cryptojs pbkdf2
+		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 			return new CryptoKey(this, state);
 		}
 		
@@ -844,21 +906,34 @@ function BIP39Plugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// unencrypted hex
-		else if (str.length === 66 && isHex(str)) {
-			state.hex = str;
-			state.wif = mnemonic.joinWords(shamir39.getWordsFromHex(str, wordlist));
-			state.encryption = null;
-			return new CryptoKey(this, state);
-		}
-		
-		// cryptojs hex
-		else if (str.length === 192 && isHex(str)) {
-			state.hex = str;
-			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-			return new CryptoKey(this, state);
+		// hex
+		if (isHex(str)) {
+			
+			// unencrypted hex
+			if (str.length === 66) {
+				state.hex = str;
+				state.wif = mnemonic.joinWords(shamir39.getWordsFromHex(str, wordlist));
+				state.encryption = null;
+				return new CryptoKey(this, state);
+			}
+			
+			// hex cryptojs pbkdf2
+			else if (str.length === 224) {
+				state.hex = str;
+				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
+				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+				return new CryptoKey(this, state);
+			}
+			
+			// cryptojs hex
+			else if (str.length === 192) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+				return new CryptoKey(this, state);
+			}
 		}
 		
 		// cryptojs wif
@@ -866,6 +941,14 @@ function BIP39Plugin() {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// wif cryptojs pbkdf2
+		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 			return new CryptoKey(this, state);
 		}
 		
@@ -910,22 +993,35 @@ function WavesPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// unencrypted hex
-		else if (str.length === 42 && isHex(str)) {
-			state.hex = str;
-			state.wif = shamir39.getWordsFromHex(str, wordlist).join(' ');
-			state.address = Waves.Seed.fromExistingPhrase(state.wif).address;
-			state.encryption = null;
-			return new CryptoKey(this, state);
-		}
-		
-		// cryptojs hex
-		else if (str.length === 128 && isHex(str)) {
-			state.hex = str;
-			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized wif or hex: " + str);
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-			return new CryptoKey(this, state);
+		// hex
+		if (isHex(str)) {
+			
+			// unencrypted hex
+			if (str.length === 42) {
+				state.hex = str;
+				state.wif = shamir39.getWordsFromHex(str, wordlist).join(' ');
+				state.address = Waves.Seed.fromExistingPhrase(state.wif).address;
+				state.encryption = null;
+				return new CryptoKey(this, state);
+			}
+			
+			// hex cryptojs pbkdf2
+			else if (str.length === 160) {
+				state.hex = str;
+				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
+				if (!isWifCryptoJsPbkdf2Waves(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+				return new CryptoKey(this, state);
+			}
+			
+			// cryptojs hex
+			else if (str.length === 128) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized wif or hex: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+				return new CryptoKey(this, state);
+			}
 		}
 		
 		// cryptojs wif
@@ -936,8 +1032,20 @@ function WavesPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
+		// wif cryptojs pbkdf2
+		else if (isWifCryptoJsPbkdf2Waves(str)) {
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+			return new CryptoKey(this, state);
+		}
+		
 		// unrecognized wif or hex
 		throw new Error("Unrecognized wif or hex: " + str);
+		
+		function isWifCryptoJsPbkdf2Waves(str) {
+			return AppUtils.isBase58(str) && str.length === 109 || str.length === 110;
+		}
 	}
 	this.isAddress = function(str) {
 		var Waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
@@ -977,22 +1085,35 @@ function NeoPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// unencrypted hex
-		else if (str.length === 64 && isHex(str)) {
-			state.hex = str;
-			state.wif = Neon.wallet.getWIFFromPrivateKey(state.hex);
-			state.address = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(state.hex)));
-			state.encryption = null;
-			return new CryptoKey(this, state);
-		}
-		
-		// cryptojs hex
-		else if (str.length === 192 && isHex(str)) {
-			state.hex = str;
-			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-			return new CryptoKey(this, state);
+		// hex
+		if (isHex(str)) {
+			
+			// unencrypted hex
+			if (str.length === 64) {
+				state.hex = str;
+				state.wif = Neon.wallet.getWIFFromPrivateKey(state.hex);
+				state.address = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(state.hex)));
+				state.encryption = null;
+				return new CryptoKey(this, state);
+			}
+			
+			// hex cryptojs pbkdf2
+			else if (str.length === 224) {
+				state.hex = str;
+				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
+				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+				return new CryptoKey(this, state);
+			}
+			
+			// cryptojs hex
+			else if (str.length === 192) {
+				state.hex = str;
+				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+				return new CryptoKey(this, state);
+			}
 		}
 		
 		// cryptojs wif
@@ -1000,6 +1121,14 @@ function NeoPlugin() {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// wif cryptojs pbkdf2
+		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 			return new CryptoKey(this, state);
 		}
 		

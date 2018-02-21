@@ -28,8 +28,8 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 10,
-	REPEAT_SHORT: 1,
+	REPEAT_LONG: 5,
+	REPEAT_SHORT: 5,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
@@ -40,18 +40,18 @@ var Tests = {
 	 */
 	getTestCryptoPlugins: function() {
 		var plugins = [];
-		plugins.push(new BitcoinPlugin());
-		plugins.push(new BitcoinCashPlugin());
-		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
-		plugins.push(new DashPlugin());
+//		plugins.push(new BitcoinPlugin());
+//		plugins.push(new BitcoinCashPlugin());
+//		plugins.push(new EthereumPlugin());
+//		plugins.push(new MoneroPlugin());
+//		plugins.push(new DashPlugin());
 		plugins.push(new LitecoinPlugin());
-		plugins.push(new ZcashPlugin());
-		plugins.push(new RipplePlugin());
-		plugins.push(new StellarPlugin());
-		plugins.push(new WavesPlugin());
-		plugins.push(new NeoPlugin());
-		plugins.push(new BIP39Plugin());
+//		plugins.push(new ZcashPlugin());
+//		plugins.push(new RipplePlugin());
+//		plugins.push(new StellarPlugin());
+//		plugins.push(new WavesPlugin());
+//		plugins.push(new NeoPlugin());
+//		plugins.push(new BIP39Plugin());
 		return plugins;
 	},
 	
@@ -88,7 +88,10 @@ var Tests = {
 				
 				// test key generation
 				testGenerateKeys(plugins, function(err) {
-					if (err) throw err;
+					if (err) {
+						if (callback) callback(err);
+						return;
+					}
 					
 					// test individual plugins
 					if (Tests.TEST_PLUGINS) {
@@ -196,41 +199,42 @@ function testGenerateKeys(plugins, onDone) {
 					lastProgress = percent;
 				}, function(err, keys, pieces, pieceDivs) {
 					
-						// check for error
-						if (err) {
-							onDone(err);
-							return;
+					// check for error
+					if (err) {
+						console.log("Error bro");
+						onDone(err);
+						return;
+					}
+					
+					// test progress and pieces
+					assertEquals(lastProgress, 1);
+					assertEquals(config.numPieces, pieces.length);
+					assertEquals(config.numPieces, pieceDivs.length);
+					
+					// test key structure
+					var keyIdx = 0;
+					for (var i = 0; i < config.currencies.length; i++) {
+						for (var j = 0; j < config.currencies[i].numKeys; j++) {
+							var key = keys[keyIdx++];
+							assertTrue(plugin.isAddress(key.getAddress()));
+							assertEquals(config.currencies[i].encryption, key.getEncryptionScheme());
 						}
-						
-						// test progress and pieces
-						assertEquals(lastProgress, 1);
-						assertEquals(config.numPieces, pieces.length);
-						assertEquals(config.numPieces, pieceDivs.length);
-						
-						// test key structure
-						var keyIdx = 0;
-						for (var i = 0; i < config.currencies.length; i++) {
-							for (var j = 0; j < config.currencies[i].numKeys; j++) {
-								var key = keys[keyIdx++];
-								assertTrue(plugin.isAddress(key.getAddress()));
-								assertEquals(config.currencies[i].encryption, key.getEncryptionScheme());
-							}
+					}
+					assertEquals(keyIdx, keys.length);
+					
+					// test piece combinations recreate keys
+					var combinations = getCombinations(pieces, Tests.MIN_PIECES);
+					for (var j = 0; j < combinations.length; j++) {
+						var combination = combinations[j];
+						var combinedKeys = AppUtils.piecesToKeys(combination);
+						assertEquals(keys.length, combinedKeys.length);
+						for (var i = 0; i < keys.length; i++) {
+							assertTrue(keys[i].equals(combinedKeys[i]));
 						}
-						assertEquals(keyIdx, keys.length);
-						
-						// test piece combinations recreate keys
-						var combinations = getCombinations(pieces, Tests.MIN_PIECES);
-						for (var j = 0; j < combinations.length; j++) {
-							var combination = combinations[j];
-							var combinedKeys = AppUtils.piecesToKeys(combination);
-							assertEquals(keys.length, combinedKeys.length);
-							for (var i = 0; i < keys.length; i++) {
-								assertTrue(keys[i].equals(combinedKeys[i]));
-							}
-						}						
-						
-						// no failures
-						onDone();
+					}						
+					
+					// no failures
+					onDone();
 				});
 				
 				// build key generation configuration

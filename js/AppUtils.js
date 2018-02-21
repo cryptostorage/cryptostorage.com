@@ -312,9 +312,9 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Determines if the given string is a valid CryptoJS PBKDF2 WIF private key.
+	 * Determines if the given string is a valid CryptoJS PBKDF2 WIF private key with length 153.
 	 */
-	isWifCryptoJsPbkdf2: function(str) {
+	isWifCryptoJsPbkdf2Standard: function(str) {
 		return AppUtils.isBase58(str) && str.length === 153;
 	},
 	
@@ -955,6 +955,7 @@ var AppUtils = {
 			if (encryptionInitialized) assertInitialized(config.passphrase);
 		} catch (err) {
 			onDone(err);
+			return;
 		}
 		
 		// track done and total weight for progress
@@ -972,7 +973,13 @@ var AppUtils = {
 		}
 		dependencies = toUniqueArray(dependencies);
 		if (onProgress) onProgress(0, "Loading dependencies");
-		LOADER.load(dependencies, function() {
+		LOADER.load(dependencies, function(err) {
+			
+			// check for error
+			if (err) {
+				onDone(err);
+				return;
+			}
 			
 			// internet is no longer required if accessing remotely
 			if (noInternetIsNotErrorAfterDependenciesLoaded) AppUtils.setNoInternetCanBeError(false);
@@ -989,54 +996,55 @@ var AppUtils = {
 			// generate keys
 			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
 			async.series(funcs, function(err, keys) {
-				try {
 					
-					// check for error
-					if (err) throw err;
-					
-					// collect keys and schemes to encrypt
-					var keysToEncrypt = [];
-					var encryptionSchemes = [];
-					var keyIdx = 0;
-					for (var i = 0; i < config.currencies.length; i++) {
-						for (var j = 0; j < config.currencies[i].numKeys; j++) {
-							if (config.currencies[i].encryption) {
-								keysToEncrypt.push(keys[keyIdx]);
-								encryptionSchemes.push(config.currencies[i].encryption);
-							}
-							keyIdx++;
-						}
-					}
-										
-					// encrypt keys
-					if (keysToEncrypt.length > 0) {
-						assertEquals(keysToEncrypt.length, encryptionSchemes.length);
-						
-						// compute encryption + verification weight
-						var encryptWeight = 0;
-						for (var i = 0; i < encryptionSchemes.length; i++) {
-							encryptWeight += AppUtils.getWeightEncryptKey(encryptionSchemes[i]) + (config.verifyEncryption ? AppUtils.getWeightDecryptKey(encryptionSchemes[i]) : 0);
-						}
-						
-						// start encryption
-						if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
-						AppUtils.encryptKeys(keysToEncrypt, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent, label) {
-							if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
-						}, function(err, encryptedKeys) {
-							if (err) onDone(err);
-							else {
-								doneWeight += encryptWeight;
-								generatePieces(keys, config);
-							}
-						});
-					}
-					
-					// no encryption
-					else {
-						generatePieces(keys, config);
-					}
-				} catch (err) {
+				// check for error
+				if (err) {
 					onDone(err);
+					return;
+				}
+				
+				// collect keys and schemes to encrypt
+				var keysToEncrypt = [];
+				var encryptionSchemes = [];
+				var keyIdx = 0;
+				for (var i = 0; i < config.currencies.length; i++) {
+					for (var j = 0; j < config.currencies[i].numKeys; j++) {
+						if (config.currencies[i].encryption) {
+							keysToEncrypt.push(keys[keyIdx]);
+							encryptionSchemes.push(config.currencies[i].encryption);
+						}
+						keyIdx++;
+					}
+				}
+									
+				// encrypt keys
+				if (keysToEncrypt.length > 0) {
+					assertEquals(keysToEncrypt.length, encryptionSchemes.length);
+					
+					// compute encryption + verification weight
+					var encryptWeight = 0;
+					for (var i = 0; i < encryptionSchemes.length; i++) {
+						encryptWeight += AppUtils.getWeightEncryptKey(encryptionSchemes[i]) + (config.verifyEncryption ? AppUtils.getWeightDecryptKey(encryptionSchemes[i]) : 0);
+					}
+					
+					// start encryption
+					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
+					AppUtils.encryptKeys(keysToEncrypt, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent, label) {
+						if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
+					}, function(err, encryptedKeys) {
+						if (err) {
+							onDone(err);
+						}
+						else {
+							doneWeight += encryptWeight;
+							generatePieces(keys, config);
+						}
+					});
+				}
+				
+				// no encryption
+				else {
+					generatePieces(keys, config);
 				}
 			});
 		});
@@ -1044,10 +1052,12 @@ var AppUtils = {
 		function newKeyFunc(plugin, onDone) {
 			return function(onDone) {
 				setImmediate(function() {	// let UI breath
+					var key;
 					try {
-						var key = plugin.newKey();
+						key = plugin.newKey();
 					} catch(err) {
 						onDone(err);
+						return;
 					}
 					doneWeight += AppUtils.getWeightCreateKey();
 					if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
