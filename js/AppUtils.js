@@ -954,6 +954,7 @@ var AppUtils = {
 			assertInitialized(config.numPieces);
 			if (encryptionInitialized) assertInitialized(config.passphrase);
 		} catch (err) {
+			console.log("onDone(1)");
 			onDone(err);
 			return;
 		}
@@ -977,6 +978,7 @@ var AppUtils = {
 			
 			// check for error
 			if (err) {
+				console.log("onDone(2)");
 				onDone(err);
 				return;
 			}
@@ -999,6 +1001,7 @@ var AppUtils = {
 					
 				// check for error
 				if (err) {
+					console.log("onDone(3)");
 					onDone(err);
 					return;
 				}
@@ -1033,6 +1036,7 @@ var AppUtils = {
 						if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
 					}, function(err, encryptedKeys) {
 						if (err) {
+							console.log("onDone(4)");
 							onDone(err);
 						}
 						else {
@@ -1067,36 +1071,39 @@ var AppUtils = {
 		}
 		
 		function generatePieces(keys, config) {
-			try {
 				
-				// convert keys to pieces
-				var pieces = AppUtils.keysToPieces(keys, config.numPieces, config.minPieces);
-				
-				// verify pieces recreate keys
-				var keysFromPieces = AppUtils.piecesToKeys(pieces);
-				assertEquals(keys.length, keysFromPieces.length);
-				for (var i = 0; i < keys.length; i++) {
-					assertTrue(keys[i].equals(keysFromPieces[i]));
-				}
-				
-				// render pieces to divs
-				var renderWeight = PieceRenderer.getWeight(keys.length, config.numPieces, null);
-				if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
-				new PieceRenderer(pieces, null, null).render(function(percent) {
-					if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
-				}, function(err, pieceDivs) {
-					try {
-						if (err) throw err;
-						assertEquals(pieces.length, pieceDivs.length);
-						if (onProgress) onProgress(1, "Complete");
-						onDone(null, keys, pieces, pieceDivs);
-					} catch (err) {
-						onDone(err);
-					}
-				});
-			} catch (err) {
-				onDone(err);
+			// convert keys to pieces
+			// TODO: why are resulting keys different?
+			var pieces = AppUtils.keysToPieces(keys, config.numPieces, config.minPieces);
+			
+			console.log(keys);
+			console.log(pieces);
+			
+			// verify pieces recreate keys
+			var keysFromPieces = AppUtils.piecesToKeys(pieces);
+			console.log(keysFromPieces);
+			assertEquals(keys.length, keysFromPieces.length);
+			for (var i = 0; i < keys.length; i++) {
+				assertTrue(keys[i].equals(keysFromPieces[i]));
 			}
+			
+			// render pieces to divs
+			var renderWeight = PieceRenderer.getWeight(keys.length, config.numPieces, null);
+			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
+			new PieceRenderer(pieces, null, null).render(function(percent) {
+				if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
+			}, function(err, pieceDivs) {
+				try {
+					if (err) throw err;
+					assertEquals(pieces.length, pieceDivs.length);
+					if (onProgress) onProgress(1, "Complete");
+					console.log("onDone(5)");
+					onDone(null, keys, pieces, pieceDivs);
+				} catch (err) {
+					console.log("onDone(6)");
+					onDone(err);
+				}
+			});
 		}
 	},
 	

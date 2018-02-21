@@ -1,5 +1,4 @@
 v0.1.6
-why is litecoin failing and was it failing before cryptojs pbkdf2
 refactor constants
 implement across other plugins
 isWifCryptoJsPbkdfs in plugins

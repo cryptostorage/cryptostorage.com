@@ -175,7 +175,7 @@ function BitcoinPlugin() {
 	this.getLogoPath = function() { return "img/bitcoin.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js"]; }
 	this.getDonationAddress = function() { return "1ArmuyQfgM1Sd3tN1A242FzPhbePfCjbmE"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS, AppUtils.EncryptionScheme.BIP38]; }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -202,6 +202,14 @@ function BitcoinPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
+		// wif cryptojs pbkdf2
+		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+			return new CryptoKey(this, state);
+		}
+		
 		// wif cryptojs
 		else if (AppUtils.isWifCryptoJs(str)) {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
@@ -218,6 +226,15 @@ function BitcoinPlugin() {
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
 				state.encryption = AppUtils.EncryptionScheme.BIP38;
+				return new CryptoKey(this, state);
+			}
+			
+			// cryptojs pbkdf2
+			if (str.length === 224) {
+				state.hex = str;
+				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
+				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 				return new CryptoKey(this, state);
 			}
 			
@@ -429,7 +446,7 @@ function LitecoinPlugin() {
 			if (str.length === 192 || str.length === 224) {
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
-				if (!isWifCryptoJsPbkdf2Litecoin(state.wif)) throw new Error("Unrecognized private key 1: " + str);
+				if (!isWifCryptoJsPbkdf2Litecoin(state.wif)) throw new Error("Unrecognized private key: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 				return new CryptoKey(this, state);
 			}
@@ -438,7 +455,7 @@ function LitecoinPlugin() {
 			else if (str.length > 100) {
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key 2: " + str);
+				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
 				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 				return new CryptoKey(this, state);
 			}
@@ -461,7 +478,7 @@ function LitecoinPlugin() {
 		}
 		
 		// otherwise key is not recognized
-		throw new Error("Unrecognized private key 3: " + str);
+		throw new Error("Unrecognized private key: " + str);
 		
 		function isWifCryptoJsPbkdf2Litecoin(str) {
 			return AppUtils.isBase58(str) && str.length === 131 || str.length === 132 || str.length === 153;

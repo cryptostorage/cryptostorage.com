@@ -29,7 +29,7 @@ var Tests = {
 	
 	// constants
 	REPEAT_LONG: 2,
-	REPEAT_SHORT: 500,
+	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
@@ -198,6 +198,8 @@ function testGenerateKeys(plugins, onDone) {
 					assertTrue(percent >= 0 && percent <= 1);
 					lastProgress = percent;
 				}, function(err, keys, pieces, pieceDivs) {
+					
+					console.log("generateKeys() done");
 					
 					// check for error
 					if (err) {
