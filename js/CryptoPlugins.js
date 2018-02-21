@@ -284,6 +284,7 @@ function EthereumPlugin() {
 	this.getLogoPath = function() { return "img/ethereum.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/keythereum.js", "lib/ethereumjs-util.js"]; }
 	this.getDonationAddress = function() { return "0x8074da70E22a58A9E4a5DCeCf968Ea499D60e470"; }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }	// TODO: all will support
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -303,6 +304,15 @@ function EthereumPlugin() {
 				return new CryptoKey(this, state);
 			}
 			
+			// hex cryptojs pbkdf2
+			else if (str.length === 224) {
+				state.hex = str;
+				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
+				if (!AppUtils.isWifCryptoJsPbkdf2(state.wif)) throw new Error("Unrecognized private key: " + str);
+				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+				return new CryptoKey(this, state);
+			}
+			
 			// hex cryptojs
 			else if (str.length > 100) {
 				state.hex = str;
@@ -318,6 +328,14 @@ function EthereumPlugin() {
 			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			state.wif = str;
 			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return new CryptoKey(this, state);
+		}
+		
+		// wif cryptojs pbkdf2
+		else if (AppUtils.isWifCryptoJsPbkdf2(str)) {
+			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			state.wif = str;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
 			return new CryptoKey(this, state);
 		}
 		
@@ -492,7 +510,7 @@ function MoneroPlugin() {
 	this.getLogoPath = function() { return "img/monero.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/moneroaddress.js"]; }
 	this.getDonationAddress = function() { return "42fuBvVfgPUWphR6C5XgsXDGfx2KVhbv4cjhJDm9Y87oU1ixpDnzF82RAWCbt8p81f26kx3kstGJCat1YEohwS1e1o27zWE"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }	// TODO: all will support
 	this.newKey = function(str) {
 		
 		// create key if not given
