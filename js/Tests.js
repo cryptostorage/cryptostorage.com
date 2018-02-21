@@ -29,7 +29,7 @@ var Tests = {
 	
 	// constants
 	REPEAT_LONG: 10,
-	REPEAT_SHORT: 2,
+	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
@@ -87,7 +87,7 @@ var Tests = {
 				if (plugins.length > 1) testInvalidPiecesToKeys(plugins);
 				
 				// test key generation
-				testEndToEnd(plugins, function(err) {
+				testGenerateKeys(plugins, function(err) {
 					console.log("Done testing end to end!");
 					if (err) throw err;
 					
@@ -171,83 +171,97 @@ var Tests = {
 			}
 		}
 		
-		function testGenerateKeys(plugins, onDone) {
+function testGenerateKeys(plugins, onDone) {
 			
-			// number of keys to generate per plugin
-			var numKeys = 2;
-			
-			// generate keys without encryption
-			var progressReported = false;
-			AppUtils.generateKeys(getNoEncryptionConfig(), function(percent, label) {
-				assertTrue(percent >= 0 && percent <= 1);
-				progressReported = true;
-			}, function(err, keys, pieces, pieceDivs) {
-				assertNull(err);
-				assertTrue(progressReported);
-				assertEquals(2 * plugins.length, keys.length);
-				assertEquals(1, pieces.length);
-				assertEquals(1, pieceDivs.length);
-				
-				// generate keys with encryption and splitting
-				progressReported = false;
-				AppUtils.generateKeys(getEncryptionAndSplitConfig(), function(percent, label) {
-					assertTrue(percent >= 0 && percent <= 1);
-					progressReported = true;
-				}, function(err, keys, pieces, pieceDivs) {
-					assertNull(err);
-					assertTrue(progressReported);
-					assertEquals(2 * plugins.length, keys.length);
-					assertEquals(3, pieces.length);
-					assertEquals(3, pieceDivs.length);
-					
-					// test keys are encrypted
-					for (var i = 0; i < keys.length; i++) {
-						assertTrue(keys[i].isEncrypted());
-						assertEquals(AppUtils.EncryptionScheme.CRYPTOJS, keys[i].getEncryptionScheme());
-					}
-					
-					// test pieces recreate keys
-					var combinedKeys = AppUtils.piecesToKeys(pieces);
-					assertEquals(keys.length, combinedKeys.length);
-					for (var i = 0; i < keys.length; i++) {
-						assertTrue(keys[i].equals(combinedKeys[i]));
-					}
-					
-					// done testing key generation
-					if (onDone) onDone();
-				});
-			});
-			
-			function getNoEncryptionConfig() {
-				var config = {};
-				config.numPieces = 1;
-				config.currencies = [];
-				for (var i = 0; i < plugins.length; i++) {
-					var plugin = plugins[i];
-					config.currencies.push({
-						ticker: plugin.getTicker(),
-						numKeys: numKeys,
-						encryption: null,
-					});
+			// test each plugin
+			var testFuncs = [];
+			for (var i = 0; i < plugins.length; i++) testFuncs.push(testGenerateKeysPlugin(plugins[i]));
+			async.series(testFuncs, onDone);
+			function testEndToEndFunc(plugin) {
+				return function(onDone) {
+					return testEndToEndPlugin(plugin, onDone);
 				}
-				return config;
 			}
 			
-			function getEncryptionAndSplitConfig() {
-				var config = {};
-				config.numPieces = 3;
-				config.minPieces = 2;
-				config.currencies = [];
-				config.passphrase = Tests.PASSPHRASE;
-				for (var i = 0; i < plugins.length; i++) {
-					var plugin = plugins[i];
+			// test one plugin
+			function testGenerateKeysPlugin(plugin, onDone) {
+				console.log("testGenerateKeys(" + plugin.getTicker() + ")");
+				
+				// get generation config
+				var config = getGenerateConfig(plugin);
+				
+				// generate keys
+				var progressReported = true;
+				AppUtils.generateKeys(config, function(percent, label) {
+					assertTrue(percent >= 0 && percent <= 1);
+					lastProgress = percent;
+				}, function(err, keys, pieces, pieceDivs) {
+					
+						// check for error
+						if (err) {
+							onDone (err);
+							return;
+						}
+						
+						// test progress and pieces
+						assertEquals(lastProgress, 1);
+						assertEquals(config.numPieces, pieces.length);
+						assertEquals(config.numPieces, pieceDivs.length);
+						
+						// test key structure
+						var keyIdx = 0;
+						for (var i = 0; i < config.currencies.length; i++) {
+							for (var j = 0; j < config.currencies[i].numKeys; j++) {
+								var key = keys[keyIdx++];
+								assertTrue(plugin.isAddress(key.getAddress()));
+								assertEquals(config.currencies[i].encryption, key.getEncryptionScheme());
+							}
+						}
+						assertEquals(keyIdx, keys.length);
+						
+						// test piece combinations recreate keys
+						var combinations = getCombinations(pieces, Tests.MIN_PIECES);
+						for (var j = 0; j < combinations.length; j++) {
+							var combination = combinations[j];
+							var combinedKeys = AppUtils.piecesToKeys(combination);
+							assertEquals(keys.length, combinedKeys.length);
+							for (var i = 0; i < keys.length; i++) {
+								assertTrue(keys[i].equals(combinedKeys[i]));
+							}
+						}						
+						
+						// no failures
+						onDone();
+				});
+				
+				// build key generation configuration
+				function getGenerateConfig(plugin) {
+					var config = {};
+					config.currencies = [];
+					config.passphrase = Tests.PASSPHRASE;
+					config.verifyEncryption = true;
+					config.numPieces = Tests.NUM_PIECES;
+					config.minPieces = Tests.MIN_PIECES;
+					
+					// config no encryption
 					config.currencies.push({
 						ticker: plugin.getTicker(),
-						numKeys: numKeys,
-						encryption: AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2,
+						numKeys: Tests.REPEAT_SHORT,
+						encryption: null
 					});
+					
+					// config encryption
+					for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
+						var scheme = plugin.getEncryptionSchemes()[i];
+						config.currencies.push({
+							ticker: plugin.getTicker(),
+							numKeys: Tests.REPEAT_SHORT,
+							encryption: scheme
+						})
+					}
+					
+					return config;
 				}
-				return config;
 			}
 		}
 
@@ -865,101 +879,6 @@ var Tests = {
 					return AppUtils.keysToPieces(keys, numPieces, minPieces);
 				}
 			});
-		}
-		
-		function testEndToEnd(plugins, onDone) {
-			
-			// test each plugin
-			var testFuncs = [];
-			for (var i = 0; i < plugins.length; i++) testFuncs.push(testEndToEndFunc(plugins[i]));
-			async.series(testFuncs, onDone);
-			function testEndToEndFunc(plugin) {
-				return function(onDone) {
-					return testEndToEndPlugin(plugin, onDone);
-				}
-			}
-			
-			// test one plugin
-			function testEndToEndPlugin(plugin, onDone) {
-				console.log("testEndToEnd(" + plugin.getTicker() + ")");
-				
-				// get generation config
-				var config = getGenerateConfig(plugin);
-				
-				// generate keys
-				var progressReported = true;
-				AppUtils.generateKeys(config, function(percent, label) {
-					assertTrue(percent >= 0 && percent <= 1);
-					lastProgress = percent;
-				}, function(err, keys, pieces, pieceDivs) {
-					
-						// check for error
-						if (err) {
-							onDone (err);
-							return;
-						}
-						
-						// test progress and pieces
-						assertEquals(lastProgress, 1);
-						assertEquals(config.numPieces, pieces.length);
-						assertEquals(config.numPieces, pieceDivs.length);
-						
-						// test key structure
-						var keyIdx = 0;
-						for (var i = 0; i < config.currencies.length; i++) {
-							for (var j = 0; j < config.currencies[i].numKeys; j++) {
-								var key = keys[keyIdx++];
-								assertTrue(plugin.isAddress(key.getAddress()));
-								assertEquals(config.currencies[i].encryption, key.getEncryptionScheme());
-							}
-						}
-						assertEquals(keyIdx, keys.length);
-						
-						// test piece combinations recreate keys
-						var combinations = getCombinations(pieces, Tests.MIN_PIECES);
-						for (var j = 0; j < combinations.length; j++) {
-							var combination = combinations[j];
-							var combinedKeys = AppUtils.piecesToKeys(combination);
-							assertEquals(keys.length, combinedKeys.length);
-							for (var i = 0; i < keys.length; i++) {
-								assertTrue(keys[i].equals(combinedKeys[i]));
-							}
-						}						
-						
-						// no failures
-						onDone();
-				});
-				
-				// build key generation configuration
-				function getGenerateConfig(plugin) {
-					var config = {};
-					config.currencies = [];
-					config.passphrase = Tests.PASSPHRASE;
-					config.verifyEncryption = true;
-					config.numPieces = Tests.NUM_PIECES;
-					config.minPieces = Tests.MIN_PIECES;
-					
-					// config no encryption
-					config.currencies.push({
-						ticker: plugin.getTicker(),
-						numKeys: Tests.REPEAT_LONG,
-						encryption: null
-					});
-					
-					// config encryption
-					for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
-						var scheme = plugin.getEncryptionSchemes()[i];
-						var repeat = scheme === AppUtils.EncryptionScheme.BIP38 ? Tests.REPEAT_SHORT : Tests.REPEAT_LONG;
-						config.currencies.push({
-							ticker: plugin.getTicker(),
-							numKeys: repeat,
-							encryption: scheme
-						})
-					}
-					
-					return config;
-				}
-			}
 		}
 	}
 }

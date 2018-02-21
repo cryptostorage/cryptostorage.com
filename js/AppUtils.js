@@ -1254,14 +1254,14 @@ var AppUtils = {
 			    mode: CryptoJS.mode.CBC
 			  });
 			  var decryptedHex = decrypted.toString(CryptoJS.enc.Utf8);
-			  if (!decryptedHex) throw new Error("Incorrect passphrase");
+			  assertInitialized(decryptedHex);
 			  
 			  // update key
 			  key.setPrivateKey(decryptedHex);
 				if (onProgress) onProgress(1)
 				if (onDone) onDone(null, key);
 			} catch (err) {
-				onDone(err);
+				onDone(new Error("Incorrect passphrase"));
 			}
 		}
 		
