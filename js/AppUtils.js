@@ -1022,7 +1022,6 @@ var AppUtils = {
 						}, function(err, encryptedKeys) {
 							if (err) onDone(err);
 							else {
-								console.log(encryptionSchemes);
 								doneWeight += encryptWeight;
 								generatePieces(encryptedKeys, config);
 							}
