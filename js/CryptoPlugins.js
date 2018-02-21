@@ -429,7 +429,6 @@ function LitecoinPlugin() {
 			
 			// hex cryptojs pbkdf2
 			if (str.length === 224) {
-				console.log("supposedly cryptojs_pbkdf2?")
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
 				if (!AppUtils.isWifCryptoJsPbkdf2(state.wif)) throw new Error("Unrecognized private key: " + str);

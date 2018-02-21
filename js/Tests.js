@@ -899,8 +899,10 @@ var Tests = {
 							return;
 						}
 						
-						// ensure progress went to 100%
+						// test progress and pieces
 						assertEquals(lastProgress, 1);
+						assertEquals(config.numPieces, pieces.length);
+						assertEquals(config.numPieces, pieceDivs.length);
 						
 						// test key structure
 						var keyIdx = 0;
@@ -911,6 +913,18 @@ var Tests = {
 								assertEquals(config.currencies[i].encryption, key.getEncryptionScheme());
 							}
 						}
+						assertEquals(keyIdx, keys.length);
+						
+						// test piece combinations recreate keys
+						var combinations = getCombinations(pieces, Tests.MIN_PIECES);
+						for (var j = 0; j < combinations.length; j++) {
+							var combination = combinations[j];
+							var combinedKeys = AppUtils.piecesToKeys(combination);
+							assertEquals(keys.length, combinedKeys.length);
+							for (var i = 0; i < keys.length; i++) {
+								assertTrue(keys[i].equals(combinedKeys[i]));
+							}
+						}						
 						
 						// no failures
 						onDone();
