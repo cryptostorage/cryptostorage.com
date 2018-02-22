@@ -425,7 +425,8 @@ function LitecoinPlugin() {
 	this.newKey = function(str) {
 		
 		// create key if not given
-		if (!str) str = new litecore.PrivateKey().toString();	
+		//if (!str) str = "31fe7a8b58100ef54e9dda4446b5193df3299e220c6542d3685db6536081cf";
+		if (!str) str = new litecore.PrivateKey().toString();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
 		
@@ -443,7 +444,7 @@ function LitecoinPlugin() {
 		else if (isHex(str)) {
 			
 			// hex cryptojs pbkdf2
-			if (str.length === 192 || str.length === 224) {
+			if (str.length === 224) {	// TODO: string can be 192 with or without pbkdf2
 				state.hex = str;
 				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
 				if (!isWifCryptoJsPbkdf2Litecoin(state.wif)) throw new Error("Unrecognized private key: " + str);
@@ -453,6 +454,7 @@ function LitecoinPlugin() {
 			
 			// hex cryptojs
 			else if (str.length > 100) {
+				console.log(str.length);
 				state.hex = str;
 				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
 				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);

@@ -199,8 +199,6 @@ function testGenerateKeys(plugins, onDone) {
 					lastProgress = percent;
 				}, function(err, keys, pieces, pieceDivs) {
 					
-					console.log("generateKeys() done");
-					
 					// check for error
 					if (err) {
 						onDone(err);
