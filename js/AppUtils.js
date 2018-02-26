@@ -305,6 +305,109 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Determines if the given string is an encrypted private key.
+	 * 
+	 * @param str is the string to test
+	 * @returns true if the string is an encrypted private key, false otherwise
+	 */
+	isEncryptedKey: function(str) {
+		return AppUtils.isEncryptedHexV1(str) || AppUtils.isEncryptedWifV1(str) || AppUtils.isEncryptedHexV2(str) || AppUtils.isEncryptedWifV2(str);
+	},
+	
+	/**
+	 * Decodes the given encrypted private key.
+	 * 
+	 * @param str is the encrypted private key to decode
+	 * @returns Object with hex, wif, and encryption fields
+	 */
+	decodeEncryptedKey: function(str) {
+		if (AppUtils.isEncryptedHexV1(str)) return AppUtils.decodeEncryptedHexV1(str);
+		if (AppUtils.isEncryptedWifV1(str)) return AppUtils.decodeEncryptedWifV1(str);
+		if (AppUtils.isEncryptedHexV2(str)) return AppUtils.decodeEncryptedHexV2(str);
+		if (AppUtils.isEncryptedWifV2(str)) return AppUtils.decodeEncryptedWifV2(str);
+	},
+	
+	/**
+	 * Determines if the given string is a v1 encrypted hex private key.
+	 * 
+	 * @param str is the string to test
+	 * @returns true if the string is a v1 encrypted hex private key, false otherwise
+	 */
+	isEncryptedHexV1: function(str) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Decodes the given v1 encrypted hex private key.
+	 * 
+	 * @param str is a v1 encrypted hex private key
+	 * @returns Object with hex, wif, and encryption fields
+	 */
+	decodeEncryptedHexV1: function(str) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Determines if the given string is a v1 encrypted WIF private key.
+	 * 
+	 * @param str is the string to test
+	 * @returns true if the string is a v1 encrypted WIF private key, false otherwise
+	 */
+	isEncryptedWifV1: function(str) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Decodes the given v1 encrypted WIF private key.
+	 * 
+	 * @param str is a v1 encrypted WIF private key
+	 * @returns Object with hex, wif, and encryption fields
+	 */
+	decodeEncryptedWifV1: function(str) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Determines if the given string is a v2 encrypted hex private key.
+	 * 
+	 * @param str is the string to test
+	 * @returns true if the string is a v2 encrypted hex private key, false otherwise
+	 */
+	isEncryptedHexV2: function(str) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Decodes the given v2 encrypted hex private key.
+	 * 
+	 * @param str is a v2 encrypted hex private key
+	 * @returns Object with hex, wif, and encryption fields
+	 */
+	decodeEncryptedHexV2: function(str) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Determines if the given string is a v2 encrypted WIF private key.
+	 * 
+	 * @param str is the string to test
+	 * @returns true if the string is a v2 encrypted WIF private key, false otherwise
+	 */
+	isEncryptedWifV2: function(str) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Decodes the given v2 encrypted WIF private key.
+	 * 
+	 * @param str is a v2 encrypted WIF private key
+	 * @returns Object with hex, wif, and encryption fields
+	 */
+	decodeEncryptedWifV2: function(str) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
 	 * Determines if the given string is a valid CryptoJS WIF private key.
 	 */
 	isWifCryptoJs: function(str) {
