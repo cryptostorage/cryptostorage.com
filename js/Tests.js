@@ -28,7 +28,7 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 10,
+	REPEAT_LONG: 2,
 	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
@@ -40,18 +40,18 @@ var Tests = {
 	 */
 	getTestCryptoPlugins: function() {
 		var plugins = [];
-//		plugins.push(new BitcoinPlugin());
-//		plugins.push(new BitcoinCashPlugin());
+		plugins.push(new BitcoinPlugin());
+		plugins.push(new BitcoinCashPlugin());
 		plugins.push(new EthereumPlugin());
-//		plugins.push(new MoneroPlugin());
-//		plugins.push(new DashPlugin());
-//		plugins.push(new LitecoinPlugin());
-//		plugins.push(new ZcashPlugin());
-//		plugins.push(new RipplePlugin());
-//		plugins.push(new StellarPlugin());
-//		plugins.push(new WavesPlugin());
-//		plugins.push(new NeoPlugin());
-//		plugins.push(new BIP39Plugin());
+		plugins.push(new MoneroPlugin());
+		plugins.push(new DashPlugin());
+		plugins.push(new LitecoinPlugin());
+		plugins.push(new ZcashPlugin());
+		plugins.push(new RipplePlugin());
+		plugins.push(new StellarPlugin());
+		plugins.push(new WavesPlugin());
+		plugins.push(new NeoPlugin());
+		plugins.push(new BIP39Plugin());
 		return plugins;
 	},
 	
