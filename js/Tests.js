@@ -28,12 +28,12 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 2,
+	REPEAT_LONG: 10,
 	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
-	TEST_PLUGINS: false,	// TODO: re-enable
+	TEST_PLUGINS: true,
 	
 	/**
 	 * Returns crypto plugins to test.
@@ -43,9 +43,9 @@ var Tests = {
 //		plugins.push(new BitcoinPlugin());
 //		plugins.push(new BitcoinCashPlugin());
 //		plugins.push(new EthereumPlugin());
-//		plugins.push(new MoneroPlugin());
+		plugins.push(new MoneroPlugin());
 //		plugins.push(new DashPlugin());
-		plugins.push(new LitecoinPlugin());
+//		plugins.push(new LitecoinPlugin());
 //		plugins.push(new ZcashPlugin());
 //		plugins.push(new RipplePlugin());
 //		plugins.push(new StellarPlugin());

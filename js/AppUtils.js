@@ -1098,7 +1098,6 @@ var AppUtils = {
 			assertInitialized(config.numPieces);
 			if (encryptionInitialized) assertInitialized(config.passphrase);
 		} catch (err) {
-			console.log("onDone(1)");
 			onDone(err);
 			return;
 		}
@@ -1122,7 +1121,6 @@ var AppUtils = {
 			
 			// check for error
 			if (err) {
-				console.log("onDone(2)");
 				onDone(err);
 				return;
 			}
@@ -1145,7 +1143,6 @@ var AppUtils = {
 					
 				// check for error
 				if (err) {
-					console.log("onDone(3)");
 					onDone(err);
 					return;
 				}
@@ -1180,10 +1177,7 @@ var AppUtils = {
 						if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
 					}, function(err, encryptedKeys) {
 						if (err) {
-							console.log("onDone(4)");
-							console.log("Hello");
-							console.log(err);
-							onDone(err);	// TODO: why doesn't this get printed?
+							onDone(err);
 						} else {
 							doneWeight += encryptWeight;
 							generatePieces(keys, config);
@@ -1241,10 +1235,8 @@ var AppUtils = {
 					if (err) throw err;
 					assertEquals(pieces.length, pieceDivs.length);
 					if (onProgress) onProgress(1, "Complete");
-					console.log("onDone(5)");
 					onDone(null, keys, pieces, pieceDivs);
 				} catch (err) {
-					console.log("onDone(6)");
 					onDone(err);
 				}
 			});
@@ -1406,7 +1398,7 @@ var AppUtils = {
 				assertEquals(AppUtils.ENCRYPTION_PREFIX_V2, key.getHex().substring(0, 2));
 				
 				// get passphrase key
-				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(2, 34));
+				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(2, 32));
 			  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
 			  	keySize: KEY_SIZE / 32,
 			  	iterations: PBKDF_ITER,
