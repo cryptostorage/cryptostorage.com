@@ -1214,12 +1214,8 @@ var AppUtils = {
 			// convert keys to pieces
 			var pieces = AppUtils.keysToPieces(keys, config.numPieces, config.minPieces);
 			
-			console.log(keys);
-			console.log(pieces);
-			
 			// verify pieces recreate keys
 			var keysFromPieces = AppUtils.piecesToKeys(pieces);
-			console.log(keysFromPieces);
 			assertEquals(keys.length, keysFromPieces.length);
 			for (var i = 0; i < keys.length; i++) {
 				assertTrue(keys[i].equals(keysFromPieces[i]));
@@ -1306,11 +1302,6 @@ var AppUtils = {
 				// encrypted hex = salt + iv + hex cipher text
 				var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
 				var encryptedHex = AppUtils.ENCRYPTION_PREFIX_V2 + salt.toString() + ctHex;
-//				console.log(key);
-//				console.log("Encrypted hex length: " + encryptedHex.length);
-//				console.log("Encrypted hex: " + encryptedHex);
-//				console.log(Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex)));
-//				console.log(CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8));
 				key.setState(Object.assign(key.getPlugin().newKey(encryptedHex).getState(), {address: key.getAddress()}));
 				if (onProgress) onProgress(1);
 				if (onDone) onDone(null, key);

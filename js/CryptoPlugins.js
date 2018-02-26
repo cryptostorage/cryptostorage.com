@@ -422,6 +422,7 @@ function LitecoinPlugin() {
 	this.getLogoPath = function() { return "img/litecoin.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/litecore.js"]; }
 	this.getDonationAddress = function() { return "LSRx2UwU5rjKGcmUXx8KDNTNXMBV1PudHB"; }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -440,44 +441,8 @@ function LitecoinPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// hex
-		else if (isHex(str)) {
-			
-			// hex cryptojs pbkdf2
-			if (str.length === 224) {	// TODO: string can be 192 with or without pbkdf2
-				state.hex = str;
-				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
-				if (!isWifCryptoJsPbkdf2Litecoin(state.wif)) throw new Error("Unrecognized private key: " + str);
-				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
-				return new CryptoKey(this, state);
-			}
-			
-			// hex cryptojs
-			else if (str.length > 100) {
-				console.log(str.length);
-				state.hex = str;
-				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
-				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-				return new CryptoKey(this, state);
-			}
-		}
-		
-		// wif cryptojs
-		else if (AppUtils.isWifCryptoJs(str)) {
-			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-			state.wif = str;
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-			return new CryptoKey(this, state);
-		}
-		
-		// wif cryptojs pbkdf2
-		else if (isWifCryptoJsPbkdf2Litecoin(str)) {
-			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
-			state.wif = str;
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
-			return new CryptoKey(this, state);
-		}
+		// key encrypted with cryptostorage conventions
+		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
@@ -591,7 +556,7 @@ function MoneroPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// encrypted key
+		// key encrypted with cryptostorage conventions
 		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
 		
 		// unencrypted hex
