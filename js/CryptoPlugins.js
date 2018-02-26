@@ -574,6 +574,7 @@ function MoneroPlugin() {
 	this.getLogoPath = function() { return "img/monero.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/moneroaddress.js"]; }
 	this.getDonationAddress = function() { return "42fuBvVfgPUWphR6C5XgsXDGfx2KVhbv4cjhJDm9Y87oU1ixpDnzF82RAWCbt8p81f26kx3kstGJCat1YEohwS1e1o27zWE"; }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -594,7 +595,7 @@ function MoneroPlugin() {
 		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
 		
 		// unencrypted hex
-		else if (isHex(str)) {
+		else if (isHex(str) && str.length >= 63 && str.length <= 65) {	// TODO: should not be necessary to check length
 			var address = cnUtil.create_address(str);
 			if (!cnUtil.valid_keys(address.view.pub, address.view.sec, address.spend.pub, address.spend.sec)) throw new Error("Invalid address keys derived from hex key");
 			var state = {};

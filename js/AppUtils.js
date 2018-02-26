@@ -58,7 +58,7 @@ var AppUtils = {
 	SIMULATED_LOAD_TIME: null,				// simulate slow load times in ms, disabled if null
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
-	ENCRYPTED_PREFIX_V2: "02",				// prefix to indicate password encryption v2
+	ENCRYPTION_PREFIX_V2: "02",				// prefix to indicate password encryption v2
 	
 	/**
 	 * Mock environment checks.
@@ -395,8 +395,9 @@ var AppUtils = {
 	isEncryptedHexV2: function(str) {
 		if (!isHex(str)) return false;
 		if (str.length - 34 < 1) return false;
-		if ((str.length - 34) % 32 !== 0) return false;	// 2 to identify encryption version + 32 for salt, remaining must be multiple of 32
-		if (str.substring(0, 2) !== AppUtils.ENCRYPTED_PREFIX_V2) return false;
+		if ((str.length - 2) % 32 !== 0) return false;	// first 2 characters identify encryption version
+		if (str.substring(0, 2) !== AppUtils.ENCRYPTION_PREFIX_V2) return false;
+		return true;
 	},
 	
 	/**
@@ -1180,9 +1181,10 @@ var AppUtils = {
 					}, function(err, encryptedKeys) {
 						if (err) {
 							console.log("onDone(4)");
-							onDone(err);
-						}
-						else {
+							console.log("Hello");
+							console.log(err);
+							onDone(err);	// TODO: why doesn't this get printed?
+						} else {
 							doneWeight += encryptWeight;
 							generatePieces(keys, config);
 						}
@@ -1293,7 +1295,7 @@ var AppUtils = {
 				var BLOCK_SIZE = 16;
 				var HASHER = CryptoJS.algo.SHA512;
 				
-				// derive key for encryption
+				// strengthen passphrase with passphrase key
 				var salt = CryptoJS.lib.WordArray.random(BLOCK_SIZE);
 				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
 		      keySize: KEY_SIZE / 32,
@@ -1311,12 +1313,12 @@ var AppUtils = {
 				
 				// encrypted hex = salt + iv + hex cipher text
 				var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
-				var encryptedHex = salt.toString() + ctHex;
-				console.log(key);
-				console.log("Encrypted hex length: " + encryptedHex.length);
-				console.log("Encrypted hex: " + encryptedHex);
-				console.log(Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex)));
-				console.log(CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8));
+				var encryptedHex = AppUtils.ENCRYPTION_PREFIX_V2 + salt.toString() + ctHex;
+//				console.log(key);
+//				console.log("Encrypted hex length: " + encryptedHex.length);
+//				console.log("Encrypted hex: " + encryptedHex);
+//				console.log(Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex)));
+//				console.log(CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8));
 				key.setState(Object.assign(key.getPlugin().newKey(encryptedHex).getState(), {address: key.getAddress()}));
 				if (onProgress) onProgress(1);
 				if (onDone) onDone(null, key);
@@ -1398,10 +1400,13 @@ var AppUtils = {
 				var PBKDF_ITER = 10000;
 				var KEY_SIZE = 256;
 				var BLOCK_SIZE = 16;
-				var HASHER = CryptoJS.algo.SHA512;
+				var HASHER = CryptoJS.algo.SHA512;	// TODO: factor these to constants
+				
+				// assert correct prefix
+				assertEquals(AppUtils.ENCRYPTION_PREFIX_V2, key.getHex().substring(0, 2));
 				
 				// get passphrase key
-				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(0, 32));
+				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(2, 34));
 			  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
 			  	keySize: KEY_SIZE / 32,
 			  	iterations: PBKDF_ITER,
@@ -1410,7 +1415,7 @@ var AppUtils = {
 			  
 			  // decrypt
 			  var iv = salt;
-			  var ctHex = key.getHex().substring(32);
+			  var ctHex = key.getHex().substring(34);
 			  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
 			  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
 			  	iv: iv, 
