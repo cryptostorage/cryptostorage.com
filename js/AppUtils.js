@@ -1201,7 +1201,7 @@ var AppUtils = {
 				
 				// create random salt and replace first two characters with version
 				var salt = CryptoJS.lib.WordArray.random(BLOCK_SIZE);
-				salt = AppUtils.ENCRYPTION_PREFIX_V1 + salt.substring(2);
+				salt = AppUtils.ENCRYPTION_PREFIX_V1 + salt.toString().substring(2);
 				salt = CryptoJS.enc.Hex.parse(salt);
 				
 				// strengthen passphrase with passphrase key
