@@ -1147,11 +1147,11 @@ var AppUtils = {
 				// constants
 				var PBKDF_ITER = 10000;
 				var KEY_SIZE = 256;
-				var RANDOM_SIZE = 16;
+				var BLOCK_SIZE = 16;
 				var HASHER = CryptoJS.algo.SHA512;
 				
 				// derive key for encryption
-				var salt = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
+				var salt = CryptoJS.lib.WordArray.random(BLOCK_SIZE);
 				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
 		      keySize: KEY_SIZE / 32,
 		      iterations: PBKDF_ITER,
@@ -1159,7 +1159,7 @@ var AppUtils = {
 		    });
 				
 				// encrypt
-				var iv = CryptoJS.lib.WordArray.random(RANDOM_SIZE);
+				var iv = salt;
 				var encrypted = CryptoJS.AES.encrypt(key.getHex(), passphraseKey, { 
 			    iv: iv, 
 			    padding: CryptoJS.pad.Pkcs7,
@@ -1168,10 +1168,12 @@ var AppUtils = {
 				
 				// encrypted hex = salt + iv + hex cipher text
 				var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
-				var encryptedHex = salt.toString() + iv.toString() + ctHex;
+				var encryptedHex = salt.toString() + ctHex;
 				console.log(key);
 				console.log("Encrypted hex length: " + encryptedHex.length);
 				console.log("Encrypted hex: " + encryptedHex);
+				console.log(Bitcoin.Base58.encode(Crypto.util.hexToBytes(encryptedHex)));
+				console.log(CryptoJS.enc.Hex.parse(encryptedHex).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8));
 				key.setState(Object.assign(key.getPlugin().newKey(encryptedHex).getState(), {address: key.getAddress()}));
 				if (onProgress) onProgress(1);
 				if (onDone) onDone(null, key);
@@ -1252,7 +1254,7 @@ var AppUtils = {
 				// constants
 				var PBKDF_ITER = 10000;
 				var KEY_SIZE = 256;
-				var RANDOM_SIZE = 16;
+				var BLOCK_SIZE = 16;
 				var HASHER = CryptoJS.algo.SHA512;
 				
 				// get passphrase key
@@ -1264,8 +1266,8 @@ var AppUtils = {
 			  });
 			  
 			  // decrypt
-			  var iv = CryptoJS.enc.Hex.parse(key.getHex().substr(32, 32))
-			  var ctHex = key.getHex().substring(64);
+			  var iv = salt;
+			  var ctHex = key.getHex().substring(32);
 			  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
 			  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
 			  	iv: iv, 
