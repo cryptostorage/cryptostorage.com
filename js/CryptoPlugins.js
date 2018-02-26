@@ -62,7 +62,7 @@ CryptoPlugin.prototype.getDonationAddress = function() { throw new Error("Subcla
 /**
  * Returns the supported encryption schemes.
  */
-CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS]; }
+CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
 
 /**
  * Encrypts the given key with the given scheme and passphrase.
@@ -306,54 +306,19 @@ function EthereumPlugin() {
 		// create key if not given
 		if (!str) str = keythereum.create().privateKey.toString("hex");
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+			
+		// unencryptedhex 
 		var state = {};
-		
-		// handle hex
-		if (isHex(str)) {
-			
-			// unencrypted
-			if (str.length >= 63 && str.length <= 65) {
-				state.hex = str;
-				state.wif = str;
-				state.address = ethereumjsutil.toChecksumAddress(keythereum.privateKeyToAddress(state.hex));
-				state.encryption = null;
-				return new CryptoKey(this, state);
-			}
-			
-			// hex cryptojs pbkdf2
-			else if (str.length === 224) {
-				state.hex = str;
-				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
-				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
-				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
-				return new CryptoKey(this, state);
-			}
-			
-			// hex cryptojs
-			else if (str.length > 100) {
-				state.hex = str;
-				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
-				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-				return new CryptoKey(this, state);
-			}
-		}
-		
-		// wif cryptojs
-		else if (AppUtils.isWifCryptoJs(str)) {
-			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+		if (str.length >= 63 && str.length <= 65 && isHex(str)) {
+			state.hex = str;
 			state.wif = str;
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			state.address = ethereumjsutil.toChecksumAddress(keythereum.privateKeyToAddress(state.hex));
+			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
 		
-		// wif cryptojs pbkdf2
-		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
-			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
-			state.wif = str;
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
-			return new CryptoKey(this, state);
-		}
+		// key encrypted with cryptostorage conventions
+		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
@@ -422,11 +387,9 @@ function LitecoinPlugin() {
 	this.getLogoPath = function() { return "img/litecoin.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/litecore.js"]; }
 	this.getDonationAddress = function() { return "LSRx2UwU5rjKGcmUXx8KDNTNXMBV1PudHB"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
-		//if (!str) str = "31fe7a8b58100ef54e9dda4446b5193df3299e220c6542d3685db6536081cf";
 		if (!str) str = new litecore.PrivateKey().toString();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var state = {};
@@ -539,7 +502,6 @@ function MoneroPlugin() {
 	this.getLogoPath = function() { return "img/monero.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/moneroaddress.js"]; }
 	this.getDonationAddress = function() { return "42fuBvVfgPUWphR6C5XgsXDGfx2KVhbv4cjhJDm9Y87oU1ixpDnzF82RAWCbt8p81f26kx3kstGJCat1YEohwS1e1o27zWE"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
 	this.newKey = function(str) {
 		
 		// create key if not given

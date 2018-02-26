@@ -42,10 +42,10 @@ var Tests = {
 		var plugins = [];
 //		plugins.push(new BitcoinPlugin());
 //		plugins.push(new BitcoinCashPlugin());
-//		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
+		plugins.push(new EthereumPlugin());
+//		plugins.push(new MoneroPlugin());
 //		plugins.push(new DashPlugin());
-		plugins.push(new LitecoinPlugin());
+//		plugins.push(new LitecoinPlugin());
 //		plugins.push(new ZcashPlugin());
 //		plugins.push(new RipplePlugin());
 //		plugins.push(new StellarPlugin());
