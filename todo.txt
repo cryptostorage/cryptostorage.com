@@ -1,9 +1,6 @@
 v0.1.6
-optimize new encryption utilities
 refactor constants
-implement across other plugins
-isWifCryptoJsPbkdfs in plugins
-pbkdf2 weight tests
+rename encryption schemes
 ethereum logo not pushed down with 3 line encryption
 remake screenshot with new encryption format
 split could incorporate min pieces in hex which translates to b64
