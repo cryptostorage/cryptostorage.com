@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: true,
+	RUN_FULL_TESTS: false,
 	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
@@ -319,124 +319,60 @@ var AppUtils = {
 	 * Decodes the given encrypted private key.
 	 * 
 	 * @param str is the encrypted private key to decode
-	 * @returns Object with hex, wif, and encryption fields
+	 * @returns Object with hex, wif, and encryption fields or null if not recognized
 	 */
 	decodeEncryptedKey: function(str) {
 		var decoded = null;
-		if ((decoded = AppUtils.decodeEncryptedHexV1(str)) !== null) return decoded;
-		if ((decoded = AppUtils.decodeEncryptedWifV1(str)) !== null) return decoded;
-		if ((decoded = AppUtils.decodeEncryptedHexV2(str)) !== null) return decoded;
-		if ((decoded = AppUtils.decodeEncryptedWifV2(str)) !== null) return decoded;
+		if ((decoded = decodeEncryptedHexV1(str)) !== null) return decoded;
+		if ((decoded = decodeEncryptedWifV1(str)) !== null) return decoded;
+		if ((decoded = decodeEncryptedHexV2(str)) !== null) return decoded;
+		if ((decoded = decodeEncryptedWifV2(str)) !== null) return decoded;
 		return null;
-	},
-	
-	/**
-	 * Determines if the given string is a v1 encrypted hex private key.
-	 * 
-	 * @param str is the string to test
-	 * @returns true if the string is a v1 encrypted hex private key, false otherwise
-	 */
-	isEncryptedHexV1: function(str) {
-		return AppUtils.decodeEncryptedHexV1(str) !== null;
-	},
-	
-	/**
-	 * Decodes the given v1 encrypted hex private key.
-	 * 
-	 * @param str is a v1 encrypted hex private key
-	 * @returns Object with hex, wif, and encryption fields
-	 */
-	decodeEncryptedHexV1: function(str) {
 		
-		// determine if encrypted hex v1
-		if (!isHex(str)) return null;
-		if (str.length % 32 !== 0) return null;
-		var b64 = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-		if (!b64.startsWith("U2")) return null;
+		function decodeEncryptedHexV1(str) {
+			
+			// determine if encrypted hex v1
+			if (!isHex(str)) return null;
+			if (str.length % 32 !== 0) return null;
+			var b64 = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!b64.startsWith("U2")) return null;
 
-		// decode
-		var state = {};
-		state.hex = str;
-		state.wif = b64;
-		state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-		return state;
-	},
-	
-	/**
-	 * Determines if the given string is a v1 encrypted WIF private key.
-	 * 
-	 * @param str is the string to test
-	 * @returns true if the string is a v1 encrypted WIF private key, false otherwise
-	 */
-	isEncryptedWifV1: function(str) {
-		return AppUtils.decodeEncryptedWifV1(str) !== null;
-	},
-	
-	/**
-	 * Decodes the given v1 encrypted WIF private key.
-	 * 
-	 * @param str is a v1 encrypted WIF private key
-	 * @returns Object with hex, wif, and encryption fields
-	 */
-	decodeEncryptedWifV1: function(str) {
-		if (!str.startsWith("U2")) return null;
-		if (!AppUtils.isBase64(str)) return null;
-		var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-		return AppUtils.decodeEncryptedHexV1(hex);
-	},
-	
-	/**
-	 * Determines if the given string is a v2 encrypted hex private key.
-	 * 
-	 * @param str is the string to test
-	 * @returns true if the string is a v2 encrypted hex private key, false otherwise
-	 */
-	isEncryptedHexV2: function(str) {
-		return AppUtils.decodeEncryptedHexV2(str) !== null;
-	},
-	
-	/**
-	 * Decodes the given v2 encrypted hex private key.
-	 * 
-	 * @param str is a v2 encrypted hex private key
-	 * @returns Object with hex, wif, and encryption fields
-	 */
-	decodeEncryptedHexV2: function(str) {
+			// decode
+			var state = {};
+			state.hex = str;
+			state.wif = b64;
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			return state;
+		}
 		
-		// determine if encrypted hex v2
-		if (!isHex(str)) return null;
-		if (str.length - 34 < 1) return null;
-		if ((str.length - 2) % 32 !== 0) return null;	// first 2 characters identify encryption version
-		if (str.substring(0, 2) !== AppUtils.ENCRYPTION_PREFIX_V2) return null;
+		function decodeEncryptedWifV1(str) {
+			if (!str.startsWith("U2")) return null;
+			if (!AppUtils.isBase64(str)) return null;
+			var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			return decodeEncryptedHexV1(hex);
+		}
 		
-		// decode
-		var state = {};
-		state.hex = str;
-		state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-		state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
-		return state;
-	},
-	
-	/**
-	 * Determines if the given string is a v2 encrypted WIF private key.
-	 * 
-	 * @param str is the string to test
-	 * @returns true if the string is a v2 encrypted WIF private key, false otherwise
-	 */
-	isEncryptedWifV2: function(str) {
-		return AppUtils.decodeEncryptedWifV2(str) !== null;
-	},
-	
-	/**
-	 * Decodes the given v2 encrypted WIF private key.
-	 * 
-	 * @param str is a v2 encrypted WIF private key
-	 * @returns Object with hex, wif, and encryption fields
-	 */
-	decodeEncryptedWifV2: function(str) {
-		if (!AppUtils.isBase64(str)) return null;
-		var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-		return AppUtils.decodeEncryptedHexV2(hex);
+		function decodeEncryptedHexV2(str) {
+			
+			// determine if encrypted hex v2
+			if (!isHex(str)) return null;
+			if (str.length - 34 < 1) return null;
+			if ((str.length - 2) % 32 !== 0) return null;	// first 2 characters identify encryption version
+			if (str.substring(0, 2) !== AppUtils.ENCRYPTION_PREFIX_V2) return null;
+			
+			// decode
+			var state = {};
+			state.hex = str;
+			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+			return state;
+		}
+		
+		function decodeEncryptedWifV2(str) {
+			if (!AppUtils.isBase64(str)) return null;
+			var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			return decodeEncryptedHexV2(hex);
+		}
 	},
 	
 	/**
