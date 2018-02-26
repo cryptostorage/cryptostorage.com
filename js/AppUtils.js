@@ -58,7 +58,7 @@ var AppUtils = {
 	SIMULATED_LOAD_TIME: null,				// simulate slow load times in ms, disabled if null
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
-	ENCRYPTION_PREFIX_V2: "02",				// prefix to indicate password encryption v2
+	ENCRYPTION_PREFIX_V1: "01",				// prefix to indicate password encryption v1
 	
 	/**
 	 * Mock environment checks.
@@ -323,15 +323,15 @@ var AppUtils = {
 	 */
 	decodeEncryptedKey: function(str) {
 		var decoded = null;
+		if ((decoded = decodeEncryptedHexV0(str)) !== null) return decoded;
+		if ((decoded = decodeEncryptedWifV0(str)) !== null) return decoded;
 		if ((decoded = decodeEncryptedHexV1(str)) !== null) return decoded;
 		if ((decoded = decodeEncryptedWifV1(str)) !== null) return decoded;
-		if ((decoded = decodeEncryptedHexV2(str)) !== null) return decoded;
-		if ((decoded = decodeEncryptedWifV2(str)) !== null) return decoded;
 		return null;
 		
-		function decodeEncryptedHexV1(str) {
+		function decodeEncryptedHexV0(str) {
 			
-			// determine if encrypted hex v1
+			// determine if encrypted hex V0
 			if (!isHex(str)) return null;
 			if (str.length % 32 !== 0) return null;
 			var b64 = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
@@ -345,20 +345,19 @@ var AppUtils = {
 			return state;
 		}
 		
-		function decodeEncryptedWifV1(str) {
+		function decodeEncryptedWifV0(str) {
 			if (!str.startsWith("U2")) return null;
 			if (!AppUtils.isBase64(str)) return null;
 			var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-			return decodeEncryptedHexV1(hex);
+			return decodeEncryptedHexV0(hex);
 		}
 		
-		function decodeEncryptedHexV2(str) {
+		function decodeEncryptedHexV1(str) {
 			
-			// determine if encrypted hex v2
+			// determine if encrypted hex V1
 			if (!isHex(str)) return null;
-			if (str.length - 34 < 1) return null;
-			if ((str.length - 2) % 32 !== 0) return null;	// first 2 characters identify encryption version
-			if (str.substring(0, 2) !== AppUtils.ENCRYPTION_PREFIX_V2) return null;
+			if (str.length - 32 < 1 || str.length % 32 !== 0) return null;
+			if (str.substring(0, AppUtils.ENCRYPTION_PREFIX_V1.length) !== AppUtils.ENCRYPTION_PREFIX_V1) return null;
 			
 			// decode
 			var state = {};
@@ -368,10 +367,10 @@ var AppUtils = {
 			return state;
 		}
 		
-		function decodeEncryptedWifV2(str) {
+		function decodeEncryptedWifV1(str) {
 			if (!AppUtils.isBase64(str)) return null;
 			var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-			return decodeEncryptedHexV2(hex);
+			return decodeEncryptedHexV1(hex);
 		}
 	},
 	
@@ -1191,7 +1190,7 @@ var AppUtils = {
 		}
 		encryptFunc(key, scheme, passphrase, onProgress, onDone);
 		
-		function encryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {
+		function encryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {	// TODO: rename these
 			try {
 				
 				// constants
@@ -1200,8 +1199,12 @@ var AppUtils = {
 				var BLOCK_SIZE = 16;
 				var HASHER = CryptoJS.algo.SHA512;
 				
-				// strengthen passphrase with passphrase key
+				// create random salt and replace first two characters with version
 				var salt = CryptoJS.lib.WordArray.random(BLOCK_SIZE);
+				salt = AppUtils.ENCRYPTION_PREFIX_V1 + salt.substring(2);
+				salt = CryptoJS.enc.Hex.parse(salt);
+				
+				// strengthen passphrase with passphrase key
 				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
 		      keySize: KEY_SIZE / 32,
 		      iterations: PBKDF_ITER,
@@ -1216,9 +1219,9 @@ var AppUtils = {
 			    mode: CryptoJS.mode.CBC
 			  });
 				
-				// encrypted hex = salt + iv + hex cipher text
+				// encrypted hex = salt + hex cipher text
 				var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
-				var encryptedHex = AppUtils.ENCRYPTION_PREFIX_V2 + salt.toString() + ctHex;
+				var encryptedHex = salt.toString() + ctHex;
 				key.setState(Object.assign(key.getPlugin().newKey(encryptedHex).getState(), {address: key.getAddress()}));
 				if (onProgress) onProgress(1);
 				if (onDone) onDone(null, key);
@@ -1303,10 +1306,10 @@ var AppUtils = {
 				var HASHER = CryptoJS.algo.SHA512;	// TODO: factor these to constants
 				
 				// assert correct prefix
-				assertEquals(AppUtils.ENCRYPTION_PREFIX_V2, key.getHex().substring(0, 2));
+				assertEquals(AppUtils.ENCRYPTION_PREFIX_V1, key.getHex().substring(0, AppUtils.ENCRYPTION_PREFIX_V1.length));
 				
 				// get passphrase key
-				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(2, 32));
+				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(0, 32));
 			  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
 			  	keySize: KEY_SIZE / 32,
 			  	iterations: PBKDF_ITER,
@@ -1315,7 +1318,7 @@ var AppUtils = {
 			  
 			  // decrypt
 			  var iv = salt;
-			  var ctHex = key.getHex().substring(34);
+			  var ctHex = key.getHex().substring(32);
 			  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
 			  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
 			  	iv: iv, 
