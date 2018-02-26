@@ -160,6 +160,7 @@ function isLowerCase(str) {
 var HEX_REG_EXP = /([0-9]|[a-f])/gim
 function isHex(arg) {
 	if (typeof arg !== 'string') return false;
+	assertTrue(arg.length > 0, "Cannot determine if empty string is hex");
 	return (arg.match(HEX_REG_EXP) || []).length === arg.length;
 }
 

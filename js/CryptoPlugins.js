@@ -62,7 +62,7 @@ CryptoPlugin.prototype.getDonationAddress = function() { throw new Error("Subcla
 /**
  * Returns the supported encryption schemes.
  */
-CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
+CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS]; }
 
 /**
  * Encrypts the given key with the given scheme and passphrase.
@@ -579,10 +579,10 @@ function MoneroPlugin() {
 		// create key if not given
 		if (!str) str = cnUtil.sc_reduce32(cnUtil.rand_32());
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		var state = {};
 		
 		// wif unencrypted
 		if (str.indexOf(' ') !== -1) {
+			var state = {};
 			state.hex = mn_decode(str);
 			state.wif = str;
 			state.address = cnUtil.create_address(state.hex).public_addr;
@@ -590,54 +590,18 @@ function MoneroPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// handle hex
+		// encrypted key
+		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		
+		// unencrypted hex
 		else if (isHex(str)) {
-			
-			// unencrypted
-			if (str.length >= 63 && str.length <= 65) {
-				var address = cnUtil.create_address(str);
-				if (!cnUtil.valid_keys(address.view.pub, address.view.sec, address.spend.pub, address.spend.sec)) {
-					throw new Error("Invalid address keys derived from hex key");
-				}
-				state.hex = str;
-				state.wif = mn_encode(state.hex, 'english');
-				state.address = address.public_addr;
-				state.encryption = null;
-				return new CryptoKey(this, state);
-			}
-			
-			// hex cryptojs pbkdf2
-			else if (str.length === 224) {
-				state.hex = str;
-				state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(state.hex));
-				if (!AppUtils.isWifCryptoJsPbkdf2Standard(state.wif)) throw new Error("Unrecognized private key: " + str);
-				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
-				return new CryptoKey(this, state);
-			}
-			
-			// hex cryptojs
-			else if (str.length > 100) {
-				state.hex = str;
-				state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-				if (!AppUtils.isWifCryptoJs(state.wif)) throw new Error("Unrecognized private key: " + str);
-				state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-				return new CryptoKey(this, state);
-			}
-		}
-		
-		// wif cryptojs
-		else if (AppUtils.isWifCryptoJs(str)) {
-			state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-			state.wif = str;
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-			return new CryptoKey(this, state);
-		}
-		
-		// wif cryptojs pbkdf2
-		else if (AppUtils.isWifCryptoJsPbkdf2Standard(str)) {
-			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
-			state.wif = str;
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+			var address = cnUtil.create_address(str);
+			if (!cnUtil.valid_keys(address.view.pub, address.view.sec, address.spend.pub, address.spend.sec)) throw new Error("Invalid address keys derived from hex key");
+			var state = {};
+			state.hex = str;
+			state.wif = mn_encode(state.hex, 'english');
+			state.address = address.public_addr;
+			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
 		

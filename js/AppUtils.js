@@ -58,6 +58,7 @@ var AppUtils = {
 	SIMULATED_LOAD_TIME: null,				// simulate slow load times in ms, disabled if null
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
+	ENCRYPTED_PREFIX_V2: "02",				// prefix to indicate password encryption v2
 	
 	/**
 	 * Mock environment checks.
@@ -325,6 +326,7 @@ var AppUtils = {
 		if (AppUtils.isEncryptedWifV1(str)) return AppUtils.decodeEncryptedWifV1(str);
 		if (AppUtils.isEncryptedHexV2(str)) return AppUtils.decodeEncryptedHexV2(str);
 		if (AppUtils.isEncryptedWifV2(str)) return AppUtils.decodeEncryptedWifV2(str);
+		throw new Error("String is not an encrypted key: " + str);
 	},
 	
 	/**
@@ -334,7 +336,11 @@ var AppUtils = {
 	 * @returns true if the string is a v1 encrypted hex private key, false otherwise
 	 */
 	isEncryptedHexV1: function(str) {
-		throw new Error("Not implemented");
+		if (!isHex(str)) return false;
+		if (str.length % 32 !== 0) return false;
+		var b64 = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+		if (!b64.startsWith("U2")) return false;
+		return true;
 	},
 	
 	/**
@@ -344,7 +350,12 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields
 	 */
 	decodeEncryptedHexV1: function(str) {
-		throw new Error("Not implemented");
+		assertTrue(AppUtils.isEncryptedHexV1(str));
+		var state = {};
+		state.hex = str;
+		state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+		state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+		return state;
 	},
 	
 	/**
@@ -354,7 +365,10 @@ var AppUtils = {
 	 * @returns true if the string is a v1 encrypted WIF private key, false otherwise
 	 */
 	isEncryptedWifV1: function(str) {
-		throw new Error("Not implemented");
+		if (!str.startsWith("U2")) return false;
+		if (!AppUtils.isBase64(str)) return false;
+		var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+		return AppUtils.isEncryptedHexV1(hex);
 	},
 	
 	/**
@@ -364,7 +378,12 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields
 	 */
 	decodeEncryptedWifV1: function(str) {
-		throw new Error("Not implemented");
+		assertTrue(AppUtils.isEncryptedWifV1(str));
+		var state = {};
+		state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+		state.wif = str;
+		state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+		return state;
 	},
 	
 	/**
@@ -374,7 +393,10 @@ var AppUtils = {
 	 * @returns true if the string is a v2 encrypted hex private key, false otherwise
 	 */
 	isEncryptedHexV2: function(str) {
-		throw new Error("Not implemented");
+		if (!isHex(str)) return false;
+		if (str.length - 34 < 1) return false;
+		if ((str.length - 34) % 32 !== 0) return false;	// 2 to identify encryption version + 32 for salt, remaining must be multiple of 32
+		if (str.substring(0, 2) !== AppUtils.ENCRYPTED_PREFIX_V2) return false;
 	},
 	
 	/**
@@ -384,7 +406,12 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields
 	 */
 	decodeEncryptedHexV2: function(str) {
-		throw new Error("Not implemented");
+		assertTrue(AppUtils.isEncryptedHexV2(str));
+		var state = {};
+		state.hex = str;
+		state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+		state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+		return state;
 	},
 	
 	/**
@@ -394,7 +421,9 @@ var AppUtils = {
 	 * @returns true if the string is a v2 encrypted WIF private key, false otherwise
 	 */
 	isEncryptedWifV2: function(str) {
-		throw new Error("Not implemented");
+		if (!AppUtils.isBase64(str)) return false;
+		var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+		return AppUtils.isEncryptedHexV2(hex);
 	},
 	
 	/**
@@ -404,7 +433,12 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields
 	 */
 	decodeEncryptedWifV2: function(str) {
-		throw new Error("Not implemented");
+		assertTrue(AppUtils.isEncryptedWifV2(str));
+		var state = {};
+		state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+		state.wif = str;
+		state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+		return state;
 	},
 	
 	/**
@@ -425,6 +459,8 @@ var AppUtils = {
 	 * Determines if the given string is base32.
 	 */
 	isBase32: function(str) {
+		if (typeof str !== 'string') return false;
+		assertTrue(str.length > 0, "Cannot determine if empty string is base32");
 		return /^[ABCDEFGHIJKLMNOPQRSTUVWXYZ234567]+$/.test(str);
 	},
 	
@@ -432,6 +468,8 @@ var AppUtils = {
 	 * Determines if the given string is base58.
 	 */
 	isBase58: function(str) {
+		if (typeof str !== 'string') return false;
+		assertTrue(str.length > 0, "Cannot determine if empty string is base58");
 		return /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(str);
 	},
 	
@@ -439,6 +477,8 @@ var AppUtils = {
 	 * Determines if the given string is base64.
 	 */
 	isBase64: function(str) {
+		if (typeof str !== 'string') return false;
+		assertTrue(str.length > 0, "Cannot determine if empty string is base64");
 		try {
 			return btoa(atob(str)) == str;
 		} catch (err) {
@@ -1613,6 +1653,8 @@ var AppUtils = {
 	
 	/**
 	 * Returns the weight to encrypt a key with the given scheme.
+	 * 
+	 * TODO: rename these?
 	 * 
 	 * @param scheme is the scheme to encrypt a key with
 	 * @returns weight is the weight to encrypt a key with the given scheme
