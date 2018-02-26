@@ -211,7 +211,7 @@ function BitcoinPlugin() {
 		}
 		
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);		
@@ -271,9 +271,9 @@ function EthereumPlugin() {
 		// create key if not given
 		if (!str) str = keythereum.create().privateKey.toString("hex");
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
 			
 		// unencrypted hex 
-		var state = {};
 		if (str.length >= 63 && str.length <= 65 && isHex(str)) {
 			state.hex = str;
 			state.wif = str;
@@ -283,7 +283,7 @@ function EthereumPlugin() {
 		}
 		
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
@@ -357,9 +357,9 @@ function LitecoinPlugin() {
 		// create key if not given
 		if (!str) str = new litecore.PrivateKey().toString();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
 		
 		// unencrypted
-		var state = {};
 		if (str.length >= 52 && litecore.PrivateKey.isValid(str)) {	// litecore says 'ab' is valid?
 			var key = new litecore.PrivateKey(str);
 			state.hex = key.toString();
@@ -370,7 +370,7 @@ function LitecoinPlugin() {
 		}
 		
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
@@ -395,10 +395,10 @@ function DashPlugin() {
 		// create key if not given
 		if (!str) str = new dashcore.PrivateKey().toString();		
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
 		
 		// unencrypted
 		if (str.length >= 52 && dashcore.PrivateKey.isValid(str)) {	// dashcore says 'ab' is valid?
-			var state = {};
 			var key = new dashcore.PrivateKey(str);
 			state.hex = key.toString();
 			state.wif = key.toWIF();
@@ -408,7 +408,7 @@ function DashPlugin() {
 		}
 		
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
@@ -433,10 +433,10 @@ function MoneroPlugin() {
 		// create key if not given
 		if (!str) str = cnUtil.sc_reduce32(cnUtil.rand_32());
 		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
 		
 		// unencrypted wif
 		if (str.indexOf(' ') !== -1) {
-			var state = {};
 			state.hex = mn_decode(str);
 			state.wif = str;
 			state.address = cnUtil.create_address(state.hex).public_addr;
@@ -444,20 +444,19 @@ function MoneroPlugin() {
 			return new CryptoKey(this, state);
 		}
 		
-		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
-		
 		// unencrypted hex
 		else if (str.length >= 63 && str.length <= 65 && isHex(str)) {
 			var address = cnUtil.create_address(str);
 			if (!cnUtil.valid_keys(address.view.pub, address.view.sec, address.spend.pub, address.spend.sec)) throw new Error("Invalid address keys derived from hex key");
-			var state = {};
 			state.hex = str;
 			state.wif = mn_encode(state.hex, 'english');
 			state.address = address.public_addr;
 			state.encryption = null;
 			return new CryptoKey(this, state);
 		}
+		
+		// encrypted with cryptostorage conventions
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
@@ -488,10 +487,10 @@ function ZcashPlugin() {
 		// create key if not given
 		if (!str) str = new zcashcore.PrivateKey().toString();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
 		
 		// unencrypted
 		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// zcashcore says 'ab' is valid?
-			var state = {};
 			var key = new zcashcore.PrivateKey(str);
 			state.hex = key.toString();
 			state.wif = key.toWIF();
@@ -501,7 +500,7 @@ function ZcashPlugin() {
 		}
 		
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
@@ -526,10 +525,10 @@ function RipplePlugin() {
 		// generate seed if not given
 		if (!str) str = ripple_key_pairs.generateSeed();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
 		
 		// unencrypted wif
 		if (str.length === 29 && AppUtils.isBase58(str)) {
-			var state = {};
 			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(str).publicKey);
@@ -539,7 +538,6 @@ function RipplePlugin() {
 		
 		// unencrypted hex
 		if (str.length === 44 && isHex(str)) {
-			var state = {};
 			state.hex = str;
 			state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
 			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(state.wif).publicKey);			
@@ -548,7 +546,7 @@ function RipplePlugin() {
 		}
 		
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
@@ -573,10 +571,10 @@ function StellarPlugin() {
 		// generate seed if not given
 		if (!str) str = StellarBase.Keypair.random().secret();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
 		
 		// unencrypted wif
 		if (str.length === 56 && isUpperCase(str) && AppUtils.isBase32(str)) {
-			var state = {};
 			var keypair = StellarBase.Keypair.fromSecret(str);
 			state.hex = keypair.rawSecretKey().toString('hex');
 			state.wif = str;			
@@ -587,7 +585,6 @@ function StellarPlugin() {
 
 		// unencrypted hex
 		if (str.length === 64 && isHex(str)) {
-			var state = {};
 			var rawSecret = new Uint8Array(Crypto.util.hexToBytes(str));
 			var keypair = StellarBase.Keypair.fromRawEd25519Seed(rawSecret);
 			state.hex = str;
@@ -598,7 +595,7 @@ function StellarPlugin() {
 		}
 			
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
@@ -631,6 +628,7 @@ function BIP39Plugin() {
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		
 		// initialize state
+		var decoded;
 		var state = {address: AppUtils.NA};
 		
 		// unencrypted wif
@@ -650,7 +648,7 @@ function BIP39Plugin() {
 		}
 		
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, Object.assign(state, AppUtils.decodeEncryptedKey(str)));
+		else if ((decoded = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, Object.assign(state, decoded));
 		
 		// unrecognized bip39 wif or hex phrase
 		throw new Error("Unrecognized bip39 seed: " + str);
@@ -680,10 +678,10 @@ function WavesPlugin() {
 		// generate phrase if not given
 		if (!str) str = Waves.Seed.create().phrase;
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
 
 		// unencrypted wif
 		if (str.indexOf(' ') !== -1 && str.split(' ').length === 15) {
-			var state = {};
 			state.hex = shamir39.getHexFromWords(str.split(' '), wordlist);
 			state.wif = str;
 			state.address = Waves.Seed.fromExistingPhrase(state.wif).address;
@@ -693,7 +691,6 @@ function WavesPlugin() {
 		
 		// unencrypted hex
 		if (str.length === 42 && isHex(str)) {
-			var state = {};
 			state.hex = str;
 			state.wif = shamir39.getWordsFromHex(str, wordlist).join(' ');
 			state.address = Waves.Seed.fromExistingPhrase(state.wif).address;
@@ -702,7 +699,7 @@ function WavesPlugin() {
 		}
 		
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// unrecognized wif or hex
 		throw new Error("Unrecognized wif or hex: " + str);
@@ -732,10 +729,10 @@ function NeoPlugin() {
 		// generate phrase if not given
 		if (!str) str = Neon.wallet.generatePrivateKey();
 		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var state = {};
 		
 		// unencrypted wif
 		if (Neon.wallet.isWIF(str)) {
-			var state = {};
 			state.hex = Neon.wallet.getPrivateKeyFromWIF(str);
 			state.wif = str;
 			state.address = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(state.hex)));
@@ -745,7 +742,6 @@ function NeoPlugin() {
 		
 		// unencrypted hex
 		if (str.length === 64 && isHex(str)) {
-			var state = {};
 			state.hex = str;
 			state.wif = Neon.wallet.getWIFFromPrivateKey(state.hex);
 			state.address = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(state.hex)));
@@ -754,7 +750,7 @@ function NeoPlugin() {
 		}
 		
 		// encrypted with cryptostorage conventions
-		else if (AppUtils.isEncryptedKey(str)) return new CryptoKey(this, AppUtils.decodeEncryptedKey(str));
+		else if ((state = AppUtils.decodeEncryptedKey(str)) !== null) return new CryptoKey(this, state);
 		
 		// unrecognized wif or hex
 		throw new Error("Unrecognized private key: " + str);
