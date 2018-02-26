@@ -312,7 +312,7 @@ var AppUtils = {
 	 * @returns true if the string is an encrypted private key, false otherwise
 	 */
 	isEncryptedKey: function(str) {
-		return AppUtils.isEncryptedHexV1(str) || AppUtils.isEncryptedWifV1(str) || AppUtils.isEncryptedHexV2(str) || AppUtils.isEncryptedWifV2(str);
+		return AppUtils.decodeEncryptedKey(str) !== null;
 	},
 	
 	/**
@@ -322,11 +322,12 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields
 	 */
 	decodeEncryptedKey: function(str) {
-		if (AppUtils.isEncryptedHexV1(str)) return AppUtils.decodeEncryptedHexV1(str);
-		if (AppUtils.isEncryptedWifV1(str)) return AppUtils.decodeEncryptedWifV1(str);
-		if (AppUtils.isEncryptedHexV2(str)) return AppUtils.decodeEncryptedHexV2(str);
-		if (AppUtils.isEncryptedWifV2(str)) return AppUtils.decodeEncryptedWifV2(str);
-		throw new Error("String is not an encrypted key: " + str);
+		var decoded = null;
+		if ((decoded = AppUtils.decodeEncryptedHexV1(str)) !== null) return decoded;
+		if ((decoded = AppUtils.decodeEncryptedWifV1(str)) !== null) return decoded;
+		if ((decoded = AppUtils.decodeEncryptedHexV2(str)) !== null) return decoded;
+		if ((decoded = AppUtils.decodeEncryptedWifV2(str)) !== null) return decoded;
+		return null;
 	},
 	
 	/**
@@ -336,11 +337,7 @@ var AppUtils = {
 	 * @returns true if the string is a v1 encrypted hex private key, false otherwise
 	 */
 	isEncryptedHexV1: function(str) {
-		if (!isHex(str)) return false;
-		if (str.length % 32 !== 0) return false;
-		var b64 = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-		if (!b64.startsWith("U2")) return false;
-		return true;
+		return AppUtils.decodeEncryptedHexV1(str) !== null;
 	},
 	
 	/**
@@ -350,10 +347,17 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields
 	 */
 	decodeEncryptedHexV1: function(str) {
-		assertTrue(AppUtils.isEncryptedHexV1(str));
+		
+		// determine if encrypted hex v1
+		if (!isHex(str)) return null;
+		if (str.length % 32 !== 0) return null;
+		var b64 = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+		if (!b64.startsWith("U2")) return null;
+
+		// decode
 		var state = {};
 		state.hex = str;
-		state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+		state.wif = b64;
 		state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
 		return state;
 	},
@@ -365,10 +369,7 @@ var AppUtils = {
 	 * @returns true if the string is a v1 encrypted WIF private key, false otherwise
 	 */
 	isEncryptedWifV1: function(str) {
-		if (!str.startsWith("U2")) return false;
-		if (!AppUtils.isBase64(str)) return false;
-		var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-		return AppUtils.isEncryptedHexV1(hex);
+		return AppUtils.decodeEncryptedWifV1(str) !== null;
 	},
 	
 	/**
@@ -378,12 +379,10 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields
 	 */
 	decodeEncryptedWifV1: function(str) {
-		assertTrue(AppUtils.isEncryptedWifV1(str));
-		var state = {};
-		state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-		state.wif = str;
-		state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
-		return state;
+		if (!str.startsWith("U2")) return null;
+		if (!AppUtils.isBase64(str)) return null;
+		var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+		return AppUtils.decodeEncryptedHexV1(hex);
 	},
 	
 	/**
@@ -393,11 +392,7 @@ var AppUtils = {
 	 * @returns true if the string is a v2 encrypted hex private key, false otherwise
 	 */
 	isEncryptedHexV2: function(str) {
-		if (!isHex(str)) return false;
-		if (str.length - 34 < 1) return false;
-		if ((str.length - 2) % 32 !== 0) return false;	// first 2 characters identify encryption version
-		if (str.substring(0, 2) !== AppUtils.ENCRYPTION_PREFIX_V2) return false;
-		return true;
+		return AppUtils.decodeEncryptedHexV2(str) !== null;
 	},
 	
 	/**
@@ -407,7 +402,14 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields
 	 */
 	decodeEncryptedHexV2: function(str) {
-		assertTrue(AppUtils.isEncryptedHexV2(str));
+		
+		// determine if encrypted hex v2
+		if (!isHex(str)) return null;
+		if (str.length - 34 < 1) return null;
+		if ((str.length - 2) % 32 !== 0) return null;	// first 2 characters identify encryption version
+		if (str.substring(0, 2) !== AppUtils.ENCRYPTION_PREFIX_V2) return null;
+		
+		// decode
 		var state = {};
 		state.hex = str;
 		state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
@@ -422,9 +424,7 @@ var AppUtils = {
 	 * @returns true if the string is a v2 encrypted WIF private key, false otherwise
 	 */
 	isEncryptedWifV2: function(str) {
-		if (!AppUtils.isBase64(str)) return false;
-		var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-		return AppUtils.isEncryptedHexV2(hex);
+		return AppUtils.decodeEncryptedWifV2(str) !== null;
 	},
 	
 	/**
@@ -434,26 +434,9 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields
 	 */
 	decodeEncryptedWifV2: function(str) {
-		assertTrue(AppUtils.isEncryptedWifV2(str));
-		var state = {};
-		state.hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
-		state.wif = str;
-		state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
-		return state;
-	},
-	
-	/**
-	 * Determines if the given string is a valid CryptoJS WIF private key.
-	 */
-	isWifCryptoJs: function(str) {
-		return str.startsWith("U2") && (str.length === 88 || str.length === 108 || str.length === 128) && !hasWhitespace(str);
-	},
-	
-	/**
-	 * Determines if the given string is a valid CryptoJS PBKDF2 WIF private key with length 153.
-	 */
-	isWifCryptoJsPbkdf2Standard: function(str) {
-		return AppUtils.isBase58(str) && str.length === 153;
+		if (!AppUtils.isBase64(str)) return null;
+		var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+		return AppUtils.decodeEncryptedHexV2(hex);
 	},
 	
 	/**
@@ -1227,13 +1210,11 @@ var AppUtils = {
 			new PieceRenderer(pieces, null, null).render(function(percent) {
 				if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
 			}, function(err, pieceDivs) {
-				try {
-					if (err) throw err;
-					assertEquals(pieces.length, pieceDivs.length);
+				if (err) onDone(err);
+				else if (pieces.length !== pieceDivs.length) onDone(new Error("pieces.length !== pieceDivs.length"));
+				else {
 					if (onProgress) onProgress(1, "Complete");
 					onDone(null, keys, pieces, pieceDivs);
-				} catch (err) {
-					onDone(err);
 				}
 			});
 		}

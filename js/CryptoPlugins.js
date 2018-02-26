@@ -374,10 +374,6 @@ function LitecoinPlugin() {
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
-		
-		function isWifCryptoJsPbkdf2Litecoin(str) {
-			return AppUtils.isBase58(str) && str.length === 131 || str.length === 132 || str.length === 153;
-		}
 	}
 	this.isAddress = function(str) {
 		return litecore.Address.isValid(str);
@@ -556,10 +552,6 @@ function RipplePlugin() {
 		
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
-		
-		function isWifCryptoJsPbkdf2Ripple(str) {
-			return AppUtils.isBase58(str) && str.length === 109 || str.length === 110;
-		}
 	}
 	this.isAddress = function(str) {
 		return isString(str) && (str.length === 33  || str.length === 34) && AppUtils.isBase58(str);
@@ -714,10 +706,6 @@ function WavesPlugin() {
 		
 		// unrecognized wif or hex
 		throw new Error("Unrecognized wif or hex: " + str);
-		
-		function isWifCryptoJsPbkdf2Waves(str) {
-			return AppUtils.isBase58(str) && str.length === 109 || str.length === 110;
-		}
 	}
 	this.isAddress = function(str) {
 		var Waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
