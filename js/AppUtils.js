@@ -1186,8 +1186,8 @@ var AppUtils = {
 		
 		// encrypt key according to scheme
 		var encryptFunc;
-		if (scheme === AppUtils.EncryptionScheme.CRYPTOJS) encryptFunc = encryptKeyCryptoJsDefault;
-		else if (scheme === AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2) encryptFunc = encryptKeyCryptoJsPbkdf2;
+		if (scheme === AppUtils.EncryptionScheme.CRYPTOJS) encryptFunc = encryptKeyV0;
+		else if (scheme === AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2) encryptFunc = encryptKeyV1;
 		else if (scheme === AppUtils.EncryptionScheme.BIP38) encryptFunc = encryptKeyBip38;
 		else {
 			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
@@ -1195,7 +1195,7 @@ var AppUtils = {
 		}
 		encryptFunc(key, scheme, passphrase, onProgress, onDone);
 		
-		function encryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {	// TODO: rename these
+		function encryptKeyV1(key, scheme, passphrase, onProgress, onDone) {	// TODO: rename these
 			try {
 				
 				// create random salt and replace first two characters with version
@@ -1229,7 +1229,7 @@ var AppUtils = {
 			}
 		}
 		
-		function encryptKeyCryptoJsDefault(key, scheme, passphrase, onProgress, onDone) {
+		function encryptKeyV0(key, scheme, passphrase, onProgress, onDone) {
 			try {
 				var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
 				key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
@@ -1286,8 +1286,8 @@ var AppUtils = {
 		// decrypt key according to scheme
 		var decryptFunc;
 		var scheme = key.getEncryptionScheme();
-		if (scheme === AppUtils.EncryptionScheme.CRYPTOJS) decryptFunc = decryptKeyCryptoJsDefault;
-		else if (scheme === AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2) decryptFunc = decryptKeyCryptoJsPbkdf2;
+		if (scheme === AppUtils.EncryptionScheme.CRYPTOJS) decryptFunc = decryptKeyV0;
+		else if (scheme === AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2) decryptFunc = decryptKeyV1;
 		else if (scheme === AppUtils.EncryptionScheme.BIP38) decryptFunc = decryptKeyBip38;
 		else {
 			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
@@ -1295,7 +1295,7 @@ var AppUtils = {
 		}
 		decryptFunc(key, scheme, passphrase, onProgress, onDone);
 		
-		function decryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {
+		function decryptKeyV1(key, scheme, passphrase, onProgress, onDone) {
 			try {
 				
 				// assert correct prefix
@@ -1330,7 +1330,7 @@ var AppUtils = {
 			}
 		}
 		
-		function decryptKeyCryptoJsDefault(key, scheme, passphrase, onProgress, onDone) {
+		function decryptKeyV0(key, scheme, passphrase, onProgress, onDone) {
 			try {
 				var hex;
 				try {

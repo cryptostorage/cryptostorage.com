@@ -1,6 +1,5 @@
 v0.1.6
-refactor constants
-rename encryption schemes
+test backwards compatibility
 ethereum logo not pushed down with 3 line encryption
 remake screenshot with new encryption format
 split could incorporate min pieces in hex which translates to b64
