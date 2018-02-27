@@ -43,8 +43,8 @@ var AppUtils = {
 	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: true,
-	RUN_FULL_TESTS: true,
-	DEV_MODE: true,
+	RUN_FULL_TESTS: false,
+	DEV_MODE: false,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
@@ -307,7 +307,6 @@ var AppUtils = {
 		BIP38: "BIP38",
 		V0_CRYPTOJS: "V0_CRYPTOJS",
 		V1_CRYPTOJS: "V1_CRYPTOJS",
-		SJCL: "SJCL"
 	},
 	
 	/**
@@ -952,10 +951,10 @@ var AppUtils = {
 			assertDefined(piece.keys[i].ticker, "piece.keys[" + i + "].ticker is not defined");
 			assertDefined(piece.keys[i].encryption, "piece.keys[" + i + "].encryption is not defined");
 			
-//			// upgrade legacy encryption label for backward compatibility
-//			for (var j = 0; i < piece.keys.length; j++) {
-//				if (piece.keys[i].encryption === "CRYPTOJS") piece.keys[i].encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
-//			}
+			// upgrade legacy encryption label for backward compatibility
+			for (var j = 0; j < piece.keys.length; j++) {
+				if (piece.keys[j].encryption === "CryptoJS") piece.keys[j].encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
+			}
 			
 			// validate encryption scheme
 			if (piece.keys[i].encryption !== null) {

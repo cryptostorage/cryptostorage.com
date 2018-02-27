@@ -1,6 +1,4 @@
 v0.1.6
-rename encryption schemes
-test backwards compatibility
 interoperability disclaimer
 only one "not applicable" for save public addresses txt
 remake screenshot with new encryption format

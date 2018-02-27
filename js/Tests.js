@@ -28,7 +28,7 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 2,
+	REPEAT_LONG: 10,
 	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
