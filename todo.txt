@@ -1,10 +1,10 @@
 v0.1.6
 rename encryption schemes
 test backwards compatibility
+interoperability disclaimer
 only one "not applicable" for save public addresses txt
-split could incorporate min pieces in hex which translates to b64
 remake screenshot with new encryption format
-ethereum logo not pushed down with 3 line encryption; replace character length with PK height
+split could incorporate min pieces in hex which translates to b64
 
 private component name part of plugins
 passphrase-protect/split arbitrary text
@@ -29,6 +29,7 @@ credits design
 link back to import / homepage from export
 
 low priority:
+ethereum logo not pushed down with 3 line encryption; replace character length with PK height
 banner is pretty big on low resolution / landscape
 firefox cache stops working after 3 loads, only shows error in export console
 ddslick animation could be cleaner
