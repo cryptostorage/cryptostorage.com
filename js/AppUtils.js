@@ -1567,7 +1567,7 @@ var AppUtils = {
 			case AppUtils.EncryptionScheme.CRYPTOJS:
 				return 10;
 			case AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2:
-				return 1000;	// TODO: derive through experimentation
+				return 540;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
@@ -1601,7 +1601,7 @@ var AppUtils = {
 			case AppUtils.EncryptionScheme.CRYPTOJS:
 				return 100;
 			case AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2:
-				return 1000;	// TODO: derive through experimentation
+				return 540;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	},
