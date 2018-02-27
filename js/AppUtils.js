@@ -42,9 +42,9 @@ var AppUtils = {
 	// app constants
 	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
-	RUN_MIN_TESTS: false,
+	RUN_MIN_TESTS: true,
 	RUN_FULL_TESTS: false,
-	DEV_MODE: true,
+	DEV_MODE: false,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
@@ -59,11 +59,11 @@ var AppUtils = {
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
 	
-	// constants
+	// encryption v1 constants
 	ENCRYPTION_V1_PBKDF_ITER: 10000,
 	ENCRYPTION_V1_KEY_SIZE: 256,
 	ENCRYPTION_V1_BLOCK_SIZE: 16,
-	ENCRYPTION_V1_PREFIX: "01",				// prefix to indicate password encryption v1
+	ENCRYPTION_V1_PREFIX: "01",
 	
 	/**
 	 * Mock environment checks.
