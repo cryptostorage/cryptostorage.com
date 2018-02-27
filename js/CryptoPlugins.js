@@ -67,7 +67,7 @@ CryptoPlugin.prototype.getDonationAddress = function() { throw new Error("Subcla
 /**
  * Returns the supported encryption schemes.
  */
-CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.CRYPTOJS]; }
+CryptoPlugin.prototype.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
 
 /**
  * Encrypts the given key with the given scheme and passphrase.
@@ -180,7 +180,7 @@ function BitcoinPlugin() {
 	this.getLogoPath = function() { return "img/bitcoin.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js"]; }
 	this.getDonationAddress = function() { return "1ArmuyQfgM1Sd3tN1A242FzPhbePfCjbmE"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.CRYPTOJS]; }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
 	this.newKey = function(str) {
 		
 		// create key if not given
@@ -242,7 +242,7 @@ function BitcoinCashPlugin() {
 	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/bchaddrjs-0.1.4.js"]; }
 	this.getDonationAddress = function() { return "qqcsh20ltcnxxw2wqd3m7j8j8qeh46qwuv5s93987x"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.CRYPTOJS]; }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
 	this.newKey = function(str) {
 		var key = bitcoinPlugin.newKey(str);
 		key.setPlugin(this);

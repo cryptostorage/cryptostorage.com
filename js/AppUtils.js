@@ -43,8 +43,8 @@ var AppUtils = {
 	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: true,
-	RUN_FULL_TESTS: false,
-	DEV_MODE: false,
+	RUN_FULL_TESTS: true,
+	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
@@ -305,8 +305,8 @@ var AppUtils = {
 	 */
 	EncryptionScheme: {
 		BIP38: "BIP38",
-		CRYPTOJS: "CRYPTOJS",
-		CRYPTOJS_PBKDF2: "CRYPTOJS_PBKDF2",
+		V0_CRYPTOJS: "V0_CRYPTOJS",
+		V1_CRYPTOJS: "V1_CRYPTOJS",
 		SJCL: "SJCL"
 	},
 	
@@ -346,7 +346,7 @@ var AppUtils = {
 			var state = {};
 			state.hex = str;
 			state.wif = b64;
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS;
+			state.encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
 			return state;
 		}
 		
@@ -368,7 +368,7 @@ var AppUtils = {
 			var state = {};
 			state.hex = str;
 			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
-			state.encryption = AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2;
+			state.encryption = AppUtils.EncryptionScheme.V1_CRYPTOJS;
 			return state;
 		}
 		
@@ -930,7 +930,10 @@ var AppUtils = {
 	 */
 	validatePiece: function(piece, allowMissingPublicXorPrivate) {
 		assertDefined(piece.version, "piece.version is not defined");
-		if (piece.version === "1.0") piece.version = "0.0.1";	// hack for backwards compatibility of pieces that already exist
+		
+		// upgrade legacy piece version for backward compatibility
+		if (piece.version === "1.0") piece.version = "0.0.1";
+		
 		try {
 			AppUtils.getVersionNumbers(piece.version);
 		} catch (err) {
@@ -948,6 +951,26 @@ var AppUtils = {
 		for (var i = 0; i < piece.keys.length; i++) {
 			assertDefined(piece.keys[i].ticker, "piece.keys[" + i + "].ticker is not defined");
 			assertDefined(piece.keys[i].encryption, "piece.keys[" + i + "].encryption is not defined");
+			
+//			// upgrade legacy encryption label for backward compatibility
+//			for (var j = 0; i < piece.keys.length; j++) {
+//				if (piece.keys[i].encryption === "CRYPTOJS") piece.keys[i].encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
+//			}
+			
+			// validate encryption scheme
+			if (piece.keys[i].encryption !== null) {
+				var found = false;
+				for (var j = 0; j < Object.keys(AppUtils.EncryptionScheme).length; j++) {
+					var key = Object.keys(AppUtils.EncryptionScheme)[j];
+					var val = AppUtils.EncryptionScheme[key];
+					if (val === piece.keys[i].encryption) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) throw new Error("piece.keys[" + i + "].encryption is unrecognized: " + piece.keys[i].encryption);
+			}
+			
 			if (allowMissingPublicXorPrivate) {
 				if (!isDefined(piece.keys[i].address) && !isDefined(piece.keys[i].wif)) throw new Error("piece.keys[" + i + "] is missing an address and private key");
 			} else {
@@ -1186,8 +1209,8 @@ var AppUtils = {
 		
 		// encrypt key according to scheme
 		var encryptFunc;
-		if (scheme === AppUtils.EncryptionScheme.CRYPTOJS) encryptFunc = encryptKeyV0;
-		else if (scheme === AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2) encryptFunc = encryptKeyV1;
+		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) encryptFunc = encryptKeyV0;
+		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) encryptFunc = encryptKeyV1;
 		else if (scheme === AppUtils.EncryptionScheme.BIP38) encryptFunc = encryptKeyBip38;
 		else {
 			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
@@ -1286,8 +1309,8 @@ var AppUtils = {
 		// decrypt key according to scheme
 		var decryptFunc;
 		var scheme = key.getEncryptionScheme();
-		if (scheme === AppUtils.EncryptionScheme.CRYPTOJS) decryptFunc = decryptKeyV0;
-		else if (scheme === AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2) decryptFunc = decryptKeyV1;
+		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) decryptFunc = decryptKeyV0;
+		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) decryptFunc = decryptKeyV1;
 		else if (scheme === AppUtils.EncryptionScheme.BIP38) decryptFunc = decryptKeyBip38;
 		else {
 			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
@@ -1562,9 +1585,9 @@ var AppUtils = {
 		switch (scheme) {
 			case AppUtils.EncryptionScheme.BIP38:
 				return 4187;
-			case AppUtils.EncryptionScheme.CRYPTOJS:
+			case AppUtils.EncryptionScheme.V0_CRYPTOJS:
 				return 10;
-			case AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2:
+			case AppUtils.EncryptionScheme.V1_CRYPTOJS:
 				return 540;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
@@ -1596,9 +1619,9 @@ var AppUtils = {
 		switch (scheme) {
 			case AppUtils.EncryptionScheme.BIP38:
 				return 4581;
-			case AppUtils.EncryptionScheme.CRYPTOJS:
+			case AppUtils.EncryptionScheme.V0_CRYPTOJS:
 				return 100;
-			case AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2:
+			case AppUtils.EncryptionScheme.V1_CRYPTOJS:
 				return 540;
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
@@ -1974,17 +1997,17 @@ var AppUtils = {
 		config.currencies.push({
 			ticker: AppUtils.getCryptoPlugin("BTC").getTicker(),
 			numKeys: 1,
-			encryption: AppUtils.EncryptionScheme.CRYPTOJS
+			encryption: AppUtils.EncryptionScheme.V0_CRYPTOJS
 		});
 		config.currencies.push({
 			ticker: AppUtils.getCryptoPlugin("XMR").getTicker(),
 			numKeys: 1,
-			encryption: AppUtils.EncryptionScheme.CRYPTOJS_PBKDF2
+			encryption: AppUtils.EncryptionScheme.V1_CRYPTOJS
 		});
 		config.currencies.push({
 			ticker: AppUtils.getCryptoPlugin("ETH").getTicker(),
 			numKeys: 1,
-			encryption: AppUtils.EncryptionScheme.CRYPTOJS
+			encryption: AppUtils.EncryptionScheme.V0_CRYPTOJS
 		});
 		
 		// generate keys and test

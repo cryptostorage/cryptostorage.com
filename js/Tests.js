@@ -28,7 +28,7 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 10,
+	REPEAT_LONG: 2,
 	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
@@ -753,6 +753,18 @@ function testGenerateKeys(plugins, onDone) {
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
 						assertEquals("Invalid piece 'piece.json': piece.keys[0].encryption is not defined", controller.getWarning());
+						controller.startOver();
+						
+						piece = { version: "4.6.4", keys: [{
+							ticker: "BTC",
+							address: "1Gdkr2UhDACVCzz1Xm3mB3j3RFiTBLAT8a",
+							wif: "Ky65sCEcvmVWjngwGnRBQEwtZ9kHnZEjsjRkjoa1xAMaDKQrzE2q",
+							encryption: "invalidScheme"
+						}]};
+						namedPieces = [];
+						namedPieces.push({name: 'piece.json', piece: piece});
+						controller.addNamedPieces(namedPieces);
+						assertEquals("Invalid piece 'piece.json': piece.keys[0].encryption is unrecognized: invalidScheme", controller.getWarning());
 						controller.startOver();
 						
 						piece = { version: "0.0.1", pieceNum: 1, keys: [{
