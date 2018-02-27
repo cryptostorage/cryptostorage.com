@@ -1195,7 +1195,7 @@ var AppUtils = {
 		}
 		encryptFunc(key, scheme, passphrase, onProgress, onDone);
 		
-		function encryptKeyV1(key, scheme, passphrase, onProgress, onDone) {	// TODO: rename these
+		function encryptKeyV1(key, scheme, passphrase, onProgress, onDone) {
 			try {
 				
 				// create random salt and replace first two characters with version
@@ -1554,8 +1554,6 @@ var AppUtils = {
 	
 	/**
 	 * Returns the weight to encrypt a key with the given scheme.
-	 * 
-	 * TODO: rename these?
 	 * 
 	 * @param scheme is the scheme to encrypt a key with
 	 * @returns weight is the weight to encrypt a key with the given scheme

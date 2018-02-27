@@ -38,6 +38,11 @@ CryptoPlugin.prototype.getName = function() { throw new Error("Subclass must imp
 CryptoPlugin.prototype.getTicker = function() { throw new Error("Subclass must implement"); }
 
 /**
+ * Returns the name of the token's private component.
+ */
+CryptoPlugin.prototype.getPrivateLabel = function() { return "Private Key"; }
+
+/**
  * Returns the logo.
  */
 CryptoPlugin.prototype.getLogo = function() {
@@ -425,6 +430,7 @@ inheritsFrom(DashPlugin, CryptoPlugin);
 function MoneroPlugin() {
 	this.getName = function() { return "Monero"; }
 	this.getTicker = function() { return "XMR" };
+	this.getPrivateLabel = function() { return "Mnemonic"; }
 	this.getLogoPath = function() { return "img/monero.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/moneroaddress.js"]; }
 	this.getDonationAddress = function() { return "42fuBvVfgPUWphR6C5XgsXDGfx2KVhbv4cjhJDm9Y87oU1ixpDnzF82RAWCbt8p81f26kx3kstGJCat1YEohwS1e1o27zWE"; }
@@ -612,6 +618,7 @@ inheritsFrom(StellarPlugin, CryptoPlugin);
 function BIP39Plugin() {
 	this.getName = function() { return "BIP39"; }
 	this.getTicker = function() { return "BIP39" };
+	this.getPrivateLabel = function() { return "Mnemonic"; }
 	this.getLogoPath = function() { return "img/usb.png"; }
 	this.getDependencies = function() { return ["lib/bip39.js"]; }
 	this.getDonationAddress = function() { return null; }
@@ -665,6 +672,7 @@ inheritsFrom(BIP39Plugin, CryptoPlugin);
 function WavesPlugin() {
 	this.getName = function() { return "Waves"; }
 	this.getTicker = function() { return "WAVES" };
+	this.getPrivateLabel = function() { return "Mnemonic"; }
 	this.getLogoPath = function() { return "img/waves.png"; }
 	this.getDependencies = function() { return ["lib/bip39.js", "lib/polyfill.js", "lib/waves-api.js"]; }
 	this.getDonationAddress = function() { return "3P2xXtsfe4FUnQmu2iuKwXLshYYc2CjnXQH"; }
