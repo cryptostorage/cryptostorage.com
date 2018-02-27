@@ -58,7 +58,12 @@ var AppUtils = {
 	SIMULATED_LOAD_TIME: null,				// simulate slow load times in ms, disabled if null
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
-	ENCRYPTION_PREFIX_V1: "01",				// prefix to indicate password encryption v1
+	
+	// constants
+	ENCRYPTION_V1_PBKDF_ITER: 10000,
+	ENCRYPTION_V1_KEY_SIZE: 256,
+	ENCRYPTION_V1_BLOCK_SIZE: 16,
+	ENCRYPTION_V1_PREFIX: "01",				// prefix to indicate password encryption v1
 	
 	/**
 	 * Mock environment checks.
@@ -357,7 +362,7 @@ var AppUtils = {
 			// determine if encrypted hex V1
 			if (!isHex(str)) return null;
 			if (str.length - 32 < 1 || str.length % 32 !== 0) return null;
-			if (str.substring(0, AppUtils.ENCRYPTION_PREFIX_V1.length) !== AppUtils.ENCRYPTION_PREFIX_V1) return null;
+			if (str.substring(0, AppUtils.ENCRYPTION_V1_PREFIX.length) !== AppUtils.ENCRYPTION_V1_PREFIX) return null;
 			
 			// decode
 			var state = {};
@@ -1193,22 +1198,16 @@ var AppUtils = {
 		function encryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {	// TODO: rename these
 			try {
 				
-				// constants
-				var PBKDF_ITER = 10000;
-				var KEY_SIZE = 256;
-				var BLOCK_SIZE = 16;
-				var HASHER = CryptoJS.algo.SHA512;
-				
 				// create random salt and replace first two characters with version
-				var salt = CryptoJS.lib.WordArray.random(BLOCK_SIZE);
-				salt = AppUtils.ENCRYPTION_PREFIX_V1 + salt.toString().substring(2);
+				var salt = CryptoJS.lib.WordArray.random(AppUtils.ENCRYPTION_V1_BLOCK_SIZE);
+				salt = AppUtils.ENCRYPTION_V1_PREFIX + salt.toString().substring(2);
 				salt = CryptoJS.enc.Hex.parse(salt);
 				
 				// strengthen passphrase with passphrase key
 				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-		      keySize: KEY_SIZE / 32,
-		      iterations: PBKDF_ITER,
-		      hasher: HASHER
+		      keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
+		      iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
+		      hasher: CryptoJS.algo.SHA512
 		    });
 				
 				// encrypt
@@ -1299,21 +1298,15 @@ var AppUtils = {
 		function decryptKeyCryptoJsPbkdf2(key, scheme, passphrase, onProgress, onDone) {
 			try {
 				
-				// constants
-				var PBKDF_ITER = 10000;
-				var KEY_SIZE = 256;
-				var BLOCK_SIZE = 16;
-				var HASHER = CryptoJS.algo.SHA512;	// TODO: factor these to constants
-				
 				// assert correct prefix
-				assertEquals(AppUtils.ENCRYPTION_PREFIX_V1, key.getHex().substring(0, AppUtils.ENCRYPTION_PREFIX_V1.length));
+				assertEquals(AppUtils.ENCRYPTION_V1_PREFIX, key.getHex().substring(0, AppUtils.ENCRYPTION_V1_PREFIX.length));
 				
 				// get passphrase key
 				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(0, 32));
 			  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-			  	keySize: KEY_SIZE / 32,
-			  	iterations: PBKDF_ITER,
-			  	hasher: HASHER
+			  	keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
+			  	iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
+			  	hasher: CryptoJS.algo.SHA512
 			  });
 			  
 			  // decrypt
