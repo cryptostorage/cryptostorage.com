@@ -412,6 +412,8 @@ var AppUtils = {
 	/**
 	 * Determines if the given string is a possible split piece of a private key (cannot be excluded as one).
 	 * 
+	 * TODO: delete
+	 * 
 	 * A piece must be at least 36 characters and base58 encoded.
 	 * 
 	 * @returns true if the given string meets the minimum requirements to be a split piece
@@ -429,16 +431,14 @@ var AppUtils = {
 	 */
 	encodeShare: function(share, minPieces) {
 		console.log("encodeShare()");
-		var hex = CryptoJS.enc.Hex.parse(share);
-		console.log(hex.toString());
-		console.log(secrets.str2hex("Hello there!"));	// TODO: this is inserting 00s
-		console.log(share);
-		return share + secrets.str2hex(minPieces + "c");
+		return "c" + share;
 	},
 	
 	decodeShare: function(encodedShare) {
 		console.log("decodeShare()");
 		console.log(encodedShare);
+		
+		
 		throw new Error("Not implemented");
 	},
 	
