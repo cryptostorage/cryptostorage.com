@@ -2571,7 +2571,7 @@ function ImportTextController(div, plugins) {
 								importedPieces.push(piece);
 							}
 						} catch (err) {
-							if (AppUtils.isPossibleSplitPiece(piece)) importedPieces.push(piece);
+							if (AppUtils.isPossibleSplitPiece(piece)) importedPieces.push(piece);	// TODO: deprecated
 							else setWarningAux("Invalid private key or piece");
 						}
 					}

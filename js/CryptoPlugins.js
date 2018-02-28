@@ -109,19 +109,22 @@ CryptoPlugin.prototype.decrypt = function(key, passphrase, onProgress, onDone) {
  * @returns string[] are the split pieces
  */
 CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
+	
+	// validate input
 	assertTrue(isObject(key, CryptoKey));
 	assertTrue(numPieces >= 2);
 	assertTrue(minPieces >= 2);
-
-	// split key into shares
-	var shares = secrets.share(key.getHex(), numPieces, minPieces).map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
-
-	// append minimum pieces prefix so insufficient pieces cannot create wrong key (cryptostorage convention)
-	var prefix = minPieces + 'c';
+	
+	// split keys into hex shares
+	var shares = secrets.share(key.getHex(), numPieces, minPieces)
+	
+	// encode shares with minimum threshold
 	for (var i = 0; i < shares.length; i++) {
-		shares[i] = prefix + shares[i];
+		shares[i] = AppUtils.encodeShare(shares[i], minPieces);
 	}
-	return shares;
+	
+	// return base58 encoded shares
+	return shares.map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
 }
 
 /**
@@ -134,20 +137,23 @@ CryptoPlugin.prototype.combine = function(shares) {
 	assertArray(shares);
 	assertTrue(shares.length > 0);
 	
-	// get minimum shares and shares without 'XXXc' prefix
-	var minShares;
-	var nonPrefixedShares = [];
+	// convert shares from base58 to hex
+	shares = shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex);
+	//.map(ninja.wallets.splitwallet.stripLeadZeros)
+	
+	// decode hex shares
+	var minPieces;
+	var rawShares = [];
 	for (var i = 0; i < shares.length; i++) {
 		var share = shares[i];
-		if (!AppUtils.isPossibleSplitPiece(share)) throw new Error("Invalid split piece: " + share);
-		var min = AppUtils.getMinPieces(share);
-		if (!min) throw new Error("Share is not prefixed with minimum pieces: " + share);
-		if (!isInitialized(minShares)) minShares = min;
-		else if (min !== minShares) throw new Error("Shares have different minimum threshold prefixes: " + min + " vs " + minShares);
-		nonPrefixedShares.push(share.substring(share.indexOf('c') + 1));
+		var decodedShare = AppUtils.decodeShare(share);
+		if (!decodedShare) throw new Error("Invalid split piece: " + share);
+		if (!isInitialized(minPieces)) minShares = decodedShare.minPieces;
+		else assertEquals(minPieces, decodedShare.minPieces, "Shares have different minimum threshold: " + minPieces + " vs " + decodedShare.minPieces);
+		rawShares.push(decodedShare.hex);
 	}
 	
-	// ensure sufficient shares are provided
+	// ensure sufficient shares provided
 	if (shares.length < minShares) {
 		var additional = minShares - shares.length;
 		throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private key");
@@ -155,10 +161,37 @@ CryptoPlugin.prototype.combine = function(shares) {
 	
 	// combine shares and create key
 	try {
-		return this.newKey(secrets.combine(nonPrefixedShares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
+		return this.newKey(secrets.combine(rawShares.map(ninja.wallets.splitwallet.stripLeadZeros)));
 	} catch (err) {
 		throw new Error("Pieces do not combine to make valid private key");
 	}
+//	
+//	
+//	// get minimum shares and shares without 'XXXc' prefix
+//	var minShares;
+//	var nonPrefixedShares = [];
+//	for (var i = 0; i < shares.length; i++) {
+//		var share = shares[i];
+//		if (!AppUtils.isPossibleSplitPiece(share)) throw new Error("Invalid split piece: " + share);
+//		var min = AppUtils.getMinPieces(share);
+//		if (!min) throw new Error("Share is not prefixed with minimum pieces: " + share);
+//		if (!isInitialized(minShares)) minShares = min;
+//		else if (min !== minShares) throw new Error("Shares have different minimum thresholds: " + min + " vs " + minShares);
+//		nonPrefixedShares.push(share.substring(share.indexOf('c') + 1));
+//	}
+//	
+//	// ensure sufficient shares are provided
+//	if (shares.length < minShares) {
+//		var additional = minShares - shares.length;
+//		throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private key");
+//	}
+//	
+//	// combine shares and create key
+//	try {
+//		return this.newKey(secrets.combine(nonPrefixedShares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex).map(ninja.wallets.splitwallet.stripLeadZeros)));
+//	} catch (err) {
+//		throw new Error("Pieces do not combine to make valid private key");
+//	}
 }
 
 /**

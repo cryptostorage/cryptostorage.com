@@ -421,6 +421,28 @@ var AppUtils = {
 	},
 	
 	/**
+	 * Encodes the given share with the given minimum pieces threshold.
+	 * 
+	 * @param share is the share hex to encode
+	 * @param minPieces is the minimum threshold to combine shares
+	 * @returns a hex share encoded with minimum threshold
+	 */
+	encodeShare: function(share, minPieces) {
+		console.log("encodeShare()");
+		var hex = CryptoJS.enc.Hex.parse(share);
+		console.log(hex.toString());
+		console.log(secrets.str2hex("Hello there!"));	// TODO: this is inserting 00s
+		console.log(share);
+		return share + secrets.str2hex(minPieces + "c");
+	},
+	
+	decodeShare: function(encodedShare) {
+		console.log("decodeShare()");
+		console.log(encodedShare);
+		throw new Error("Not implemented");
+	},
+	
+	/**
 	 * Returns the version numbers from a string of the format NN.NN.NN.
 	 * 
 	 * @param str is the string to get the version numbers from
