@@ -1,5 +1,4 @@
 v0.1.6
-version code should be only one hex character
 interoperability disclaimer
 only one "not applicable" for save public addresses txt
 remake screenshot with new encryption format

@@ -63,7 +63,7 @@ var AppUtils = {
 	ENCRYPTION_V1_PBKDF_ITER: 10000,
 	ENCRYPTION_V1_KEY_SIZE: 256,
 	ENCRYPTION_V1_BLOCK_SIZE: 16,
-	ENCRYPTION_V1_PREFIX: "01",
+	ENCRYPTION_V1_PREFIX: "1",
 	
 	/**
 	 * Mock environment checks.
@@ -1222,7 +1222,7 @@ var AppUtils = {
 				
 				// create random salt and replace first two characters with version
 				var salt = CryptoJS.lib.WordArray.random(AppUtils.ENCRYPTION_V1_BLOCK_SIZE);
-				salt = AppUtils.ENCRYPTION_V1_PREFIX + salt.toString().substring(2);
+				salt = AppUtils.ENCRYPTION_V1_PREFIX + salt.toString().substring(AppUtils.ENCRYPTION_V1_PREFIX.length);
 				salt = CryptoJS.enc.Hex.parse(salt);
 				
 				// strengthen passphrase with passphrase key
