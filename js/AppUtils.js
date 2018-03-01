@@ -430,17 +430,6 @@ var AppUtils = {
 	 * @returns a hex share encoded with minimum threshold
 	 */
 	encodeShare: function(share, minPieces) {
-		console.log("encodeShare()");
-		console.log(share);
-		console.log(share.length);
-		minPieces = 10;
-		console.log(minPieces);
-		console.log(minPieces.toString(16));
-		console.log(minPieces.toString(16) + share);
-		console.log(secrets.str2hex(share));
-		console.log(secrets.str2hex(minPieces.toString(16)));
-		console.log(padLeft(minPieces.toString(16), 2));
-		console.log(padLeft(minPieces.toString(16), 2) + padLeft(share, 2));
 		return padLeft(minPieces.toString(16), 2) + padLeft(share, 2);
 		
 		// Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
@@ -454,9 +443,12 @@ var AppUtils = {
 	decodeShare: function(encodedShare) {
 		console.log("decodeShare()");
 		console.log(encodedShare);
-		
-		
-		throw new Error("Not implemented");
+		assertTrue(encodedShare.length % 2 === 0, "Split share must be even length");
+		var decoded = {};
+		decoded.minPieces = parseInt(encodedShare.substring(0, 2), 16);
+		decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(encodedShare.substring(2));
+		console.log(decoded);
+		return decoded;		
 	},
 	
 	/**
@@ -786,6 +778,7 @@ var AppUtils = {
 					}
 				}
 			} catch (err) {
+				console.log(err);
 				throw new Error("Could not import private keys from the given pieces.  Verify the pieces are correct.");
 			}
 		}

@@ -160,6 +160,7 @@ CryptoPlugin.prototype.combine = function(shares) {
 	
 	// combine shares and create key
 	try {
+		console.log(rawShares);
 		return this.newKey(secrets.combine(rawShares.map(ninja.wallets.splitwallet.stripLeadZeros)));
 	} catch (err) {
 		throw new Error("Pieces do not combine to make valid private key");
