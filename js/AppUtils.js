@@ -441,13 +441,10 @@ var AppUtils = {
 	},
 	
 	decodeShare: function(encodedShare) {
-		console.log("decodeShare()");
-		console.log(encodedShare);
 		assertTrue(encodedShare.length % 2 === 0, "Split share must be even length");
 		var decoded = {};
 		decoded.minPieces = parseInt(encodedShare.substring(0, 2), 16);
 		decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(encodedShare.substring(2));
-		console.log(decoded);
 		return decoded;		
 	},
 	
