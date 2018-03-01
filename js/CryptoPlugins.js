@@ -139,7 +139,6 @@ CryptoPlugin.prototype.combine = function(shares) {
 	
 	// convert shares from base58 to hex
 	shares = shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex);
-	//.map(ninja.wallets.splitwallet.stripLeadZeros)
 	
 	// decode hex shares
 	var minPieces;

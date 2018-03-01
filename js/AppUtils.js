@@ -42,9 +42,9 @@ var AppUtils = {
 	// app constants
 	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
-	RUN_MIN_TESTS: true,
+	RUN_MIN_TESTS: false,
 	RUN_FULL_TESTS: false,
-	DEV_MODE: false,
+	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
@@ -431,7 +431,24 @@ var AppUtils = {
 	 */
 	encodeShare: function(share, minPieces) {
 		console.log("encodeShare()");
-		return "c" + share;
+		console.log(share);
+		console.log(share.length);
+		minPieces = 10;
+		console.log(minPieces);
+		console.log(minPieces.toString(16));
+		console.log(minPieces.toString(16) + share);
+		console.log(secrets.str2hex(share));
+		console.log(secrets.str2hex(minPieces.toString(16)));
+		console.log(padLeft(minPieces.toString(16), 2));
+		console.log(padLeft(minPieces.toString(16), 2) + padLeft(share, 2));
+		return padLeft(minPieces.toString(16), 2) + padLeft(share, 2);
+		
+		// Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
+		function padLeft(str, bits){
+			bits = bits || config.bits
+			var missing = str.length % bits;
+			return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
+		}
 	},
 	
 	decodeShare: function(encodedShare) {
