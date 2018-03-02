@@ -665,6 +665,14 @@ function testGenerateKeys(plugins, onDone) {
 					assertTrue(key.equals(combined));
 				}
 			}
+			
+			// test split with many shares
+			var key = plugin.newKey();
+			var min = 150;
+			var num = 250;
+			var pieces = plugin.split(key, num, min);
+			var combined = plugin.combine(pieces);
+			assertTrue(key.equals(combined));
 		}
 		
 		function testFileImport(plugins, onDone) {
@@ -842,7 +850,7 @@ function testGenerateKeys(plugins, onDone) {
 						namedPieces.push({name: "piece1.json", piece: pieces1[0]});
 						namedPieces.push({name: "piece2.json", piece: pieces1[1]});
 						controller.addNamedPieces(namedPieces);
-						assertEquals("Pieces have different minimum threshold prefixes", controller.getWarning());
+						assertEquals("Pieces have different minimum thresholds", controller.getWarning());
 						pieces1[1].keys[1].wif = oldValue;
 						controller.startOver();
 

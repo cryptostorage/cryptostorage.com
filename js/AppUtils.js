@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: false,
+	RUN_FULL_TESTS: true,
 	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
@@ -410,19 +410,6 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Determines if the given string is a possible split piece of a private key (cannot be excluded as one).
-	 * 
-	 * TODO: delete
-	 * 
-	 * A piece must be at least 36 characters and base58 encoded.
-	 * 
-	 * @returns true if the given string meets the minimum requirements to be a split piece
-	 */
-	isPossibleSplitPiece: function(str) {
-		return isString(str) && str.length >= 34 && AppUtils.isBase58(str) && isNumber(AppUtils.getMinPieces(str));
-	},
-	
-	/**
 	 * Encodes the given share with the given minimum pieces threshold.
 	 * 
 	 * @param share is the share hex to encode
@@ -430,22 +417,91 @@ var AppUtils = {
 	 * @returns a hex share encoded with minimum threshold
 	 */
 	encodeShare: function(share, minPieces) {
-		return padLeft(minPieces.toString(16), 2) + padLeft(share, 2);
+		return encodeShareV0(share, minPieces);
 		
-		// Pads a string `str` with zeros on the left so that its length is a multiple of `bits`
-		function padLeft(str, bits){
-			bits = bits || config.bits
-			var missing = str.length % bits;
-			return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
+		function encodeShareV0(share, minPieces) {
+			try {
+				var encoded = {};
+				encoded.wif = minPieces + 'c' + Bitcoin.Base58.encode(ninja.wallets.splitwallet.hexToBytes(share));
+				encoded.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(encoded.wif));
+				return encoded;
+			} catch (err) {
+				return null;
+			}
 		}
+		
+		function encodeShareV1(share, minPieces) {
+			
+		}
+		
+
+		
+		// encode v0
+		return 
+
+//		// encode v1
+//		return padLeft(minPieces.toString(16), 2) + padLeft(share, 2);
+//		
+//		// Pads a string `str` with zeros on the left so that its length is a multiple of `bits` (credit: bitaddress.org)
+//		function padLeft(str, bits){
+//			bits = bits || config.bits
+//			var missing = str.length % bits;
+//			return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
+//		}
 	},
 	
 	decodeShare: function(encodedShare) {
-		assertTrue(encodedShare.length % 2 === 0, "Split share must be even length");
-		var decoded = {};
-		decoded.minPieces = parseInt(encodedShare.substring(0, 2), 16);
-		decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(encodedShare.substring(2));
-		return decoded;		
+		if (!isString(encodedShare)) return null;
+		var decoded;
+		if ((decoded = decodeShareV0(encodedShare))) return decoded;
+		if ((decoded = decodeShareV1(encodedShare))) return decoded;
+		return null;
+		
+		function decodeShareV0(encodedShare) {
+			try {
+				var minPieces;
+				var decoded = {};
+				
+				// wif
+				if (encodedShare.length >= 34 && AppUtils.isBase58(encodedShare) && (minPieces = getMinPiecesV0(encodedShare)) !== null) {
+					decoded.minPieces = minPieces;
+					decoded.wif = encodedShare.substring(encodedShare.indexOf('c') + 1);
+					decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(decoded.wif)));
+					return decoded;
+				}
+			} catch (err) {
+				return null;
+			}
+			
+			/**
+			 * Determines the minimum pieces to reconstitute based on a possible split piece string.
+			 * 
+			 * Looks for 'XXXc' prefix in the given split piece where XXX is the minimum to reconstitute.
+			 * 
+			 * @param splitPiece is a string which may be prefixed with 'XXXc...'
+			 * @return the minimum pieces to reconstitute if prefixed, null otherwise
+			 */
+			function getMinPiecesV0(splitPiece) {
+				var idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
+				if (idx <= 0) return null;
+				var minPieces = Number(splitPiece.substring(0, idx));	// parse preceding numbers to int
+				if (!minPieces || !isNumber(minPieces) || minPieces < 2) return null;
+				return minPieces;
+			}
+		}
+		
+		function decodeShareV1(encodedShare) {
+			return null;
+		}
+		
+//		// decode v1
+//		if (encodedShare.length % 2 !== 0) return null;
+//		var decoded = {};
+//		decoded.minPieces = parseInt(encodedShare.substring(0, 2), 16);
+//		console.log("Here: " + decoded.minPieces);
+//		if (!decoded.minPieces || !isNumber(decoded.minPieces) || decoded.minPieces < 2) return null;
+//		decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(encodedShare.substring(2));
+//		return decoded;
 	},
 	
 	/**
@@ -471,33 +527,6 @@ var AppUtils = {
 		}
 		assertTrue(nums[0] + nums[1] + nums[2] > 0, "Version does not have positive element: " + str);
 		return nums;
-	},
-	
-	/**
-	 * Determines the minimum pieces to reconstitute based on a possible split piece string.
-	 * 
-	 * Looks for 'XXXc' prefix in the given split piece where XXX is the minimum to reconstitute.
-	 * 
-	 * @param splitPiece is a string which may be prefixed with 'XXXc...'
-	 * @return the minimum pieces to reconstitute if prefixed, null otherwise
-	 */
-	getMinPieces: function(splitPiece) {
-		assertString(splitPiece);
-		var idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
-		if (idx <= 0) return null;
-		return Number(splitPiece.substring(0, idx)); // parse preceding numbers to int
-	},
-
-	/**
-	 * Splits the given string.  First converts the string to hex.
-	 * 
-	 * @param str is the string to split
-	 * @param numPieces is the number of pieces to make
-	 * @param minPieces is the minimum number of pieces to reconstitute
-	 * @returns string[] are the pieces
-	 */
-	splitString: function(str, numPieces, minPieces) {
-		return secrets.share(secrets.str2hex(str), numPieces, minPieces);
 	},
 
 	/**
@@ -704,7 +733,7 @@ var AppUtils = {
 		if (pieces.length === 1) {
 			assertTrue(pieces[0].keys.length > 0);
 			if (pieces[0].pieceNum && pieces[0].keys[0].wif) {
-				var minPieces = AppUtils.getMinPieces(pieces[0].keys[0].wif);
+				var minPieces = AppUtils.decodeShare(pieces[0].keys[0].wif).minPieces;
 				var additional = minPieces - 1;
 				throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private keys");
 			}
@@ -746,8 +775,14 @@ var AppUtils = {
 					if (!encryption) encryption = piece.keys[i].encryption;
 					else if (encryption !== piece.keys[i].encryption) throw new Error("Pieces have different encryption states");
 					if (pieces[j].keys[i].wif) {
-						if (!minPieces) minPieces = AppUtils.getMinPieces(piece.keys[i].wif);
-						else if (minPieces !== AppUtils.getMinPieces(piece.keys[i].wif)) throw new Error("Pieces have different minimum threshold prefixes");
+						
+						
+						var decoded = AppUtils.decodeShare(piece.keys[i].wif);
+						var decodedMin = decoded ? decoded.minPieces : null;
+						console.log(pieces[j].keys[i].wif);
+						console.log(decodedMin);
+						if (!minPieces) minPieces = decodedMin;
+						else if (minPieces !== decodedMin) throw new Error("Pieces have different minimum thresholds");
 					}
 				}
 			}
@@ -1006,8 +1041,10 @@ var AppUtils = {
 				assertDefined(piece.keys[i].wif, "piece.keys[" + i + "].wif is not defined");
 			}
 			if (piece.pieceNum && piece.keys[i].wif) {
-				if (!minPieces) minPieces = AppUtils.getMinPieces(piece.keys[i].wif);
-				else if (minPieces !== AppUtils.getMinPieces(piece.keys[i].wif)) throw new Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");
+				var decoded = AppUtils.decodeShare(piece.keys[i].wif);
+				var decodedMin = decoded ? decoded.minPieces : null;
+				if (!minPieces) minPieces = decodedMin;
+				else if (minPieces !== decodedMin) throw new Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");
 			}
 		}
 	},

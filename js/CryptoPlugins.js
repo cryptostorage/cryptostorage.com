@@ -120,11 +120,11 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	
 	// encode shares with minimum threshold
 	for (var i = 0; i < shares.length; i++) {
-		shares[i] = AppUtils.encodeShare(shares[i], minPieces);
+		shares[i] = AppUtils.encodeShare(shares[i], minPieces).wif;
 	}
 	
-	// return base58 encoded shares
-	return shares.map(ninja.wallets.splitwallet.hexToBytes).map(Bitcoin.Base58.encode);
+	// return encoded shares
+	return shares;
 }
 
 /**
@@ -137,10 +137,7 @@ CryptoPlugin.prototype.combine = function(shares) {
 	assertArray(shares);
 	assertTrue(shares.length > 0);
 	
-	// convert shares from base58 to hex
-	shares = shares.map(Bitcoin.Base58.decode).map(Crypto.util.bytesToHex);
-	
-	// decode hex shares
+	// decode shares
 	var minPieces;
 	var rawShares = [];
 	for (var i = 0; i < shares.length; i++) {
