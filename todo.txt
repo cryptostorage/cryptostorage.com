@@ -1,9 +1,4 @@
 v0.1.6
-why is this considered bip38 encrypted: LE1sutLJXnKhYyyyhZhCxF2w63ZCMj7jHD9KhsEZVmWdEWZMATTEVQbGQpXH
-if that's considered bip38 encrypted, why doesn't text import advance to passphrase input?
-why would incompatible pieces be treated as key that can be decrypted?
-invalid checksum on incompatible split pieces
-
 interoperability disclaimer
 only one "not applicable" for save public addresses txt
 remake screenshot with new encryption format
