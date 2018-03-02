@@ -465,7 +465,7 @@ var AppUtils = {
 				decoded.minPieces = getMinPiecesV0(encodedShare);
 				if (!decoded.minPieces) return null;
 				var wif = encodedShare.substring(encodedShare.indexOf('c') + 1);
-				if (!AppUtils.isBase58(decoded.wif)) return null;
+				if (!AppUtils.isBase58(wif)) return null;
 				decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif)));
 				return decoded;
 			} catch (err) {
