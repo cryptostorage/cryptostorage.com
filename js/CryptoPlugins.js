@@ -181,6 +181,7 @@ CryptoPlugin.prototype.isAddress = function(str) { throw new Error("Subclass mus
  * Bitcoin plugin.
  */
 function BitcoinPlugin() {
+	var that = this;
 	this.getName = function() { return "Bitcoin"; }
 	this.getTicker = function() { return "BTC" };
 	this.getLogoPath = function() { return "img/bitcoin.png"; }
@@ -215,10 +216,7 @@ function BitcoinPlugin() {
 		
 		// bip38 hex
 		else if (str.length > 80 && str.length < 90 && isHex(str)) {
-			state.hex = str;
-			state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
-			state.encryption = AppUtils.EncryptionScheme.BIP38;
-			return new CryptoKey(this, state);
+			return that.newKey(Bitcoin.Base58.encode(Crypto.util.hexToBytes(str)));
 		}
 		
 		// encrypted with cryptostorage conventions
