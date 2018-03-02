@@ -2746,7 +2746,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 				
 				// render pieces
 				new PieceRenderer(pieces, null, null).render(function(percentDone) {
-					setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering...");
+					setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering");
 				}, function(err, pieceDivs) {
 					if (err) throw err;
 					onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
