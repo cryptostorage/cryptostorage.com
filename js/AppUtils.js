@@ -939,7 +939,7 @@ var AppUtils = {
 		var str = "";
 		for (var i = 0; i < piece.keys.length; i++) {
 			str += "===== #" + (i + 1) + " " + AppUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
-			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n" + piece.keys[i].address + "\n\n";
+			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + (piece.keys[i].address !== AppUtils.NA ? "\n" + piece.keys[i].address : "") + "\n\n";
 		}
 		return str.trim();
 	},
