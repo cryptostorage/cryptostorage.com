@@ -2344,6 +2344,7 @@ function ImportTextController(div, plugins) {
 	}
 	
 	this.startOver = function() {
+		selectedPlugin = null;
 		setWarning("");
 		textArea.val("");
 		importedStorageDiv.hide();
