@@ -1515,7 +1515,7 @@ function FormController(div) {
 			var numPiecesError = false;
 			var numPieces = Number(numPiecesInput.val());
 			if (strictBlankAndRange) {
-				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2) {
+				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
 					numPiecesError = true;
 					formErrors.split = true;
 					numPiecesInput.addClass("form_input_error_div");
@@ -1535,7 +1535,7 @@ function FormController(div) {
 			// validate min pieces
 			var minPieces = Number(minPiecesInput.val());
 			if (strictBlankAndRange) {
-				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!numPiecesError && minPieces > numPieces)) {
+				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!numPiecesError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
 					formErrors.split = true;
 					minPiecesInput.addClass("form_input_error_div");
 				} else {
