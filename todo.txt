@@ -1,7 +1,6 @@
 v0.1.6
 interoperability disclaimer
 remake screenshot with new encryption format
-split could incorporate min pieces in hex which translates to b64
 error when new tab cannot be opened
 
 private component name part of plugins
