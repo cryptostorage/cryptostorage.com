@@ -596,7 +596,10 @@ function testGenerateKeys(plugins, onDone) {
 				for (var i = 0; i < pieces[0].keys.length; i++) {
 					var pieceKey = pieces[0].keys[i];
 					if (pieceKey.wif && !pieceKey.encryption && pieceKey.ticker === 'BTC') {
-						assertTrue(pieceKey.wif.startsWith(minPieces + "c3X"));
+						var decoded = AppUtils.decodeShare(pieceKey.wif);
+						assertEquals(minPieces, decoded.minPieces);
+						var b58 = Bitcoin.Base58.encode(Crypto.util.hexToBytes(decoded.hex));
+						assertTrue(b58.startsWith("3X"));
 					}
 				}
 			}
@@ -666,11 +669,9 @@ function testGenerateKeys(plugins, onDone) {
 				}
 			}
 			
-			// test split with many shares
+			// test split with max shares
 			var key = plugin.newKey();
-			var min = 150;
-			var num = 250;
-			var pieces = plugin.split(key, num, min);
+			var pieces = plugin.split(key, AppUtils.MAX_SHARES, AppUtils.MAX_SHARES);
 			var combined = plugin.combine(pieces);
 			assertTrue(key.equals(combined));
 		}

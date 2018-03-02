@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.1.6",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: true,
+	RUN_FULL_TESTS: false,
 	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
@@ -58,6 +58,7 @@ var AppUtils = {
 	SIMULATED_LOAD_TIME: null,				// simulate slow load times in ms, disabled if null
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
+	MAX_SHARES: 127,									// maximum number of split shares
 	
 	// encryption v1 constants
 	ENCRYPTION_V1_PBKDF_ITER: 10000,
@@ -414,16 +415,15 @@ var AppUtils = {
 	 * 
 	 * @param share is the share hex to encode
 	 * @param minPieces is the minimum threshold to combine shares
-	 * @returns a hex share encoded with minimum threshold
+	 * @returns Object with wif field or null if cannot encode
 	 */
 	encodeShare: function(share, minPieces) {
-		return encodeShareV0(share, minPieces);
+		return encodeShareV1(share, minPieces);
 		
 		function encodeShareV0(share, minPieces) {
 			try {
 				var encoded = {};
 				encoded.wif = minPieces + 'c' + Bitcoin.Base58.encode(ninja.wallets.splitwallet.hexToBytes(share));
-				encoded.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(encoded.wif));
 				return encoded;
 			} catch (err) {
 				return null;
@@ -431,25 +431,26 @@ var AppUtils = {
 		}
 		
 		function encodeShareV1(share, minPieces) {
+			var hex = padLeft(minPieces.toString(16), 2) + padLeft(share, 2);
+			var encoded = {};
+			encoded.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(hex));
+			return encoded;
 			
+			// Pads a string `str` with zeros on the left so that its length is a multiple of `bits` (credit: bitaddress.org)
+			function padLeft(str, bits){
+				bits = bits || config.bits
+				var missing = str.length % bits;
+				return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
+			}
 		}
-		
-
-		
-		// encode v0
-		return 
-
-//		// encode v1
-//		return padLeft(minPieces.toString(16), 2) + padLeft(share, 2);
-//		
-//		// Pads a string `str` with zeros on the left so that its length is a multiple of `bits` (credit: bitaddress.org)
-//		function padLeft(str, bits){
-//			bits = bits || config.bits
-//			var missing = str.length % bits;
-//			return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
-//		}
 	},
 	
+	/**
+	 * Decodes the given encoded share.
+	 * 
+	 * @param share is the share string to decode
+	 * @returns Object with minPieces and hex fields or null if cannot decode
+	 */
 	decodeShare: function(encodedShare) {
 		if (!isString(encodedShare)) return null;
 		var decoded;
@@ -459,16 +460,14 @@ var AppUtils = {
 		
 		function decodeShareV0(encodedShare) {
 			try {
-				var minPieces;
+				if (encodedShare.length < 34) return null;
 				var decoded = {};
-				
-				// wif
-				if (encodedShare.length >= 34 && AppUtils.isBase58(encodedShare) && (minPieces = getMinPiecesV0(encodedShare)) !== null) {
-					decoded.minPieces = minPieces;
-					decoded.wif = encodedShare.substring(encodedShare.indexOf('c') + 1);
-					decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(decoded.wif)));
-					return decoded;
-				}
+				decoded.minPieces = getMinPiecesV0(encodedShare);
+				if (!decoded.minPieces) return null;
+				var wif = encodedShare.substring(encodedShare.indexOf('c') + 1);
+				if (!AppUtils.isBase58(decoded.wif)) return null;
+				decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif)));
+				return decoded;
 			} catch (err) {
 				return null;
 			}
@@ -491,17 +490,16 @@ var AppUtils = {
 		}
 		
 		function decodeShareV1(encodedShare) {
-			return null;
+			if (encodedShare.length < 33) return null;
+			if (!AppUtils.isBase58(encodedShare)) return null;
+			var hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(encodedShare));
+			if (hex.length % 2 !== 0) return null;
+			var decoded = {};
+			decoded.minPieces = parseInt(hex.substring(0, 2), 16);
+			if (!decoded.minPieces || !isNumber(decoded.minPieces) || decoded.minPieces < 2) return null;
+			decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(2));
+			return decoded;
 		}
-		
-//		// decode v1
-//		if (encodedShare.length % 2 !== 0) return null;
-//		var decoded = {};
-//		decoded.minPieces = parseInt(encodedShare.substring(0, 2), 16);
-//		console.log("Here: " + decoded.minPieces);
-//		if (!decoded.minPieces || !isNumber(decoded.minPieces) || decoded.minPieces < 2) return null;
-//		decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(encodedShare.substring(2));
-//		return decoded;
 	},
 	
 	/**
@@ -775,12 +773,8 @@ var AppUtils = {
 					if (!encryption) encryption = piece.keys[i].encryption;
 					else if (encryption !== piece.keys[i].encryption) throw new Error("Pieces have different encryption states");
 					if (pieces[j].keys[i].wif) {
-						
-						
 						var decoded = AppUtils.decodeShare(piece.keys[i].wif);
 						var decodedMin = decoded ? decoded.minPieces : null;
-						console.log(pieces[j].keys[i].wif);
-						console.log(decodedMin);
 						if (!minPieces) minPieces = decodedMin;
 						else if (minPieces !== decodedMin) throw new Error("Pieces have different minimum thresholds");
 					}
