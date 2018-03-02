@@ -1,5 +1,4 @@
 v0.1.6
-1px whitespace on progress bar
 why would incompatible pieces be treated as key that can be decrypted?
 invalid checksum on incompatible split pieces
 interoperability disclaimer
@@ -40,6 +39,7 @@ cryptostorage.com/faq, etc
 es6 with modules
 loading gif resets on init of other renderers
 let UI breath during bip38
+1px whitespace on import progress bar
 1px border on mobile safari import print
 disable import new tabs if environment error
 file import loading - see spec, only show if minimum file size

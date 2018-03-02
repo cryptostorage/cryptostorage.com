@@ -450,7 +450,7 @@ var AppUtils = {
 				var idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
 				if (idx <= 0) return null;
 				var minPieces = Number(splitPiece.substring(0, idx));	// parse preceding numbers to int
-				if (!minPieces || !isNumber(minPieces) || minPieces < 2) return null;
+				if (!minPieces || !isNumber(minPieces) || minPieces < 2 || minPieces > AppUtils.MAX_SHARES) return null;
 				return minPieces;
 			}
 		}
@@ -462,7 +462,7 @@ var AppUtils = {
 			if (hex.length % 2 !== 0) return null;
 			var decoded = {};
 			decoded.minPieces = parseInt(hex.substring(0, 2), 16);
-			if (!decoded.minPieces || !isNumber(decoded.minPieces) || decoded.minPieces < 2) return null;
+			if (!decoded.minPieces || !isNumber(decoded.minPieces) || decoded.minPieces < 2 || decoded.minPieces > AppUtils.MAX_SHARES) return null;
 			decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(2));
 			return decoded;
 		}
