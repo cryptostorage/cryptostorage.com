@@ -352,7 +352,7 @@ var AppUtils = {
 		
 		function decodeEncryptedWifV0(str) {
 			if (!str.startsWith("U2")) return null;
-			if (!AppUtils.isBase64(str)) return null;
+			if (!isBase64(str)) return null;
 			var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			return decodeEncryptedHexV0(hex);
 		}
@@ -373,40 +373,9 @@ var AppUtils = {
 		}
 		
 		function decodeEncryptedWifV1(str) {
-			if (!AppUtils.isBase64(str)) return null;
+			if (!isBase64(str)) return null;
 			var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
 			return decodeEncryptedHexV1(hex);
-		}
-	},
-	
-	/**
-	 * Determines if the given string is base32.
-	 */
-	isBase32: function(str) {
-		if (typeof str !== 'string') return false;
-		assertTrue(str.length > 0, "Cannot determine if empty string is base32");
-		return /^[ABCDEFGHIJKLMNOPQRSTUVWXYZ234567]+$/.test(str);
-	},
-	
-	/**
-	 * Determines if the given string is base58.
-	 */
-	isBase58: function(str) {
-		if (typeof str !== 'string') return false;
-		assertTrue(str.length > 0, "Cannot determine if empty string is base58");
-		return /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(str);
-	},
-	
-	/**
-	 * Determines if the given string is base64.
-	 */
-	isBase64: function(str) {
-		if (typeof str !== 'string') return false;
-		assertTrue(str.length > 0, "Cannot determine if empty string is base64");
-		try {
-			return btoa(atob(str)) == str;
-		} catch (err) {
-			return false;
 		}
 	},
 	
@@ -415,16 +384,15 @@ var AppUtils = {
 	 * 
 	 * @param share is the share hex to encode
 	 * @param minPieces is the minimum threshold to combine shares
-	 * @returns Object with wif field or null if cannot encode
+	 * @returns wif encoded share
 	 */
 	encodeShare: function(share, minPieces) {
+		assertTrue(isHex(share));
 		return encodeShareV1(share, minPieces);
 		
 		function encodeShareV0(share, minPieces) {
 			try {
-				var encoded = {};
-				encoded.wif = minPieces + 'c' + Bitcoin.Base58.encode(ninja.wallets.splitwallet.hexToBytes(share));
-				return encoded;
+				return minPieces + 'c' + Bitcoin.Base58.encode(ninja.wallets.splitwallet.hexToBytes(share));
 			} catch (err) {
 				return null;
 			}
@@ -432,9 +400,7 @@ var AppUtils = {
 		
 		function encodeShareV1(share, minPieces) {
 			var hex = padLeft(minPieces.toString(16), 2) + padLeft(share, 2);
-			var encoded = {};
-			encoded.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(hex));
-			return encoded;
+			return Bitcoin.Base58.encode(Crypto.util.hexToBytes(hex));
 			
 			// Pads a string `str` with zeros on the left so that its length is a multiple of `bits` (credit: bitaddress.org)
 			function padLeft(str, bits){
@@ -448,7 +414,7 @@ var AppUtils = {
 	/**
 	 * Decodes the given encoded share.
 	 * 
-	 * @param share is the share string to decode
+	 * @param share is the wif encoded share to decode
 	 * @returns Object with minPieces and hex fields or null if cannot decode
 	 */
 	decodeShare: function(encodedShare) {
@@ -465,7 +431,7 @@ var AppUtils = {
 				decoded.minPieces = getMinPiecesV0(encodedShare);
 				if (!decoded.minPieces) return null;
 				var wif = encodedShare.substring(encodedShare.indexOf('c') + 1);
-				if (!AppUtils.isBase58(wif)) return null;
+				if (!isBase58(wif)) return null;
 				decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif)));
 				return decoded;
 			} catch (err) {
@@ -491,7 +457,7 @@ var AppUtils = {
 		
 		function decodeShareV1(encodedShare) {
 			if (encodedShare.length < 33) return null;
-			if (!AppUtils.isBase58(encodedShare)) return null;
+			if (!isBase58(encodedShare)) return null;
 			var hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(encodedShare));
 			if (hex.length % 2 !== 0) return null;
 			var decoded = {};

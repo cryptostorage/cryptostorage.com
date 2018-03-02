@@ -1,4 +1,7 @@
 v0.1.6
+why would incompatible pieces be treated as key that can be decrypted?
+invalid checksum on incompatible split pieces
+last selected text import currency stays valid on start over if no new currency selected
 interoperability disclaimer
 only one "not applicable" for save public addresses txt
 remake screenshot with new encryption format

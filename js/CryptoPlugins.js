@@ -118,11 +118,11 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	assertTrue(numPieces <= AppUtils.MAX_SHARES);
 	
 	// split keys into hex shares
-	var shares = secrets.share(key.getHex(), numPieces, minPieces)
+	var shares = secrets.share(key.getHex(), numPieces, minPieces);
 	
 	// encode shares with minimum threshold
 	for (var i = 0; i < shares.length; i++) {
-		shares[i] = AppUtils.encodeShare(shares[i], minPieces).wif;
+		shares[i] = AppUtils.encodeShare(shares[i], minPieces);
 	}
 	
 	// return encoded shares
@@ -540,7 +540,7 @@ function RipplePlugin() {
 		var state = {};
 		
 		// unencrypted wif
-		if (str.length === 29 && AppUtils.isBase58(str)) {
+		if (str.length === 29 && isBase58(str)) {
 			state.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			state.wif = str;
 			state.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(str).publicKey);
@@ -564,7 +564,7 @@ function RipplePlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
-		return isString(str) && (str.length === 33  || str.length === 34) && AppUtils.isBase58(str);
+		return isString(str) && (str.length === 33  || str.length === 34) && isBase58(str);
 	}
 }
 inheritsFrom(RipplePlugin, CryptoPlugin);
@@ -586,7 +586,7 @@ function StellarPlugin() {
 		var state = {};
 		
 		// unencrypted wif
-		if (str.length === 56 && isUpperCase(str) && AppUtils.isBase32(str)) {
+		if (str.length === 56 && isUpperCase(str) && isBase32(str)) {
 			var keypair = StellarBase.Keypair.fromSecret(str);
 			state.hex = keypair.rawSecretKey().toString('hex');
 			state.wif = str;			
@@ -613,7 +613,7 @@ function StellarPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	this.isAddress = function(str) {
-		return isString(str) && isUpperCase(str) && str.length === 56 && AppUtils.isBase32(str);
+		return isString(str) && isUpperCase(str) && str.length === 56 && isBase32(str);
 	}
 }
 inheritsFrom(StellarPlugin, CryptoPlugin);

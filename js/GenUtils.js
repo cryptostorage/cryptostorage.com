@@ -165,6 +165,37 @@ function isHex(arg) {
 }
 
 /**
+ * Determines if the given string is base32.
+ */
+function isBase32(str) {
+	if (typeof str !== 'string') return false;
+	assertTrue(str.length > 0, "Cannot determine if empty string is base32");
+	return /^[ABCDEFGHIJKLMNOPQRSTUVWXYZ234567]+$/.test(str);
+}
+
+/**
+ * Determines if the given string is base58.
+ */
+function isBase58(str) {
+	if (typeof str !== 'string') return false;
+	assertTrue(str.length > 0, "Cannot determine if empty string is base58");
+	return /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(str);
+}
+
+/**
+ * Determines if the given string is base64.
+ */
+function isBase64(str) {
+	if (typeof str !== 'string') return false;
+	assertTrue(str.length > 0, "Cannot determine if empty string is base64");
+	try {
+		return btoa(atob(str)) == str;
+	} catch (err) {
+		return false;
+	}
+}
+
+/**
  * Throws an exception with the given message.
  * 
  * @param msg defines the message to throw the exception with (optional)

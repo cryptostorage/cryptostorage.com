@@ -116,8 +116,8 @@ var Tests = {
 			assertFalse(isString(null));
 			assertFalse(isString(undefined));
 			assertFalse(isString(123));
-			assertTrue(AppUtils.isBase58("abcd"))
-			assertFalse(AppUtils.isBase58("abcd0"))
+			assertTrue(isBase58("abcd"))
+			assertFalse(isBase58("abcd0"))
 			
 			// test valid versions
 			var validVersions = [[0, 0, 1], [12, 23, 4], [16, 1, 5]];
@@ -145,7 +145,7 @@ var Tests = {
 				var key = plugin.newKey()
 				var pieces = plugin.split(key, 3, 2);
 				for (var j = 0; j < pieces.length; j++) {
-					assertTrue(AppUtils.isBase58(pieces[j]));
+					assertTrue(isBase58(pieces[j]));
 				}
 			}
 		}
