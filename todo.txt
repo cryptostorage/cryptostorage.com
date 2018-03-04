@@ -7,7 +7,7 @@ support json as text input
 info box on currencies
 
 designer:
-encrpyt / split imported storage
+encrypt / split imported storage
 encrypt / split arbitrary text
 link back to import / homepage from export
 ability to view balance and sign/send transaction
