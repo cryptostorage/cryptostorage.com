@@ -3,13 +3,13 @@ interoperability disclaimer
 remake screenshot with new encryption format
 error when new tab cannot be opened
 
-private component name part of plugins
-passphrase-protect/split arbitrary text
-re-encrypt / split imported storage
 support json as text input
 info box on currencies
 
 designer:
+encrpyt / split imported storage
+encrypt / split arbitrary text
+link back to import / homepage from export
 ability to view balance and sign/send transaction
 ability to import keys and re-export
 should home images fade or reflect?
