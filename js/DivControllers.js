@@ -1132,6 +1132,7 @@ function FormController(div) {
 			passphraseInputDiv = $("<div class='passphrase_input_div flex_vertical flex_align_start flex_justify_start'>").appendTo(passphraseDiv);
 			var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
 			passphraseWarnDiv.append("This passphrase is required to access funds later on.  <b>Do not lose it.</b>");
+			//renderInteroperabilityDisclaimer($("<div>").appendTo(passphraseInputDiv), "Passphrase encryption will not be interoperable with other tools.");
 			passphraseInputDiv.append("Passphrase");
 			passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
 			passphraseInput.on("input", function(e) { setPassphraseError(false); });
@@ -1372,7 +1373,9 @@ function FormController(div) {
 	function renderInteroperabilityDisclaimer(div, msg) {
 		div.empty();
 		div.addClass("interoperability_disclaimer flex_horizontal");
+		$("<img class='interoperability_caution' src='img/caution.png'>").appendTo(div);
 		var msgDiv = $("<div>").appendTo(div);
+		msg = "&nbsp;" + msg;
 		msgDiv.append(msg);
 		div.append("&nbsp;");
 		var readMoreLink = $("<a target='_blank' href='#faq_interoperable'>Read more</a>").appendTo(div);

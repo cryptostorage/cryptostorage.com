@@ -1737,7 +1737,7 @@ input[type='checkbox'][disabled] +label {
 .interoperability_disclaimer {
 	padding: 5px 10px 5px 10px;
 	border-radius: 10px;
-	border:2px solid;
+	border:1px solid;
 	width: unset;
 	font-size: 22px;
 	margin-bottom: 10px;
@@ -1745,4 +1745,9 @@ input[type='checkbox'][disabled] +label {
 
 .interoperability_disclaimer * {
 	font-size:16px;
+}
+
+.interoperability_caution {
+	width: 20px;
+	height: 20px;
 }
