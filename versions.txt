@@ -58,7 +58,8 @@ cryptostorage-v0.1.5-beta
 - Removed duplicate tag in sitemap.xml
 
 03/06/2018
-cryptostorage-v0.1.6-beta
+cryptostorage-v0.2.0-beta
 - Improved security of passphrase encryption with PBKDF2, 10000 iterations, SHA512, and embedded config version for future extensibility
 - Modified split encoding to base58 encode minimum share threshold and embed config version for future extensibility
 - Added disclaimers that passphrase encryption and splitting use conventions that will not be interoperable with other tools
+- Refactoring and code cleanup
