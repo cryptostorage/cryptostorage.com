@@ -652,6 +652,7 @@ function testGenerateKeys(plugins, onDone) {
 				
 				// test that single pieces cannot create key
 				for (var j = 0; j < pieces.length; j++) {
+					assertTrue(pieces[j].length <= 136);
 					try {
 						plugin.combine([pieces[j]]);
 						throw new Error("fail");
