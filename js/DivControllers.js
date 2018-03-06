@@ -654,7 +654,8 @@ function FaqController(div) {
 				}, {
 					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this tool?"; },
-					getAnswer: function() { return "<p>CryptoStorage is 100% open-source which means anyone can review the source code.</p>" +
+					getAnswer: function() { return "<p>Don't trust.  Verify.</p>" +
+						"<p>CryptoStorage is 100% open-source which means anyone can review the source code.</p>" +
 						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publicly reviewed and has not been modified by an attacker.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",
@@ -681,6 +682,14 @@ function FaqController(div) {
 					getAnswer: function() { return "<p>For bug reports and feature requests, please submit an issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
 						"<p>For community discussion, please join the conversation on Reddit at <a href='https://reddit.com/r/cryptostorage'>https://reddit.com/r/cryptostorage</a>.</p>" +
 						"<p><i>No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost.</i></p>"
+					}
+				},{
+					id: "faq_interoperable",
+					getQuestion: function() { return "Is this tool compatible with other wallets?"; },
+					getAnswer: function() {
+						var answerDiv = $("<div>");
+						answerDiv.append("<p>TODO</p>");	// TODO: finish this
+						return answerDiv;
 					}
 				}
 			];
@@ -1216,7 +1225,7 @@ function FormController(div) {
 			});
 			
 			// split input
-			splitInputDiv = $("<div class='split_input_div flex_vertical flex_align_start flex_justify_start'>").appendTo(splitDiv);
+			splitInputDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
 			renderInteroperabilityDisclaimer($("<div>").appendTo(splitInputDiv), "Split storage will not be interoperable with other tools.");
 			var splitConfigDiv = $("<div class='flex_horizontal'>").appendTo(splitInputDiv);
 			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitConfigDiv);
@@ -1361,9 +1370,12 @@ function FormController(div) {
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function renderInteroperabilityDisclaimer(div, msg) {
-		div.addClass("passphrase_warn_div flex_horizontal");
 		div.empty();
-		div.append(msg);
+		div.addClass("interoperability_disclaimer flex_horizontal");
+		var msgDiv = $("<div>").appendTo(div);
+		msgDiv.append(msg);
+		div.append("&nbsp;");
+		var readMoreLink = $("<a target='_blank' href='#faq_interoperable'>Read more</a>").appendTo(div);
 	}
 	
 	function addCurrency(defaultTicker) {

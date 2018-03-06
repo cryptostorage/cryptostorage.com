@@ -1733,3 +1733,16 @@ input[type='checkbox'][disabled] +label {
 	height: 30px;
 	margin-right: 3px;
 }
+
+.interoperability_disclaimer {
+	padding: 5px 10px 5px 10px;
+	border-radius: 10px;
+	border:2px solid;
+	width: unset;
+	font-size: 22px;
+	margin-bottom: 10px;
+}
+
+.interoperability_disclaimer * {
+	font-size:16px;
+}
