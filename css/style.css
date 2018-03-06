@@ -644,7 +644,7 @@ input[type='checkbox'][disabled] +label {
 	color: red;
 	width: 100%;
 	text-align: center;
-	margin-bottom: 15px;
+	margin-bottom: 10px;
 }
 
 .passphrase_input {
@@ -1735,12 +1735,9 @@ input[type='checkbox'][disabled] +label {
 }
 
 .interoperability_disclaimer {
-	padding: 5px 10px 5px 10px;
-	border-radius: 10px;
-	border:1px solid;
 	width: unset;
 	font-size: 22px;
-	margin-bottom: 10px;
+	margin-bottom: 15px;
 }
 
 .interoperability_disclaimer * {

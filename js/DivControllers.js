@@ -1129,11 +1129,11 @@ function FormController(div) {
 			});
 			
 			// passphrase input
-			passphraseInputDiv = $("<div class='passphrase_input_div flex_vertical flex_align_start flex_justify_start'>").appendTo(passphraseDiv);
+			passphraseInputDiv = $("<div class='passphrase_input_div flex_vertical flex_justify_start'>").appendTo(passphraseDiv);
 			var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
 			passphraseWarnDiv.append("This passphrase is required to access funds later on.  <b>Do not lose it.</b>");
-			//renderInteroperabilityDisclaimer($("<div>").appendTo(passphraseInputDiv), "Passphrase encryption will not be interoperable with other tools.");
-			passphraseInputDiv.append("Passphrase");
+			renderInteroperabilityDisclaimer($("<div>").appendTo(passphraseInputDiv), "Passphrase encryption will not be interoperable with other tools.");
+			passphraseInputDiv.append($("<div style='width:100%'>Passphrase</div>"));
 			passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
 			passphraseInput.on("input", function(e) { setPassphraseError(false); });
 			
