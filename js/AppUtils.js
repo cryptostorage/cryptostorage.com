@@ -59,13 +59,14 @@ var AppUtils = {
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
 	MAX_SHARES: 127,									// maximum number of split shares
+	SPLIT_V1_VERSION: 1,							// split encoding config version
 	
 	// encryption v1 constants
 	ENCRYPTION_V1_PBKDF_ITER: 10000,
 	ENCRYPTION_V1_KEY_SIZE: 256,
 	ENCRYPTION_V1_BLOCK_SIZE: 16,
-	ENCRYPTION_V1_PREFIX: "1",
-	
+	ENCRYPTION_V1_VERSION: 1,
+
 	/**
 	 * Mock environment checks.
 	 */
@@ -362,7 +363,8 @@ var AppUtils = {
 			// determine if encrypted hex V1
 			if (!isHex(str)) return null;
 			if (str.length - 32 < 1 || str.length % 32 !== 0) return null;
-			if (str.substring(0, AppUtils.ENCRYPTION_V1_PREFIX.length) !== AppUtils.ENCRYPTION_V1_PREFIX) return null;
+			var version = parseInt(str.substring(0, AppUtils.ENCRYPTION_V1_VERSION.toString(16).length), 16);
+			if (version !== AppUtils.ENCRYPTION_V1_VERSION) return null;
 			
 			// decode
 			var state = {};
@@ -400,7 +402,7 @@ var AppUtils = {
 		}
 		
 		function encodeShareV1(share, minPieces) {
-			var hex = padLeft(minPieces.toString(16), 2) + padLeft(share, 2);
+			var hex = padLeft(AppUtils.SPLIT_V1_VERSION.toString(16), 2) + padLeft(minPieces.toString(16), 2) + padLeft(share, 2);
 			return Bitcoin.Base58.encode(Crypto.util.hexToBytes(hex));
 			
 			// Pads a string `str` with zeros on the left so that its length is a multiple of `bits` (credit: bitaddress.org)
@@ -451,7 +453,7 @@ var AppUtils = {
 				var idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
 				if (idx <= 0) return null;
 				var minPieces = Number(splitPiece.substring(0, idx));	// parse preceding numbers to int
-				if (!minPieces || !isNumber(minPieces) || minPieces < 2 || minPieces > AppUtils.MAX_SHARES) return null;
+				if (!isNumber(minPieces) || minPieces < 2 || minPieces > AppUtils.MAX_SHARES) return null;
 				return minPieces;
 			}
 		}
@@ -461,10 +463,12 @@ var AppUtils = {
 			if (!isBase58(encodedShare)) return null;
 			var hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(encodedShare));
 			if (hex.length % 2 !== 0) return null;
+			var version = parseInt(hex.substring(0, 2), 16);
+			if (version !== AppUtils.SPLIT_V1_VERSION) return null;
 			var decoded = {};
-			decoded.minPieces = parseInt(hex.substring(0, 2), 16);
-			if (!decoded.minPieces || !isNumber(decoded.minPieces) || decoded.minPieces < 2 || decoded.minPieces > AppUtils.MAX_SHARES) return null;
-			decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(2));
+			decoded.minPieces = parseInt(hex.substring(2, 4), 16);
+			if (!isNumber(decoded.minPieces) || decoded.minPieces < 2 || decoded.minPieces > AppUtils.MAX_SHARES) return null;
+			decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
 			return decoded;
 		}
 	},
@@ -1249,7 +1253,8 @@ var AppUtils = {
 				
 				// create random salt and replace first two characters with version
 				var salt = CryptoJS.lib.WordArray.random(AppUtils.ENCRYPTION_V1_BLOCK_SIZE);
-				salt = AppUtils.ENCRYPTION_V1_PREFIX + salt.toString().substring(AppUtils.ENCRYPTION_V1_PREFIX.length);
+				var hexVersion = AppUtils.ENCRYPTION_V1_VERSION.toString(16);
+				salt = hexVersion + salt.toString().substring(hexVersion.length);
 				salt = CryptoJS.enc.Hex.parse(salt);
 				
 				// strengthen passphrase with passphrase key
@@ -1347,8 +1352,8 @@ var AppUtils = {
 		function decryptKeyV1(key, scheme, passphrase, onProgress, onDone) {
 			try {
 				
-				// assert correct prefix
-				assertEquals(AppUtils.ENCRYPTION_V1_PREFIX, key.getHex().substring(0, AppUtils.ENCRYPTION_V1_PREFIX.length));
+				// assert correct version
+				assertEquals(AppUtils.ENCRYPTION_V1_VERSION, parseInt(key.getHex().substring(0, AppUtils.ENCRYPTION_V1_VERSION.toString(16).length), 16));
 				
 				// get passphrase key
 				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(0, 32));
