@@ -677,19 +677,20 @@ function FaqController(div) {
 					getQuestion: function() { return "Can I send funds using CryptoStorage?"; },
 					getAnswer: function() { return "<p>Not currently.  It is expected that users will send funds using wallet software of their choice after private keys have been recovered using this tool.</p>"; }
 				}, {
+					id: "faq_interoperable",
+					getQuestion: function() { return "Does CryptoStorage work with other wallet software?"; },
+					getAnswer: function() {
+						var answerDiv = $("<div>");
+						answerDiv.append("<p>All unencrypted keys generated with CryptoStorage will work with other wallet software and vice versa.</p>" +
+								"<p>However, there is currently no standardized way of encrypting or splitting cryptocurrency keys that works across all tokens.  As a result, CryptoStorage uses conventions to encrypt and split keys which will not work with other tools unless they use the same conventions.  A copy of this tool should be saved to recover keys in the future if using encryption or splitting.</p>");
+						return answerDiv;
+					}
+				}, {
 					id: "faq_contact",
 					getQuestion: function() { return "I still need help.  Who can I contact?"; },
 					getAnswer: function() { return "<p>For bug reports and feature requests, please submit an issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
 						"<p>For community discussion, please join the conversation on Reddit at <a href='https://reddit.com/r/cryptostorage'>https://reddit.com/r/cryptostorage</a>.</p>" +
 						"<p><i>No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost.</i></p>"
-					}
-				},{
-					id: "faq_interoperable",
-					getQuestion: function() { return "Is this tool compatible with other wallets?"; },
-					getAnswer: function() {
-						var answerDiv = $("<div>");
-						answerDiv.append("<p>TODO</p>");	// TODO: finish this
-						return answerDiv;
 					}
 				}
 			];
@@ -1130,9 +1131,9 @@ function FormController(div) {
 			
 			// passphrase input
 			passphraseInputDiv = $("<div class='passphrase_input_div flex_vertical flex_justify_start'>").appendTo(passphraseDiv);
+			renderInteroperabilityDisclaimer($("<div>").appendTo(passphraseInputDiv), "Passphrase encryption is not interoperable with other tools.");
 			var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
 			passphraseWarnDiv.append("This passphrase is required to access funds later on.  <b>Do not lose it.</b>");
-			renderInteroperabilityDisclaimer($("<div>").appendTo(passphraseInputDiv), "Passphrase encryption will not be interoperable with other tools.");
 			passphraseInputDiv.append($("<div style='width:100%'>Passphrase</div>"));
 			passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
 			passphraseInput.on("input", function(e) { setPassphraseError(false); });
@@ -1227,7 +1228,7 @@ function FormController(div) {
 			
 			// split input
 			splitInputDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
-			renderInteroperabilityDisclaimer($("<div>").appendTo(splitInputDiv), "Split storage will not be interoperable with other tools.");
+			renderInteroperabilityDisclaimer($("<div>").appendTo(splitInputDiv), "Split storage is not interoperable with other tools.");
 			var splitConfigDiv = $("<div class='flex_horizontal'>").appendTo(splitInputDiv);
 			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitConfigDiv);
 			var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitConfigDiv);
