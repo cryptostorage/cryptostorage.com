@@ -388,6 +388,7 @@ var AppUtils = {
 	 */
 	encodeShare: function(share, minPieces) {
 		assertTrue(isHex(share));
+		assertTrue(isNumber(minPieces) && minPieces <= AppUtils.MAX_SHARES);
 		return encodeShareV1(share, minPieces);
 		
 		function encodeShareV0(share, minPieces) {
