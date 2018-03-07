@@ -1,5 +1,4 @@
 v0.2.0
-run tests
 remake screenshot with new encryption format
 error when new tab cannot be opened
 
