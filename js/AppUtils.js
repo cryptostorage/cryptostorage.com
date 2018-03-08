@@ -44,7 +44,7 @@ var AppUtils = {
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: true,
 	RUN_FULL_TESTS: false,
-	DEV_MODE: true,
+	DEV_MODE: false,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
