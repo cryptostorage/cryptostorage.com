@@ -369,14 +369,14 @@ var AppUtils = {
 			// decode
 			var state = {};
 			state.hex = str;
-			state.wif = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
 			state.encryption = AppUtils.EncryptionScheme.V1_CRYPTOJS;
 			return state;
 		}
 		
 		function decodeEncryptedWifV1(str) {
-			if (!isBase64(str)) return null;
-			var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			if (!isBase58(str)) return null;
+			var hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			return decodeEncryptedHexV1(hex);
 		}
 	},
