@@ -10,7 +10,6 @@ encrypt / split imported storage
 encrypt / split arbitrary text
 link back to import / homepage from export
 ability to view balance and sign/send transaction
-ability to import keys and re-export
 should home images fade or reflect?
 footer on every page?
 margin above home footer?
