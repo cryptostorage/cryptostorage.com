@@ -682,7 +682,7 @@ function FaqController(div) {
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>All unencrypted keys generated with CryptoStorage will work with other wallet software and vice versa.</p>" +
-								"<p>However, there is currently no standardized way of encrypting or splitting cryptocurrency keys that works across all tokens.  As a result, CryptoStorage uses conventions to encrypt and split keys which will not work with other tools unless they use the same conventions.  A copy of this tool should be saved to recover keys in the future if using encryption or splitting.</p>");
+								"<p>However, there is currently no standardized way of encrypting or splitting cryptocurrency keys that works across all networks.  As a result, CryptoStorage uses conventions to encrypt and split keys which will not work with other tools unless they use the same conventions.  <b>A copy of this tool should be saved to recover keys in the future if using encryption or splitting.</p>");
 						return answerDiv;
 					}
 				}, {
@@ -690,6 +690,7 @@ function FaqController(div) {
 					getQuestion: function() { return "I still need help.  Who can I contact?"; },
 					getAnswer: function() { return "<p>For bug reports and feature requests, please submit an issue to <a href='https://github.com/cryptostorage/cryptostorage.com/issues'>https://github.com/cryptostorage/cryptostorage.com/issues</a>.</p>" +
 						"<p>For community discussion, please join the conversation on Reddit at <a href='https://reddit.com/r/cryptostorage'>https://reddit.com/r/cryptostorage</a>.</p>" +
+						"<p>For email support, please email <a href='mailto:support@cryptostorage.com'>support@cryptostorage.com</a>.  Email is answered on a best-effort basis only.</p>" +
 						"<p><i>No one can recover lost keys or passwords for you.  Do not lose these or your funds will be lost.</i></p>"
 					}
 				}
