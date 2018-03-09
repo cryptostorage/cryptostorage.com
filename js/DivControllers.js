@@ -80,7 +80,15 @@ var UiUtils = {
 		if (!isInitialized(config.showNotices)) config.showNotices = true;
 		
 		// open tab
-		newWindow(null, browserTabName, AppUtils.getExportJs(), AppUtils.getExportCss(), getInternalStyleSheetText(), function(window) {
+		newWindow(null, browserTabName, AppUtils.getExportJs(), AppUtils.getExportCss(), getInternalStyleSheetText(), function(err, window) {
+			
+			// check for error
+			if (err) {
+				AppUtils.setTabError(true);
+				return;
+			}
+			
+			// initialize tab
 			config.environmentInfo = AppUtils.getCachedEnvironment();
 		  window.exportToBody(window, config);
 			window.focus();

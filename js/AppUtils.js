@@ -1799,6 +1799,7 @@ var AppUtils = {
 		info.isLocal = AppUtils.isLocal();
 		info.runtimeError = AppUtils.RUNTIME_ERROR;
 		info.dependencyError = AppUtils.DEPENDENCY_ERROR;
+		info.tabError = AppUtils.TAB_ERROR;
 		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = Object.assign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
 		info.checks = AppUtils.getEnvironmentChecks(info);
 		return info;
@@ -1850,6 +1851,9 @@ var AppUtils = {
 		
 		// check if dependency error
 		if (info.dependencyError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.INTERNET});
+		
+		// check if tab error
+		if (info.tabError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER});
 		
 		// check if remote and not online
 		var internetRequiredError = false;
@@ -1991,6 +1995,17 @@ var AppUtils = {
 		if (!AppUtils.environment) AppUtils.environment = {};
 		AppUtils.DEPENDENCY_ERROR = bool;
 		AppUtils.environment.dependencyError = bool;
+		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
+		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
+	},
+	
+	/**
+	 * Sets an error if a new tab cannot be opened.
+	 */
+	setTabError: function(bool) {
+		if (!AppUtils.environment) AppUtils.environment = {};
+		AppUtils.TAB_ERROR = bool;
+		AppUtils.environment.tabError = bool;
 		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
 		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
 	},

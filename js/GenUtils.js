@@ -800,16 +800,28 @@ function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
  * @param jsPaths are javascript paths to import (optional)
  * @param cssPaths are css paths to import (optional)
  * @param internalCss is css to embed in the html document (optional)
- * @param onLoad is invoked with a reference to the window when available
+ * @param onLoad(err, window) is invoked with a reference to the window when available
  */
 function newWindow(div, title, jsPaths, cssPaths, internalCss, onLoad) {
+	var onLoadCalled = false;
 	var w = window.open();
+	if (!isInitialized(w) || !isInitialized(w.document)) {
+		onLoadOnce(new Error("Could not get window reference"));
+		return;
+	}
 	w.opener = null;
 	w.document.write(buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss));
 	w.addEventListener('load', function() {
-		if (onLoad) onLoad(w);
+		onLoadOnce(null, w);
 	});
 	w.document.close();
+	
+	// prevents onLoad() from being called multiple times
+	function onLoadOnce(err, window) {
+		if (onLoadCalled) return;
+		onLoadCalled = true;
+		if (onLoad) onLoad(err, window);
+	}
 }
 
 /**
