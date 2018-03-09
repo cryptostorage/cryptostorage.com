@@ -1,5 +1,6 @@
 v0.2.1
 save as txt and csv
+add caution.png and share.png to dependencies
 support json as text input
 info box on currencies
 wording: keypairs and open source
