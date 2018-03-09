@@ -2894,6 +2894,7 @@ function ExportController(div, window, config) {
 	var saveButton;
 	var printButton;
 	var savePublicButton;
+	var moreButton;
 	var showPublicCheckbox;
 	var showPrivateCheckbox;
 	var showLogosCheckbox;
@@ -2936,6 +2937,23 @@ function ExportController(div, window, config) {
 		printButton.html("Print All");
 		savePublicButton = $("<div class='export_button'>").appendTo(exportButtons);
 		savePublicButton.html("Save Public Addresses");
+		
+		// more dropdown
+		var moreDropdown = $("<div class='dropdown'>").appendTo(exportButtons);
+		moreButton = $("<div class='export_button dropbtn'>").appendTo(moreDropdown);
+		moreButton.html("...");
+		moreButton.click(function(e) {
+			console.log("clicked");
+			dropdownContent.toggleClass("show");
+		});
+		var dropdownContent = $("<div id='dropdownContent' class='dropdown-content'>").appendTo(moreDropdown);
+		dropdownContent.append($("<a href='#sup'>Sup</a>"));
+		dropdownContent.append($("<a href='#bro'>Bro</a>"));
+		window.onclick = function(event) { // close the dropdown if the user clicks outside of it
+		  if (!event.target.matches('.dropbtn')) {
+		  	dropdownContent.removeClass('show');
+		  }
+		}
 		
 		// export checkboxes
 		var exportCheckboxes = $("<div class='export_checkboxes flex_horizontal'>").appendTo(exportControls);
