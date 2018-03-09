@@ -1,5 +1,4 @@
 v0.2.1
-error when new tab cannot be opened
 save as txt and csv
 support json as text input
 info box on currencies
