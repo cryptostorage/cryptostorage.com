@@ -2939,18 +2939,17 @@ function ExportController(div, window, config) {
 		savePublicButton.html("Save Public Addresses");
 		
 		// more dropdown
-		var moreDropdown = $("<div class='dropdown'>").appendTo(exportButtons);
-		moreButton = $("<div class='export_button dropbtn'>").appendTo(moreDropdown);
-		moreButton.html("...");
+		var moreDropdown = $("<div class='dropdown flex_vertical'>").appendTo(exportButtons);
+		moreButton = $("<div class='dropbtn flex_vertical'>").appendTo(moreDropdown);
+		moreButton.append("<img src='img/share.png' class='export_more_img'>");
 		moreButton.click(function(e) {
-			console.log("clicked");
 			dropdownContent.toggleClass("show");
 		});
 		var dropdownContent = $("<div id='dropdownContent' class='dropdown-content'>").appendTo(moreDropdown);
 		dropdownContent.append($("<a href='#sup'>Sup</a>"));
 		dropdownContent.append($("<a href='#bro'>Bro</a>"));
 		window.onclick = function(event) { // close the dropdown if the user clicks outside of it
-		  if (!event.target.matches('.dropbtn')) {
+		  if (!event.target.matches('.dropbtn') && !event.target.matches('.export_more_img')) {
 		  	dropdownContent.removeClass('show');
 		  }
 		}
