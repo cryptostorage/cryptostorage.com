@@ -2939,7 +2939,7 @@ function ExportController(div, window, config) {
 		savePublicButton.html("Save Public Addresses");
 		
 		// more dropdown
-		var moreDropdown = $("<div class='dropdown flex_vertical'>").appendTo(exportButtons);
+		var moreDropdown = $("<div class='dropdown'>").appendTo(exportButtons);
 		moreButton = $("<div class='dropbtn flex_vertical'>").appendTo(moreDropdown);
 		moreButton.append("<img src='img/share.png' class='export_more_img'>");
 		moreButton.click(function(e) {

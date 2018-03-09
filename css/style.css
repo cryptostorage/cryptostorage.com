@@ -1173,17 +1173,17 @@ input[type='checkbox'][disabled] +label {
 }
 
 .export_buttons {
-	-ms-flex-pack: center;
-	justify-content: center;
 	margin-top: 0px;
 	align-items: stretch;
+	height: 55px;
+	line-height: 65px;
 }
 
 .export_button {
 	background-color: white;
 	color: black;
 	margin: 0 10px 0 10px;
-	padding: 5px 20px 5px 20px;
+	padding: 0px 20px 0px 20px;
 	border: 2.5px solid black;
 	font-size: 28px;
 	font-weight: bold;
@@ -1207,7 +1207,7 @@ input[type='checkbox'][disabled] +label {
 	background-color: white;
 	color: grey;
 	margin: 0 10px 0 10px;
-	padding: 5px 20px 5px 20px;
+	padding: 0px 20px 0px 20px;
 	border: 2.5px solid black;
 	font-size: 28px;
 	font-weight: bold;
@@ -1753,6 +1753,7 @@ input[type='checkbox'][disabled] +label {
 /* --- Export more dropdown from W3 --- */
 
 .dropdown {
+    height: 100%;
     float: right;
     position: relative;
     display: inline-block;
@@ -1779,6 +1780,7 @@ input[type='checkbox'][disabled] +label {
 .dropdown a:hover {background-color: #ddd}
 
 .dropbtn {
+	height: 100%;
 	background-color: white;
 	color: black;
 	margin: 0 10px 0 10px;
@@ -1789,7 +1791,6 @@ input[type='checkbox'][disabled] +label {
 	-ms-user-select: none;
 	user-select: none;
 	white-space: nowrap;
-	height: 100%;
 }
 
 .dropbtn:hover {
@@ -1803,6 +1804,8 @@ input[type='checkbox'][disabled] +label {
 
 .export_more_img {
 	width:40px;
+	margin-right: -5px;
+	margin-top: -5px;
 }
 
 .show {display:block;}
