@@ -1175,8 +1175,8 @@ input[type='checkbox'][disabled] +label {
 .export_buttons {
 	margin-top: 0px;
 	align-items: stretch;
-	height: 55px;
-	line-height: 65px;
+	height: 53px;
+	line-height: 50px;
 }
 
 .export_button {
