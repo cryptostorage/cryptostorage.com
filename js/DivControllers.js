@@ -2945,11 +2945,6 @@ function ExportController(div, window, config) {
 		moreButton.click(function(e) {
 			dropdownContent.toggleClass("show");
 		});
-		window.onclick = function(event) { // close the dropdown if user clicks outside
-		  if (!event.target.matches('.dropbtn') && !event.target.matches('.export_more_img')) {
-		  	dropdownContent.removeClass('show');
-		  }
-		}
 		var dropdownContent = $("<div id='dropdownContent' class='dropdown-content'>").appendTo(moreDropdown);
 		var saveCsvBtn = $("<div class='export_button dropdown_export_button'>").appendTo(dropdownContent);
 		saveCsvBtn.append("Export to CSV");
@@ -2957,6 +2952,11 @@ function ExportController(div, window, config) {
 		var saveTxtBtn = $("<div class='export_button dropdown_export_button'>").appendTo(dropdownContent);
 		saveTxtBtn.append("Export to TXT");
 		saveTxtBtn.click(function() { saveTxt(); });
+		window.onclick = function(event) { // close the dropdown if user clicks outside
+		  if (!event.target.matches('.dropbtn') && !event.target.matches('.export_more_img')) {
+		  	dropdownContent.removeClass('show');
+		  }
+		}
 		
 		// export checkboxes
 		var exportCheckboxes = $("<div class='export_checkboxes flex_horizontal'>").appendTo(exportControls);
