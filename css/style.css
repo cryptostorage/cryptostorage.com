@@ -1775,43 +1775,21 @@ input[type='checkbox'][disabled] +label {
 }
 
 .dropdown_export_button {
-	background-color: white;
-	color: black;
 	padding: 0px 10px 0px 10px;
 	border-style: solid;
     border-width: 0px 2.5px 2.5px 2.5px;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	white-space: nowrap;
+    font-weight: normal;
+    font-size: 23px;
+    margin: 0;
     text-decoration: none;
     display: block;
-}
-
-.dropdown_export_button:hover {
-	background-color: #ddd
 }
 
 .dropbtn {
 	height: 100%;
 	padding: 0px 10px 0px 10px;
 	margin: 0 10px 0 10px;
-	background-color: white;
-	color: black;
-	border: 2.5px solid black;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	white-space: nowrap;
 }
-
-.dropbtn:hover {
-	cursor: pointer;
-	background-color: #EBEDEF;
-}
-
 .dropbtn:active {
 	background-color: #ABB2B9;
 }

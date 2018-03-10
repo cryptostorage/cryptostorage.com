@@ -2940,7 +2940,7 @@ function ExportController(div, window, config) {
 		
 		// more dropdown
 		var moreDropdown = $("<div class='dropdown'>").appendTo(exportButtons);
-		moreButton = $("<div class='dropbtn flex_vertical'>").appendTo(moreDropdown);
+		moreButton = $("<div class='export_button dropbtn flex_vertical'>").appendTo(moreDropdown);
 		moreButton.append("<img src='img/share.png' class='export_more_img'>");
 		moreButton.click(function(e) {
 			dropdownContent.toggleClass("show");
@@ -2951,13 +2951,13 @@ function ExportController(div, window, config) {
 		  }
 		}
 		var dropdownContent = $("<div id='dropdownContent' class='dropdown-content'>").appendTo(moreDropdown);
-		var saveCsvBtn = $("<div class='dropdown_export_button'>").appendTo(dropdownContent);
-		saveCsvBtn.append("Save CSV");
+		var saveCsvBtn = $("<div class='export_button dropdown_export_button'>").appendTo(dropdownContent);
+		saveCsvBtn.append("Export to CSV");
 		saveCsvBtn.click(function() {
 			console.log("save csv!");
 		});
-		var saveTxtBtn = $("<div class='dropdown_export_button'>").appendTo(dropdownContent);
-		saveTxtBtn.append("Save TXT");
+		var saveTxtBtn = $("<div class='export_button dropdown_export_button'>").appendTo(dropdownContent);
+		saveTxtBtn.append("Export to TXT");
 		saveTxtBtn.click(function() {
 			console.log("save txt!");
 		});
