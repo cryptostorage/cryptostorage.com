@@ -1770,21 +1770,35 @@ input[type='checkbox'][disabled] +label {
     z-index: 1;
 }
 
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
+.dropdown_export_button:first-child {
+	border-top: 2.5px solid black;
+}
+
+.dropdown_export_button {
+	background-color: white;
+	color: black;
+	padding: 0px 10px 0px 10px;
+	border-style: solid;
+    border-width: 0px 2.5px 2.5px 2.5px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	white-space: nowrap;
     text-decoration: none;
     display: block;
 }
 
-.dropdown a:hover {background-color: #ddd}
+.dropdown_export_button:hover {
+	background-color: #ddd
+}
 
 .dropbtn {
 	height: 100%;
+	padding: 0px 10px 0px 10px;
+	margin: 0 10px 0 10px;
 	background-color: white;
 	color: black;
-	margin: 0 10px 0 10px;
-	padding: 0px 10px 0px 10px;
 	border: 2.5px solid black;
 	-webkit-user-select: none;
 	-moz-user-select: none;

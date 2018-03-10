@@ -2945,14 +2945,22 @@ function ExportController(div, window, config) {
 		moreButton.click(function(e) {
 			dropdownContent.toggleClass("show");
 		});
-		var dropdownContent = $("<div id='dropdownContent' class='dropdown-content'>").appendTo(moreDropdown);
-		dropdownContent.append($("<a href='#sup'>Sup</a>"));
-		dropdownContent.append($("<a href='#bro'>Bro</a>"));
-		window.onclick = function(event) { // close the dropdown if the user clicks outside of it
+		window.onclick = function(event) { // close the dropdown if user clicks outside
 		  if (!event.target.matches('.dropbtn') && !event.target.matches('.export_more_img')) {
 		  	dropdownContent.removeClass('show');
 		  }
 		}
+		var dropdownContent = $("<div id='dropdownContent' class='dropdown-content'>").appendTo(moreDropdown);
+		var saveCsvBtn = $("<div class='dropdown_export_button'>").appendTo(dropdownContent);
+		saveCsvBtn.append("Save CSV");
+		saveCsvBtn.click(function() {
+			console.log("save csv!");
+		});
+		var saveTxtBtn = $("<div class='dropdown_export_button'>").appendTo(dropdownContent);
+		saveTxtBtn.append("Save TXT");
+		saveTxtBtn.click(function() {
+			console.log("save txt!");
+		});
 		
 		// export checkboxes
 		var exportCheckboxes = $("<div class='export_checkboxes flex_horizontal'>").appendTo(exportControls);
