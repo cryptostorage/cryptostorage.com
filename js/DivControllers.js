@@ -2953,14 +2953,10 @@ function ExportController(div, window, config) {
 		var dropdownContent = $("<div id='dropdownContent' class='dropdown-content'>").appendTo(moreDropdown);
 		var saveCsvBtn = $("<div class='export_button dropdown_export_button'>").appendTo(dropdownContent);
 		saveCsvBtn.append("Export to CSV");
-		saveCsvBtn.click(function() {
-			console.log("save csv!");
-		});
+		saveCsvBtn.click(function() { saveCsv(); });
 		var saveTxtBtn = $("<div class='export_button dropdown_export_button'>").appendTo(dropdownContent);
 		saveTxtBtn.append("Export to TXT");
-		saveTxtBtn.click(function() {
-			console.log("save txt!");
-		});
+		saveTxtBtn.click(function() { saveTxt(); });
 		
 		// export checkboxes
 		var exportCheckboxes = $("<div class='export_checkboxes flex_horizontal'>").appendTo(exportControls);
@@ -3239,6 +3235,20 @@ function ExportController(div, window, config) {
 	}
 	
 	/**
+	 * Saves CSV.
+	 */
+	function saveCsv() {
+		console.log("saveCsv()");
+	}
+	
+	/**
+	 * Saves TXT.
+	 */
+	function saveTxt() {
+		console.log("saveTxt()");
+	}
+	
+	/**
 	 * Returns a control state that is completely enabled/disabled depending on the given boolean.
 	 * 
 	 * @param bool specifies if all states are enabled or disabled
@@ -3248,6 +3258,7 @@ function ExportController(div, window, config) {
 			saveAll: bool,
 			printAll: bool,
 			savePublic: bool,
+			more: bool,
 			checkboxes: bool,
 			paginator: bool
 		};
