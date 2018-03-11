@@ -3172,14 +3172,6 @@ function ExportController(div, window, config) {
 		};
 	}
 	
-	function printAll() {
-		if (!controlState.printAll) return;
-		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this printed document because the private keys are not included.\n\nContinue?")) {
-			saved = true;
-			window.print();
-		}
-	}
-	
 	/**
 	 * Caches the file and name for Save All.
 	 * 
@@ -3213,13 +3205,24 @@ function ExportController(div, window, config) {
 	}
 	
 	/**
-	 * Saves all pieces.
+	 * Save all.
 	 */
 	function saveAll() {
 		if (!controlState.saveAll) return;
 		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this saved file because the private keys are not included.\n\nContinue?")) {
 			saved = true;
 			saveAs(saveBlob, saveName);
+		}
+	}
+	
+	/**
+	 * Print all.
+	 */
+	function printAll() {
+		if (!controlState.printAll) return;
+		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this printed document because the private keys are not included.\n\nContinue?")) {
+			saved = true;
+			window.print();
 		}
 	}
 	
@@ -3235,14 +3238,14 @@ function ExportController(div, window, config) {
 	}
 	
 	/**
-	 * Saves CSV.
+	 * Save CSV.
 	 */
 	function saveCsv() {
 		console.log("saveCsv()");
 	}
 	
 	/**
-	 * Saves TXT.
+	 * Save TXT.
 	 */
 	function saveTxt() {
 		console.log("saveTxt()");
