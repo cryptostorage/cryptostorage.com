@@ -2109,7 +2109,7 @@ function ImportFileController(div) {
 				onNamedPieces(null, [namedPiece]);
 			}
 			else if (isZipFile(file)) {
-				AppUtils.zipToPieces(data, function(namedPieces) {
+				AppUtils.jsonZipToPieces(data, function(namedPieces) {
 					onNamedPieces(null, namedPieces);
 				});
 			}
@@ -3199,10 +3199,24 @@ function ExportController(div, window, config) {
 			exportFiles.txtName = name + ".txt";
 			onDone();
 		} else {
-			AppUtils.piecesToZip(transformedPieces, function(blob) {
+			
+			// json zip
+			AppUtils.piecesToZip(transformedPieces, "json", function(blob) {
 				exportFiles.saveAllBlob = blob;
-				exportFiles.saveAllName = exportFiles.saveAllName + ".zip";
-				onDone();
+				exportFiles.saveAllName = name + ".zip";
+				
+				// csv zip
+				AppUtils.piecesToZip(transformedPieces, "csv", function(blob) {
+					exportFiles.csvBlob = blob;
+					exportFiles.csvName = name + "_csv.zip";
+					
+					// txt zip
+					AppUtils.piecesToZip(transformedPieces, "txt", function(blob) {
+						exportFiles.txtBlob = blob;
+						exportFiles.txtName = name + "_txt.zip";
+						onDone();
+					});
+				});		
 			});
 		}
 	}

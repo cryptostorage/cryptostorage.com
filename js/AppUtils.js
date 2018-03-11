@@ -783,24 +783,39 @@ var AppUtils = {
 
 		return keys;
 	},
-
+	
 	/**
-	 * Zips the given pieces.
+	 * Creates a zip with the given pieces.
 	 * 
 	 * @param pieces are the pieces to zip
-	 * @param callback(blob) is invoked when zipping is complete
+	 * @param zipType specifies the file contents of the zip: json | csv | txt
+	 * @param onDone(blob) is called when zipping is complete
 	 */
-	piecesToZip: function(pieces, callback) {
+	piecesToZip: function(pieces, zipType, callback) {
 		assertTrue(pieces.length > 0, "Pieces cannot be empty");
 		
 		// get common ticker
 		var ticker = AppUtils.getCommonTicker(pieces[0]).toLowerCase();
 		
+		// get extension and transform function
+		var extension;
+		var transformFunc;
+		if (zipType === "json") {
+			extension = ".json";
+			transformFunc = AppUtils.pieceToJson;
+		} else if (zipType === "csv") {
+			extension = ".csv";
+			transformFunc = AppUtils.pieceToCsv;
+		} else if (zipType === "txt") {
+			extension = ".txt";
+			transformFunc = AppUtils.pieceToTxt;
+		} else throw new Error("Invalid zip type: " + zipType);
+
 		// prepare zip
 		var zip = JSZip();
 		for (var i = 0; i < pieces.length; i++) {
 			var name = "cryptostorage_" + ticker + (pieces.length > 1 ? "_piece_" + (i + 1) : "");
-			zip.file(name + ".json", AppUtils.pieceToJson(pieces[i]));
+			zip.file(name + extension, transformFunc(pieces[i]));
 		}
 		
 		// create zip
@@ -815,7 +830,7 @@ var AppUtils = {
 	 * @param blob is the raw zip data
 	 * @param onPieces(namedPieces) is called when all pieces have been extracted
 	 */
-	zipToPieces: function(blob, onPieces) {
+	jsonZipToPieces: function(blob, onPieces) {
 		
 		// load zip asynchronously
 		JSZip.loadAsync(blob).then(function(zip) {
@@ -865,7 +880,7 @@ var AppUtils = {
 		function getZipCallbackFunction(zipObject) {
 			return function(callback) {
 				zipObject.async("blob").then(function(blob) {
-					AppUtils.zipToPieces(blob, function(pieces) {
+					AppUtils.jsonZipToPieces(blob, function(pieces) {
 						callback(null, pieces);
 					});
 				});
