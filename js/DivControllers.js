@@ -3188,6 +3188,9 @@ function ExportController(div, window, config) {
 			transformedPieces.push(AppUtils.transformPiece(pieces[i], config));
 		}
 		
+		// TODO: finish this
+		throw new Error("not implemented");
+		
 		// generate json or zip for save button
 		exportFiles.saveAllName = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
 		if (pieces.length === 1) {
@@ -3240,14 +3243,22 @@ function ExportController(div, window, config) {
 	 * Save CSV.
 	 */
 	function saveCsv() {
-		console.log("saveCsv()");
+		if (!controlState.more) return;
+		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this saved file because the private keys are not included.\n\nContinue?")) {
+			saved = true;
+			saveAs(exportFiles.saveCsvBlob, exportFiles.saveCsvName);
+		}
 	}
 	
 	/**
 	 * Save TXT.
 	 */
 	function saveTxt() {
-		console.log("saveTxt()");
+		if (!controlState.more) return;
+		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this saved file because the private keys are not included.\n\nContinue?")) {
+			saved = true;
+			saveAs(exportFiles.saveTxtBlob, exportFiles.saveTxtName);
+		}
 	}
 	
 	/**
