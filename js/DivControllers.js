@@ -2908,8 +2908,7 @@ function ExportController(div, window, config) {
 	var publicAvailable;
 	var privateAvailable;
 	var quickGenerate = isQuickGenerate();	// only show notice bar and key pair when completely done if quick generate
-	var saveBlob;														// cached blob to save when Save All clicked
-	var saveName;														// cached name to save when Save All clicked
+	var exportFiles = {};										// cached file blobs and names for saving
 	var controlState;												// tracks enable/disable state of control elements
 	
 	// confirm exit if storage not saved or printed
@@ -3173,12 +3172,12 @@ function ExportController(div, window, config) {
 	}
 	
 	/**
-	 * Caches the file and name for Save All.
+	 * Caches file content and names for saving.
 	 * 
 	 * @param pieces are the pieces to transform and save per the configuration
 	 * @param onDone() is invoked when ready
 	 */
-	function prepareSaveAll(pieces, onDone) {
+	function prepareExportFiles(pieces, onDone) {
 		assertInitialized(pieces);
 		assertTrue(pieces.length > 0);
 		
@@ -3190,15 +3189,15 @@ function ExportController(div, window, config) {
 		}
 		
 		// generate json or zip for save button
-		saveName = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
+		exportFiles.saveAllName = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
 		if (pieces.length === 1) {
-			saveBlob = new Blob([AppUtils.pieceToJson(transformedPieces[0])], {type: "text/plain;charset=utf-8"});
-			saveName = saveName + ".json";
+			exportFiles.saveAllBlob = new Blob([AppUtils.pieceToJson(transformedPieces[0])], {type: "text/plain;charset=utf-8"});
+			exportFiles.saveAllName = exportFiles.saveAllName + ".json";
 			onDone();
 		} else {
 			AppUtils.piecesToZip(transformedPieces, function(blob) {
-				saveBlob = blob;
-				saveName = saveName + ".zip";
+				exportFiles.saveAllBlob = blob;
+				exportFiles.saveAllName = exportFiles.saveAllName + ".zip";
 				onDone();
 			});
 		}
@@ -3211,7 +3210,7 @@ function ExportController(div, window, config) {
 		if (!controlState.saveAll) return;
 		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this saved file because the private keys are not included.\n\nContinue?")) {
 			saved = true;
-			saveAs(saveBlob, saveName);
+			saveAs(exportFiles.saveAllBlob, exportFiles.saveAllName);
 		}
 	}
 	
@@ -3400,7 +3399,7 @@ function ExportController(div, window, config) {
 			//setVisiblePiece(config.pieceDivs, paginator ? paginator.pagination('getSelectedPageNum') - 1 : 0);
 			setPieceDivs(config.pieceDivs);
 			makePieceDivsCopyable(config.pieceDivs);
-			prepareSaveAll(config.pieces, function() {
+			prepareExportFiles(config.pieces, function() {
 				setControlsEnabled(true);
 				if (onDone) onDone();
 			});
@@ -3419,7 +3418,7 @@ function ExportController(div, window, config) {
 				state.printAll = false;
 				state.paginator = false;
 				setControlsEnabled(state);
-				prepareSaveAll(config.pieces, function() {
+				prepareExportFiles(config.pieces, function() {
 					if (lastRenderer) lastRenderer.cancel();
 					lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getExportConfig());
 					lastRenderer.render(null, function(err, pieceDivs) {
