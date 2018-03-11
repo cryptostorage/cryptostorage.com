@@ -188,6 +188,7 @@ var AppUtils = {
 			"lib/pagination.js",
 			"js/PieceRenderer.js",
 			"lib/qrcode.js",
+			"lib/jquery-csv.js",
 			"lib/jszip.js",
 			"lib/FileSaver.js",
 			"lib/crypto-js.js",
@@ -903,6 +904,25 @@ var AppUtils = {
 		return JSON.stringify(piece);
 	},
 	
+	pieceToTxt: function(piece) {
+		var str = "";
+		for (var i = 0; i < piece.keys.length; i++) {
+			str += "===== #" + (i + 1) + " " + AppUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
+			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n\n";
+			if (piece.keys[i].wif) str += "Private Key " + (piece.pieceNum ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
+		}
+		return str.trim();
+	},
+	
+	pieceToAddresses: function(piece) {
+		var str = "";
+		for (var i = 0; i < piece.keys.length; i++) {
+			str += "===== #" + (i + 1) + " " + AppUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
+			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + (piece.keys[i].address !== AppUtils.NA ? "\n" + piece.keys[i].address : "") + "\n\n";
+		}
+		return str.trim();
+	},
+	
 	/**
 	 * Transforms the given piece according to the given configuration.
 	 * 
@@ -928,25 +948,6 @@ var AppUtils = {
 				showPrivate: true
 			}
 		}
-	},
-
-	pieceToStr: function(piece) {
-		var str = "";
-		for (var i = 0; i < piece.keys.length; i++) {
-			str += "===== #" + (i + 1) + " " + AppUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
-			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n\n";
-			if (piece.keys[i].wif) str += "Private Key " + (piece.pieceNum ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
-		}
-		return str.trim();
-	},
-	
-	pieceToAddresses: function(piece) {
-		var str = "";
-		for (var i = 0; i < piece.keys.length; i++) {
-			str += "===== #" + (i + 1) + " " + AppUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
-			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + (piece.keys[i].address !== AppUtils.NA ? "\n" + piece.keys[i].address : "") + "\n\n";
-		}
-		return str.trim();
 	},
 
 	/**

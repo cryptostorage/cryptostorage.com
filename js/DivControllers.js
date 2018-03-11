@@ -3188,14 +3188,15 @@ function ExportController(div, window, config) {
 			transformedPieces.push(AppUtils.transformPiece(pieces[i], config));
 		}
 		
-		// TODO: finish this
-		throw new Error("not implemented");
-		
-		// generate json or zip for save button
-		exportFiles.saveAllName = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
+		// generate exports
+		var name = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
 		if (pieces.length === 1) {
 			exportFiles.saveAllBlob = new Blob([AppUtils.pieceToJson(transformedPieces[0])], {type: "text/plain;charset=utf-8"});
-			exportFiles.saveAllName = exportFiles.saveAllName + ".json";
+			exportFiles.saveAllName = name + ".json";
+			exportFiles.csvBlob = new Blob([AppUtils.pieceToCsv(transformedPieces[0])], {type: "text/plain;charset=utf-8"});
+			exportFiles.csvName = name + ".csv";
+			exportFiles.txtBlob = new Blob([AppUtils.pieceToTxt(transformedPieces[0])], {type: "text/plain;charset=utf-8"});
+			exportFiles.txtName = name + ".txt";
 			onDone();
 		} else {
 			AppUtils.piecesToZip(transformedPieces, function(blob) {
@@ -3246,7 +3247,7 @@ function ExportController(div, window, config) {
 		if (!controlState.more) return;
 		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this saved file because the private keys are not included.\n\nContinue?")) {
 			saved = true;
-			saveAs(exportFiles.saveCsvBlob, exportFiles.saveCsvName);
+			saveAs(exportFiles.csvBlob, exportFiles.csvName);
 		}
 	}
 	
@@ -3257,7 +3258,7 @@ function ExportController(div, window, config) {
 		if (!controlState.more) return;
 		if (getExportConfig().showPrivate || confirm("Funds CANNOT be recovered from this saved file because the private keys are not included.\n\nContinue?")) {
 			saved = true;
-			saveAs(exportFiles.saveTxtBlob, exportFiles.saveTxtName);
+			saveAs(exportFiles.txtBlob, exportFiles.txtName);
 		}
 	}
 	
