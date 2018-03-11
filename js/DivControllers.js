@@ -2895,6 +2895,8 @@ function ExportController(div, window, config) {
 	var printButton;
 	var savePublicButton;
 	var moreButton;
+	var moreButtonImg;
+	var moreDropdownContent;
 	var showPublicCheckbox;
 	var showPrivateCheckbox;
 	var showLogosCheckbox;
@@ -2941,20 +2943,18 @@ function ExportController(div, window, config) {
 		// more dropdown
 		var moreDropdown = $("<div class='dropdown'>").appendTo(exportButtons);
 		moreButton = $("<div class='export_button dropbtn flex_vertical'>").appendTo(moreDropdown);
-		moreButton.append("<img src='img/share.png' class='export_more_img'>");
-		moreButton.click(function(e) {
-			dropdownContent.toggleClass("show");
-		});
-		var dropdownContent = $("<div id='dropdownContent' class='dropdown-content'>").appendTo(moreDropdown);
-		var saveCsvBtn = $("<div class='export_button dropdown_export_button'>").appendTo(dropdownContent);
+		moreButtonImg = $("<img src='img/share.png' class='export_more_img'>");
+		moreButton.append(moreButtonImg);
+		moreDropdownContent = $("<div id='dropdownContent' class='dropdown-content'>").appendTo(moreDropdown);
+		var saveCsvBtn = $("<div class='export_button dropdown_export_button'>").appendTo(moreDropdownContent);
 		saveCsvBtn.append("Export to CSV");
 		saveCsvBtn.click(function() { saveCsv(); });
-		var saveTxtBtn = $("<div class='export_button dropdown_export_button'>").appendTo(dropdownContent);
+		var saveTxtBtn = $("<div class='export_button dropdown_export_button'>").appendTo(moreDropdownContent);
 		saveTxtBtn.append("Export to TXT");
 		saveTxtBtn.click(function() { saveTxt(); });
 		window.onclick = function(event) { // close the dropdown if user clicks outside
 		  if (!event.target.matches('.dropbtn') && !event.target.matches('.export_more_img')) {
-		  	dropdownContent.removeClass('show');
+		  	moreDropdownContent.removeClass('show');
 		  }
 		}
 		
@@ -3321,6 +3321,21 @@ function ExportController(div, window, config) {
 			} else {
 				savePublicButton.addClass("export_button_disabled");
 				savePublicButton.removeClass("export_button");
+			}
+		}
+		
+		// more button
+		if (isInitialized(state.more)) {
+			moreButton.unbind("click");
+			if (state.more) {
+				moreButton.addClass("export_button dropbtn");
+				moreButton.removeClass("export_button_disabled");
+				moreButton.click(function(e) { moreDropdownContent.toggleClass("show"); });
+				moreButtonImg.removeClass('export_more_img_disabled');
+			} else {
+				moreButton.addClass("export_button_disabled dropbtn");
+				moreButton.removeClass("export_button");
+				moreButtonImg.addClass('export_more_img_disabled');
 			}
 		}
 		

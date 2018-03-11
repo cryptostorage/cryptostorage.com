@@ -1790,14 +1790,15 @@ input[type='checkbox'][disabled] +label {
 	padding: 0px 10px 0px 10px;
 	margin: 0 10px 0 10px;
 }
-.dropbtn:active {
-	background-color: #ABB2B9;
-}
 
 .export_more_img {
 	width:40px;
 	margin-right: -5px;
 	margin-top: -5px;
+}
+
+.export_more_img_disabled {
+	opacity: .5;
 }
 
 .show {display:block;}
