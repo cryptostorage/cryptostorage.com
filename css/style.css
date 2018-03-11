@@ -1793,8 +1793,7 @@ input[type='checkbox'][disabled] +label {
 
 .export_more_img {
 	width:40px;
-	margin-right: -5px;
-	margin-top: -5px;
+	margin: -5px 0px 0px 5px;
 }
 
 .export_more_img_disabled {
