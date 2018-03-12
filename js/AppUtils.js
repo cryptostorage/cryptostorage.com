@@ -906,7 +906,7 @@ var AppUtils = {
 			var key = piece.keys[i];
 			var csvKey = [];
 			for (var prop in key) {
-				csvKey.push(isInitialized(key[prop]) ? key[prop] : "");
+				csvKey.push(isInitialized(key[prop]) ? key[prop] : "NULL");
 			}
 			csvArr.push(csvKey);
 		}
