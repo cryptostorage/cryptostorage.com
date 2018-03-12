@@ -80,6 +80,9 @@ var Tests = {
 				// test key parsing
 				testParseKey(plugins);
 				
+				// test piece conversion
+				testPieceConversion(plugins);
+				
 				// test split and combine
 				for (var i = 0; i < plugins.length; i++) testSplitAndCombine(plugins[i]);
 				
@@ -903,6 +906,33 @@ function testGenerateKeys(plugins, onDone) {
 					return AppUtils.keysToPieces(keys, numPieces, minPieces);
 				}
 			});
+		}
+		
+		function testPieceConversion(plugins) {
+			
+			// generate keys
+			
+			
+			// generate keys
+			var keys = [];
+			for (var i = 0; i < plugins.length; i++) {
+				keys.push(plugins[i].newKey());
+			}
+			
+			// convert keys to piece
+			var piece = AppUtils.keysToPieces(keys)[0];
+			
+			// test csv conversion
+			var csv = AppUtils.pieceToCsv(piece);
+			var piece2 = AppUtils.csvToPiece(csv);
+			console.log(piece);
+			console.log(piece2);
+			assertEquals(piece, piece2);
+			
+			// test txt conversion
+			var txt = AppUtils.pieceToTxt(piece);
+			piece2 = AppUtils.txtToPiece(txt);
+			assertEquals(piece, piece2);
 		}
 	}
 }

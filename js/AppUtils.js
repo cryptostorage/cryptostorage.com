@@ -42,8 +42,8 @@ var AppUtils = {
 	// app constants
 	VERSION: "0.2.0",
 	VERSION_POSTFIX: " beta",
-	RUN_MIN_TESTS: true,
-	RUN_FULL_TESTS: false,
+	RUN_MIN_TESTS: false,
+	RUN_FULL_TESTS: true,
 	DEV_MODE: false,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
@@ -888,6 +888,12 @@ var AppUtils = {
 		}
 	},
 
+	/**
+	 * Converts a piece to CSV.
+	 * 
+	 * @param piece is the piece to convert
+	 * @returns a CSV-formatted string
+	 */
 	pieceToCsv: function(piece) {
 		assertTrue(piece.keys.length > 0);
 		
@@ -913,6 +919,33 @@ var AppUtils = {
 	
 		// convert array to csv
 		return arrToCsv(csvArr);
+	},
+	
+	/**
+	 * Converts a CSV-formatted string to a piece.
+	 * 
+	 * @param csv is the CSV-formatted string to convert
+	 * @returns piece is the piece converted from the CSV
+	 */
+	csvToPiece: function(csv) {
+		
+		// convert csv to array
+		var arr = csvToArr(csv);
+		
+		// build piece from array
+		var piece = {};
+		piece.version = AppUtils.VERSION;
+		piece.keys = [];
+		for (var row = 1; row < arr.length; row++) {
+			var key = {};
+			piece.keys.push(key);
+			for (var col = 0; col < arr[0].length; col++) {
+				var val = arr[row][col];
+				val = val.toLowerCase() === "null" ? null : val;
+				key[arr[0][col].toLowerCase()] = val;
+			}
+		}
+		return piece;
 	},
 	
 	pieceToJson: function(piece, config) {
