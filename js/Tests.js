@@ -925,8 +925,6 @@ function testGenerateKeys(plugins, onDone) {
 			// test csv conversion
 			var csv = AppUtils.pieceToCsv(piece);
 			var piece2 = AppUtils.csvToPiece(csv);
-			console.log(piece);
-			console.log(piece2);
 			assertEquals(piece, piece2);
 			
 			// test txt conversion

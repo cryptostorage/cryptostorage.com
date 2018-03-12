@@ -1335,6 +1335,7 @@ function FormController(div) {
 	
 	// handle when generate button clicked
 	function onGenerate(onDone) {
+		console.log("onGenerate()");
 		validateForm(true);
 		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", {keyGenConfig: getConfig(), confirmExit: true});
 		if (onDone) onDone();
@@ -1478,7 +1479,7 @@ function FormController(div) {
 	}
 	
 	function hasFormErrors() {
-		return formErrors.environment || formErrors.currencyInputs || formErrors.passphrase || formErrors.split;
+		return (formErrors.environment && !AppUtils.DEV_MODE) || formErrors.currencyInputs || formErrors.passphrase || formErrors.split;
 	}
 	
 	function validateForm(validateCurrencySelection) {
