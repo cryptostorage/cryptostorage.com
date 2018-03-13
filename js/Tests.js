@@ -81,29 +81,30 @@ var Tests = {
 				testParseKey(plugins);
 				
 				// test piece conversion
-				testPieceConversion(plugins);
-				
-				// test split and combine
-				for (var i = 0; i < plugins.length; i++) testSplitAndCombine(plugins[i]);
-				
-				// test invalid pieces
-				if (plugins.length > 1) testInvalidPiecesToKeys(plugins);
-				
-				// test key generation
-				testGenerateKeys(plugins, function(err) {
-					if (err) {
-						if (callback) callback(err);
-						return;
-					}
+				testPieceConversion(plugins, function() {
 					
-					// test individual plugins
-					if (Tests.TEST_PLUGINS) {
-						testCryptoPlugins(plugins, function(error) {
-							if (callback) callback(error);
-						});
-					} else {
-						if (callback) callback();
-					}
+					// test split and combine
+					for (var i = 0; i < plugins.length; i++) testSplitAndCombine(plugins[i]);
+					
+					// test invalid pieces
+					if (plugins.length > 1) testInvalidPiecesToKeys(plugins);
+					
+					// test key generation
+					testGenerateKeys(plugins, function(err) {
+						if (err) {
+							if (callback) callback(err);f
+							return;
+						}
+						
+						// test individual plugins
+						if (Tests.TEST_PLUGINS) {
+							testCryptoPlugins(plugins, function(error) {
+								if (callback) callback(error);
+							});
+						} else {
+							if (callback) callback();
+						}
+					});
 				});
 			});
 		});
@@ -908,29 +909,46 @@ function testGenerateKeys(plugins, onDone) {
 			});
 		}
 		
-		function testPieceConversion(plugins) {
+		function testPieceConversion(plugins, onDone) {
 			
-			// generate keys
+			console.log("testPieceConversion()");
 			
-			
-			// generate keys
-			var keys = [];
+			// generate unsplit piece
+			var config = {};
+			config.currencies = [];
 			for (var i = 0; i < plugins.length; i++) {
-				keys.push(plugins[i].newKey());
+				config.currencies.push({
+					ticker: plugins[i].getTicker(),
+					numKeys: 1,
+					encryption: null
+				})
 			}
+			AppUtils.generateKeys(config, null, function(err, keys, pieces) {
+				assertUninitialized(err);
+				assertEquals(1, pieces.length);
+				testConversion(pieces[0]);
+				
+				// generate split pieces
+				config.NUM_PIECES = Tests.NUM_PIECES;
+				config.MIN_PIECES = Tests.MIN_PIECES;
+				AppUtils.generateKeys(config, null, function(err, keys, pieces) {
+					assertUninitialized(err);
+					for (var i = 0; i < pieces.length; i++) testConversion(pieces[i]);
+				});
+			});
 			
-			// convert keys to piece
-			var piece = AppUtils.keysToPieces(keys)[0];
-			
-			// test csv conversion
-			var csv = AppUtils.pieceToCsv(piece);
-			var piece2 = AppUtils.csvToPiece(csv);
-			assertEquals(piece, piece2);
-			
-			// test txt conversion
-			var txt = AppUtils.pieceToTxt(piece);
-			piece2 = AppUtils.txtToPiece(txt);
-			assertEquals(piece, piece2);
+			function testConversion(piece) {
+				
+				// test csv conversion
+				var csv = AppUtils.pieceToCsv(piece);
+				var piece2 = AppUtils.csvToPiece(csv);
+				assertEquals(piece, piece2);
+				
+				// test txt conversion
+				var txt = AppUtils.pieceToTxt(piece);
+				piece2 = AppUtils.txtToPiece(txt);
+				assertEquals(piece, piece2);
+			}
 		}
 	}
 }

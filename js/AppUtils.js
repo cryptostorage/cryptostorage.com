@@ -1120,7 +1120,7 @@ var AppUtils = {
 				assertDefined(config.currencies[i].encryption);
 				if (isInitialized(config.currencies[i].encryption)) encryptionInitialized = true;
 			}
-			assertInitialized(config.numPieces);
+			if (!config.numPieces) config.numPieces = 1;
 			if (encryptionInitialized) assertInitialized(config.passphrase);
 		} catch (err) {
 			onDone(err);
