@@ -160,7 +160,7 @@ var AppUtils = {
 		return dependencies;
 	},
 	
-	getExportJs: function() {
+	getInitialExportDependencies: function() {
 		return [
 			"lib/jquery-3.2.1.js",
 			"lib/async.js",
@@ -171,18 +171,13 @@ var AppUtils = {
 			"js/DivControllers.js",
 			"js/CryptoPlugins.js",
 			"js/BodyExporter.js",
-			"lib/pagination.js"
+			"lib/pagination.js",
+			"css/style.css",
+			"css/pagination.css",
 		];
 	},
-	
-	getExportCss: function() {
-		return [
-			"css/style.css",
-			"css/pagination.css"
-		]
-	},
 
-	getExportDependencies: function() {
+	getDynamicExportDependencies: function() {
 		var dependencies = [
 			"css/pagination.css",
 			"lib/pagination.js",
@@ -253,13 +248,14 @@ var AppUtils = {
 			"img/checkmark.png",
 			"img/drag_and_drop.png",
 			"img/bitpay.png",
-			"img/ethereumjs.png"
+			"img/ethereumjs.png",
+			"img/share.png"
 		];
 		
 		// add dependencies
 		dependencies = dependencies.concat(AppUtils.getCryptoDependencies());
 		dependencies = dependencies.concat(AppUtils.getNoticeDependencies());
-		dependencies = dependencies.concat(AppUtils.getExportDependencies());
+		dependencies = dependencies.concat(AppUtils.getDynamicExportDependencies());
 		
 		// return unique array
 		return toUniqueArray(dependencies);

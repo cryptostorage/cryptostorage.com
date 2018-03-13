@@ -766,24 +766,21 @@ function getInternalStyleSheetText() {
  * 
  * @param div is the div to embed within the document's body (optional)
  * @param title is the title of the tab (optional)
- * @param jsPaths are paths to javascript files (optional)
- * @param cssPaths are paths to css files (optional)
+ * @param dependencyPaths are js, css, or img to import (optional)
  * @param internalCss are css rules to embed within the document's style (optional)
  * @returns str is the document string
  */
-function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
+function buildHtmlDocument(div, title, dependencyPaths, internalCss) {
 	var str = "<!DOCTYPE HTML>";
 	str += "<html><head>" + (title ? "<title>" + title + "</title>" : "") + (internalCss ? "<style>" + internalCss + "</style>" : "");
-	if (jsPaths) {
-		jsPaths = listify(jsPaths);
-		for (var i = 0; i < jsPaths.length; i++) {
-			str += "<script src='" + jsPaths[i] + "'></script>";
-		}
-	}
-	if (cssPaths) {
-		cssPaths = listify(cssPaths);
-		for (var i = 0; i < cssPaths.length; i++) {
-			str += "<link rel='stylesheet' type='text/css' href='" + cssPaths[i] + "'/>";
+	if (dependencyPaths) {
+		dependencyPaths = listify(dependencyPaths);
+		for (var i = 0; i < dependencyPaths.length; i++) {
+			var dependencyPath = dependencyPaths[i];
+			if (dependencyPath.endsWith(".js")) str += "<script src='" + dependencyPath + "'></script>";
+			else if (dependencyPath.endsWith(".css")) str += "<link rel='stylesheet' type='text/css' href='" + dependencyPath + "'/>";
+			else if (dependencyPath.endsWith(".png") || dependencyPath.endsWith(".img"))  str += "<img src='" + dependencyPath + "'>";
+			else throw new Error("Unrecognized dependency path extension: " + dependencyPath);			
 		}
 	}
 	str += "</head><body>";
@@ -797,12 +794,11 @@ function buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss) {
  * 
  * @param div is the jquery div to render to (optional)
  * @param title is the title of the new tab (optional)
- * @param jsPaths are javascript paths to import (optional)
- * @param cssPaths are css paths to import (optional)
+ * @param dependencyPaths are js, css, or img paths to import (optional)
  * @param internalCss is css to embed in the html document (optional)
  * @param onLoad(err, window) is invoked with a reference to the window when available
  */
-function newWindow(div, title, jsPaths, cssPaths, internalCss, onLoad) {
+function newWindow(div, title, dependencyPaths, internalCss, onLoad) {
 	var onLoadCalled = false;
 	var w = window.open();
 	if (!isInitialized(w) || !isInitialized(w.document)) {
@@ -810,7 +806,7 @@ function newWindow(div, title, jsPaths, cssPaths, internalCss, onLoad) {
 		return;
 	}
 	w.opener = null;
-	w.document.write(buildHtmlDocument(div, title, jsPaths, cssPaths, internalCss));
+	w.document.write(buildHtmlDocument(div, title, dependencyPaths, internalCss));
 	w.addEventListener('load', function() {
 		onLoadOnce(null, w);
 	});

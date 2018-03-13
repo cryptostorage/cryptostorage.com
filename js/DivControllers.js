@@ -80,7 +80,7 @@ var UiUtils = {
 		if (!isInitialized(config.showNotices)) config.showNotices = true;
 		
 		// open tab
-		newWindow(null, browserTabName, AppUtils.getExportJs(), AppUtils.getExportCss(), getInternalStyleSheetText(), function(err, window) {
+		newWindow(null, browserTabName, AppUtils.getInitialExportDependencies(), getInternalStyleSheetText(), function(err, window) {
 			
 			// check for error
 			if (err) {
@@ -3052,7 +3052,7 @@ function ExportController(div, window, config) {
 		this.render = function(onDone) {
 			
 			// load export dependencies
-			LOADER.load(AppUtils.getExportDependencies(), function(err) {
+			LOADER.load(AppUtils.getDynamicExportDependencies(), function(err) {
 				if (err) throw err;
 
 				// notices
