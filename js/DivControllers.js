@@ -3232,7 +3232,7 @@ function ExportController(div, window, config) {
 						exportFiles.txtName = name + "_txt.zip";
 						onDone();
 					});
-				});		
+				});
 			});
 		}
 	}
