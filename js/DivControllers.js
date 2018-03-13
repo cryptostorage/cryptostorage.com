@@ -1895,7 +1895,7 @@ function ImportFileController(div) {
 		dragDropBrowse.append("or click to browse");
 		
 		// register browse link with hidden input
-		inputFiles = $("<input type='file' multiple accept='.json,.zip'>").appendTo(dragDropDiv);
+		inputFiles = $("<input type='file' multiple accept='.json,.csv,.zip'>").appendTo(dragDropDiv);
 		inputFiles.change(function() { onFilesImported($(this).get(0).files); });
 		inputFiles.hide();
 		dragDropBrowse.click(function() {
@@ -2085,19 +2085,22 @@ function ImportFileController(div) {
 					}
 					else if (namedPieces.length === 0) {
 						if (isJsonFile(file)) that.setWarning("File '" + file.name + "' is not a valid json piece");
-						else if (isZipFile(file)) that.setWarning("Zip '" + file.name + "' does not contain any valid json pieces");
+						if (isCsvFile(file)) that.setWarning("File '" + file.name + "' is not a valid csv piece");
+						else if (isZipFile(file)) that.setWarning("Zip '" + file.name + "' does not contain any valid pieces");
 						else throw new Error("Unrecognized file type: " + file.type);
 					} else {
 						onNamedPieces(null, namedPieces);
 					}
 				});
 			}
-			if (isJsonFile(file)) reader.readAsText(file);
+			if (isJsonFile(file) || isCsvFile(file)) reader.readAsText(file);
 			else if (isZipFile(file)) reader.readAsArrayBuffer(file);
-			else that.setWarning("File is not a zip or json file");
+			else that.setWarning("File is not a json, csv, or zip file");
 		}
 		
 		function getNamedPiecesFromFile(file, data, onNamedPieces) {
+			
+			// handle json file
 			if (isJsonFile(file)) {
 				var piece;
 				try {
@@ -2108,8 +2111,21 @@ function ImportFileController(div) {
 				var namedPiece = {name: file.name, piece: piece};
 				onNamedPieces(null, [namedPiece]);
 			}
+			
+			// handle csv file
+			else if (isCsvFile(file)) {
+				try {
+					piece = AppUtils.csvToPiece(data);
+				} catch (err) {
+					onNamedPieces(Error("'" + file.name + "' is not valid piece CSV"));
+				}
+				var namedPiece = {name: file.name, piece: piece};
+				onNamedPieces(null, [namedPiece]);
+			}
+			
+			// handle zip file
 			else if (isZipFile(file)) {
-				AppUtils.jsonZipToPieces(data, function(namedPieces) {
+				AppUtils.zipToPieces(data, function(namedPieces) {
 					onNamedPieces(null, namedPieces);
 				});
 			}

@@ -900,6 +900,16 @@ function isJsonFile(file) {
 }
 
 /**
+ * Determines if the given file is a csv file.
+ * 
+ * @param file is a file
+ * @returns true if the given file is a csv file, false otherwise
+ */
+function isCsvFile(file) {
+	return file.name.endsWith(".csv") || file.type === 'text/csv';
+}
+
+/**
  * Fetches the given list of images.
  * 
  * Prerequisite: async.js.
