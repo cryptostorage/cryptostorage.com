@@ -904,7 +904,7 @@ var AppUtils = {
 	    	csvHeader.push(prop.toString().toUpperCase());
 	    }
 		}
-		csvHeader.push("PIECE_NUM");
+		if (piece.pieceNum) csvHeader.push("PIECE_NUM");
 		
 		// build csv
 		var csvArr = [];
@@ -915,7 +915,7 @@ var AppUtils = {
 			for (var prop in key) {
 				csvKey.push(isInitialized(key[prop]) ? key[prop] : "NULL");
 			}
-			csvKey.push(piece.pieceNum ? piece.pieceNum : "NULL");
+			if (piece.pieceNum) csvKey.push(piece.pieceNum ? piece.pieceNum : "NULL");
 			csvArr.push(csvKey);
 		}
 	
@@ -942,10 +942,12 @@ var AppUtils = {
 		for (var row = 1; row < arr.length; row++) {
 			
 			// collect piece num and validate across rows
-			var pieceNum = arr[row][pieceNumCol].toLowerCase();
-			pieceNum = pieceNum === "null" ? null : parseInt(pieceNum);
-			if (!isDefined(piece.pieceNum)) piece.pieceNum = pieceNum;
-			else if (piece.pieceNum !== pieceNum) throw new Error("Piece num at row " + (row + 1) + " does not match previous piece nums");
+			if (pieceNumCol >= 0) {
+				var pieceNum = arr[row][pieceNumCol].toLowerCase();
+				pieceNum = pieceNum === "null" ? null : parseInt(pieceNum);
+				if (!isDefined(piece.pieceNum)) piece.pieceNum = pieceNum;
+				else if (piece.pieceNum !== pieceNum) throw new Error("Piece num at row " + (row + 1) + " does not match previous piece nums");
+			}
 			
 			// collect pieces
 			var key = {};
