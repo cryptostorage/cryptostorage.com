@@ -243,6 +243,7 @@ var AppUtils = {
 			"img/loading.gif",
 			"img/information.png",
 			"img/trash.png",
+			"img/caution.png",
 			"img/qr_code.png",
 			"img/split_lines_2.png",
 			"img/split_lines_3.png",
