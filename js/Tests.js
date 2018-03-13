@@ -194,7 +194,7 @@ function testGenerateKeys(plugins, onDone) {
 				console.log("testGenerateKeys(" + plugin.getTicker() + ")");
 				
 				// get generation config
-				var config = getGenerateConfig(plugin);
+				var config = getKeyGenConfig(plugin);
 				
 				// generate keys
 				var progressReported = true;
@@ -209,10 +209,18 @@ function testGenerateKeys(plugins, onDone) {
 						return;
 					}
 					
-					// test progress and pieces
+					// test that progress was reported
 					assertEquals(lastProgress, 1);
+					
+					// test piece structure
 					assertEquals(config.numPieces, pieces.length);
 					assertEquals(config.numPieces, pieceDivs.length);
+					for (var i = 0; i < pieces.length; i++) {
+						assertEquals(AppUtils.VERSION, pieces[i].version);
+						assertEquals(i + 1, pieces[i].pieceNum);
+						assertInitialized(pieces[i].keys);
+						assertTrue(pieces[i].keys.length > 1);
+					}
 					
 					// test key structure
 					var keyIdx = 0;
@@ -241,7 +249,7 @@ function testGenerateKeys(plugins, onDone) {
 				});
 				
 				// build key generation configuration
-				function getGenerateConfig(plugin) {
+				function getKeyGenConfig(plugin) {
 					var config = {};
 					config.currencies = [];
 					config.passphrase = Tests.PASSPHRASE;
@@ -910,7 +918,6 @@ function testGenerateKeys(plugins, onDone) {
 		}
 		
 		function testPieceConversion(plugins, onDone) {
-			
 			console.log("testPieceConversion()");
 			
 			// generate unsplit piece
@@ -926,27 +933,21 @@ function testGenerateKeys(plugins, onDone) {
 			AppUtils.generateKeys(config, null, function(err, keys, pieces) {
 				assertUninitialized(err);
 				assertEquals(1, pieces.length);
-				testConversion(pieces[0]);
+				testCsvConversion(pieces[0]);
 				
 				// generate split pieces
-				config.NUM_PIECES = Tests.NUM_PIECES;
-				config.MIN_PIECES = Tests.MIN_PIECES;
+				config.numPieces = Tests.NUM_PIECES;
+				config.minPieces = Tests.MIN_PIECES;
 				AppUtils.generateKeys(config, null, function(err, keys, pieces) {
 					assertUninitialized(err);
-					for (var i = 0; i < pieces.length; i++) testConversion(pieces[i]);
+					for (var i = 0; i < pieces.length; i++) testCsvConversion(pieces[i]);
+					onDone();
 				});
 			});
 			
-			function testConversion(piece) {
-				
-				// test csv conversion
+			function testCsvConversion(piece) {
 				var csv = AppUtils.pieceToCsv(piece);
 				var piece2 = AppUtils.csvToPiece(csv);
-				assertEquals(piece, piece2);
-				
-				// test txt conversion
-				var txt = AppUtils.pieceToTxt(piece);
-				piece2 = AppUtils.txtToPiece(txt);
 				assertEquals(piece, piece2);
 			}
 		}
