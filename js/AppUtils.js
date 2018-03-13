@@ -899,7 +899,7 @@ var AppUtils = {
 		function getZipCallbackFunction(zipObject) {
 			return function(callback) {
 				zipObject.async("blob").then(function(blob) {
-					AppUtils.jsonZipToPieces(blob, function(pieces) {
+					AppUtils.zipToPieces(blob, function(pieces) {
 						callback(null, pieces);
 					});
 				});
