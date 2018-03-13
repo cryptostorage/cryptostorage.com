@@ -2105,22 +2105,22 @@ function ImportFileController(div) {
 				var piece;
 				try {
 					piece = JSON.parse(data);
+					var namedPiece = {name: file.name, piece: piece};
+					onNamedPieces(null, [namedPiece]);
 				} catch (err) {
 					onNamedPieces(Error("Could not parse JSON content from '" + file.name + "'"));
 				}
-				var namedPiece = {name: file.name, piece: piece};
-				onNamedPieces(null, [namedPiece]);
 			}
 			
 			// handle csv file
 			else if (isCsvFile(file)) {
 				try {
 					piece = AppUtils.csvToPiece(data);
+					var namedPiece = {name: file.name, piece: piece};
+					onNamedPieces(null, [namedPiece]);
 				} catch (err) {
 					onNamedPieces(Error("'" + file.name + "' is not valid piece CSV"));
 				}
-				var namedPiece = {name: file.name, piece: piece};
-				onNamedPieces(null, [namedPiece]);
 			}
 			
 			// handle zip file

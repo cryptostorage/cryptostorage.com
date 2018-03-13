@@ -830,7 +830,7 @@ var AppUtils = {
 	 * @param blob is the raw zip data
 	 * @param onPieces(namedPieces) is called when all pieces have been extracted
 	 */
-	jsonZipToPieces: function(blob, onPieces) {
+	zipToPieces: function(blob, onPieces) {
 		
 		// load zip asynchronously
 		JSZip.loadAsync(blob).then(function(zip) {
@@ -839,7 +839,7 @@ var AppUtils = {
 			var funcs = [];
 			zip.forEach(function(path, zipObject) {
 				if (path.startsWith("_")) return;
-				if (path.endsWith(".json")) {
+				if (path.endsWith(".json") || path.endsWith(".csv")) {
 					funcs.push(getPieceCallbackFunction(zipObject));
 				} else if (path.endsWith(".zip")) {
 					funcs.push(getZipCallbackFunction(zipObject));
@@ -865,13 +865,35 @@ var AppUtils = {
 			return function(onPiece) {
 				zipObject.async("string").then(function(str) {
 					var piece;
-					try {
-						piece = JSON.parse(str);
-						AppUtils.validatePiece(piece, true);
-					} catch (err) {
-						//throw err;
-						console.log(err);
+					
+					// handle json
+					if (zipObject.name.endsWith(".json")) {
+						try {
+							piece = JSON.parse(str);
+							AppUtils.validatePiece(piece, true);
+						} catch (err) {
+							//throw err;
+							console.log(err);
+						}
 					}
+					
+					// handle csv
+					else if (zipObject.name.endsWith(".csv")) {
+						try {
+							piece = AppUtils.csvToPiece(str);
+							AppUtils.validatePiece(piece, true);
+						} catch (err) {
+							//throw err;
+							console.log(err);
+						}
+					}
+					
+					// unexpected extension
+					else {
+						throw new Error("Unexpected path extension: " + path);
+					}
+					
+					// callback
 					onPiece(null, {name: zipObject.name, piece: piece});
 				});
 			}
