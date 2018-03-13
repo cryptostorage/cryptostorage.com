@@ -1383,7 +1383,7 @@ function FormController(div) {
 	function renderInteroperabilityDisclaimer(div, msg) {
 		div.empty();
 		div.addClass("interoperability_disclaimer flex_horizontal");
-		$("<img class='interoperability_caution' src='img/caution.png'>").appendTo(div);
+		$("<img class='interoperability_caution' src='img/caution_solid.png'>").appendTo(div);
 		var msgDiv = $("<div>").appendTo(div);
 		msg = "&nbsp;" + msg;
 		msgDiv.append(msg);
@@ -1931,7 +1931,7 @@ function ImportFileController(div) {
 		warningDiv.hide();
 		warningDiv.empty();
 		if (str) {
-			if (!img) img = $("<img src='img/warning.png'>");
+			if (!img) img = $("<img src='img/caution.png'>");
 			warningDiv.append(img);
 			img.addClass("import_warning_div_icon");
 			warningDiv.append(str);
@@ -2509,7 +2509,7 @@ function ImportTextController(div, plugins) {
 	function setWarning(str, img) {
 		warningDiv.empty();
 		if (str) {
-			if (!img) img = $("<img src='img/warning.png'>");
+			if (!img) img = $("<img src='img/caution.png'>");
 			warningDiv.append(img);
 			img.addClass("import_warning_div_icon");
 			warningDiv.append(str);
@@ -3073,7 +3073,7 @@ function ExportController(div, window, config) {
 					
 					// beta warning
 					var betaDiv = $("<div class='beta_warning flex_horizontal'>").appendTo(div);
-					betaDiv.append($("<img class='beta_icon' src='img/warning.png'>"));
+					betaDiv.append($("<img class='beta_icon' src='img/caution.png'>"));
 					betaDiv.append("<span style='text-align:center;'>Beta Version: Do not use with significant amounts until community-reviewed.");
 					
 					// progress bar
