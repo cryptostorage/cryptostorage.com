@@ -66,5 +66,5 @@ cryptostorage-v0.2.0-beta
 
 03/13/2018
 cryptostorage-v0.2.1-beta
-- Add support for csv and txt export
-- Indicate browser is not supported if tab fails to open
+- Added support for csv and txt export
+- Indicate that browser is not supported if tab fails to open
