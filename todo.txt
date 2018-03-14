@@ -1,5 +1,4 @@
 v0.2.2
-run minimum tests before page renders
 support json, csv as text input
 info box on currencies
 wording: keypairs and open source
