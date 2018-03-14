@@ -2541,33 +2541,8 @@ function ImportTextController(div, plugins) {
 		resetControls();
 		
 		// get and clear text
-		var val = textArea.val();
+		var val = textArea.val().trim();
 		textArea.val("");
-		
-		// process input value and display error as form warning
-		try {
-			
-			// get pieces from input text
-			var pieces = getPiecesFromText(text, selectedPlugin);
-			
-			
-		} catch (err) {
-			setWarning(err);
-		}
-		
-		
-		
-		// check if valid pieces input
-		if (pieces.length === 0) {
-			setWarning("Input text is not a private key or piece");
-			return;
-		}
-		
-		// check for unselected currency
-		if (!selectedPlugin) {
-			setWarning("No currency selected");
-			return;
-		}
 		
 		// check for empty text
 		if (val.trim() === "") {
@@ -2575,56 +2550,22 @@ function ImportTextController(div, plugins) {
 			return;
 		}
 		
-		
-		
-		function getPiecesFromText(text) {
-			
-			// try to parse json
-			try { return AppUtils.jsonToPiece(text); }
-			catch (err) {}
-			
-			// try to parse csv
-			try { return AppUtils.csvToPiece(text); }
-			catch (err) {}
-			
-			// TODO: still in here
-			
-			// get lines
-			var lines = getLines(val);
-			
-			// get lines with content
-			var contentLines = [];
-			for (var i = 0; i < lines.length; i++) {
-				var line = lines[i];
-				if (line.trim() !== "") contentLines.push(line);
-			}
-			
-			throw new Error("Not implemented");
+		// get pieces from input text
+		try {
+			var pieces = AppUtils.parsePiecesFromText(text, selectedPlugin);
+		} catch (err) {
+			if (err.message.indexOf("Plugin required") !== -1) setWarning("No currency selected");
+			else throw err;
 		}
 		
+		// check if valid pieces input
+		if (pieces.length === 0) throw new Error("Input text is not a private key or a piece");
 		
+		// TODO: check how new pieces mix with given pieces
+		throw new Error("Not implemented");
 		
-		
-		
-		// TODO: add pieces to the pool, one by one
-		
-		// process imported pieces
+		// process pieces
 		processPieces();
-	}
-	
-	/**
-	 * Attempts to add a piece to the imported piece pool.
-	 * 
-	 * Displays a warning if the piece is rejected.  Adds the piece to the pool and re-processes
-	 * the imported pieces if it's not rejected.
-	 * 
-	 * @param textInput is the input text which may or not be valid piece(s) or private key(s)
-	 */
-	function addPiece(textInput) {
-		console.log("addPiece()");
-		console.log(textInput);
-		
-		var piece = getPieceFromText(textInput);
 	}
 	
 	/**
@@ -2650,9 +2591,6 @@ function ImportTextController(div, plugins) {
 		
 		throw new Error("Not implemented");
 	}
-	
-	
-	
 	
 //	function submitPieces() {
 //		

@@ -574,6 +574,65 @@ var AppUtils = {
 			}
 		}
 	},
+	
+	/**
+	 * Parses pieces from text.
+	 * 
+	 * @param text is the text to parse into pieces
+	 * @param plugin is the plugin to parse keys if text is not json or csv
+	 * @returns array of parsed pieces
+	 * @throws exception if given empty string or plugin not provided and not csv or json
+	 */
+	parsePiecesFromText: function(text, plugin) {
+		
+		// validate non-empty string
+		assertTrue(isString(text));
+		assertFalse(text.trim() === "");
+		
+		// try to parse json
+		try { return [AppUtils.jsonToPiece(text)]; }
+		catch (err) {}
+		
+		// try to parse csv
+		try { return [AppUtils.csvToPiece(text)]; }
+		catch (err) {}
+		
+		// otherwise must have plugin
+		if (!plugin) throw new Error("Plugin required to parse keys");
+		
+		// get lines
+		var lines = getLines(val);
+		for (var i = 0; i < lines.length; i++) lines[i] = lines[i].trim();
+		lines.removeVal("");
+		
+		// convert lines to pieces
+		var pieces = [];
+		for (var i = 0; i < lines.length; i++) {
+				
+			// check if it's a key
+			try {
+				var key = plugin.newKey(lines[i]);
+				pieces.push(AppUtils.keysToPieces([key])[0]);
+				continue;
+			} catch (err) { }
+			
+			// check if it's a share
+			var share = AppUtils.decodeShare(lines[i]);
+			if (share) pieces.push(pieceFromWif(plugin, wif));
+		}
+		
+		return pieces;
+		
+		function pieceFromWif(plugin, wif) {
+			var piece = {};
+			piece.version = AppUtils.VERSION;
+			piece.keys = [];
+			var key = {};
+			key.wif = wif;
+			key.ticker = plugin.getTicker();
+			piece.keys.push(key);
+		}
+	},
 
 	/**
 	 * Attempts to construct a key from the given string.  The string is expected to be a
