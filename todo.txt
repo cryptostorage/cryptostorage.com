@@ -8,18 +8,10 @@ encrypt / split imported storage
 encrypt / split arbitrary text
 link back to import / homepage from export
 ability to view balance and sign/send transaction
-should home images fade or reflect?
 footer on every page?
 margin above home footer?
-view split pieces and placement
-tip address
-credit non-donations
 all checks pass design
 blue link against red notice is hard to read
-refresh image on regenerate button
-new window dependencies are not reliably cached
-credits design
-link back to import / homepage from export
 different print layouts
 
 low priority:
@@ -30,13 +22,11 @@ ddslick animation could be cleaner
 mobile brave/firefox window.open returns null
 cryptostorage.com/faq, etc
 es6 with modules
-loading gif resets on init of other renderers
 let UI breath during bip38
 1px whitespace on import progress bar
 1px border on mobile safari import print
 disable import new tabs if environment error
 file import loading - see spec, only show if minimum file size
-transition all css flex to common flex classes
 confirm navigate away from import if decrypting
 export transactions which can be imported and sent making it fully functional cold storage web wallet
 meeting times should be plus or minus 10% of time invested
@@ -54,9 +44,7 @@ double click cryptostorage.html opens page in browser
 try all imported file / key combinations to recover
 prevent scroll revealing some of next picture
 copy line break in pdf inserts space
-console warning "unexpected end of file" in firefox caused by ddslick
 timeouts in tests so browser doesn't lock
-csv import to support "bring your own keys"
 optimize tests by getting one set of keys of repeat_long size
 verify no name collisions
 code scan
