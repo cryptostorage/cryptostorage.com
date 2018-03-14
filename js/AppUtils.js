@@ -2105,7 +2105,7 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Runs minimum tests to verify key generation, encryption, and splitting.
+	 * Runs minimum tests to sanity check key generation, encryption, and splitting.
 	 * 
 	 * @param onDone(err) is invoked when done
 	 */
@@ -2113,28 +2113,25 @@ var AppUtils = {
 		
 		// build key generation configuration
 		var config = {};
-		config.passphraseEnabled = true;
 		config.passphrase = Tests.PASSPHRASE;
-		config.splitEnabled = true;
 		config.numPieces = 3;
 		config.minPieces = 2;
-		config.verifyEncryption = true;
+		config.verifyEncryption = false;
 		config.currencies = [];
-		var plugins = AppUtils.getCryptoPlugins();
 		config.currencies.push({
 			ticker: AppUtils.getCryptoPlugin("BTC").getTicker(),
 			numKeys: 1,
-			encryption: AppUtils.EncryptionScheme.V0_CRYPTOJS
+			encryption: null
 		});
 		config.currencies.push({
 			ticker: AppUtils.getCryptoPlugin("XMR").getTicker(),
 			numKeys: 1,
-			encryption: AppUtils.EncryptionScheme.V1_CRYPTOJS
+			encryption: AppUtils.EncryptionScheme.V0_CRYPTOJS	// just makes sure cryptojs is in place
 		});
 		config.currencies.push({
 			ticker: AppUtils.getCryptoPlugin("ETH").getTicker(),
 			numKeys: 1,
-			encryption: AppUtils.EncryptionScheme.V0_CRYPTOJS
+			encryption: null
 		});
 		
 		// generate keys and test

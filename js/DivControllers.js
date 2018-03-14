@@ -495,8 +495,6 @@ function HomeController(div) {
 		
 		function getKeyGenConfig(plugin) {
 			var config = {};
-			config.passphraseEnabled = false;
-			config.splitEnabled = false;
 			config.numPieces = 1;
 			config.minPieces = null;
 			config.currencies = [];
@@ -1335,18 +1333,16 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm(true);
-		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", {keyGenConfig: getConfig(), confirmExit: true});
+		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
 		if (onDone) onDone();
 	}
 	
 	// get current form configuration
-	function getConfig() {
+	function getKeyGenConfig() {
 		var config = {};
-		config.passphraseEnabled = passphraseCheckbox.prop('checked');
-		config.passphrase = passphraseInput.val();
-		config.splitEnabled = splitCheckbox.prop('checked');
-		config.numPieces = config.splitEnabled ? parseFloat(numPiecesInput.val()) : 1;
-		config.minPieces = config.splitEnabled ? parseFloat(minPiecesInput.val()) : null;
+		config.passphrase = passphraseCheckbox.prop('checked') ? passphraseInput.val() : null;
+		config.numPieces = splitCheckbox.prop('checked') ? parseFloat(numPiecesInput.val()) : 1;
+		config.minPieces = splitCheckbox.prop('checked') ? parseFloat(minPiecesInput.val()) : null;
 		config.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
 		config.currencies = [];
 		for (var i = 0; i < currencyInputs.length; i++) {
@@ -1354,7 +1350,7 @@ function FormController(div) {
 			config.currencies.push({
 				ticker: currencyInput.getSelectedPlugin().getTicker(),
 				numKeys: currencyInput.getNumKeys(),
-				encryption: config.passphraseEnabled ? getEncryptionScheme(currencyInput) : null
+				encryption: passphraseCheckbox.prop('checked') ? getEncryptionScheme(currencyInput) : null
 			});
 		}
 		verifyConfig(config);
@@ -3532,7 +3528,9 @@ function ExportController(div, window, config) {
 			if (keyGenConfig.currencies[i].encryption === AppUtils.EncryptionScheme.BIP38) return false;	// BIP38 is slow
 			numPairs += keyGenConfig.currencies[i].numKeys;
 		}
-		numPairs *= keyGenConfig.splitEnabled ? keyGenConfig.numPieces : 1;
+		assertNumber(keyGenConfig.numPieces);
+		assertTrue(keyGenConfig.numPieces >= 1);
+		numPairs *= keyGenConfig.numPieces;
 		return numPairs <= 2;
 	}
 }
