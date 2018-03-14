@@ -719,7 +719,7 @@ function countNonWhitespaceCharacters(str) {
  * @param str is the string to get tokens from
  * @returns string[] are the tokens separated by whitespace within the string
  */
-function getTokens(str) {
+function getWhitespaceTokens(str) {
 	return str.match(/\S+/g);
 }
 

@@ -580,6 +580,8 @@ var AppUtils = {
 	 * single private key (hex or wif, encrypted or unencrypted) or one or more pieces that
 	 * reconstitute a single private key (hex or wif, encrypted or unencrypted).
 	 * 
+	 * TODO: only used in tests
+	 * 
 	 * @param plugin in the coin plugin used to parse the string
 	 * @param str is the string to parse into a key
 	 * @returns a key parsed from the given string
@@ -596,7 +598,7 @@ var AppUtils = {
 		} catch (err) {
 
 			// try tokenizing and combining
-			var tokens = getTokens(str);
+			var tokens = getWhitespaceTokens(str);
 			if (tokens.length === 0) return null;
 			try {
 				return plugin.combine(tokens);
@@ -608,6 +610,8 @@ var AppUtils = {
 	
 	/**
 	 * Attempts to get a key from the given strings.
+	 * 
+	 * TODO: unused
 	 * 
 	 * @param plugin is the currency plugin to parse the strings to a key
 	 * @param strings is expected to be a private key or pieces
@@ -906,12 +910,22 @@ var AppUtils = {
 			}
 		}
 	},
-
+	
 	/**
-	 * Converts a piece to CSV.
+	 * Converts a piece to a json-formatted string.
 	 * 
 	 * @param piece is the piece to convert
-	 * @returns a CSV-formatted string
+	 * @returns a json-formatted string
+	 */
+	pieceToJson: function(piece) {
+		return JSON.stringify(piece);
+	},
+
+	/**
+	 * Converts a piece to a csv-formatted string.
+	 * 
+	 * @param piece is the piece to convert
+	 * @returns a csv-formatted string
 	 */
 	pieceToCsv: function(piece) {
 		assertTrue(piece.keys.length > 0);
@@ -942,11 +956,42 @@ var AppUtils = {
 		return arrToCsv(csvArr);
 	},
 	
+	pieceToTxt: function(piece) {
+		var str = "";
+		for (var i = 0; i < piece.keys.length; i++) {
+			str += "===== #" + (i + 1) + " " + AppUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
+			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n\n";
+			if (piece.keys[i].wif) str += "Private Key " + (piece.pieceNum ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
+		}
+		return str.trim();
+	},
+	
+	pieceToAddresses: function(piece) {
+		var str = "";
+		for (var i = 0; i < piece.keys.length; i++) {
+			str += "===== #" + (i + 1) + " " + AppUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
+			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + (piece.keys[i].address !== AppUtils.NA ? "\n" + piece.keys[i].address : "") + "\n\n";
+		}
+		return str.trim();
+	},
+	
 	/**
-	 * Converts a CSV-formatted string to a piece.
+	 * Converts a json-formatted string to a piece.
 	 * 
-	 * @param csv is the CSV-formatted string to convert
-	 * @returns piece is the piece converted from the CSV
+	 * @param json is the json-formatted string to convert
+	 * @returns the piece converted from the json, throws and error if not valid json piece
+	 */
+	jsonToPiece: function(json) {
+		var piece = JSON.parse(json);
+		AppUtils.validatePiece(piece);
+		return piece;
+	},
+	
+	/**
+	 * Converts a csv-formatted string to a piece.
+	 * 
+	 * @param csv is the csv-formatted string to convert
+	 * @returns the piece converted from the csv, throws an error if not valid csv piece
 	 */
 	csvToPiece: function(csv) {
 		
@@ -977,30 +1022,10 @@ var AppUtils = {
 				key[arr[0][col].toLowerCase()] = val;
 			}
 		}
+		
+		// validate and return piece
+		AppUtils.validatePiece(piece);
 		return piece;
-	},
-	
-	pieceToJson: function(piece, config) {
-		return JSON.stringify(piece);
-	},
-	
-	pieceToTxt: function(piece) {
-		var str = "";
-		for (var i = 0; i < piece.keys.length; i++) {
-			str += "===== #" + (i + 1) + " " + AppUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
-			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + "\n\n";
-			if (piece.keys[i].wif) str += "Private Key " + (piece.pieceNum ? "(split)" : (piece.keys[i].encryption ? "(encrypted)" : "(unencrypted)")) + ":\n" + piece.keys[i].wif + "\n\n";
-		}
-		return str.trim();
-	},
-	
-	pieceToAddresses: function(piece) {
-		var str = "";
-		for (var i = 0; i < piece.keys.length; i++) {
-			str += "===== #" + (i + 1) + " " + AppUtils.getCryptoPlugin(piece.keys[i].ticker).getName() + " =====\n\n";
-			if (piece.keys[i].address) str += "Public Address:\n" + piece.keys[i].address + (piece.keys[i].address !== AppUtils.NA ? "\n" + piece.keys[i].address : "") + "\n\n";
-		}
-		return str.trim();
 	},
 	
 	/**
@@ -1027,6 +1052,15 @@ var AppUtils = {
 				showPublic: true,
 				showPrivate: true
 			}
+		}
+	},
+	
+	isValidPiece: function(piece, allowMissingPublicXorPrivate) {
+		try {
+			validatePiece(piece, allowMissingPublicXorPrivate);
+			return true;
+		} catch (err) {
+			return false;
 		}
 	},
 

@@ -2350,7 +2350,7 @@ function ImportTextController(div, plugins) {
 		// submit button
 		var submit = $("<div class='import_button'>").appendTo(textInputDiv);
 		submit.html("Submit");
-		submit.click(function() { submitPieces(); });
+		submit.click(function() { onSubmit(); });
 		
 		// imported pieces
 		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(textInputDiv);
@@ -2517,27 +2517,51 @@ function ImportTextController(div, plugins) {
 	function removePieces() {
 		importedPieces = [];
 		lastKeys = undefined;
-		updatePieces();
+		processPieces();
 	}
 	
 	function removePiece(piece) {
 		for (var i = 0; i < importedPieces.length; i++) {
 			if (importedPieces[i] === piece) {
 				importedPieces.splice(i, 1);
-				updatePieces();
+				processPieces();
 				return;
 			}
 		}
 		throw new Error("No piece imported: " + piece);
 	}
 	
-	function submitPieces() {
+	
+	/**
+	 * Invoked when the submit button clicked.
+	 */
+	function onSubmit() {
+		console.log("onSubmit()");
 		
 		resetControls();
 		
 		// get and clear text
 		var val = textArea.val();
 		textArea.val("");
+		
+		// process input value and display error as form warning
+		try {
+			
+			// get pieces from input text
+			var pieces = getPiecesFromText(text, selectedPlugin);
+			
+			
+		} catch (err) {
+			setWarning(err);
+		}
+		
+		
+		
+		// check if valid pieces input
+		if (pieces.length === 0) {
+			setWarning("Input text is not a private key or piece");
+			return;
+		}
 		
 		// check for unselected currency
 		if (!selectedPlugin) {
@@ -2551,97 +2575,196 @@ function ImportTextController(div, plugins) {
 			return;
 		}
 		
-		// get lines
-		var lines = getLines(val);
 		
-		// get lines with content
-		var contentLines = [];
-		for (var i = 0; i < lines.length; i++) {
-			var line = lines[i];
-			if (line.trim() !== "") contentLines.push(line);
+		
+		function getPiecesFromText(text) {
+			
+			// try to parse json
+			try { return AppUtils.jsonToPiece(text); }
+			catch (err) {}
+			
+			// try to parse csv
+			try { return AppUtils.csvToPiece(text); }
+			catch (err) {}
+			
+			// TODO: still in here
+			
+			// get lines
+			var lines = getLines(val);
+			
+			// get lines with content
+			var contentLines = [];
+			for (var i = 0; i < lines.length; i++) {
+				var line = lines[i];
+				if (line.trim() !== "") contentLines.push(line);
+			}
+			
+			throw new Error("Not implemented");
 		}
 		
-		// add pieces
-		updatePieces(contentLines);
+		
+		
+		
+		
+		// TODO: add pieces to the pool, one by one
+		
+		// process imported pieces
+		processPieces();
 	}
 	
-	function updatePieces(newPieces) {
+	/**
+	 * Attempts to add a piece to the imported piece pool.
+	 * 
+	 * Displays a warning if the piece is rejected.  Adds the piece to the pool and re-processes
+	 * the imported pieces if it's not rejected.
+	 * 
+	 * @param textInput is the input text which may or not be valid piece(s) or private key(s)
+	 */
+	function addPiece(textInput) {
+		console.log("addPiece()");
+		console.log(textInput);
 		
-		// reset warning
-		setWarning("");
-		
-		// interanl warning setter to track if warning is set
-		var warningSet = false;
-		function setWarningAux(str, icon) {
-			setWarning(str, icon);
-			warningSet = true;
-		}
-		
-		// scenarios:
-		// add private key, don't allow anything after
-		// add private keys, add first, don't allow anything after
-		// add piece, need additional, allow pieces, don't allow private key
-		// add pieces, check if key created, allow pieces, don't allow private key
-		
-		// check for existing private key
-		var key;
-		if (importedPieces.length === 1) {
-			try {
-				key = selectedPlugin.newKey(importedPieces[0]);
-			} catch (err) {
-				// nothing to do
-			}
-		}
-		
-		// add new pieces
-		if (newPieces) {
-			if (key) setWarningAux("Private key already added");
-			else {
-				for (var i = 0; i < newPieces.length; i++) {
-					var piece = newPieces[i];
-					if (arrayContains(importedPieces, piece)) {
-						setWarningAux("Piece already added");
-						continue;
-					}
-					if (key) setWarningAux("Private key alread added");
-					else {
-						try {
-							var thisKey = selectedPlugin.newKey(piece);
-							if (importedPieces.length > 0) setWarningAux("Cannot add private key to existing pieces");
-							else {
-								key = thisKey;
-								importedPieces.push(piece);
-							}
-						} catch (err) {
-							if (AppUtils.decodeShare(piece) !== null) importedPieces.push(piece);
-							else setWarningAux("Invalid private key or piece");
-						}
-					}
-				}
-			}
-		}
-		
-		// check if pieces combine to make private key
-		if (!key && importedPieces.length > 0) {
-			try {
-				key = selectedPlugin.combine(importedPieces);
-			} catch (err) {
-				if (!warningSet) {
-					if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
-					else setWarning(err.message);
-				}
-			}
-		}
-		
-		// render pieces
-		renderImportedPieces(importedPieces);
-		
-		// selector only enabled if no pieces
-		setSelectorEnabled(importedPieces.length === 0);
-		
-		// handle if key exists
-		if (key) onKeysImported(key);
+		var piece = getPieceFromText(textInput);
 	}
+	
+	/**
+	 * Reads the imported piece pool which is guaranteed to be in a good state (no incompatible pieces).
+	 */
+	function processPieces() {
+		console.log("readPieces()");
+		if (importedPieces.length === 0) return;
+		
+		
+		
+	// check if pieces combine to make private key
+//	if (!key && importedPieces.length > 0) {
+//		try {
+//			key = selectedPlugin.combine(importedPieces);
+//		} catch (err) {
+//			if (!warningSet) {
+//				if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
+//				else setWarning(err.message);
+//			}
+//		}
+//	}
+		
+		throw new Error("Not implemented");
+	}
+	
+	
+	
+	
+//	function submitPieces() {
+//		
+//		resetControls();
+//		
+//		// get and clear text
+//		var val = textArea.val();
+//		textArea.val("");
+//		
+//		// check for unselected currency
+//		if (!selectedPlugin) {
+//			setWarning("No currency selected");
+//			return;
+//		}
+//		
+//		// check for empty text
+//		if (val.trim() === "") {
+//			setWarning("No text entered");
+//			return;
+//		}
+//		
+//		// get lines
+//		var lines = getLines(val);
+//		
+//		// get lines with content
+//		var contentLines = [];
+//		for (var i = 0; i < lines.length; i++) {
+//			var line = lines[i];
+//			if (line.trim() !== "") contentLines.push(line);
+//		}
+//		
+//		// add pieces
+//		updatePieces(contentLines);
+//	}
+//	
+//	function updatePieces(newPieces) {
+//		
+//		// reset warning
+//		setWarning("");
+//		
+//		// interanl warning setter to track if warning is set
+//		var warningSet = false;
+//		function setWarningAux(str, icon) {
+//			setWarning(str, icon);
+//			warningSet = true;
+//		}
+//		
+//		// scenarios:
+//		// add private key, don't allow anything after
+//		// add private keys, add first, don't allow anything after
+//		// add piece, need additional, allow pieces, don't allow private key
+//		// add pieces, check if key created, allow pieces, don't allow private key
+//		
+//		// check for existing private key
+//		var key;
+//		if (importedPieces.length === 1) {
+//			try {
+//				key = selectedPlugin.newKey(importedPieces[0]);
+//			} catch (err) {
+//				// nothing to do
+//			}
+//		}
+//		
+//		// add new pieces
+//		if (newPieces) {
+//			if (key) setWarningAux("Private key already added");
+//			else {
+//				for (var i = 0; i < newPieces.length; i++) {
+//					var piece = newPieces[i];
+//					if (arrayContains(importedPieces, piece)) {
+//						setWarningAux("Piece already added");
+//						continue;
+//					}
+//					if (key) setWarningAux("Private key alread added");
+//					else {
+//						try {
+//							var thisKey = selectedPlugin.newKey(piece);
+//							if (importedPieces.length > 0) setWarningAux("Cannot add private key to existing pieces");
+//							else {
+//								key = thisKey;
+//								importedPieces.push(piece);
+//							}
+//						} catch (err) {
+//							if (AppUtils.decodeShare(piece) !== null) importedPieces.push(piece);
+//							else setWarningAux("Invalid private key or piece");
+//						}
+//					}
+//				}
+//			}
+//		}
+//		
+//		// check if pieces combine to make private key
+//		if (!key && importedPieces.length > 0) {
+//			try {
+//				key = selectedPlugin.combine(importedPieces);
+//			} catch (err) {
+//				if (!warningSet) {
+//					if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
+//					else setWarning(err.message);
+//				}
+//			}
+//		}
+//		
+//		// render pieces
+//		renderImportedPieces(importedPieces);
+//		
+//		// selector only enabled if no pieces
+//		setSelectorEnabled(importedPieces.length === 0);
+//		
+//		// handle if key exists
+//		if (key) onKeysImported(key);
+//	}
 	
 	function renderImportedPieces(pieces) {
 		importedPiecesDiv.empty();
