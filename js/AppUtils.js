@@ -601,7 +601,7 @@ var AppUtils = {
 		if (!plugin) throw new Error("Plugin required to parse keys");
 		
 		// get lines
-		var lines = getLines(val);
+		var lines = getLines(text);
 		for (var i = 0; i < lines.length; i++) lines[i] = lines[i].trim();
 		lines.removeVal("");
 		

@@ -2541,11 +2541,11 @@ function ImportTextController(div, plugins) {
 		resetControls();
 		
 		// get and clear text
-		var val = textArea.val().trim();
+		var text = textArea.val().trim();
 		textArea.val("");
 		
 		// check for empty text
-		if (val.trim() === "") {
+		if (text === "") {
 			setWarning("No text entered");
 			return;
 		}
@@ -2562,6 +2562,7 @@ function ImportTextController(div, plugins) {
 		if (pieces.length === 0) throw new Error("Input text is not a private key or a piece");
 		
 		// TODO: check how new pieces mix with given pieces
+		for (var i = 0; i < pieces.length; i++) console.log(pieces[i]);
 		throw new Error("Not implemented");
 		
 		// process pieces
