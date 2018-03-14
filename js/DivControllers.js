@@ -662,8 +662,7 @@ function FaqController(div) {
 				}, {
 					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this tool?"; },
-					getAnswer: function() { return "<p>Don't trust.  Verify.</p>" +
-						"<p>CryptoStorage is 100% open-source which means anyone can review the source code.</p>" +
+					getAnswer: function() { return "<p>Don't trust.  Verify.  CryptoStorage is 100% open-source which means anyone can review the source code.</p>" +
 						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publicly reviewed and has not been modified by an attacker.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",
@@ -690,7 +689,7 @@ function FaqController(div) {
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>All unencrypted keys generated with CryptoStorage will work with other wallet software and vice versa.</p>" +
-								"<p>However, there is currently no standardized way of encrypting or splitting cryptocurrency keys that works across all networks.  As a result, CryptoStorage uses conventions to encrypt and split keys which will not work with other tools unless they use the same conventions.  <b>A copy of this tool should be saved to recover keys in the future if using encryption or splitting.</p>");
+								"<p>However, there is currently no standardized way of encrypting or splitting cryptocurrency keys that works across all key types.  As a result, CryptoStorage uses its own conventions to encrypt and split keys which will not work with other tools unless they use the same conventions.  <b>A copy of this tool should be saved to recover keys in the future if using encryption or splitting.</b></p>");
 						return answerDiv;
 					}
 				}, {
