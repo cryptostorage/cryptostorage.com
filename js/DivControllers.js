@@ -2538,6 +2538,8 @@ function ImportTextController(div, plugins) {
 	function onSubmit() {
 		console.log("onSubmit()");
 		
+		// init state
+		setWarning("");
 		resetControls();
 		
 		// get and clear text
@@ -2554,16 +2556,33 @@ function ImportTextController(div, plugins) {
 		try {
 			var pieces = AppUtils.parsePiecesFromText(text, selectedPlugin);
 		} catch (err) {
-			if (err.message.indexOf("Plugin required") !== -1) setWarning("No currency selected");
-			else throw err;
+			if (err.message.indexOf("Plugin required") !== -1) {
+				setWarning("No currency selected");
+				return;
+			}
+			throw err;
 		}
 		
 		// check if valid pieces input
-		if (pieces.length === 0) throw new Error("Input text is not a private key or a piece");
+		if (pieces.length === 0) {
+			setWarning("Input text is not a private key or piece");
+			return;
+		}
 		
-		// TODO: check how new pieces mix with given pieces
-		for (var i = 0; i < pieces.length; i++) console.log(pieces[i]);
-		throw new Error("Not implemented");
+		// add each piece to the pool
+		for (var i = 0; i < pieces.length; i++) {
+			var msg = getCompatibilityError(pieces[i], importedPieces);
+			if (msg) setWarning(msg);
+			else importedPieces.push(pieces[i]);
+		}
+		
+		// TODO: implement
+		function getCompatibilityError(piece, pieces) {
+			return null;
+		}
+		
+		// update piece rendering
+		renderImportedPieces();
 		
 		// process pieces
 		processPieces();
