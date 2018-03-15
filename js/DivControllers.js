@@ -2582,7 +2582,7 @@ function ImportTextController(div, plugins) {
 		}
 		
 		// update piece rendering
-		renderImportedPieces();
+		renderImportedPieces(importedPieces);
 		
 		// process pieces
 		processPieces();
@@ -2741,7 +2741,9 @@ function ImportTextController(div, plugins) {
 		function getImportedPieceDiv(piece) {
 			var importedPieceDiv = $("<div class='import_text_imported_piece'>").appendTo(importedPiecesDiv);
 			var icon = $("<img src='img/file.png' class='import_imported_icon'>").appendTo(importedPieceDiv);
-			importedPieceDiv.append(AppUtils.getShortenedString(piece, MAX_PIECE_LENGTH));
+			assertTrue(piece.keys.length > 0);
+			var pieceLabel = piece.keys.length === 1 ? piece.keys[0].wif : "Imported piece" + (piece.pieceNum ? " " + piece.pieceNum : "");
+			importedPieceDiv.append(AppUtils.getShortenedString(pieceLabel, MAX_PIECE_LENGTH));
 			var trash = $("<img src='img/trash.png' class='import_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
 			return importedPieceDiv;
