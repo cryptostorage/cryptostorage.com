@@ -2114,7 +2114,7 @@ function ImportFileController(div) {
 					var namedPiece = {name: file.name, piece: piece};
 					onNamedPieces(null, [namedPiece]);
 				} catch (err) {
-					onNamedPieces(Error("'" + file.name + "' is not valid piece CSV"));
+					onNamedPieces(Error("'" + file.name + "' is not a valid piece"));
 				}
 			}
 			
@@ -2345,7 +2345,7 @@ function ImportTextController(div, plugins) {
 		
 		// text area
 		textArea = $("<textarea class='import_textarea'>").appendTo(textInputDiv);
-		textArea.attr("placeholder", "Enter a private key or split pieces of a private key");
+		textArea.attr("placeholder", "Enter private keys, split pieces, csv, or json...");
 		
 		// submit button
 		var submit = $("<div class='import_button'>").appendTo(textInputDiv);
@@ -2573,10 +2573,28 @@ function ImportTextController(div, plugins) {
 			return;
 		}
 		
+		// assign pieceNum if not given
+		if (!piece.pieceNum) piece.pieceNum = getNextAvailablePieceNum(importedPieces);
+		
 		// accept piece into imported pieces
 		textArea.val("");
 		importedPieces.push(piece);
 		processPieces();
+		
+		function getNextAvailablePieceNum(pieces) {
+			var pieceNum = 1;
+			while (true) {
+				var found = false;
+				for (var i = 0; i < pieces.length; i++) {
+					if (pieces[i].pieceNum === pieceNum) {
+						found = true;
+						break;
+					} 
+				}
+				if (!found) return pieceNum;
+				pieceNum++;
+			}
+		}
 		
 		function getCompatibilityError(piece, pieces) {
 			
@@ -2620,6 +2638,11 @@ function ImportTextController(div, plugins) {
 		// done if no pieces
 		if (importedPieces.length === 0) return;
 		
+		// add control to view pieces
+		addControl("view imported pieces", function() {
+			UiUtils.openStorage("Imported Storage", {pieces: importedPieces});
+		});
+		
 		// check if pieces combine to make private keys
 		try {
 			var keys = AppUtils.piecesToKeys(importedPieces);
@@ -2633,7 +2656,7 @@ function ImportTextController(div, plugins) {
 	function renderImportedPieces(pieces) {
 		
 		// selector enabled iff no pieces
-		setSelectorEnabled(pieces.length === 0);
+		setSelectorEnabled(pieces.length === 0 || !selectedPlugin);
 
 		importedPiecesDiv.empty();
 		if (pieces.length === 0) {

@@ -1101,7 +1101,7 @@ var AppUtils = {
 		}
 		
 		// validate and return piece
-		AppUtils.validatePiece(piece);
+		AppUtils.validatePiece(piece, true);
 		return piece;
 	},
 	
