@@ -1,7 +1,6 @@
 v0.2.2
 imported pieces viewable from encrypted / decrypted pieces
-different encryption states?
-encryption info should not be included in split shares
+different encryption states? encryption info should not be included in split shares
 naming scheme if duplicate pieceNums imported
 
 info box on currencies
