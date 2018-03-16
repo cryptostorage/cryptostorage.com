@@ -2522,7 +2522,7 @@ function ImportTextController(div, plugins) {
 	
 	function removePiece(piece) {
 		for (var i = 0; i < importedPieces.length; i++) {
-			if (importedPieces[i] === piece) {
+			if (equals(importedPieces[i], piece)) {
 				importedPieces.splice(i, 1);
 				processPieces();
 				return;
@@ -2572,17 +2572,46 @@ function ImportTextController(div, plugins) {
 		// add each piece to the pool
 		for (var i = 0; i < pieces.length; i++) {
 			var msg = getCompatibilityError(pieces[i], importedPieces);
-			if (msg) setWarning(msg);
+			if (msg) {
+				setWarning(msg);
+				return;
+			}
 			else importedPieces.push(pieces[i]);
 		}
 		
-		// TODO: implement
+		// TODO: support paste multiple private keys
+		
 		function getCompatibilityError(piece, pieces) {
+			
+			// check if piece already added
+			if (arrayContains(pieces, piece)) return "Piece already imported";
+			
+			// private key not allowed if pieces already imported
+			if (pieces.length > 0) {
+				try {
+					AppUtils.getCryptoPlugin(piece.keys[0].ticker).newKey(piece.keys[0].wif);
+					return "Cannot add private key to existing pieces";
+				} catch (err) { };
+			}
+			
+			// determine if private key is already imported
+			var keyFound = false;
+			for (var i = 0; i < pieces.length; i++) {
+				try {
+					AppUtils.getCryptoPlugin(pieces[0].keys[0].ticker).newKey(pieces[0].keys[0].wif);
+					keyFound = true;
+				} catch (err) { }
+			}
+			
+			// new pieces not allowed if private key already added
+			if (keyFound) return "Cannot add to existing private key";
+			
+			// piece is not allowed if incompatible with existing pieces
+			// TODO
+			
+			// no issues adding private key
 			return null;
 		}
-		
-		// update piece rendering
-		renderImportedPieces(importedPieces);
 		
 		// process pieces
 		processPieces();
@@ -2592,24 +2621,23 @@ function ImportTextController(div, plugins) {
 	 * Reads the imported piece pool which is guaranteed to be in a good state (no incompatible pieces).
 	 */
 	function processPieces() {
-		console.log("readPieces()");
+		console.log("processPieces()");
+		
+		// update UI
+		setWarning("");
+		renderImportedPieces(importedPieces);
+		
+		// done if no pieces
 		if (importedPieces.length === 0) return;
 		
-		
-		
-	// check if pieces combine to make private key
-//	if (!key && importedPieces.length > 0) {
-//		try {
-//			key = selectedPlugin.combine(importedPieces);
-//		} catch (err) {
-//			if (!warningSet) {
-//				if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
-//				else setWarning(err.message);
-//			}
-//		}
-//	}
-		
-		throw new Error("Not implemented");
+		// check if pieces combine to make private keys
+		try {
+			var keys = AppUtils.piecesToKeys(importedPieces);
+			onKeysImported(keys);
+		} catch (err) {
+			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
+			else setWarning(err.message);
+		}
 	}
 	
 //	function submitPieces() {
@@ -2725,6 +2753,10 @@ function ImportTextController(div, plugins) {
 //	}
 	
 	function renderImportedPieces(pieces) {
+		
+		// selector enabled iff no pieces
+		setSelectorEnabled(pieces.length === 0);
+		
 		importedPiecesDiv.empty();
 		if (pieces.length === 0) {
 			importedPiecesDiv.hide();

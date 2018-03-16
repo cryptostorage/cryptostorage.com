@@ -44,7 +44,7 @@ var AppUtils = {
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: true,
 	RUN_FULL_TESTS: false,
-	DEV_MODE: false,
+	DEV_MODE: true,
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
@@ -611,19 +611,19 @@ var AppUtils = {
 				
 			// check if it's a key
 			try {
-				var key = plugin.newKey(lines[i]);
+				var key = plugin.newKey(lines[i]);	
 				pieces.push(AppUtils.keysToPieces([key])[0]);
 				continue;
 			} catch (err) { }
 			
 			// check if it's a share
 			var share = AppUtils.decodeShare(lines[i]);
-			if (share) pieces.push(pieceFromWif(plugin, wif));
+			if (share) pieces.push(getPieceFromWif(plugin, lines[i]));
 		}
 		
 		return pieces;
 		
-		function pieceFromWif(plugin, wif) {
+		function getPieceFromWif(plugin, wif) {
 			var piece = {};
 			piece.version = AppUtils.VERSION;
 			piece.keys = [];
@@ -631,6 +631,7 @@ var AppUtils = {
 			key.wif = wif;
 			key.ticker = plugin.getTicker();
 			piece.keys.push(key);
+			return piece;
 		}
 	},
 
@@ -762,11 +763,18 @@ var AppUtils = {
 		// handle one piece
 		if (pieces.length === 1) {
 			assertTrue(pieces[0].keys.length > 0);
-			if (pieces[0].pieceNum && pieces[0].keys[0].wif) {
-				var minPieces = AppUtils.decodeShare(pieces[0].keys[0].wif).minPieces;
-				var additional = minPieces - 1;
-				throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private keys");
+			
+			// check if share
+			if (pieces[0].keys[0].wif) {
+				var share = AppUtils.decodeShare(pieces[0].keys[0].wif);
+				if (share) {
+					var minPieces = share.minPieces;
+					var additional = minPieces - 1;
+					throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private keys");
+				}
 			}
+			
+			// get keys from piece
 			for (var i = 0; i < pieces[0].keys.length; i++) {
 				var pieceKey = pieces[0].keys[i];
 				var state = {};

@@ -480,7 +480,7 @@ function listify(arrOrElem) {
 function arrayContains(arr, obj) {
 	assertTrue(isArray(arr));
 	for (var i = 0; i < arr.length; i++) {
-		if (arr[i] === obj) return true;
+		if (equals(arr[i], obj)) return true;
 	}
 	return false;
 }
