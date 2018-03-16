@@ -2553,7 +2553,7 @@ function ImportTextController(div, plugins) {
 		
 		// get pieces from input text
 		try {
-			var pieces = AppUtils.parsePiecesFromText(text, selectedPlugin);
+			var piece = AppUtils.parsePieceFromText(text, selectedPlugin);
 		} catch (err) {
 			if (err.message.indexOf("Plugin required") !== -1) {
 				setWarning("No currency selected");
@@ -2562,23 +2562,22 @@ function ImportTextController(div, plugins) {
 			throw err;
 		}
 		
-		// check if valid pieces input
-		if (pieces.length === 0) {
+		// check if valid piece input
+		if (!piece) {
 			setWarning("Input text is not a private key or piece");
 			return;
 		}
 		
-		// add each piece to the pool
-		for (var i = 0; i < pieces.length; i++) {
-			var msg = getCompatibilityError(pieces[i], importedPieces);
-			if (msg) {
-				setWarning(msg);
-				return;
-			}
-			else importedPieces.push(pieces[i]);
+		// check if piece can be added to the pool
+		var msg = getCompatibilityError(piece, importedPieces);
+		if (msg) {
+			setWarning(msg);
+			return;
 		}
 		
-		// TODO: support paste multiple private keys
+		// add piece to the pool
+		importedPieces.push(piece);
+		processPieces();
 		
 		function getCompatibilityError(piece, pieces) {
 			
@@ -2611,9 +2610,6 @@ function ImportTextController(div, plugins) {
 			// no issues adding private key
 			return null;
 		}
-		
-		// process pieces
-		processPieces();
 	}
 	
 	/**
@@ -2639,123 +2635,11 @@ function ImportTextController(div, plugins) {
 		}
 	}
 	
-//	function submitPieces() {
-//		
-//		resetControls();
-//		
-//		// get and clear text
-//		var val = textArea.val();
-//		textArea.val("");
-//		
-//		// check for unselected currency
-//		if (!selectedPlugin) {
-//			setWarning("No currency selected");
-//			return;
-//		}
-//		
-//		// check for empty text
-//		if (val.trim() === "") {
-//			setWarning("No text entered");
-//			return;
-//		}
-//		
-//		// get lines
-//		var lines = getLines(val);
-//		
-//		// get lines with content
-//		var contentLines = [];
-//		for (var i = 0; i < lines.length; i++) {
-//			var line = lines[i];
-//			if (line.trim() !== "") contentLines.push(line);
-//		}
-//		
-//		// add pieces
-//		updatePieces(contentLines);
-//	}
-//	
-//	function updatePieces(newPieces) {
-//		
-//		// reset warning
-//		setWarning("");
-//		
-//		// interanl warning setter to track if warning is set
-//		var warningSet = false;
-//		function setWarningAux(str, icon) {
-//			setWarning(str, icon);
-//			warningSet = true;
-//		}
-//		
-//		// scenarios:
-//		// add private key, don't allow anything after
-//		// add private keys, add first, don't allow anything after
-//		// add piece, need additional, allow pieces, don't allow private key
-//		// add pieces, check if key created, allow pieces, don't allow private key
-//		
-//		// check for existing private key
-//		var key;
-//		if (importedPieces.length === 1) {
-//			try {
-//				key = selectedPlugin.newKey(importedPieces[0]);
-//			} catch (err) {
-//				// nothing to do
-//			}
-//		}
-//		
-//		// add new pieces
-//		if (newPieces) {
-//			if (key) setWarningAux("Private key already added");
-//			else {
-//				for (var i = 0; i < newPieces.length; i++) {
-//					var piece = newPieces[i];
-//					if (arrayContains(importedPieces, piece)) {
-//						setWarningAux("Piece already added");
-//						continue;
-//					}
-//					if (key) setWarningAux("Private key alread added");
-//					else {
-//						try {
-//							var thisKey = selectedPlugin.newKey(piece);
-//							if (importedPieces.length > 0) setWarningAux("Cannot add private key to existing pieces");
-//							else {
-//								key = thisKey;
-//								importedPieces.push(piece);
-//							}
-//						} catch (err) {
-//							if (AppUtils.decodeShare(piece) !== null) importedPieces.push(piece);
-//							else setWarningAux("Invalid private key or piece");
-//						}
-//					}
-//				}
-//			}
-//		}
-//		
-//		// check if pieces combine to make private key
-//		if (!key && importedPieces.length > 0) {
-//			try {
-//				key = selectedPlugin.combine(importedPieces);
-//			} catch (err) {
-//				if (!warningSet) {
-//					if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
-//					else setWarning(err.message);
-//				}
-//			}
-//		}
-//		
-//		// render pieces
-//		renderImportedPieces(importedPieces);
-//		
-//		// selector only enabled if no pieces
-//		setSelectorEnabled(importedPieces.length === 0);
-//		
-//		// handle if key exists
-//		if (key) onKeysImported(key);
-//	}
-	
 	function renderImportedPieces(pieces) {
 		
 		// selector enabled iff no pieces
 		setSelectorEnabled(pieces.length === 0);
-		
+
 		importedPiecesDiv.empty();
 		if (pieces.length === 0) {
 			importedPiecesDiv.hide();

@@ -576,25 +576,25 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Parses pieces from text.
+	 * Parses a piece from text.
 	 * 
-	 * @param text is the text to parse into pieces
+	 * @param text is the text to parse into a piece
 	 * @param plugin is the plugin to parse keys if text is not json or csv
-	 * @returns array of parsed pieces
+	 * @returns the piece parsed from text or null if no piece can be parsed
 	 * @throws exception if given empty string or plugin not provided and not csv or json
 	 */
-	parsePiecesFromText: function(text, plugin) {
+	parsePieceFromText: function(text, plugin) {
 		
 		// validate non-empty string
 		assertTrue(isString(text));
 		assertFalse(text.trim() === "");
 		
 		// try to parse json
-		try { return [AppUtils.jsonToPiece(text)]; }
+		try { return AppUtils.jsonToPiece(text); }
 		catch (err) {}
 		
 		// try to parse csv
-		try { return [AppUtils.csvToPiece(text)]; }
+		try { return AppUtils.csvToPiece(text); }
 		catch (err) {}
 		
 		// otherwise must have plugin
@@ -605,32 +605,42 @@ var AppUtils = {
 		for (var i = 0; i < lines.length; i++) lines[i] = lines[i].trim();
 		lines.removeVal("");
 		
-		// convert lines to pieces
-		var pieces = [];
+		// get keys or shares
+		var keys = [];
+		var shares = [];
+		var minPieces;
 		for (var i = 0; i < lines.length; i++) {
-				
-			// check if it's a key
 			try {
-				var key = plugin.newKey(lines[i]);	
-				pieces.push(AppUtils.keysToPieces([key])[0]);
-				continue;
-			} catch (err) { }
-			
-			// check if it's a share
-			var share = AppUtils.decodeShare(lines[i]);
-			if (share) pieces.push(getPieceFromWif(plugin, lines[i]));
+				var key = plugin.newKey(lines[i]);
+				keys.push(key);
+			} catch (err) {
+				var share = AppUtils.decodeShare(lines[i]);
+				if (!share) return null;
+				if (!minPieces) minPieces = share.minPieces;
+				else if (minPieces !== share.minPieces) return null;
+				shares.push(lines[i]);
+			}
 		}
 		
-		return pieces;
+		// convert keys or shares to piece
+		if (keys.length === lines.length) {
+			return AppUtils.keysToPieces(keys)[0];
+		} else if (shares.length === lines.length) {
+			return getPieceFromWifs(plugin, shares);
+		} else {
+			return null;
+		}
 		
-		function getPieceFromWif(plugin, wif) {
+		function getPieceFromWifs(plugin, wifs) {
 			var piece = {};
 			piece.version = AppUtils.VERSION;
 			piece.keys = [];
-			var key = {};
-			key.wif = wif;
-			key.ticker = plugin.getTicker();
-			piece.keys.push(key);
+			for (var i = 0; i < wifs.length; i++) {
+				var key = {};
+				key.wif = wifs[i];
+				key.ticker = plugin.getTicker();
+				piece.keys.push(key);
+			}
 			return piece;
 		}
 	},
