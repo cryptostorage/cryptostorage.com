@@ -2541,9 +2541,8 @@ function ImportTextController(div, plugins) {
 		setWarning("");
 		resetControls();
 		
-		// get and clear text
+		// get text
 		var text = textArea.val().trim();
-		textArea.val("");
 		
 		// check for empty text
 		if (text === "") {
@@ -2568,14 +2567,15 @@ function ImportTextController(div, plugins) {
 			return;
 		}
 		
-		// check if piece can be added to the pool
+		// check if piece can be added to imported pieces
 		var msg = getCompatibilityError(piece, importedPieces);
 		if (msg) {
 			setWarning(msg);
 			return;
 		}
 		
-		// add piece to the pool
+		// accept piece into imported pieces
+		textArea.val("");
 		importedPieces.push(piece);
 		processPieces();
 		
@@ -2604,8 +2604,15 @@ function ImportTextController(div, plugins) {
 			// new pieces not allowed if private key already added
 			if (keyFound) return "Cannot add to existing private key";
 			
-			// piece is not allowed if incompatible with existing pieces
-			// TODO
+//			// piece is not allowed if incompatible with existing pieces
+//			try {
+//				var combined = [];
+//				combined.push(piece);
+//				for (var i = 0; i < pieces.length; i++) combined.push(pieces[i]);
+//				AppUtils.piecesToKeys(combined);
+//			} catch (err) {
+//				if (err.message.indexOf("additional piece") === -1) return err.message;
+//			}
 			
 			// no issues adding private key
 			return null;
