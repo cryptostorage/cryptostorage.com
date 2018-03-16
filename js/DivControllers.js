@@ -2531,7 +2531,6 @@ function ImportTextController(div, plugins) {
 		throw new Error("No piece imported: " + piece);
 	}
 	
-	
 	/**
 	 * Invoked when the submit button clicked.
 	 */
