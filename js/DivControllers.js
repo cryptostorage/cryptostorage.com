@@ -2535,7 +2535,6 @@ function ImportTextController(div, plugins) {
 	 * Invoked when the submit button clicked.
 	 */
 	function onSubmit() {
-		console.log("onSubmit()");
 		
 		// init state
 		setWarning("");
@@ -2604,16 +2603,6 @@ function ImportTextController(div, plugins) {
 			// new pieces not allowed if private key already added
 			if (keyFound) return "Cannot add to existing private key";
 			
-//			// piece is not allowed if incompatible with existing pieces
-//			try {
-//				var combined = [];
-//				combined.push(piece);
-//				for (var i = 0; i < pieces.length; i++) combined.push(pieces[i]);
-//				AppUtils.piecesToKeys(combined);
-//			} catch (err) {
-//				if (err.message.indexOf("additional piece") === -1) return err.message;
-//			}
-			
 			// no issues adding private key
 			return null;
 		}
@@ -2623,7 +2612,6 @@ function ImportTextController(div, plugins) {
 	 * Reads the imported piece pool which is guaranteed to be in a good state (no incompatible pieces).
 	 */
 	function processPieces() {
-		console.log("processPieces()");
 		
 		// update UI
 		setWarning("");
