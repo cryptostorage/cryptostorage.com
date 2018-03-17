@@ -1,5 +1,4 @@
 v0.2.2
-add default password in developer mode
 encryption info should not be included in split shares
 naming scheme if duplicate pieceNums imported
 imported pieces viewable from encrypted / decrypted pieces

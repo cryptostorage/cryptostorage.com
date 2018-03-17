@@ -28,8 +28,8 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 2,
-	REPEAT_SHORT: 2,
+	REPEAT_LONG: 1,
+	REPEAT_SHORT: 1,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",
@@ -177,7 +177,7 @@ var Tests = {
 			}
 		}
 		
-function testGenerateKeys(plugins, onDone) {
+		function testGenerateKeys(plugins, onDone) {
 			
 			// test each plugin
 			var testFuncs = [];
@@ -587,7 +587,7 @@ function testGenerateKeys(plugins, onDone) {
 					assertEquals(keys[j].getPlugin().getTicker(), piece.keys[j].ticker);
 					assertEquals(keys[j].getAddress(), piece.keys[j].address);
 					if (piece.keys[j].wif) {
-						assertDefined(piece.keys[j].encryption);
+						assertNull(piece.keys[j].encryption);
 						assertEquals(keys[j].getEncryptionScheme(), piece.keys[j].encryption);
 					}
 					else assertUndefined(piece.keys[j].encryption);

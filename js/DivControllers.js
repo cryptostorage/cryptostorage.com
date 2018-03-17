@@ -1256,31 +1256,6 @@ function FormController(div) {
 			minPiecesInput.on("input", function(e) { validateSplit(false); });
 			minPiecesInput.on("focusout", function(e) { validateSplit(true); });
 			
-//			// split warn information tooltip
-//			var splitWarnInfo = $("<img src='img/information.png' class='information_img'>").appendTo(splitWarnDiv);
-//			var splitWarnTooltip = $("<div>");
-//			splitWarnTooltip.append("There is currently no standardized way of splitting cryptocurrency keys.  As a result, split storage generated from this tool will likely not be interoperable with other tools.  Saving a copy of this tool for future use is recommended if using the split feature.");
-//			tippy(splitWarnInfo.get(0), {
-//				arrow: true,
-//				html: splitWarnTooltip.get(0),
-//				interactive: true,
-//				placement: 'bottom',
-//				theme: 'translucent',
-//				trigger: "mouseenter",
-//				multiple: 'false',
-//				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
-//				distance: 20,
-//				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-//				offset: '-180, 0'
-//			});
-			
-			// apply default configuration
-			passphraseCheckbox.prop('checked', false);
-			passphraseInputDiv.hide();
-			showPassphraseCheckbox.prop('checked', false);
-			splitCheckbox.prop('checked', false);
-			splitInputDiv.hide();
-			
 			// add generate button
 			var generateDiv = $("<div class='form_generate_div flex_horizontal'>").appendTo(pageDiv);
 			btnGenerate = $("<div class='dark_green_btn flex_horizontal'>").appendTo(generateDiv);
@@ -1297,8 +1272,8 @@ function FormController(div) {
 				updateGenerateButton();
 			});
 			
-			// add first currency
-			addCurrency();
+			// initialize state
+			that.startOver();
 			
 			// done rendering
 			onDone(div);
@@ -1316,6 +1291,7 @@ function FormController(div) {
 		}
 		currencyInputs = [];
 		addCurrency();
+		if (AppUtils.DEV_MODE) currencyInputs[0].setSelectedCurrency("XMR");
 		
 		// reset passphrase
 		resetPassphrase();
@@ -1438,6 +1414,7 @@ function FormController(div) {
 		bip38Checkbox.prop('checked', false);
 		passphraseInputDiv.hide();
 		setPassphraseError(false);
+		if (AppUtils.DEV_MODE) passphraseInput.val(AppUtils.DEV_MODE_PASSPHRASE);	// dev mode default passphrase
 	}
 	
 	function updateBip38Checkbox() {
@@ -2716,6 +2693,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		// passphrase input
 		inputDiv = $("<div>").appendTo(div);
 		passphraseInput = $("<input type='password' class='import_passphrase_input'>").appendTo(inputDiv)
+		if (AppUtils.DEV_MODE) passphraseInput.val(AppUtils.DEV_MODE_PASSPHRASE);
 		submitButton = $("<div class='import_button'>").appendTo(inputDiv);
 		submitButton.html("Submit");
 		submitButton.click(function() { onSubmit(); });
