@@ -586,19 +586,21 @@ var Tests = {
 				for (var j = 0; j < keys.length; j++) {
 					assertEquals(keys[j].getPlugin().getTicker(), piece.keys[j].ticker);
 					assertEquals(keys[j].getAddress(), piece.keys[j].address);
-					if (piece.keys[j].wif) {
-						assertNull(piece.keys[j].encryption);
-						assertEquals(keys[j].getEncryptionScheme(), piece.keys[j].encryption);
-					}
-					else assertUndefined(piece.keys[j].encryption);
 					if (numPieces > 1) {
 						assertNumber(piece.pieceNum);
 						assertInt(piece.pieceNum);
 						assertTrue(piece.pieceNum > 0);
 						assertFalse(keys[j].getWif() === piece.keys[j].wif);
+						assertEquals(undefined, piece.keys[j].encryption);
 					} else {
 						assertUndefined(piece.pieceNum);
 						assertTrue(keys[j].getWif() === piece.keys[j].wif);
+						if (piece.keys[j].wif) {
+							assertDefined(piece.keys[j].encryption);
+							assertEquals(keys[j].getEncryptionScheme(), piece.keys[j].encryption);
+						} else {
+							assertEquals(undefined, piece.keys[j].encryption);
+						}
 					}
 				}
 			}
@@ -607,7 +609,7 @@ var Tests = {
 			if (numPieces > 1) {
 				for (var i = 0; i < pieces[0].keys.length; i++) {
 					var pieceKey = pieces[0].keys[i];
-					if (pieceKey.wif && !pieceKey.encryption && pieceKey.ticker === 'BTC') {
+					if (pieceKey.wif && !keys[i].getEncryptionScheme() && pieceKey.ticker === 'BTC') {
 						var decoded = AppUtils.decodeShare(pieceKey.wif);
 						assertEquals(minPieces, decoded.minPieces);
 						var b58 = Bitcoin.Base58.encode(Crypto.util.hexToBytes(decoded.hex));
@@ -774,7 +776,7 @@ var Tests = {
 						namedPieces = [];
 						namedPieces.push({name: 'piece.json', piece: piece});
 						controller.addNamedPieces(namedPieces);
-						assertEquals("Invalid piece 'piece.json': piece.keys[0].encryption is not defined", controller.getWarning());
+						assertEquals("", controller.getWarning());
 						controller.startOver();
 						
 						piece = { version: "4.6.4", keys: [{

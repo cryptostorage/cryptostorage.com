@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.2.1",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: true,
-	RUN_FULL_TESTS: false,
+	RUN_FULL_TESTS: true,
 	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
@@ -753,7 +753,7 @@ var AppUtils = {
 				pieceKey.ticker = key.getPlugin().getTicker();
 				pieceKey.address = key.getAddress();
 				pieceKey.wif = keyPieces[j];
-				if (pieceKey.wif) pieceKey.encryption = key.getEncryptionScheme();
+				if (pieceKey.wif && numPieces === 1) pieceKey.encryption = key.getEncryptionScheme();
 				pieces[j].keys.push(pieceKey);
 			}
 		}
@@ -775,16 +775,6 @@ var AppUtils = {
 		if (pieces.length === 1) {
 			assertTrue(pieces[0].keys.length > 0);
 			
-			// check if share
-			if (pieces[0].keys[0].wif) {
-				var share = AppUtils.decodeShare(pieces[0].keys[0].wif);
-				if (share) {
-					var minPieces = share.minPieces;
-					var additional = minPieces - 1;
-					throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private keys");
-				}
-			}
-			
 			// get keys from piece
 			for (var i = 0; i < pieces[0].keys.length; i++) {
 				var pieceKey = pieces[0].keys[i];
@@ -792,9 +782,19 @@ var AppUtils = {
 				state.address = pieceKey.address;
 				state.wif = pieceKey.wif;
 				state.encryption = pieceKey.encryption;
-				var key = new CryptoKey(AppUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
-				if (key.hasPrivateKey() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// set address because it cannot be derived from encrypted key
-				keys.push(key);
+				try {
+					var key = new CryptoKey(AppUtils.getCryptoPlugin(pieceKey.ticker), state.wif ? state.wif : state);
+					if (key.hasPrivateKey() && key.isEncrypted() && pieceKey.address) key.setAddress(pieceKey.address);	// set address because it cannot be derived from encrypted key
+					keys.push(key);
+				} catch (err) {
+				
+					// additional pieces are needed
+					var share = AppUtils.decodeShare(pieces[0].keys[0].wif);
+					assertInitialized(share, "piece.keys[" + i + "] is neither a key nor a share");
+					var minPieces = share.minPieces;
+					var additional = minPieces - 1;
+					throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to import private keys");
+				}
 			}
 		}
 		
@@ -1171,7 +1171,6 @@ var AppUtils = {
 		var minPieces;
 		for (var i = 0; i < piece.keys.length; i++) {
 			assertDefined(piece.keys[i].ticker, "piece.keys[" + i + "].ticker is not defined");
-			assertDefined(piece.keys[i].encryption, "piece.keys[" + i + "].encryption is not defined");
 			
 			// upgrade legacy encryption label for backward compatibility
 			for (var j = 0; j < piece.keys.length; j++) {
@@ -1179,7 +1178,7 @@ var AppUtils = {
 			}
 			
 			// validate encryption scheme
-			if (piece.keys[i].encryption !== null) {
+			if (isInitialized(piece.keys[i].encryption)) {
 				var found = false;
 				for (var j = 0; j < Object.keys(AppUtils.EncryptionScheme).length; j++) {
 					var key = Object.keys(AppUtils.EncryptionScheme)[j];
