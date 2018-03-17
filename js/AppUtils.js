@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.2.1",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: true,
-	RUN_FULL_TESTS: true,
+	RUN_FULL_TESTS: false,
 	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
