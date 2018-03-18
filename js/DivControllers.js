@@ -336,7 +336,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			getSlide($(mixImg), "Generate offline wallets for major cryptocurrencies.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets or save keys to a file for long-term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-			getSlide($("<img src='img/microscope.png'>"), "100% open-source and free to use.  No account necessary.").appendTo(sliderDiv);
+			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png'>"), "Passphrase-protect and split private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automatic environment checks.").appendTo(sliderDiv);
 			
@@ -457,8 +457,8 @@ function HomeController(div) {
 			
 			// download section
 			pageDiv.append("<div style='height: 70px'>");
-			pageDiv.append("<div class='home_label'>Download our 100% free and open-source software and run it offline</div>");
-			pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open-source, so the community can maintain it indefinitely.</div>")
+			pageDiv.append("<div class='home_label'>Download our 100% free and open source software and run it offline</div>");
+			pageDiv.append("<div class='home_description'>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>")
 			var licenseDiv = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 			var mitImg = $().appendTo(licenseDiv);
 			licenseDiv.append("<a target='_blank' href='./LICENSE.txt'><img src='img/mit.png' class='license_img'></a>");
@@ -559,13 +559,13 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is CryptoStorage?"; },
-					getAnswer: function() { return "<p>CryptoStorage is an open-source tool to generate offline storage for multiple cryptocurrencies.  This tool generates <a href='#faq_key_pair'>key pairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be easily printed and saved to digital files for long-term storage.</p>" +
+					getAnswer: function() { return "<p>CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies.  This tool generates <a href='#faq_key_pair'>keypairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated keypairs can be easily printed and saved to digital files for long-term storage.</p>" +
 						"<p>This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
 					}
 				}, {
 					id: "faq_key_pair",
-					getQuestion: function() { return "What is a cryptocurrency key pair?" },
-					getAnswer: function() { return "<p>A cryptocurrency key pair is like an account that can send and receive cryptocurrency.  It is comprised of a public address and a private key.  For example, this is a Bitcoin key pair:</p>" +
+					getQuestion: function() { return "What is a cryptocurrency keypair?" },
+					getAnswer: function() { return "<p>A cryptocurrency keypair is like an account that can send and receive cryptocurrency.  It is comprised of a public address and a private key.  For example, this is a Bitcoin keypair:</p>" +
 						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
 						"<p>The public address is used to receive funds.  It can be publicly shared with anyone.</p>" + 
 						"<p>The private key authorizes received funds to be spent.  <span style='color:red'>The private key must remain private or all funds can be lost.</span></p>"; }
@@ -574,7 +574,7 @@ function FaqController(div) {
 					getQuestion: function() { return "How does CryptoStorage help keep my cryptocurrency safe and secure?"; },
 					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys can be generated offline and are never shared with a third party by design.</p>" + 
 						"<p>Second, private keys can be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
-						"<p>Third, private keys can be split into separate pieces which must be combined to access funds.  For example, a Bitcoin key pair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one location.</p>" +
+						"<p>Third, private keys can be split into separate pieces which must be combined to access funds.  For example, a Bitcoin keypair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one location.</p>" +
 						"<p>Fourth, keys can printed and saved to digital files for long-term storage.</p>" +
 						"<p>Finally, this tool <a href='#faq_recommendations'>automatically detects and recommends</a> ways to improve the security of its environment.</p>"; }
 				}, {
@@ -586,8 +586,8 @@ function FaqController(div) {
 						var recommendationsList = $("<ol>").appendTo(answerDiv);
 						recommendationsList.append("<li><a href='#faq_download_verify'>Download and verify</a> then run the source code offline, not from the cryptostorage.com domain.</li>");
 						recommendationsList.append("<li>Run this tool on a device that is disconnected from the internet.  For maximum security, the device should never connect to the internet again after generating high-value storage.</li>");
-						recommendationsList.append("<li>Run this tool in an open-source browser like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
-						recommendationsList.append("<li>Run this tool on an open-source operating system like " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
+						recommendationsList.append("<li>Run this tool in an open source browser like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
+						recommendationsList.append("<li>Run this tool on an open source operating system like " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 						return answerDiv;
 					}
 				}, {
@@ -600,11 +600,11 @@ function FaqController(div) {
 						var generateTransfer = $("<li><p>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure computer using a flash drive.</p></li>").appendTo(generateList);
 						var generateTransferList = $("<ul>").appendTo(generateTransfer);
 						generateTransferList.append("<li>The computer should be disconnected from the internet.  For maximum security, the device should never connect to the internet again after generating cryptocurrency storage.</li>");
-						generateTransferList.append("<li>An open-source operating system is recommended like " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
+						generateTransferList.append("<li>An open source operating system is recommended like " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 						generateList.append("<li>Unzip cryptostorage.com-<i>[version]</i>.zip</li>");
 						var generateBrowser = $("<li><p>Open index.html in the unzipped folder in a browser.</p></li>").appendTo(generateList);
 						var generateBrowserList = $("<ul>").appendTo(generateBrowser);
-						generateBrowserList.append("<li>An open-source browser is recommended like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
+						generateBrowserList.append("<li>An open source browser is recommended like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
 						var generateChecks = $("<li><p>Confirm that all environment checks pass.</p></li>").appendTo(generateList)
 						var generateChecksList = $("<ol>").appendTo(generateChecks);
 						generateChecksList.append("<li><p>Go to Generate New Keys from the homepage.</p></li>");
@@ -660,18 +660,18 @@ function FaqController(div) {
 				}, {
 					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this tool?"; },
-					getAnswer: function() { return "<p>Don't trust.  Verify.  CryptoStorage is 100% open-source which means anyone can review the source code.</p>" +
+					getAnswer: function() { return "<p>Don't trust.  Verify.  CryptoStorage is 100% open source which means anyone can review the source code.</p>" +
 						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publicly reviewed and has not been modified by an attacker.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",
 					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
-					getAnswer: function() { return "<p>No.  The public/private key pairs are generated only in your devices browser so they are never shared with a third party by design.</p>"; }
+					getAnswer: function() { return "<p>No.  The public/private keypairs are generated only in your devices browser so they are never shared with a third party by design.</p>"; }
 				}, {
 					id: "faq_split_keys",
 					getQuestion: function() { return "What does it mean to split private keys?"; },
 					getAnswer: function() { return "<p>Generated storage can be split into separate pieces where some of the pieces must be combined in order to access funds.</p>" +
 						"<p>This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.</p>" +
-						"<p>For example, 10 key pairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 key pairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.</p>" +
+						"<p>For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.</p>" +
 						"<p>In this example, one might choose to keep one piece, put one in a bank, and give one to a trusted family member.</p>"; }
 				}, {
 					id: "faq_online_to_recover",
@@ -1217,7 +1217,7 @@ function FormController(div) {
 			var splitTooltip = $("<div>");
 			splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
 			splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
-			splitTooltip.append("For example, 10 key pairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 key pairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
+			splitTooltip.append("For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
 			tippy(splitInfo.get(0), {
 				arrow: true,
 				html: splitTooltip.get(0),
@@ -1746,7 +1746,7 @@ function FormController(div) {
 			
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
-			rightDiv.append("Key pairs to generate&nbsp;&nbsp;");
+			rightDiv.append("Keypairs to generate&nbsp;&nbsp;");
 			numKeysInput = $("<input type='tel' value='1' min='1'>").appendTo(rightDiv);
 			numKeysInput.on("input", function(e) { validateNumKeys(true); });
 			numKeysInput.on("focusout", function(e) { validateNumKeys(false); });
@@ -2920,7 +2920,7 @@ function ExportController(div, window, config) {
 	var regenerateDiv;
 	var publicAvailable;
 	var privateAvailable;
-	var quickGenerate = isQuickGenerate();	// only show notice bar and key pair when completely done if quick generate
+	var quickGenerate = isQuickGenerate();	// only show notice bar and keypair when completely done if quick generate
 	var exportFiles = {};										// cached file blobs and names for saving
 	var controlState;												// tracks enable/disable state of control elements
 	
@@ -3100,7 +3100,7 @@ function ExportController(div, window, config) {
 							btnRegenerate.append("Regenerate");
 							var refreshImg = $("<img src='img/refresh.png' class='refresh_img rotate2'>").appendTo(btnRegenerate);
 							btnRegenerate.click(function() {
-								if (confirm("Discard key pair and create a new one?")) {
+								if (confirm("Discard keypair and create a new one?")) {
 									
 									// rotate refresh icon
 									refreshImg.data("deg", refreshImg.data("deg") ? refreshImg.data("deg") + 180 : 180);
@@ -3747,11 +3747,11 @@ function NoticeController(div, config) {
 			// interpret environment code and state
 			switch (check.code) {
 				case AppUtils.EnvironmentCode.BROWSER:
-					if (check.state === "pass") div.append("Browser is open-source (" + info.browser.name + ")");
+					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
 					else {
 						var content = $("<div>").appendTo(div);
 						if (check.state === "fail") content.append("<div class='notice_bar_center_major'>Browser is not supported (" + info.browser.name + " " + info.browser.version + ")</div>");
-						else content.append("<div class='notice_bar_center_major'>Browser is not open-source (" + info.browser.name + ")</div>");
+						else content.append("<div class='notice_bar_center_major'>Browser is not open source (" + info.browser.name + ")</div>");
 						content.append("<div class='notice_bar_center_minor'>Recommended browsers: " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + "</div>");
 					}
 					break;
@@ -3779,10 +3779,10 @@ function NoticeController(div, config) {
 					}
 					break;
 				case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
-					if (check.state === "pass") div.append("Operating system is open-source (" + info.os.name + ")");
+					if (check.state === "pass") div.append("Operating system is open source (" + info.os.name + ")");
 					else {
 						var content = $("<div>").appendTo(div);
-						content.append("<div class='notice_bar_center_major'>Operating system is not open-source (" + info.os.name + ")</div>");
+						content.append("<div class='notice_bar_center_major'>Operating system is not open source (" + info.os.name + ")</div>");
 						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 					}
 					break;

@@ -5,15 +5,15 @@ cryptostorage-v0.1.0-beta
 - First release!
 - Generate offline storage for multiple cryptocurrencies.
 - Keys are generated only in your device's browser so funds are never entrusted to a third party by design.
-- 100% open-source, client-side, and free to use.  No account necessary.
+- 100% open source, client-side, and free to use.  No account necessary.
 - Private keys can be passphrase-protected using CryptoJS.  Also supports BIP38 for Bitcoin and Bitcoin Cash.
 - Storage can be split into pieces which can be geographically separated so funds are not accessible at any one location.
 - Print or save to digital file for long-term storage.
 - Recommendations are automatically provided to improve the security of the tool's environment:
 	- Checks if the internet connection is active
 	- Checks if the tool is downloaded and running locally
-	- Checks if the browser is open-source
-	- Checks if the operating system is open-source
+	- Checks if the browser is open source
+	- Checks if the operating system is open source
 - Supported tokens:
 	- Bitcoin
 	- Bitcoin Cash
@@ -69,3 +69,9 @@ cryptostorage-v0.2.1-beta
 - Added support to import and export CSV
 - Added support to export TXT
 - Indicate that browser is not supported if tab fails to open
+
+03/18/2018
+cryptostorage-v0.2.2-beta
+- Added support to import CSV and JSON as text
+- Added support to import list of private keys or split shares as text
+- Reduced workload of minimum tests

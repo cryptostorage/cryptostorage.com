@@ -1,6 +1,4 @@
 v0.2.2
-imported pieces viewable from encrypted / decrypted pieces
-
 info box on currencies
 wording: keypairs and open source
 

@@ -123,12 +123,12 @@ function PieceRenderer(pieces, pieceDivs, config) {
 				}
 			}
 			
-			// collect function to render key pair
+			// collect function to render keypair
 			var placeholderDiv = $("<div class='key_div'>").appendTo(pageDiv);
 			funcs.push(renderKeyPairFunc(placeholderDiv, piece, i, config));
 		}
 		
-		// callback function to render key pair
+		// callback function to render keypair
 		function renderKeyPairFunc(placeholderDiv, piece, index, config) {
 			return function(onDone) {
 				if (isCancelled) return;
@@ -160,11 +160,11 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		});
 		
 		/**
-		 * Renders a single key pair.
+		 * Renders a single keypair.
 		 * 
 		 * @param div is the div to render to
-		 * @param piece is the piece containing the key pair to render
-		 * @param index is the index of the key pair within the piece
+		 * @param piece is the piece containing the keypair to render
+		 * @param index is the index of the keypair within the piece
 		 * @param config is the render configuration
 		 * @param onDone is invoked when rendering is done
 		 */
