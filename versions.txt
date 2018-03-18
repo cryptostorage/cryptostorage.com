@@ -72,6 +72,7 @@ cryptostorage-v0.2.1-beta
 
 03/18/2018
 cryptostorage-v0.2.2-beta
-- Support CSV and JSON text import
+- Support CSV and JSON text import which enables bulk export and import on mobile
 - Support importing list of private keys or split shares as text
+- Removed encryption scheme metadata from split shares
 - Reduced workload of minimum tests
