@@ -2322,7 +2322,7 @@ function ImportTextController(div, plugins) {
 		
 		// text area
 		textArea = $("<textarea class='import_textarea'>").appendTo(textInputDiv);
-		textArea.attr("placeholder", "Enter private keys, split pieces, csv, or json...");
+		textArea.attr("placeholder", "Enter private keys, split shares, csv, or json");
 		
 		// submit button
 		var submit = $("<div class='import_button'>").appendTo(textInputDiv);
