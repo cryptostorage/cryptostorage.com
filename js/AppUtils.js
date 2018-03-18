@@ -1145,7 +1145,10 @@ var AppUtils = {
 		for (var i = 0; i < copy.keys.length; i++) {
 			var key = copy.keys[i];
 			if (!config.showPublic) delete key.address;
-			if (!config.showPrivate) delete key.wif;
+			if (!config.showPrivate) {
+				delete key.wif;
+				delete key.encryption;
+			}
 		}
 		return copy;
 		

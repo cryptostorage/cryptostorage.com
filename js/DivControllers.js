@@ -2640,7 +2640,7 @@ function ImportTextController(div, plugins) {
 			var importedPieceDiv = $("<div class='import_text_imported_piece'>").appendTo(importedPiecesDiv);
 			var icon = $("<img src='img/file.png' class='import_imported_icon'>").appendTo(importedPieceDiv);
 			assertTrue(piece.keys.length > 0);
-			var pieceLabel = piece.keys.length === 1 ? piece.keys[0].wif : "Imported piece" + (piece.pieceNum ? " " + piece.pieceNum : "");
+			var pieceLabel = piece.keys.length === 1 ? (piece.keys[0].wif ? piece.keys[0].wif : piece.keys[0].address) : "Imported piece" + (piece.pieceNum ? " " + piece.pieceNum : "");
 			importedPieceDiv.append(AppUtils.getShortenedString(pieceLabel, MAX_PIECE_LENGTH));
 			var trash = $("<img src='img/trash.png' class='import_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
