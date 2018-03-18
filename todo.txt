@@ -1,6 +1,5 @@
 v0.2.2
 info box on currencies
-wording: keypairs and open source
 
 designer:
 encrypt / split imported storage

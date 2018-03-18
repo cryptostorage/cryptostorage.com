@@ -28,8 +28,8 @@
 var Tests = {
 	
 	// constants
-	REPEAT_LONG: 1,
-	REPEAT_SHORT: 1,
+	REPEAT_LONG: 20,
+	REPEAT_SHORT: 2,
 	NUM_PIECES: 3,
 	MIN_PIECES: 2,
 	PASSPHRASE: "MySuperSecretPassphraseAbcTesting123",

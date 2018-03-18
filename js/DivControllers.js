@@ -2586,26 +2586,6 @@ function ImportTextController(div, plugins) {
 			// check if piece already added
 			if (arrayContains(pieces, piece)) return "Piece already imported";
 			
-//			// private key not allowed if pieces already imported
-//			if (pieces.length > 0) {
-//				try {
-//					AppUtils.getCryptoPlugin(piece.keys[0].ticker).newKey(piece.keys[0].wif);
-//					return "Cannot add private key to existing pieces";
-//				} catch (err) { };
-//			}
-//			
-//			// determine if private key is already imported
-//			var keyFound = false;
-//			for (var i = 0; i < pieces.length; i++) {
-//				try {
-//					AppUtils.getCryptoPlugin(pieces[0].keys[0].ticker).newKey(pieces[0].keys[0].wif);
-//					keyFound = true;
-//				} catch (err) { }
-//			}
-//			
-//			// new pieces not allowed if private key already added
-//			if (keyFound) return "Cannot add to existing private key";
-			
 			// no issues adding private key
 			return null;
 		}
