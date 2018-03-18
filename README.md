@@ -119,4 +119,4 @@ This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/ma
 # Donate
 Donations are gratefully accepted to support this project.
 
-Please see https://cryptostorage.com/#donate for donation addresses ❤. 
+Please see https://cryptostorage.com/#donate for donation addresses.
