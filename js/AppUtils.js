@@ -592,7 +592,7 @@ var AppUtils = {
 		
 		// try to parse json
 		try { return AppUtils.jsonToPiece(text); }
-		catch (err) {}
+		catch (err) { }
 		
 		// try to parse csv
 		try { return AppUtils.csvToPiece(text); }
@@ -889,11 +889,18 @@ var AppUtils = {
 			extension = ".txt";
 			transformFunc = AppUtils.pieceToTxt;
 		} else throw new Error("Invalid zip type: " + zipType);
+		
+		// build names for pieces
+		var pieceNames = [];
+		for (var i = 0; i < pieces.length; i++) {
+			var name = "cryptostorage_" + ticker + (pieces[i].pieceNum ? "_piece_" + pieces[i].pieceNum : "");
+			pieceNames.push(getNextAvailableName(pieceNames, name));
+		}
 
 		// prepare zip
 		var zip = JSZip();
 		for (var i = 0; i < pieces.length; i++) {
-			var name = "cryptostorage_" + ticker + (pieces.length > 1 ? "_piece_" + (i + 1) : "");
+			var name = pieceNames[i];
 			zip.file(name + extension, transformFunc(pieces[i]));
 		}
 		
@@ -901,6 +908,23 @@ var AppUtils = {
 		zip.generateAsync({type:"blob"}).then(function(blob) {
 			callback(blob);
 		});
+		
+		/**
+		 * Gets the next available name, adding a postfix to prevent duplicates.
+		 * 
+		 * @param names is the list of existing names
+		 * @param name is the desired name to add
+		 * @returns a name which will be postfixed if necessary to prevent duplicates
+		 */
+		function getNextAvailableName(names, name) {
+			if (!arrayContains(names, name)) return name;
+			var idx = 2;
+			while (true) {
+				var postfixedName = name + "_" + idx;
+				if (!arrayContains(names, postfixedName)) return postfixedName;
+				idx++;
+			}
+		}
 	},
 
 	/**
@@ -1061,7 +1085,7 @@ var AppUtils = {
 	 */
 	jsonToPiece: function(json) {
 		var piece = JSON.parse(json);
-		AppUtils.validatePiece(piece);
+		AppUtils.validatePiece(piece, true);
 		return piece;
 	},
 	

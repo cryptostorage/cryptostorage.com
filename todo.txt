@@ -1,5 +1,4 @@
 v0.2.2
-naming scheme if duplicate pieceNums imported
 imported pieces viewable from encrypted / decrypted pieces
 
 info box on currencies
