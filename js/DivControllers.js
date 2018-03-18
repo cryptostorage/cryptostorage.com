@@ -71,7 +71,7 @@ var UiUtils = {
 	 * 				config.showRegenerate specifies if the regenerate button should be shown
 	 * 				config.showNotices specifies if notices should be shown
 	 */
-	openStorage: function(browserTabName, config) {
+	openStorageTab: function(browserTabName, config) {
 		
 		// deep copy config
 		config = Object.assign({}, config);
@@ -490,7 +490,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (!environmentFailure) UiUtils.openStorage(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
+			if (!environmentFailure) UiUtils.openStorageTab(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
 		}
 		
 		function getKeyGenConfig(plugin) {
@@ -1309,7 +1309,7 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm(true);
-		if (!hasFormErrors()) UiUtils.openStorage("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
+		if (!hasFormErrors()) UiUtils.openStorageTab("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
 		if (onDone) onDone();
 	}
 	
@@ -1965,7 +1965,7 @@ function ImportFileController(div) {
 			decryptionController = new DecryptionController(decryptionDiv, keys, function(warning) {
 				that.setWarning(warning);
 			}, function(decryptedKeys, decryptedPieces, decryptedPieceDivs) {
-				showStorage(pieces, decryptedKeys, decryptedPieces, decryptedPieceDivs);
+				showInlineStorage(pieces, decryptedKeys, decryptedPieces, decryptedPieceDivs);
 			});
 			
 			// render decryption controller
@@ -1979,15 +1979,15 @@ function ImportFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openStorage("Encrypted Keys", {splitPieces: pieces.length > 1 ? pieces : null, keys: keys});
+					UiUtils.openStorageTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
 				});
 			});
 		} else {
-			showStorage(pieces, keys);
+			showInlineStorage(pieces, keys);
 		}
 	}
 	
-	function showStorage(importedPieces, keys, pieces, pieceDivs) {
+	function showInlineStorage(importedPieces, keys, pieces, pieceDivs) {
 		resetControls();
 		importInputDiv.hide();
 		importedStorageDiv.empty();
@@ -2006,7 +2006,7 @@ function ImportFileController(div) {
 		if (importedPieces.length > 1) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
 			viewSplit.append("view split pieces");
-			viewSplit.click(function() { UiUtils.openStorage("Imported Pieces", {pieces: importedPieces}); });
+			viewSplit.click(function() { UiUtils.openStorageTab("Imported Pieces", {pieces: importedPieces}); });
 		}
 		
 		// inline storage
@@ -2149,7 +2149,7 @@ function ImportFileController(div) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openStorage("Imported Storage", {pieces: pieces});
+			UiUtils.openStorageTab("Imported Storage", {pieces: pieces});
 		});
 		
 		// attempt to get keys
@@ -2421,16 +2421,18 @@ function ImportTextController(div, plugins) {
 		}
 	}
 	
-	function onKeysImported(keys) {
+	function onKeysImported(pieces, keys) {
+		resetControls();
+		setWarning("");
 		keys = listify(keys);
 		assertTrue(keys.length > 0);
-		if (keys[0].isEncrypted()) {
+		if (keys[0].hasPrivateKey() && keys[0].isEncrypted()) {
 			
 			// create decryption controller and register callbacks
 			decryptionController = new DecryptionController(decryptionDiv, keys, function(warning) {
 				setWarning(warning);
-			}, function(decryptedKeys, pieces, pieceDivs) {
-				onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
+			}, function(decryptedKeys, decryptedPieces, decryptedPieceDivs) {
+				showInlineStorage(pieces, decryptedKeys, decryptedPieces, decryptedPieceDivs);
 			});
 			
 			// render decryption controller
@@ -2443,16 +2445,16 @@ function ImportTextController(div, plugins) {
 				decryptionController.focus();
 				
 				// add control to view encrypted keys
-				addControl("view encrypted key", function() {
-					UiUtils.openStorage("Encrypted Key", {keys: keys});
+				addControl("view encrypted keys", function() {
+					UiUtils.openStorageTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
 				});
 			});
 		} else {
-			onKeysDecrypted(keys);
+			showInlineStorage(pieces, keys);
 		}
 	}
 	
-	function onKeysDecrypted(keys, pieces, pieceDivs) {
+	function showInlineStorage(importedPieces, keys, pieces, pieceDivs) {
 		resetControls();
 		importInputDiv.hide();
 		importedStorageDiv.empty();
@@ -2464,9 +2466,15 @@ function ImportTextController(div, plugins) {
 		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
 		successTitle.append("Imported Successfully");
 		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successDiv);
+		if (importedPieces.length > 1) successLinks.append("<div class='import_success_checkmark'>");	// filler to center control links under title text
 		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
+		if (importedPieces.length > 1) {
+			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
+			viewSplit.append("view split pieces");
+			viewSplit.click(function() { UiUtils.openStorageTab("Imported Pieces", {pieces: importedPieces}); });
+		}
 		
 		// inline storage
 		var storageDiv = $("<div>").appendTo(importedStorageDiv);
@@ -2604,7 +2612,7 @@ function ImportTextController(div, plugins) {
 	}
 	
 	/**
-	 * Reads the imported piece pool which is guaranteed to be in a good state (no incompatible pieces).
+	 * Reads the imported pieces.
 	 */
 	function processPieces() {
 		
@@ -2617,13 +2625,13 @@ function ImportTextController(div, plugins) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openStorage("Imported Storage", {pieces: importedPieces});
+			UiUtils.openStorageTab("Imported Storage", {pieces: importedPieces});
 		});
 		
 		// check if pieces combine to make private keys
 		try {
 			var keys = AppUtils.piecesToKeys(importedPieces);
-			onKeysImported(keys);
+			onKeysImported(importedPieces, keys);
 		} catch (err) {
 			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 			else setWarning(err.message);
@@ -3018,7 +3026,7 @@ function ExportController(div, window, config) {
 			var viewImported = $("<div class='import_control_link'>").appendTo(exportControls);
 			viewImported.html("view split pieces");
 			viewImported.click(function() {
-				UiUtils.openStorage("Imported Pieces", {pieces: config.splitPieces});
+				UiUtils.openStorageTab("Imported Pieces", {pieces: config.splitPieces});
 			});
 		}
 		
