@@ -1,5 +1,6 @@
 v0.2.2
 info box on currencies
+cryptocash design
 
 designer:
 encrypt / split imported storage
