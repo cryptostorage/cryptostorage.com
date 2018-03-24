@@ -1361,10 +1361,6 @@ input[type='checkbox'][disabled] +label {
 	margin-bottom: 0px;
 }
 
-.key_div_cryptostorage_logo {
-	width: 150px;
-}
-
 .key_div_qr {
 	width: 90px;
 	height: 90px;
@@ -1561,6 +1557,44 @@ input[type='checkbox'][disabled] +label {
 	.export_regenerate_div {
 		display: none;
 	}
+}
+
+.cryptocash_instructions {
+	flex: 1;
+	margin-left: 10px;
+}
+
+.cryptocash_instructions, .cryptocash_instructions * {
+	font-size: 14px;
+}
+
+.cryptocash_instructions ol {
+	padding-left: 19px;
+}
+
+.cryptocash_instructions li {
+	padding-left: 8px;
+	margin-top: 2px;
+}
+
+.cryptocash_branding {
+	margin-right: 25px;
+}
+
+.cryptocash_branding, .cryptocash_branding * {
+	font-size: 14px;
+}
+
+.cryptocash_branding * {
+	margin-top: 3px;
+}
+
+.cryptocash_branding * :first-child {
+	margin-top: 0px;
+}
+
+.cryptocash_branding_logo {
+	width: 175px;
 }
 
 .hidden {

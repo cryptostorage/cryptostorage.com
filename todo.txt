@@ -1,5 +1,4 @@
 v0.2.3
-instructions to sweep funds
 cross-browser testing
 
 info box on currencies
