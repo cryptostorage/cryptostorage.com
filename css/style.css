@@ -1170,6 +1170,7 @@ input[type='checkbox'][disabled] +label {
 	padding: 12px;
 	margin-top: 2px;	/* fix mobile safari border showing */
 	padding: 20px;
+	max-width: 875px;
 }
 
 .export_buttons {
@@ -1219,6 +1220,16 @@ input[type='checkbox'][disabled] +label {
 
 .export_checkboxes {
 	margin-top: 15px;
+	flex-wrap: wrap;
+}
+
+.export_checkbox_span {
+	white-space: nowrap;
+	margin-left: 15px;
+}
+
+.export_checkbox_span:first-child {
+	margin-left: 0px;
 }
 
 .export_checkbox {
@@ -1230,6 +1241,7 @@ input[type='checkbox'][disabled] +label {
 .export_checkbox_label {
 	color: white;
 	font-size: 24px;
+	white-space: nowrap;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;

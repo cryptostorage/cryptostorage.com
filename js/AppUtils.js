@@ -1271,7 +1271,8 @@ var AppUtils = {
 	 * 		numPieces: _,
 	 * 		minPieces: _,
 	 * 		verifyEnryption: true|false	
-	 * 		passphrase: _,	// only needed if currency encryption initialized
+	 * 		passphrase: _,		// only needed if currency encryption initialized
+	 *    renderConfig: {}	// piece render config  TODO: rendering should probably not be a part of this function
 	 * 	}
 	 * @param onProgress(percent, label) is invoked as progress is made (optional)
 	 * @param onDone(err, keys, pieces, pieceDivs) is invoked when done
@@ -1419,7 +1420,7 @@ var AppUtils = {
 			// render pieces to divs
 			var renderWeight = PieceRenderer.getWeight(keys.length, config.numPieces, null);
 			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
-			new PieceRenderer(pieces, null, null).render(function(percent) {
+			new PieceRenderer(pieces, null, config.renderConfig).render(function(percent) {
 				if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
 			}, function(err, pieceDivs) {
 				if (err) onDone(err);

@@ -2893,6 +2893,9 @@ function ExportController(div, window, config) {
 	var showPublicCheckbox;
 	var showPrivateCheckbox;
 	var showLogosCheckbox;
+	var cryptoCashCheckbox;
+	var cryptoCashBackSpan;
+	var cryptoCashBackCheckbox;
 	var paginator;
 	var piecesDiv;
 	var piecesLabel;
@@ -2950,19 +2953,42 @@ function ExportController(div, window, config) {
 		  }
 		}
 		
+		// sort pieces and pieceDivs by piece number
+		sortPieces();
+		
+		// get paginator source if split pieces
+		var paginatorSource = getPaginatorSource(config.keyGenConfig, config.pieces);
+		
 		// export checkboxes
 		var exportCheckboxes = $("<div class='export_checkboxes flex_horizontal'>").appendTo(exportControls);
-		showPublicCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPublicCheckbox'>").appendTo(exportCheckboxes);
-		var showPublicCheckboxLabel = $("<label class='export_checkbox_label' for='showPublicCheckbox'>").appendTo(exportCheckboxes);
-		showPublicCheckboxLabel.html("Include public addresses");
-		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
-		showPrivateCheckbox = $("<input type='checkbox' class='export_checkbox' id='showPrivateCheckbox'>").appendTo(exportCheckboxes);
-		var showPrivateCheckboxLabel = $("<label class='export_checkbox_label' for='showPrivateCheckbox'>").appendTo(exportCheckboxes);
-		showPrivateCheckboxLabel.html("Include private keys");
-		exportCheckboxes.append("&nbsp;&nbsp;&nbsp;");
-		showLogosCheckbox = $("<input type='checkbox' class='export_checkbox' id='showLogosCheckbox'>").appendTo(exportCheckboxes);
-		var showLogosCheckboxLabel = $("<label class='export_checkbox_label' for='showLogosCheckbox'>").appendTo(exportCheckboxes);
-		showLogosCheckboxLabel.html("Include logos");
+		var exportCheckbox = getControlCheckbox("Include public addresses");
+		exportCheckboxes.append(exportCheckbox[0]);
+		showPublicCheckbox = exportCheckbox[1];
+		exportCheckbox = getControlCheckbox("Include private keys");
+		exportCheckboxes.append(exportCheckbox[0]);
+		showPrivateCheckbox = exportCheckbox[1];
+		exportCheckbox = getControlCheckbox("Include logos");
+		exportCheckboxes.append(exportCheckbox[0]);
+		showLogosCheckbox = exportCheckbox[1];
+		exportCheckbox = getControlCheckbox("Crypto-cash");
+		exportCheckboxes.append(exportCheckbox[0]);
+		cryptoCashCheckbox = exportCheckbox[1];
+		if (paginatorSource) exportCheckbox[0].hide();
+		exportCheckbox = getControlCheckbox("Crypto-cash reverse side");
+		exportCheckboxes.append(exportCheckbox[0]);
+		cryptoCashBackSpan = exportCheckbox[0];
+		cryptoCashBackCheckbox = exportCheckbox[1];
+		if (paginatorSource) cryptoCashBackSpan[0].hide();
+		
+		// creates a control checkbox with the given label
+		function getControlCheckbox(label) {
+			var span = $("<span class='export_checkbox_span flex_horizontal'>");
+			var uuid = uuidv4();
+			var checkbox = $("<input type='checkbox' class='export_checkbox' id='" + uuid + "'>").appendTo(span);
+			var checkboxLabel = $("<label class='export_checkbox_label' for='" + uuid + "'>").appendTo(span);
+			checkboxLabel.html(label);
+			return [span, checkbox, label];
+		}
 		
 		// apply default checkbox state
 		publicAvailable = (!config.keys && !config.pieces) || isPublicAvailable(config.keys, config.pieces);
@@ -2980,12 +3006,10 @@ function ExportController(div, window, config) {
 			showPrivateCheckbox.attr("disabled", "disabled");
 		}
 		showLogosCheckbox.prop('checked', true);
+		cryptoCashCheckbox.prop('checked', false);
+		cryptoCashBackCheckbox.prop('checked', true);
 		
-		// sort pieces and pieceDivs by piece number
-		sortPieces();
-		
-		// piece selection
-		var paginatorSource = getPaginatorSource(config.keyGenConfig, config.pieces);
+		// paginator
 		if (paginatorSource) {
 			paginator = $("<div id='paginator' class='flex_horizontal'>").appendTo(exportControls);
 			$("#paginator", exportHeader).pagination({
@@ -3066,6 +3090,8 @@ function ExportController(div, window, config) {
 					showPublicCheckbox.click(function() { update(); });
 					showPrivateCheckbox.click(function() { update(); });
 					showLogosCheckbox.click(function() { update(); });
+					cryptoCashCheckbox.click(function() { update(); });
+					cryptoCashBackCheckbox.click(function() { update(); });
 					
 					// done rendering if not quick generate
 					if (onDone && !quickGenerate) onDone(div);
@@ -3160,7 +3186,9 @@ function ExportController(div, window, config) {
 		return {
 			showPublic: showPublicCheckbox.prop('checked'),
 			showPrivate: showPrivateCheckbox.prop('checked'),
-			showLogos: showLogosCheckbox.prop('checked')
+			showLogos: showLogosCheckbox.prop('checked'),
+			cryptoCash: cryptoCashCheckbox.prop('checked'),
+			cryptoCashBack: cryptoCashBackCheckbox.prop('checked')
 		};
 	}
 	
@@ -3384,10 +3412,18 @@ function ExportController(div, window, config) {
 					showPrivateCheckbox.attr('disabled', 'disabled');
 				}
 				showLogosCheckbox.removeAttr('disabled');
+				cryptoCashCheckbox.removeAttr('disabled');
+				if (cryptoCashCheckbox.prop('checked')) {
+					cryptoCashBackSpan.show();
+				} else {
+					cryptoCashBackSpan.hide();
+				}
 			} else {
 				showPublicCheckbox.attr('disabled', 'disabled');
 				showPrivateCheckbox.attr('disabled', 'disabled');
 				showLogosCheckbox.attr('disabled', 'disabled');
+				cryptoCashCheckbox.attr('disabled', 'disabled');
+				cryptoCashBackSpan.hide();
 			}
 		}
 	}
@@ -3455,6 +3491,7 @@ function ExportController(div, window, config) {
 			// otherwise generate keys from config
 			else {
 				assertInitialized(config.keyGenConfig);
+				config.keyGenConfig.renderConfig = getExportConfig();	// render configuration
 				if (!quickGenerate) setControlsEnabled(false);
 				AppUtils.generateKeys(config.keyGenConfig, function(percent, label) {
 					progressBar.set(percent);
