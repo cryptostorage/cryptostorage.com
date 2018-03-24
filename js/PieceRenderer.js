@@ -114,7 +114,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			if (i % config.pairsPerPage === 0) {
 				if (i > 0) {
 					pieceDiv.append($("<div>"));
-					if (config.cryptoCash && config.cryptoStorageLogos) pieceDiv.append(getCryptoStorageLogosPage(config.pairsPerPage));
+					if (config.cryptoCash && config.cryptoCashBack) pieceDiv.append(getCryptoStorageLogosPage(config.pairsPerPage));
 				}
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
 				if (!config.cryptoCash && (piece.pieceNum || config.showLogos)) {
@@ -133,7 +133,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		}
 		
 		// add cryptostoarge logos
-		if (piece.keys.length % config.pairsPerPage !== 0 && config.cryptoCash && config.cryptoStorageLogos) pieceDiv.append(getCryptoStorageLogosPage(piece.keys.length % config.pairsPerPage));
+		if (piece.keys.length % config.pairsPerPage !== 0 && config.cryptoCash && config.cryptoCashBack) pieceDiv.append(getCryptoStorageLogosPage(piece.keys.length % config.pairsPerPage));
 		
 		// callback function to render keypair
 		function renderKeyPairFunc(placeholderDiv, piece, index, config) {
@@ -296,7 +296,6 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		
 		function getCryptoStorageLogosPage(numLogos) {
 			assertTrue(config.cryptoCash);
-			console.log("getCryptoStorageLogosPage(" + numLogos + ")");
 			var pageDiv = $("<div class='piece_page_div'>");
 			for (var i = 0; i < numLogos; i++) pageDiv.append(getOutlinedLogoDiv());
 			return pageDiv;
@@ -304,7 +303,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			function getOutlinedLogoDiv() {
 				var div = $("<div>");
 				div.addClass("key_div key_div_spaced flex_horizontal");
-				div.append($("<img class='key_div_cryptostorage_logo' src='img/cryptostorage_export.png'>"));
+				if (config.showLogos) div.append($("<img class='key_div_cryptostorage_logo' src='img/cryptostorage_export.png'>"));
 				return div;
 			}
 		}
@@ -323,7 +322,7 @@ PieceRenderer.defaultConfig = {
 		qrScale: 4,
 		qrPadding: 5,		// spacing in pixels
 		cryptoCash: true,
-		cryptoStorageLogos: true
+		cryptoCashBack: true
 };
 
 // compute render weight
