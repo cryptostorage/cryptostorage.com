@@ -166,6 +166,7 @@ var AppUtils = {
 			"lib/jquery-3.2.1.js",
 			"lib/async.js",
 			"lib/loadjs.js",
+			"lib/tippy.all.js",
 			"js/DependencyLoader.js",
 			"js/GenUtils.js",
 			"js/AppUtils.js",

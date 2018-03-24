@@ -101,7 +101,7 @@ var UiUtils = {
 	TAILS_LINK: "<a target='_blank' href='https://tails.boum.org'>Tails</a>",
 	DEBIAN_LINK: " <a target='_blank' href='https://www.debian.org/'>Debian</a>",
 	RASPBIAN_LINK: "<a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>",
-	INFO_TOOLTIP_MAX_WIDTH: "600px",
+	INFO_TOOLTIP_MAX_WIDTH: "700px",
 	NOTICE_TOOLTIP_MAX_WIDTH: "700px"
 }
 
@@ -2970,7 +2970,7 @@ function ExportController(div, window, config) {
 		exportCheckbox = getControlCheckbox("Include logos");
 		exportCheckboxes.append(exportCheckbox[0]);
 		showLogosCheckbox = exportCheckbox[1];
-		exportCheckbox = getControlCheckbox("Crypto-cash");
+		exportCheckbox = getControlCheckbox("Crypto-cash", "Formats keypairs to be printed and cut out.  Perfect for tipping in real life.");
 		exportCheckboxes.append(exportCheckbox[0]);
 		cryptoCashCheckbox = exportCheckbox[1];
 		if (!isCryptoCashEnabled()) exportCheckbox[0].hide();
@@ -2981,12 +2981,32 @@ function ExportController(div, window, config) {
 		if (!isCryptoCashEnabled()) cryptoCashBackSpan.hide();
 		
 		// creates a control checkbox with the given label
-		function getControlCheckbox(label) {
+		function getControlCheckbox(label, info) {
 			var span = $("<span class='export_checkbox_span flex_horizontal'>");
 			var uuid = uuidv4();
 			var checkbox = $("<input type='checkbox' class='export_checkbox' id='" + uuid + "'>").appendTo(span);
-			var checkboxLabel = $("<label class='export_checkbox_label' for='" + uuid + "'>").appendTo(span);
-			checkboxLabel.html(label);
+			var checkboxLabel = $("<label class='export_checkbox_label flex_horizontal' for='" + uuid + "'>").appendTo(span);
+			checkboxLabel.append(label);
+			
+			// info tooltip
+			if (info) {
+				var infoImg = $("<img src='img/information_white.png' class='information_img'>").appendTo(checkboxLabel);
+				var tooltip = $("<div>");
+				tooltip.append(info);
+				tippy(infoImg.get(0), {
+					arrow: true,
+					html: tooltip.get(0),
+					placement: 'bottom',
+					theme: 'translucent',
+					trigger: "mouseenter",
+					multiple: 'false',
+					maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
+					distance: 20,
+					arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+					offset: '0, 0'
+				});
+			}
+			
 			return [span, checkbox, label];
 		}
 		
