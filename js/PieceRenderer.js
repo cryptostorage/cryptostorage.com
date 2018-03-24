@@ -112,7 +112,10 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			
 			// add new page
 			if (i % config.pairsPerPage === 0) {
-				if (i > 0) pieceDiv.append($("<div>"));
+				if (i > 0) {
+					pieceDiv.append($("<div>"));
+					if (config.cryptoCash && config.cryptoStorageLogos) pieceDiv.append(getCryptoStorageLogosPage(config.pairsPerPage));
+				}
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
 				if (!config.cryptoCash && (piece.pieceNum || config.showLogos)) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
@@ -128,6 +131,9 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			if (config.cryptoCash) placeholderDiv.addClass("key_div_spaced");
 			funcs.push(renderKeyPairFunc(placeholderDiv, piece, i, config));
 		}
+		
+		// add cryptostoarge logos
+		if (piece.keys.length % config.pairsPerPage !== 0 && config.cryptoCash && config.cryptoStorageLogos) pieceDiv.append(getCryptoStorageLogosPage(piece.keys.length % config.pairsPerPage));
 		
 		// callback function to render keypair
 		function renderKeyPairFunc(placeholderDiv, piece, index, config) {
@@ -285,6 +291,21 @@ function PieceRenderer(pieces, pieceDivs, config) {
 				if ("undefined" !== config.qrErrorCorrectionLevel) qr_config.errorCorrectionLevel = config.qrErrorCorrectionLevel;
 				if ("undefined" !== config.qrScale) qr_config.scale = config.qrScale;
 				return qr_config;
+			}
+		}
+		
+		function getCryptoStorageLogosPage(numLogos) {
+			assertTrue(config.cryptoCash);
+			console.log("getCryptoStorageLogosPage(" + numLogos + ")");
+			var pageDiv = $("<div class='piece_page_div'>");
+			for (var i = 0; i < numLogos; i++) pageDiv.append(getOutlinedLogoDiv());
+			return pageDiv;
+			
+			function getOutlinedLogoDiv() {
+				var div = $("<div>");
+				div.addClass("key_div key_div_spaced flex_horizontal");
+				div.append($("<img class='key_div_cryptostorage_logo' src='img/cryptostorage_export.png'>"));
+				return div;
 			}
 		}
 	}

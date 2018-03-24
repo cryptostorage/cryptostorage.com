@@ -1349,6 +1349,10 @@ input[type='checkbox'][disabled] +label {
 	margin-bottom: 0px;
 }
 
+.key_div_cryptostorage_logo {
+	width: 200px;
+}
+
 .key_div_qr {
 	width: 90px;
 	height: 90px;
