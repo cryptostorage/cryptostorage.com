@@ -1,7 +1,5 @@
 v0.2.3
 crypto info box not part of label
-uuid generation cs5
-cross-browser testing
 
 info box on currencies
 cryptocash design
