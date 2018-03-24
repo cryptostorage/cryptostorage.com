@@ -300,12 +300,18 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		function getCryptoStorageLogosPage(numLogos) {
 			assertTrue(config.spaceBetween);
 			var pageDiv = $("<div class='piece_page_div'>");
-			for (var i = 0; i < numLogos; i++) pageDiv.append(getOutlinedLogoDiv());
+			for (var i = 0; i < numLogos; i++) pageDiv.append(getSweepInstructionsDiv());
 			return pageDiv;
 			
-			function getOutlinedLogoDiv() {
+			function getSweepInstructionsDiv() {
 				var div = $("<div>");
 				div.addClass("key_div key_div_spaced flex_horizontal");
+				// TODO: implement sweep instructions UI
+				
+				
+				
+				
+				
 				if (config.showLogos) div.append($("<img class='key_div_cryptostorage_logo' src='img/cryptostorage_export.png'>"));
 				return div;
 			}
