@@ -1354,7 +1354,7 @@ input[type='checkbox'][disabled] +label {
 .key_div_spaced {
 	border-bottom: 2px solid;
 	border-color: green;
-	margin-bottom: 35px;
+	margin-bottom: 34px;
 }
 
 .key_div_spaced:last-child {
