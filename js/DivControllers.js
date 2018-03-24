@@ -2973,12 +2973,12 @@ function ExportController(div, window, config) {
 		exportCheckbox = getControlCheckbox("Crypto-cash");
 		exportCheckboxes.append(exportCheckbox[0]);
 		cryptoCashCheckbox = exportCheckbox[1];
-		if (paginatorSource) exportCheckbox[0].hide();
-		exportCheckbox = getControlCheckbox("Logo on back");
+		if (!cryptoCashEnabled()) exportCheckbox[0].hide();
+		exportCheckbox = getControlCheckbox("Instructions on back");
 		exportCheckboxes.append(exportCheckbox[0]);
 		cryptoCashBackSpan = exportCheckbox[0];
 		cryptoCashBackCheckbox = exportCheckbox[1];
-		if (paginatorSource) cryptoCashBackSpan.hide();
+		if (!cryptoCashEnabled()) cryptoCashBackSpan.hide();
 		
 		// creates a control checkbox with the given label
 		function getControlCheckbox(label) {
@@ -2988,6 +2988,23 @@ function ExportController(div, window, config) {
 			var checkboxLabel = $("<label class='export_checkbox_label' for='" + uuid + "'>").appendTo(span);
 			checkboxLabel.html(label);
 			return [span, checkbox, label];
+		}
+		
+		// determines if crypto-cash option is enabled
+		function cryptoCashEnabled() {
+			if (paginatorSource) {
+				return false;																													// disable if split
+			} else if (config.pieces) {
+				if (!isInitialized(config.pieces[0].keys[0].wif)) return false;				// disable if no private key
+				return !isInitialized(config.pieces[0].keys[0].encryption);						// enable if unencrypted
+			} else if (config.keys) {
+				if (!config.keys[0].hasPrivateKey()) return false;										// disable if no private key
+				return !config.keys[0].isEncrypted();																	// enable if unencrypted
+			} else if (config.keyGenConfig) {
+				return !isInitialized(config.keyGenConfig.currencies[0].encryption);	// disable if encrypted
+			} else {
+				throw new Error("One of config.pieces, config.keys, or config.keyGenConfig required");
+			}
 		}
 		
 		// apply default checkbox state
