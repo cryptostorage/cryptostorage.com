@@ -136,7 +136,9 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		}
 		
 		// add cryptostoarge logos
-		if (piece.keys.length % pairsPerPage !== 0 && config.spaceBetween && config.logoBack) pieceDiv.append(getCryptoStorageLogosPage(piece.keys.length % pairsPerPage));
+		var numPairsLastPage = piece.keys.length % pairsPerPage;
+		if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
+		if (config.spaceBetween && config.logoBack) pieceDiv.append(getCryptoStorageLogosPage(numPairsLastPage));
 		
 		// callback function to render keypair
 		function renderKeyPairFunc(placeholderDiv, piece, index, config) {
