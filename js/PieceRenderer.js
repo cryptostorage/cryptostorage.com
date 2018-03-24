@@ -110,11 +110,11 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		var funcs = [];
 		for (var i = 0; i < piece.keys.length; i++) {
 			
-			// render new page
+			// add new page
 			if (i % config.pairsPerPage === 0) {
-				if (i > 0) pieceDiv.append($("<div class='piece_page_spacer'>"));
+				if (i > 0) pieceDiv.append($("<div>"));
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
-				if (piece.pieceNum || config.showLogos) {
+				if (!config.cryptoCash && (piece.pieceNum || config.showLogos)) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
 					if (config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
@@ -125,6 +125,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			
 			// collect function to render keypair
 			var placeholderDiv = $("<div class='key_div'>").appendTo(pageDiv);
+			if (config.cryptoCash) placeholderDiv.addClass("key_div_spaced");
 			funcs.push(renderKeyPairFunc(placeholderDiv, piece, i, config));
 		}
 		
@@ -162,7 +163,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		/**
 		 * Renders a single keypair.
 		 * 
-		 * @param div is the div to render to
+		 * @param div is the div to render to (optional)
 		 * @param piece is the piece containing the keypair to render
 		 * @param index is the index of the keypair within the piece
 		 * @param config is the render configuration
@@ -193,6 +194,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			// div setup
 			if (!div) div = $("<div>");
 			div.addClass("key_div");
+			if (config.cryptoCash) div.addClass("key_div_spaced");
 			
 			// left qr code
 			var keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
@@ -290,7 +292,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 
 // default configuration
 PieceRenderer.defaultConfig = {
-		pairsPerPage: 7,
+		pairsPerPage: 6,
 		showPublic: true,
 		showPrivate: true,
 		showLogos: true,
@@ -298,7 +300,9 @@ PieceRenderer.defaultConfig = {
 		qrVersion: null,
 		qrErrorCorrectionLevel: 'H',
 		qrScale: 4,
-		qrPadding: 5		// spacing in pixels
+		qrPadding: 5,		// spacing in pixels
+		cryptoCash: true,
+		cryptoStorageLogos: true
 };
 
 // compute render weight
