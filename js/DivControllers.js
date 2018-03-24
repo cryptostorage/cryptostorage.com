@@ -1291,7 +1291,7 @@ function FormController(div) {
 		}
 		currencyInputs = [];
 		addCurrency();
-		if (AppUtils.DEV_MODE) currencyInputs[0].setSelectedCurrency("XMR");
+		if (AppUtils.DEV_MODE) currencyInputs[0].setSelectedCurrency("BCH");
 		
 		// reset passphrase
 		resetPassphrase();
@@ -2974,11 +2974,11 @@ function ExportController(div, window, config) {
 		exportCheckboxes.append(exportCheckbox[0]);
 		cryptoCashCheckbox = exportCheckbox[1];
 		if (paginatorSource) exportCheckbox[0].hide();
-		exportCheckbox = getControlCheckbox("Crypto-cash reverse side");
+		exportCheckbox = getControlCheckbox("Logo on back");
 		exportCheckboxes.append(exportCheckbox[0]);
 		cryptoCashBackSpan = exportCheckbox[0];
 		cryptoCashBackCheckbox = exportCheckbox[1];
-		if (paginatorSource) cryptoCashBackSpan[0].hide();
+		if (paginatorSource) cryptoCashBackSpan.hide();
 		
 		// creates a control checkbox with the given label
 		function getControlCheckbox(label) {
@@ -3187,8 +3187,8 @@ function ExportController(div, window, config) {
 			showPublic: showPublicCheckbox.prop('checked'),
 			showPrivate: showPrivateCheckbox.prop('checked'),
 			showLogos: showLogosCheckbox.prop('checked'),
-			cryptoCash: cryptoCashCheckbox.prop('checked'),
-			cryptoCashBack: cryptoCashBackCheckbox.prop('checked')
+			spaceBetween: cryptoCashCheckbox.prop('checked'),
+			logoBack: cryptoCashBackCheckbox.prop('checked')
 		};
 	}
 	
