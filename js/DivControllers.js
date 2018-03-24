@@ -2973,12 +2973,12 @@ function ExportController(div, window, config) {
 		exportCheckbox = getControlCheckbox("Crypto-cash");
 		exportCheckboxes.append(exportCheckbox[0]);
 		cryptoCashCheckbox = exportCheckbox[1];
-		if (!cryptoCashEnabled()) exportCheckbox[0].hide();
+		if (!isCryptoCashEnabled()) exportCheckbox[0].hide();
 		exportCheckbox = getControlCheckbox("Instructions on back");
 		exportCheckboxes.append(exportCheckbox[0]);
 		cryptoCashBackSpan = exportCheckbox[0];
 		cryptoCashBackCheckbox = exportCheckbox[1];
-		if (!cryptoCashEnabled()) cryptoCashBackSpan.hide();
+		if (!isCryptoCashEnabled()) cryptoCashBackSpan.hide();
 		
 		// creates a control checkbox with the given label
 		function getControlCheckbox(label) {
@@ -2991,7 +2991,7 @@ function ExportController(div, window, config) {
 		}
 		
 		// determines if crypto-cash option is enabled
-		function cryptoCashEnabled() {
+		function isCryptoCashEnabled() {
 			if (paginatorSource) {
 				return false;																													// disable if split
 			} else if (config.pieces) {
