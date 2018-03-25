@@ -313,9 +313,9 @@ function PieceRenderer(pieces, pieceDivs, config) {
 				var instructionsDiv = $("<div class='cryptocash_instructions'>").appendTo(div);
 				instructionsDiv.append("<b>To claim funds:</b>");
 				var instructionsList = $("<ol>").appendTo(instructionsDiv);
-				instructionsList.append("<li><b>Download</b> wallet sofware of your choice.<br>Recommendations: Jaxx or Copay (for all devices)</li>");
-				instructionsList.append("<li><b>Sweep</b> the unencrypted private key using your wallet.</li>");
-				instructionsList.append("<li><b>Done.</b> Funds are claimed and accessible in your wallet.</li>");
+				instructionsList.append("<li><b>Download</b> wallet sofware of your choice (recommendation: Jaxx)</li>");
+				instructionsList.append("<li><b>Sweep</b> the private key on the reverse side using your wallet<br>Jaxx: Menu > Tools > Transfer paper wallet</li>");
+				instructionsList.append("<li><b>All done.</b> Funds are now claimed and accessible in your wallet</li>");
 				
 				// branding
 				var brandingDiv = $("<div class='cryptocash_branding flex_vertical'>").appendTo(div);
