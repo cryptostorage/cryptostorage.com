@@ -251,7 +251,8 @@ var AppUtils = {
 			"img/drag_and_drop.png",
 			"img/bitpay.png",
 			"img/ethereumjs.png",
-			"img/share.png"
+			"img/share.png",
+			"img/information_white.png"
 		];
 		
 		// add dependencies
