@@ -111,13 +111,16 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		// setup pages and collect functions to render keys
 		var pageDiv;
 		var funcs = [];
+		var tickers;
 		for (var i = 0; i < piece.keys.length; i++) {
 			
 			// add new page
 			if (i % pairsPerPage === 0) {
 				if (i > 0) {
 					pieceDiv.append($("<div>"));
-					if (config.spaceBetween && config.infoBack) pieceDiv.append(getCryptoStorageLogosPage(pairsPerPage));
+					tickers = [];
+					for (var j = 0; j < pairsPerPage; j++) tickers.push(piece.keys[i - (pairsPerPage - j)].ticker);
+					if (config.spaceBetween && config.infoBack) pieceDiv.append(getSweepInstructionsPage(tickers));
 				}
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
 				if (!config.spaceBetween && (piece.pieceNum || config.showLogos)) {
@@ -138,7 +141,9 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		// add cryptostoarge logos
 		var numPairsLastPage = piece.keys.length % pairsPerPage;
 		if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
-		if (config.spaceBetween && config.infoBack) pieceDiv.append(getCryptoStorageLogosPage(numPairsLastPage));
+		tickers = [];
+		for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.keys[piece.keys.length - (numPairsLastPage - i)].ticker);
+		if (config.spaceBetween && config.infoBack) pieceDiv.append(getSweepInstructionsPage(tickers));
 		
 		// callback function to render keypair
 		function renderKeyPairFunc(placeholderDiv, piece, index, config) {
@@ -299,13 +304,16 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			}
 		}
 		
-		function getCryptoStorageLogosPage(numLogos) {
+		function getSweepInstructionsPage(tickers) {
 			assertTrue(config.spaceBetween);
+			assertArray(tickers);
+			assertTrue(tickers.length > 0);
 			var pageDiv = $("<div class='piece_page_div'>");
-			for (var i = 0; i < numLogos; i++) pageDiv.append(getSweepInstructionsDiv());
+			for (var i = 0; i < tickers.length; i++) pageDiv.append(getSweepInstructionsDiv(tickers[i]));
 			return pageDiv;
 			
-			function getSweepInstructionsDiv() {
+			function getSweepInstructionsDiv(ticker) {
+				assertInitialized(ticker);
 				var div = $("<div>");
 				div.addClass("key_div key_div_spaced flex_horizontal");
 				
@@ -313,9 +321,15 @@ function PieceRenderer(pieces, pieceDivs, config) {
 				var instructionsDiv = $("<div class='cryptocash_instructions'>").appendTo(div);
 				instructionsDiv.append("<b>To claim funds:</b>");
 				var instructionsList = $("<ol>").appendTo(instructionsDiv);
-				instructionsList.append("<li><b>Download</b> wallet sofware of your choice (recommendation: Jaxx)</li>");
-				instructionsList.append("<li><b>Sweep</b> the private key on the reverse side using your wallet<br>Jaxx: Menu > Tools > Transfer paper wallet > follow on-screen instructions</li>");
-				instructionsList.append("<li><b>All done.</b> Funds are now claimed and accessible in your wallet</li>");
+				if (ticker === "BCH" || ticker === "BTC") {
+					instructionsList.append("<li><b>Download</b> wallet sofware of your choice (e.g. Bitcoin.com wallet)</li>");
+					instructionsList.append("<li><b>Sweep</b> the private key on the reverse side using your wallet<br>Bitcoin.com wallet: Scan QR code > Sweep paper wallet > Sweep</li>");
+					instructionsList.append("<li><b>All done.</b> Funds are now claimed and accessible in your wallet</li>");
+				} else {
+					instructionsList.append("<li><b>Download</b> wallet sofware of your choice (e.g.: Jaxx)</li>");
+					instructionsList.append("<li><b>Sweep</b> the private key on the reverse side using your wallet<br>Jaxx: Menu > Tools > Transfer paper wallet > follow on-screen instructions</li>");
+					instructionsList.append("<li><b>All done.</b> Funds are now claimed and accessible in your wallet</li>");
+				}
 				
 				// branding
 				var brandingDiv = $("<div class='cryptocash_branding flex_vertical'>").appendTo(div);
