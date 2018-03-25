@@ -10,6 +10,7 @@ This tool is security-focused.  Funds are never entrusted to a third party.  Pri
 - Private keys can be passphrase-protected using [CryptoJS](https://github.com/brix/crypto-js).  Also supports [BIP38](https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki) for Bitcoin and Bitcoin Cash.
 - Storage can be split into pieces which can be geographically separated so funds are not accessible at any one location.
 - Print or save to digital files (json, csv, and txt) for long-term storage.
+- Print and cut out "crypto-cash" to easily tip people in real life.
 - Recommendations are automatically provided to improve the security of the tool's environment:
 	- Checks if the internet connection is active
 	- Checks if the tool is downloaded and running locally
