@@ -314,7 +314,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 				instructionsDiv.append("<b>To claim funds:</b>");
 				var instructionsList = $("<ol>").appendTo(instructionsDiv);
 				instructionsList.append("<li><b>Download</b> wallet sofware of your choice (recommendation: Jaxx)</li>");
-				instructionsList.append("<li><b>Sweep</b> the private key on the reverse side using your wallet<br>Jaxx: Menu > Tools > Transfer paper wallet</li>");
+				instructionsList.append("<li><b>Sweep</b> the private key on the reverse side using your wallet<br>Jaxx: Menu > Tools > Transfer paper wallet > follow on-screen instructions</li>");
 				instructionsList.append("<li><b>All done.</b> Funds are now claimed and accessible in your wallet</li>");
 				
 				// branding
