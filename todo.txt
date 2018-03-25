@@ -1,5 +1,5 @@
 v0.2.4
-crypto-cash faq
+crypto-cash faq and slider point
 
 designer:
 encrypt / split imported storage
