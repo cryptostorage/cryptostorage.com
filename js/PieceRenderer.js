@@ -326,7 +326,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 					instructionsList.append("<li><b>Sweep</b> the private key on the reverse side using your wallet<br>Bitcoin.com wallet: Scan QR code > Sweep paper wallet > Sweep</li>");
 					instructionsList.append("<li><b>All done.</b> Funds are now claimed and accessible in your wallet</li>");
 				} else {
-					instructionsList.append("<li><b>Download</b> wallet sofware of your choice (e.g.: Jaxx)</li>");
+					instructionsList.append("<li><b>Download</b> wallet sofware of your choice (e.g. Jaxx)</li>");
 					instructionsList.append("<li><b>Sweep</b> the private key on the reverse side using your wallet<br>Jaxx: Menu > Tools > Transfer paper wallet > follow on-screen instructions</li>");
 					instructionsList.append("<li><b>All done.</b> Funds are now claimed and accessible in your wallet</li>");
 				}
