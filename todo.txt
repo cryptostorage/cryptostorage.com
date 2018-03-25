@@ -1,8 +1,4 @@
-v0.2.3
-crypto info box not part of label
-
-info box on currencies
-cryptocash design
+v0.2.4
 
 designer:
 encrypt / split imported storage
@@ -16,6 +12,9 @@ blue link against red notice is hard to read
 different print layouts
 
 low priority:
+info box on currencies
+improve cryptocash design
+crypto-cash reverse print slightly misaligned
 ethereum logo not pushed down with 3 line encryption; replace character length with PK height
 banner is pretty big on low resolution / landscape
 firefox cache stops working after 3 loads, only shows error in export console
