@@ -2894,7 +2894,8 @@ function ExportController(div, window, config) {
 	var showPrivateCheckbox;
 	var showLogosCheckbox;
 	var cryptoCashCheckbox;
-	var cryptoCashBackSpan;
+	var cryptoCashCheckboxInfoImg;
+	var cryptoCashBackCheckboxSpan;
 	var cryptoCashBackCheckbox;
 	var paginator;
 	var piecesDiv;
@@ -2973,12 +2974,13 @@ function ExportController(div, window, config) {
 		exportCheckbox = getControlCheckbox("Crypto-cash", "Formats keypairs to be printed and cut out.  Perfect for tipping in real life.");
 		exportCheckboxes.append(exportCheckbox[0]);
 		cryptoCashCheckbox = exportCheckbox[1];
+		cryptoCashCheckboxInfoImg = exportCheckbox[3];
 		if (!isCryptoCashEnabled()) exportCheckbox[0].hide();
 		exportCheckbox = getControlCheckbox("Instructions on back");
 		exportCheckboxes.append(exportCheckbox[0]);
-		cryptoCashBackSpan = exportCheckbox[0];
+		cryptoCashBackCheckboxSpan = exportCheckbox[0];
 		cryptoCashBackCheckbox = exportCheckbox[1];
-		if (!isCryptoCashEnabled()) cryptoCashBackSpan.hide();
+		if (!isCryptoCashEnabled()) cryptoCashBackCheckboxSpan.hide();
 		
 		// creates a control checkbox with the given label
 		function getControlCheckbox(label, info) {
@@ -2989,8 +2991,9 @@ function ExportController(div, window, config) {
 			checkboxLabel.append(label);
 			
 			// info tooltip
+			var infoImg;
 			if (info) {
-				var infoImg = $("<img src='img/information_white.png' class='information_img'>").appendTo(checkboxLabel);
+				infoImg = $("<img src='img/information_white.png' class='information_img'>").appendTo(span);
 				var tooltip = $("<div>");
 				tooltip.append(info);
 				tippy(infoImg.get(0), {
@@ -3007,7 +3010,7 @@ function ExportController(div, window, config) {
 				});
 			}
 			
-			return [span, checkbox, label];
+			return [span, checkbox, label, infoImg];
 		}
 		
 		// determines if crypto-cash option is enabled
@@ -3450,17 +3453,19 @@ function ExportController(div, window, config) {
 				}
 				showLogosCheckbox.removeAttr('disabled');
 				cryptoCashCheckbox.removeAttr('disabled');
+				cryptoCashCheckboxInfoImg.css("opacity", "1");		// manually set info opacity
 				if (cryptoCashCheckbox.prop('checked')) {
-					cryptoCashBackSpan.show();
+					cryptoCashBackCheckboxSpan.show();
 				} else {
-					cryptoCashBackSpan.hide();
+					cryptoCashBackCheckboxSpan.hide();
 				}
 			} else {
 				showPublicCheckbox.attr('disabled', 'disabled');
 				showPrivateCheckbox.attr('disabled', 'disabled');
 				showLogosCheckbox.attr('disabled', 'disabled');
 				cryptoCashCheckbox.attr('disabled', 'disabled');
-				cryptoCashBackSpan.hide();
+				cryptoCashCheckboxInfoImg.css("opacity", ".5");	// manually set info opacity
+				cryptoCashBackCheckboxSpan.hide();
 			}
 		}
 	}
