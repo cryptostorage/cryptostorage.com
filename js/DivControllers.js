@@ -3024,7 +3024,7 @@ function ExportController(div, window, config) {
 				if (!config.keys[0].hasPrivateKey()) return false;										// disable if no private key
 				return !config.keys[0].isEncrypted();																	// enable if unencrypted
 			} else if (config.keyGenConfig) {
-				return !isInitialized(config.keyGenConfig.currencies[0].encryption);	// disable if encrypted
+				return !isInitialized(config.keyGenConfig.currencies[0].encryption);	// enable if unencrypted
 			} else {
 				throw new Error("One of config.pieces, config.keys, or config.keyGenConfig required");
 			}
@@ -3228,7 +3228,7 @@ function ExportController(div, window, config) {
 			showPrivate: showPrivateCheckbox.prop('checked'),
 			showLogos: showLogosCheckbox.prop('checked'),
 			spaceBetween: cryptoCashCheckbox.prop('checked'),
-			logoBack: cryptoCashBackCheckbox.prop('checked')
+			infoBack: cryptoCashBackCheckbox.prop('checked')
 		};
 	}
 	

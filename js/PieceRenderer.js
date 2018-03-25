@@ -117,7 +117,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 			if (i % pairsPerPage === 0) {
 				if (i > 0) {
 					pieceDiv.append($("<div>"));
-					if (config.spaceBetween && config.logoBack) pieceDiv.append(getCryptoStorageLogosPage(pairsPerPage));
+					if (config.spaceBetween && config.infoBack) pieceDiv.append(getCryptoStorageLogosPage(pairsPerPage));
 				}
 				pageDiv = $("<div class='piece_page_div'>").appendTo(pieceDiv);
 				if (!config.spaceBetween && (piece.pieceNum || config.showLogos)) {
@@ -138,7 +138,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		// add cryptostoarge logos
 		var numPairsLastPage = piece.keys.length % pairsPerPage;
 		if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
-		if (config.spaceBetween && config.logoBack) pieceDiv.append(getCryptoStorageLogosPage(numPairsLastPage));
+		if (config.spaceBetween && config.infoBack) pieceDiv.append(getCryptoStorageLogosPage(numPairsLastPage));
 		
 		// callback function to render keypair
 		function renderKeyPairFunc(placeholderDiv, piece, index, config) {
@@ -339,7 +339,7 @@ PieceRenderer.defaultConfig = {
 		qrScale: 4,
 		qrPadding: 5,		// spacing in pixels
 		spaceBetween: false,
-		logoBack: true
+		infoBack: true
 };
 
 // compute render weight
