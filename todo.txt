@@ -1,4 +1,5 @@
 v0.2.4
+crypto-cash faq
 
 designer:
 encrypt / split imported storage
