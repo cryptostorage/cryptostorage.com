@@ -1,23 +1,24 @@
 v0.2.4
-crypto-cash faq and slider point
+put homepage text in index.html and dynamically hide for seo
+footer
+notice color gradient
+collect designs of existing wallets and send to designer
 
 designer:
-encrypt / split imported storage - see spec
-encrypt / split arbitrary text - link within footer - see spec
-link back to import / homepage from export - probably not worth it
-ability to view balance and sign/send transaction - multi arrows, modal, send; future
-footer on every page? - no
-margin above home footer? - no
-all checks pass design - good
-blue link against red notice is hard to read
-different print layouts
-put homepage text in index.html and dynamically hide it for seo
-view balance qr code on cryptocash
-feature request tracker on footer
-color gradient for security checks
-send designs of existing wallets
+bitcoin cash payment address?
+ability to show passphrase?
+use bip38 for bitcoin/bitcoin cash?
+show passphrase/split input if checkboxes not checked?
+need clarification on groups / regenerate flow
+what if floating regenerate covers controls?
+save modal design?
+piece selector in export header, but keypair config in main pane
+crypto-cash faq and slider point
 
 low priority:
+view balance qr code on cryptocash
+different print layouts
+blue link against red notice is hard to read
 info box on currencies
 improve cryptocash design
 crypto-cash reverse print slightly misaligned
