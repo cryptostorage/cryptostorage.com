@@ -2,16 +2,15 @@ v0.2.4
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient
-collect designs of existing wallets and send to designer
 
 designer:
-bitcoin cash payment address?
-ability to show passphrase?
-use bip38 for bitcoin/bitcoin cash?
-show passphrase/split input if checkboxes not checked?
-need clarification on groups / regenerate flow
-what if floating regenerate covers controls?
-save modal design?
+bitcoin cash payment address
+ability to show passphrase
+show passphrase/split input if checkboxes not checked
+!need clarification on groups / regenerate flow
+!use bip38 for bitcoin/bitcoin cash
+!what if floating regenerate covers controls
+!save modal design
 piece selector in export header, but keypair config in main pane
 crypto-cash faq and slider point
 
