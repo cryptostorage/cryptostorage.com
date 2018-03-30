@@ -4,14 +4,14 @@ footer
 notice color gradient
 
 designer:
-bitcoin cash payment address
-ability to show passphrase
-show passphrase/split input if checkboxes not checked
-!need clarification on groups / regenerate flow
-!use bip38 for bitcoin/bitcoin cash
-!what if floating regenerate covers controls
-!save modal design
-piece selector in export header, but keypair config in main pane
+How to make passphrase visible?
+How to specify BIP38 encryption for Bitcoin and Bitcoin Cash?
+How to specify save type (json, csv, txt)?
+Are passphrase/split inputs hidden if unchecked?
+What if floating regenerate/save/print controls cover form controls?
+Want to confirm generation and grouping flow (I have mockups)
+Currency inputs will be at bottom of generated storage which can be long.  Ok?
+Split piece selector is part of header, but is not config.  Worth moving?
 crypto-cash faq and slider point
 
 low priority:
