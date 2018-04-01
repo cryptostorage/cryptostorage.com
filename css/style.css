@@ -433,13 +433,6 @@ body {
 	flex: .6;
 }
 
-input[type='tel'] {
-	width: 85px;
-	text-align: center;
-	border: 2.5px solid;
-	padding: 5px;
-}
-
 input[type='checkbox'] {
 	height: auto;
 	width: auto;
@@ -598,6 +591,13 @@ input[type='checkbox'][disabled] +label {
 	margin-left: auto;
 }
 
+.num_keys_input {
+	width: 85px;
+	text-align: right;
+	border: 2.5px solid;
+	padding: 5px;
+}
+
 .trash_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -671,66 +671,6 @@ input[type='checkbox'][disabled] +label {
 
 .show_passphrase_checkbox_div {
 	margin-left: auto;
-}
-
-.split_input_div {
-	margin: 20px 20px 0px 20px;
-}
-
-.split_warn_div {
-	width: 100%;
-	text-align: center;
-	margin-bottom: 15px;
-}
-
-.split_qr {
-	width: 100px;
-	height: 100px;
-	margin: 10px;
-}
-
-.split_lines_3 {
-	width: 100px;
-	height: 100px;
-	margin: 10px;
-}
-
-.split_num_div {
-	margin: 10px;
-	max-width: 115px;
-}
-
-.split_num_label_top {
-	text-align: center;
-	padding-bottom: 10px;
-	max-width: 115px;
-}
-
-.split_num_label_bottom {
-	text-align: center;
-	padding-top: 10px;
-	max-width: 115px;
-}
-
-.split_lines_2 {
-	width: 100px;
-	height: 100px;
-	margin: 10px;
-}
-
-.split_min_div {
-	margin: 10px;
-	width: 115px;
-}
-
-.split_min_label_top {
-	text-align: center;
-	padding-bottom: 10px;
-}
-
-.split_min_label_bottom {
-	text-align: center;
-	padding-top: 10px;
 }
 
 .form_generate_div {
@@ -1168,7 +1108,7 @@ input[type='checkbox'][disabled] +label {
 .editor_header {
 	background-color: rgb(17, 119, 184);
 	width: 100%;
-	padding: 20px;
+	padding: 10px;
 }
 
 .editor_header, .editor_header * {
@@ -1177,7 +1117,6 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_header label {
-	margin-right: 20px;
 	white-space: nowrap;
 }
 
@@ -1193,6 +1132,62 @@ input[type='checkbox'][disabled] +label {
 	padding: 5px;
 	border: 2.5px solid;
 	color: black;
+	margin-left: 25px;
+}
+
+.split_input_div {
+	margin: 20px 20px 0px 20px;
+}
+
+.split_warn_div {
+	width: 100%;
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+.split_qr {
+	width: 60px;
+	height: 60px;
+	margin: 0px 7px 0px 25px;
+}
+
+.split_lines_3 {
+	width: 40px;
+	height: 40px;
+	margin: 7px;
+}
+
+.split_input_div {
+	margin: 7px;
+}
+
+.split_input {
+	height: 40px;
+	width: 70px;
+	color: black;
+	border: 2.5px solid;
+	font-size: 20px;
+	text-align: right;
+	padding: 5px;
+}
+
+.split_lines_2 {
+	width: 40px;
+	height: 40px;
+	margin: 7px;
+}
+
+.split_config_label {
+	text-align: center;
+	font-size: 18px;
+}
+
+.split_config_label_top {
+	margin-bottom: 3px;
+}
+
+.split_config_label_bottom {
+	margin-top: 3px;
 }
 
 .editor_body {

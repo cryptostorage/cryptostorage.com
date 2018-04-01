@@ -1,19 +1,21 @@
 v0.2.4
 export editor
 	interoperability disclaimer if passphrase/split checked
+	split lines bolder
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient
 
 designer:
-How to make passphrase visible?
-How to specify BIP38 encryption for Bitcoin and Bitcoin Cash?
-How to specify save type (json, csv, txt)?
-Are passphrase/split inputs hidden if unchecked?
-What if floating regenerate/save/print controls cover form controls?
-Want to confirm generation and grouping flow (I have mockups)
-Currency inputs will be at bottom of generated storage which can be long.  Ok?
-Split piece selector is part of header, but is not config.  Worth moving?
+split qr and lines white?
+how to make passphrase visible?
+how to specify BIP38 encryption for Bitcoin and Bitcoin Cash?
+how to specify save type (json, csv, txt)?
+are passphrase/split inputs hidden if unchecked?
+what if floating regenerate/save/print controls cover form controls?
+want to confirm generation and grouping flow (I have mockups)
+currency inputs will be at bottom of generated storage which can be long.  Ok?
+split piece selector is part of header, but is not config.  Worth moving?
 crypto-cash faq and slider point
 
 low priority:

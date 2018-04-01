@@ -1740,7 +1740,7 @@ function FormController(div) {
 			// create right div
 			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 			rightDiv.append("Keypairs to generate&nbsp;&nbsp;");
-			numKeysInput = $("<input type='tel' value='1' min='1'>").appendTo(rightDiv);
+			numKeysInput = $("<input class='num_keys_input' type='tel' value='1' min='1'>").appendTo(rightDiv);
 			numKeysInput.on("input", function(e) { validateNumKeys(true); });
 			numKeysInput.on("focusout", function(e) { validateNumKeys(false); });
 			rightDiv.append("&nbsp;&nbsp;");
@@ -2890,11 +2890,46 @@ function ExportEditor(div, config) {
 		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseDiv);
 		
 		// split input
-		var splitDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
+		var splitDiv = $("<div class='editor_split_div flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
 		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
 		var splitCheckboxLabel = $("<label class='user_select_none' for='split_checkbox'>").appendTo(splitDiv);
 		splitCheckboxLabel.html("Split Keys?");
-		splitInput = $("<input type='password' class='editor_split_input'>").appendTo(splitDiv);
+		var splitInfo = $("<img src='img/information_white.png' class='information_img'>").appendTo(splitDiv);
+		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitDiv);
+		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitDiv);
+		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
+		var splitNumLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitNumDiv);
+		splitNumLabelTop.html("Split Into");
+		numPiecesInput = $("<input class='split_input' type='tel' value='3' min='2'>").appendTo(splitNumDiv);
+		var splitNumLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitNumDiv);
+		splitNumLabelBottom.html("Pieces");
+		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitDiv);
+		var splitMinDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
+		var splitMinLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitMinDiv);
+		splitMinLabelTop.html("Require");
+		minPiecesInput = $("<input class='split_input' type='tel' value='2' min='2'>").appendTo(splitMinDiv);
+		var splitMinLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitMinDiv);
+		splitMinLabelBottom.html("To Recover");		
+		
+		// split tooltip
+		var splitTooltip = $("<div>");
+		splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
+		splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
+		splitTooltip.append("For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
+		tippy(splitInfo.get(0), {
+			arrow: true,
+			html: splitTooltip.get(0),
+			interactive: true,
+			placement: 'bottom',
+			theme: 'translucent',
+			trigger: "mouseenter",
+			multiple: 'false',
+			maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
+			distance: 20,
+			arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+			offset: '-180, 0'
+		});
+		
 		
 		
 //		var passphraseCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseDiv);
