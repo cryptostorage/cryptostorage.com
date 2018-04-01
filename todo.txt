@@ -8,6 +8,7 @@ notice color gradient
 
 designer:
 split qr and lines white?
+display interoperability warning if passphrase or split
 how to make passphrase visible?
 how to specify BIP38 encryption for Bitcoin and Bitcoin Cash?
 how to specify save type (json, csv, txt)?
