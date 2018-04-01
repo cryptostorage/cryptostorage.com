@@ -23,19 +23,14 @@
  */
 
 /**
- * Renders an export page to the current tab's body.
- * 
- * Used to run export code in child tab which is unaffected if parent tab is closed.
+ * Renders an export editor to the given window's body.
  * 
  * @param window is the window to export to
  * @param config is the export configuration
  * 				config.splitPieces are imported split pieces
- * 				config.keyGenConfig is a configuration to generate new storage
  * 				config.keys are keys to generate pieces from
  * 				config.pieces are pieces to export and generate pieceDivs from
  * 				config.pieceDivs are pre-generated piece divs ready for display
- * 				config.confirmExit specifies if the window should confirm exit
- * 				config.showRegenerate specifies if the regenerate button should be shown
  * 				config.environmentInfo is initial info for the export (optional)
  */
 window.exportToBody = function(window, config) {
@@ -76,5 +71,5 @@ window.exportToBody = function(window, config) {
 	}
 	
 	// render storage export
-	new ExportController($("<div>").appendTo(body), window, config).render();
+	new ExportEditor($("<div>").appendTo(body), config).render();
 }

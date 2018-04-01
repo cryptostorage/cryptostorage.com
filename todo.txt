@@ -1,4 +1,5 @@
 v0.2.4
+export editor
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient

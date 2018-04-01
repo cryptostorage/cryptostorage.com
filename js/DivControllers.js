@@ -2862,23 +2862,19 @@ inheritsFrom(TwoTabController, DivController);
  * Export editor.
  * 
  * @param div is the div to render to
- * @param window is a reference to the window for printing
  * @param config specifies export page behavior
  * 				config.splitPieces are imported split pieces
- * 				config.keyGenConfig is a configuration to generate new storage
  * 				config.keys are keys to generate pieces from
  * 				config.pieces are pieces to export and generate pieceDivs from
  * 				config.pieceDivs are pre-generated piece divs ready for display
- * 				config.confirmExit specifies if the window should confirm exit
- * 				config.showRegenerate specifies if the regenerate button should be shown
- * 				config.showNotices specifies if notices should be shown
- * 				config.isInline specifies if this is inline imported storage
  */
-function ExportEditor(div, window, config) {
+function ExportEditor(div, config) {
 	DivController.call(this, div);
 	
 	this.render = function(onDone) {
-		
+		div.empty();
+		div.append("Hello there my good friend");
+		if (onDone) onDone(div);
 	};
 }
 inheritsFrom(ExportEditor, DivController);
