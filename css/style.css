@@ -88,6 +88,13 @@ body {
 	justify-content: space-between;
 }
 
+.user_select_none {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 .app_body {
 	display: -webkit-flex;
 	display: -ms-flexbox;
@@ -1161,6 +1168,7 @@ input[type='checkbox'][disabled] +label {
 .editor_header {
 	background-color: rgb(17, 119, 184);
 	width: 100%;
+	padding: 20px;
 }
 
 .editor_header, .editor_header * {
@@ -1168,8 +1176,17 @@ input[type='checkbox'][disabled] +label {
 	color: white;
 }
 
+.editor_header label {
+	margin-right: 20px;
+	white-space: nowrap;
+}
+
 .editor_passphrase_split {
-	
+	flex-wrap: wrap;
+}
+
+.editor_passphrase_split > div {
+	margin: 10px 20px 10px 20px;
 }
 
 .editor_passphrase_input {

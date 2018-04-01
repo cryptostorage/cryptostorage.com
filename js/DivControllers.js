@@ -2867,6 +2867,8 @@ function ExportEditor(div, config) {
 	// global variables
 	var passphraseCheckbox;
 	var passphraseInput;
+	var splitCheckbox;
+	var splitInput;
 	
 	this.render = function(onDone) {
 		
@@ -2879,11 +2881,20 @@ function ExportEditor(div, config) {
 		
 		// passphrase and split input row
 		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal'>").appendTo(header);
+		
+		// passphrase input
 		var passphraseDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
 		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
-		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
+		var passphraseCheckboxLabel = $("<label class='user_select_none' for='passphrase_checkbox'>").appendTo(passphraseDiv);
 		passphraseCheckboxLabel.html("Use Passphrase?");
 		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseDiv);
+		
+		// split input
+		var splitDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
+		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
+		var splitCheckboxLabel = $("<label class='user_select_none' for='split_checkbox'>").appendTo(splitDiv);
+		splitCheckboxLabel.html("Split Keys?");
+		splitInput = $("<input type='password' class='editor_split_input'>").appendTo(splitDiv);
 		
 		
 //		var passphraseCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseDiv);
