@@ -58,26 +58,19 @@ var UiUtils = {
 	},
 	
 	/**
-	 * Opens storage in a new tab.
+	 * Opens the export editor in a new tab.
 	 * 
 	 * @param browserTabName is the name of the tab
 	 * @param config is the storage configuration
 	 * 				config.splitPieces are imported split pieces
-	 * 				config.keyGenConfig is a configuration to generate new storage
 	 * 				config.keys are keys to generate pieces from
 	 * 				config.pieces are pieces to export and generate pieceDivs from
 	 * 				config.pieceDivs are pre-generated piece divs ready for display
-	 * 				config.confirmExit specifies if the window should confirm exit
-	 * 				config.showRegenerate specifies if the regenerate button should be shown
-	 * 				config.showNotices specifies if notices should be shown
 	 */
-	openStorageTab: function(browserTabName, config) {
+	openExportTab: function(browserTabName, config) {
 		
 		// deep copy config
 		config = Object.assign({}, config);
-		
-		// default config
-		if (!isInitialized(config.showNotices)) config.showNotices = true;
 		
 		// open tab
 		newWindow(null, browserTabName, AppUtils.getInitialExportDependencies(), getInternalStyleSheetText(), function(err, window) {
@@ -490,7 +483,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (!environmentFailure) UiUtils.openStorageTab(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
+			if (!environmentFailure) UiUtils.openExportTab(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
 		}
 		
 		function getKeyGenConfig(plugin) {
@@ -1309,7 +1302,7 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm(true);
-		if (!hasFormErrors()) UiUtils.openStorageTab("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
+		if (!hasFormErrors()) UiUtils.openExportTab("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
 		if (onDone) onDone();
 	}
 	
@@ -1979,7 +1972,7 @@ function ImportFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openStorageTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
+					UiUtils.openExportTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
 				});
 			});
 		} else {
@@ -2006,7 +1999,7 @@ function ImportFileController(div) {
 		if (importedPieces.length > 1) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
 			viewSplit.append("view split pieces");
-			viewSplit.click(function() { UiUtils.openStorageTab("Imported Pieces", {pieces: importedPieces}); });
+			viewSplit.click(function() { UiUtils.openExportTab("Imported Pieces", {pieces: importedPieces}); });
 		}
 		
 		// inline storage
@@ -2149,7 +2142,7 @@ function ImportFileController(div) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openStorageTab("Imported Storage", {pieces: pieces});
+			UiUtils.openExportTab("Imported Storage", {pieces: pieces});
 		});
 		
 		// attempt to get keys
@@ -2446,7 +2439,7 @@ function ImportTextController(div, plugins) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openStorageTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
+					UiUtils.openExportTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
 				});
 			});
 		} else {
@@ -2473,7 +2466,7 @@ function ImportTextController(div, plugins) {
 		if (importedPieces.length > 1) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
 			viewSplit.append("view split pieces");
-			viewSplit.click(function() { UiUtils.openStorageTab("Imported Pieces", {pieces: importedPieces}); });
+			viewSplit.click(function() { UiUtils.openExportTab("Imported Pieces", {pieces: importedPieces}); });
 		}
 		
 		// inline storage
@@ -2605,7 +2598,7 @@ function ImportTextController(div, plugins) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openStorageTab("Imported Storage", {pieces: importedPieces});
+			UiUtils.openExportTab("Imported Storage", {pieces: importedPieces});
 		});
 		
 		// check if pieces combine to make private keys
@@ -3091,7 +3084,7 @@ function ExportController(div, window, config) {
 			var viewImported = $("<div class='import_control_link'>").appendTo(exportControls);
 			viewImported.html("view split pieces");
 			viewImported.click(function() {
-				UiUtils.openStorageTab("Imported Pieces", {pieces: config.splitPieces});
+				UiUtils.openExportTab("Imported Pieces", {pieces: config.splitPieces});
 			});
 		}
 		
