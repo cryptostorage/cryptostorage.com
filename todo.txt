@@ -1,5 +1,6 @@
 v0.2.4
 export editor
+	interoperability disclaimer if passphrase/split checked
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient

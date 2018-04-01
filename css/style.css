@@ -1152,6 +1152,40 @@ input[type='checkbox'][disabled] +label {
 	background-color: white;
 }
 
+.editor_div {
+	min-width: 775px;
+	-webkit-text-size-adjust: 100%;
+	background-color: white;
+}
+
+.editor_header {
+	background-color: rgb(17, 119, 184);
+	width: 100%;
+}
+
+.editor_header, .editor_header * {
+	font-size: 24px;
+	color: white;
+}
+
+.editor_passphrase_split {
+	
+}
+
+.editor_passphrase_input {
+	padding: 5px;
+	border: 2.5px solid;
+	color: black;
+}
+
+.editor_body {
+	width: 100%;
+}
+
+.editor_body, .editor_body * {
+	font-size: 24px;
+}
+
 .export_div {
 	align-items: center;
 	min-width: 775px;

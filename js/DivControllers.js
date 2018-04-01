@@ -2864,9 +2864,46 @@ inheritsFrom(TwoTabController, DivController);
 function ExportEditor(div, config) {
 	DivController.call(this, div);
 	
+	// global variables
+	var passphraseCheckbox;
+	var passphraseInput;
+	
 	this.render = function(onDone) {
+		
+		// div setup
 		div.empty();
-		div.append("Hello there my good friend");
+		div.addClass("editor_div, flex_vertical");
+		
+		// header
+		var header = $("<div class='editor_header flex_vertical'>").appendTo(div);
+		
+		// passphrase and split input row
+		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal'>").appendTo(header);
+		var passphraseDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
+		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
+		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseDiv);
+		passphraseCheckboxLabel.html("Use Passphrase?");
+		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseDiv);
+		
+		
+//		var passphraseCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseDiv);
+//		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
+//		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
+//		passphraseCheckboxLabel.html("Do you want to protect your private keys with a passphrase?");
+//		passphraseCheckbox.click(function() {
+//			if (passphraseCheckbox.prop('checked')) {
+//				passphraseInputDiv.show();
+//				passphraseInput.focus();
+//			} else {
+//				resetPassphrase();
+//			}
+//		});
+//		passphraseSplitRow.append("passphrase split input");
+		
+		// body
+		var body = $("<div class='editor_body flex_vertical'>").appendTo(div);
+		body.append("This is the body");
+		
 		if (onDone) onDone(div);
 	};
 }
