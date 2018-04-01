@@ -58,7 +58,7 @@ var UiUtils = {
 	},
 	
 	/**
-	 * Opens the export editor in a new tab.
+	 * Opens the editor in a new tab.
 	 * 
 	 * @param browserTabName is the name of the tab
 	 * @param config is the storage configuration
@@ -67,7 +67,7 @@ var UiUtils = {
 	 * 				config.pieces are pieces to export and generate pieceDivs from
 	 * 				config.pieceDivs are pre-generated piece divs ready for display
 	 */
-	openExportTab: function(browserTabName, config) {
+	openEditorTab: function(browserTabName, config) {
 		
 		// deep copy config
 		config = Object.assign({}, config);
@@ -483,7 +483,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (!environmentFailure) UiUtils.openExportTab(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
+			if (!environmentFailure) UiUtils.openEditorTab(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
 		}
 		
 		function getKeyGenConfig(plugin) {
@@ -1302,7 +1302,7 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm(true);
-		if (!hasFormErrors()) UiUtils.openExportTab("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
+		if (!hasFormErrors()) UiUtils.openEditorTab("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
 		if (onDone) onDone();
 	}
 	
@@ -1972,7 +1972,7 @@ function ImportFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openExportTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
+					UiUtils.openEditorTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
 				});
 			});
 		} else {
@@ -1999,7 +1999,7 @@ function ImportFileController(div) {
 		if (importedPieces.length > 1) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
 			viewSplit.append("view split pieces");
-			viewSplit.click(function() { UiUtils.openExportTab("Imported Pieces", {pieces: importedPieces}); });
+			viewSplit.click(function() { UiUtils.openEditorTab("Imported Pieces", {pieces: importedPieces}); });
 		}
 		
 		// inline storage
@@ -2142,7 +2142,7 @@ function ImportFileController(div) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openExportTab("Imported Storage", {pieces: pieces});
+			UiUtils.openEditorTab("Imported Storage", {pieces: pieces});
 		});
 		
 		// attempt to get keys
@@ -2439,7 +2439,7 @@ function ImportTextController(div, plugins) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openExportTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
+					UiUtils.openEditorTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
 				});
 			});
 		} else {
@@ -2466,7 +2466,7 @@ function ImportTextController(div, plugins) {
 		if (importedPieces.length > 1) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
 			viewSplit.append("view split pieces");
-			viewSplit.click(function() { UiUtils.openExportTab("Imported Pieces", {pieces: importedPieces}); });
+			viewSplit.click(function() { UiUtils.openEditorTab("Imported Pieces", {pieces: importedPieces}); });
 		}
 		
 		// inline storage
@@ -2598,7 +2598,7 @@ function ImportTextController(div, plugins) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openExportTab("Imported Storage", {pieces: importedPieces});
+			UiUtils.openEditorTab("Imported Storage", {pieces: importedPieces});
 		});
 		
 		// check if pieces combine to make private keys
@@ -3084,7 +3084,7 @@ function ExportController(div, window, config) {
 			var viewImported = $("<div class='import_control_link'>").appendTo(exportControls);
 			viewImported.html("view split pieces");
 			viewImported.click(function() {
-				UiUtils.openExportTab("Imported Pieces", {pieces: config.splitPieces});
+				UiUtils.openEditorTab("Imported Pieces", {pieces: config.splitPieces});
 			});
 		}
 		

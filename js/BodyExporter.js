@@ -70,6 +70,6 @@ window.exportToBody = function(window, config) {
 		config.pieceDivs = clonedDivs;
 	}
 	
-	// render storage export
+	// render editor
 	new ExportEditor($("<div>").appendTo(body), config).render();
 }
