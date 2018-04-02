@@ -1055,7 +1055,7 @@ function DonateController(div, appController) {
 inheritsFrom(DonateController, DivController);
 
 /**
- * Encapsulate a currency input.
+ * Single currency input.
  * 
  * @param div is the div to render to
  * @param defaultTicker is the ticker of the initial selected currency
@@ -1115,11 +1115,11 @@ function CurrencyInput(div, plugins, defaultTicker, onCurrencyChanged, onDelete,
 		// no longer initializing
 		initializing = false;
 		if (onDone) onDone(div);
-	},
+	};
 	
 	this.getSelectedPlugin = function() {
 		return selectedPlugin;
-	},
+	};
 	
 	this.setSelectedCurrency = function(ticker) {
 					
@@ -1156,13 +1156,13 @@ function CurrencyInput(div, plugins, defaultTicker, onCurrencyChanged, onDelete,
 				}
 			}
 		}
-	},
+	};
 	
 	this.getNumKeys = function() {
 		var num = Number(numKeysInput.val());
 		if (isInt(num)) return num;
 		return null;
-	},
+	};
 	
 	this.setTrashEnabled = function(enabled) {
 		trashDiv.unbind("click");
@@ -1172,7 +1172,7 @@ function CurrencyInput(div, plugins, defaultTicker, onCurrencyChanged, onDelete,
 		} else {
 			trashImg.addClass("trash_div_disabled");
 		}
-	},
+	};
 	
 	/**
 	 * Indicates if any validation errors are visible on this currency input.
@@ -1181,7 +1181,7 @@ function CurrencyInput(div, plugins, defaultTicker, onCurrencyChanged, onDelete,
 	 */
 	this.isValid = function() {
 		return valid;
-	},
+	};
 	
 	/**
 	 * Validates the currency input.
@@ -1192,7 +1192,7 @@ function CurrencyInput(div, plugins, defaultTicker, onCurrencyChanged, onDelete,
 		validateCurrency();
 		validateNumKeys(false);
 		return that.isValid();
-	}
+	};
 	
 	// ---------------------- PRIVATE ------------------------
 	
@@ -1245,6 +1245,43 @@ function CurrencyInput(div, plugins, defaultTicker, onCurrencyChanged, onDelete,
 	}
 }
 inheritsFrom(CurrencyInput, DivController);
+
+/**
+ * Collection of currency inputs.
+ */
+function CurrencyInputs(div, plugins, defaultTicker) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var currencyInputs = [];
+	
+	this.render = function(onDone) {
+		
+	};
+	
+	this.add = function(ticker) {
+		throw new Error("Not implemented");
+	};
+	
+	this.getConfig = function() {
+		throw new Error("Not implemented");
+	};
+	
+	this.validate = function() {
+		
+	};
+	
+	this.reset = function() {
+		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
+		currencyInputs = [];
+		that.add(AppUtils.DEV_MODE ? "BCH" : null);
+	};
+	
+	function remove(currencyInput) {
+		
+	}
+}
+inheritsFrom(CurrencyInputs, DivController);
 
 /**
  * Form page.
