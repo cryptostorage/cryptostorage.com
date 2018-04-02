@@ -1258,14 +1258,22 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		
 		// div setup
 		div.empty();
+		div.addClass("currency_inputs_div");
 		
 		// initial state
+		var onInputsChangeBkp = onInputsChange;
+		onInputsChange = null;	// disable notifications
 		currencyInputs = [];
 		formError = false;
-		that.reset();
+		that.startOver();
+		onInputsChange = onInputsChangeBkp;
 		
 		// done
 		if (onDone) onDone();
+	};
+	
+	this.getCurrencyInputs = function() {
+		return currencyInputs;
 	};
 	
 	this.add = function(ticker) {
@@ -1289,16 +1297,39 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		for (var i = 0; i < currencyInputs.length; i++) {
 			currencyInputs[i].validate();
 		}
+		updateFormError();
 	};
 	
-	this.reset = function() {
+	this.empty = function() {
+		if (!currencyInputs.length) return;
+		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
+		currencyInputs = [];
+		if (onInputsChange) onInputsChange();
+	};
+	
+	this.startOver = function() {
 		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
 		currencyInputs = [];
 		that.add(AppUtils.DEV_MODE ? "BCH" : null);
 	};
 	
 	this.getConfig = function() {
-		throw new Error("Not implemented");
+		var config = [];
+		for (var i = 0; i < currencyInputs.length; i++) {
+			config.push({
+				ticker: currencyInputs[i].getSelectedPlugin() ? currencyInputs[i].getSelectedPlugin().getTicker() : null,
+				numKeys: currencyInputs[i].getNumKeys()
+			});
+		}
+		return config;
+	};
+	
+	this.hasCurrencySelected = function(ticker) {
+		assertInitialized(ticker);
+		for (var i = 0; i < currencyInputs.length; i++) {
+			if (currencyInputs[i].getSelectedPlugin() && currencyInputs[i].getSelectedPlugin().getTicker() === ticker) return true;
+		}
+		return false;
 	};
 	
 	//---------------------- PRIVATE ------------------------
@@ -1310,7 +1341,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		currencyInputs.splice(idx, 1);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().remove();
-		if (that.hasFormError() !== formErrorBeforeRemove && onFormErrorChange) onFormErrorChange(that.hasFormError());
+		updateFormError();
 		if (onInputsChange) onInputsChange();
 	}
 	
@@ -1335,7 +1366,7 @@ function FormController(div) {
 	DivController.call(this, div);
 	
 	var that = this;
-	var currencyInputs;			// tracks each currency input
+	var currencyInputsController;
 	var passphraseCheckbox;
 	var passphraseInputDiv;
 	var passphraseInput;
@@ -1374,16 +1405,21 @@ function FormController(div) {
 			}
 			
 			// currency inputs
-			currencyInputs = [];
 			var currencyDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-			currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(currencyDiv);
+			currencyInputsController = new CurrencyInputsController($("<div>").appendTo(currencyDiv), plugins, function() {
+				updateBip38Checkbox();
+			}, function(hasError) {
+				validateCurrencyInputs();
+				updateGenerateButton();
+			});
+			currencyInputsController.render();
 			
 			// link to add currency
 			var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
 			var addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
 			addCurrencySpan.html("+ Add another currency");
 			addCurrencySpan.click(function() {
-				addCurrency();
+				currencyInputsController.add();
 			});
 			
 			// passphrase checkbox
@@ -1549,15 +1585,10 @@ function FormController(div) {
 	this.startOver = function() {
 		
 		// ignore if not initialized
-		if (!currencyInputs) return;
+		if (!currencyInputsController) return;
 		
-		// reset currencies
-		for (var i = 0; i < currencyInputs.length; i++) {
-			currencyInputs[i].getDiv().remove();
-		}
-		currencyInputs = [];
-		addCurrency();
-		if (AppUtils.DEV_MODE) currencyInputs[0].setSelectedCurrency("BCH");
+		// reset currency inputs
+		currencyInputsController.startOver();
 		
 		// reset passphrase
 		resetPassphrase();
@@ -1586,14 +1617,9 @@ function FormController(div) {
 		config.numPieces = splitCheckbox.prop('checked') ? parseFloat(numPiecesInput.val()) : 1;
 		config.minPieces = splitCheckbox.prop('checked') ? parseFloat(minPiecesInput.val()) : null;
 		config.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
-		config.currencies = [];
-		for (var i = 0; i < currencyInputs.length; i++) {
-			var currencyInput = currencyInputs[i];
-			config.currencies.push({
-				ticker: currencyInput.getSelectedPlugin().getTicker(),
-				numKeys: currencyInput.getNumKeys(),
-				encryption: passphraseCheckbox.prop('checked') ? getEncryptionScheme(currencyInput) : null
-			});
+		config.currencies = currencyInputsController.getConfig();
+		for (var i = 0; i < config.currencies.length; i++) {
+			config.currencies[i].encryption = passphraseCheckbox.prop('checked') ? getEncryptionScheme(currencyInputsController.getCurrencyInputs()[i]) : null;
 		}
 		verifyConfig(config);
 		return config;
@@ -1628,45 +1654,10 @@ function FormController(div) {
 		var readMoreLink = $("<a target='_blank' href='#faq_interoperable'>Read more</a>").appendTo(div);
 	}
 	
-	function addCurrency(defaultTicker) {
-		
-		// create input
-		var currencyInput = new CurrencyInputController($("<div>"), plugins, defaultTicker, updateBip38Checkbox, function() {
-			removeCurrency(currencyInput);
-		}, function(hasError) {
-			validateCurrencyInputs();
-			updateGenerateButton();
-		});
-		currencyInput.render();
-		
-		// update currency inputs and add to page
-		currencyInputs.push(currencyInput);
-		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
-		currencyInput.getDiv().appendTo(currencyInputsDiv);
-		updateBip38Checkbox();
-	}
-	
-	function removeCurrency(currencyInput) {
-		var idx = currencyInputs.indexOf(currencyInput);
-		if (idx < 0) throw new Error("Could not find currency input");
-		currencyInputs.splice(idx, 1);
-		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
-		currencyInput.getDiv().remove();
-		updateBip38Checkbox();
-		validateCurrencyInputs();
-	}
-	
 	function onOneOfEach() {
-		
-		// remove existing currencies
-		for (var i = 0; i < currencyInputs.length; i++) {
-			currencyInputs[i].getDiv().remove();
-		}
-		currencyInputs = [];
-		
-		// add one input per currency
+		currencyInputsController.empty();
 		for (var i = 0; i < plugins.length; i++) {
-			addCurrency(plugins[i].getTicker());
+			currencyInputsController.add(plugins[i].getTicker());
 		}
 		validateCurrencyInputs();
 		updateBip38Checkbox();
@@ -1685,31 +1676,11 @@ function FormController(div) {
 	}
 	
 	function updateBip38Checkbox() {
-		
-		// determine if BTC is selected
-		var btcFound = false;
-		for (var i = 0; i < currencyInputs.length; i++) {
-			var currencyInput = currencyInputs[i];
-			if (!currencyInput.getSelectedPlugin()) continue;
-			if (currencyInput.getSelectedPlugin().getTicker() === "BTC") {
-				btcFound = true;
-				break;
-			}
+		if (currencyInputsController.hasCurrencySelected("BCH") || currencyInputsController.hasCurrencySelected("BTC")) {
+			bip38CheckboxDiv.show();
+		} else {
+			bip38CheckboxDiv.hide();
 		}
-		
-		// determine if BCH is selected
-		var bchFound = false;
-		for (var i = 0; i < currencyInputs.length; i++) {
-			var currencyInput = currencyInputs[i];
-			if (!currencyInput.getSelectedPlugin()) continue;
-			if (currencyInput.getSelectedPlugin().getTicker() === "BCH") {
-				bchFound = true;
-				break;
-			}
-		}
-		
-		// show or hide bip38 checkbox
-		btcFound || bchFound ? bip38CheckboxDiv.show() : bip38CheckboxDiv.hide();
 	}
 	
 	function updateGenerateButton() {
@@ -1727,12 +1698,8 @@ function FormController(div) {
 	}
 	
 	function validateCurrencyInputs(validateCurrencySelection) {
-		var err = null;
-		for (var i = 0; i < currencyInputs.length; i++) {
-			if (validateCurrencySelection) currencyInputs[i].validate();
-			if (currencyInputs[i].hasFormError()) err = true;
-		}
-		formErrors.currencyInputs = err;
+		if (validateCurrencySelection) currencyInputsController.validate();
+		formErrors.currencyInputs = currencyInputsController.hasFormError();
 		updateGenerateButton();
 	}
 	
