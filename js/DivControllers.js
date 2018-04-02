@@ -1062,9 +1062,9 @@ inheritsFrom(DonateController, DivController);
  * @param defaultTicker is the ticker of the initial selected currency
  * @param onCurrencyChange(ticker) is invoked when the user changes the currency selection
  * @param onDelete is invoked when the user delets this input
- * @param onValidChange(isValid) is invoked when the validity state changes
+ * @param onFormErrorChange(hasError) is invoked when the validity state changes
  */
-function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, onDelete, onValidChange) {
+function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, onDelete, onFormErrorChange) {
 	DivController.call(this, div);
 	
 	assertInitialized(div);
@@ -1202,7 +1202,7 @@ function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, 
 			currencyError = true;
 			$(".dd-select", selector).addClass("form_input_error_div");
 		}
-		updateValidity();
+		updateFormError();
 	}
 	
 	function validateNumKeys(ignoreBlank) {
@@ -1225,14 +1225,14 @@ function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, 
 			}
 		}
 		
-		// update valid state
-		updateValidity();
+		// update error state
+		updateFormError();
 	}
 	
-	function updateValidity() {
+	function updateFormError() {
 		var lastError = formError;
 		formError = currencyError || numKeysError;
-		if (!currencyError && numKeysError !== lastError) onValidChange(!formError);	// notify validity change
+		if (!currencyError && numKeysError !== lastError) onFormErrorChange(formError);	// notify of form error change
 	}
 }
 inheritsFrom(CurrencyInputController, DivController);
@@ -1261,8 +1261,8 @@ function CurrencyInputsController(div, plugins, defaultTicker, onInputsChange, o
 	this.add = function(ticker) {
 		var currencyInput = new CurrencyInputController($("<div>"), plugins, defaultTicker, onInputsChange, function() {
 			that.remove(currencyInput);
-		}, function(isValid) {
-			that.validate();
+		}, function(hasError) {
+			throw new Exception("Not sure what to do here");
 		});
 		currencyInput.render();
 		currencyInput.getDiv().appendTo(div);
@@ -1606,7 +1606,7 @@ function FormController(div) {
 		// create input
 		var currencyInput = new CurrencyInputController($("<div>"), plugins, defaultTicker, updateBip38Checkbox, function() {
 			removeCurrency(currencyInput);
-		}, function(isValid) {
+		}, function(hasError) {
 			validateCurrencyInputs();
 			updateGenerateButton();
 		});
