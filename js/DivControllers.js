@@ -1305,12 +1305,14 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
 		currencyInputs = [];
 		if (onInputsChange) onInputsChange();
+		updateFormError();
 	};
 	
 	this.startOver = function() {
 		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
 		currencyInputs = [];
 		that.add(AppUtils.DEV_MODE ? "BCH" : null);
+		updateFormError();
 	};
 	
 	this.getConfig = function() {
@@ -2977,25 +2979,11 @@ function ExportEditor(div, config) {
 			offset: '-180, 0'
 		});
 		
-		
-		
-//		var passphraseCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseDiv);
-//		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
-//		var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
-//		passphraseCheckboxLabel.html("Do you want to protect your private keys with a passphrase?");
-//		passphraseCheckbox.click(function() {
-//			if (passphraseCheckbox.prop('checked')) {
-//				passphraseInputDiv.show();
-//				passphraseInput.focus();
-//			} else {
-//				resetPassphrase();
-//			}
-//		});
-//		passphraseSplitRow.append("passphrase split input");
-		
 		// body
 		var body = $("<div class='editor_body flex_vertical'>").appendTo(div);
-		body.append("This is the body");
+		
+		// currency inputs
+		
 		
 		if (onDone) onDone(div);
 	};
