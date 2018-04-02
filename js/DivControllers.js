@@ -1055,13 +1055,204 @@ function DonateController(div, appController) {
 inheritsFrom(DonateController, DivController);
 
 /**
+ * Encapsulate a currency input.
+ * 
+ * @param div is the div to render to
+ * @param defaultTicker is the ticker of the initial selected currency
+ * @param onCurrencyChanged(ticker) is invoked when the user changes the currency selection
+ * @param onDelete is invoked when the user delets this input
+ * @param onValidChange(bool) is invoked when the validity state changes
+ */
+function CurrencyInput(div, plugins, defaultTicker, onCurrencyChanged, onDelete, onValidChange) {
+	DivController.call(this, div);
+	
+	assertInitialized(div);
+	assertInitialized(plugins);
+	
+	var that = this;
+	var id = uuidv4();	// id to accomodate ddslick's id requirement
+	var selectedPlugin;
+	var numKeysInput;
+	var selector;
+	var selectorData;
+	var trashDiv;
+	var trashImg;
+	var initializing = true;
+	var valid = true;
+	var validCurrency = true;
+	var validNumKeys = true;
+	
+	this.render = function(onDone) {
+		div.empty();
+		div.attr("class", "currency_input_div");
+		
+		// format pull down plugin data
+		selectorData = [];
+		for (var i = 0; i < plugins.length; i++) {
+			var plugin = plugins[i];
+			selectorData.push({
+				text: plugin.getName(),
+				imageSrc: plugin.getLogo().get(0).src
+			});
+		}
+		
+		// create pull down
+		selector = $("<div id='currency_selector_" + id + "'>").appendTo(div);
+		that.setSelectedCurrency(null);	// initializes selector
+		if (defaultTicker) that.setSelectedCurrency(defaultTicker);
+		
+		// create right div
+		var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
+		rightDiv.append("Keypairs to generate&nbsp;&nbsp;");
+		numKeysInput = $("<input class='num_keys_input' type='tel' value='1' min='1'>").appendTo(rightDiv);
+		numKeysInput.on("input", function(e) { validateNumKeys(true); });
+		numKeysInput.on("focusout", function(e) { validateNumKeys(false); });
+		rightDiv.append("&nbsp;&nbsp;");
+		trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
+		trashDiv.click(function() { onDelete(); });
+		trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
+		
+		// no longer initializing
+		initializing = false;
+		if (onDone) onDone(div);
+	},
+	
+	this.getSelectedPlugin = function() {
+		return selectedPlugin;
+	},
+	
+	this.setSelectedCurrency = function(ticker) {
+					
+		// reset dropdown
+		if (ticker === null || ticker === undefined) {
+			selector.ddslick("destroy");
+			selector = $("#currency_selector_" + id, div);	// ddslick requires id reference
+			selector.ddslick({
+				data: selectorData,
+				background: "white",
+				imagePosition: "left",
+				selectText: "Select a Currency...",
+				defeaultSelectedIndex: null,
+				onSelected: function(selection) {
+					selectedPlugin = plugins[selection.selectedIndex];
+					if (!initializing && onCurrencyChanged) onCurrencyChanged(ticker);
+					validateCurrency();
+				}
+			});
+			selectedPlugin = null;
+			selector = $("#currency_selector_" + id, div);	// ddslick requires id reference
+		}
+		
+		// set to currency
+		else {
+			var name = AppUtils.getCryptoPlugin(ticker).getName();
+			for (var i = 0; i < selectorData.length; i++) {
+				if (selectorData[i].text === name) {
+					selector.ddslick('select', {index: i});
+					selectedPlugin = plugins[i];
+					if (!initializing && onCurrencyChanged) onCurrencyChanged(ticker);
+					validateCurrency();
+					break;
+				}
+			}
+		}
+	},
+	
+	this.getNumKeys = function() {
+		var num = Number(numKeysInput.val());
+		if (isInt(num)) return num;
+		return null;
+	},
+	
+	this.setTrashEnabled = function(enabled) {
+		trashDiv.unbind("click");
+		if (enabled) {
+			trashDiv.click(function() { onDelete(); });
+			trashImg.removeClass("trash_div_disabled");
+		} else {
+			trashImg.addClass("trash_div_disabled");
+		}
+	},
+	
+	/**
+	 * Indicates if any validation errors are visible on this currency input.
+	 * 
+	 * @returns true if any validation errors are visible, false otherwise
+	 */
+	this.isValid = function() {
+		return valid;
+	},
+	
+	/**
+	 * Validates the currency input.
+	 * 
+	 * @returns true if this currency input has validation errors visible on the UI, false otherwise
+	 */
+	this.validate = function() {
+		validateCurrency();
+		validateNumKeys(false);
+		return that.isValid();
+	}
+	
+	// ---------------------- PRIVATE ------------------------
+	
+	function validateCurrency() {
+		if (selectedPlugin) {
+			validCurrency = true;
+			$(".dd-select", selector).removeClass("form_input_error_div");
+		} else {
+			validCurrency = false;
+			$(".dd-select", selector).addClass("form_input_error_div");
+		}
+		
+		// update valid state
+		updateValidity();
+		return validCurrency;
+	}
+	
+	function validateNumKeys(ignoreBlank) {
+		
+		// check for blank box
+		if (ignoreBlank && !numKeysInput.val()) {
+			numKeysInput.removeClass("form_input_error_div");
+			validNumKeys = true;
+		}
+		
+		// validate num keys
+		else {
+			var numKeys = that.getNumKeys();
+			if (isInt(numKeys) && numKeys >= 1) {
+				numKeysInput.removeClass("form_input_error_div");
+				validNumKeys = true;
+			} else {
+				numKeysInput.addClass("form_input_error_div");
+				validNumKeys = false;
+			}
+		}
+		
+		// update valid state
+		updateValidity();
+		return validNumKeys;
+	}
+	
+	function updateValidity() {
+		if (validCurrency && validNumKeys !== valid) {
+			valid = validCurrency && validNumKeys;
+			onValidChange(valid);
+		} else {
+			valid = validCurrency && validNumKeys;
+		}
+	}
+}
+inheritsFrom(CurrencyInput, DivController);
+
+/**
  * Form page.
  */
 function FormController(div) {
 	DivController.call(this, div);
 	
 	var that = this;
-	var currencyInputsDiv;
 	var currencyInputs;			// tracks each currency input
 	var passphraseCheckbox;
 	var passphraseInputDiv;
@@ -1358,12 +1549,13 @@ function FormController(div) {
 	function addCurrency(defaultTicker) {
 		
 		// create input
-		var currencyInput = new CurrencyInput($("<div>"), currencyInputs.length, plugins, defaultTicker, updateBip38Checkbox, function() {
+		var currencyInput = new CurrencyInput($("<div>"), plugins, defaultTicker, updateBip38Checkbox, function() {
 			removeCurrency(currencyInput);
 		}, function(isValid) {
 			validateCurrencyInputs();
 			updateGenerateButton();
 		});
+		currencyInput.render();
 		
 		// update currency inputs and add to page
 		currencyInputs.push(currencyInput);
@@ -1556,200 +1748,6 @@ function FormController(div) {
 			btnGenerate.click(function() { onGenerate(); });
 		} else {
 			btnGenerate.addClass("dark_green_btn_disabled");
-		}
-	}
-	
-	/**
-	 * Encapsulate a currency input.
-	 * 
-	 * @param div is the div to render to
-	 * @param idx is the index of this input relative to the other inputs to accomodate ddslick's id requirement
-	 * @param defaultTicker is the ticker of the initial selected currency
-	 * @param onCurrencyChanged(ticker) is invoked when the user changes the currency selection
-	 * @param onDelete is invoked when the user delets this input
-	 * @param onValidChange(bool) is invoked when the validity state changes
-	 */
-	function CurrencyInput(div, idx, plugins, defaultTicker, onCurrencyChanged, onDelete, onValidChange) {
-		assertInitialized(div);
-		assertInitialized(plugins);
-		
-		var that = this;
-		var selectedPlugin;
-		var numKeysInput;
-		var selector;
-		var selectorData;
-		var trashDiv;
-		var trashImg;
-		var initializing = true;
-		var valid = true;
-		var validCurrency = true;
-		var validNumKeys = true;
-		
-		this.getDiv = function() {
-			return div;
-		},
-		
-		this.getSelectedPlugin = function() {
-			return selectedPlugin;
-		},
-		
-		this.setSelectedCurrency = function(ticker) {
-						
-			// reset dropdown
-			if (ticker === null || ticker === undefined) {
-				selector.ddslick("destroy");
-				selector = $("#currency_selector_" + idx, div);	// ddslick requires id reference
-				selector.ddslick({
-					data: selectorData,
-					background: "white",
-					imagePosition: "left",
-					selectText: "Select a Currency...",
-					defeaultSelectedIndex: null,
-					onSelected: function(selection) {
-						selectedPlugin = plugins[selection.selectedIndex];
-						if (!initializing && onCurrencyChanged) onCurrencyChanged(ticker);
-						validateCurrency();
-					}
-				});
-				selectedPlugin = null;
-				selector = $("#currency_selector_" + idx, div);	// ddslick requires id reference
-			}
-			
-			// set to currency
-			else {
-				var name = AppUtils.getCryptoPlugin(ticker).getName();
-				for (var i = 0; i < selectorData.length; i++) {
-					if (selectorData[i].text === name) {
-						selector.ddslick('select', {index: i});
-						selectedPlugin = plugins[i];
-						if (!initializing && onCurrencyChanged) onCurrencyChanged(ticker);
-						validateCurrency();
-						break;
-					}
-				}
-			}
-		},
-		
-		this.getNumKeys = function() {
-			var num = Number(numKeysInput.val());
-			if (isInt(num)) return num;
-			return null;
-		},
-		
-		this.setTrashEnabled = function(enabled) {
-			trashDiv.unbind("click");
-			if (enabled) {
-				trashDiv.click(function() { onDelete(); });
-				trashImg.removeClass("trash_div_disabled");
-			} else {
-				trashImg.addClass("trash_div_disabled");
-			}
-		},
-		
-		/**
-		 * Indicates if any validation errors are visible on this currency input.
-		 * 
-		 * @returns true if any validation errors are visible, false otherwise
-		 */
-		this.isValid = function() {
-			return valid;
-		},
-		
-		/**
-		 * Validates the currency input.
-		 * 
-		 * @returns true if this currency input has validation errors visible on the UI, false otherwise
-		 */
-		this.validate = function() {
-			validateCurrency();
-			validateNumKeys(false);
-			return that.isValid();
-		}
-		
-		// ---------------------- PRIVATE ------------------------
-		
-		function validateCurrency() {
-			if (selectedPlugin) {
-				validCurrency = true;
-				$(".dd-select", selector).removeClass("form_input_error_div");
-			} else {
-				validCurrency = false;
-				$(".dd-select", selector).addClass("form_input_error_div");
-			}
-			
-			// update valid state
-			updateValidity();
-			return validCurrency;
-		}
-		
-		function validateNumKeys(ignoreBlank) {
-			
-			// check for blank box
-			if (ignoreBlank && !numKeysInput.val()) {
-				numKeysInput.removeClass("form_input_error_div");
-				validNumKeys = true;
-			}
-			
-			// validate num keys
-			else {
-				var numKeys = that.getNumKeys();
-				if (isInt(numKeys) && numKeys >= 1) {
-					numKeysInput.removeClass("form_input_error_div");
-					validNumKeys = true;
-				} else {
-					numKeysInput.addClass("form_input_error_div");
-					validNumKeys = false;
-				}
-			}
-			
-			// update valid state
-			updateValidity();
-			return validNumKeys;
-		}
-		
-		function updateValidity() {
-			if (validCurrency && validNumKeys !== valid) {
-				valid = validCurrency && validNumKeys;
-				onValidChange(valid);
-			} else {
-				valid = validCurrency && validNumKeys;
-			}
-		}
-		
-		// render input
-		render();
-		function render() {
-			div.empty();
-			div.attr("class", "currency_input_div");
-			
-			// format pull down plugin data
-			selectorData = [];
-			for (var i = 0; i < plugins.length; i++) {
-				var plugin = plugins[i];
-				selectorData.push({
-					text: plugin.getName(),
-					imageSrc: plugin.getLogo().get(0).src
-				});
-			}
-			
-			// create pull down
-			selector = $("<div id='currency_selector_" + idx + "'>").appendTo(div);
-			that.setSelectedCurrency(null);	// initializes selector
-			if (defaultTicker) that.setSelectedCurrency(defaultTicker);
-			
-			// create right div
-			var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
-			rightDiv.append("Keypairs to generate&nbsp;&nbsp;");
-			numKeysInput = $("<input class='num_keys_input' type='tel' value='1' min='1'>").appendTo(rightDiv);
-			numKeysInput.on("input", function(e) { validateNumKeys(true); });
-			numKeysInput.on("focusout", function(e) { validateNumKeys(false); });
-			rightDiv.append("&nbsp;&nbsp;");
-			trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
-			trashDiv.click(function() { onDelete(); });
-			trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
-			
-			// no longer initializing
-			initializing = false;
 		}
 	}
 }
