@@ -1055,7 +1055,7 @@ function DonateController(div, appController) {
 inheritsFrom(DonateController, DivController);
 
 /**
- * Single currency input.
+ * Manages a single currency input.
  * 
  * @param div is the div to render to
  * @param plugins are crypto plugins to select from
@@ -1070,6 +1070,7 @@ function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, 
 	assertInitialized(div);
 	assertInitialized(plugins);
 	
+	// state variables
 	var that = this;
 	var id = uuidv4();	// id to accomodate ddslick's id requirement
 	var selectedPlugin;
@@ -1238,31 +1239,40 @@ function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, 
 inheritsFrom(CurrencyInputController, DivController);
 
 /**
- * Collection of currency inputs.
+ * Manages a collection of currency inputs.
  * 
  * @param div is the div to render to
  * @param plugins are crypto plugins to select from
- * @param defaultTicker is the ticker of the initial selected currency
- * @param onDelete is invoked when the user delets this input
- * @param onInputsChange is invoked when one of the inputs change
- * @param onValidChange(isValid) is invoked when the validity state changes
+ * @param onInputsChange() is invoked when one of the inputs change
+ * @param onFormErrorChange(hasError) is invoked when the validity state changes
  */
-function CurrencyInputsController(div, plugins, defaultTicker, onInputsChange, onValidChange) {
+function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChange) {
 	DivController.call(this, div);
 	
+	// state variables
 	var that = this;
-	var currencyInputs = [];
-	var validity;
+	var currencyInputs;
+	var formError;
 	
 	this.render = function(onDone) {
 		
+		// div setup
+		div.empty();
+		
+		// initial state
+		currencyInputs = [];
+		formError = false;
+		that.reset();
+		
+		// done
+		if (onDone) onDone();
 	};
 	
 	this.add = function(ticker) {
-		var currencyInput = new CurrencyInputController($("<div>"), plugins, defaultTicker, onInputsChange, function() {
-			that.remove(currencyInput);
+		var currencyInput = new CurrencyInputController($("<div>"), plugins, ticker, onInputsChange, function() {
+			remove(currencyInput);
 		}, function(hasError) {
-			throw new Exception("Not sure what to do here");
+			updateFormError();
 		});
 		currencyInput.render();
 		currencyInput.getDiv().appendTo(div);
@@ -1271,22 +1281,14 @@ function CurrencyInputsController(div, plugins, defaultTicker, onInputsChange, o
 		if (onInputsChange) onInputsChange();
 	};
 	
-	this.remove = function(currencyInput) {
-		var idx = currencyInputs.indexOf(currencyInput);
-		if (idx < 0) throw new Error("Could not find currency input");
-		currencyInputs.splice(idx, 1);
-		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
-		currencyInput.getDiv().remove();
-		that.validate();
-		if (onInputsChange) onInputsChange();
+	this.hasFormError = function() {
+		return formError;
 	}
 	
-	this.getConfig = function() {
-		throw new Error("Not implemented");
-	};
-	
 	this.validate = function() {
-		
+		for (var i = 0; i < currencyInputs.length; i++) {
+			currencyInputs[i].validate();
+		}
 	};
 	
 	this.reset = function() {
@@ -1295,8 +1297,33 @@ function CurrencyInputsController(div, plugins, defaultTicker, onInputsChange, o
 		that.add(AppUtils.DEV_MODE ? "BCH" : null);
 	};
 	
+	this.getConfig = function() {
+		throw new Error("Not implemented");
+	};
+	
+	//---------------------- PRIVATE ------------------------
+	
 	function remove(currencyInput) {
-		
+		var idx = currencyInputs.indexOf(currencyInput);
+		if (idx < 0) throw new Error("Could not find currency input");
+		var formErrorBeforeRemoved = that.hasFormError();
+		currencyInputs.splice(idx, 1);
+		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
+		currencyInput.getDiv().remove();
+		if (that.hasFormError() !== formErrorBeforeRemove && onFormErrorChange) onFormErrorChange(that.hasFormError());
+		if (onInputsChange) onInputsChange();
+	}
+	
+	function updateFormError() {
+		var lastError = formError;
+		formError = false;
+		for (var i = 0; i < currencyInputs.length; i++) {
+			if (currencyInputs[i].hasFormError()) {
+				formError = true;
+				break;
+			}
+		}
+		if (formError !== lastError && onFormErrorChange) onFormErrorChange(formError);	// notify of form error change
 	}
 }
 inheritsFrom(CurrencyInputsController, DivController);
