@@ -2982,10 +2982,21 @@ function ExportEditor(div, config) {
 		// body
 		var body = $("<div class='editor_body flex_vertical'>").appendTo(div);
 		
-		// currency inputs
-		
-		
-		if (onDone) onDone(div);
+		// load export dependencies
+		LOADER.load(AppUtils.getAppDependencies(), function(err) {
+			if (err) throw err;
+			
+			// currency inputs
+			currencyInputsController = new CurrencyInputsController($("<div>").appendTo(body), AppUtils.getCryptoPlugins(), function() {
+				console.log("currency inputs change");
+			}, function(hasError) {
+				console.log("currency inputs form error change")
+			});
+			currencyInputsController.render();
+			
+			// done rendering
+			if (onDone) onDone(div);
+		});
 	};
 }
 inheritsFrom(ExportEditor, DivController);
