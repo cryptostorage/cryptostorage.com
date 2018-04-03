@@ -142,7 +142,6 @@ function AppController(div) {
 		if (hash.startsWith("#faq")) that.showFaq(onDone);
 		else if (hash === "#donate") that.showDonate(onDone);
 		else if (hash === "#import") that.showImport(onDone);
-		else if (hash === "#new") UiUtils.openEditorTab("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
 		else that.showHome(onDone);
 	}
 	
@@ -298,7 +297,7 @@ function AppController(div) {
 	}
 	
 	function onSelectGenerate() {
-		navigate("#new");
+		UiUtils.openEditorTab("Export Storage", {confirmExit: true});
 	}
 	
 	function onSelectImport() {
