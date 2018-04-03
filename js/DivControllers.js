@@ -1086,7 +1086,7 @@ function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, 
 	
 	this.render = function(onDone) {
 		div.empty();
-		div.attr("class", "currency_input_div");
+		div.attr("class", "currency_input_div flex_horizontal width_100");
 		
 		// format pull down plugin data
 		selectorData = [];
@@ -2983,6 +2983,7 @@ function ExportEditor(div, config) {
 		var body = $("<div class='editor_body flex_vertical'>").appendTo(div);
 		
 		// load export dependencies
+		// TODO: load dependecies correctly
 		LOADER.load(AppUtils.getAppDependencies(), function(err) {
 			if (err) throw err;
 			

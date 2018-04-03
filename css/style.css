@@ -563,18 +563,15 @@ input[type='checkbox'][disabled] +label {
 	margin-bottom: 20px;
 }
 
+.currency_inputs_div {
+	width: 100%;
+}
+
 .currency_inputs_div:first-child {
 	border-top: 2.5px solid;
 }
 
 .currency_input_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
 	border-style:solid;
 	border-width: 0 2.5px 2.5px 2.5px;
 	padding: 15px;
@@ -1191,7 +1188,8 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_body {
-	width: 100%;
+	padding: 60px;
+	width: 875px;
 }
 
 .editor_body, .editor_body * {
