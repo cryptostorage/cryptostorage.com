@@ -1198,9 +1198,9 @@ input[type='checkbox'][disabled] +label {
 
 .editor_floating_controls {
 	position: fixed;
-	bottom: 75px;
-	right: 75px;
-	width: 400px;
+	bottom: 50px;
+	right: 50px;
+	width: 350px;
 }
 
 .editor_btn_green {

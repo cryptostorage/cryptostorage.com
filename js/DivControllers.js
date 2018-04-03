@@ -3031,6 +3031,7 @@ function EditorController(div, config) {
 				btnGo.append("Go button");
 				var btnReset = $("<div class='editor_btn_red flex_horizontal user_select_none'>").appendTo(floatingControls);
 				btnReset.append("Reset");
+				btnReset.click(function() { currencyInputsController.startOver(); });
 				var savePrintDiv = $("<div class='flex_horizontal width_100'>").appendTo(floatingControls);
 				var btnSave = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
 				btnSave.append("Save");
