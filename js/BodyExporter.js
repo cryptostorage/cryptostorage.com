@@ -71,5 +71,5 @@ window.exportToBody = function(window, config) {
 	}
 	
 	// render editor
-	new ExportEditor($("<div>").appendTo(body), config).render();
+	new EditorController($("<div>").appendTo(body), config).render();
 }

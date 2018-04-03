@@ -2911,7 +2911,7 @@ function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, def
 inheritsFrom(TwoTabController, DivController);
 
 /**
- * Export editor.
+ * Editor controller.
  * 
  * @param div is the div to render to
  * @param config specifies export page behavior
@@ -2920,7 +2920,7 @@ inheritsFrom(TwoTabController, DivController);
  * 				config.pieces are pieces to export and generate pieceDivs from
  * 				config.pieceDivs are pre-generated piece divs ready for display
  */
-function ExportEditor(div, config) {
+function EditorController(div, config) {
 	DivController.call(this, div);
 	
 	// global variables
@@ -2989,32 +2989,47 @@ function ExportEditor(div, config) {
 			offset: '-180, 0'
 		});
 		
-		// body
+		// editor body
 		var body = $("<div class='editor_body flex_vertical'>").appendTo(div);
-		
-		// load export dependencies
-		// TODO: load dependecies correctly
-		LOADER.load(AppUtils.getAppDependencies(), function(err) {
-			if (err) throw err;
-			
-			// cryptostorage logo
-			var logoHeader = $("<div class='piece_page_header_div'>").appendTo(body);
-			$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
-			
-			// currency inputs
-			currencyInputsController = new CurrencyInputsController($("<div style='width:100%'>").appendTo(body), AppUtils.getCryptoPlugins(), function() {
-				console.log("currency inputs change");
-			}, function(hasError) {
-				console.log("currency inputs form error change")
-			});
-			currencyInputsController.render();
-			
-			// done rendering
+		new LoadController(new EditorBodyController(body)).render(function() {
 			if (onDone) onDone(div);
 		});
-	};
+	}
+	
+	// ------------------------------- PRIVATE --------------------------------
+	
+	/**
+	 * Editor body controller.
+	 */
+	function EditorBodyController(div) {
+		DivController.call(this, div);
+		
+		this.render = function(onDone) {
+			
+			// load dependencies TODO: load correct dependencies
+			LOADER.load(AppUtils.getAppDependencies(), function(err) {
+				if (err) throw err;
+				
+				// cryptostorage logo
+				var logoHeader = $("<div class='piece_page_header_div'>").appendTo(div);
+				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
+				
+				// currency inputs
+				currencyInputsController = new CurrencyInputsController($("<div style='width:100%'>").appendTo(div), AppUtils.getCryptoPlugins(), function() {
+					console.log("currency inputs change");
+				}, function(hasError) {
+					console.log("currency inputs form error change")
+				});
+				currencyInputsController.render();
+				
+				// done rendering
+				if (onDone) onDone(div);
+			});
+		}
+	}
+	inheritsFrom(EditorBodyController, DivController);
 }
-inheritsFrom(ExportEditor, DivController);
+inheritsFrom(EditorController, DivController);
 
 /**
  * Export page.
