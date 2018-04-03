@@ -142,7 +142,7 @@ function AppController(div) {
 		if (hash.startsWith("#faq")) that.showFaq(onDone);
 		else if (hash === "#donate") that.showDonate(onDone);
 		else if (hash === "#import") that.showImport(onDone);
-		else if (hash === "#new") that.showForm(onDone);
+		else if (hash === "#new") UiUtils.openEditorTab("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
 		else that.showHome(onDone);
 	}
 	
@@ -1251,6 +1251,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 	
 	// state variables
 	var that = this;
+	var currencyInputsDiv;
 	var currencyInputs;
 	var formError;
 	
@@ -1260,12 +1261,23 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		div.empty();
 		div.addClass("currency_inputs_div");
 		
+		// currency inputs div
+		currencyInputsDiv = $("<div>").appendTo(div);
+		
+		// add another currency link
+		var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(div);
+		var addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
+		addCurrencySpan.html("+ Add another currency");
+		addCurrencySpan.click(function() {
+			currencyInputsController.add();
+		});
+		
 		// initial state
 		var onInputsChangeBkp = onInputsChange;
 		onInputsChange = null;	// disable notifications
 		currencyInputs = [];
 		formError = false;
-		that.startOver();
+		that.add(AppUtils.DEV_MODE ? "BCH" : null);
 		onInputsChange = onInputsChangeBkp;
 		
 		// done
@@ -1283,7 +1295,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 			updateFormError();
 		});
 		currencyInput.render();
-		currencyInput.getDiv().appendTo(div);
+		currencyInput.getDiv().appendTo(currencyInputsDiv);
 		currencyInputs.push(currencyInput);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		if (onInputsChange) onInputsChange();
