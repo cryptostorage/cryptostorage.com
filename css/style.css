@@ -1188,7 +1188,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_body {
-	padding: 60px;
+	padding: 45px;
 	width: 875px;
 }
 

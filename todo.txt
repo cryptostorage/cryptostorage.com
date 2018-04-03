@@ -3,6 +3,8 @@ export editor
 	interoperability disclaimer if passphrase/split checked
 	split lines bolder
 	precise static and dynamic dependencies
+	direct link to editor
+	cancel button on generate
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient

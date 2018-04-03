@@ -1258,10 +1258,9 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		
 		// div setup
 		div.empty();
-		div.addClass("currency_inputs_div");
 		
 		// currency inputs div
-		currencyInputsDiv = $("<div>").appendTo(div);
+		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(div);
 		
 		// add another currency link
 		var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(div);
@@ -2998,8 +2997,12 @@ function ExportEditor(div, config) {
 		LOADER.load(AppUtils.getAppDependencies(), function(err) {
 			if (err) throw err;
 			
+			// cryptostorage logo
+			var logoHeader = $("<div class='piece_page_header_div'>").appendTo(body);
+			$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
+			
 			// currency inputs
-			currencyInputsController = new CurrencyInputsController($("<div>").appendTo(body), AppUtils.getCryptoPlugins(), function() {
+			currencyInputsController = new CurrencyInputsController($("<div style='width:100%'>").appendTo(body), AppUtils.getCryptoPlugins(), function() {
 				console.log("currency inputs change");
 			}, function(hasError) {
 				console.log("currency inputs form error change")
