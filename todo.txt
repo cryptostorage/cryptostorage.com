@@ -1,5 +1,6 @@
 v0.2.4
 export editor
+	click outside dropdown only works if click within container
 	interoperability disclaimer if passphrase/split checked
 	split lines bolder
 	precise static and dynamic dependencies
