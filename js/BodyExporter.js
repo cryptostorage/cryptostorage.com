@@ -23,7 +23,7 @@
  */
 
 /**
- * Renders an export editor to the given window's body.
+ * Renders an editor to the given window's body.
  * 
  * @param window is the window to export to
  * @param config is the export configuration
