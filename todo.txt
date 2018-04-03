@@ -5,6 +5,7 @@ export editor
 	precise static and dynamic dependencies
 	direct link to editor
 	cancel button on generate
+	tweak floating button colors
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient

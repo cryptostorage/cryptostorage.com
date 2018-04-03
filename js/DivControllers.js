@@ -2990,8 +2990,7 @@ function EditorController(div, config) {
 		});
 		
 		// editor body
-		var body = $("<div class='editor_body flex_vertical'>").appendTo(div);
-		new LoadController(new EditorBodyController(body)).render(function() {
+		new LoadController(new EditorBodyController($("<div>").appendTo(div))).render(function() {
 			if (onDone) onDone(div);
 		});
 	}
@@ -3010,6 +3009,10 @@ function EditorController(div, config) {
 			LOADER.load(AppUtils.getAppDependencies(), function(err) {
 				if (err) throw err;
 				
+				// div setup
+				div.empty();
+				div.addClass("editor_body flex_vertical");
+				
 				// cryptostorage logo
 				var logoHeader = $("<div class='piece_page_header_div'>").appendTo(div);
 				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
@@ -3021,6 +3024,19 @@ function EditorController(div, config) {
 					console.log("currency inputs form error change")
 				});
 				currencyInputsController.render();
+				
+				// floating controls
+				var floatingControls = $("<div class='editor_floating_controls'>").appendTo(div);
+				var btnGo = $("<div class='editor_btn_green flex_horizontal user_select_none'>").appendTo(floatingControls);
+				btnGo.append("Go button");
+				var btnReset = $("<div class='editor_btn_red flex_horizontal user_select_none'>").appendTo(floatingControls);
+				btnReset.append("Reset");
+				var savePrintDiv = $("<div class='flex_horizontal width_100'>").appendTo(floatingControls);
+				var btnSave = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
+				btnSave.append("Save");
+				$("<div style='width:30px;'>").appendTo(savePrintDiv);
+				var btnPrint = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
+				btnPrint.append("Print");
 				
 				// done rendering
 				if (onDone) onDone(div);

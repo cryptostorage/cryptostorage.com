@@ -1196,6 +1196,61 @@ input[type='checkbox'][disabled] +label {
 	font-size: 24px;
 }
 
+.editor_floating_controls {
+	position: fixed;
+	bottom: 75px;
+	right: 75px;
+	width: 400px;
+}
+
+.editor_btn_green {
+	color: white;
+	background-color: rgb(144, 212, 66);
+	padding: 15px;
+	font-size: 30px;
+	font-weight: bold;
+}
+
+.editor_btn_green:hover {
+	background-color: rgb(164, 232, 86);
+}
+
+.editor_btn_green:active {
+	background-color: rgb(134, 202, 56);
+}
+
+.editor_btn_red {
+	color: white;
+	background-color: rgb(224, 112, 82);
+	padding: 10px;
+	font-size: 28px;
+}
+
+.editor_btn_red:hover {
+	background-color: rgb(244, 132, 102);
+}
+
+.editor_btn_red:active {
+	background-color: rgb(214, 102, 72);
+}
+
+.editor_btn_blue {
+	color: white;
+	background-color: rgb(66, 116, 184);
+	padding: 12px;
+	font-size: 28px;
+	width: 100%;
+	margin-top: 8px;
+}
+
+.editor_btn_blue:hover {
+	background-color: rgb(86, 136, 204);
+}
+
+.editor_btn_blue:active {
+	background-color: rgb(56, 106, 174);
+}
+
 .export_div {
 	align-items: center;
 	min-width: 775px;
