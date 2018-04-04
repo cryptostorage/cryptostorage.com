@@ -2922,18 +2922,20 @@ function EditorController(div, config) {
 	DivController.call(this, div);
 	
 	// global variables
-	var editorController = this;
+	var that = this;
 	var passphraseCheckbox;
 	var passphraseInput;
 	var splitCheckbox;
 	var splitInput;
 	var editorBodyController;
+	var configListeners;
 	
 	this.render = function(onDone) {
 		
-		// div setup
+		// init
 		div.empty();
 		div.addClass("editor_div, flex_vertical");
+		configListeners = [];
 		
 		// header
 		var header = $("<div class='editor_header flex_vertical'>").appendTo(div);
@@ -2989,9 +2991,13 @@ function EditorController(div, config) {
 			offset: '-180, 0'
 		});
 		
-		// editor body
+		// load editor body
 		editorBodyController = new EditorBodyController($("<div>").appendTo(div));
 		new LoadController(editorBodyController).render(function() {
+			
+			// floating controls
+			new FloatingControlsController($("<div>").appendTo(div), that).render();
+			
 			if (onDone) onDone(div);
 		});
 	}
@@ -3012,7 +3018,17 @@ function EditorController(div, config) {
 		console.log("generate()");
 	}
 	
+	this.addConfigListener = function(listener) {
+		configListeners.push(listener);
+	}
+	
 	// ------------------------------- PRIVATE --------------------------------
+	
+	function notifyConfigChange() {
+		for (var i = 0; i < configListeners.length; i++) {
+			configListeners.onConfigChange(config);
+		}
+	}
 	
 	/**
 	 * Editor body controller.
@@ -3044,9 +3060,6 @@ function EditorController(div, config) {
 				});
 				currencyInputsController.render();
 				
-				// floating controls
-				new FloatingControlsController($("<div>").appendTo(div)).render();
-				
 				// done rendering
 				if (onDone) onDone(div);
 			});
@@ -3061,14 +3074,19 @@ function EditorController(div, config) {
 	/**
 	 * Floating controls controller.
 	 */
-	function FloatingControlsController(div) {
+	function FloatingControlsController(div, editorController) {
 		DivController.call(this, div);
+		
+		var that = this;
 		
 		this.render = function() {
 			
 			// div setup
 			div.empty();
 			div.addClass("editor_floating_controls");
+			
+			// register as config listener
+			editorController.addConfigListener(that);
 
 			// buttons
 			var btnGo = $("<div class='editor_btn_green flex_horizontal user_select_none'>").appendTo(div);
@@ -3082,6 +3100,10 @@ function EditorController(div, config) {
 			$("<div style='width:30px;'>").appendTo(savePrintDiv);
 			var btnPrint = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
 			btnPrint.append("Print");
+		}
+		
+		this.onConfigChange = function(config) {
+			console.log("Update floating controls!");
 		}
 	}
 	inheritsFrom(FloatingControlsController, DivController);
