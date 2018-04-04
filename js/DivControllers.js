@@ -1266,9 +1266,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(div);
 		var addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
 		addCurrencySpan.html("+ Add another currency");
-		addCurrencySpan.click(function() {
-			currencyInputsController.add();
-		});
+		addCurrencySpan.click(function() { that.add(); });
 		
 		// initial state
 		var onInputsChangeBkp = onInputsChange;
@@ -2924,10 +2922,12 @@ function EditorController(div, config) {
 	DivController.call(this, div);
 	
 	// global variables
+	var editorController = this;
 	var passphraseCheckbox;
 	var passphraseInput;
 	var splitCheckbox;
 	var splitInput;
+	var editorBodyController;
 	
 	this.render = function(onDone) {
 		
@@ -2990,9 +2990,26 @@ function EditorController(div, config) {
 		});
 		
 		// editor body
-		new LoadController(new EditorBodyController($("<div>").appendTo(div))).render(function() {
+		editorBodyController = new EditorBodyController($("<div>").appendTo(div));
+		new LoadController(editorBodyController).render(function() {
 			if (onDone) onDone(div);
 		});
+	}
+	
+	this.startOver = function() {
+		editorBodyController.startOver();
+	}
+	
+	this.save = function() {
+		console.log("save()");
+	}
+	
+	this.print = function() {
+		console.log("print()");
+	}
+	
+	this.generate = function() {
+		console.log("generate()");
 	}
 	
 	// ------------------------------- PRIVATE --------------------------------
@@ -3002,6 +3019,8 @@ function EditorController(div, config) {
 	 */
 	function EditorBodyController(div) {
 		DivController.call(this, div);
+		
+		var currencyInputsController;
 		
 		this.render = function(onDone) {
 			
@@ -3026,25 +3045,46 @@ function EditorController(div, config) {
 				currencyInputsController.render();
 				
 				// floating controls
-				var floatingControls = $("<div class='editor_floating_controls'>").appendTo(div);
-				var btnGo = $("<div class='editor_btn_green flex_horizontal user_select_none'>").appendTo(floatingControls);
-				btnGo.append("Go button");
-				var btnReset = $("<div class='editor_btn_red flex_horizontal user_select_none'>").appendTo(floatingControls);
-				btnReset.append("Reset");
-				btnReset.click(function() { currencyInputsController.startOver(); });
-				var savePrintDiv = $("<div class='flex_horizontal width_100'>").appendTo(floatingControls);
-				var btnSave = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
-				btnSave.append("Save");
-				$("<div style='width:30px;'>").appendTo(savePrintDiv);
-				var btnPrint = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
-				btnPrint.append("Print");
+				new FloatingControlsController($("<div>").appendTo(div)).render();
 				
 				// done rendering
 				if (onDone) onDone(div);
 			});
 		}
+		
+		this.startOver = function() {
+			currencyInputsController.startOver();
+		}
 	}
 	inheritsFrom(EditorBodyController, DivController);
+	
+	/**
+	 * Floating controls controller.
+	 */
+	function FloatingControlsController(div) {
+		DivController.call(this, div);
+		
+		this.render = function() {
+			
+			// div setup
+			div.empty();
+			div.addClass("editor_floating_controls");
+
+			// buttons
+			var btnGo = $("<div class='editor_btn_green flex_horizontal user_select_none'>").appendTo(div);
+			btnGo.append("Go button");
+			var btnReset = $("<div class='editor_btn_red flex_horizontal user_select_none'>").appendTo(div);
+			btnReset.append("Reset");
+			btnReset.click(function() { editorController.startOver(); });
+			var savePrintDiv = $("<div class='flex_horizontal width_100'>").appendTo(div);
+			var btnSave = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
+			btnSave.append("Save");
+			$("<div style='width:30px;'>").appendTo(savePrintDiv);
+			var btnPrint = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
+			btnPrint.append("Print");
+		}
+	}
+	inheritsFrom(FloatingControlsController, DivController);
 }
 inheritsFrom(EditorController, DivController);
 
