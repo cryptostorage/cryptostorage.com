@@ -1316,7 +1316,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		updateFormError();
 	};
 	
-	this.startOver = function() {
+	this.reset = function() {
 		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
 		currencyInputs = [];
 		that.add(AppUtils.DEV_MODE ? "BCH" : null);
@@ -1598,7 +1598,7 @@ function FormController(div) {
 		if (!currencyInputsController) return;
 		
 		// reset currency inputs
-		currencyInputsController.startOver();
+		currencyInputsController.reset();
 		
 		// reset passphrase
 		resetPassphrase();
@@ -2923,11 +2923,8 @@ function EditorController(div, config) {
 	
 	// global variables
 	var that = this;
-	var passphraseCheckbox;
-	var passphraseInput;
-	var splitCheckbox;
-	var splitInput;
-	var editorBodyController;
+	var headerController;
+	var bodyController;
 	var configListeners;
 	
 	this.render = function(onDone) {
@@ -2938,88 +2935,46 @@ function EditorController(div, config) {
 		configListeners = [];
 		
 		// header
-		var header = $("<div class='editor_header flex_vertical'>").appendTo(div);
-		
-		// passphrase and split input row
-		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal'>").appendTo(header);
-		
-		// passphrase input
-		var passphraseDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
-		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
-		var passphraseCheckboxLabel = $("<label class='user_select_none' for='passphrase_checkbox'>").appendTo(passphraseDiv);
-		passphraseCheckboxLabel.html("Use Passphrase?");
-		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseDiv);
-		
-		// split input
-		var splitDiv = $("<div class='editor_split_div flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
-		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
-		var splitCheckboxLabel = $("<label class='user_select_none' for='split_checkbox'>").appendTo(splitDiv);
-		splitCheckboxLabel.html("Split Keys?");
-		var splitInfo = $("<img src='img/information_white.png' class='information_img'>").appendTo(splitDiv);
-		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitDiv);
-		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitDiv);
-		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
-		var splitNumLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitNumDiv);
-		splitNumLabelTop.html("Split Into");
-		numPiecesInput = $("<input class='split_input' type='tel' value='3' min='2'>").appendTo(splitNumDiv);
-		var splitNumLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitNumDiv);
-		splitNumLabelBottom.html("Pieces");
-		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitDiv);
-		var splitMinDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
-		var splitMinLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitMinDiv);
-		splitMinLabelTop.html("Require");
-		minPiecesInput = $("<input class='split_input' type='tel' value='2' min='2'>").appendTo(splitMinDiv);
-		var splitMinLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitMinDiv);
-		splitMinLabelBottom.html("To Recover");		
-		
-		// split tooltip
-		var splitTooltip = $("<div>");
-		splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
-		splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
-		splitTooltip.append("For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
-		tippy(splitInfo.get(0), {
-			arrow: true,
-			html: splitTooltip.get(0),
-			interactive: true,
-			placement: 'bottom',
-			theme: 'translucent',
-			trigger: "mouseenter",
-			multiple: 'false',
-			maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
-			distance: 20,
-			arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-			offset: '-180, 0'
-		});
-		
-		// load editor body
-		editorBodyController = new EditorBodyController($("<div>").appendTo(div));
-		new LoadController(editorBodyController).render(function() {
+		headerController = new EditorHeaderController($("<div>").appendTo(div)).render(function() {
 			
-			// floating controls
-			new FloatingControlsController($("<div>").appendTo(div), that).render();
-			
-			if (onDone) onDone(div);
+			// body with loader
+			bodyController = new EditorBodyController($("<div>").appendTo(div));
+			new LoadController(bodyController).render(function() {
+				
+				// floating controls
+				new FloatingControlsController($("<div>").appendTo(div), that).render();
+				
+				if (onDone) onDone(div);
+			});
 		});
-	}
-	
-	this.startOver = function() {
-		editorBodyController.startOver();
-	}
-	
-	this.save = function() {
-		console.log("save()");
-	}
-	
-	this.print = function() {
-		console.log("print()");
 	}
 	
 	this.generate = function() {
 		console.log("generate()");
 	}
 	
+	this.reset = function() {
+		editorBodyController.reset();
+		notifyConfigChange();
+	}
+	
+	this.save = function() {
+		if (!config.pieces) throw new Error("Cannot save because config.pieces is not initialized");
+		console.log("save()");
+	}
+	
+	this.print = function() {
+		if (!config.pieces) throw new Error("Cannot print because config.pieces is not initialized");
+		console.log("print()");
+	}
+	
 	this.addConfigListener = function(listener) {
 		configListeners.push(listener);
+		listener.onConfigChange(that.getConfig());	// immediate notification
+	}
+	
+	this.getConfig = function() {
+		return config;
 	}
 	
 	// ------------------------------- PRIVATE --------------------------------
@@ -3031,7 +2986,82 @@ function EditorController(div, config) {
 	}
 	
 	/**
-	 * Editor body controller.
+	 * Editor header.
+	 */
+	function EditorHeaderController(div) {
+		DivController.call(this, div);
+		
+		var passphraseCheckbox;
+		var passphraseInput;
+		var splitCheckbox;
+		var splitInput;
+		
+		this.render = function(onDone) {
+			
+			// div setup
+			div.empty();
+			div.addClass("editor_header flex_vertical");
+			
+			// passphrase and split input row
+			var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal'>").appendTo(div);
+			
+			// passphrase input
+			var passphraseDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
+			passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
+			var passphraseCheckboxLabel = $("<label class='user_select_none' for='passphrase_checkbox'>").appendTo(passphraseDiv);
+			passphraseCheckboxLabel.html("Use Passphrase?");
+			passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseDiv);
+			
+			// split input
+			var splitDiv = $("<div class='editor_split_div flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
+			splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
+			var splitCheckboxLabel = $("<label class='user_select_none' for='split_checkbox'>").appendTo(splitDiv);
+			splitCheckboxLabel.html("Split Keys?");
+			var splitInfo = $("<img src='img/information_white.png' class='information_img'>").appendTo(splitDiv);
+			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitDiv);
+			var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitDiv);
+			var splitNumDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
+			var splitNumLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitNumDiv);
+			splitNumLabelTop.html("Split Into");
+			numPiecesInput = $("<input class='split_input' type='tel' value='3' min='2'>").appendTo(splitNumDiv);
+			var splitNumLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitNumDiv);
+			splitNumLabelBottom.html("Pieces");
+			var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitDiv);
+			var splitMinDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
+			var splitMinLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitMinDiv);
+			splitMinLabelTop.html("Require");
+			minPiecesInput = $("<input class='split_input' type='tel' value='2' min='2'>").appendTo(splitMinDiv);
+			var splitMinLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitMinDiv);
+			splitMinLabelBottom.html("To Recover");		
+			
+			// split tooltip
+			var splitTooltip = $("<div>");
+			splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
+			splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
+			splitTooltip.append("For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
+			tippy(splitInfo.get(0), {
+				arrow: true,
+				html: splitTooltip.get(0),
+				interactive: true,
+				placement: 'bottom',
+				theme: 'translucent',
+				trigger: "mouseenter",
+				multiple: 'false',
+				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
+				distance: 20,
+				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+				offset: '-180, 0'
+			});
+			
+			// done
+			if (onDone) onDone(div);
+		}
+	}
+	inheritsFrom(EditorHeaderController, DivController);
+	
+	
+	/**
+	 * Editor body.
 	 */
 	function EditorBodyController(div) {
 		DivController.call(this, div);
@@ -3065,45 +3095,72 @@ function EditorController(div, config) {
 			});
 		}
 		
-		this.startOver = function() {
-			currencyInputsController.startOver();
+		this.reset = function() {
+			currencyInputsController.reset();
+		}
+		
+		this.hasFormError = function() {
+			return currencyInputsController.hasFormError();
 		}
 	}
 	inheritsFrom(EditorBodyController, DivController);
 	
 	/**
-	 * Floating controls controller.
+	 * Editor floating controls.
 	 */
 	function FloatingControlsController(div, editorController) {
 		DivController.call(this, div);
 		
 		var that = this;
+		var btnGenerate;
+		var btnReset;
+		var btnCancel;
+		var savePrintDiv;
+		var btnSave;
+		var btnPrint;
 		
-		this.render = function() {
+		this.render = function(onDone) {
 			
 			// div setup
 			div.empty();
 			div.addClass("editor_floating_controls");
 			
+			// generate button
+			btnGenerate = $("<div class='editor_btn_green flex_horizontal user_select_none'>");
+			btnGenerate.append("Generate");
+			btnGenerate.click(function() { editorController.generate(); });
+			btnGenerate.hide();
+			btnGenerate.appendTo(div);
+			
+			// reset button
+			btnReset =  $("<div class='editor_btn_red flex_horizontal user_select_none'>");
+			btnReset.append("Reset");
+			btnReset.click(function() { editorController.reset(); });
+			btnReset.hide();
+			btnReset.appendTo(div);
+			
+			// save and print buttons
+			savePrintDiv = $("<div class='flex_horizontal width_100'>");
+			btnSave = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
+			btnSave.append("Save");
+			btnSave.click(function() { editorController.save(); });
+			$("<div style='width:30px;'>").appendTo(savePrintDiv);
+			btnPrint = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
+			btnPrint.append("Print");
+			btnPrint.click(function() { editorController.print(); });
+			savePrintDiv.hide();
+			savePrintDiv.appendTo(div);			
+			
 			// register as config listener
 			editorController.addConfigListener(that);
-
-			// buttons
-			var btnGo = $("<div class='editor_btn_green flex_horizontal user_select_none'>").appendTo(div);
-			btnGo.append("Go button");
-			var btnReset = $("<div class='editor_btn_red flex_horizontal user_select_none'>").appendTo(div);
-			btnReset.append("Reset");
-			btnReset.click(function() { editorController.startOver(); });
-			var savePrintDiv = $("<div class='flex_horizontal width_100'>").appendTo(div);
-			var btnSave = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
-			btnSave.append("Save");
-			$("<div style='width:30px;'>").appendTo(savePrintDiv);
-			var btnPrint = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
-			btnPrint.append("Print");
+			
+			// done rendering
+			if (onDone) onDone();
 		}
 		
 		this.onConfigChange = function(config) {
-			console.log("Update floating controls!");
+			console.log("FloatingControlsController.onConfigChange()");
+			console.log(config);
 		}
 	}
 	inheritsFrom(FloatingControlsController, DivController);
