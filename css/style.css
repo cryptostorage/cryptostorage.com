@@ -1960,3 +1960,17 @@ input[type='checkbox'][disabled] +label {
 }
 
 .show {display:block;}
+
+.btn_disabled {
+	color: black;
+	background-color: grey;
+}
+
+.btn_disabled:hover {
+	background-color: grey;
+	cursor: auto;
+}
+
+.btn_disabled:active {
+	background-color: grey;
+}

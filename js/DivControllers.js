@@ -2957,12 +2957,19 @@ function EditorController(div, config) {
 	
 	this.generate = function() {
 		console.log("EditorController.generate()");
+		headerController.validate();
+		bodyController.validate();
+		update();
 	}
 	
 	this.reset = function() {
 		console.log("EditorController.reset()");
 		headerController.reset();
 		bodyController.reset();
+	}
+	
+	this.isReset = function() {
+		return headerController.isReset() && bodyController.isReset();
 	}
 	
 	this.save = function() {
@@ -3081,6 +3088,10 @@ function EditorController(div, config) {
 			console.log("EditorHeaderController.reset()");
 		}
 		
+		this.isReset = function() {
+			return true;	// TODO
+		}
+		
 		this.validate = function() {
 			console.log("EditorHeaderController.validate()");
 		}
@@ -3190,7 +3201,6 @@ function EditorController(div, config) {
 			// generate button
 			btnGenerate = $("<div class='editor_btn_green flex_horizontal user_select_none'>");
 			btnGenerate.append("Generate");
-			btnGenerate.click(function() { editorController.generate(); });
 			btnGenerate.hide();
 			btnGenerate.appendTo(div);
 			
@@ -3222,9 +3232,19 @@ function EditorController(div, config) {
 		
 		this.update = function() {
 			console.log("FloatingControlsController.update()");
+			
+			// generate button
 			btnGenerate.show();
-			if (!editorController.getBodyController().isReset()) btnReset.show();
-			else btnReset.hide();
+			btnGenerate.unbind("click");
+			if (editorController.hasFormError()) {
+				btnGenerate.addClass("btn_disabled");
+			} else {
+				btnGenerate.removeClass("btn_disabled");
+				btnGenerate.click(function() { editorController.generate(); });
+			}			
+			
+			// reset button
+			editorController.isReset() ? btnReset.hide() : btnReset.show();
 		}
 	}
 	inheritsFrom(FloatingControlsController, DivController);
