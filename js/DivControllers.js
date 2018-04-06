@@ -1319,7 +1319,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 	this.reset = function() {
 		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
 		currencyInputs = [];
-		that.add(AppUtils.DEV_MODE ? "BCH" : null);
+		that.add(null);
 		updateFormError();
 	};
 	
@@ -2925,70 +2925,90 @@ function EditorController(div, config) {
 	var that = this;
 	var headerController;
 	var bodyController;
-	var configListeners;
+	var listeners;
 	
 	this.render = function(onDone) {
 		
 		// init
 		div.empty();
 		div.addClass("editor_div, flex_vertical");
-		configListeners = [];
+		listeners = [];
 		
 		// header
-		headerController = new EditorHeaderController($("<div>").appendTo(div)).render(function() {
+		headerController = new EditorHeaderController($("<div>").appendTo(div), that, update);
+		that.addListener(headerController);
+		headerController.render(function() {
 			
 			// body with loader
-			bodyController = new EditorBodyController($("<div>").appendTo(div));
+			bodyController = new EditorBodyController($("<div>").appendTo(div), update);
+			that.addListener(bodyController);
 			new LoadController(bodyController).render(function() {
 				
 				// floating controls
-				new FloatingControlsController($("<div>").appendTo(div), that).render();
+				var floatingControls = new FloatingControlsController($("<div>").appendTo(div), that);
+				that.addListener(floatingControls);
+				floatingControls.render();
 				
+				// done rendering
 				if (onDone) onDone(div);
 			});
 		});
 	}
 	
 	this.generate = function() {
-		console.log("generate()");
+		console.log("EditorController.generate()");
 	}
 	
 	this.reset = function() {
-		editorBodyController.reset();
-		notifyConfigChange();
+		console.log("EditorController.reset()");
+		headerController.reset();
+		bodyController.reset();
 	}
 	
 	this.save = function() {
-		if (!config.pieces) throw new Error("Cannot save because config.pieces is not initialized");
-		console.log("save()");
+		console.log("EditorController.save()");
 	}
 	
 	this.print = function() {
-		if (!config.pieces) throw new Error("Cannot print because config.pieces is not initialized");
-		console.log("print()");
+		console.log("EditorController.print()");
 	}
 	
-	this.addConfigListener = function(listener) {
-		configListeners.push(listener);
-		listener.onConfigChange(that.getConfig());	// immediate notification
+	this.addListener = function(listener) {
+		assertInitialized(listener);
+		assertInitialized(listener.update, "Listener must have update() function");
+		listeners.push(listener);
+	}
+	
+	this.hasFormError = function() {
+		if (headerController.hasFormError()) return true;
+		if (bodyController.hasFormError()) return true;
+		return false;
 	}
 	
 	this.getConfig = function() {
 		return config;
 	}
 	
+	this.getHeaderController = function() {
+		return headerController;
+	}
+	
+	this.getBodyController = function() {
+		return bodyController;
+	}
+	
 	// ------------------------------- PRIVATE --------------------------------
 	
-	function notifyConfigChange() {
-		for (var i = 0; i < configListeners.length; i++) {
-			configListeners.onConfigChange(config);
+	function update() {
+		for (var i = 0; i < listeners.length; i++) {
+			listeners[i].update();
 		}
 	}
 	
 	/**
 	 * Editor header.
 	 */
-	function EditorHeaderController(div) {
+	function EditorHeaderController(div, editorController, onChange) {
 		DivController.call(this, div);
 		
 		var passphraseCheckbox;
@@ -3056,16 +3076,38 @@ function EditorController(div, config) {
 			// done
 			if (onDone) onDone(div);
 		}
+		
+		this.reset = function() {
+			console.log("EditorHeaderController.reset()");
+		}
+		
+		this.validate = function() {
+			console.log("EditorHeaderController.validate()");
+		}
+		
+		this.hasFormError = function() {
+			console.log("EditorHeaderController.hasFormError()");
+			return false;	// TODO
+		}
+		
+		this.update = function() {
+			console.log("EditorHeaderController.update()");
+		}
+		
+		this.getConfig = function() {
+			console.log("EditorHeaderController.getConfig()");
+			return {};	// TODO
+		}
 	}
 	inheritsFrom(EditorHeaderController, DivController);
-	
 	
 	/**
 	 * Editor body.
 	 */
-	function EditorBodyController(div) {
+	function EditorBodyController(div, onChange) {
 		DivController.call(this, div);
 		
+		var that = this;
 		var currencyInputsController;
 		
 		this.render = function(onDone) {
@@ -3083,11 +3125,7 @@ function EditorController(div, config) {
 				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
 				
 				// currency inputs
-				currencyInputsController = new CurrencyInputsController($("<div style='width:100%'>").appendTo(div), AppUtils.getCryptoPlugins(), function() {
-					console.log("currency inputs change");
-				}, function(hasError) {
-					console.log("currency inputs form error change")
-				});
+				currencyInputsController = new CurrencyInputsController($("<div style='width:100%'>").appendTo(div), AppUtils.getCryptoPlugins(), onChange, onChange);
 				currencyInputsController.render();
 				
 				// done rendering
@@ -3095,12 +3133,36 @@ function EditorController(div, config) {
 			});
 		}
 		
+		this.update = function() {
+			console.log("EditorBodyController.update()");
+		}
+		
 		this.reset = function() {
+			console.log("EditorBodyController.reset()");
 			currencyInputsController.reset();
 		}
 		
+		this.isReset = function() {
+			if (that.hasFormError()) return false;
+			if (that.getConfig().length > 1) return false;
+			console.log(that.getConfig());
+			if (that.getConfig()[0].ticker) return false;
+			return true;
+		}
+		
+		this.validate = function() {
+			console.log("EditorBodyController.validate()");
+			currencyInputsController.validate();
+		}
+		
 		this.hasFormError = function() {
+			console.log("EditorBodyController.hasFormError()");
 			return currencyInputsController.hasFormError();
+		}
+		
+		this.getConfig = function() {
+			console.log("EditorBodyController.getConfig()");
+			return currencyInputsController.getConfig();
 		}
 	}
 	inheritsFrom(EditorBodyController, DivController);
@@ -3149,18 +3211,20 @@ function EditorController(div, config) {
 			btnPrint.append("Print");
 			btnPrint.click(function() { editorController.print(); });
 			savePrintDiv.hide();
-			savePrintDiv.appendTo(div);			
+			savePrintDiv.appendTo(div);
 			
-			// register as config listener
-			editorController.addConfigListener(that);
+			// initial state
+			update();
 			
 			// done rendering
 			if (onDone) onDone();
 		}
 		
-		this.onConfigChange = function(config) {
-			console.log("FloatingControlsController.onConfigChange()");
-			console.log(config);
+		this.update = function() {
+			console.log("FloatingControlsController.update()");
+			btnGenerate.show();
+			if (!editorController.getBodyController().isReset()) btnReset.show();
+			else btnReset.hide();
 		}
 	}
 	inheritsFrom(FloatingControlsController, DivController);
