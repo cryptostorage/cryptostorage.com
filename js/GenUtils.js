@@ -329,6 +329,16 @@ function assertNumber(arg, msg) {
 }
 
 /**
+ * Asserts that the given argument is a boolean.
+ * 
+ * @param arg is the argument to assert as a boolean
+ * @param msg is the message to throw if the argument is not a boolean
+ */
+function assertBoolean(arg, msg) {
+	if (!isBoolean(arg)) throw new Error(msg ? msg : "Argument asserted as a boolean but is not a boolean");
+}
+
+/**
  * Asserts that the given argument is a string.
  * 
  * @param arg is the argument to assert as a string

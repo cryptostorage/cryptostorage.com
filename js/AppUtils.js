@@ -49,7 +49,7 @@ var AppUtils = {
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
-	MIN_PASSWORD_LENGTH: 7,
+	MIN_PASSPHRASE_LENGTH: 7,
 	CRYPTOSTORAGE_URL: "https://cryptostorage.com",
 	ONLINE_IMAGE_URL: "https://cryptostorage.com/favicon.ico",
 	ENVIRONMENT_REFRESH_RATE: 8000,		// environment refresh rate in milliseconds

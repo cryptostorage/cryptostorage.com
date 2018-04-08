@@ -1723,7 +1723,7 @@ function FormController(div) {
 		// handle passphrase checked
 		else {
 			var passphrase = passphraseInput.val();
-			setPassphraseError(!passphrase || passphrase.length < AppUtils.MIN_PASSWORD_LENGTH);
+			setPassphraseError(!passphrase || passphrase.length < AppUtils.MIN_PASSPHRASE_LENGTH);
 		}
 
 		updateGenerateButton();
@@ -2951,10 +2951,14 @@ function EditorController(div, config) {
 		});
 	}
 	
-	this.generate = function() {
-		console.log("EditorController.generate()");
+	this.validate = function() {
 		headerController.validate();
 		bodyController.validate();
+	}
+	
+	this.generate = function() {
+		console.log("EditorController.generate()");
+		that.validate();
 		if (!that.hasFormError()) {
 			console.log("Ok we're ready to generate!");
 			console.log(getKeyGenConfig());
@@ -3006,12 +3010,10 @@ function EditorController(div, config) {
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function getKeyGenConfig() {
+		assertFalse(that.hasFormError());
 		var keyGenConfig = {};
 		keyGenConfig.currencies = bodyController.getConfig();
-		
 		var headerConfig = headerController.getConfig();
-		console.log(headerConfig);
-		
 		validateKeyGenConfig(keyGenConfig);
 		return keyGenConfig;
 		
@@ -3067,6 +3069,9 @@ function EditorHeaderController(div, editorController, onChange) {
 	var passphraseInput;
 	var splitCheckbox;
 	var splitInput;
+	var passphraseError;
+	var splitError;
+	var formError;
 	
 	this.render = function(onDone) {
 		
@@ -3129,11 +3134,15 @@ function EditorHeaderController(div, editorController, onChange) {
 		passphraseCheckbox.click(function() {
 			editorController.update();
 			if (passphraseCheckbox.prop("checked")) passphraseInput.focus();
-			else passphraseInput.val("");
+			else {
+				passphraseInput.val("");
+				validatePassphrase();
+			}
 		});
 		splitCheckbox.click(function() {
 			editorController.update();
 			if (splitCheckbox.prop("checked")) numPiecesInput.focus();
+			else validateSplit();
 		});
 		
 		// initial state
@@ -3144,11 +3153,14 @@ function EditorHeaderController(div, editorController, onChange) {
 	}
 	
 	this.reset = function() {
+		console.log("EditorHeaderController.reset()");
 		passphraseCheckbox.prop("checked", false);
 		passphraseInput.val("");
 		splitCheckbox.prop("checked", false);
 		numPiecesInput.val("3");
 		minPiecesInput.val("2");
+		validatePassphrase();
+		validateSplit();
 		that.update();
 	}
 	
@@ -3158,20 +3170,21 @@ function EditorHeaderController(div, editorController, onChange) {
 	
 	this.validate = function() {
 		console.log("EditorHeaderController.validate()");
+		validatePassphrase();
+		validateSplit();
 	}
 	
 	this.hasFormError = function() {
-		console.log("EditorHeaderController.hasFormError()");
-		return false;	// TODO
+		return formError;
 	}
 	
 	this.update = function() {
 		console.log("EditorHeaderController.update()");
 		
-		// disable passphrase input
+		// enable or disable passphrase input
 		passphraseCheckbox.prop("checked") ? passphraseInput.removeAttr("disabled") : passphraseInput.attr("disabled", "disabled");
 		
-		// disalbe split inputs
+		// enable or disable split inputs
 		if (splitCheckbox.prop("checked")) {
 			numPiecesInput.removeAttr("disabled");
 			minPiecesInput.removeAttr("disabled");
@@ -3183,7 +3196,85 @@ function EditorHeaderController(div, editorController, onChange) {
 	
 	this.getConfig = function() {
 		console.log("EditorHeaderController.getConfig()");
-		return {};	// TODO
+		var config = {};
+		config.usePassphrase = passphraseCheckbox.prop("checked");
+		config.passphrase = passphraseInput.val();
+		config.split = splitCheckbox.prop("checked");
+		config.numPieces = config.split ? parseFloat(numPiecesInput.val()) : 1;
+		config.minPieces = config.split ? parseFloat(minPiecesInput.val()) : null;
+		return config;
+	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function validatePassphrase() {
+		console.log("EditorHeaderController.validatePassphrase()");
+		passphraseError = false;
+		if (passphraseCheckbox.prop("checked")) {
+			var passphrase = passphraseInput.val();
+			if (passphrase.length <= AppUtils.MIN_PASSPHRASE_LENGTH) {
+				passphraseInput.addClass("form_input_error_div");
+				passphraseInput.focus();
+				//setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
+				passphraseError = true;
+			}
+		} else {
+			passphraseInput.removeClass("form_input_error_div");
+		}
+		updateFormError();
+	}
+	
+	function validateSplit(strictBlankAndRange) {
+		console.log("EditorHeaderController.validateSplit(" + strictBlankAndRange + ")");
+		splitError = false;
+		if (splitCheckbox.prop("checked")) {
+			
+			// validate num pieces
+			var numPieces = Number(numPiecesInput.val());
+			if (strictBlankAndRange) {
+				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
+					splitError = true;
+					numPiecesInput.addClass("form_input_error_div");
+				} else {
+					numPiecesInput.removeClass("form_input_error_div");
+				}
+			} else {
+				if (!numPiecesInput.val() || isInt(numPieces)) {
+					numPiecesInput.removeClass("form_input_error_div");
+				} else {
+					splitError = true;
+					numPiecesInput.addClass("form_input_error_div");
+				}
+			}
+			
+			// validate min pieces
+			var minPieces = Number(minPiecesInput.val());
+			if (strictBlankAndRange) {
+				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!numPiecesError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
+					splitError = true;
+					minPiecesInput.addClass("form_input_error_div");
+				} else {
+					minPiecesInput.removeClass("form_input_error_div");
+				}
+			} else {
+				if (!minPiecesInput.val() || isInt(minPieces)) {
+					minPiecesInput.removeClass("form_input_error_div");
+				} else {
+					splitError = true;
+					minPiecesInput.addClass("form_input_error_div");
+				}
+			}
+		} else {
+			numPiecesInput.removeClass("form_input_error_div");
+			minPiecesInput.removeClass("form_input_error_div");
+		}
+		updateFormError();
+	}
+	
+	function updateFormError() {
+		var lastError = formError;
+		formError = passphraseError || splitError;
+		if (formError !== lastError && onChange) onChange();	// notify of change
 	}
 }
 inheritsFrom(EditorHeaderController, DivController);
@@ -3318,7 +3409,7 @@ function EditorActionsController(div, editorController) {
 	}
 	
 	this.update = function() {
-		console.log("FloatingControlsController.update()");
+		console.log("EditorActionsController.update()");
 		
 		// generate button
 		btnGenerate.show();
