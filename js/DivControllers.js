@@ -2925,7 +2925,6 @@ function EditorController(div, config) {
 	var that = this;
 	var headerController;
 	var bodyController;
-	var listeners;
 	
 	this.render = function(onDone) {
 		
@@ -2936,17 +2935,14 @@ function EditorController(div, config) {
 		
 		// header
 		headerController = new EditorHeaderController($("<div>").appendTo(div), that, update);
-		that.addListener(headerController);
 		headerController.render(function() {
 			
 			// body with loader
 			bodyController = new EditorBodyController($("<div>").appendTo(div), update);
-			that.addListener(bodyController);
 			new LoadController(bodyController).render(function() {
 				
 				// floating controls
 				var floatingControls = new FloatingControlsController($("<div>").appendTo(div), that);
-				that.addListener(floatingControls);
 				floatingControls.render();
 				
 				// done rendering
@@ -2980,12 +2976,6 @@ function EditorController(div, config) {
 		console.log("EditorController.print()");
 	}
 	
-	this.addListener = function(listener) {
-		assertInitialized(listener);
-		assertInitialized(listener.update, "Listener must have update() function");
-		listeners.push(listener);
-	}
-	
 	this.hasFormError = function() {
 		if (headerController.hasFormError()) return true;
 		if (bodyController.hasFormError()) return true;
@@ -3007,9 +2997,9 @@ function EditorController(div, config) {
 	// ------------------------------- PRIVATE --------------------------------
 	
 	function update() {
-		for (var i = 0; i < listeners.length; i++) {
-			listeners[i].update();
-		}
+		headerController.update();
+		bodyController.update();
+		floatingControls.update();
 	}
 	
 	/**
@@ -3018,6 +3008,7 @@ function EditorController(div, config) {
 	function EditorHeaderController(div, editorController, onChange) {
 		DivController.call(this, div);
 		
+		var that = this;
 		var passphraseCheckbox;
 		var passphraseInput;
 		var splitCheckbox;
@@ -3080,6 +3071,9 @@ function EditorController(div, config) {
 				offset: '-180, 0'
 			});
 			
+			// initialize
+			that.update();
+			
 			// done
 			if (onDone) onDone(div);
 		}
@@ -3138,6 +3132,9 @@ function EditorController(div, config) {
 				// currency inputs
 				currencyInputsController = new CurrencyInputsController($("<div style='width:100%'>").appendTo(div), AppUtils.getCryptoPlugins(), onChange, onChange);
 				currencyInputsController.render();
+				
+				// initial state
+				that.update();
 				
 				// done rendering
 				if (onDone) onDone(div);
@@ -3224,7 +3221,7 @@ function EditorController(div, config) {
 			savePrintDiv.appendTo(div);
 			
 			// initial state
-			update();
+			that.update();
 			
 			// done rendering
 			if (onDone) onDone();
