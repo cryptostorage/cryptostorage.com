@@ -2942,7 +2942,7 @@ function EditorController(div, config) {
 			new LoadController(bodyController).render(function() {
 				
 				// floating controls
-				actionsController = new ActionsController($("<div>").appendTo(div), that);
+				actionsController = new EditorActionsController($("<div>").appendTo(div), that);
 				actionsController.render();
 				
 				// done rendering
@@ -2955,7 +2955,7 @@ function EditorController(div, config) {
 		console.log("EditorController.generate()");
 		headerController.validate();
 		bodyController.validate();
-		update();
+		that.update();
 	}
 	
 	this.reset = function() {
@@ -3213,7 +3213,7 @@ inheritsFrom(EditorBodyController, DivController);
 /**
  * Main actions.
  */
-function ActionsController(div, editorController) {
+function EditorActionsController(div, editorController) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -3273,13 +3273,13 @@ function ActionsController(div, editorController) {
 		} else {
 			btnGenerate.removeClass("btn_disabled");
 			btnGenerate.click(function() { editorController.generate(); });
-		}			
+		}
 		
 		// reset button
-		editorController.isReset() ? btnReset.hide() : btnReset.show();
+		btnReset.show();
 	}
 }
-inheritsFrom(ActionsController, DivController);
+inheritsFrom(EditorActionsController, DivController);
 
 /**
  * Export page.
