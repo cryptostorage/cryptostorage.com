@@ -1272,8 +1272,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		var onInputsChangeBkp = onInputsChange;
 		onInputsChange = null;	// disable notifications
 		currencyInputs = [];
-		formError = false;
-		that.add(AppUtils.DEV_MODE ? "BCH" : null);
+		that.reset();
 		onInputsChange = onInputsChangeBkp;
 		
 		// done
@@ -1319,7 +1318,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 	this.reset = function() {
 		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
 		currencyInputs = [];
-		that.add(null);
+		that.add();
 		updateFormError();
 	};
 	
@@ -2999,9 +2998,9 @@ function EditorController(div, config) {
 	
 	this.update = function() {
 		console.log("EditorController.update()");
-		headerController.update();
-		bodyController.update();
-		actionsController.update();
+		if (headerController) headerController.update();
+		if (bodyController) bodyController.update();
+		if (actionsController) actionsController.update();
 	}
 }
 inheritsFrom(EditorController, DivController);
@@ -3045,14 +3044,14 @@ function EditorHeaderController(div, editorController, onChange) {
 		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
 		var splitNumLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitNumDiv);
 		splitNumLabelTop.html("Split Into");
-		numPiecesInput = $("<input class='split_input' type='tel' value='3' min='2'>").appendTo(splitNumDiv);
+		numPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitNumDiv);
 		var splitNumLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitNumDiv);
 		splitNumLabelBottom.html("Pieces");
 		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitDiv);
 		var splitMinDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
 		var splitMinLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitMinDiv);
 		splitMinLabelTop.html("Require");
-		minPiecesInput = $("<input class='split_input' type='tel' value='2' min='2'>").appendTo(splitMinDiv);
+		minPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitMinDiv);
 		var splitMinLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitMinDiv);
 		splitMinLabelBottom.html("To Recover");		
 		
@@ -3087,7 +3086,7 @@ function EditorHeaderController(div, editorController, onChange) {
 		});
 		
 		// initial state
-		that.update();
+		that.reset();
 		
 		// done
 		if (onDone) onDone(div);
@@ -3095,7 +3094,11 @@ function EditorHeaderController(div, editorController, onChange) {
 	
 	this.reset = function() {
 		passphraseCheckbox.prop("checked", false);
+		passphraseInput.val("");
 		splitCheckbox.prop("checked", false);
+		numPiecesInput.val("3");
+		minPiecesInput.val("2");
+		that.update();
 	}
 	
 	this.isReset = function() {
@@ -3162,7 +3165,10 @@ function EditorBodyController(div, onChange) {
 			currencyInputsController.render();
 			
 			// initial state
-			that.update();
+			that.reset();
+			
+			// dev mode convenience
+			if (AppUtils.DEV_MODE) currencyInputsController.getCurrencyInputs()[0].setSelectedCurrency("BCH");
 			
 			// done rendering
 			if (onDone) onDone(div);
@@ -3176,6 +3182,7 @@ function EditorBodyController(div, onChange) {
 	this.reset = function() {
 		console.log("EditorBodyController.reset()");
 		currencyInputsController.reset();
+		that.update();
 	}
 	
 	this.isReset = function() {
