@@ -3224,44 +3224,44 @@ function EditorHeaderController(div, editorController, onChange) {
 		updateFormError();
 	}
 	
-	function validateSplit(strictBlankAndRange) {
-		console.log("EditorHeaderController.validateSplit(" + strictBlankAndRange + ")");
+	function validateSplit(lenientBlankAndRange) {
+		console.log("EditorHeaderController.validateSplit(" + lenientBlankAndRange + ")");
 		splitError = false;
 		if (splitCheckbox.prop("checked")) {
 			
 			// validate num pieces
 			var numPieces = Number(numPiecesInput.val());
-			if (strictBlankAndRange) {
-				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
-					splitError = true;
-					numPiecesInput.addClass("form_input_error_div");
-				} else {
-					numPiecesInput.removeClass("form_input_error_div");
-				}
-			} else {
+			if (lenientBlankAndRange) {
 				if (!numPiecesInput.val() || isInt(numPieces)) {
 					numPiecesInput.removeClass("form_input_error_div");
 				} else {
 					splitError = true;
 					numPiecesInput.addClass("form_input_error_div");
 				}
+			} else {
+				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
+					splitError = true;
+					numPiecesInput.addClass("form_input_error_div");
+				} else {
+					numPiecesInput.removeClass("form_input_error_div");
+				}
 			}
 			
 			// validate min pieces
 			var minPieces = Number(minPiecesInput.val());
-			if (strictBlankAndRange) {
-				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!numPiecesError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
-					splitError = true;
-					minPiecesInput.addClass("form_input_error_div");
-				} else {
-					minPiecesInput.removeClass("form_input_error_div");
-				}
-			} else {
+			if (lenientBlankAndRange) {
 				if (!minPiecesInput.val() || isInt(minPieces)) {
 					minPiecesInput.removeClass("form_input_error_div");
 				} else {
 					splitError = true;
 					minPiecesInput.addClass("form_input_error_div");
+				}
+			} else {
+				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!splitError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
+					splitError = true;
+					minPiecesInput.addClass("form_input_error_div");
+				} else {
+					minPiecesInput.removeClass("form_input_error_div");
 				}
 			}
 		} else {
