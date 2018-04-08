@@ -3071,6 +3071,17 @@ function EditorController(div, config) {
 				offset: '-180, 0'
 			});
 			
+			// register clicks
+			passphraseCheckbox.click(function() {
+				that.update();
+				if (passphraseCheckbox.prop("checked")) passphraseInput.focus();
+				else passphraseInput.val("");
+			});
+			splitCheckbox.click(function() {
+				that.update();
+				if (splitCheckbox.prop("checked")) numPiecesInput.focus();
+			});
+			
 			// initialize
 			that.update();
 			
@@ -3079,11 +3090,12 @@ function EditorController(div, config) {
 		}
 		
 		this.reset = function() {
-			console.log("EditorHeaderController.reset()");
+			passphraseCheckbox.prop("checked", false);
+			splitCheckbox.prop("checked", false);
 		}
 		
 		this.isReset = function() {
-			return true;	// TODO
+			return !passphraseCheckbox.prop("checked") && !splitCheckbox.prop("checked");
 		}
 		
 		this.validate = function() {
@@ -3097,6 +3109,18 @@ function EditorController(div, config) {
 		
 		this.update = function() {
 			console.log("EditorHeaderController.update()");
+			
+			// disable passphrase input
+			passphraseCheckbox.prop("checked") ? passphraseInput.removeAttr("disabled") : passphraseInput.attr("disabled", "disabled");
+			
+			// disalbe split inputs
+			if (splitCheckbox.prop("checked")) {
+				numPiecesInput.removeAttr("disabled");
+				minPiecesInput.removeAttr("disabled");
+			} else {
+				numPiecesInput.attr("disabled", "disabled");
+				minPiecesInput.attr("disabled", "disabled");
+			}
 		}
 		
 		this.getConfig = function() {
