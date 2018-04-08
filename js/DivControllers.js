@@ -2955,6 +2955,10 @@ function EditorController(div, config) {
 		console.log("EditorController.generate()");
 		headerController.validate();
 		bodyController.validate();
+		if (!that.hasFormError()) {
+			console.log("Ok we're ready to generate!");
+			console.log(getKeyGenConfig());
+		}
 		that.update();
 	}
 	
@@ -2984,10 +2988,6 @@ function EditorController(div, config) {
 		return false;
 	}
 	
-	this.getConfig = function() {
-		return config;
-	}
-	
 	this.getHeaderController = function() {
 		return headerController;
 	}
@@ -3001,6 +3001,57 @@ function EditorController(div, config) {
 		if (headerController) headerController.update();
 		if (bodyController) bodyController.update();
 		if (actionsController) actionsController.update();
+	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function getKeyGenConfig() {
+		var keyGenConfig = {};
+		keyGenConfig.currencies = bodyController.getConfig();
+		
+		var headerConfig = headerController.getConfig();
+		console.log(headerConfig);
+		
+		validateKeyGenConfig(keyGenConfig);
+		return keyGenConfig;
+		
+		function validateKeyGenConfig(config) {
+			assertInitialized(config);
+			assertObject(config);
+			if (config.passphrase) {
+				assertString(config.passphrase, "config.passphrase is not a string");
+				assertTrue(passphrase.length >= 7, "config.passphrase.length is not >= 7");
+				assertDefined(config.verifyEncryption, "config.verifyEncryption is not defined");
+			}
+			if (config.numPieces || config.minPieces) {
+				assertNumber(config.numPieces, "config.numPieces is not a number");
+				assertNumber(config.minPieces, "config.minPieces is not a number");
+				assertTrue(config.numPieces >= 2, "config.numPieces is not >= 2");
+				assertTrue(config.minPieces >= 2, "config.minPieces is not >= 2");
+				assertTrue(config.minPieces <= config.numPieces, "config.minPieces is not <= config.numPieces");
+			}
+			assertInitialized(config.currencies, "config.currencies is not initialized");
+			assertTrue(config.currencies.length >= 1, "config.currencies.length is not >= 1");
+			for (var i = 0; i < config.currencies.length; i++) {
+				var currency = config.currencies[i];
+				assertDefined(currency.ticker, "config.currencies[" + i + "].ticker is not defined");
+				assertDefined(currency.numKeys, "config.currencies[" + i + "].numKeys is not defined");
+				assertDefined(currency.encryption, "config.currencies[" + i + "].encryption is not defined");
+				if (config.passphrase) assertInitialized(currency.encryption, "config.currencies[" + i + "].encryption is not initialized");
+			}
+		}
+		
+//		var config = {};
+//		config.passphrase = passphraseCheckbox.prop('checked') ? passphraseInput.val() : null;
+//		config.numPieces = splitCheckbox.prop('checked') ? parseFloat(numPiecesInput.val()) : 1;
+//		config.minPieces = splitCheckbox.prop('checked') ? parseFloat(minPiecesInput.val()) : null;
+//		config.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
+//		config.currencies = currencyInputsController.getConfig();
+//		for (var i = 0; i < config.currencies.length; i++) {
+//			config.currencies[i].encryption = passphraseCheckbox.prop('checked') ? getEncryptionScheme(currencyInputsController.getCurrencyInputs()[i]) : null;
+//		}
+//		verifyConfig(config);
+//		return config;
 	}
 }
 inheritsFrom(EditorController, DivController);
@@ -3173,6 +3224,10 @@ function EditorBodyController(div, onChange) {
 			// done rendering
 			if (onDone) onDone(div);
 		});
+	}
+	
+	this.getConfig = function() {
+		return currencyInputsController.getConfig();
 	}
 	
 	this.update = function() {
