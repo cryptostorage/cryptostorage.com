@@ -1100,7 +1100,7 @@ function FormController(div) {
 			
 			// currency inputs
 			var currencyDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-			currencyInputsController = new CurrencyInputsController($("<div>").appendTo(currencyDiv), plugins, function() {
+			currencyInputsController = new EditorCurrenciesController($("<div>").appendTo(currencyDiv), plugins, function() {
 				updateBip38Checkbox();
 			}, function(hasError) {
 				validateCurrencyInputs();
@@ -2609,7 +2609,7 @@ function EditorController(div, config) {
 	var that = this;
 	var passphraseController
 	var splitController;
-	var currencyInputsController;
+	var currenciesController;
 	var actionsController;
 	
 	this.render = function(onDone) {
@@ -2625,11 +2625,11 @@ function EditorController(div, config) {
 		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal'>").appendTo(headerDiv);
 		
 		// passphrase controller
-		passphraseController = new PassphraseController($("<div>").appendTo(passphraseSplitDiv), that.update);
+		passphraseController = new EditorPassphraseController($("<div>").appendTo(passphraseSplitDiv), that.update);
 		passphraseController.render();
 		
 		// split controller
-		splitController = new SplitController($("<div>").appendTo(passphraseSplitDiv), that.update);
+		splitController = new EditorSplitController($("<div>").appendTo(passphraseSplitDiv), that.update);
 		splitController.render();
 		
 		// body
@@ -2643,8 +2643,8 @@ function EditorController(div, config) {
 			$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
 			
 			// currency inputs controller
-			currencyInputsController = new CurrencyInputsController($("<div style='width:100%'>").appendTo(bodyDiv), AppUtils.getCryptoPlugins(), that.update, that.update);
-			currencyInputsController.render();
+			currenciesController = new EditorCurrenciesController($("<div>").appendTo(bodyDiv), AppUtils.getCryptoPlugins(), that.update, that.update);
+			currenciesController.render();
 			
 			// actions controller
 			actionsController = new EditorActionsController($("<div>").appendTo(div), that);
@@ -2654,7 +2654,7 @@ function EditorController(div, config) {
 			that.reset();
 			
 			// dev mode convenience
-			if (AppUtils.DEV_MODE) currencyInputsController.getCurrencyInputs()[0].setSelectedCurrency("BCH");
+			if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");
 		});
 		
 		// done rendering
@@ -2664,7 +2664,7 @@ function EditorController(div, config) {
 	this.validate = function() {
 		passphraseController.validate();
 		splitController.validate();
-		currencyInputsController.validate();
+		currenciesController.validate();
 	}
 	
 	this.generate = function() {
@@ -2680,7 +2680,7 @@ function EditorController(div, config) {
 	this.reset = function() {
 		passphraseController.reset();
 		splitController.reset();
-		currencyInputsController.reset();
+		currenciesController.reset();
 	}
 	
 	this.save = function() {
@@ -2694,7 +2694,7 @@ function EditorController(div, config) {
 	this.hasFormError = function() {
 		if (passphraseController.hasFormError()) return true;
 		if (splitController.hasFormError()) return true;
-		if (currencyInputsController.hasFormError()) return true;
+		if (currenciesController.hasFormError()) return true;
 		return false;
 	}
 	
@@ -2711,7 +2711,7 @@ function EditorController(div, config) {
 		var keyGenConfig = {};
 		
 		// currencies config
-		keyGenConfig.currencies = currencyInputsController.getConfig();
+		keyGenConfig.currencies = currenciesController.getConfig();
 		
 		// encryption config
 		if (passphraseController.usePassphrase()) {
@@ -2782,7 +2782,7 @@ inheritsFrom(EditorController, DivController);
  * @param div is the div to render to
  * @param onChange() is invoked when the state changes
  */
-function PassphraseController(div, onChange) {
+function EditorPassphraseController(div, onChange) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -2853,7 +2853,7 @@ function PassphraseController(div, onChange) {
 		return passphraseInput.val();
 	}
 }
-inheritsFrom(PassphraseController, DivController);
+inheritsFrom(EditorPassphraseController, DivController);
 
 /**
  * Controls split input and validation.
@@ -2861,7 +2861,7 @@ inheritsFrom(PassphraseController, DivController);
  * @param div is the div to render to
  * @param onChange() is invoked when the state changes
  */
-function SplitController(div, onChange) {
+function EditorSplitController(div, onChange) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -3014,7 +3014,7 @@ function SplitController(div, onChange) {
 		return minPieces;
 	}
 }
-inheritsFrom(SplitController, DivController);
+inheritsFrom(EditorSplitController, DivController);
 
 /**
  * Manages a single currency input.
@@ -3026,7 +3026,7 @@ inheritsFrom(SplitController, DivController);
  * @param onDelete is invoked when the user delets this input
  * @param onFormErrorChange(hasError) is invoked when the validity state changes
  */
-function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, onDelete, onFormErrorChange) {
+function EditorCurrencyController(div, plugins, defaultTicker, onCurrencyChange, onDelete, onFormErrorChange) {
 	DivController.call(this, div);
 	
 	assertInitialized(div);
@@ -3198,7 +3198,7 @@ function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, 
 		if (!currencyError && numKeysError !== lastError) onFormErrorChange(formError);	// notify of form error change
 	}
 }
-inheritsFrom(CurrencyInputController, DivController);
+inheritsFrom(EditorCurrencyController, DivController);
 
 /**
  * Manages a collection of currency inputs.
@@ -3208,7 +3208,7 @@ inheritsFrom(CurrencyInputController, DivController);
  * @param onInputsChange() is invoked when one of the inputs change
  * @param onFormErrorChange(hasError) is invoked when the validity state changes
  */
-function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChange) {
+function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorChange) {
 	DivController.call(this, div);
 	
 	// state variables
@@ -3221,6 +3221,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		
 		// div setup
 		div.empty();
+		div.css("width", "100%");
 		
 		// currency inputs div
 		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(div);
@@ -3247,7 +3248,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 	};
 	
 	this.add = function(ticker) {
-		var currencyInput = new CurrencyInputController($("<div>"), plugins, ticker, onInputsChange, function() {
+		var currencyInput = new EditorCurrencyController($("<div>"), plugins, ticker, onInputsChange, function() {
 			remove(currencyInput);
 		}, function(hasError) {
 			updateFormError();
@@ -3329,7 +3330,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 		if (formError !== lastError && onFormErrorChange) onFormErrorChange(formError);	// notify of form error change
 	}
 }
-inheritsFrom(CurrencyInputsController, DivController);
+inheritsFrom(EditorCurrenciesController, DivController);
 
 /**
  * Editor actions controller.
