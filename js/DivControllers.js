@@ -2987,9 +2987,7 @@ function EditorController(div, config) {
 	}
 	
 	this.hasFormError = function() {
-		if (headerController.hasFormError()) return true;
-		if (bodyController.hasFormError()) return true;
-		return false;
+		return headerController.hasFormError() || bodyController.hasFormError();
 	}
 	
 	this.getHeaderController = function() {
@@ -3012,8 +3010,28 @@ function EditorController(div, config) {
 	function getKeyGenConfig() {
 		assertFalse(that.hasFormError());
 		var keyGenConfig = {};
+		
+		// currencies config
 		keyGenConfig.currencies = bodyController.getConfig();
+		
+		// encryption config
 		var headerConfig = headerController.getConfig();
+		if (headerConfig.usePassphrase) {
+			keyGenConfig.passphrase = headerConfig.passphrase;
+			keyGenConfig.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
+		}
+		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
+			var currency = keyGenConfig.currencies[i];
+			currency.encryption = headerConfig.usePassphrase ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
+		}
+		
+		// split config
+		if (headerConfig.split) {
+			keyGenConfig.numPieces = headerConfig.numPieces;
+			keyGenConfig.minPieces = headerConfig.minPieces;
+		}
+
+		// validate and return
 		validateKeyGenConfig(keyGenConfig);
 		return keyGenConfig;
 		
@@ -3022,7 +3040,7 @@ function EditorController(div, config) {
 			assertObject(config);
 			if (config.passphrase) {
 				assertString(config.passphrase, "config.passphrase is not a string");
-				assertTrue(passphrase.length >= 7, "config.passphrase.length is not >= 7");
+				assertTrue(config.passphrase.length >= 7, "config.passphrase.length is not >= 7");
 				assertDefined(config.verifyEncryption, "config.verifyEncryption is not defined");
 			}
 			if (config.numPieces || config.minPieces) {
