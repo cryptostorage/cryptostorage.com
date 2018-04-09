@@ -2643,7 +2643,7 @@ function EditorController(div, config) {
 			$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
 			
 			// currency inputs controller
-			currencyInputsController = new CurrencyInputsController($("<div>").appendTo(bodyDiv), AppUtils.getCryptoPlugins(), that.update, that.update);
+			currencyInputsController = new CurrencyInputsController($("<div style='width:100%'>").appendTo(bodyDiv), AppUtils.getCryptoPlugins(), that.update, that.update);
 			currencyInputsController.render();
 			
 			// actions controller
@@ -2695,6 +2695,7 @@ function EditorController(div, config) {
 		if (passphraseController.hasFormError()) return true;
 		if (splitController.hasFormError()) return true;
 		if (currencyInputsController.hasFormError()) return true;
+		return false;
 	}
 	
 	this.update = function() {
@@ -2710,22 +2711,22 @@ function EditorController(div, config) {
 		var keyGenConfig = {};
 		
 		// currencies config
-		keyGenConfig.currencies = bodyController.getCurrencyInputsController().getConfig();
+		keyGenConfig.currencies = currencyInputsController.getConfig();
 		
 		// encryption config
-		if (headerController.usePassphrase()) {
-			keyGenConfig.passphrase = headerController.getPassphrase();
+		if (passphraseController.usePassphrase()) {
+			keyGenConfig.passphrase = passphraseController.getPassphrase();
 			keyGenConfig.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
 		}
 		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
 			var currency = keyGenConfig.currencies[i];
-			currency.encryption = headerController.usePassphrase() ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
+			currency.encryption = passphraseController.usePassphrase() ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
 		}
 
 		// split config
-		if (headerController.useSplit()) {
-			keyGenConfig.numPieces = headerController.getNumPieces();
-			keyGenConfig.minPieces = headerController.getMinPieces();
+		if (splitController.useSplit()) {
+			keyGenConfig.numPieces = splitController.getNumPieces();
+			keyGenConfig.minPieces = splitController.getMinPieces();
 		}
 
 		// validate and return
@@ -2969,7 +2970,7 @@ function SplitController(div, onChange) {
 					minPiecesInput.addClass("form_input_error_div");
 				}
 			} else {
-				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!splitError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
+				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!formError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
 					formError = true;
 					minPiecesInput.addClass("form_input_error_div");
 				} else {
