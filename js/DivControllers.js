@@ -2593,6 +2593,429 @@ function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, def
 inheritsFrom(TwoTabController, DivController);
 
 /**
+ * Editor controller.
+ * 
+ * @param div is the div to render to
+ * @param config specifies export page behavior
+ * 				config.splitPieces are imported split pieces
+ * 				config.keys are keys to generate pieces from
+ * 				config.pieces are pieces to export and generate pieceDivs from
+ * 				config.pieceDivs are pre-generated piece divs ready for display
+ */
+function EditorController(div, config) {
+	DivController.call(this, div);
+	
+	// global variables
+	var that = this;
+	var passphraseController
+	var splitController;
+	var currencyInputsController;
+	var actionsController;
+	
+	this.render = function(onDone) {
+		
+		// init
+		div.empty();
+		div.addClass("editor_div, flex_vertical");
+		
+		// header
+		var headerDiv = $("<div class='editor_header flex_vertical'>").appendTo(div);
+		
+		// passphrase and split input div
+		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal'>").appendTo(headerDiv);
+		
+		// passphrase controller
+		passphraseController = new PassphraseController($("<div>").appendTo(passphraseSplitDiv), that.update);
+		passphraseController.render();
+		
+		// split controller
+		splitController = new SplitController($("<div>").appendTo(passphraseSplitDiv), that.update);
+		splitController.render();
+		
+		// body
+		var bodyDiv = $("<div class='editor_body flex_vertical'>").appendTo(div);
+		
+		// load dependencies
+		new LoadController(new EditorDependencyLoader(bodyDiv)).render(function() {
+
+			// cryptostorage logo
+			var logoHeader = $("<div class='piece_page_header_div'>").appendTo(bodyDiv);
+			$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
+			
+			// currency inputs controller
+			currencyInputsController = new CurrencyInputsController($("<div>").appendTo(bodyDiv), AppUtils.getCryptoPlugins(), that.update, that.update);
+			currencyInputsController.render();
+			
+			// actions controller
+			actionsController = new EditorActionsController($("<div>").appendTo(div), that);
+			actionsController.render();
+			
+			// initial state
+			that.reset();
+			
+			// dev mode convenience
+			if (AppUtils.DEV_MODE) currencyInputsController.getCurrencyInputs()[0].setSelectedCurrency("BCH");
+		});
+		
+		// done rendering
+		if (onDone) onDone(div);
+	}
+	
+	this.validate = function() {
+		passphraseController.validate();
+		splitController.validate();
+		currencyInputsController.validate();
+	}
+	
+	this.generate = function() {
+		console.log("EditorController.generate()");
+		that.validate();
+		if (!that.hasFormError()) {
+			console.log("Ok we're ready to generate!");
+			console.log(getKeyGenConfig());
+		}
+		that.update();
+	}
+	
+	this.reset = function() {
+		passphraseController.reset();
+		splitController.reset();
+		currencyInputsController.reset();
+	}
+	
+	this.save = function() {
+		console.log("EditorController.save()");
+	}
+	
+	this.print = function() {
+		console.log("EditorController.print()");
+	}
+	
+	this.hasFormError = function() {
+		if (passphraseController.hasFormError()) return true;
+		if (splitController.hasFormError()) return true;
+		if (currencyInputsController.hasFormError()) return true;
+	}
+	
+	this.update = function() {
+		if (passphraseController) passphraseController.update();
+		if (splitController) splitController.update();
+		if (actionsController) actionsController.update();
+	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function getKeyGenConfig() {
+		assertFalse(that.hasFormError());
+		var keyGenConfig = {};
+		
+		// currencies config
+		keyGenConfig.currencies = bodyController.getCurrencyInputsController().getConfig();
+		
+		// encryption config
+		if (headerController.usePassphrase()) {
+			keyGenConfig.passphrase = headerController.getPassphrase();
+			keyGenConfig.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
+		}
+		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
+			var currency = keyGenConfig.currencies[i];
+			currency.encryption = headerController.usePassphrase() ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
+		}
+
+		// split config
+		if (headerController.useSplit()) {
+			keyGenConfig.numPieces = headerController.getNumPieces();
+			keyGenConfig.minPieces = headerController.getMinPieces();
+		}
+
+		// validate and return
+		validateKeyGenConfig(keyGenConfig);
+		return keyGenConfig;
+		
+		function validateKeyGenConfig(config) {
+			assertInitialized(config);
+			assertObject(config);
+			if (config.passphrase) {
+				assertString(config.passphrase, "config.passphrase is not a string");
+				assertTrue(config.passphrase.length >= 7, "config.passphrase.length is not >= 7");
+				assertDefined(config.verifyEncryption, "config.verifyEncryption is not defined");
+			}
+			if (config.numPieces || config.minPieces) {
+				assertNumber(config.numPieces, "config.numPieces is not a number");
+				assertNumber(config.minPieces, "config.minPieces is not a number");
+				assertTrue(config.numPieces >= 2, "config.numPieces is not >= 2");
+				assertTrue(config.minPieces >= 2, "config.minPieces is not >= 2");
+				assertTrue(config.minPieces <= config.numPieces, "config.minPieces is not <= config.numPieces");
+			}
+			assertInitialized(config.currencies, "config.currencies is not initialized");
+			assertTrue(config.currencies.length >= 1, "config.currencies.length is not >= 1");
+			for (var i = 0; i < config.currencies.length; i++) {
+				var currency = config.currencies[i];
+				assertDefined(currency.ticker, "config.currencies[" + i + "].ticker is not defined");
+				assertDefined(currency.numKeys, "config.currencies[" + i + "].numKeys is not defined");
+				assertDefined(currency.encryption, "config.currencies[" + i + "].encryption is not defined");
+				if (config.passphrase) assertInitialized(currency.encryption, "config.currencies[" + i + "].encryption is not initialized");
+			}
+		}
+	}
+	
+	/**
+	 * Controller that only loads editor dependencies.
+	 */
+	function EditorDependencyLoader(div) {
+		DivController.call(this, div);
+		this.render = function(onDone) {
+			LOADER.load(AppUtils.getAppDependencies(), function(err) {	// TODO: load correct dependencies
+				if (err) throw err;
+				if (onDone) onDone(div);
+			});
+		}
+	}
+	inheritsFrom(EditorDependencyLoader, DivController);
+}
+inheritsFrom(EditorController, DivController);
+
+/**
+ * Controls passphrase input and validation.
+ * 
+ * @param div is the div to render to
+ * @param onChange() is invoked when the state changes
+ */
+function PassphraseController(div, onChange) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var passphraseCheckbox;
+	var passphraseInput;
+	var formError;
+
+	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("flex_horizonal flex_justify_start");
+		
+		// passphrase input
+		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(div);
+		var passphraseCheckboxLabel = $("<label class='user_select_none' for='passphrase_checkbox'>").appendTo(div);
+		passphraseCheckboxLabel.html("Use Passphrase?");
+		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(div);
+		
+		// register clicks
+		passphraseCheckbox.click(function() {
+			if (passphraseCheckbox.prop("checked")) passphraseInput.focus();
+			else {
+				passphraseInput.val("");
+				that.validate();
+			}
+			if (onChange) onChange();
+		});
+	}
+	
+	this.reset = function() {
+		passphraseCheckbox.prop("checked", false);
+		passphraseInput.val("");
+		that.validate();
+		that.update();
+	}
+	
+	this.validate = function() {
+		var lastError = formError;
+		formError = false;
+		if (that.usePassphrase()) {
+			var passphrase = that.getPassphrase();
+			if (passphrase.length <= AppUtils.MIN_PASSPHRASE_LENGTH) {
+				formError = true;
+				passphraseInput.addClass("form_input_error_div");
+				passphraseInput.focus();
+				//setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
+			}
+		} else {
+			passphraseInput.removeClass("form_input_error_div");
+		}
+		if (formError !== lastError && onChange) onChange();	// notify of change
+	}
+	
+	this.hasFormError = function() {
+		return formError;
+	}
+	
+	this.update = function() {
+		that.usePassphrase() ? passphraseInput.removeAttr("disabled") : passphraseInput.attr("disabled", "disabled");
+	}
+	
+	this.usePassphrase = function() {
+		return passphraseCheckbox.prop("checked");
+	}
+	
+	this.getPassphrase = function() {
+		return passphraseInput.val();
+	}
+}
+inheritsFrom(PassphraseController, DivController);
+
+/**
+ * Controls split input and validation.
+ * 
+ * @param div is the div to render to
+ * @param onChange() is invoked when the state changes
+ */
+function SplitController(div, onChange) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var splitCheckbox;
+	var splitInput;
+	var formError;
+	
+	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("editor_split_div flex_horizontal flex_justify_start");
+		
+		// split input
+		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(div);
+		var splitCheckboxLabel = $("<label class='user_select_none' for='split_checkbox'>").appendTo(div);
+		splitCheckboxLabel.html("Split Keys?");
+		var splitInfo = $("<img src='img/information_white.png' class='information_img'>").appendTo(div);
+		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(div);
+		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(div);
+		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(div);
+		var splitNumLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitNumDiv);
+		splitNumLabelTop.html("Split Into");
+		numPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitNumDiv);
+		var splitNumLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitNumDiv);
+		splitNumLabelBottom.html("Pieces");
+		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(div);
+		var splitMinDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(div);
+		var splitMinLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitMinDiv);
+		splitMinLabelTop.html("Require");
+		minPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitMinDiv);
+		var splitMinLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitMinDiv);
+		splitMinLabelBottom.html("To Recover");		
+		
+		// split tooltip
+		var splitTooltip = $("<div>");
+		splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
+		splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
+		splitTooltip.append("For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
+		tippy(splitInfo.get(0), {
+			arrow: true,
+			html: splitTooltip.get(0),
+			interactive: true,
+			placement: 'bottom',
+			theme: 'translucent',
+			trigger: "mouseenter",
+			multiple: 'false',
+			maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
+			distance: 20,
+			arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+			offset: '-180, 0'
+		});
+		
+		// register clicks
+		splitCheckbox.click(function() {
+			if (splitCheckbox.prop("checked")) numPiecesInput.focus();
+			else that.validate();
+			if (onChange) onChange();
+		});
+		
+		// initial state
+		that.reset();
+		
+		// done
+		if (onDone) onDone(div);
+	}
+	
+	this.reset = function() {
+		splitCheckbox.prop("checked", false);
+		numPiecesInput.val("3");
+		minPiecesInput.val("2");
+		that.validate();
+		that.update();
+	}
+	
+	this.validate = function(lenientBlankAndRange) {
+		var lastError = formError;
+		formError = false;
+		if (that.useSplit()) {
+			
+			// validate num pieces
+			var numPieces = Number(numPiecesInput.val());
+			if (lenientBlankAndRange) {
+				if (!numPiecesInput.val() || isInt(numPieces)) {
+					numPiecesInput.removeClass("form_input_error_div");
+				} else {
+					formError = true;
+					numPiecesInput.addClass("form_input_error_div");
+				}
+			} else {
+				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
+					formError = true;
+					numPiecesInput.addClass("form_input_error_div");
+				} else {
+					numPiecesInput.removeClass("form_input_error_div");
+				}
+			}
+			
+			// validate min pieces
+			var minPieces = Number(minPiecesInput.val());
+			if (lenientBlankAndRange) {
+				if (!minPiecesInput.val() || isInt(minPieces)) {
+					minPiecesInput.removeClass("form_input_error_div");
+				} else {
+					formError = true;
+					minPiecesInput.addClass("form_input_error_div");
+				}
+			} else {
+				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!splitError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
+					formError = true;
+					minPiecesInput.addClass("form_input_error_div");
+				} else {
+					minPiecesInput.removeClass("form_input_error_div");
+				}
+			}
+		} else {
+			numPiecesInput.removeClass("form_input_error_div");
+			minPiecesInput.removeClass("form_input_error_div");
+		}
+		if (formError !== lastError && onChange) onChange();	// notify of change
+	}
+	
+	this.hasFormError = function() {
+		return formError;
+	}
+	
+	this.update = function() {
+		if (that.useSplit()) {
+			numPiecesInput.removeAttr("disabled");
+			minPiecesInput.removeAttr("disabled");
+		} else {
+			numPiecesInput.attr("disabled", "disabled");
+			minPiecesInput.attr("disabled", "disabled");
+		}
+	}
+	
+	this.useSplit = function() {
+		return splitCheckbox.prop("checked");
+	}
+	
+	this.getNumPieces = function() {
+		var numPieces = Number(numPiecesInput.val());
+		if (!isInt(numPieces)) return null;
+		return numPieces;
+	}
+	
+	this.getMinPieces = function() {
+		var minPieces = Number(minPiecesInput.val());
+		if (!isInt(minPieces)) return null;
+		return minPieces;
+	}
+}
+inheritsFrom(SplitController, DivController);
+
+/**
  * Manages a single currency input.
  * 
  * @param div is the div to render to
@@ -2908,485 +3331,7 @@ function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChang
 inheritsFrom(CurrencyInputsController, DivController);
 
 /**
- * Editor controller.
- * 
- * @param div is the div to render to
- * @param config specifies export page behavior
- * 				config.splitPieces are imported split pieces
- * 				config.keys are keys to generate pieces from
- * 				config.pieces are pieces to export and generate pieceDivs from
- * 				config.pieceDivs are pre-generated piece divs ready for display
- */
-function EditorController(div, config) {
-	DivController.call(this, div);
-	
-	// global variables
-	var that = this;
-	var headerController;
-	var bodyController;
-	var actionsController;
-	
-	this.render = function(onDone) {
-		
-		// init
-		div.empty();
-		div.addClass("editor_div, flex_vertical");
-		listeners = [];
-		
-		// header
-		headerController = new EditorHeaderController($("<div>").appendTo(div), that, that.update);
-		headerController.render(function() {
-			
-			// body with loader
-			bodyController = new EditorBodyController($("<div>").appendTo(div), that.update);
-			new LoadController(bodyController).render(function() {
-				
-				// floating controls
-				actionsController = new EditorActionsController($("<div>").appendTo(div), that);
-				actionsController.render();
-				
-				// done rendering
-				if (onDone) onDone(div);
-			});
-		});
-	}
-	
-	this.validate = function() {
-		headerController.validate();
-		bodyController.validate();
-	}
-	
-	this.generate = function() {
-		console.log("EditorController.generate()");
-		that.validate();
-		if (!that.hasFormError()) {
-			console.log("Ok we're ready to generate!");
-			console.log(getKeyGenConfig());
-		}
-		that.update();
-	}
-	
-	this.reset = function() {
-		console.log("EditorController.reset()");
-		headerController.reset();
-		bodyController.reset();
-	}
-	
-	this.isReset = function() {
-		console.log(headerController.isReset());
-		console.log(bodyController.isReset());
-		return headerController.isReset() && bodyController.isReset();
-	}
-	
-	this.save = function() {
-		console.log("EditorController.save()");
-	}
-	
-	this.print = function() {
-		console.log("EditorController.print()");
-	}
-	
-	this.hasFormError = function() {
-		return headerController.hasFormError() || bodyController.hasFormError();
-	}
-	
-	this.getHeaderController = function() {
-		return headerController;
-	}
-	
-	this.getBodyController = function() {
-		return bodyController;
-	}
-	
-	this.update = function() {
-		console.log("EditorController.update()");
-		if (headerController) headerController.update();
-		if (bodyController) bodyController.update();
-		if (actionsController) actionsController.update();
-	}
-	
-	// -------------------------------- PRIVATE ---------------------------------
-	
-	function getKeyGenConfig() {
-		assertFalse(that.hasFormError());
-		var keyGenConfig = {};
-		
-		// currencies config
-		keyGenConfig.currencies = bodyController.getCurrencyInputsController().getConfig();
-		
-		// encryption config
-		if (headerController.usePassphrase()) {
-			keyGenConfig.passphrase = headerController.getPassphrase();
-			keyGenConfig.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
-		}
-		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
-			var currency = keyGenConfig.currencies[i];
-			currency.encryption = headerController.usePassphrase() ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
-		}
-
-		// split config
-		if (headerController.useSplit()) {
-			keyGenConfig.numPieces = headerController.getNumPieces();
-			keyGenConfig.minPieces = headerController.getMinPieces();
-		}
-
-		// validate and return
-		validateKeyGenConfig(keyGenConfig);
-		return keyGenConfig;
-		
-		function validateKeyGenConfig(config) {
-			assertInitialized(config);
-			assertObject(config);
-			if (config.passphrase) {
-				assertString(config.passphrase, "config.passphrase is not a string");
-				assertTrue(config.passphrase.length >= 7, "config.passphrase.length is not >= 7");
-				assertDefined(config.verifyEncryption, "config.verifyEncryption is not defined");
-			}
-			if (config.numPieces || config.minPieces) {
-				assertNumber(config.numPieces, "config.numPieces is not a number");
-				assertNumber(config.minPieces, "config.minPieces is not a number");
-				assertTrue(config.numPieces >= 2, "config.numPieces is not >= 2");
-				assertTrue(config.minPieces >= 2, "config.minPieces is not >= 2");
-				assertTrue(config.minPieces <= config.numPieces, "config.minPieces is not <= config.numPieces");
-			}
-			assertInitialized(config.currencies, "config.currencies is not initialized");
-			assertTrue(config.currencies.length >= 1, "config.currencies.length is not >= 1");
-			for (var i = 0; i < config.currencies.length; i++) {
-				var currency = config.currencies[i];
-				assertDefined(currency.ticker, "config.currencies[" + i + "].ticker is not defined");
-				assertDefined(currency.numKeys, "config.currencies[" + i + "].numKeys is not defined");
-				assertDefined(currency.encryption, "config.currencies[" + i + "].encryption is not defined");
-				if (config.passphrase) assertInitialized(currency.encryption, "config.currencies[" + i + "].encryption is not initialized");
-			}
-		}
-		
-//		var config = {};
-//		config.passphrase = passphraseCheckbox.prop('checked') ? passphraseInput.val() : null;
-//		config.numPieces = splitCheckbox.prop('checked') ? parseFloat(numPiecesInput.val()) : 1;
-//		config.minPieces = splitCheckbox.prop('checked') ? parseFloat(minPiecesInput.val()) : null;
-//		config.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
-//		config.currencies = currencyInputsController.getConfig();
-//		for (var i = 0; i < config.currencies.length; i++) {
-//			config.currencies[i].encryption = passphraseCheckbox.prop('checked') ? getEncryptionScheme(currencyInputsController.getCurrencyInputs()[i]) : null;
-//		}
-//		verifyConfig(config);
-//		return config;
-	}
-}
-inheritsFrom(EditorController, DivController);
-
-/**
- * Editor header.
- */
-function EditorHeaderController(div, editorController, onChange) {
-	DivController.call(this, div);
-	
-	var that = this;
-	var passphraseCheckbox;
-	var passphraseInput;
-	var splitCheckbox;
-	var splitInput;
-	var passphraseError;
-	var splitError;
-	var formError;
-	
-	this.render = function(onDone) {
-		
-		// div setup
-		div.empty();
-		div.addClass("editor_header flex_vertical");
-		
-		// passphrase and split input row
-		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal'>").appendTo(div);
-		
-		// passphrase input
-		var passphraseDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
-		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseDiv);
-		var passphraseCheckboxLabel = $("<label class='user_select_none' for='passphrase_checkbox'>").appendTo(passphraseDiv);
-		passphraseCheckboxLabel.html("Use Passphrase?");
-		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseDiv);
-		
-		// split input
-		var splitDiv = $("<div class='editor_split_div flex_horizontal flex_justify_start'>").appendTo(passphraseSplitDiv)
-		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitDiv);
-		var splitCheckboxLabel = $("<label class='user_select_none' for='split_checkbox'>").appendTo(splitDiv);
-		splitCheckboxLabel.html("Split Keys?");
-		var splitInfo = $("<img src='img/information_white.png' class='information_img'>").appendTo(splitDiv);
-		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitDiv);
-		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitDiv);
-		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
-		var splitNumLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitNumDiv);
-		splitNumLabelTop.html("Split Into");
-		numPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitNumDiv);
-		var splitNumLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitNumDiv);
-		splitNumLabelBottom.html("Pieces");
-		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitDiv);
-		var splitMinDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
-		var splitMinLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitMinDiv);
-		splitMinLabelTop.html("Require");
-		minPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitMinDiv);
-		var splitMinLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitMinDiv);
-		splitMinLabelBottom.html("To Recover");		
-		
-		// split tooltip
-		var splitTooltip = $("<div>");
-		splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
-		splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
-		splitTooltip.append("For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
-		tippy(splitInfo.get(0), {
-			arrow: true,
-			html: splitTooltip.get(0),
-			interactive: true,
-			placement: 'bottom',
-			theme: 'translucent',
-			trigger: "mouseenter",
-			multiple: 'false',
-			maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
-			distance: 20,
-			arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-			offset: '-180, 0'
-		});
-		
-		// register clicks
-		passphraseCheckbox.click(function() {
-			editorController.update();
-			if (passphraseCheckbox.prop("checked")) passphraseInput.focus();
-			else {
-				passphraseInput.val("");
-				validatePassphrase();
-			}
-		});
-		splitCheckbox.click(function() {
-			editorController.update();
-			if (splitCheckbox.prop("checked")) numPiecesInput.focus();
-			else validateSplit();
-		});
-		
-		// initial state
-		that.reset();
-		
-		// done
-		if (onDone) onDone(div);
-	}
-	
-	this.reset = function() {
-		console.log("EditorHeaderController.reset()");
-		passphraseCheckbox.prop("checked", false);
-		passphraseInput.val("");
-		splitCheckbox.prop("checked", false);
-		numPiecesInput.val("3");
-		minPiecesInput.val("2");
-		validatePassphrase();
-		validateSplit();
-		that.update();
-	}
-	
-	this.isReset = function() {
-		return !passphraseCheckbox.prop("checked") && !splitCheckbox.prop("checked");
-	}
-	
-	this.validate = function() {
-		console.log("EditorHeaderController.validate()");
-		validatePassphrase();
-		validateSplit();
-	}
-	
-	this.hasFormError = function() {
-		return formError;
-	}
-	
-	this.update = function() {
-		console.log("EditorHeaderController.update()");
-		
-		// enable or disable passphrase input
-		that.usePassphrase() ? passphraseInput.removeAttr("disabled") : passphraseInput.attr("disabled", "disabled");
-		
-		// enable or disable split inputs
-		if (that.useSplit()) {
-			numPiecesInput.removeAttr("disabled");
-			minPiecesInput.removeAttr("disabled");
-		} else {
-			numPiecesInput.attr("disabled", "disabled");
-			minPiecesInput.attr("disabled", "disabled");
-		}
-	}
-	
-	this.usePassphrase = function() {
-		return passphraseCheckbox.prop("checked");
-	}
-	
-	this.getPassphrase = function() {
-		return passphraseInput.val();
-	}
-	
-	this.useSplit = function() {
-		return splitCheckbox.prop("checked");
-	}
-	
-	this.getNumPieces = function() {
-		var numPieces = Number(numPiecesInput.val());
-		if (!isInt(numPieces)) return null;
-		return numPieces;
-	}
-	
-	this.getMinPieces = function() {
-		var minPieces = Number(minPiecesInput.val());
-		if (!isInt(minPieces)) return null;
-		return minPieces;
-	}
-	
-	// -------------------------------- PRIVATE ---------------------------------
-	
-	function validatePassphrase() {
-		console.log("EditorHeaderController.validatePassphrase()");
-		passphraseError = false;
-		if (that.usePassphrase()) {
-			var passphrase = that.getPassphrase();
-			if (passphrase.length <= AppUtils.MIN_PASSPHRASE_LENGTH) {
-				passphraseInput.addClass("form_input_error_div");
-				passphraseInput.focus();
-				//setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
-				passphraseError = true;
-			}
-		} else {
-			passphraseInput.removeClass("form_input_error_div");
-		}
-		updateFormError();
-	}
-	
-	function validateSplit(lenientBlankAndRange) {
-		console.log("EditorHeaderController.validateSplit(" + lenientBlankAndRange + ")");
-		splitError = false;
-		if (that.useSplit()) {
-			
-			// validate num pieces
-			var numPieces = Number(numPiecesInput.val());
-			if (lenientBlankAndRange) {
-				if (!numPiecesInput.val() || isInt(numPieces)) {
-					numPiecesInput.removeClass("form_input_error_div");
-				} else {
-					splitError = true;
-					numPiecesInput.addClass("form_input_error_div");
-				}
-			} else {
-				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
-					splitError = true;
-					numPiecesInput.addClass("form_input_error_div");
-				} else {
-					numPiecesInput.removeClass("form_input_error_div");
-				}
-			}
-			
-			// validate min pieces
-			var minPieces = Number(minPiecesInput.val());
-			if (lenientBlankAndRange) {
-				if (!minPiecesInput.val() || isInt(minPieces)) {
-					minPiecesInput.removeClass("form_input_error_div");
-				} else {
-					splitError = true;
-					minPiecesInput.addClass("form_input_error_div");
-				}
-			} else {
-				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!splitError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
-					splitError = true;
-					minPiecesInput.addClass("form_input_error_div");
-				} else {
-					minPiecesInput.removeClass("form_input_error_div");
-				}
-			}
-		} else {
-			numPiecesInput.removeClass("form_input_error_div");
-			minPiecesInput.removeClass("form_input_error_div");
-		}
-		updateFormError();
-	}
-	
-	function updateFormError() {
-		var lastError = formError;
-		formError = passphraseError || splitError;
-		if (formError !== lastError && onChange) onChange();	// notify of change
-	}
-}
-inheritsFrom(EditorHeaderController, DivController);
-
-/**
- * Editor body.
- */
-function EditorBodyController(div, onChange) {
-	DivController.call(this, div);
-	
-	var that = this;
-	var currencyInputsController;
-	
-	this.render = function(onDone) {
-		
-		// load dependencies TODO: load correct dependencies
-		LOADER.load(AppUtils.getAppDependencies(), function(err) {
-			if (err) throw err;
-			
-			// div setup
-			div.empty();
-			div.addClass("editor_body flex_vertical");
-			
-			// cryptostorage logo
-			var logoHeader = $("<div class='piece_page_header_div'>").appendTo(div);
-			$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
-			
-			// currency inputs
-			currencyInputsController = new CurrencyInputsController($("<div style='width:100%'>").appendTo(div), AppUtils.getCryptoPlugins(), onChange, onChange);
-			currencyInputsController.render();
-			
-			// initial state
-			that.reset();
-			
-			// dev mode convenience
-			if (AppUtils.DEV_MODE) currencyInputsController.getCurrencyInputs()[0].setSelectedCurrency("BCH");
-			
-			// done rendering
-			if (onDone) onDone(div);
-		});
-	}
-	
-	this.getConfig = function() {
-		return currencyInputsController.getConfig();
-	}
-	
-	this.update = function() {
-		console.log("EditorBodyController.update()");
-	}
-	
-	this.reset = function() {
-		console.log("EditorBodyController.reset()");
-		currencyInputsController.reset();
-		that.update();
-	}
-	
-	this.isReset = function() {
-		if (that.hasFormError()) return false;
-		if (that.getConfig().length > 1) return false;
-		console.log(that.getConfig());
-		if (that.getConfig()[0].ticker) return false;
-		return true;
-	}
-	
-	this.validate = function() {
-		console.log("EditorBodyController.validate()");
-		currencyInputsController.validate();
-	}
-	
-	this.hasFormError = function() {
-		console.log("EditorBodyController.hasFormError()");
-		return currencyInputsController.hasFormError();
-	}
-	
-	this.getCurrencyInputsController = function() {
-		return currencyInputsController;
-	}
-}
-inheritsFrom(EditorBodyController, DivController);
-
-/**
- * Main actions.
+ * Editor actions controller.
  */
 function EditorActionsController(div, editorController) {
 	DivController.call(this, div);
