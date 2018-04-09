@@ -1054,321 +1054,6 @@ function DonateController(div, appController) {
 inheritsFrom(DonateController, DivController);
 
 /**
- * Manages a single currency input.
- * 
- * @param div is the div to render to
- * @param plugins are crypto plugins to select from
- * @param defaultTicker is the ticker of the initial selected currency
- * @param onCurrencyChange(ticker) is invoked when the user changes the currency selection
- * @param onDelete is invoked when the user delets this input
- * @param onFormErrorChange(hasError) is invoked when the validity state changes
- */
-function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, onDelete, onFormErrorChange) {
-	DivController.call(this, div);
-	
-	assertInitialized(div);
-	assertInitialized(plugins);
-	
-	// state variables
-	var that = this;
-	var id = uuidv4();	// id to accomodate ddslick's id requirement
-	var selectedPlugin;
-	var numKeysInput;
-	var selector;
-	var selectorData;
-	var trashDiv;
-	var trashImg;
-	var initializing = true;
-	var formError = false;
-	var currencyError = false;
-	var numKeysError = false;
-	
-	this.render = function(onDone) {
-		div.empty();
-		div.attr("class", "currency_input_div flex_horizontal width_100");
-		
-		// format pull down plugin data
-		selectorData = [];
-		for (var i = 0; i < plugins.length; i++) {
-			var plugin = plugins[i];
-			selectorData.push({
-				text: plugin.getName(),
-				imageSrc: plugin.getLogo().get(0).src
-			});
-		}
-		
-		// create pull down
-		selector = $("<div id='currency_selector_" + id + "'>").appendTo(div);
-		that.setSelectedCurrency(null);	// initializes selector
-		if (defaultTicker) that.setSelectedCurrency(defaultTicker);
-		
-		// create right div
-		var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
-		rightDiv.append("Keypairs to generate&nbsp;&nbsp;");
-		numKeysInput = $("<input class='num_keys_input' type='tel' value='1' min='1'>").appendTo(rightDiv);
-		numKeysInput.on("input", function(e) { validateNumKeys(true); });
-		numKeysInput.on("focusout", function(e) { validateNumKeys(false); });
-		rightDiv.append("&nbsp;&nbsp;");
-		trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
-		trashDiv.click(function() { onDelete(); });
-		trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
-		
-		// no longer initializing
-		initializing = false;
-		if (onDone) onDone(div);
-	};
-	
-	this.getSelectedPlugin = function() {
-		return selectedPlugin;
-	};
-	
-	this.setSelectedCurrency = function(ticker) {
-					
-		// reset dropdown
-		if (ticker === null || ticker === undefined) {
-			selector.ddslick("destroy");
-			selector = $("#currency_selector_" + id, div);	// ddslick requires id reference
-			selector.ddslick({
-				data: selectorData,
-				background: "white",
-				imagePosition: "left",
-				selectText: "Select a Currency...",
-				defeaultSelectedIndex: null,
-				onSelected: function(selection) {
-					selectedPlugin = plugins[selection.selectedIndex];
-					if (!initializing && onCurrencyChange) onCurrencyChange(ticker);
-					validateCurrency();
-				}
-			});
-			selectedPlugin = null;
-			selector = $("#currency_selector_" + id, div);	// ddslick requires id reference
-		}
-		
-		// set to currency
-		else {
-			var name = AppUtils.getCryptoPlugin(ticker).getName();
-			for (var i = 0; i < selectorData.length; i++) {
-				if (selectorData[i].text === name) {
-					selector.ddslick('select', {index: i});
-					selectedPlugin = plugins[i];
-					if (!initializing && onCurrencyChange) onCurrencyChange(ticker);
-					validateCurrency();
-					break;
-				}
-			}
-		}
-	};
-	
-	this.getNumKeys = function() {
-		var num = Number(numKeysInput.val());
-		if (isInt(num)) return num;
-		return null;
-	};
-	
-	this.setTrashEnabled = function(enabled) {
-		trashDiv.unbind("click");
-		if (enabled) {
-			trashDiv.click(function() { onDelete(); });
-			trashImg.removeClass("trash_div_disabled");
-		} else {
-			trashImg.addClass("trash_div_disabled");
-		}
-	};
-	
-	/**
-	 * Indicates if any form errors are visible on this currency input.
-	 * 
-	 * @returns true if any form errors are visible, false otherwise
-	 */
-	this.hasFormError = function() {
-		return formError;
-	};
-	
-	/**
-	 * Validates the currency input.
-	 */
-	this.validate = function() {
-		validateCurrency();
-		validateNumKeys(false);
-	};
-	
-	// ---------------------- PRIVATE ------------------------
-	
-	function validateCurrency() {
-		if (selectedPlugin) {
-			currencyError = false;
-			$(".dd-select", selector).removeClass("form_input_error_div");
-		} else {
-			currencyError = true;
-			$(".dd-select", selector).addClass("form_input_error_div");
-		}
-		updateFormError();
-	}
-	
-	function validateNumKeys(ignoreBlank) {
-		
-		// check for blank box
-		if (ignoreBlank && !numKeysInput.val()) {
-			numKeysInput.removeClass("form_input_error_div");
-			numKeysError = false;
-		}
-		
-		// validate num keys
-		else {
-			var numKeys = that.getNumKeys();
-			if (isInt(numKeys) && numKeys >= 1) {
-				numKeysInput.removeClass("form_input_error_div");
-				numKeysError = false;
-			} else {
-				numKeysInput.addClass("form_input_error_div");
-				numKeysError = true;
-			}
-		}
-		
-		// update error state
-		updateFormError();
-	}
-	
-	function updateFormError() {
-		var lastError = formError;
-		formError = currencyError || numKeysError;
-		if (!currencyError && numKeysError !== lastError) onFormErrorChange(formError);	// notify of form error change
-	}
-}
-inheritsFrom(CurrencyInputController, DivController);
-
-/**
- * Manages a collection of currency inputs.
- * 
- * @param div is the div to render to
- * @param plugins are crypto plugins to select from
- * @param onInputsChange() is invoked when one of the inputs change
- * @param onFormErrorChange(hasError) is invoked when the validity state changes
- */
-function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChange) {
-	DivController.call(this, div);
-	
-	// state variables
-	var that = this;
-	var currencyInputsDiv;
-	var currencyInputs;
-	var formError;
-	
-	this.render = function(onDone) {
-		
-		// div setup
-		div.empty();
-		
-		// currency inputs div
-		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(div);
-		
-		// add another currency link
-		var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(div);
-		var addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
-		addCurrencySpan.html("+ Add another currency");
-		addCurrencySpan.click(function() { that.add(); });
-		
-		// initial state
-		var onInputsChangeBkp = onInputsChange;
-		onInputsChange = null;	// disable notifications
-		currencyInputs = [];
-		that.reset();
-		onInputsChange = onInputsChangeBkp;
-		
-		// done
-		if (onDone) onDone();
-	};
-	
-	this.getCurrencyInputs = function() {
-		return currencyInputs;
-	};
-	
-	this.add = function(ticker) {
-		var currencyInput = new CurrencyInputController($("<div>"), plugins, ticker, onInputsChange, function() {
-			remove(currencyInput);
-		}, function(hasError) {
-			updateFormError();
-		});
-		currencyInput.render();
-		currencyInput.getDiv().appendTo(currencyInputsDiv);
-		currencyInputs.push(currencyInput);
-		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
-		if (onInputsChange) onInputsChange();
-	};
-	
-	this.hasFormError = function() {
-		return formError;
-	}
-	
-	this.validate = function() {
-		for (var i = 0; i < currencyInputs.length; i++) {
-			currencyInputs[i].validate();
-		}
-		updateFormError();
-	};
-	
-	this.empty = function() {
-		if (!currencyInputs.length) return;
-		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
-		currencyInputs = [];
-		if (onInputsChange) onInputsChange();
-		updateFormError();
-	};
-	
-	this.reset = function() {
-		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
-		currencyInputs = [];
-		that.add();
-		updateFormError();
-	};
-	
-	this.getConfig = function() {
-		var config = [];
-		for (var i = 0; i < currencyInputs.length; i++) {
-			config.push({
-				ticker: currencyInputs[i].getSelectedPlugin() ? currencyInputs[i].getSelectedPlugin().getTicker() : null,
-				numKeys: currencyInputs[i].getNumKeys()
-			});
-		}
-		return config;
-	};
-	
-	this.hasCurrencySelected = function(ticker) {
-		assertInitialized(ticker);
-		for (var i = 0; i < currencyInputs.length; i++) {
-			if (currencyInputs[i].getSelectedPlugin() && currencyInputs[i].getSelectedPlugin().getTicker() === ticker) return true;
-		}
-		return false;
-	};
-	
-	//---------------------- PRIVATE ------------------------
-	
-	function remove(currencyInput) {
-		var idx = currencyInputs.indexOf(currencyInput);
-		if (idx < 0) throw new Error("Could not find currency input");
-		var formErrorBeforeRemoved = that.hasFormError();
-		currencyInputs.splice(idx, 1);
-		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
-		currencyInput.getDiv().remove();
-		updateFormError();
-		if (onInputsChange) onInputsChange();
-	}
-	
-	function updateFormError() {
-		var lastError = formError;
-		formError = false;
-		for (var i = 0; i < currencyInputs.length; i++) {
-			if (currencyInputs[i].hasFormError()) {
-				formError = true;
-				break;
-			}
-		}
-		if (formError !== lastError && onFormErrorChange) onFormErrorChange(formError);	// notify of form error change
-	}
-}
-inheritsFrom(CurrencyInputsController, DivController);
-
-/**
  * Form page.
  */
 function FormController(div) {
@@ -2908,6 +2593,321 @@ function TwoTabController(div, tabName1, tabContent1, tabName2, tabContent2, def
 inheritsFrom(TwoTabController, DivController);
 
 /**
+ * Manages a single currency input.
+ * 
+ * @param div is the div to render to
+ * @param plugins are crypto plugins to select from
+ * @param defaultTicker is the ticker of the initial selected currency
+ * @param onCurrencyChange(ticker) is invoked when the user changes the currency selection
+ * @param onDelete is invoked when the user delets this input
+ * @param onFormErrorChange(hasError) is invoked when the validity state changes
+ */
+function CurrencyInputController(div, plugins, defaultTicker, onCurrencyChange, onDelete, onFormErrorChange) {
+	DivController.call(this, div);
+	
+	assertInitialized(div);
+	assertInitialized(plugins);
+	
+	// state variables
+	var that = this;
+	var id = uuidv4();	// id to accomodate ddslick's id requirement
+	var selectedPlugin;
+	var numKeysInput;
+	var selector;
+	var selectorData;
+	var trashDiv;
+	var trashImg;
+	var initializing = true;
+	var formError = false;
+	var currencyError = false;
+	var numKeysError = false;
+	
+	this.render = function(onDone) {
+		div.empty();
+		div.attr("class", "currency_input_div flex_horizontal width_100");
+		
+		// format pull down plugin data
+		selectorData = [];
+		for (var i = 0; i < plugins.length; i++) {
+			var plugin = plugins[i];
+			selectorData.push({
+				text: plugin.getName(),
+				imageSrc: plugin.getLogo().get(0).src
+			});
+		}
+		
+		// create pull down
+		selector = $("<div id='currency_selector_" + id + "'>").appendTo(div);
+		that.setSelectedCurrency(null);	// initializes selector
+		if (defaultTicker) that.setSelectedCurrency(defaultTicker);
+		
+		// create right div
+		var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
+		rightDiv.append("Keypairs to generate&nbsp;&nbsp;");
+		numKeysInput = $("<input class='num_keys_input' type='tel' value='1' min='1'>").appendTo(rightDiv);
+		numKeysInput.on("input", function(e) { validateNumKeys(true); });
+		numKeysInput.on("focusout", function(e) { validateNumKeys(false); });
+		rightDiv.append("&nbsp;&nbsp;");
+		trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
+		trashDiv.click(function() { onDelete(); });
+		trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
+		
+		// no longer initializing
+		initializing = false;
+		if (onDone) onDone(div);
+	};
+	
+	this.getSelectedPlugin = function() {
+		return selectedPlugin;
+	};
+	
+	this.setSelectedCurrency = function(ticker) {
+					
+		// reset dropdown
+		if (ticker === null || ticker === undefined) {
+			selector.ddslick("destroy");
+			selector = $("#currency_selector_" + id, div);	// ddslick requires id reference
+			selector.ddslick({
+				data: selectorData,
+				background: "white",
+				imagePosition: "left",
+				selectText: "Select a Currency...",
+				defeaultSelectedIndex: null,
+				onSelected: function(selection) {
+					selectedPlugin = plugins[selection.selectedIndex];
+					if (!initializing && onCurrencyChange) onCurrencyChange(ticker);
+					validateCurrency();
+				}
+			});
+			selectedPlugin = null;
+			selector = $("#currency_selector_" + id, div);	// ddslick requires id reference
+		}
+		
+		// set to currency
+		else {
+			var name = AppUtils.getCryptoPlugin(ticker).getName();
+			for (var i = 0; i < selectorData.length; i++) {
+				if (selectorData[i].text === name) {
+					selector.ddslick('select', {index: i});
+					selectedPlugin = plugins[i];
+					if (!initializing && onCurrencyChange) onCurrencyChange(ticker);
+					validateCurrency();
+					break;
+				}
+			}
+		}
+	};
+	
+	this.getNumKeys = function() {
+		var num = Number(numKeysInput.val());
+		if (isInt(num)) return num;
+		return null;
+	};
+	
+	this.setTrashEnabled = function(enabled) {
+		trashDiv.unbind("click");
+		if (enabled) {
+			trashDiv.click(function() { onDelete(); });
+			trashImg.removeClass("trash_div_disabled");
+		} else {
+			trashImg.addClass("trash_div_disabled");
+		}
+	};
+	
+	/**
+	 * Indicates if any form errors are visible on this currency input.
+	 * 
+	 * @returns true if any form errors are visible, false otherwise
+	 */
+	this.hasFormError = function() {
+		return formError;
+	};
+	
+	/**
+	 * Validates the currency input.
+	 */
+	this.validate = function() {
+		validateCurrency();
+		validateNumKeys(false);
+	};
+	
+	// ---------------------- PRIVATE ------------------------
+	
+	function validateCurrency() {
+		if (selectedPlugin) {
+			currencyError = false;
+			$(".dd-select", selector).removeClass("form_input_error_div");
+		} else {
+			currencyError = true;
+			$(".dd-select", selector).addClass("form_input_error_div");
+		}
+		updateFormError();
+	}
+	
+	function validateNumKeys(ignoreBlank) {
+		
+		// check for blank box
+		if (ignoreBlank && !numKeysInput.val()) {
+			numKeysInput.removeClass("form_input_error_div");
+			numKeysError = false;
+		}
+		
+		// validate num keys
+		else {
+			var numKeys = that.getNumKeys();
+			if (isInt(numKeys) && numKeys >= 1) {
+				numKeysInput.removeClass("form_input_error_div");
+				numKeysError = false;
+			} else {
+				numKeysInput.addClass("form_input_error_div");
+				numKeysError = true;
+			}
+		}
+		
+		// update error state
+		updateFormError();
+	}
+	
+	function updateFormError() {
+		var lastError = formError;
+		formError = currencyError || numKeysError;
+		if (!currencyError && numKeysError !== lastError) onFormErrorChange(formError);	// notify of form error change
+	}
+}
+inheritsFrom(CurrencyInputController, DivController);
+
+/**
+ * Manages a collection of currency inputs.
+ * 
+ * @param div is the div to render to
+ * @param plugins are crypto plugins to select from
+ * @param onInputsChange() is invoked when one of the inputs change
+ * @param onFormErrorChange(hasError) is invoked when the validity state changes
+ */
+function CurrencyInputsController(div, plugins, onInputsChange, onFormErrorChange) {
+	DivController.call(this, div);
+	
+	// state variables
+	var that = this;
+	var currencyInputsDiv;
+	var currencyInputs;
+	var formError;
+	
+	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		
+		// currency inputs div
+		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(div);
+		
+		// add another currency link
+		var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(div);
+		var addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
+		addCurrencySpan.html("+ Add another currency");
+		addCurrencySpan.click(function() { that.add(); });
+		
+		// initial state
+		var onInputsChangeBkp = onInputsChange;
+		onInputsChange = null;	// disable notifications
+		currencyInputs = [];
+		that.reset();
+		onInputsChange = onInputsChangeBkp;
+		
+		// done
+		if (onDone) onDone();
+	};
+	
+	this.getCurrencyInputs = function() {
+		return currencyInputs;
+	};
+	
+	this.add = function(ticker) {
+		var currencyInput = new CurrencyInputController($("<div>"), plugins, ticker, onInputsChange, function() {
+			remove(currencyInput);
+		}, function(hasError) {
+			updateFormError();
+		});
+		currencyInput.render();
+		currencyInput.getDiv().appendTo(currencyInputsDiv);
+		currencyInputs.push(currencyInput);
+		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
+		if (onInputsChange) onInputsChange();
+	};
+	
+	this.hasFormError = function() {
+		return formError;
+	}
+	
+	this.validate = function() {
+		for (var i = 0; i < currencyInputs.length; i++) {
+			currencyInputs[i].validate();
+		}
+		updateFormError();
+	};
+	
+	this.empty = function() {
+		if (!currencyInputs.length) return;
+		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
+		currencyInputs = [];
+		if (onInputsChange) onInputsChange();
+		updateFormError();
+	};
+	
+	this.reset = function() {
+		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
+		currencyInputs = [];
+		that.add();
+		updateFormError();
+	};
+	
+	this.getConfig = function() {
+		var config = [];
+		for (var i = 0; i < currencyInputs.length; i++) {
+			config.push({
+				ticker: currencyInputs[i].getSelectedPlugin() ? currencyInputs[i].getSelectedPlugin().getTicker() : null,
+				numKeys: currencyInputs[i].getNumKeys()
+			});
+		}
+		return config;
+	};
+	
+	this.hasCurrencySelected = function(ticker) {
+		assertInitialized(ticker);
+		for (var i = 0; i < currencyInputs.length; i++) {
+			if (currencyInputs[i].getSelectedPlugin() && currencyInputs[i].getSelectedPlugin().getTicker() === ticker) return true;
+		}
+		return false;
+	};
+	
+	//---------------------- PRIVATE ------------------------
+	
+	function remove(currencyInput) {
+		var idx = currencyInputs.indexOf(currencyInput);
+		if (idx < 0) throw new Error("Could not find currency input");
+		var formErrorBeforeRemoved = that.hasFormError();
+		currencyInputs.splice(idx, 1);
+		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
+		currencyInput.getDiv().remove();
+		updateFormError();
+		if (onInputsChange) onInputsChange();
+	}
+	
+	function updateFormError() {
+		var lastError = formError;
+		formError = false;
+		for (var i = 0; i < currencyInputs.length; i++) {
+			if (currencyInputs[i].hasFormError()) {
+				formError = true;
+				break;
+			}
+		}
+		if (formError !== lastError && onFormErrorChange) onFormErrorChange(formError);	// notify of form error change
+	}
+}
+inheritsFrom(CurrencyInputsController, DivController);
+
+/**
  * Editor controller.
  * 
  * @param div is the div to render to
@@ -3024,7 +3024,6 @@ function EditorController(div, config) {
 			currency.encryption = headerController.usePassphrase() ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
 		}
 
-		
 		// split config
 		if (headerController.useSplit()) {
 			keyGenConfig.numPieces = headerController.getNumPieces();
