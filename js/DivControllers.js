@@ -2937,12 +2937,16 @@ function EditorSplitController(div, onChange) {
 			offset: '-180, 0'
 		});
 		
-		// register clicks
+		// register inputs
 		splitCheckbox.click(function() {
 			if (splitCheckbox.prop("checked")) numPiecesInput.focus();
 			else that.validate();
 			if (onChange) onChange();
 		});
+		numPiecesInput.on("input", function(e) { that.validate(true); });
+		numPiecesInput.on("focusout", function(e) { that.validate(false); });
+		minPiecesInput.on("input", function(e) { that.validate(true); });
+		minPiecesInput.on("focusout", function(e) { that.validate(false); });
 		
 		// initial state
 		that.reset();
