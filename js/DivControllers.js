@@ -2609,6 +2609,12 @@ function EditorController(div, config) {
 	var that = this;
 	var passphraseController
 	var splitController;
+	var progressDiv;
+	var progressBar;
+	var progressLabel;
+	var piecesDiv;
+	var logoHeader;
+	var currenciesDiv;
 	var currenciesController;
 	var actionsController;
 	
@@ -2639,11 +2645,22 @@ function EditorController(div, config) {
 		new LoadController(new EditorDependencyLoader(bodyDiv)).render(function() {
 
 			// cryptostorage logo
-			var logoHeader = $("<div class='piece_page_header_div'>").appendTo(bodyDiv);
+			logoHeader = $("<div class='piece_page_header_div'>").appendTo(bodyDiv);
 			$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
 			
+			// progress bar
+			progressDiv = $("<div class='export_progress_div'>").appendTo(bodyDiv);
+			progressDiv.hide();
+			progressBar = UiUtils.getProgressBar(progressDiv);
+			progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
+			
+			// pieces div
+			piecesDiv = $("<div class='export_pieces_div'>").appendTo(bodyDiv);
+			piecesDiv.hide();
+			
 			// currency inputs controller
-			currenciesController = new EditorCurrenciesController($("<div>").appendTo(bodyDiv), AppUtils.getCryptoPlugins(), that.update, that.update);
+			currenciesDiv = $("<div>").appendTo(bodyDiv);
+			currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins(), that.update, that.update);
 			currenciesController.render();
 			
 			// actions controller
@@ -2670,14 +2687,29 @@ function EditorController(div, config) {
 	this.generate = function() {
 		console.log("EditorController.generate()");
 		that.validate();
-		if (!that.hasFormError()) {
-			console.log("Ok we're ready to generate!");
-			console.log(getKeyGenConfig());
-		}
 		that.update();
+		if (that.hasFormError()) return;
+		
+		// hide other body stuff
+		logoHeader.hide();
+		currenciesDiv.hide();
+		piecesDiv.hide();
+		
+		// generate them keys
+		piecesDiv.empty();
+		AppUtils.generateKeys(getKeyGenConfig(), setGenerateProgress, function(err, keys, pieces, pieceDivs) {
+			progressDiv.hide();
+			currenciesDiv.show();
+			for (var i = 0; i < pieceDivs.length; i++) {
+				piecesDiv.append(pieceDivs[i]);
+			}
+			piecesDiv.show();
+		}, true);
 	}
 	
 	this.reset = function() {
+		piecesDiv.empty();
+		piecesDiv.hide();
 		passphraseController.reset();
 		splitController.reset();
 		currenciesController.reset();
@@ -2705,6 +2737,13 @@ function EditorController(div, config) {
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
+	
+	function setGenerateProgress(percent, label) {
+		progressBar.set(percent);
+		progressBar.setText(Math.round(percent * 100)  + "%");
+		progressLabel.html(label);
+		progressDiv.show();
+	}
 	
 	function getKeyGenConfig() {
 		assertFalse(that.hasFormError());
