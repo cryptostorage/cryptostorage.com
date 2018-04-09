@@ -3012,23 +3012,23 @@ function EditorController(div, config) {
 		var keyGenConfig = {};
 		
 		// currencies config
-		keyGenConfig.currencies = bodyController.getConfig();
+		keyGenConfig.currencies = bodyController.getCurrencyInputsController().getConfig();
 		
 		// encryption config
-		var headerConfig = headerController.getConfig();
-		if (headerConfig.usePassphrase) {
-			keyGenConfig.passphrase = headerConfig.passphrase;
+		if (headerController.usePassphrase()) {
+			keyGenConfig.passphrase = headerController.getPassphrase();
 			keyGenConfig.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
 		}
 		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
 			var currency = keyGenConfig.currencies[i];
-			currency.encryption = headerConfig.usePassphrase ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
+			currency.encryption = headerController.usePassphrase() ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
 		}
+
 		
 		// split config
-		if (headerConfig.split) {
-			keyGenConfig.numPieces = headerConfig.numPieces;
-			keyGenConfig.minPieces = headerConfig.minPieces;
+		if (headerController.useSplit()) {
+			keyGenConfig.numPieces = headerController.getNumPieces();
+			keyGenConfig.minPieces = headerController.getMinPieces();
 		}
 
 		// validate and return
@@ -3200,10 +3200,10 @@ function EditorHeaderController(div, editorController, onChange) {
 		console.log("EditorHeaderController.update()");
 		
 		// enable or disable passphrase input
-		passphraseCheckbox.prop("checked") ? passphraseInput.removeAttr("disabled") : passphraseInput.attr("disabled", "disabled");
+		that.usePassphrase() ? passphraseInput.removeAttr("disabled") : passphraseInput.attr("disabled", "disabled");
 		
 		// enable or disable split inputs
-		if (splitCheckbox.prop("checked")) {
+		if (that.useSplit()) {
 			numPiecesInput.removeAttr("disabled");
 			minPiecesInput.removeAttr("disabled");
 		} else {
@@ -3212,15 +3212,28 @@ function EditorHeaderController(div, editorController, onChange) {
 		}
 	}
 	
-	this.getConfig = function() {
-		console.log("EditorHeaderController.getConfig()");
-		var config = {};
-		config.usePassphrase = passphraseCheckbox.prop("checked");
-		config.passphrase = passphraseInput.val();
-		config.split = splitCheckbox.prop("checked");
-		config.numPieces = config.split ? parseFloat(numPiecesInput.val()) : 1;
-		config.minPieces = config.split ? parseFloat(minPiecesInput.val()) : null;
-		return config;
+	this.usePassphrase = function() {
+		return passphraseCheckbox.prop("checked");
+	}
+	
+	this.getPassphrase = function() {
+		return passphraseInput.val();
+	}
+	
+	this.useSplit = function() {
+		return splitCheckbox.prop("checked");
+	}
+	
+	this.getNumPieces = function() {
+		var numPieces = Number(numPiecesInput.val());
+		if (!isInt(numPieces)) return null;
+		return numPieces;
+	}
+	
+	this.getMinPieces = function() {
+		var minPieces = Number(minPiecesInput.val());
+		if (!isInt(minPieces)) return null;
+		return minPieces;
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -3228,8 +3241,8 @@ function EditorHeaderController(div, editorController, onChange) {
 	function validatePassphrase() {
 		console.log("EditorHeaderController.validatePassphrase()");
 		passphraseError = false;
-		if (passphraseCheckbox.prop("checked")) {
-			var passphrase = passphraseInput.val();
+		if (that.usePassphrase()) {
+			var passphrase = that.getPassphrase();
 			if (passphrase.length <= AppUtils.MIN_PASSPHRASE_LENGTH) {
 				passphraseInput.addClass("form_input_error_div");
 				passphraseInput.focus();
@@ -3245,7 +3258,7 @@ function EditorHeaderController(div, editorController, onChange) {
 	function validateSplit(lenientBlankAndRange) {
 		console.log("EditorHeaderController.validateSplit(" + lenientBlankAndRange + ")");
 		splitError = false;
-		if (splitCheckbox.prop("checked")) {
+		if (that.useSplit()) {
 			
 			// validate num pieces
 			var numPieces = Number(numPiecesInput.val());
@@ -3367,9 +3380,8 @@ function EditorBodyController(div, onChange) {
 		return currencyInputsController.hasFormError();
 	}
 	
-	this.getConfig = function() {
-		console.log("EditorBodyController.getConfig()");
-		return currencyInputsController.getConfig();
+	this.getCurrencyInputsController = function() {
+		return currencyInputsController;
 	}
 }
 inheritsFrom(EditorBodyController, DivController);

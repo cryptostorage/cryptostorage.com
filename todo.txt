@@ -7,7 +7,6 @@ export editor
 	direct link to editor
 	cancel button on generate
 	tweak floating button colors
-	headerController and bodyController accessor methods instead of getConfig()
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient
