@@ -2802,6 +2802,21 @@ function EditorPassphraseController(div, onChange) {
 		passphraseCheckboxLabel.html("Use Passphrase?");
 		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(div);
 		
+		// password error tooltip
+		tippy(passphraseInput.get(0), {
+			arrow: true,
+			html: $("<div>Passphrase must be at least 7 characters</div>").get(0),
+			interactive: false,
+			placement: 'bottom',
+			theme: 'error',
+			trigger: "manual",
+			multiple: 'false',
+			maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
+			distance: 20,
+			arrowTransform: 'scaleX(1.25) scaleY(2.5) translateX(110) translateY(-2px)',
+			offset: '0, 0'
+		});
+		
 		// register clicks
 		passphraseCheckbox.click(function() {
 			if (passphraseCheckbox.prop("checked")) passphraseInput.focus();
@@ -2811,6 +2826,9 @@ function EditorPassphraseController(div, onChange) {
 			}
 			if (onChange) onChange();
 		});
+		
+		// register text input
+		passphraseInput.on("input", function(e) { setPassphraseError(false); });
 	}
 	
 	this.reset = function() {
@@ -2821,20 +2839,7 @@ function EditorPassphraseController(div, onChange) {
 	}
 	
 	this.validate = function() {
-		var lastError = formError;
-		formError = false;
-		if (that.usePassphrase()) {
-			var passphrase = that.getPassphrase();
-			if (passphrase.length <= AppUtils.MIN_PASSPHRASE_LENGTH) {
-				formError = true;
-				passphraseInput.addClass("form_input_error_div");
-				passphraseInput.focus();
-				//setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
-			}
-		} else {
-			passphraseInput.removeClass("form_input_error_div");
-		}
-		if (formError !== lastError && onChange) onChange();	// notify of change
+		setPassphraseError(that.usePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH);
 	}
 	
 	this.hasFormError = function() {
@@ -2851,6 +2856,23 @@ function EditorPassphraseController(div, onChange) {
 	
 	this.getPassphrase = function() {
 		return passphraseInput.val();
+	}
+	
+	// --------------------------------- PRIVATE --------------------------------
+	
+	function setPassphraseError(bool) {
+		var lastError = formError;
+		if (bool) {
+			formError = true;
+			passphraseInput.addClass("form_input_error_div");
+			passphraseInput.focus();
+			setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
+		} else {
+			passphraseInput.removeClass("form_input_error_div");
+			formError = false;
+			passphraseInput.get(0)._tippy.hide();
+		}
+		if (formError !== lastError && onChange) onChange();
 	}
 }
 inheritsFrom(EditorPassphraseController, DivController);
