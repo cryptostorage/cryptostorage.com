@@ -29,7 +29,7 @@
  * @param pieceDivs are the divs to render to (optional)
  * @param config is the configuration to render
  */
-function PieceRenderer(pieces, pieceDivs, config) {
+function IndustrialPieceRenderer(pieces, pieceDivs, config) {
 	
 	var isCancelled = false;	// tracks if rendering is cancelled
 	
@@ -42,7 +42,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 	this.render = function(onProgress, onDone) {
 		
 		// merge default config with given confi
-		config = Object.assign({}, PieceRenderer.defaultConfig, config);
+		config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
 		
 		// initialize divs if they weren't given
 		if (pieceDivs) assertEquals(pieceDivs.length, pieces.length);
@@ -103,7 +103,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 		pieceDiv.addClass("piece_div");
 		
 		// merge configs
-		config = Object.assign({}, PieceRenderer.defaultConfig, config);
+		config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
 		
 		// compute pairs per page
 		var pairsPerPage = config.spaceBetween ? 6 : 7;
@@ -343,7 +343,7 @@ function PieceRenderer(pieces, pieceDivs, config) {
 }
 
 // default configuration
-PieceRenderer.defaultConfig = {
+IndustrialPieceRenderer.defaultConfig = {
 		showPublic: true,
 		showPrivate: true,
 		showLogos: true,
@@ -357,10 +357,10 @@ PieceRenderer.defaultConfig = {
 };
 
 // compute render weight
-PieceRenderer.getWeight = function(numKeys, numPieces, config) {
+IndustrialPieceRenderer.getWeight = function(numKeys, numPieces, config) {
 	
 	// merge configs
-	config = Object.assign({}, PieceRenderer.defaultConfig, config);
+	config = Object.assign({}, IndustrialPieceRenderer.defaultConfig, config);
 	
 	// get number of qr codes
 	var numQrs = numKeys * numPieces * 2;
@@ -378,7 +378,7 @@ PieceRenderer.getWeight = function(numKeys, numPieces, config) {
 /**
  * Makes the given div copyable assuming it is a rendered piece(s).
  */
-PieceRenderer.makeCopyable = function(div) {
+IndustrialPieceRenderer.makeCopyable = function(div) {
 	
 	// copy keys to clipboard
 	new Clipboard(".copyable", {

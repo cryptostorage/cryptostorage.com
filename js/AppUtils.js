@@ -183,7 +183,7 @@ var AppUtils = {
 		var dependencies = [
 			"css/pagination.css",
 			"lib/pagination.js",
-			"js/PieceRenderer.js",
+			"js/IndustrialPieceRenderer.js",
 			"lib/qrcode.js",
 			"lib/jquery-csv.js",
 			"lib/jszip.js",
@@ -225,7 +225,7 @@ var AppUtils = {
 			"lib/setImmediate.js",
 			"css/pagination.css",
 			"lib/pagination.js",
-			"js/PieceRenderer.js",
+			"js/IndustrialPieceRenderer.js",
 			"lib/qrcode.js",
 			"lib/jszip.js",
 			"lib/FileSaver.js",
@@ -1420,9 +1420,9 @@ var AppUtils = {
 			}
 			
 			// render pieces to divs
-			var renderWeight = PieceRenderer.getWeight(keys.length, config.numPieces, null);
+			var renderWeight = IndustrialPieceRenderer.getWeight(keys.length, config.numPieces, null);
 			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
-			new PieceRenderer(pieces, null, config.renderConfig).render(function(percent) {
+			new IndustrialPieceRenderer(pieces, null, config.renderConfig).render(function(percent) {
 				if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
 			}, function(err, pieceDivs) {
 				if (err) onDone(err);
@@ -1825,7 +1825,7 @@ var AppUtils = {
 			weight += currency.numKeys * AppUtils.getWeightCreateKey();
 			if (currency.encryption) weight += currency.numKeys * (AppUtils.getWeightEncryptKey(currency.encryption) + (keyGenConfig.verifyEncryption ? AppUtils.getWeightDecryptKey(currency.encryption) : 0));
 		}
-		return weight + PieceRenderer.getWeight(numKeys, keyGenConfig.numPieces, null);
+		return weight + IndustrialPieceRenderer.getWeight(numKeys, keyGenConfig.numPieces, null);
 	},
 	
 	/**

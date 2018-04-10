@@ -2471,7 +2471,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		
 		// compute weights for progress bar
 		var decryptWeight = AppUtils.getWeightDecryptKeys(encryptedKeys);
-		var renderWeight = PieceRenderer.getWeight(encryptedKeys.length, 1, null);
+		var renderWeight = IndustrialPieceRenderer.getWeight(encryptedKeys.length, 1, null);
 		var totalWeight = decryptWeight + renderWeight;
 		
 		// switch content div to progress bar
@@ -2502,7 +2502,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 				var pieces = AppUtils.keysToPieces(decryptedKeys);
 				
 				// render pieces
-				new PieceRenderer(pieces, null, null).render(function(percentDone) {
+				new IndustrialPieceRenderer(pieces, null, null).render(function(percentDone) {
 					setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering");
 				}, function(err, pieceDivs) {
 					if (err) throw err;
@@ -4127,7 +4127,7 @@ function ExportController(div, window, config) {
 				setControlsEnabled(state);
 				prepareExportFiles(config.pieces, function() {
 					if (lastRenderer) lastRenderer.cancel();
-					lastRenderer = new PieceRenderer(config.pieces, config.pieceDivs, getExportConfig());
+					lastRenderer = new IndustrialPieceRenderer(config.pieces, config.pieceDivs, getExportConfig());
 					lastRenderer.render(null, function(err, pieceDivs) {
 						update(config.pieceDivs, onDone);
 					});
@@ -4164,7 +4164,7 @@ function ExportController(div, window, config) {
 		// make piece divs copyable which is lost when rendered pieces transfered to new tab
 		function makePieceDivsCopyable(pieceDivs) {
 			for (var i = 0; i < pieceDivs.length; i++) {
-				PieceRenderer.makeCopyable(pieceDivs[i]);
+				IndustrialPieceRenderer.makeCopyable(pieceDivs[i]);
 			}
 		}
 	}
