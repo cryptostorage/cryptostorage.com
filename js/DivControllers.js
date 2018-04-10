@@ -487,7 +487,7 @@ function HomeController(div) {
 		
 		function getKeyGenConfig(plugin) {
 			var config = {};
-			config.numPieces = 1;
+			config.numPieces = null;
 			config.minPieces = null;
 			config.currencies = [];
 			config.currencies.push({
@@ -2668,10 +2668,11 @@ function EditorController(div, config) {
 			actionsController.render();
 			
 			// initial state
-			that.reset();
-			
-			// dev mode convenience
-			if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");
+			if (config.keyGenConfig) setKeyGenConfig(config.keyGenConfig);
+			else {
+				that.reset();
+				if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
+			}
 		});
 		
 		// done rendering
@@ -2690,12 +2691,12 @@ function EditorController(div, config) {
 		that.update();
 		if (that.hasFormError()) return;
 		
-		// hide other body stuff
+		// hide body elems
 		logoHeader.hide();
 		currenciesDiv.hide();
 		piecesDiv.hide();
 		
-		// generate them keys
+		// generate keys
 		piecesDiv.empty();
 		AppUtils.generateKeys(getKeyGenConfig(), setGenerateProgress, function(err, keys, pieces, pieceDivs) {
 			progressDiv.hide();
@@ -2745,6 +2746,22 @@ function EditorController(div, config) {
 		progressDiv.show();
 	}
 	
+	function setKeyGenConfig(keyGenConfig) {		
+		
+		// set passphrase
+		if (keyGenConfig.passphrase) passphraseController.setPassphrase(keyGenConfig.passphrase);
+		
+		// set split
+		if (keyGenConfig.numPieces) splitController.setNumPieces(keyGenConfig.numPieces);
+		if (keyGenConfig.minPieces) {
+			splitController.setMinPieces(keyGenConfig.minPieces);
+			splitController.setUseSplit(true);
+		}
+		
+		// set currencies
+		currenciesController.setConfig(keyGenConfig.currencies);
+	}
+	
 	function getKeyGenConfig() {
 		assertFalse(that.hasFormError());
 		var keyGenConfig = {};
@@ -2753,17 +2770,17 @@ function EditorController(div, config) {
 		keyGenConfig.currencies = currenciesController.getConfig();
 		
 		// encryption config
-		if (passphraseController.usePassphrase()) {
+		if (passphraseController.getUsePassphrase()) {
 			keyGenConfig.passphrase = passphraseController.getPassphrase();
 			keyGenConfig.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
 		}
 		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
 			var currency = keyGenConfig.currencies[i];
-			currency.encryption = passphraseController.usePassphrase() ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
+			currency.encryption = passphraseController.getUsePassphrase() ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
 		}
 
 		// split config
-		if (splitController.useSplit()) {
+		if (splitController.getUseSplit()) {
 			keyGenConfig.numPieces = splitController.getNumPieces();
 			keyGenConfig.minPieces = splitController.getMinPieces();
 		}
@@ -2878,7 +2895,7 @@ function EditorPassphraseController(div, onChange) {
 	}
 	
 	this.validate = function() {
-		setPassphraseError(that.usePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH);
+		setPassphraseError(that.getUsePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH);
 	}
 	
 	this.hasFormError = function() {
@@ -2886,15 +2903,23 @@ function EditorPassphraseController(div, onChange) {
 	}
 	
 	this.update = function() {
-		that.usePassphrase() ? passphraseInput.removeAttr("disabled") : passphraseInput.attr("disabled", "disabled");
+		that.getUsePassphrase() ? passphraseInput.removeAttr("disabled") : passphraseInput.attr("disabled", "disabled");
 	}
 	
-	this.usePassphrase = function() {
+	this.getUsePassphrase = function() {
 		return passphraseCheckbox.prop("checked");
+	}
+	
+	this.setUsePassphrase = function(checked) {
+		passphraseCheckbox.prop("checked", checked);
 	}
 	
 	this.getPassphrase = function() {
 		return passphraseInput.val();
+	}
+	
+	this.setPassphrase = function(passphrase) {
+		passphraseInput.val(passphrase);
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
@@ -3005,7 +3030,7 @@ function EditorSplitController(div, onChange) {
 	this.validate = function(lenientBlankAndRange) {
 		var lastError = formError;
 		formError = false;
-		if (that.useSplit()) {
+		if (that.getUseSplit()) {
 			
 			// validate num pieces
 			var numPieces = Number(numPiecesInput.val());
@@ -3054,7 +3079,7 @@ function EditorSplitController(div, onChange) {
 	}
 	
 	this.update = function() {
-		if (that.useSplit()) {
+		if (that.getUseSplit()) {
 			numPiecesInput.removeAttr("disabled");
 			minPiecesInput.removeAttr("disabled");
 		} else {
@@ -3063,8 +3088,12 @@ function EditorSplitController(div, onChange) {
 		}
 	}
 	
-	this.useSplit = function() {
+	this.getUseSplit = function() {
 		return splitCheckbox.prop("checked");
+	}
+	
+	this.setUseSplit = function(bool) {
+		splitCheckbox.prop("checked", bool);
 	}
 	
 	this.getNumPieces = function() {
@@ -3073,10 +3102,18 @@ function EditorSplitController(div, onChange) {
 		return numPieces;
 	}
 	
+	this.setNumPieces = function(numPieces) {
+		numPiecesInput.val(numPieces);
+	}
+	
 	this.getMinPieces = function() {
 		var minPieces = Number(minPiecesInput.val());
 		if (!isInt(minPieces)) return null;
 		return minPieces;
+	}
+	
+	this.setMinPieces = function(minPieces) {
+		minPiecesInout.val(minPieces);
 	}
 }
 inheritsFrom(EditorSplitController, DivController);
@@ -3192,6 +3229,10 @@ function EditorCurrencyController(div, plugins, defaultTicker, onCurrencyChange,
 		if (isInt(num)) return num;
 		return null;
 	};
+	
+	this.setNumKeys = function(numKeys) {
+		numKeysInput.val(numKeys);
+	}
 	
 	this.setTrashEnabled = function(enabled) {
 		trashDiv.unbind("click");
@@ -3361,6 +3402,18 @@ function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorCha
 		}
 		return config;
 	};
+	
+	/**
+	 * Sets the configuration.
+	 * 
+	 * @param config is an array of currencies to set for the currency inputs in the format [{ticker: "BCH", ...}, {...}]
+	 */
+	this.setConfig = function(configCurrencies) {
+		for (var i = 0; i < configCurrencies.length; i++) {
+			currencyInputs[i].setSelectedCurrency(configCurrencies[i].ticker);
+			currencyInputs[i].setNumKeys(configCurrencies[i].numKeys);
+		}
+	}
 	
 	this.hasCurrencySelected = function(ticker) {
 		assertInitialized(ticker);
