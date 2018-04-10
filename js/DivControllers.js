@@ -2668,7 +2668,10 @@ function EditorController(div, config) {
 			actionsController.render();
 			
 			// initial state
-			if (config.keyGenConfig) setKeyGenConfig(config.keyGenConfig);
+			if (config.keyGenConfig) {
+				setKeyGenConfig(config.keyGenConfig);
+				that.generate();
+			}
 			else {
 				that.reset();
 				if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
