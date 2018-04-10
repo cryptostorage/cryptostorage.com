@@ -2638,45 +2638,9 @@ function EditorController(div, config) {
 		splitController = new EditorSplitController($("<div>").appendTo(passphraseSplitDiv), that.update);
 		splitController.render();
 		
-		// body
+		// load body
 		var bodyDiv = $("<div class='editor_body flex_vertical'>").appendTo(div);
-		
-		// load dependencies
-		new LoadController(new EditorDependencyLoader(bodyDiv)).render(function() {
-
-			// cryptostorage logo
-			logoHeader = $("<div class='piece_page_header_div'>").appendTo(bodyDiv);
-			$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
-			
-			// progress bar
-			progressDiv = $("<div class='export_progress_div'>").appendTo(bodyDiv);
-			progressDiv.hide();
-			progressBar = UiUtils.getProgressBar(progressDiv);
-			progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
-			
-			// pieces div
-			piecesDiv = $("<div class='export_pieces_div'>").appendTo(bodyDiv);
-			piecesDiv.hide();
-			
-			// currency inputs controller
-			currenciesDiv = $("<div>").appendTo(bodyDiv);
-			currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins(), that.update, that.update);
-			currenciesController.render();
-			
-			// actions controller
-			actionsController = new EditorActionsController($("<div>").appendTo(div), that);
-			actionsController.render();
-			
-			// initial state
-			if (config.keyGenConfig) {
-				setKeyGenConfig(config.keyGenConfig);
-				that.generate();
-			}
-			else {
-				that.reset();
-				if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
-			}
-		});
+		new LoadController(new EditorBodyController(bodyDiv)).render();
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -2688,7 +2652,7 @@ function EditorController(div, config) {
 		currenciesController.validate();
 	}
 	
-	this.generate = function() {
+	this.generate = function(onDone) {
 		console.log("EditorController.generate()");
 		that.validate();
 		that.update();
@@ -2708,6 +2672,7 @@ function EditorController(div, config) {
 				piecesDiv.append(pieceDivs[i]);
 			}
 			piecesDiv.show();
+			if (onDone) onDone();
 		}, true);
 	}
 	
@@ -2820,18 +2785,54 @@ function EditorController(div, config) {
 	}
 	
 	/**
-	 * Controller that only loads editor dependencies.
+	 * Inner body controller.
 	 */
-	function EditorDependencyLoader(div) {
+	function EditorBodyController(div) {
 		DivController.call(this, div);
+		
 		this.render = function(onDone) {
-			LOADER.load(AppUtils.getAppDependencies(), function(err) {	// TODO: load correct dependencies
+			
+			// load dependencies TODO: load correct dependencies
+			LOADER.load(AppUtils.getAppDependencies(), function(err) {
 				if (err) throw err;
-				if (onDone) onDone(div);
+				
+				// cryptostorage logo
+				logoHeader = $("<div class='piece_page_header_div'>").appendTo(div);
+				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
+				
+				// progress bar
+				progressDiv = $("<div class='export_progress_div'>").appendTo(div);
+				progressDiv.hide();
+				progressBar = UiUtils.getProgressBar(progressDiv);
+				progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
+				
+				// pieces div
+				piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
+				piecesDiv.hide();
+				
+				// currency inputs controller
+				currenciesDiv = $("<div>").appendTo(div);
+				currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins(), that.update, that.update);
+				currenciesController.render();
+				
+				// actions controller
+				actionsController = new EditorActionsController($("<div>").appendTo(div), that);
+				actionsController.render();
+				
+				// initial state
+				if (config.keyGenConfig) {
+					setKeyGenConfig(config.keyGenConfig);
+					that.generate(function() { if (onDone) onDone(); });
+				}
+				else {
+					that.reset();
+					if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
+					if (onDone) onDone(div);
+				}
 			});
 		}
 	}
-	inheritsFrom(EditorDependencyLoader, DivController);
+	inheritsFrom(EditorBodyController, DivController);
 }
 inheritsFrom(EditorController, DivController);
 
