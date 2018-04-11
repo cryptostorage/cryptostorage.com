@@ -3526,6 +3526,50 @@ function EditorActionsController(div, editorController) {
 inheritsFrom(EditorActionsController, DivController);
 
 /**
+ * Renders pieces for display in the editor.
+ * 
+ * @param div is the div to render to
+ * @param pieces are the pieces to render
+ * @param onRenderProgress(percent) is invoked as rendering progress is made
+ */
+function EditorPiecesRenderer(div, pieces, onRenderProgress) {
+	DivController.call(this, div);
+	
+	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("editor_pieces_div flex_vertical");
+		
+		
+	}
+}
+inheritsFrom(EditorRenderer, DivController);
+
+/**
+ * Renders a single keypair.
+ * 
+ * @param div is the div to render to
+ * @param config is the keypair configuration to render
+ * 				config.leftLabel is the upper left label
+ * 				config.leftValue is the upper left value
+ * 				config.leftValueCopyable specifies if the left value is copyable and should be QR
+ * 				config.icon is the icon to render
+ * 				config.title is the main title of the keypair
+ * 				config.rightLabel is the lower right label
+ * 				config.rightValue is the lower right value
+ * 				config.rightValueCopyable specifies if the right value is copyable and should be QR
+ */
+function KeyPairRenderer(div, config) {
+	DivController.call(this, div);
+	
+	this.render = function(onDone) {
+		
+	}
+}
+inheritsFrom(KeyPairRenderer, DivController);
+
+/**
  * Export page.
  * 
  * At least one of keyGenConfig, keys, pieces, and pieceDivs are required in the config.

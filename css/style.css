@@ -1251,6 +1251,10 @@ input[type='checkbox'][disabled] +label {
 	background-color: rgb(56, 106, 174);
 }
 
+.editor_pieces_div {
+	width: 750px;
+}
+
 .export_div {
 	align-items: center;
 	min-width: 775px;
