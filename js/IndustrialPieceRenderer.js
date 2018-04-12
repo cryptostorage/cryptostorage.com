@@ -217,7 +217,7 @@ function IndustrialPieceRenderer(pieces, pieceDivs, config) {
 			
 			// title
 			var keyDivCenter = $("<div class='key_div_center'>").appendTo(div);
-			var titleDiv = $("<div class='key_div_center_title'>").appendTo(keyDivCenter);
+			var titleDiv = $("<div class='key_div_center_id'>").appendTo(keyDivCenter);
 			if (addressApplicable) titleDiv.css("position", "absolute");
 			titleDiv.html(title);
 			

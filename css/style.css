@@ -1510,7 +1510,7 @@ input[type='checkbox'][disabled] +label {
 	position: relative;
 }
 
-.key_div_center_title {
+.key_div_center_id {
 	font-size: 13px;
 	left: 0;
 	right: 0;

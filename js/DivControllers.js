@@ -3554,20 +3554,134 @@ inheritsFrom(EditorRenderer, DivController);
  * 				config.leftLabel is the upper left label
  * 				config.leftValue is the upper left value
  * 				config.leftValueCopyable specifies if the left value is copyable and should be QR
- * 				config.icon is the icon to render
- * 				config.title is the main title of the keypair
+ * 				config.logo is the center logo to render
+ * 				config.label is the center label of the keypair
  * 				config.rightLabel is the lower right label
  * 				config.rightValue is the lower right value
  * 				config.rightValueCopyable specifies if the right value is copyable and should be QR
+ * 				config.keyPairId is the keypair identifier
  */
 function KeyPairRenderer(div, config) {
 	DivController.call(this, div);
 	
+	var that = this;
+	var isCancelled;
+	var keyDivLogo;
+	var keyDivLeftValue;
+	var keyDivRightValue;
+	
 	this.render = function(onDone) {
+		if (isCancelled) return;
 		
+		// div setup
+		div.empty();
+		div.addClass("key_div");
+		
+		// left qr code
+		var keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
+		
+		// keypair id
+		var keyDivCenter = $("<div class='key_div_center'>").appendTo(div);
+		var idDiv = $("<div class='key_div_center_id'>").appendTo(keyDivCenter);
+		if (config.leftLabel) idDiv.css("position", "absolute");
+		idDiv.html(config.keyPairId);
+		
+		// left label and value
+		if (config.leftLabel) {
+			var keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivCenter);
+			keyDivLeftLabel.html(config.leftLabel);
+			keyDivLeftValue = $("<div class='key_div_left_value'>").appendTo(keyDivCenter);
+			if (!hasWhitespace(config.leftValue)) keyDivLeftValue.css("word-break", "break-all");
+			keyDivLeftValue.html(value);
+			if (config.leftValueCopyable) keyDivLeftValue.addClass("copyable");
+		}
+		
+		// center logo and label
+		var keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
+		if (config.logo) {
+			keyDivLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
+			keyDivLogo.append(config.logo);
+		}
+		var keyDivLabel = $("<div class='key_div_currency_label'>").appendTo(keyDivCurrency);
+		keyDivLabel.html(config.label);
+		
+		// right label and value
+		var keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivCenter);
+		keyDivRightLabel.html(config.rightLabel);
+		keyDivRightValue = $("<div class='key_div_right_value'>").appendTo(keyDivCenter);
+		if (!config.leftLabel) keyDivRightValue.css("margin-left", "-90px");
+		if (!hasWhitespace(config.rightValue)) keyDivRightValue.css("word-break", "break-all");
+		keyDivRightValue.html(config.rightValue);
+		if (config.rightValueCopyable) keyDivRightValue.addClass("copyable");
+		
+		// collapse spacing for long keys
+		if (config.leftLabel) {
+			if (config.leftValue.length > 71) {
+				keyDivCurrency.css("margin-top", "-15px");
+			}
+			if (config.rightValue.length > 140) {
+				keyDivCurrency.css("margin-top", "-10px");
+				keyDivRightLabel.css("margin-top", "-15px");
+			}
+		}
+		
+		// right qr code
+		var keyDivRight = $("<div class='key_div_right'>").appendTo(div);
+		
+		// add qr codes
+		if (config.leftValueCopyable) {
+			AppUtils.renderQrCode(config.leftValue, getQrConfig(config), function(img) {
+				if (isCancelled) return;
+				img.attr("class", "key_div_qr");
+				keyDivLeft.append(img);
+				addPrivateQr();
+			});
+		} else {
+			if (config.leftLabel) {
+				var omitted = $("<div class='key_div_qr_omitted flex_horizontal'>").appendTo(keyDivLeft);
+				omitted.append($("<img src='img/restricted.png' class='key_div_qr_omitted_img'>"));
+			}
+			addPrivateQr();
+		}
+		function addPrivateQr() {
+			if (config.rightValueCopyable) {
+				AppUtils.renderQrCode(config.rightValue, KeyPairRenderer.QR_CONFIG, function(img) {
+					if (isCancelled) return;
+					img.attr("class", "key_div_qr");
+					keyDivRight.append(img);
+					onDone(div);
+				});
+			} else {
+				var omitted = $("<div class='key_div_qr_omitted flex_horizontal'>").appendTo(keyDivRight);
+				omitted.append($("<img src='img/restricted.png' class='key_div_qr_omitted_img'>"));
+				onDone(div);
+			}
+		}
+	}
+	
+	this.cancel = function() {
+		isCancelled = true;
+	}
+	
+	this.setLogoVisible = function(visible) {
+		throw new Error("Not implemented");
+	}
+	
+	this.setLeftValueVisible = function(visible) {
+		throw new Error("Not implemented");
+	}
+	
+	this.setRightValueVisible = function(visible) {
+		throw new Error("Not implemented");
 	}
 }
 inheritsFrom(KeyPairRenderer, DivController);
+KeyPairRenderer.QR_CONFIG = {
+		size: 90,
+		version: null,
+		errorCorrectionLevel: 'H',
+		scale: 4,
+}
 
 /**
  * Export page.
