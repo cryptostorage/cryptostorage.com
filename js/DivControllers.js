@@ -3526,13 +3526,13 @@ function EditorActionsController(div, editorController) {
 inheritsFrom(EditorActionsController, DivController);
 
 /**
- * Renders pieces for display in the editor.
+ * Renders and controls displayed pieces in the editor.
  * 
  * @param div is the div to render to
  * @param pieces are the pieces to render
  * @param onRenderProgress(percent) is invoked as rendering progress is made
  */
-function EditorPiecesRenderer(div, pieces, onRenderProgress) {
+function EditorPiecesController(div, pieces, onRenderProgress) {
 	DivController.call(this, div);
 	
 	this.render = function(onDone) {
@@ -3541,13 +3541,16 @@ function EditorPiecesRenderer(div, pieces, onRenderProgress) {
 		div.empty();
 		div.addClass("editor_pieces_div flex_vertical");
 		
+		div.append("Ok we render pieces here");
 		
+		// done
+		if (onDone) onDone(div);
 	}
 }
-inheritsFrom(EditorRenderer, DivController);
+inheritsFrom(EditorPiecesController, DivController);
 
 /**
- * Renders a single keypair.
+ * Renders and controls a single keypair.
  * 
  * @param div is the div to render to
  * @param config is the keypair configuration to render
@@ -3561,7 +3564,7 @@ inheritsFrom(EditorRenderer, DivController);
  * 				config.rightValueCopyable specifies if the right value is copyable and should be QR
  * 				config.keyPairId is the keypair identifier
  */
-function KeyPairRenderer(div, config) {
+function KeyPairController(div, config) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -3645,7 +3648,7 @@ function KeyPairRenderer(div, config) {
 		}
 		function addPrivateQr() {
 			if (config.rightValueCopyable) {
-				AppUtils.renderQrCode(config.rightValue, KeyPairRenderer.QR_CONFIG, function(img) {
+				AppUtils.renderQrCode(config.rightValue, KeyPairController.QR_CONFIG, function(img) {
 					if (isCancelled) return;
 					img.attr("class", "key_div_qr");
 					keyDivRight.append(img);
@@ -3675,8 +3678,8 @@ function KeyPairRenderer(div, config) {
 		throw new Error("Not implemented");
 	}
 }
-inheritsFrom(KeyPairRenderer, DivController);
-KeyPairRenderer.QR_CONFIG = {
+inheritsFrom(KeyPairController, DivController);
+KeyPairController.QR_CONFIG = {
 		size: 90,
 		version: null,
 		errorCorrectionLevel: 'H',
