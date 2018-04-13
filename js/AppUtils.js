@@ -235,6 +235,7 @@ var AppUtils = {
 			"lib/clipboard.js",
 			"js/CryptoKey.js",
 			"js/Tests.js",
+			"js/TestCryptoKeypairs.js",
 			"js/BodyExporter.js",
 			"lib/jquery.ddslick.js",
 			"img/loading.gif",

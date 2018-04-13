@@ -67,6 +67,12 @@ $(document).ready(function() {
 						if (err) throw err;
 						console.log("Minimum tests pass");
 					});
+					
+					// test keypairs
+					new TestCryptoKeypairs().run(function(err) {
+						if (err) throw err;
+						console.log("Keypair tests pass");
+					});
 				}
 				
 				// run full tests
