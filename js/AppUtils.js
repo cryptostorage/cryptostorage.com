@@ -2323,10 +2323,10 @@ var AppUtils = {
 	/**
 	 * Combines the given hex shares.
 	 * 
-	 * @param hexShares are the hex shares to combine
+	 * @param shares are the hex shares to combine
 	 * @returns the combined hex share or null if insufficient shares given
 	 */
-	combineHexShares: function(hexShares) {
+	combineHex: function(shares) {
 		throw new Error("Not implemented");
 	}
 }
