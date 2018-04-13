@@ -150,6 +150,16 @@ function isLowerCase(str) {
 }
 
 /**
+ * Asserts that the given argument is hex.
+ * 
+ * @param arg is the argument to assert as hex
+ * @param msg is the message to throw if the argument is not hex
+ */
+function assertHex(str, msg) {
+	assertTrue(isHex(str), msg ? msg : "Argument asserted as hex but is not hex");
+}
+
+/**
  * Indicates if the given argument is a hexidemal string.
  * 
  * Credit: https://github.com/roryrjb/is-hex/blob/master/is-hex.js.
@@ -160,7 +170,7 @@ function isLowerCase(str) {
 var HEX_REG_EXP = /([0-9]|[a-f])/gim
 function isHex(arg) {
 	if (typeof arg !== 'string') return false;
-	assertTrue(arg.length > 0, "Cannot determine if empty string is hex");
+	if (arg.length === 0) return false;
 	return (arg.match(HEX_REG_EXP) || []).length === arg.length;
 }
 
@@ -174,12 +184,32 @@ function isBase32(str) {
 }
 
 /**
+ * Asserts that the given argument is base58.
+ * 
+ * @param arg is the argument to assert as base58
+ * @param msg is the message to throw if the argument is not base58
+ */
+function assertBase58(str, msg) {
+	assertTrue(isBase58(str), msg ? msg : "Argument asserted as base58 but is not base58");
+}
+
+/**
  * Determines if the given string is base58.
  */
 function isBase58(str) {
 	if (typeof str !== 'string') return false;
 	assertTrue(str.length > 0, "Cannot determine if empty string is base58");
 	return /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$/.test(str);
+}
+
+/**
+ * Asserts that the given argument is base64.
+ * 
+ * @param arg is the argument to assert as base64
+ * @param msg is the message to throw if the argument is not base64
+ */
+function assertBase64(str, msg) {
+	assertTrue(isBase64(str), msg ? msg : "Argument asserted as base64 but is not base64");
 }
 
 /**

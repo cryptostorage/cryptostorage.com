@@ -2293,7 +2293,87 @@ var AppUtils = {
 	 * @param onDone(err, encryptedHex) is invoked when done
 	 */
 	encryptHex: function(hex, scheme, passphrase, onProgress, onDone) {
-		throw new Error("Not implemented");
+		
+		// validate args
+		try {
+			assertHex(hex);
+			assertInitialized(scheme, "Scheme is not initialized");
+			assertInitialized(passphrase, "Passphrase is not initialized");
+			assertInitialized(onDone, "onDone is not initialized");
+		} catch (err) {
+			onDone(err);
+			return;
+		}
+		
+		// encrypt key with scheme
+		var encryptFunc;
+		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) encryptFunc = encryptHexV0;
+		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) encryptFunc = encryptHexV1;
+		else if (scheme === AppUtils.EncryptionScheme.BIP38) encryptFunc = encryptHexBip38;
+		else {
+			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+			return;
+		}
+		encryptFunc(key, scheme, passphrase, onProgress, onDone);
+		
+		function encryptHexV1(hex, scheme, passphrase, onProgress, onDone) {
+			try {
+				
+				// create random salt and replace first two characters with version
+				var salt = CryptoJS.lib.WordArray.random(AppUtils.ENCRYPTION_V1_BLOCK_SIZE);
+				var hexVersion = AppUtils.ENCRYPTION_V1_VERSION.toString(16);
+				salt = hexVersion + salt.toString().substring(hexVersion.length);
+				salt = CryptoJS.enc.Hex.parse(salt);
+				
+				// strengthen passphrase with passphrase key
+				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+		      keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
+		      iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
+		      hasher: CryptoJS.algo.SHA512
+		    });
+				
+				// encrypt
+				var iv = salt;
+				var encrypted = CryptoJS.AES.encrypt(hex, passphraseKey, { 
+			    iv: iv, 
+			    padding: CryptoJS.pad.Pkcs7,
+			    mode: CryptoJS.mode.CBC
+			  });
+				
+				// encrypted hex = salt + hex cipher text
+				var ctHex = AppUtils.toBase(64, 16, encrypted.toString());
+				var encryptedHex = salt.toString() + ctHex;
+				if (onProgress) onProgress(1);
+				if (onDone) onDone(null, encryptedHex);
+			} catch (err) {
+				onDone(err);
+			}
+		}
+		
+		function encryptHexV0(hex, scheme, passphrase, onProgress, onDone) {
+			try {
+				var encryptedb64 = CryptoJS.AES.encrypt(hex, passphrase).toString();
+				var encryptedHex = AppUtils.toBase(64, 16, encryptedb64);
+				if (onProgress) onProgress(1);
+				onDone(null, encryptedHex);
+			} catch (err) {
+				onDone(err);
+			}
+		}
+		
+		function encryptHexBip38(hex, scheme, passphrase, onProgress, onDone) {
+			try {
+				var decoded = bitcoinjs.decode(AppUtils.toBase(16, 58, hex));
+				bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
+					if (onProgress) onProgress(progress.percent / 100);
+				}, null, function(err, encryptedWif) {
+					if (err) onDone(err);
+					else onDone(null, AppUtils.toBase(58, 16, encryptedWif));
+				});
+			} catch (err) {
+				onDone(err);
+			}
+		}
 	},
 	
 	/**
@@ -2328,5 +2408,39 @@ var AppUtils = {
 	 */
 	combineHex: function(shares) {
 		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Converts the given string to another base.
+	 * 
+	 * TODO: use library?
+	 * 
+	 * @param srcBase is the source base to convert from
+	 * @param tgtBase is the target base to convert to
+	 * @param str is the string to convert
+	 */
+	toBase: function(srcBase, tgtBase, str) {
+		assertNumber(srcBase);
+		assertNumber(tgtBase);
+		assertInitialized(str);
+		if (srcBase === 16) {
+			if (tgtBase === 58) {
+				return Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
+			} else if (tgtBase === 64) {
+				return CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			} else throw new Error("Unsupported target base: " + tgtBase);
+		} else if (srcBase === 58) {
+			if (tgtBase === 16) {
+				return Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			} else if (tgtBase === 64) {
+				return AppUtils.toBase(16, 64, AppUtils.toBase(58, 16, str));
+			} else throw new Error("Unsupported target base: " + tgtBase);
+		} else if (srcBase === 64) {
+			if (tgtBase === 16) {
+				return CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			} else if (tgtBase === 58) {
+				return AppUtils.toBase(16, 58, AppUtils.toBase(64, 16, str));
+			} else throw new Error("Unsupported target base: " + tgtBase);
+		} else throw new Error("Unsupported source base: " + srcBase);
 	}
 }
