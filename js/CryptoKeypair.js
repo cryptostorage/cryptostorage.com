@@ -81,7 +81,6 @@ function CryptoKeypair(plugin, privateStr, exportJson) {
 	}
 	
 	this.isSplit = function() {
-		console.log(decoded);
 		assertDefined(that.getMinShares(), "Keypair split is unknown");
 		return that.getMinShares() !== null;
 	}

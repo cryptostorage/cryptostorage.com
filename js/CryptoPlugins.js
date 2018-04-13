@@ -314,6 +314,15 @@ function BitcoinCashPlugin() {
 		key.setAddress(address.substring(address.indexOf(':') + 1), true);	// override address with CashAddr format
 		return key;
 	}
+	
+	this.decode = function(str) {
+		var decoded = bitcoinPlugin.decode(str);
+		if (!decoded.address) return decoded;
+		var cashAddr =  bchaddr.toCashAddress(decoded.address);
+		decoded.address = cashAddr.substring(cashAddr.indexOf(':') + 1);
+		return decoded;
+	}
+	
 	this.isAddress = function(str) {
 		if (bitcoinPlugin.isAddress(str)) return true;
 		try {
