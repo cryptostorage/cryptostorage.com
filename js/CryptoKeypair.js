@@ -127,5 +127,21 @@ function CryptoKeypair(plugin, privateStr, exportJson) {
 				decoded.address = exportableJson.address;
 			}
 		}
+		
+		// verify decoding
+		verifyDecoded(decoded);
+	}
+	
+	function verifyDecoded(decoded) {
+		if (decoded.wif) {
+			assertInitialized(decoded.hex);
+			assertDefined(decoded.encryption);
+			assertDefined(decoded.minShares);
+			if (isNumber(decoded.minShares)) {
+				assertTrue(decoded.minShares >= 2);
+				assertTrue(decoded.minShares <= AppUtils.MAX_SHARES);
+			}
+		}
+		if (decoded.hex) assertInitialized(decoded.wif);
 	}
 }

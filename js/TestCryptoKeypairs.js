@@ -5,12 +5,25 @@ function TestCryptoKeypairs() {
 	var REPEAT_SHORT = 2;
 
 	this.run = function(onDone) {
+		
+		// test new keypairs
 		try {
 			testNewKeypairs();
-			onDone();
 		} catch (err) {
 			onDone(err);
+			return;
 		}
+		
+		// test encryption and splitting
+		testEncryptionAndSplitting(function(err) {
+			if (err) {
+				onDone(err);
+				return;
+			}
+			
+			// tests pass
+			onDone();
+		});
 	}
 	
 	function testNewKeypairs() {
@@ -25,5 +38,13 @@ function TestCryptoKeypairs() {
 				assertNull(keypair.getMinShares());
 			}
 		}
+	}
+	
+	function testEncryptionAndSplitting(onDone) {
+		onDone();
+	}
+	
+	function testSplit(keypairs) {
+		
 	}
 }
