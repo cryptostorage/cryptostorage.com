@@ -313,16 +313,6 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Determines if the given string is an encrypted private key.
-	 * 
-	 * @param str is the string to test
-	 * @returns true if the string is an encrypted private key, false otherwise
-	 */
-	isEncryptedKey: function(str) {
-		return AppUtils.decodeEncryptedKey(str) !== null;
-	},
-	
-	/**
 	 * Decodes the given encrypted private key.
 	 * 
 	 * @param str is the encrypted private key to decode
@@ -2289,5 +2279,32 @@ var AppUtils = {
 				}
 			}
 		});
+	},
+	
+	// ------------------------------ NEW KEYPAIRS ------------------------------
+	
+	/**
+	 * Encrypts hex with the given scheme and passphrase.
+	 * 
+	 * @param hex is the hex to encrypt
+	 * @param scheme is the encryption scheme
+	 * @param passphrase is the passphrase to encrypt with
+	 * @param onProgress(percent) is invoked as progress is made (optional)
+	 * @param onDone(err, encryptedHex) is invoked when done
+	 */
+	encryptHex: function(hex, scheme, passphrase, onProgress, onDone) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Decrypts hex with the given passphrase.
+	 * 
+	 * @param hex is the hex to decrypt
+	 * @param passphrase is the passphrase to decrypt with
+	 * @param onProgress(percent) is invoked as progress is made (optional)
+	 * @param onDone(err, decryptedHex) is invoked when done
+	 */
+	decryptHex: function(hex, passphrase, onProgress, onDone) {
+		throw new Error("Not implemented");
 	}
 }
