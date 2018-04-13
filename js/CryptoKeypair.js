@@ -5,9 +5,9 @@
  * 
  * @param plugin is the crypto plugin
  * @param privateStr is a private string (hex or wif, encrypted or unencrypted) (optional)
- * @param json is a json state to initialize from
+ * @param exportJson is exportable json to initialize from
  */
-function CryptoKeypair(plugin, privateStr, json) {
+function CryptoKeypair(plugin, privateStr, exportJson) {
 	
 	var that = this;
 	var decoded;
@@ -76,20 +76,21 @@ function CryptoKeypair(plugin, privateStr, json) {
 		});
 	}
 	
-	this.getSplitKeypairs = function(numPieces, minPieces) {
+	this.getSplitKeypairs = function(numPieces, minShares) {
 		throw new Error("Not implemented");
 	}
 	
 	this.isSplit = function() {
-		assertDefined(that.getMinPieces(), "Keypair split is unknown");
-		return that.getMinPieces() !== null;
+		console.log(decoded);
+		assertDefined(that.getMinShares(), "Keypair split is unknown");
+		return that.getMinShares() !== null;
 	}
 	
-	this.getMinPieces = function() {
-		return decoded.minPieces;
+	this.getMinShares = function() {
+		return decoded.minShares;
 	}
 	
-	this.getJson = function() {
+	this.getExportableJson = function() {
 		return {
 			ticker: plugin.getTicker(),
 			address: that.getPublicAddress(),
@@ -107,28 +108,24 @@ function CryptoKeypair(plugin, privateStr, json) {
 			assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
 			
 			// initialize with private str
-			if (privateStr) {
-				decoded = plugin.decode(privateStr);
-				assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateStr);
-			} else {
-				decoded = plugin.random();
-			}
+			decoded = plugin.decode(privateStr);
+			assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateStr);
 		}
 		
-		// initialize with json
+		// initialize from exportable json
 		else {
-			plugin = AppUtils.getCryptoPlugin(json.ticker);
+			plugin = AppUtils.getCryptoPlugin(exportableJson.ticker);
 			assertInitialized(plugin);
-			if (json.wif) {
+			if (exportableJson.wif) {
 				decoded = plugin.decode(privateStr);
 				assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateStr);
-				if (!decoded.address) decoded.address = json.address;
-				else if (json.address) assertEquals(decoded.address, json.address, "Derived and given addresses do not match");
-				if (!decoded.encryption) decoded.encryption = json.encryption;
-				else if (json.encryption) assertEquals(decoded.encryption, json.encryption, "Decoded and given encryption schemes do not match");			
+				if (!decoded.address) decoded.address = exportableJson.address;
+				else if (exportableJson.address) assertEquals(decoded.address, exportableJson.address, "Derived and given addresses do not match");
+				if (!decoded.encryption) decoded.encryption = exportableJson.encryption;
+				else if (exportableJson.encryption) assertEquals(decoded.encryption, exportableJson.encryption, "Decoded and given encryption schemes do not match");			
 			} else {
 				decoded = {};
-				decoded.address = json.address;
+				decoded.address = exportableJson.address;
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 function TestCryptoKeypairs() {
 	
-	var plugins = AppUtils.getCryptoPlugins();
+	var plugins = [AppUtils.getCryptoPlugin("BTC")];
 
 	this.run = function(onDone) {
 		try {
@@ -13,13 +13,13 @@ function TestCryptoKeypairs() {
 	
 	function testNewKeypairs() {
 		for (var i = 0; i < plugins.length; i++) {
-			var keypair = plugins[i].newKeypair();
+			var keypair = new CryptoKeypair(plugins[i]);
 			assertInitialized(keypair.getPrivateHex());
 			assertInitialized(keypair.getPrivateWif());
 			assertFalse(keypair.isEncrypted());
 			assertNull(keypair.getEncryptionScheme());
 			assertFalse(keypair.isSplit());
-			assertNull(keypair.getMinPieces());
+			assertNull(keypair.getMinShares());
 		}
 	}
 }

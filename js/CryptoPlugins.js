@@ -168,6 +168,21 @@ CryptoPlugin.prototype.combine = function(shares) {
 }
 
 /**
+ * Decodes the given private key.  Decodes a randomly generated private key if not given.
+ * 
+ * @param privateKey is the private key to decode (optional)
+ * 
+ * @returns {
+ *   address: str			// public address
+ *   hex: str					// private hex
+ *   wif: str					// private wif
+ *   encryption: str	// encryption scheme, null if unencrypted
+ *   minShares: num		// minimum share threshold, null if not split
+ * }
+ */
+CryptoPlugin.prototype.decode = function(privateKey) { throw new Error("Subclass must implement"); }
+
+/**
  * Returns a new random key.
  */
 CryptoPlugin.prototype.newKey = function(str) { throw new Error("Subclass must implement"); }
@@ -225,6 +240,50 @@ function BitcoinPlugin() {
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);		
 	}
+	
+	this.decode = function(str) {
+		var decoded = {};
+		
+		// create key if not given
+		if (!str) str = new Bitcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
+		
+		// unencrypted
+		if (ninja.privateKey.isPrivateKey(str)) {
+			var key = new Bitcoin.ECKey(str);
+			key.setCompressed(true);
+			decoded.address = key.getBitcoinAddress();
+			decoded.hex = key.getBitcoinHexFormat();
+			decoded.wif = key.getBitcoinWalletImportFormat();
+			decoded.encryption = null;
+			decoded.minShares = null;
+			return decoded;
+		}
+		
+		// bip38 wif
+		else if (ninja.privateKey.isBIP38Format(str)) {
+			decoded.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			decoded.wif = str;
+			decoded.encryption = AppUtils.EncryptionScheme.BIP38;
+			decoded.minShares = null;
+			return decoded;
+		}
+		
+		// bip38 hex
+		else if (str.length > 80 && str.length < 90 && isHex(str)) return that.decode(AppUtils.toBase(16, 58, str));			
+		
+		// encrypted with cryptostorage conventions
+		else if ((decoded = AppUtils.decodeEncryptedKey(str)) !== null) {
+			decoded.minShares = null;
+			return decoded;
+		}
+		
+		// split share
+		else if ((decoded = AppUtils.decodeShare(str)) !== null) return decoded;
+		
+		// otherwise cannot decode
+		return null;
+	}
+	
 	this.isAddress = function(str) {
 		try {
 			Bitcoin.Address.decodeString(str);
