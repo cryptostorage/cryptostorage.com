@@ -1,7 +1,14 @@
-function CryptoKeypairs(keypairs, json) {
+/**
+ * Encapsulates a 'piece' which is a collection of keypairs.
+ * 
+ * @param keypairs are keypairs to initialize with
+ * @param json is exportable json to initialize from
+ * @param splitPieces are split pieces to combine and initialize from
+ */
+function CryptoPiece(keypairs, json, splitPieces) {
 	
 	var keypairs;
-	var shareNum;
+	var pieceNum;
 	
 	this.setKeypairs = function(_keypairs) {
 		keypairs = _keypairs;
@@ -15,7 +22,7 @@ function CryptoKeypairs(keypairs, json) {
 		
 	}
 	
-	this.getEncryptWeight = function() {
+	this.getEncryptWeight = function(schemes) {
 		
 	}
 	
@@ -39,8 +46,8 @@ function CryptoKeypairs(keypairs, json) {
 		
 	}
 	
-	this.getShareNum = function() {
-		
+	this.getPieceNum = function() {
+		return pieceNum;
 	}
 	
 	this.combine = function(shares) {
@@ -51,7 +58,10 @@ function CryptoKeypairs(keypairs, json) {
 		
 	}
 	
-	// -------------------------------- PRIVATE ---------------------------------
+	this.fromJson = function(json) {
+		
+	}
 	
+	// -------------------------------- PRIVATE ---------------------------------
 	
 }

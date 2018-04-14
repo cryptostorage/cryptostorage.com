@@ -1,12 +1,14 @@
 /**
  * Encapsulates a crypto keypair which has a public and private component.
  * 
+ * One of plugin, json, or shares is required.
+ * 
  * @param plugin is the crypto plugin
  * @param json is exportable json to initialize from
- * @param shares are keypair shares to combine to initialize from
+ * @param splitKeypairs are split keypairs to combine and initialize from
  * @param privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
  */
-function CryptoKeypair(plugin, json, shares, privateKey) {
+function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 	
 	var that = this;
 	var decoded;
@@ -112,39 +114,32 @@ function CryptoKeypair(plugin, json, shares, privateKey) {
 	}
 	
 	this.fromJson = function(json) {
-		
+		plugin = AppUtils.getCryptoPlugin(json.ticker);
+		assertInitialized(plugin);
+		if (json.wif) {
+			decoded = plugin.decode(json.wif);
+			assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
+			if (!decoded.address) decoded.address = json.address;
+			else if (json.address) assertEquals(decoded.address, json.address, "Derived and given addresses do not match");
+			if (!decoded.encryption) decoded.encryption = json.encryption;
+			else if (json.encryption) assertEquals(decoded.encryption, json.encryption, "Decoded and given encryption schemes do not match");			
+		} else {
+			decoded = {};
+			decoded.address = json.address;
+		}
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function initialize() {
-		
-		// TODO: use accessor methods
-		
-		// initialize with plugin
 		if (plugin) {
 			assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
 			if (privateKey) that.setPrivateKey(privateKey);
-			else if (shares) that.combine(shares);
 			else that.random();
 		}
-		
-		// initialize from exportable json
-		else {
-			plugin = AppUtils.getCryptoPlugin(json.ticker);
-			assertInitialized(plugin);
-			if (json.wif) {
-				decoded = plugin.decode(privateKey);
-				assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
-				if (!decoded.address) decoded.address = json.address;
-				else if (json.address) assertEquals(decoded.address, json.address, "Derived and given addresses do not match");
-				if (!decoded.encryption) decoded.encryption = json.encryption;
-				else if (json.encryption) assertEquals(decoded.encryption, json.encryption, "Decoded and given encryption schemes do not match");			
-			} else {
-				decoded = {};
-				decoded.address = json.address;
-			}
-		}
+		else if (json) that.fromJson(json);
+		else if (splitKeypairs) that.combine(splitKeypairs);
+		else throw new Error("One of plugin, json, or splitKeypairs is required");
 		
 		// verify decoding
 		verifyDecoded(decoded);
