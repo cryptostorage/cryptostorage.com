@@ -107,24 +107,45 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 	
 	init();
 	function init() {
-		if (keypairs) {
-			assertTrue(keypairs.length > 0);
-			for (var i = 0; i < keypairs.length; i++) {
-				assertObject(keypairs[i], CryptoKeypair);
-			}
-		}
+		if (keypairs) setKeypairs(keypairs);
 		else if (json) fromJson(json);
 		else if (splitPieces) combine(splitPieces);
 		else if (piece) fromPiece(piece);
 		else throw new Error("All arguments null");
 	}
 	
+	function setKeypairs(_keypairs) {
+		assertTrue(_keypairs.length > 0);
+		for (var i = 0; i < _keypairs.length; i++) {
+			assertObject(_keypairs[i], CryptoKeypair);
+		}
+		keypairs = _keypairs;
+	}
+	
 	function fromJson() {
 		throw new Error("Not implemented");
 	}
 	
-	function combine() {
-		throw new Error("Not implemented");
+	function combine(splitPieces) {
+		
+		// verify consistent num keypairs
+		var numKeypairs;
+		for (var i = 0; i < splitPieces.length; i++) {
+			if (!numKeypairs) numKeypairs = splitPieces[i].getKeypairs().length;
+			else if (numKeypairs !== splitPieces[i].getKeypairs().length) throw new Error("splitPieces[" + i + "].getKeypairs() has inconsistent number of keypairs");
+		}
+		assertTrue(numKeypairs > 0);
+		
+		// combine keypairs
+		var combinedKeypairs = [];
+		for (var i = 0; i < numKeypairs; i++) {
+			var splitKeypairs = [];
+			for (var j = 0; j < splitPieces.length; j++) splitKeypairs.push(splitPieces[j].getKeypairs()[i]);
+			combinedKeypairs.push(new CryptoKeypair(null, null, splitKeypairs));
+		}
+		
+		// set keypairs to combined keypairs
+		setKeypairs(combinedKeypairs);
 	}
 	
 	function fromPiece() {
