@@ -33,16 +33,6 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 		return decoded.wif;
 	}
 	
-	this.setPrivateKey = function(privateKey) {
-		decoded = plugin.decode(privateKey);
-		assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
-	}
-	
-	this.random = function() {
-		decoded = plugin.decode();
-		assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
-	}
-	
 	this.encrypt = function(scheme, passphrase, onProgress, onDone) {
 		assertNull(decoded.encryption, "Keypair must be unencrypted to encrypt");
 		AppUtils.encryptHex(that.getPrivateHex(), scheme, passphrase, onProgress, function(err, encryptedHex) {
@@ -81,10 +71,6 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 		throw new Error("Not implemented");
 	}
 	
-	this.combine = function(shares) {
-		throw new Error("Not implemented");
-	}
-	
 	this.isSplit = function() {
 		assertDefined(that.getMinShares(), "Keypair split is unknown");
 		return that.getMinShares() !== null;
@@ -103,22 +89,6 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 		};
 	}
 	
-	this.fromJson = function(json) {
-		plugin = AppUtils.getCryptoPlugin(json.ticker);
-		assertInitialized(plugin);
-		if (json.wif) {
-			decoded = plugin.decode(json.wif);
-			assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
-			if (!decoded.address) decoded.address = json.address;
-			else if (json.address) assertEquals(decoded.address, json.address, "Derived and given addresses do not match");
-			if (!decoded.encryption) decoded.encryption = json.encryption;
-			else if (json.encryption) assertEquals(decoded.encryption, json.encryption, "Decoded and given encryption schemes do not match");			
-		} else {
-			decoded = {};
-			decoded.address = json.address;
-		}
-	}
-	
 	this.copy = function() {
 		return new CryptoKeypair(plugin, that.getPrivateHex());
 	}
@@ -130,15 +100,15 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
-	initialize();
-	function initialize() {
+	init();
+	function init() {
 		if (plugin) {
 			assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
-			if (privateKey) that.setPrivateKey(privateKey);
-			else that.random();
+			if (privateKey) setPrivateKey(privateKey);
+			else random();
 		}
-		else if (json) that.fromJson(json);
-		else if (splitKeypairs) that.combine(splitKeypairs);
+		else if (json) fromJson(json);
+		else if (splitKeypairs) combine(splitKeypairs);
 		else throw new Error("One of plugin, json, or splitKeypairs is required");
 		
 		// verify decoding
@@ -156,5 +126,35 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 			}
 		}
 		if (decoded.hex) assertInitialized(decoded.wif);
+	}
+	
+	function setPrivateKey(privateKey) {
+		decoded = plugin.decode(privateKey);
+		assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
+	}
+	
+	function random() {
+		decoded = plugin.decode();
+		assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
+	}
+	
+	function fromJson(json) {
+		plugin = AppUtils.getCryptoPlugin(json.ticker);
+		assertInitialized(plugin);
+		if (json.wif) {
+			decoded = plugin.decode(json.wif);
+			assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
+			if (!decoded.address) decoded.address = json.address;
+			else if (json.address) assertEquals(decoded.address, json.address, "Derived and given addresses do not match");
+			if (!decoded.encryption) decoded.encryption = json.encryption;
+			else if (json.encryption) assertEquals(decoded.encryption, json.encryption, "Decoded and given encryption schemes do not match");			
+		} else {
+			decoded = {};
+			decoded.address = json.address;
+		}
+	}
+	
+	function combine(shares) {
+		throw new Error("Not implemented");
 	}
 }
