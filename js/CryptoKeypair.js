@@ -149,6 +149,9 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 			if (isNumber(decoded.minShares)) {
 				assertTrue(decoded.minShares >= 2);
 				assertTrue(decoded.minShares <= AppUtils.MAX_SHARES);
+				assertNumber(decoded.shareNum);
+				assertTrue(decoded.shareNum >= 1);
+				assertTrue(decoded.shareNum <= AppUtils.MAX_SHARES);
 			}
 		}
 		if (decoded.hex) assertInitialized(decoded.wif);
