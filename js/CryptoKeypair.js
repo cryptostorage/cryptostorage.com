@@ -80,6 +80,10 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 		return decoded.minShares;
 	}
 	
+	this.getShareNum = function() {
+		return decoded.shareNum;
+	}
+	
 	this.toJson = function() {
 		return {
 			ticker: plugin.getTicker(),

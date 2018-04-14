@@ -67,21 +67,21 @@ $(document).ready(function() {
 						if (err) throw err;
 						console.log("Minimum tests pass");
 					});
-					
-					// test keypairs
-					new TestCryptoKeypairs().run(function(err) {
-						if (err) throw err;
-						console.log("Keypair tests pass");
-					});
 				}
 				
 				// run full tests
 				if (AppUtils.RUN_FULL_TESTS) {
-					console.log("Running test suite...");
-					Tests.runTests(function(err) {
+					console.log("Running crypto test suite...")
+					new TestCrypto().run(function(err) {
 						if (err) throw err;
-						console.log("Test suite passes");
+						console.log("Crypto test suite passes");
 					});
+					
+//					console.log("Running test suite...");
+//					Tests.runTests(function(err) {
+//						if (err) throw err;
+//						console.log("Test suite passes");
+//					});
 				}
 			});
 		}

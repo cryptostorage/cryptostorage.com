@@ -1,7 +1,7 @@
 /**
  * Tests keypairs and pieces.
  */
-function TestCryptoKeypairs() {
+function TestCrypto() {
 	
 	var PLUGINS = [AppUtils.getCryptoPlugin("BTC"), AppUtils.getCryptoPlugin("BCH")];
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
@@ -68,7 +68,7 @@ function TestCryptoKeypairs() {
 		var originalPiece = piece.copy();
 		
 		// test split
-		testSplit(piece);
+		//testSplit(piece);	// TODO
 		
 		// encrypt piece
 		var progressStarted = false;
@@ -88,7 +88,7 @@ function TestCryptoKeypairs() {
 				assertNull(piece.getPieceNum());
 				
 				// test split
-				testSplit(encryptedPiece);
+				//testSplit(encryptedPiece);	// TODO
 			} catch (err) {
 				onDone(err)
 				return;

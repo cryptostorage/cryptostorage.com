@@ -9,11 +9,8 @@
  * @param splitPieces are split pieces to combine and initialize from
  * @param piece is an existing piece to copy from
  */
-function CryptoPiece(keypairs, pieceNum, json, splitPieces, piece) {
-	
-	var keypairs;
-	var pieceNum;
-	
+function CryptoPiece(keypairs, json, splitPieces, piece) {
+		
 	this.getKeypairs = function() {
 		return keypairs;
 	}
@@ -47,7 +44,7 @@ function CryptoPiece(keypairs, pieceNum, json, splitPieces, piece) {
 	}
 	
 	this.getPieceNum = function() {
-		return pieceNum;
+		throw new Error("Not implemented");
 	}
 	
 	this.combine = function(shares) {
@@ -62,9 +59,10 @@ function CryptoPiece(keypairs, pieceNum, json, splitPieces, piece) {
 		throw new Error("Not implemented");
 	}
 	
-	this.copy = function(_piece) {
-		var copy = new CryptoPiece(_piece.getKeypairs());
-		
+	this.copy = function() {
+		var keypairCopies = [];
+		for (var i = 0; i < keypairs.length; i++) keypairCopies.push(keypairs[i].copy());
+		return new CryptoPiece(keypairCopies);
 	}
 	
 	this.equals = function(piece) {
@@ -75,6 +73,22 @@ function CryptoPiece(keypairs, pieceNum, json, splitPieces, piece) {
 	
 	init();
 	function init() {
-		
+		if (keypairs) return;
+		else if (json) fromJson(json);
+		else if (splitPieces) combine(splitPieces);
+		else if (piece) fromPiece(piece);
+		else throw new Error("All arguments null");
+	}
+	
+	function fromJson() {
+		throw new Error("Not implemented");
+	}
+	
+	function combine() {
+		throw new Error("Not implemented");
+	}
+	
+	function fromPiece() {
+		throw new Error("Not implemented");
 	}
 }
