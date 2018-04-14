@@ -108,8 +108,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 	function init() {
 		if (plugin) {
 			assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
-			if (privateKey) setPrivateKey(privateKey);
-			else random();
+			setPrivateKey(privateKey);
 		}
 		else if (json) fromJson(json);
 		else if (splitKeypairs) combine(splitKeypairs);
@@ -134,11 +133,6 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 	
 	function setPrivateKey(privateKey) {
 		decoded = plugin.decode(privateKey);
-		assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
-	}
-	
-	function random() {
-		decoded = plugin.decode();
 		assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
 	}
 	
