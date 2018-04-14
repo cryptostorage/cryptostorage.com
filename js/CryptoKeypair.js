@@ -198,8 +198,33 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		}
 	}
 	
-	function combine(shares) {
-		throw new Error("Not implemented");
+	function combine(splitKeypairs) {
+		
+		// verify keypairs and assign plugin
+		for (var i = 0; i < splitKeypairs.length; i++) {
+			if (!plugin) plugin = splitKeypairs[i].getPlugin();
+			else if (plugin !== splitKeypairs[i].getPlugin()) throw new Error("splitKeypairs[" + i + "] has inconsistent plugin");
+		}
+		
+		// collect decoded hex shares and verify consistent min shares
+		var minShares;
+		var decodedHexShares = [];
+		for (var i = 0; i < splitKeypairs.length; i++) {
+			var decodedShare = decodeWifShare(splitKeypairs[i].getPrivateWif());
+			assertInitialized(decodedShare);
+			if (!minShares) minShares = decodedShare.minShares;
+			else if (minShares !== decodedShare.minShares) throw new Error("splitKeypairs[" + i + "] has inconsistent min shares");
+			decodedHexShares.push(decodedShare.hex);
+		}
+		
+		// ensure sufficient shares provided
+		if (splitKeypairs.length < minShares) {
+			var additional = minShares - splitKeypairs.length;
+			throw new Error("Need " + additional + " additional " + (additional === 1 ? "share" : "shares") + " to recover private key");
+		}
+		
+		// combine hex shares
+		setPrivateKey(secrets.combine(decodedHexShares));
 	}
 	
 	function setPublicAddress(address) {
