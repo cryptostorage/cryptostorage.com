@@ -36,7 +36,22 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 	}
 	
 	this.split = function(numShares, minShares) {
-		throw new Error("Not implemented");
+		
+		// collect all split keypairs
+		var allSplitKeypairs = [];
+		for (var i = 0; i < keypairs.length; i++) {
+			var splitKeypairs = keypairs[i].split(numShares, minShares);
+			for (var j = 0; j < splitKeypairs.length; j++) {
+				allSplitKeypairs[j].push(splitKeypairs[j]);
+			}
+		}
+		
+		// build split pieces
+		var splitPieces = [];
+		for (var i = 0; i < allSplitPieces.length; i++) {
+			splitPieces.push(new CryptoPiece(allSplitPieces[i]));
+		}
+		return splitPieces;
 	}
 	
 	this.isSplit = function() {

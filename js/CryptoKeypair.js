@@ -7,8 +7,9 @@
  * @param json is exportable json to initialize from
  * @param splitKeypairs are split keypairs to combine and initialize from
  * @param privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
+ * @param publicAddress is a public address to manually set if not unencrypted
  */
-function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
+function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, shareNum) {
 	
 	var that = this;
 	var decoded;
@@ -67,8 +68,28 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 		});
 	}
 	
-	this.split = function(numPieces, minShares) {
-		throw new Error("Not implemented");
+	this.split = function(numShares, minShares) {
+		
+		// validate input
+		assertTrue(numShares >= 2);
+		assertTrue(minShares >= 2);
+		assertTrue(minShares <= numShares);
+		assertTrue(numShares <= AppUtils.MAX_SHARES);
+		
+		// split private hex into shares
+		var shares = secrets.share(that.getPrivateHex(), numShares, minShares);
+		
+		// encode shares with minimum threshold
+		for (var i = 0; i < shares.length; i++) {
+			shares[i] = AppUtils.encodeShare(shares[i], minShares);
+		}
+		
+		// create keypairs
+		var splitKeypairs = [];
+		for (var i = 0; i < shares.length; i++) {
+			splitKeypairs.push(new CryptoKeypair(plugin, null, null, shares[i], that.getPublicAddress(), i + 1));
+		}
+		return splitKeypairs;
 	}
 	
 	this.isSplit = function() {
@@ -109,6 +130,8 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 		if (plugin) {
 			assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
 			setPrivateKey(privateKey);
+			if (publicAddress) setPublicAddress(publicAddress);
+			if (shareNum) setShareNum(shareNum);
 		}
 		else if (json) fromJson(json);
 		else if (splitKeypairs) combine(splitKeypairs);
@@ -154,5 +177,17 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 	
 	function combine(shares) {
 		throw new Error("Not implemented");
+	}
+	
+	function setPublicAddress(address) {
+		if (decoded.address && decoded.address !== address) throw new Error("Cannot override known public address");
+		assertTrue(plugin.isAddress(address), "Invalid address: " + address);
+		decoded.address = address;
+	}
+	
+	function setShareNum(shareNum) {
+		assertNumber(shareNum);
+		assertTrue(shareNum >= 1 && shareNum <= AppUtils.MAX_SHARES);
+		decoded.shareNum = shareNum;
 	}
 }
