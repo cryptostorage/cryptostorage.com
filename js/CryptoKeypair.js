@@ -7,7 +7,8 @@
  * @param json is exportable json to initialize from
  * @param splitKeypairs are split keypairs to combine and initialize from
  * @param privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
- * @param publicAddress is a public address to manually set if not unencrypted
+ * @param publicAddress is a public address to manually set if not unencrypted (optional)
+ * @param shareNum is the share number (optional)
  */
 function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, shareNum) {
 	
