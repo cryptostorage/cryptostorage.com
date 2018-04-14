@@ -68,7 +68,7 @@ function TestCrypto() {
 		var originalPiece = piece.copy();
 		
 		// test split
-		//testSplit(piece);	// TODO
+		testSplit(piece);	// TODO
 		
 		// encrypt piece
 		var progressStarted = false;
@@ -88,7 +88,7 @@ function TestCrypto() {
 				assertNull(piece.getPieceNum());
 				
 				// test split
-				//testSplit(encryptedPiece);	// TODO
+				testSplit(encryptedPiece);	// TODO
 			} catch (err) {
 				onDone(err)
 				return;
