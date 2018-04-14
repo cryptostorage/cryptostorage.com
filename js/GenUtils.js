@@ -655,7 +655,7 @@ function getCombinations(arr, combinationSize) {
 		
 		// build combination from array
 		var combination = [];
-		for (var indexCombinationIdx = 0; indexCombinationIdx < indexCombinations.length; indexCombinationIdx++) {
+		for (var indexCombinationIdx = 0; indexCombinationIdx < indexCombination.length; indexCombinationIdx++) {
 			combination.push(arr[indexCombinationIdx]);
 		}
 		
