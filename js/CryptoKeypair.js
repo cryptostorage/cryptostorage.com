@@ -1,7 +1,7 @@
 /**
  * Encapsulates a crypto keypair which has a public and private component.
  * 
- * One of plugin, json, or shares is required.
+ * One of plugin, json, or splitKeypairs is required.
  * 
  * @param plugin is the crypto plugin
  * @param json is exportable json to initialize from
