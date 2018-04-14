@@ -384,7 +384,7 @@ var AppUtils = {
 	 * @param minPieces is the minimum threshold to combine shares
 	 * @returns wif encoded share
 	 */
-	encodeShare: function(share, minPieces) {
+	encodeWifShare: function(share, minPieces) {
 		assertTrue(isHex(share));
 		assertTrue(isNumber(minPieces) && minPieces <= AppUtils.MAX_SHARES);
 		return encodeShareV1(share, minPieces);
@@ -416,7 +416,7 @@ var AppUtils = {
 	 * @param share is the wif encoded share to decode
 	 * @returns Object with minPieces and hex fields or null if cannot decode
 	 */
-	decodeShare: function(encodedShare) {
+	decodeWifShare: function(encodedShare) {
 		if (!isString(encodedShare)) return null;
 		var decoded;
 		if ((decoded = decodeShareV0(encodedShare))) return decoded;
@@ -612,7 +612,7 @@ var AppUtils = {
 				var key = plugin.newKey(lines[i]);
 				keys.push(key);
 			} catch (err) {
-				var share = AppUtils.decodeShare(lines[i]);
+				var share = AppUtils.decodeWifShare(lines[i]);
 				if (!share) return null;
 				if (!minPieces) minPieces = share.minPieces;
 				else if (minPieces !== share.minPieces) return null;
@@ -786,7 +786,7 @@ var AppUtils = {
 				} catch (err) {
 				
 					// additional pieces are needed
-					var share = AppUtils.decodeShare(pieces[0].keys[0].wif);
+					var share = AppUtils.decodeWifShare(pieces[0].keys[0].wif);
 					assertInitialized(share, "piece.keys[" + i + "] is neither a key nor a share");
 					var minPieces = share.minPieces;
 					var additional = minPieces - 1;
@@ -821,7 +821,7 @@ var AppUtils = {
 					if (!encryption) encryption = piece.keys[i].encryption;
 					else if (encryption !== piece.keys[i].encryption) throw new Error("Pieces have different encryption states");
 					if (pieces[j].keys[i].wif) {
-						var decoded = AppUtils.decodeShare(piece.keys[i].wif);
+						var decoded = AppUtils.decodeWifShare(piece.keys[i].wif);
 						var decodedMin = decoded ? decoded.minPieces : null;
 						if (!minPieces) minPieces = decodedMin;
 						else if (minPieces !== decodedMin) throw new Error("Pieces have different minimum thresholds");
@@ -1222,7 +1222,7 @@ var AppUtils = {
 				assertDefined(piece.keys[i].wif, "piece.keys[" + i + "].wif is not defined");
 			}
 			if (piece.pieceNum && piece.keys[i].wif) {
-				var decoded = AppUtils.decodeShare(piece.keys[i].wif);
+				var decoded = AppUtils.decodeWifShare(piece.keys[i].wif);
 				var decodedMin = decoded ? decoded.minPieces : null;
 				if (!minPieces) minPieces = decodedMin;
 				else if (minPieces !== decodedMin) throw new Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");

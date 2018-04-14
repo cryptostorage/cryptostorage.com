@@ -610,7 +610,7 @@ var Tests = {
 				for (var i = 0; i < pieces[0].keys.length; i++) {
 					var pieceKey = pieces[0].keys[i];
 					if (pieceKey.wif && !keys[i].getEncryptionScheme() && pieceKey.ticker === 'BTC') {
-						var decoded = AppUtils.decodeShare(pieceKey.wif);
+						var decoded = AppUtils.decodeWifShare(pieceKey.wif);
 						assertEquals(minPieces, decoded.minPieces);
 						var b58 = Bitcoin.Base58.encode(Crypto.util.hexToBytes(decoded.hex));
 						assertTrue(b58.startsWith("3X"));

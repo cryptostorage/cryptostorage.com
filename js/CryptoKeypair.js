@@ -81,7 +81,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		
 		// encode shares with minimum threshold
 		for (var i = 0; i < shares.length; i++) {
-			shares[i] = AppUtils.encodeShare(shares[i], minShares);
+			shares[i] = AppUtils.encodeWifShare(shares[i], minShares);
 		}
 		
 		// create keypairs

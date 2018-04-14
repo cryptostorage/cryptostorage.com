@@ -122,7 +122,7 @@ CryptoPlugin.prototype.split = function(key, numPieces, minPieces) {
 	
 	// encode shares with minimum threshold
 	for (var i = 0; i < shares.length; i++) {
-		shares[i] = AppUtils.encodeShare(shares[i], minPieces);
+		shares[i] = AppUtils.encodeWifShare(shares[i], minPieces);
 	}
 	
 	// return encoded shares
@@ -146,7 +146,7 @@ CryptoPlugin.prototype.combine = function(shares) {
 	var hexShares = [];
 	for (var i = 0; i < shares.length; i++) {
 		var share = shares[i];
-		var decodedShare = AppUtils.decodeShare(share);
+		var decodedShare = AppUtils.decodeWifShare(share);
 		if (!decodedShare) throw new Error("Invalid split piece: " + share);
 		if (!isInitialized(minPieces)) minShares = decodedShare.minPieces;
 		else assertEquals(minPieces, decodedShare.minPieces, "Shares have different minimum threshold: " + minPieces + " vs " + decodedShare.minPieces);
@@ -278,7 +278,7 @@ function BitcoinPlugin() {
 		}
 		
 		// split share
-		else if ((decoded = AppUtils.decodeShare(str)) !== null) return decoded;
+		else if ((decoded = AppUtils.decodeWifShare(str)) !== null) return decoded;
 		
 		// otherwise cannot decode
 		return null;
