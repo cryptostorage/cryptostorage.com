@@ -68,7 +68,7 @@ function TestCrypto() {
 		var originalPiece = piece.copy();
 		
 		// test split
-		testSplit(piece);	// TODO
+		testSplit(piece);
 		
 		// encrypt piece
 		var progressStarted = false;
@@ -88,7 +88,7 @@ function TestCrypto() {
 				assertNull(piece.getPieceNum());
 				
 				// test split
-				testSplit(encryptedPiece);	// TODO
+				testSplit(encryptedPiece);
 			} catch (err) {
 				onDone(err)
 				return;
@@ -126,6 +126,7 @@ function TestCrypto() {
 		
 		// copy original for later testing
 		var original = piece.copy();
+		assertTrue(original.equals(piece));
 		
 		// split piece
 		var splitPieces = piece.split(NUM_PIECES, MIN_PIECES);
@@ -159,7 +160,7 @@ function TestCrypto() {
 		
 		// test split with max shares
 		splitPieces = combined.split(AppUtils.MAX_SHARES, AppUtils.MAX_SHARES - 10);
-		var combined = new CryptoPiece(splitPieces);
+		var combined = new CryptoPiece(null, null, splitPieces);
 		assertTrue(original.equals(combined));
 	}
 }

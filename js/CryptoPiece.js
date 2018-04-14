@@ -99,9 +99,6 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 	}
 	
 	this.equals = function(piece) {
-		console.log(that.getJson());
-		console.log(piece.getJson());
-		
 		assertObject(piece, CryptoPiece);
 		return objectsEqual(that.getJson(), piece.getJson());
 	}

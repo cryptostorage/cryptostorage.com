@@ -115,7 +115,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	}
 	
 	this.copy = function() {
-		return new CryptoKeypair(plugin, that.getPrivateHex());
+		return new CryptoKeypair(plugin, null, null, that.getPrivateHex(), that.getPublicAddress(), that.getShareNum());
 	}
 	
 	this.equals = function(keypair) {
