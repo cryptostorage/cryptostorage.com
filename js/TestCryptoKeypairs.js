@@ -129,7 +129,7 @@ function TestCryptoKeypairs() {
 		
 		// split piece
 		var splitPieces = piece.split(NUM_PIECES, MIN_PIECES);
-		assertEqual(splitPieces.length, NUM_PIECES);
+		assertEquals(splitPieces.length, NUM_PIECES);
 		for (var i = 0; i < splitPieces.length; i++) {
 			assertTrue(splitPieces[i].isSplit());
 			assertEquals(i + 1, splitPieces[i].getPieceNum());
@@ -145,23 +145,17 @@ function TestCryptoKeypairs() {
 			}
 		}
 		
-		// TODO
-			
-//			// test each piece combination
-//			var combinations = getCombinations(pieces, Tests.MIN_PIECES);
-//			for (var j = 0; j < combinations.length; j++) {
-//				var combination = combinations[j];
-//				var combined = plugin.combine(combination);
-//				assertTrue(key.equals(combined));
-//			}
-//		}
-//		
-//		// test split with max shares
-//		var key = plugin.newKey();
-//		var pieces = plugin.split(key, AppUtils.MAX_SHARES, AppUtils.MAX_SHARES);
-//		var combined = plugin.combine(pieces);
-//		assertTrue(key.equals(combined));
+		// test each piece combination
+		var combinations = getCombinations(splitPieces, MIN_PIECES);
+		for (var i = 0; i < combinations.length; i++) {
+			var combination = combinations[i];
+			var combined = new CryptoPiece(combination);
+			assertTrue(original.equals(combined));
+		}
 		
-		throw new Error("Not implemented");
+		// test split with max shares
+		splitPieces = combined.split(AppUtils.MAX_SHARES, AppUtils.MAX_SHARES - 10);
+		var combined = new CryptoPiece(splitPieces);
+		assertTrue(original.equals(combined));
 	}
 }
