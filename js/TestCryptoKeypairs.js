@@ -7,7 +7,12 @@ function TestCryptoKeypairs() {
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_LONG = 10;
 	var REPEAT_SHORT = 2;
+	var NUM_PIECES = 3;
+	var MIN_PIECES = 2;
 
+	/**
+	 * Runs the tests.
+	 */
 	this.run = function(onDone) {
 		
 		// test new keypairs
@@ -19,7 +24,7 @@ function TestCryptoKeypairs() {
 		}
 		
 		// test encryption and splitting
-		testPieceEncryptionAndSplitting(function(err) {
+		testEncryptAndSplit(function(err) {
 			if (err) {
 				onDone(err);
 				return;
@@ -29,6 +34,8 @@ function TestCryptoKeypairs() {
 			onDone();
 		});
 	}
+	
+	// --------------------------------- PRIVATE --------------------------------
 	
 	function testNewKeypairs() {
 		for (var i = 0; i < PLUGINS.length; i++) {
@@ -44,7 +51,7 @@ function TestCryptoKeypairs() {
 		}
 	}
 	
-	function testPieceEncryptionAndSplitting(onDone) {
+	function testEncryptAndSplit(onDone) {
 		
 		// collect keypairs and schemes
 		var keypairs = [];
@@ -115,7 +122,46 @@ function TestCryptoKeypairs() {
 		});
 	}
 	
-	function testSplit(keypairs) {
+	function testSplit(piece) {
+		
+		// copy original for later testing
+		var original = piece.copy();
+		
+		// split piece
+		var splitPieces = piece.split(NUM_PIECES, MIN_PIECES);
+		assertEqual(splitPieces.length, NUM_PIECES);
+		for (var i = 0; i < splitPieces.length; i++) {
+			assertTrue(splitPieces[i].isSplit());
+			assertEquals(i + 1, splitPieces[i].getPieceNum());
+		}
+		
+		// test that single pieces cannot create key
+		for (var i = 0; i < splitPieces.length; i++) {
+			try {
+				new CryptoPiece(null, null, [splitPieces[i]]);
+				throw new Error("fail");
+			} catch (err) {
+				if (err.message === "fail") throw new Error("Cannot combine single split piece");
+			}
+		}
+		
+		// TODO
+			
+//			// test each piece combination
+//			var combinations = getCombinations(pieces, Tests.MIN_PIECES);
+//			for (var j = 0; j < combinations.length; j++) {
+//				var combination = combinations[j];
+//				var combined = plugin.combine(combination);
+//				assertTrue(key.equals(combined));
+//			}
+//		}
+//		
+//		// test split with max shares
+//		var key = plugin.newKey();
+//		var pieces = plugin.split(key, AppUtils.MAX_SHARES, AppUtils.MAX_SHARES);
+//		var combined = plugin.combine(pieces);
+//		assertTrue(key.equals(combined));
+		
 		throw new Error("Not implemented");
 	}
 }

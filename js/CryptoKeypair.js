@@ -12,7 +12,6 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 	
 	var that = this;
 	var decoded;
-	initialize();
 	
 	this.getPlugin = function() {
 		return plugin;
@@ -131,6 +130,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
+	initialize();
 	function initialize() {
 		if (plugin) {
 			assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
