@@ -1,6 +1,10 @@
+/**
+ * Tests keypairs and pieces.
+ */
 function TestCryptoKeypairs() {
 	
-	var plugins = [AppUtils.getCryptoPlugin("BTC"), AppUtils.getCryptoPlugin("BCH")];
+	var PLUGINS = [AppUtils.getCryptoPlugin("BTC"), AppUtils.getCryptoPlugin("BCH")];
+	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_LONG = 10;
 	var REPEAT_SHORT = 2;
 
@@ -15,7 +19,7 @@ function TestCryptoKeypairs() {
 		}
 		
 		// test encryption and splitting
-		testEncryptionAndSplitting(function(err) {
+		testPieceEncryptionAndSplitting(function(err) {
 			if (err) {
 				onDone(err);
 				return;
@@ -27,9 +31,9 @@ function TestCryptoKeypairs() {
 	}
 	
 	function testNewKeypairs() {
-		for (var i = 0; i < plugins.length; i++) {
+		for (var i = 0; i < PLUGINS.length; i++) {
 			for (var j = 0; j < REPEAT_LONG; j++) {
-				var keypair = new CryptoKeypair(plugins[i]);
+				var keypair = new CryptoKeypair(PLUGINS[i]);
 				assertInitialized(keypair.getPrivateHex());
 				assertInitialized(keypair.getPrivateWif());
 				assertFalse(keypair.isEncrypted());
@@ -40,40 +44,74 @@ function TestCryptoKeypairs() {
 		}
 	}
 	
-	function testEncryptionAndSplitting(onDone) {
+	function testPieceEncryptionAndSplitting(onDone) {
 		
 		// collect keypairs and schemes
 		var keypairs = [];
 		var schemes = [];
-		for (var i = 0; i < plugins.length; i++) {
-			for (var j = 0; j < plugins[i].getEncryptionSchemes().length; j++) {
-				keypairs.push(new CryptoKeypair(plugins[i]));
-				schemes.push(plugins[i].getEncryptionSchemes()[j]);
+		for (var i = 0; i < PLUGINS.length; i++) {
+			for (var j = 0; j < PLUGINS[i].getEncryptionSchemes().length; j++) {
+				keypairs.push(new CryptoKeypair(PLUGINS[i]));
+				schemes.push(PLUGINS[i].getEncryptionSchemes()[j]);
 			}
 		}
 		
-		// copy originals for later comparison
-		var originals = [];
-		for (var i = 0; i < keypairs.length; i++) originals.push(keypairs[i].copy());
+		// create piece
+		var piece = new CryptoPiece(keypairs);
+		var originalPiece = piece.copy();
 		
-		// test splitting unencrypted keys
-		testSplit(keypairs);
+		// test split
+		testSplit(piece);
 		
-		// encrypt keypairs
-		var progressCompleted = false;
-		AppUtils.encryptKeypairs(keypairs, schemes, PASSPHRASE, function(percent) {
-			if (percent === 1) progressCompleted = true;
-		}, function(err, encryptedKeypairs) {
-			if (err) {
-				onDone(err);
+		// encrypt piece
+		var progressStarted = false;
+		var progressComplete = false;
+		piece.encrypt(PASSPHRASE, schemes, function(percent) {
+			if (percent === 0) progressStarted = true;
+			if (percent === 1) progressComplete = true;
+		}, function(err, encryptedPiece) {
+			
+			// test state
+			try {
+				if (err) throw err;
+				assertTrue(progressStarted, "Progress was not started");
+				assertTrue(progressComplete, "Progress was not completed");
+				assertTrue(piece.isEncrypted());
+				assertFalse(piece.isSplit());
+				assertNull(piece.getPieceNum());
+				
+				// test split
+				testSplit(encryptedPiece);
+			} catch (err) {
+				onDone(err)
 				return;
 			}
 			
-			// test splitting encrypted keys
-			testSplit(keypairs);
-			
-			// decrypt keypairs
-			AppUtils.decryptKeypairs(encryptedKeypairs, passphrase, cancellor, onProgress, onDone);	// TODO
+			// decrypt piece
+			progressStarted = false;
+			progressCompleted = false;
+			piece.decrypt(PASSPHRASE, function(percent) {
+				if (percent === 0) progressStarted = true;
+				if (percent === 1) progressComplete = true;
+			}, function(err, decryptedPiece) {
+				
+				// test state
+				try {
+					if (err) throw err;
+					assertTrue(progressStarted, "Progress was not started");
+					assertTrue(progressComplete, "Progress was not completed");
+					assertTrue(piece.equals(originalPiece));
+					assertFalse(piece.isEncrypted());
+					assertFalse(piece.isSplit());
+					assertNull(piece.getPieceNum());
+				} catch (err) {
+					onDone(err)
+					return;
+				}
+				
+				// done testing
+				onDone();
+			});
 		});
 	}
 	

@@ -18,15 +18,6 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 		return plugin;
 	}
 	
-	this.copy = function() {
-		return new CryptoKeypair(plugin, that.getPrivateHex());
-	}
-	
-	this.equals = function(keypair) {
-		assertObject(keypair, CryptoKeypair);
-		return objectsEqual(that.getJson(), keypair.getJson());
-	}
-	
 	this.getPublicAddress = function() {
 		return decoded.address;
 	}
@@ -127,6 +118,15 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey) {
 			decoded = {};
 			decoded.address = json.address;
 		}
+	}
+	
+	this.copy = function() {
+		return new CryptoKeypair(plugin, that.getPrivateHex());
+	}
+	
+	this.equals = function(keypair) {
+		assertObject(keypair, CryptoKeypair);
+		return objectsEqual(that.getJson(), keypair.getJson());
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------

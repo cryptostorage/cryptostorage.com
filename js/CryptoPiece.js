@@ -62,6 +62,14 @@ function CryptoPiece(keypairs, json, splitPieces) {
 		
 	}
 	
+	this.copy = function() {
+		
+	}
+	
+	this.equals = function(piece) {
+		
+	}
+	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 }
