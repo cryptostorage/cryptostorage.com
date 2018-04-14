@@ -1,13 +1,12 @@
 /**
  * Encapsulates a crypto keypair which has a public and private component.
  * 
- * One of plugin or json is required.
- * 
  * @param plugin is the crypto plugin
- * @param privateStr is a private string (hex or wif, encrypted or unencrypted) (optional)
- * @param exportJson is exportable json to initialize from
+ * @param json is exportable json to initialize from
+ * @param shares are keypair shares to combine to initialize from
+ * @param privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
  */
-function CryptoKeypair(plugin, privateStr, exportJson) {
+function CryptoKeypair(plugin, json, shares, privateKey) {
 	
 	var that = this;
 	var decoded;
@@ -40,6 +39,16 @@ function CryptoKeypair(plugin, privateStr, exportJson) {
 	
 	this.getPrivateWif = function() {
 		return decoded.wif;
+	}
+	
+	this.setPrivateKey = function(privateKey) {
+		decoded = plugin.decode(privateKey);
+		assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
+	}
+	
+	this.random = function() {
+		decoded = plugin.decode();
+		assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
 	}
 	
 	this.encrypt = function(scheme, passphrase, onProgress, onDone) {
@@ -76,7 +85,11 @@ function CryptoKeypair(plugin, privateStr, exportJson) {
 		});
 	}
 	
-	this.getSplitKeypairs = function(numPieces, minShares) {
+	this.split = function(numPieces, minShares) {
+		throw new Error("Not implemented");
+	}
+	
+	this.combine = function(shares) {
 		throw new Error("Not implemented");
 	}
 	
@@ -89,7 +102,7 @@ function CryptoKeypair(plugin, privateStr, exportJson) {
 		return decoded.minShares;
 	}
 	
-	this.getExportableJson = function() {
+	this.toJson = function() {
 		return {
 			ticker: plugin.getTicker(),
 			address: that.getPublicAddress(),
@@ -98,33 +111,38 @@ function CryptoKeypair(plugin, privateStr, exportJson) {
 		};
 	}
 	
+	this.fromJson = function(json) {
+		
+	}
+	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function initialize() {
 		
+		// TODO: use accessor methods
+		
 		// initialize with plugin
 		if (plugin) {
 			assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
-			
-			// initialize with private str
-			decoded = plugin.decode(privateStr);
-			assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateStr);
+			if (privateKey) that.setPrivateKey(privateKey);
+			else if (shares) that.combine(shares);
+			else that.random();
 		}
 		
 		// initialize from exportable json
 		else {
-			plugin = AppUtils.getCryptoPlugin(exportableJson.ticker);
+			plugin = AppUtils.getCryptoPlugin(json.ticker);
 			assertInitialized(plugin);
-			if (exportableJson.wif) {
-				decoded = plugin.decode(privateStr);
-				assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateStr);
-				if (!decoded.address) decoded.address = exportableJson.address;
-				else if (exportableJson.address) assertEquals(decoded.address, exportableJson.address, "Derived and given addresses do not match");
-				if (!decoded.encryption) decoded.encryption = exportableJson.encryption;
-				else if (exportableJson.encryption) assertEquals(decoded.encryption, exportableJson.encryption, "Decoded and given encryption schemes do not match");			
+			if (json.wif) {
+				decoded = plugin.decode(privateKey);
+				assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
+				if (!decoded.address) decoded.address = json.address;
+				else if (json.address) assertEquals(decoded.address, json.address, "Derived and given addresses do not match");
+				if (!decoded.encryption) decoded.encryption = json.encryption;
+				else if (json.encryption) assertEquals(decoded.encryption, json.encryption, "Decoded and given encryption schemes do not match");			
 			} else {
 				decoded = {};
-				decoded.address = exportableJson.address;
+				decoded.address = json.address;
 			}
 		}
 		
