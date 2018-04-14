@@ -81,7 +81,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		
 		// encode shares with minimum threshold
 		for (var i = 0; i < shares.length; i++) {
-			shares[i] = AppUtils.encodeWifShare(shares[i], minShares);
+			shares[i] = encodeWifShare(shares[i], minShares);
 		}
 		
 		// create keypairs
@@ -105,7 +105,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		return decoded.shareNum;
 	}
 	
-	this.toJson = function() {
+	this.getJson = function() {
 		return {
 			ticker: plugin.getTicker(),
 			address: that.getPublicAddress(),
@@ -144,9 +144,10 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	function verifyDecoded(decoded) {
 		if (decoded.wif) {
 			assertInitialized(decoded.hex);
-			assertDefined(decoded.encryption);
 			assertDefined(decoded.minShares);
+			if (!decoded.minShares) assertDefined(decoded.encryption);
 			if (isNumber(decoded.minShares)) {
+				assertUndefined(decoded.encryption);
 				assertTrue(decoded.minShares >= 2);
 				assertTrue(decoded.minShares <= AppUtils.MAX_SHARES);
 				assertNumber(decoded.shareNum);
@@ -158,8 +159,27 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	}
 	
 	function setPrivateKey(privateKey) {
+		
+		// decode with plugin
 		decoded = plugin.decode(privateKey);
-		assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
+		if (decoded) {
+			decoded.minShares = null;
+			return;
+		}
+		
+		// encrypted with cryptostorage conventions
+		if ((decoded = AppUtils.decodeEncryptedKey(privateKey)) !== null) {
+			decoded.minShares = null;
+			return;
+		}
+		
+		// split share with cryptostorage conventions
+		var decodedShare = decodeWifShare(privateKey);
+		assertInitialized(decodedShare, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
+		decoded = {};
+		decoded.wif = privateKey;
+		decoded.hex = AppUtils.toBase(58, 16, decoded.wif);
+		decoded.minShares = decodedShare.minShares;
 	}
 	
 	function fromJson(json) {
@@ -192,5 +212,97 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		assertNumber(shareNum);
 		assertTrue(shareNum >= 1 && shareNum <= AppUtils.MAX_SHARES);
 		decoded.shareNum = shareNum;
+	}
+	
+	/**
+	 * Encodes the given share with the given minimum pieces threshold.
+	 * 
+	 * @param share is the share hex to encode
+	 * @param minShares is the minimum threshold to combine shares
+	 * @returns wif encoded share
+	 */
+	function encodeWifShare(share, minShares) {
+		assertTrue(isHex(share));
+		assertTrue(isNumber(minShares) && minShares <= AppUtils.MAX_SHARES);
+		return encodeShareV1(share, minShares);
+		
+		function encodeShareV0(share, minShares) {
+			try {
+				return minShares + 'c' + Bitcoin.Base58.encode(ninja.wallets.splitwallet.hexToBytes(share));
+			} catch (err) {
+				return null;
+			}
+		}
+		
+		function encodeShareV1(share, minShares) {
+			var hex = padLeft(AppUtils.SPLIT_V1_VERSION.toString(16), 2) + padLeft(minShares.toString(16), 2) + padLeft(share, 2);
+			return Bitcoin.Base58.encode(Crypto.util.hexToBytes(hex));
+			
+			// Pads a string `str` with zeros on the left so that its length is a multiple of `bits` (credit: bitaddress.org)
+			function padLeft(str, bits){
+				bits = bits || config.bits
+				var missing = str.length % bits;
+				return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
+			}
+		}
+	}
+	
+	/**
+	 * Decodes the given encoded share.
+	 * 
+	 * @param share is the wif encoded share to decode
+	 * @returns Object with minShares and hex fields or null if cannot decode
+	 */
+	function decodeWifShare(encodedShare) {
+		if (!isString(encodedShare)) return null;
+		var decoded;
+		if ((decoded = decodeShareV0(encodedShare))) return decoded;
+		if ((decoded = decodeShareV1(encodedShare))) return decoded;
+		return null;
+		
+		function decodeShareV0(encodedShare) {
+			try {
+				if (encodedShare.length < 34) return null;
+				var decoded = {};
+				decoded.minShares = getMinPiecesV0(encodedShare);
+				if (!decoded.minShares) return null;
+				var wif = encodedShare.substring(encodedShare.indexOf('c') + 1);
+				if (!isBase58(wif)) return null;
+				decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif)));
+				return decoded;
+			} catch (err) {
+				return null;
+			}
+			
+			/**
+			 * Determines the minimum pieces to reconstitute based on a possible split piece string.
+			 * 
+			 * Looks for 'XXXc' prefix in the given split piece where XXX is the minimum to reconstitute.
+			 * 
+			 * @param splitPiece is a string which may be prefixed with 'XXXc...'
+			 * @return the minimum pieces to reconstitute if prefixed, null otherwise
+			 */
+			function getMinPiecesV0(splitPiece) {
+				var idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
+				if (idx <= 0) return null;
+				var minShares = Number(splitPiece.substring(0, idx));	// parse preceding numbers to int
+				if (!isNumber(minShares) || minShares < 2 || minShares > AppUtils.MAX_SHARES) return null;
+				return minShares;
+			}
+		}
+		
+		function decodeShareV1(encodedShare) {
+			if (encodedShare.length < 33) return null;
+			if (!isBase58(encodedShare)) return null;
+			var hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(encodedShare));
+			if (hex.length % 2 !== 0) return null;
+			var version = parseInt(hex.substring(0, 2), 16);
+			if (version !== AppUtils.SPLIT_V1_VERSION) return null;
+			var decoded = {};
+			decoded.minShares = parseInt(hex.substring(2, 4), 16);
+			if (!isNumber(decoded.minShares) || decoded.minShares < 2 || decoded.minShares > AppUtils.MAX_SHARES) return null;
+			decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
+			return decoded;
+		}
 	}
 }

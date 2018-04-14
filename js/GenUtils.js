@@ -396,7 +396,12 @@ function assertArray(arg, msg) {
  * @param msg is the message to throw if the argument is not the specified object
  */
 function assertObject(arg, obj, msg) {
-	if (!isObject(arg, obj)) throw new Error(msg ? msg : "Argument asserted as object '" + obj + "' but was not");
+	assertInitialized(arg);
+	if (obj) {
+		if (!isObject(arg, obj)) throw new Error(msg ? msg : "Argument asserted as object '" + obj.name + "' but was not");
+	} else {
+		if (!isObject(arg)) throw new Error(msg ? msg : "Argument asserted as object but was not");
+	}
 }
 
 /**

@@ -149,7 +149,7 @@ function TestCrypto() {
 		var combinations = getCombinations(splitPieces, MIN_PIECES);
 		for (var i = 0; i < combinations.length; i++) {
 			var combination = combinations[i];
-			var combined = new CryptoPiece(combination);
+			var combined = new CryptoPiece(null, null, combination);
 			assertTrue(original.equals(combined));
 		}
 		

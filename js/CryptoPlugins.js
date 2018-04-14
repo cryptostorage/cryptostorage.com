@@ -260,7 +260,7 @@ function BitcoinPlugin() {
 		}
 		
 		// bip38 wif
-		else if (ninja.privateKey.isBIP38Format(str)) {
+		if (ninja.privateKey.isBIP38Format(str)) {
 			decoded.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			decoded.wif = str;
 			decoded.encryption = AppUtils.EncryptionScheme.BIP38;
@@ -269,16 +269,9 @@ function BitcoinPlugin() {
 		}
 		
 		// bip38 hex
-		else if (str.length > 80 && str.length < 90 && isHex(str)) return that.decode(AppUtils.toBase(16, 58, str));			
-		
-		// encrypted with cryptostorage conventions
-		else if ((decoded = AppUtils.decodeEncryptedKey(str)) !== null) {
-			decoded.minShares = null;
-			return decoded;
+		if (str.length > 80 && str.length < 90 && isHex(str)) {
+			return that.decode(AppUtils.toBase(16, 58, str));			
 		}
-		
-		// split share
-		else if ((decoded = AppUtils.decodeWifShare(str)) !== null) return decoded;
 		
 		// otherwise cannot decode
 		return null;
@@ -317,6 +310,7 @@ function BitcoinCashPlugin() {
 	
 	this.decode = function(str) {
 		var decoded = bitcoinPlugin.decode(str);
+		if (!decoded) return null;
 		if (!decoded.address) return decoded;
 		var cashAddr =  bchaddr.toCashAddress(decoded.address);
 		decoded.address = cashAddr.substring(cashAddr.indexOf(':') + 1);

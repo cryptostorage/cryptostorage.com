@@ -7,6 +7,7 @@ export editor
 	direct link to editor
 	cancel button on generate
 	tweak floating button colors
+	piece incompatibilities: shareNum, currencies -> keypairs
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient

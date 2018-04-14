@@ -10,6 +10,8 @@
  * @param piece is an existing piece to copy from
  */
 function CryptoPiece(keypairs, json, splitPieces, piece) {
+	
+	var that = this;
 		
 	this.getKeypairs = function() {
 		return keypairs;
@@ -39,6 +41,7 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		
 		// collect all split keypairs
 		var allSplitKeypairs = [];
+		for (var i = 0; i < numShares; i++) allSplitKeypairs.push([]);
 		for (var i = 0; i < keypairs.length; i++) {
 			var splitKeypairs = keypairs[i].split(numShares, minShares);
 			for (var j = 0; j < splitKeypairs.length; j++) {
@@ -48,30 +51,45 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		
 		// build split pieces
 		var splitPieces = [];
-		for (var i = 0; i < allSplitPieces.length; i++) {
-			splitPieces.push(new CryptoPiece(allSplitPieces[i]));
+		for (var i = 0; i < allSplitKeypairs.length; i++) {
+			splitPieces.push(new CryptoPiece(allSplitKeypairs[i]));
 		}
 		return splitPieces;
 	}
 	
 	this.isSplit = function() {
-		throw new Error("Not implemented");
+		assertTrue(keypairs.length > 0);
+		var split;
+		for (var i = 0; i < keypairs.length; i++) {
+			if (!split) split = keypairs[i].isSplit();
+			else if (split !== keypairs[i].isSplit()) throw new Error("keypair[" + i + "] has an inconsistent split state");
+		}
+		return split;
 	}
 	
 	this.getPieceNum = function() {
-		throw new Error("Not implemented");
+		assertTrue(keypairs.length > 0);
+		var pieceNum;
+		for (var i = 0; i < keypairs.length; i++) {
+			if (!pieceNum) pieceNum = keypairs[i].getShareNum();
+			else if (pieceNum !== keypairs[i].getShareNum()) throw new Error("keypair[" + i + "] has an inconsistent share num");
+		}
+		return pieceNum;
 	}
 	
 	this.combine = function(shares) {
 		throw new Error("Not implemented");
 	}
 	
-	this.toJson = function() {
-		throw new Error("Not implemented");
-	}
-	
-	this.fromJson = function(json) {
-		throw new Error("Not implemented");
+	this.getJson = function() {
+		var json = {};
+		json.pieceNum = that.getPieceNum();
+		json.version = AppUtils.VERSION;
+		json.keypairs = [];
+		for (var i = 0; i < keypairs.length; i++) {
+			json.keypairs.push(keypairs[i].getJson());
+		}
+		return json;
 	}
 	
 	this.copy = function() {
@@ -81,14 +99,20 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 	}
 	
 	this.equals = function(piece) {
-		throw new Error("Not implemented");
+		assertObject(piece, CryptoPiece);
+		return objectsEqual(that.getJson(), piece.getJson());
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	init();
 	function init() {
-		if (keypairs) return;
+		if (keypairs) {
+			assertTrue(keypairs.length > 0);
+			for (var i = 0; i < keypairs.length; i++) {
+				assertObject(keypairs[i], CryptoKeypair);
+			}
+		}
 		else if (json) fromJson(json);
 		else if (splitPieces) combine(splitPieces);
 		else if (piece) fromPiece(piece);
