@@ -173,10 +173,6 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		return pieceNum;
 	}
 	
-	this.combine = function(shares) {
-		throw new Error("Not implemented");
-	}
-	
 	this.getJson = function() {
 		var json = {};
 		json.pieceNum = that.getPieceNum();
