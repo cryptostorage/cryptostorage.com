@@ -126,7 +126,55 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 	}
 	
 	this.decrypt = function(passphrase, onProgress, onDone) {
-		throw new Error("Not implemented");
+
+		// validate input
+		try {
+			assertTrue(keypairs.length > 0);
+			assertInitialized(passphrase);
+			assertInitialized(onDone);
+		} catch (err) {
+			onDone(err);
+			return;
+		}
+		
+		// compute total weight
+		var totalWeight = 0;
+		for (var i = 0; i < keypairs.length; i++) {
+			totalWeight += CryptoKeypair.getDecryptWeight(keypairs[i].getEncryptionScheme());
+		}
+		
+		// decrypt keys
+		var funcs = [];
+		for (var i = 0; i < keypairs.length; i++) funcs.push(decryptFunc(keypairs[i], passphrase));
+		var doneWeight = 0;
+		if (onProgress) onProgress(0, "Decrypting");
+		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
+			if (err) {
+				onDone(err);
+				return;
+			} else {
+				onDone(null, that);
+			}
+		});
+		
+		// decrypts one key
+		function decryptFunc(keypair, passphrase) {
+			return function(onDone) {
+				var scheme = keypair.getEncryptionScheme();
+				keypair.decrypt(passphrase, function(percent) {
+					if (onProgress) onProgress((doneWeight + CryptoKeypair.getDecryptWeight(scheme) * percent) / totalWeight, "Decrypting");
+				}, function(err, encryptedKeypair) {
+					if (err) {
+						onDone(err);
+						return;
+					} else {
+						doneWeight += CryptoKeypair.getDecryptWeight(scheme);
+						if (onProgress) onProgress(doneWeight / totalWeight);
+						setImmediate(function() { onDone(err, encryptedKeypair); });	// let UI breath
+					}
+				});
+			}
+		}
 	}
 	
 	this.split = function(numShares, minShares) {

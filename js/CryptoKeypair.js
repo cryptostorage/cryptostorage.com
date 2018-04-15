@@ -62,7 +62,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	
 	this.decrypt = function(passphrase, onProgress, onDone) {
 		assertInitialized(decoded.encryption, "Keypair must be encrypted to decrypt");
-		AppUtils.decryptHex(that.getPrivateHex(), passphrase, onProgress, function(err, decryptedHex) {
+		AppUtils.decryptHex(that.getPrivateHex(), that.getEncryptionScheme(), passphrase, onProgress, function(err, decryptedHex) {
 			if (err) onDone(err);
 			else {
 				Object.assign(decoded, plugin.decode(decryptedHex));

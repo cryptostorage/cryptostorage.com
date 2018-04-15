@@ -2407,16 +2407,16 @@ var AppUtils = {
 		
 		// decrypt hex according to scheme
 		var decryptFunc;
-		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) decryptFunc = decryptKeyV0;
-		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) decryptFunc = decryptKeyV1;
-		else if (scheme === AppUtils.EncryptionScheme.BIP38) decryptFunc = decryptKeyBip38;
+		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) decryptFunc = decryptHexV0;
+		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) decryptFunc = decryptHexV1;
+		else if (scheme === AppUtils.EncryptionScheme.BIP38) decryptFunc = decryptHexBip38;
 		else {
 			onDone(new Error("Decryption scheme '" + scheme + "' not supported"));
 			return;
 		}
-		decryptFunc(key, passphrase, onProgress, onDone);
+		decryptFunc(hex, passphrase, onProgress, onDone);
 		
-		function decryptHexV1(key, passphrase, onProgress, onDone) {
+		function decryptHexV1(hex, passphrase, onProgress, onDone) {
 			try {
 				
 				// assert correct version
@@ -2469,12 +2469,14 @@ var AppUtils = {
 		function decryptHexBip38(hex, passphrase, onProgress, onDone) {
 			bitcoinjs.decrypt(AppUtils.toBase(16, 58, hex), passphrase, function(progress) {
 				if (onProgress) onProgress(progress.percent / 100);
-			}, null, function(err, decrypted) {
+			}, null, function(err, decryptedKey) {
 				try {
 					if (err) throw new Error("Incorrect passphrase");
-					var decryptedB58 = bitcoinjs.encode(0x80, decrypted.privateKey, true);
+					var decryptedB58 = bitcoinjs.encode(0x80, decryptedKey.privateKey, true);
+					key = new Bitcoin.ECKey(decryptedB58);
+					key.setCompressed(true);
 					if (onProgress) onProgress(1);
-					onDone(null, AppUtils.toBase(58, 16, decryptedB58));
+					onDone(null, key.getBitcoinHexFormat());
 				} catch (err) {
 					onDone(err);
 				}

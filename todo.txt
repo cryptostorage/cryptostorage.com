@@ -9,6 +9,7 @@ export editor
 	tweak floating button colors
 	piece incompatibilities: shareNum, currencies -> keypairs
 	prolly change CryptoPiece and CryptoKeypair to take in single config
+	ability to cancel encryption / decryption
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient
