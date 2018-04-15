@@ -15,23 +15,16 @@ function TestCrypto() {
 	 */
 	this.run = function(onDone) {
 		
-		// test new keypairs
-		try {
-			testNewKeypairs();
-		} catch (err) {
-			onDone(err);
-			return;
+		// test plugins
+		var funcs = [];
+		for (var i = 0; i < PLUGINS.length; i++) {
+			funcs.push(testPluginFunc(PLUGINS[i]));
 		}
-		
-		// test encryption and splitting
-		testEncryptAndSplit(function(err) {
-			if (err) {
-				onDone(err);
-				return;
-			}
-			
-			// tests pass
-			onDone();
+		function testPluginFunc(plugin) {
+			return function(onDone) { testPlugin(plugin, onDone); }
+		}
+		async.series(funcs, function(err) {
+			onDone(err);
 		});
 	}
 	
@@ -40,44 +33,51 @@ function TestCrypto() {
 	function getTestPlugins() {
 		var plugins = [];
 		plugins.push(new BitcoinPlugin());
-//		plugins.push(new BitcoinCashPlugin());
+		plugins.push(new BitcoinCashPlugin());
 		plugins.push(new EthereumPlugin());
 		plugins.push(new MoneroPlugin());
 		plugins.push(new DashPlugin());
 		plugins.push(new LitecoinPlugin());
 		plugins.push(new ZcashPlugin());
-//		plugins.push(new RipplePlugin());
-//		plugins.push(new StellarPlugin());
-//		plugins.push(new WavesPlugin());
-//		plugins.push(new NeoPlugin());
-//		plugins.push(new BIP39Plugin());
+		plugins.push(new RipplePlugin());
+		plugins.push(new StellarPlugin());
+		plugins.push(new WavesPlugin());
+		plugins.push(new NeoPlugin());
+		plugins.push(new BIP39Plugin());
 		return plugins;
 	}
 	
-	function testNewKeypairs() {
-		for (var i = 0; i < PLUGINS.length; i++) {
-			for (var j = 0; j < REPEAT_LONG; j++) {
-				var keypair = new CryptoKeypair(PLUGINS[i]);
-				assertInitialized(keypair.getPrivateHex());
-				assertInitialized(keypair.getPrivateWif());
-				assertFalse(keypair.isEncrypted());
-				assertNull(keypair.getEncryptionScheme());
-				assertFalse(keypair.isSplit());
-				assertNull(keypair.getMinShares());
+	function testPlugin(plugin, onDone) {
+		testNewKeypairs(plugin);
+		testEncryptAndSplit(plugin, function(err) {
+			if (err) onDone(err);
+			else {
+				console.log(plugin.getTicker() + " tests pass");
+				onDone();
 			}
+		});
+	}
+	
+	function testNewKeypairs(plugin) {
+		for (var j = 0; j < REPEAT_LONG; j++) {
+			var keypair = new CryptoKeypair(plugin);
+			assertInitialized(keypair.getPrivateHex());
+			assertInitialized(keypair.getPrivateWif());
+			assertFalse(keypair.isEncrypted());
+			assertNull(keypair.getEncryptionScheme());
+			assertFalse(keypair.isSplit());
+			assertNull(keypair.getMinShares());
 		}
 	}
 	
-	function testEncryptAndSplit(onDone) {
+	function testEncryptAndSplit(plugin, onDone) {
 		
 		// collect keypairs and schemes
 		var keypairs = [];
 		var schemes = [];
-		for (var i = 0; i < PLUGINS.length; i++) {
-			for (var j = 0; j < PLUGINS[i].getEncryptionSchemes().length; j++) {
-				keypairs.push(new CryptoKeypair(PLUGINS[i]));
-				schemes.push(PLUGINS[i].getEncryptionSchemes()[j]);
-			}
+		for (var j = 0; j < plugin.getEncryptionSchemes().length; j++) {
+			keypairs.push(new CryptoKeypair(plugin));
+			schemes.push(plugin.getEncryptionSchemes()[j]);
 		}
 		
 		// create piece
