@@ -209,9 +209,12 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	function combine(splitKeypairs) {
 		
 		// verify keypairs and assign plugin
+		var publicAddress;
 		for (var i = 0; i < splitKeypairs.length; i++) {
 			if (!plugin) plugin = splitKeypairs[i].getPlugin();
 			else if (plugin !== splitKeypairs[i].getPlugin()) throw new Error("splitKeypairs[" + i + "] has inconsistent plugin");
+			if (!publicAddress) publicAddress = splitKeypairs[i].getPublicAddress();
+			else if (publicAddress !== splitKeypairs[i].getPublicAddress()) throw new Error("splitKeypairs[" + i + "] has inconsistent public address");
 		}
 		
 		// collect decoded hex shares and verify consistent min shares
@@ -232,7 +235,9 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		}
 		
 		// combine hex shares
-		setPrivateKey(secrets.combine(decodedHexShares));
+		var privateHex = secrets.combine(decodedHexShares);
+		setPrivateKey(privateHex);
+		setPublicAddress(publicAddress);
 	}
 	
 	function setPublicAddress(address) {
