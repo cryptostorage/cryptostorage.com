@@ -3,7 +3,7 @@
  */
 function TestCrypto() {
 	
-	var PLUGINS = [AppUtils.getCryptoPlugin("BTC")];
+	var PLUGINS = getTestPlugins();
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_LONG = 10;
 	var REPEAT_SHORT = 2;
@@ -36,6 +36,23 @@ function TestCrypto() {
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
+	
+	function getTestPlugins() {
+		var plugins = [];
+		plugins.push(new BitcoinPlugin());
+//		plugins.push(new BitcoinCashPlugin());
+		plugins.push(new EthereumPlugin());
+		plugins.push(new MoneroPlugin());
+		plugins.push(new DashPlugin());
+		plugins.push(new LitecoinPlugin());
+		plugins.push(new ZcashPlugin());
+//		plugins.push(new RipplePlugin());
+//		plugins.push(new StellarPlugin());
+//		plugins.push(new WavesPlugin());
+//		plugins.push(new NeoPlugin());
+//		plugins.push(new BIP39Plugin());
+		return plugins;
+	}
 	
 	function testNewKeypairs() {
 		for (var i = 0; i < PLUGINS.length; i++) {

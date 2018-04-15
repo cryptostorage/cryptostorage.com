@@ -177,7 +177,6 @@ CryptoPlugin.prototype.combine = function(shares) {
  *   hex: str					// private hex
  *   wif: str					// private wif
  *   encryption: str	// encryption scheme, null if unencrypted
- *   minShares: num		// minimum share threshold, null if not split
  * }
  */
 CryptoPlugin.prototype.decode = function(privateKey) { throw new Error("Subclass must implement"); }
@@ -242,10 +241,11 @@ function BitcoinPlugin() {
 	}
 	
 	this.decode = function(str) {
-		var decoded = {};
 		
 		// create key if not given
 		if (!str) str = new Bitcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
+		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var decoded = {};
 		
 		// unencrypted
 		if (ninja.privateKey.isPrivateKey(str)) {
@@ -255,7 +255,6 @@ function BitcoinPlugin() {
 			decoded.hex = key.getBitcoinHexFormat();
 			decoded.wif = key.getBitcoinWalletImportFormat();
 			decoded.encryption = null;
-			decoded.minShares = null;
 			return decoded;
 		}
 		
@@ -264,15 +263,11 @@ function BitcoinPlugin() {
 			decoded.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
 			decoded.wif = str;
 			decoded.encryption = AppUtils.EncryptionScheme.BIP38;
-			decoded.minShares = null;
-			decoded.shareNum = null;
 			return decoded;
 		}
 		
 		// bip38 hex
-		if (str.length > 80 && str.length < 90 && isHex(str)) {
-			return that.decode(AppUtils.toBase(16, 58, str));			
-		}
+		if (str.length > 80 && str.length < 90 && isHex(str)) return that.decode(AppUtils.toBase(16, 58, str));			
 		
 		// otherwise cannot decode
 		return null;
@@ -361,6 +356,26 @@ function EthereumPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	
+	this.decode = function(str) {
+		
+		// create key if not given
+		if (!str) str = keythereum.create().privateKey.toString("hex");
+		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+			
+		// unencrypted hex 
+		if (str.length >= 63 && str.length <= 65 && isHex(str)) {
+			var decoded = {};
+			decoded.hex = str;
+			decoded.wif = str;
+			decoded.address = ethereumjsutil.toChecksumAddress(keythereum.privateKeyToAddress(decoded.hex));
+			decoded.encryption = null;
+			return decoded;
+		}
+		
+		// otherwise key is not recognized
+		return null;
+	}
+	
 	this.isAddress = function(str) {
 		return ethereumjsutil.isValidAddress(str);
 	}
@@ -447,6 +462,28 @@ function LitecoinPlugin() {
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
 	}
+	
+	this.decode = function(str) {
+		
+		// create key if not given
+		if (!str) str = new litecore.PrivateKey().toString();
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		
+		// unencrypted
+		if (str.length >= 52 && litecore.PrivateKey.isValid(str)) {	// litecore says 'ab' is valid?
+			var decoded = {};
+			var key = new litecore.PrivateKey(str);
+			decoded.hex = key.toString();
+			decoded.wif = key.toWIF();
+			decoded.address = key.toAddress().toString();
+			decoded.encryption = null;
+			return decoded;
+		}
+		
+		// otherwise key is not recognized
+		return null;
+	}
+	
 	this.isAddress = function(str) {
 		return litecore.Address.isValid(str);
 	}
@@ -485,6 +522,28 @@ function DashPlugin() {
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
 	}
+	
+	this.decode = function(str) {
+		
+		// create key if not given
+		if (!str) str = new dashcore.PrivateKey().toString();		
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		
+		// unencrypted
+		if (str.length >= 52 && dashcore.PrivateKey.isValid(str)) {	// dashcore says 'ab' is valid?
+			var decoded = {};
+			var key = new dashcore.PrivateKey(str);
+			decoded.hex = key.toString();
+			decoded.wif = key.toWIF();
+			decoded.address = key.toAddress().toString();
+			decoded.encryption = null;
+			return decoded;
+		}
+		
+		// otherwise key is not recognized
+		return null;
+	}
+	
 	this.isAddress = function(str) {
 		return dashcore.Address.isValid(str);
 	}
@@ -534,6 +593,38 @@ function MoneroPlugin() {
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
 	}
+	
+	this.decode = function(str) {
+		
+		// create key if not given
+		if (!str) str = cnUtil.sc_reduce32(cnUtil.rand_32());
+		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		var decoded = {};
+		
+		// unencrypted wif
+		if (str.indexOf(' ') !== -1) {
+			decoded.hex = mn_decode(str);
+			decoded.wif = str;
+			decoded.address = cnUtil.create_address(decoded.hex).public_addr;
+			decoded.encryption = null;
+			return decoded;
+		}
+		
+		// unencrypted hex
+		else if (str.length >= 63 && str.length <= 65 && isHex(str)) {
+			var address = cnUtil.create_address(str);
+			if (!cnUtil.valid_keys(address.view.pub, address.view.sec, address.spend.pub, address.spend.sec)) throw new Error("Invalid address keys derived from hex key");
+			decoded.hex = str;
+			decoded.wif = mn_encode(decoded.hex, 'english');
+			decoded.address = address.public_addr;
+			decoded.encryption = null;
+			return decoded;
+		}
+		
+		// otherwise key is not recognized
+		return null;
+	}
+	
 	this.isAddress = function(str) {
 		if (!isString(str)) return false;
 		try {
@@ -578,6 +669,28 @@ function ZcashPlugin() {
 		// otherwise key is not recognized
 		throw new Error("Unrecognized private key: " + str);
 	}
+	
+	this.decode = function(str) {
+		
+		// create key if not given
+		if (!str) str = new zcashcore.PrivateKey().toString();
+		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		
+		// unencrypted
+		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// zcashcore says 'ab' is valid?
+			var decoded = {};
+			var key = new zcashcore.PrivateKey(str);
+			decoded.hex = key.toString();
+			decoded.wif = key.toWIF();
+			decoded.address = key.toAddress().toString();
+			decoded.encryption = null;
+			return decoded;
+		}
+		
+		// otherwise key is not recognized
+		return null;
+	}
+	
 	this.isAddress = function(str) {
 		return zcashcore.Address.isValid(str);
 	}
