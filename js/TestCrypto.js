@@ -81,6 +81,7 @@ function TestCrypto() {
 			// test state
 			try {
 				if (err) throw err;
+				assertTrue(piece === encryptedPiece);
 				assertTrue(progressStarted, "Progress was not started");
 				assertTrue(progressComplete, "Progress was not completed");
 				assertTrue(piece.isEncrypted());

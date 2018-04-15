@@ -65,7 +65,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		AppUtils.decryptHex(that.getPrivateHex(), that.getEncryptionScheme(), passphrase, onProgress, function(err, decryptedHex) {
 			if (err) onDone(err);
 			else {
-				Object.assign(decoded, plugin.decode(decryptedHex));
+				setPrivateKey(decryptedHex);
 				onDone(null, that);
 			}
 		});
@@ -113,7 +113,8 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 			ticker: plugin.getTicker(),
 			address: that.getPublicAddress(),
 			wif: that.getPrivateWif(),
-			encryption: that.getEncryptionScheme()
+			encryption: that.getEncryptionScheme(),
+			shareNum: that.getShareNum()
 		};
 	}
 	
@@ -138,7 +139,6 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 			assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
 			setPrivateKey(privateKey);
 			if (publicAddress) setPublicAddress(publicAddress);
-			if (shareNum) setShareNum(shareNum);
 		}
 		else if (json) fromJson(json);
 		else if (splitKeypairs) combine(splitKeypairs);
@@ -157,9 +157,11 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 				assertUndefined(decoded.encryption);
 				assertTrue(decoded.minShares >= 2);
 				assertTrue(decoded.minShares <= AppUtils.MAX_SHARES);
-				assertNumber(decoded.shareNum);
-				assertTrue(decoded.shareNum >= 1);
-				assertTrue(decoded.shareNum <= AppUtils.MAX_SHARES);
+				assertTrue(isUndefined(decoded.shareNum) || decoded.shareNum === null || isNumber(decoded.shareNum));
+				if (isNumber(decoded.shareNum)) {
+					assertTrue(decoded.shareNum >= 1);
+					assertTrue(decoded.shareNum <= AppUtils.MAX_SHARES);
+				}
 			}
 		}
 		if (decoded.hex) assertInitialized(decoded.wif);
@@ -171,6 +173,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		decoded = plugin.decode(privateKey);
 		if (decoded) {
 			decoded.minShares = null;
+			decoded.shareNum = null;
 			return;
 		}
 		
@@ -188,6 +191,9 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		decoded.wif = privateKey;
 		decoded.hex = AppUtils.toBase(58, 16, decoded.wif);
 		decoded.minShares = decodedShare.minShares;
+		assertTrue(isUndefined(shareNum) || shareNum === null || isNumber(shareNum));
+		if (isNumber(shareNum)) assertTrue(shareNum >= 1 && shareNum <= AppUtils.MAX_SHARES);
+		decoded.shareNum = shareNum;
 	}
 	
 	function fromJson(json) {
@@ -246,12 +252,6 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		if (that.getEncryptionScheme() === null) throw new Error("Cannot set public address of unencrypted keypair");
 		assertTrue(plugin.isAddress(address), "Invalid address: " + address);
 		decoded.address = address;
-	}
-	
-	function setShareNum(shareNum) {
-		assertNumber(shareNum);
-		assertTrue(shareNum >= 1 && shareNum <= AppUtils.MAX_SHARES);
-		decoded.shareNum = shareNum;
 	}
 	
 	/**
