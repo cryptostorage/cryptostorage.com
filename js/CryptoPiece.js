@@ -129,10 +129,6 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		throw new Error("Not implemented");
 	}
 	
-	this.getDecryptWeight = function() {
-		throw new Error("Not implemented");
-	}
-	
 	this.split = function(numShares, minShares) {
 		
 		// collect all split keypairs
