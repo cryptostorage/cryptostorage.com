@@ -2310,7 +2310,7 @@ var AppUtils = {
 			return;
 		}
 		
-		// encrypt key with scheme
+		// encrypt hex with scheme
 		var encryptFunc;
 		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) encryptFunc = encryptHexV0;
 		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) encryptFunc = encryptHexV1;
@@ -2319,7 +2319,7 @@ var AppUtils = {
 			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
 			return;
 		}
-		encryptFunc(key, scheme, passphrase, onProgress, onDone);
+		encryptFunc(hex, scheme, passphrase, onProgress, onDone);
 		
 		function encryptHexV1(hex, scheme, passphrase, onProgress, onDone) {
 			try {
@@ -2367,7 +2367,10 @@ var AppUtils = {
 		
 		function encryptHexBip38(hex, scheme, passphrase, onProgress, onDone) {
 			try {
-				var decoded = bitcoinjs.decode(AppUtils.toBase(16, 58, hex));
+				var key = new Bitcoin.ECKey(hex);
+				key.setCompressed(true);
+				var wif = key.getBitcoinWalletImportFormat();
+				var decoded = bitcoinjs.decode(wif);
 				bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
 					if (onProgress) onProgress(progress.percent / 100);
 				}, null, function(err, encryptedWif) {

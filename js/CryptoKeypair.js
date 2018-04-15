@@ -37,10 +37,12 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	
 	this.encrypt = function(scheme, passphrase, onProgress, onDone) {
 		assertNull(decoded.encryption, "Keypair must be unencrypted to encrypt");
+		var address = that.getPublicAddress();
 		AppUtils.encryptHex(that.getPrivateHex(), scheme, passphrase, onProgress, function(err, encryptedHex) {
 			if (err) onDone(err);
 			else {
-				Object.assign(decoded, plugin.decode(encryptedHex));
+				setPrivateKey(encryptedHex);
+				setPublicAddress(address);
 				onDone(null, that);
 			}
 		});
@@ -124,6 +126,10 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		return objectsEqual(that.getJson(), keypair.getJson());
 	}
 	
+	this.getDecoded = function() {
+		return decoded;
+	}
+	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	init();
@@ -171,6 +177,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		// encrypted with cryptostorage conventions
 		if ((decoded = AppUtils.decodeEncryptedKey(privateKey)) !== null) {
 			decoded.minShares = null;
+			decoded.shareNum = null;
 			return;
 		}
 		
@@ -229,7 +236,9 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	}
 	
 	function setPublicAddress(address) {
-		if (decoded.address && decoded.address !== address) throw new Error("Cannot override known public address");
+		if (decoded.address === address) return;
+		if (decoded.address) throw new Error("Cannot override known public address");
+		if (that.getEncryptionScheme() === null) throw new Error("Cannot set public address of unencrypted keypair");
 		assertTrue(plugin.isAddress(address), "Invalid address: " + address);
 		decoded.address = address;
 	}
@@ -329,6 +338,42 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 			if (!isNumber(decoded.minShares) || decoded.minShares < 2 || decoded.minShares > AppUtils.MAX_SHARES) return null;
 			decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
 			return decoded;
+		}
+	}
+}
+
+CryptoKeypair.getEncryptWeight = function(schemes) {
+	schemes = listify(schemes)
+	var weight = 0;
+	for (var i = 0; i < schemes.length; i++) weight += getSingleEncryptWeight(schemes[i]);
+	return weight;
+	function getSingleEncryptWeight(scheme) {
+		switch (scheme) {
+			case AppUtils.EncryptionScheme.BIP38:
+				return 4187;
+			case AppUtils.EncryptionScheme.V0_CRYPTOJS:
+				return 10;
+			case AppUtils.EncryptionScheme.V1_CRYPTOJS:
+				return 540;
+			default: throw new Error("Unrecognized encryption scheme: " + scheme);
+		}
+	}
+}
+
+CryptoKeypair.getDecryptWeight = function(schemes) {
+	schemes = listify(schemes);
+	var weight = 0;
+	for (var i = 0; i < schemes.length; i++) weight += getSingleDecryptWeight(schemes[i]);
+	return weight;
+	function getSingleDecryptWeight(scheme) {
+		switch (scheme) {
+			case AppUtils.EncryptionScheme.BIP38:
+				return 4581;
+			case AppUtils.EncryptionScheme.V0_CRYPTOJS:
+				return 100;
+			case AppUtils.EncryptionScheme.V1_CRYPTOJS:
+				return 540;
+			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	}
 }

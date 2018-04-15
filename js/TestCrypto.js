@@ -3,7 +3,7 @@
  */
 function TestCrypto() {
 	
-	var PLUGINS = [AppUtils.getCryptoPlugin("BTC"), AppUtils.getCryptoPlugin("BCH")];
+	var PLUGINS = [AppUtils.getCryptoPlugin("BTC")];
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_LONG = 10;
 	var REPEAT_SHORT = 2;
@@ -123,6 +123,7 @@ function TestCrypto() {
 	}
 	
 	function testSplit(piece) {
+		assertObject(piece, CryptoPiece);
 		
 		// copy original for later testing
 		var original = piece.copy();

@@ -265,6 +265,7 @@ function BitcoinPlugin() {
 			decoded.wif = str;
 			decoded.encryption = AppUtils.EncryptionScheme.BIP38;
 			decoded.minShares = null;
+			decoded.shareNum = null;
 			return decoded;
 		}
 		
