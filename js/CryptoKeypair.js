@@ -269,6 +269,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		
 		// combine hex shares
 		var privateHex = secrets.combine(decodedHexShares);
+		assertHex(privateHex);
 		setPrivateKey(privateHex);
 		setPublicAddress(publicAddress);
 	}

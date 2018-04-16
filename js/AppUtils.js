@@ -2454,28 +2454,6 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Splits the given hex into shares where the min share threshold is encoded in each share.
-	 * 
-	 * @param hex is the hex to split into shares
-	 * @param numPieces is the number of shares to create
-	 * @param minPieces is the minimum number of shares to recover the hex
-	 * @returns hex shares where the min share threshold is encoded in each share
-	 */
-	splitHex: function(hex, numPieces, minPieces) {
-		throw new Error("Not implemented");
-	},
-	
-	/**
-	 * Combines the given hex shares.
-	 * 
-	 * @param shares are the hex shares to combine
-	 * @returns the combined hex share or null if insufficient shares given
-	 */
-	combineHex: function(shares) {
-		throw new Error("Not implemented");
-	},
-	
-	/**
 	 * Converts the given string to another base.
 	 * 
 	 * TODO: use library?
