@@ -97,6 +97,14 @@ var UiUtils = {
 	INFO_TOOLTIP_MAX_WIDTH: "700px",
 	NOTICE_TOOLTIP_MAX_WIDTH: "700px",
 	
+	// default QR configuration
+	DefaultQrConfig: {
+		version: null,
+		errorCorrectionLevel: 'Q',
+		margin: 0,
+		scale: null
+	},
+	
 	/**
 	 * Renders a QR code to an image.
 	 * 
@@ -109,7 +117,7 @@ var UiUtils = {
 	renderQrCode: function(text, config, callback) {
 		
 		// merge configs
-		config = Object.assign({}, AppUtils.DefaultQrConfig, config);
+		config = Object.assign({}, UiUtils.DefaultQrConfig, config);
 
 		// generate QR code
 		var segments = [{data: text, mode: 'byte'}];	// manually specify mode
