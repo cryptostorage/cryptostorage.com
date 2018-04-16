@@ -316,6 +316,471 @@ var AppUtils = {
 		V0_CRYPTOJS: "V0_CRYPTOJS",
 		V1_CRYPTOJS: "V1_CRYPTOJS",
 	},
+		
+	/**
+	 * Returns the version numbers from a string of the format NN.NN.NN.
+	 * 
+	 * @param str is the string to get the version numbers from
+	 * 
+	 * @returns int[3] with the three version numbers
+	 */
+	getVersionNumbers: function(str) {
+		var dotIdx1 = str.indexOf('.');
+		if (dotIdx1 < 0) throw new Error("Version does not have dot separator: " + str);
+		var dotIdx2 = str.indexOf('.', dotIdx1 + 1);
+		if (dotIdx2 < 0) throw new Error("Version does not have two dot separators: " + str);
+		if (str.indexOf('.', dotIdx2 + 1) >= 0) throw new Error("Version has more than 2 dot separators: " + str);
+		var nums = [];
+		nums.push(Number(str.substring(0, dotIdx1)));
+		nums.push(Number(str.substring(dotIdx1 + 1, dotIdx2)));
+		nums.push(Number(str.substring(dotIdx2 + 1)));
+		for (var i = 0; i < nums.length; i++) {
+			assertNumber(nums[i], "Version element " + i + " is not a number");
+			assertTrue(nums[i] >= 0, "Version element " + i + " + is negative");
+		}
+		assertTrue(nums[0] + nums[1] + nums[2] > 0, "Version does not have positive element: " + str);
+		return nums;
+	},
+	
+	getCommonTicker: function(piece) {
+		assertTrue(piece.keys.length > 0);
+		var ticker;
+		for (var i = 0; i < piece.keys.length; i++) {
+			var pieceKey = piece.keys[i];
+			if (!ticker) ticker = pieceKey.ticker;
+			else if (ticker !== pieceKey.ticker) return "mix";
+		}
+		return ticker;
+	},
+	
+	/**
+	 * Returns a version of the string up to the given maxLength characters.
+	 * 
+	 * If the string is longer than maxLength, shortens the string by replacing middle characters with '...'.
+	 * 
+	 * @param str is the string to shorten
+	 * @param maxLength is the maximum length of the string
+	 * @return the given str if str.length <= maxLength, shortened version otherwise
+	 */
+	getShortenedString: function(str, maxLength) {
+		assertString(str);
+		if (str.length <= maxLength) return str;
+		var insert = '...';
+		var sideLength = Math.floor((maxLength - insert.length) / 2);
+		if (sideLength === 0) throw new Error("Cannot create string of length " + maxLength + " from string '" + str + "'");
+		return str.substring(0, sideLength) + insert + str.substring(str.length - sideLength);
+	},
+	
+	/**
+	 * Gets a formatted timestamp.
+	 */
+	getTimestamp: function() {
+		var date = new Date();
+		var year = date.getFullYear();
+		var month = date.getMonth() + 1;
+		if (month < 10) month = "0" + month;
+		var day = date.getDate();
+		if (day < 10) day = "0" + day;
+		var hour = date.getHours();
+		if (hour < 10) hour = "0" + hour;
+		var min = date.getMinutes();
+		if (min < 10) min = "0" + min;
+//		var sec = date.getSeconds();
+//		if (sec < 10) sec = "0" + sec;
+		return "" + year + month + day + hour + min;
+	},
+	
+	/**
+	 * Returns browser info.
+	 * 
+	 * Requires lib/ua-parser.js to be loaded.
+	 * 
+	 * @returns
+	 * 	{
+	 * 		name: "...",
+	 * 		version: "...",
+	 * 		major: e.g. 57
+	 * 	 	windowCryptoExists: true|false,
+	 * 		isOpenSource: true|false,
+	 * 	  isSupported: true|false
+	 * 	}
+	 */
+	getBrowserInfo: function() {
+		
+		// parse browser user agent
+		var parser = new UAParser();
+		var result = parser.getResult();
+		
+		// build info and return
+		var info = {};
+		info.name = result.browser.name;
+		if (info.name === "Chrome" && !isChrome()) info.name = "Chromium";	// check for chromium
+		info.version = result.browser.version;
+		info.major = Number(result.browser.major);
+		info.isOpenSource = isOpenSourceBrowser(info.name);
+		info.windowCryptoExists = window.crypto ? true : false;
+		info.isSupported = isSupportedBrowser(info);
+		return info;
+		
+		// determines if chrome by checking for in-built PDF viewer
+		function isChrome() {
+			for (var i = 0; i < navigator.plugins.length; i++) {
+				if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
+			}
+			return false;
+		}
+		
+		// determines if browser is open source
+		function isOpenSourceBrowser(browserName) {
+			if (arrayContains(AppUtils.OPEN_SOURCE_BROWSERS, browserName)) return true;
+			if (arrayContains(AppUtils.CLOSED_SOURCE_BROWSERS, browserName)) return false;
+			return null;
+		}
+		
+		// determines if the browser is supported
+		function isSupportedBrowser(browserInfo) {
+			if (!browserInfo.windowCryptoExists) return false;
+			if (browserInfo.name === "IE" && browserInfo.major < 11) return false;
+			return true;
+		}
+	},
+	
+	/**
+	 * Returns operating system info.
+	 * 
+	 * Requires lib/ua-parser.js to be loaded.
+	 * 
+	 * @returns
+	 * 	{
+	 * 		name: "...",
+	 * 		version: "...",
+	 * 		isOpenSource: true|false
+	 * 	}
+	 */
+	getOsInfo: function() {
+		
+		// parse browser user agent
+		var parser = new UAParser();
+		var result = parser.getResult();
+		
+		// build and return response
+		var info = {};
+		info.name = result.os.name;
+		info.version = result.os.version;
+		info.isOpenSource = isOpenSourceOs(info);
+		return info;
+		
+		function isOpenSourceOs(osInfo) {
+			if (arrayContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, osInfo.name)) return true;
+			if (arrayContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, osInfo.name)) return false;
+			return null;
+		}
+	},
+
+	/**
+	 * Determines if this app is running locally or from a remote domain.
+	 * 
+	 * @returns true if running local, false otherwise
+	 */
+	isLocal: function() {
+		return window.location.href.indexOf("file://") > -1;
+	},
+	
+	/**
+	 * Determines if this app has an internet connection.
+	 * 
+	 * @param isOnline(true|false) is invoked when connectivity is determined
+	 * @returns true if this app is online, false otherwise
+	 */
+	isOnline: function(isOnline) {
+		isImageAccessible(AppUtils.ONLINE_IMAGE_URL, AppUtils.ONLINE_DETECTION_TIMEOUT, isOnline);
+	},
+	
+	/**
+	 * Gets all environment info that can be determined synchronously.
+	 * 
+	 * Requires lib/ua-parser.js to be loaded.
+	 * 
+	 * @returns info that can be acquired synchronously
+	 */
+	getEnvironmentSync: function() {		
+		var info = {};
+		info.browser = AppUtils.getBrowserInfo();
+		info.os = AppUtils.getOsInfo();
+		info.isLocal = AppUtils.isLocal();
+		info.runtimeError = AppUtils.RUNTIME_ERROR;
+		info.dependencyError = AppUtils.DEPENDENCY_ERROR;
+		info.tabError = AppUtils.TAB_ERROR;
+		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = Object.assign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
+		info.checks = AppUtils.getEnvironmentChecks(info);
+		return info;
+	},
+	
+	/**
+	 * Gets all environment info.
+	 * 
+	 * Requires lib/ua-parser.js to be loaded.
+	 * 
+	 * @param onDone(info) is asynchronously invoked when all info is retrieved
+	 */
+	getEnvironment: function(onDone) {
+		AppUtils.isOnline(function(online) {
+			var info = AppUtils.getEnvironmentSync();
+			info.isOnline = online;
+			if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = Object.assign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
+			info.checks = AppUtils.getEnvironmentChecks(info);
+			if (onDone) onDone(info);
+		});
+	},
+	
+	/**
+	 * Enumerates environment check codes.
+	 */
+	EnvironmentCode: {
+		BROWSER: "BROWSER",
+		OPERATING_SYSTEM: "OPERATING_SYSTEM",
+		INTERNET: "INTERNET",
+		IS_LOCAL: "IS_LOCAL",
+		RUNTIME_ERROR: "RUNTIME_ERROR",
+		OPEN_SOURCE: "OPEN_SOURCE",
+	},
+	
+	/**
+	 * Interprets the given environment info and returns pass/fail/warn checks.
+	 * 
+	 * @param info is output from getEnvironmentInfo()
+	 * @returns [{state: "pass|fail|warn", code: "..."}, ...]
+	 */
+	getEnvironmentChecks: function(info) {
+		var checks = [];
+		
+		// check if browser supported
+		if (info.browser && !info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER});
+		
+		// check if runtime error
+		if (info.runtimeError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.RUNTIME_ERROR});
+		
+		// check if dependency error
+		if (info.dependencyError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.INTERNET});
+		
+		// check if tab error
+		if (info.tabError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER});
+		
+		// check if remote and not online
+		var internetRequiredError = false;
+		if (isInitialized(info.isOnline)) {
+			if (!info.isLocal && !info.isOnline && AppUtils.NO_INTERNET_CAN_BE_ERROR) {
+				internetRequiredError = true;
+				checks.push({state: "fail", code: AppUtils.EnvironmentCode.INTERNET});
+			}
+		}
+		
+		// check if online
+		if (!internetRequiredError && !info.dependencyError && isInitialized(info.isOnline)) {
+			if (!info.isOnline) checks.push({state: "pass", code: AppUtils.EnvironmentCode.INTERNET});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.INTERNET});
+		}
+		
+		// check if local
+		if (isInitialized(info.isLocal)) {
+			if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
+		}
+		
+		// check open source browser
+		if (info.browser && info.browser.isSupported) {
+			if (info.browser.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.BROWSER});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.BROWSER});
+		}
+		
+		// check open source os
+		if (isInitialized(info.os)) {
+			if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
+			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
+		}
+		
+		return checks;
+	},
+	
+	/**
+	 * Sets the cached environment info.
+	 * 
+	 * @param environment is the cached environment info to set
+	 */
+	setCachedEnvironment: function(environment) {
+		AppUtils.environment = environment;
+	},
+	
+	/**
+	 * Returns the cached environment info.
+	 */
+	getCachedEnvironment: function() {
+		return AppUtils.environment;
+	},
+	
+	/**
+	 * Polls environment info and notifies listeners on loop.
+	 * 
+	 * Requires lib/ua-parser.js to be loaded.
+	 * 
+	 * @param initialEnvironmentInfo is initial environment info to notify listeners
+	 */
+	pollEnvironment: function(initialEnvironmentInfo) {
+		
+		// notify listeners of initial environment info
+		if (initialEnvironmentInfo) setEnvironmentInfo(initialEnvironmentInfo);
+		
+		// refresh environment info on loop
+		refreshEnvironmentInfo();
+		function refreshEnvironmentInfo() {
+			AppUtils.getEnvironment(function(info) {
+				setEnvironmentInfo(info);
+			});
+			setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
+		}
+		
+		function setEnvironmentInfo(info) {
+			AppUtils.environment = info;
+			AppUtils.notifyEnvironmentListeners(info);
+		}
+	},
+	
+	/**
+	 * Registers an environment listener to be notified when environment info is updated.
+	 * 
+	 * Synchronously calls the listener with the last known environment info.
+	 * 
+	 * @param listener(info) will be invoked as environment info is updated
+	 */
+	addEnvironmentListener: function(listener) {
+		assertInitialized(listener);
+		if (!AppUtils.environmentListeners) AppUtils.environmentListeners = [];
+		AppUtils.environmentListeners.push(listener);
+		if (AppUtils.environment) listener(AppUtils.environment);
+	},
+	
+	/**
+	 * Notifies all registered environment listeners of updated environment info.
+	 * 
+	 * @param info is the environment info to notify listeners of
+	 */
+	notifyEnvironmentListeners: function(info) {
+		if (!AppUtils.environmentListeners) return;
+		for (var i = 0; i < AppUtils.environmentListeners.length; i++) {
+			var listener = AppUtils.environmentListeners[i];
+			if (listener) listener(info);
+		}
+	},
+	
+	/**
+	 * Determines if the given environment info has the given state.
+	 * 
+	 * @param info is environment info with state
+	 * @param state is the state to check the environment info for
+	 * @returns true if the environment info has the given state, false otherwise
+	 */
+	hasEnvironmentState: function(state) {
+		for (var i = 0; i < AppUtils.environment.checks.length; i++) {
+			if (AppUtils.environment.checks[i].state === state) return true;
+		}
+		return false;
+	},
+	
+	/**
+	 * Set an unexpected runtime error and notifies all listeners of the updated environment.
+	 */
+	setRuntimeError: function(err) {
+		if (!AppUtils.environment) AppUtils.environment = {};
+		AppUtils.RUNTIME_ERROR = err;
+		AppUtils.environment.runtimeError = err;
+		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
+		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
+	},
+	
+	/**
+	 * Sets an error if cannot fetch dependencies.
+	 * 
+	 * @param bool specifies if the dependency error is enabled or disabled
+	 */
+	setDependencyError: function(bool) {
+		if (!AppUtils.environment) AppUtils.environment = {};
+		AppUtils.DEPENDENCY_ERROR = bool;
+		AppUtils.environment.dependencyError = bool;
+		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
+		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
+	},
+	
+	/**
+	 * Sets an error if a new tab cannot be opened.
+	 */
+	setTabError: function(bool) {
+		if (!AppUtils.environment) AppUtils.environment = {};
+		AppUtils.TAB_ERROR = bool;
+		AppUtils.environment.tabError = bool;
+		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
+		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
+	},
+	
+		/**
+	 * Sets if lack of internet can be a critical error if the site is running remotely.
+	 * 
+	 * After dependencies are done loading in the export page, internet is no longer required
+	 * even if the site is running remotely, so this method stops treating internet disconnection
+	 * as critical.
+	 * 
+	 * @param bool specifies if no internet can be a critical error
+	 */
+	setNoInternetCanBeError: function(bool) {
+		AppUtils.NO_INTERNET_CAN_BE_ERROR = bool;
+	},
+	
+	/**
+	 * Runs minimum tests to sanity check key generation, encryption, and splitting.
+	 * 
+	 * @param onDone(err) is invoked when done
+	 */
+	runMinimumTests: function(onDone) {
+		
+		// build key generation configuration
+		var config = {};
+		config.passphrase = Tests.PASSPHRASE;
+		config.numPieces = 3;
+		config.minPieces = 2;
+		config.verifyEncryption = false;
+		config.currencies = [];
+		config.currencies.push({
+			ticker: AppUtils.getCryptoPlugin("BTC").getTicker(),
+			numKeys: 1,
+			encryption: null
+		});
+		config.currencies.push({
+			ticker: AppUtils.getCryptoPlugin("XMR").getTicker(),
+			numKeys: 1,
+			encryption: AppUtils.EncryptionScheme.V0_CRYPTOJS	// just makes sure cryptojs is in place
+		});
+		config.currencies.push({
+			ticker: AppUtils.getCryptoPlugin("ETH").getTicker(),
+			numKeys: 1,
+			encryption: null
+		});
+		
+		// generate keys and test
+		AppUtils.generateKeys(config, null, function(err, keys, pieces, pieceDivs) {
+			if (err) onDone(err);
+			else {
+				try {
+					assertEquals(3, keys.length);
+					assertEquals(3, pieces.length);
+					assertEquals(3, pieceDivs.length);
+					onDone(null);
+				} catch (err) {
+					onDone(err);
+				}
+			}
+		});
+	},
+	
+	// ------------------------------- DEPRECATED -------------------------------
 	
 	/**
 	 * Decodes the given encrypted private key.
@@ -472,30 +937,623 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Returns the version numbers from a string of the format NN.NN.NN.
+	 * Generates keys, pieces, rendered pieces according to a configuration.
 	 * 
-	 * @param str is the string to get the version numbers from
-	 * 
-	 * @returns int[3] with the three version numbers
+	 * @param config is the key generation configuration:
+	 * 	{
+	 * 		currencies: [{ticker: _, numKeys: _, encryption: _}, ...],
+	 * 		numPieces: _,
+	 * 		minPieces: _,
+	 * 		verifyEnryption: true|false	
+	 * 		passphrase: _,		// only needed if currency encryption initialized
+	 *    renderConfig: {}	// piece render config  TODO: rendering should probably not be a part of this function
+	 * 	}
+	 * @param onProgress(percent, label) is invoked as progress is made (optional)
+	 * @param onDone(err, keys, pieces, pieceDivs) is invoked when done
+	 * @param noInternetIsNotErrorAfterDependenciesLoaded makes lack of internet a non-error even if remote after dependencies are loaded (used on export page)
 	 */
-	getVersionNumbers: function(str) {
-		var dotIdx1 = str.indexOf('.');
-		if (dotIdx1 < 0) throw new Error("Version does not have dot separator: " + str);
-		var dotIdx2 = str.indexOf('.', dotIdx1 + 1);
-		if (dotIdx2 < 0) throw new Error("Version does not have two dot separators: " + str);
-		if (str.indexOf('.', dotIdx2 + 1) >= 0) throw new Error("Version has more than 2 dot separators: " + str);
-		var nums = [];
-		nums.push(Number(str.substring(0, dotIdx1)));
-		nums.push(Number(str.substring(dotIdx1 + 1, dotIdx2)));
-		nums.push(Number(str.substring(dotIdx2 + 1)));
-		for (var i = 0; i < nums.length; i++) {
-			assertNumber(nums[i], "Version element " + i + " is not a number");
-			assertTrue(nums[i] >= 0, "Version element " + i + " + is negative");
+	generateKeys: function(config, onProgress, onDone, noInternetIsNotErrorAfterDependenciesLoaded) {
+		
+		// verify config
+		try {
+			assertInitialized(config.currencies);
+			assertTrue(config.currencies.length > 0);
+			var encryptionInitialized = false;
+			for (var i = 0; i < config.currencies.length; i++) {
+				assertInitialized(config.currencies[i].ticker);
+				assertInitialized(config.currencies[i].numKeys);
+				assertDefined(config.currencies[i].encryption);
+				if (isInitialized(config.currencies[i].encryption)) encryptionInitialized = true;
+			}
+			if (!config.numPieces) config.numPieces = 1;
+			if (encryptionInitialized) assertInitialized(config.passphrase);
+		} catch (err) {
+			onDone(err);
+			return;
 		}
-		assertTrue(nums[0] + nums[1] + nums[2] > 0, "Version does not have positive element: " + str);
-		return nums;
+		
+		// track done and total weight for progress
+		var doneWeight = 0;
+		var totalWeight = AppUtils.getWeightGenerateKeys(config);
+
+		// load dependencies
+		var dependencies = [];
+		for (var i = 0; i < config.currencies.length; i++) {
+			var currency = config.currencies[i];
+			var pluginDependencies = AppUtils.getCryptoPlugin(currency.ticker).getDependencies();
+			for (var j = 0; j < pluginDependencies.length; j++) {
+				dependencies.push(pluginDependencies[j]);
+			}
+		}
+		dependencies = toUniqueArray(dependencies);
+		if (onProgress) onProgress(0, "Loading dependencies");
+		LOADER.load(dependencies, function(err) {
+			
+			// check for error
+			if (err) {
+				onDone(err);
+				return;
+			}
+			
+			// internet is no longer required if accessing remotely
+			if (noInternetIsNotErrorAfterDependenciesLoaded) AppUtils.setNoInternetCanBeError(false);
+			
+			// collect key creation functions
+			var funcs = [];
+			for (var i = 0; i < config.currencies.length; i++) {
+				var currency = config.currencies[i];
+				for (var j = 0; j < currency.numKeys; j++) {
+					funcs.push(newKeyFunc(AppUtils.getCryptoPlugin(currency.ticker)));
+				}
+			}
+			
+			// generate keys
+			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
+			async.series(funcs, function(err, keys) {
+					
+				// check for error
+				if (err) {
+					onDone(err);
+					return;
+				}
+				
+				// collect keys and schemes to encrypt
+				var keysToEncrypt = [];
+				var encryptionSchemes = [];
+				var keyIdx = 0;
+				for (var i = 0; i < config.currencies.length; i++) {
+					for (var j = 0; j < config.currencies[i].numKeys; j++) {
+						if (config.currencies[i].encryption) {
+							keysToEncrypt.push(keys[keyIdx]);
+							encryptionSchemes.push(config.currencies[i].encryption);
+						}
+						keyIdx++;
+					}
+				}
+									
+				// encrypt keys
+				if (keysToEncrypt.length > 0) {
+					assertEquals(keysToEncrypt.length, encryptionSchemes.length);
+					
+					// compute encryption + verification weight
+					var encryptWeight = 0;
+					for (var i = 0; i < encryptionSchemes.length; i++) {
+						encryptWeight += AppUtils.getWeightEncryptKey(encryptionSchemes[i]) + (config.verifyEncryption ? AppUtils.getWeightDecryptKey(encryptionSchemes[i]) : 0);
+					}
+					
+					// start encryption
+					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
+					AppUtils.encryptKeys(keysToEncrypt, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent, label) {
+						if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
+					}, function(err, encryptedKeys) {
+						if (err) {
+							onDone(err);
+						} else {
+							doneWeight += encryptWeight;
+							generatePieces(keys, config);
+						}
+					});
+				}
+				
+				// no encryption
+				else {
+					generatePieces(keys, config);
+				}
+			});
+		});
+		
+		function newKeyFunc(plugin, onDone) {
+			return function(onDone) {
+				setImmediate(function() {	// let UI breath
+					var key;
+					try {
+						key = plugin.newKey();
+					} catch(err) {
+						onDone(err);
+						return;
+					}
+					doneWeight += AppUtils.getWeightCreateKey();
+					if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
+					onDone(null, key);
+				});
+			}
+		}
+		
+		function generatePieces(keys, config) {
+				
+			// convert keys to pieces
+			var pieces = AppUtils.keysToPieces(keys, config.numPieces, config.minPieces);
+			
+			// verify pieces recreate keys
+			var keysFromPieces = AppUtils.piecesToKeys(pieces);
+			assertEquals(keys.length, keysFromPieces.length);
+			for (var i = 0; i < keys.length; i++) {
+				assertTrue(keys[i].equals(keysFromPieces[i]));
+			}
+			
+			// render pieces to divs
+			var renderWeight = IndustrialPieceRenderer.getWeight(keys.length, config.numPieces, null);
+			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
+			new IndustrialPieceRenderer(pieces, null, config.renderConfig).render(function(percent) {
+				if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
+			}, function(err, pieceDivs) {
+				if (err) onDone(err);
+				else if (pieces.length !== pieceDivs.length) onDone(new Error("pieces.length !== pieceDivs.length"));
+				else {
+					if (onProgress) onProgress(1, "Complete");
+					onDone(null, keys, pieces, pieceDivs);
+				}
+			});
+		}
+	},
+	
+	/**
+	 * Encrypts the given key with the given scheme and passphrase.
+	 * 
+	 * Requires crypto-js.js and bitcoinjs.js.
+	 * 
+	 * @param key is an unencrypted key to encrypt
+	 * @param scheme is the scheme to encrypt the key
+	 * @param passphrase is the passphrase to encrypt with
+	 * @param onProgress(percent) is invoked as progress as made (optional)
+	 * @param onDone(err, encryptedKey) is invoked when done
+	 */
+	encryptKey: function(key, scheme, passphrase, onProgress, onDone) {
+		
+		// validate input
+		try {
+			if (!scheme) throw new Error("Scheme must be initialized");
+			if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+			if (!passphrase) throw new Error("Passphrase must be initialized");
+			assertInitialized(onDone);
+		} catch (err) {
+			if (onDone) onDone(err);
+			return;
+		}
+		
+		// encrypt key according to scheme
+		var encryptFunc;
+		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) encryptFunc = encryptKeyV0;
+		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) encryptFunc = encryptKeyV1;
+		else if (scheme === AppUtils.EncryptionScheme.BIP38) encryptFunc = encryptKeyBip38;
+		else {
+			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+			return;
+		}
+		encryptFunc(key, scheme, passphrase, onProgress, onDone);
+		
+		function encryptKeyV1(key, scheme, passphrase, onProgress, onDone) {
+			try {
+				
+				// create random salt and replace first two characters with version
+				var salt = CryptoJS.lib.WordArray.random(AppUtils.ENCRYPTION_V1_BLOCK_SIZE);
+				var hexVersion = AppUtils.ENCRYPTION_V1_VERSION.toString(16);
+				salt = hexVersion + salt.toString().substring(hexVersion.length);
+				salt = CryptoJS.enc.Hex.parse(salt);
+				
+				// strengthen passphrase with passphrase key
+				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+		      keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
+		      iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
+		      hasher: CryptoJS.algo.SHA512
+		    });
+				
+				// encrypt
+				var iv = salt;
+				var encrypted = CryptoJS.AES.encrypt(key.getHex(), passphraseKey, { 
+			    iv: iv, 
+			    padding: CryptoJS.pad.Pkcs7,
+			    mode: CryptoJS.mode.CBC
+			  });
+				
+				// encrypted hex = salt + hex cipher text
+				var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
+				var encryptedHex = salt.toString() + ctHex;
+				key.setState(Object.assign(key.getPlugin().newKey(encryptedHex).getState(), {address: key.getAddress()}));
+				if (onProgress) onProgress(1);
+				if (onDone) onDone(null, key);
+			} catch (err) {
+				onDone(err);
+			}
+		}
+		
+		function encryptKeyV0(key, scheme, passphrase, onProgress, onDone) {
+			try {
+				var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
+				key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
+				if (onProgress) onProgress(1);
+				if (onDone) onDone(null, key);
+			} catch (err) {
+				if (onDone) onDone(err);
+			}
+		}
+		
+		function encryptKeyBip38(key, scheme, passphrase, onProgress, onDone) {
+			try {
+				var decoded = bitcoinjs.decode(key.getWif());
+				bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
+					if (onProgress) onProgress(progress.percent / 100);
+				}, null, function(err, encryptedWif) {
+					try {
+						if (err) throw err;
+						key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
+						if (onDone) onDone(null, key);
+					} catch (err) {
+						if (onDone) onDone(err);
+					}
+				});
+			} catch (err) {
+				if (onDone) onDone(err);
+			}
+		}
+	},
+	
+	/**
+	 * Decrypts the given key with the given passphrase.
+	 * 
+	 * Requires bitcoin.js and crypto-js.js.
+	 * 
+	 * @param key is the key to decrypt
+	 * @param passphrase is the passphrase to decrypt the key
+	 * @param onProgress(percent) is invoked as progress is made (optional)
+	 * @param onDone(err, decryptedKey) is invoked when done
+	 */
+	decryptKey: function(key, passphrase, onProgress, onDone) {
+		
+		// validate input
+		try {
+			if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
+			if (!passphrase) throw new Error("Passphrase must be initialized");
+			assertTrue(key.isEncrypted());
+			assertInitialized(onDone)
+		} catch (err) {
+			if (onDone) onDone(err);
+			return;
+		}
+		
+		// decrypt key according to scheme
+		var decryptFunc;
+		var scheme = key.getEncryptionScheme();
+		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) decryptFunc = decryptKeyV0;
+		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) decryptFunc = decryptKeyV1;
+		else if (scheme === AppUtils.EncryptionScheme.BIP38) decryptFunc = decryptKeyBip38;
+		else {
+			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
+			return;
+		}
+		decryptFunc(key, scheme, passphrase, onProgress, onDone);
+		
+		function decryptKeyV1(key, scheme, passphrase, onProgress, onDone) {
+			try {
+				
+				// assert correct version
+				assertEquals(AppUtils.ENCRYPTION_V1_VERSION, parseInt(key.getHex().substring(0, AppUtils.ENCRYPTION_V1_VERSION.toString(16).length), 16));
+				
+				// get passphrase key
+				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(0, 32));
+			  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+			  	keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
+			  	iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
+			  	hasher: CryptoJS.algo.SHA512
+			  });
+			  
+			  // decrypt
+			  var iv = salt;
+			  var ctHex = key.getHex().substring(32);
+			  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
+			  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
+			  	iv: iv, 
+			    padding: CryptoJS.pad.Pkcs7,
+			    mode: CryptoJS.mode.CBC
+			  });
+			  var decryptedHex = decrypted.toString(CryptoJS.enc.Utf8);
+			  assertInitialized(decryptedHex);
+			  
+			  // update key
+			  key.setPrivateKey(decryptedHex);
+				if (onProgress) onProgress(1)
+				if (onDone) onDone(null, key);
+			} catch (err) {
+				onDone(new Error("Incorrect passphrase"));
+			}
+		}
+		
+		function decryptKeyV0(key, scheme, passphrase, onProgress, onDone) {
+			try {
+				var hex;
+				try {
+					hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
+				} catch (err) { }
+				if (!hex) throw new Error("Incorrect passphrase");
+				try {
+					key.setPrivateKey(hex);
+					if (onProgress) onProgress(1)
+					if (onDone) onDone(null, key);
+				} catch (err) {
+					throw new Error("Incorrect passphrase");
+				}
+			} catch (err) {
+				if (onDone) onDone(err);
+			}
+		}
+		
+		function decryptKeyBip38(key, scheme, passphrase, onProgress, onDone) {
+			bitcoinjs.decrypt(key.getWif(), passphrase, function(progress) {
+				if (onProgress) onProgress(progress.percent / 100);
+			}, null, function(err, decrypted) {
+				try {
+					if (err) throw new Error("Incorrect passphrase");
+					var privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
+					key.setPrivateKey(privateKey);
+					if (onDone) onDone(null, key);
+				} catch (err) {
+					if (onDone) onDone(err);
+				}
+			});
+		}
+	},
+	
+	/**
+	 * Encrypts the given keys with the given encryption schemes.
+	 * 
+	 * @param keys are the keys to encrypt
+	 * @param encryptionSchemes are the schemes to encrypt the keys
+	 * @param passphrase is the passphrase to encrypt the keys with
+	 * @param verifyEncryption specifies if encryption should be verified by decrypting
+	 * @param onProgress(percent, label) is invoked as progress is made (optional)
+	 * @param onDone(err, encryptedKeys) is invoked when encryption is done (optional)
+	 */
+	encryptKeys: function(keys, encryptionSchemes, passphrase, verifyEncryption, onProgress, onDone) {
+		
+		// verify input
+		try {
+			assertEquals(keys.length, encryptionSchemes.length);
+			assertInitialized(passphrase);
+		} catch (err) {
+			if (onDone) onDone(err);
+		}
+		
+		// collect originals if verifying encryption
+		var originals;
+		if (verifyEncryption) {
+			originals = [];
+			for (var i = 0; i < keys.length; i++) {
+				originals.push(keys[i].copy());
+			}
+		}
+		
+		// track weights for progress
+		var doneWeight = 0;
+		var verifyWeight = 0;
+		var totalWeight = 0;
+		
+		// collect encryption functions and weights
+		var funcs = [];
+		for (var i = 0; i < keys.length; i++) {
+			totalWeight += AppUtils.getWeightEncryptKey(encryptionSchemes[i]);
+			if (verifyEncryption) verifyWeight += AppUtils.getWeightDecryptKey(encryptionSchemes[i]);
+			funcs.push(encryptFunc(keys[i], encryptionSchemes[i], passphrase));
+		}
+		totalWeight += verifyWeight;
+		
+		// encrypt async
+		if (onProgress) onProgress(0, "Encrypting");
+		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeys) {
+			
+			// check for error
+			if (err) {
+				if (onDone) onDone(err);
+				return;
+			}
+			
+			// verify encryption
+			if (verifyEncryption) {
+				
+				// copy encrypted keys
+				var encryptedCopies = [];
+				for (var i = 0; i < encryptedKeys.length; i++) {
+					encryptedCopies.push(encryptedKeys[i].copy());
+				}
+				
+				// decrypt keys
+				if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
+				AppUtils.decryptKeys(encryptedCopies, passphrase, null, function(percent) {
+					if (onProgress) onProgress((doneWeight + percent * verifyWeight) / totalWeight, "Verifying encryption");
+				}, function(err, decryptedKeys) {
+					try {
+						
+						// check for error
+						if (err) throw err;
+						
+						// assert originals match decrypted keys
+						doneWeight += verifyWeight;
+						assertEquals(originals.length, decryptedKeys.length);
+						for (var j = 0; j < originals.length; j++) {
+							assertTrue(originals[j].equals(decryptedKeys[j]));
+						}
+						
+						// done
+						if (onDone) onDone(null, encryptedKeys);
+					} catch (err) {
+						if (onDone) onDone(err);
+					}
+				})
+			}
+			
+			// don't verify encryption
+			else {
+				if (onDone) onDone(err, encryptedKeys);
+			}
+		});
+		
+		function encryptFunc(key, scheme, passphrase) {
+			return function(onDone) {
+				key.encrypt(scheme, passphrase, function(percent) {
+					if (onProgress) onProgress((doneWeight +  AppUtils.getWeightEncryptKey(scheme) * percent) / totalWeight, "Encrypting");
+				}, function(err, key) {
+					if (err) onDone(err);
+					else {
+						doneWeight += AppUtils.getWeightEncryptKey(scheme);
+						if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
+						setImmediate(function() { onDone(null, key); });	// let UI breath
+					}
+				});
+			}
+		}
+	},
+	
+	/**
+	 * Decrypts the given keys.
+	 * 
+	 * @param keys are the encrypted keys to decrypt
+	 * @param phassphrase is the phassphrase to decrypt the keys
+	 * @param canceller.isCancelled specifies if decryption should be cancelled
+	 * @param onProgress(done, total) is called as progress is made
+	 * @param onDone(err, decryptedKeys) is called when decryption is complete
+	 */
+	decryptKeys: function(keys, passphrase, canceller, onProgress, onDone) {
+		
+		// validate input
+		try {
+			assertInitialized(keys);
+			assertTrue(keys.length > 0);
+			assertInitialized(passphrase);
+			assertInitialized(onDone);
+		} catch (err) {
+			if (onDone) onDone(err);
+		}
+		
+		// compute weight
+		var totalWeight = 0;
+		for (var i = 0; i < keys.length; i++) {
+			totalWeight += AppUtils.getWeightDecryptKey(keys[i].getEncryptionScheme());
+		}
+		
+		// decrypt keys
+		var funcs = [];
+		for (var i = 0; i < keys.length; i++) funcs.push(decryptFunc(keys[i], passphrase));
+		var doneWeight = 0;
+		if (onProgress) onProgress(0, "Decrypting");
+		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, result) {
+			if (canceller && canceller.isCancelled) return;
+			else if (err) onDone(err);
+			else onDone(null, keys);
+		});
+		
+		// decrypts one key
+		function decryptFunc(key, passphrase) {
+			return function(onDone) {
+				if (canceller && canceller.isCancelled) return;
+				var scheme = key.getEncryptionScheme();
+				key.decrypt(passphrase, function(percent) {
+					if (onProgress) onProgress((doneWeight + AppUtils.getWeightDecryptKey(scheme) * percent) / totalWeight, "Decrypting");
+				}, function(err, key) {
+					if (canceller && canceller.isCancelled) return;
+					if (err) onDone(err);
+					else {
+						doneWeight += AppUtils.getWeightDecryptKey(scheme);
+						if (onProgress) onProgress(doneWeight / totalWeight);
+						setImmediate(function() { onDone(err, key); });	// let UI breath
+					}
+				});
+			}
+		}
+	},
+	
+	// Relative weights of key generation derived from experimentation and used for representative progress bars
+	
+	/**
+	 * Computes the total weight for the given key generation configuration.
+	 * 
+	 * @param keyGenConfig is the key generation configuration to get the weight of
+	 * @return the weight of the given key genereation configuration
+	 */
+	getWeightGenerateKeys: function(keyGenConfig) {
+		var weight = 0;
+		var numKeys = 0;
+		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
+			var currency = keyGenConfig.currencies[i];
+			numKeys += currency.numKeys;
+			weight += currency.numKeys * AppUtils.getWeightCreateKey();
+			if (currency.encryption) weight += currency.numKeys * (AppUtils.getWeightEncryptKey(currency.encryption) + (keyGenConfig.verifyEncryption ? AppUtils.getWeightDecryptKey(currency.encryption) : 0));
+		}
+		return weight + IndustrialPieceRenderer.getWeight(numKeys, keyGenConfig.numPieces, null);
+	},
+	
+	/**
+	 * Returns the weight to encrypt a key with the given scheme.
+	 * 
+	 * @param scheme is the scheme to encrypt a key with
+	 * @returns weight is the weight to encrypt a key with the given scheme
+	 */
+	getWeightEncryptKey: function(scheme) {
+		switch (scheme) {
+			case AppUtils.EncryptionScheme.BIP38:
+				return 4187;
+			case AppUtils.EncryptionScheme.V0_CRYPTOJS:
+				return 10;
+			case AppUtils.EncryptionScheme.V1_CRYPTOJS:
+				return 540;
+			default: throw new Error("Unrecognized encryption scheme: " + scheme);
+		}
+	},
+	
+	/**
+	 * Returns the weight to decrypt the given keys.
+	 * 
+	 * @param encryptedKeys are encrypted keys to determine the weight of to decrypt
+	 * @returns the weight to decrypt the given keys
+	 */
+	getWeightDecryptKeys: function(encryptedKeys) {
+		var weight = 0;
+		for (var i = 0; i < encryptedKeys.length; i++) {
+			var key = encryptedKeys[i];
+			assertTrue(key.isEncrypted());
+			weight += AppUtils.getWeightDecryptKey(key.getEncryptionScheme());
+		}
+		return weight;
 	},
 
+	/**
+	 * Returns the weight to decrypt a key with the given scheme.
+	 * 
+	 * @param scheme is the scheme to decrypt a key with
+	 * @returns weight is the weigh tto decrypt a key with the given scheme
+	 */
+	getWeightDecryptKey: function(scheme) {
+		switch (scheme) {
+			case AppUtils.EncryptionScheme.BIP38:
+				return 4581;
+			case AppUtils.EncryptionScheme.V0_CRYPTOJS:
+				return 100;
+			case AppUtils.EncryptionScheme.V1_CRYPTOJS:
+				return 540;
+			default: throw new Error("Unrecognized encryption scheme: " + scheme);
+		}
+	},
+	
+	getWeightCreateKey: function() { return 63; },
+	
 	/**
 	 * Reconstitutes the given pieces.  Assumes the pieces reconstitute hex which is converted to a string.
 	 * 
@@ -1195,1062 +2253,6 @@ var AppUtils = {
 				else if (minPieces !== decodedMin) throw new Error("piece.keys[" + i + "].wif has a different minimum threshold prefix");
 			}
 		}
-	},
-	
-	getCommonTicker: function(piece) {
-		assertTrue(piece.keys.length > 0);
-		var ticker;
-		for (var i = 0; i < piece.keys.length; i++) {
-			var pieceKey = piece.keys[i];
-			if (!ticker) ticker = pieceKey.ticker;
-			else if (ticker !== pieceKey.ticker) return "mix";
-		}
-		return ticker;
-	},
-	
-	/**
-	 * Returns a version of the string up to the given maxLength characters.
-	 * 
-	 * If the string is longer than maxLength, shortens the string by replacing middle characters with '...'.
-	 * 
-	 * @param str is the string to shorten
-	 * @param maxLength is the maximum length of the string
-	 * @return the given str if str.length <= maxLength, shortened version otherwise
-	 */
-	getShortenedString: function(str, maxLength) {
-		assertString(str);
-		if (str.length <= maxLength) return str;
-		var insert = '...';
-		var sideLength = Math.floor((maxLength - insert.length) / 2);
-		if (sideLength === 0) throw new Error("Cannot create string of length " + maxLength + " from string '" + str + "'");
-		return str.substring(0, sideLength) + insert + str.substring(str.length - sideLength);
-	},
-	
-	/**
-	 * Generates keys, pieces, rendered pieces according to a configuration.
-	 * 
-	 * @param config is the key generation configuration:
-	 * 	{
-	 * 		currencies: [{ticker: _, numKeys: _, encryption: _}, ...],
-	 * 		numPieces: _,
-	 * 		minPieces: _,
-	 * 		verifyEnryption: true|false	
-	 * 		passphrase: _,		// only needed if currency encryption initialized
-	 *    renderConfig: {}	// piece render config  TODO: rendering should probably not be a part of this function
-	 * 	}
-	 * @param onProgress(percent, label) is invoked as progress is made (optional)
-	 * @param onDone(err, keys, pieces, pieceDivs) is invoked when done
-	 * @param noInternetIsNotErrorAfterDependenciesLoaded makes lack of internet a non-error even if remote after dependencies are loaded (used on export page)
-	 */
-	generateKeys: function(config, onProgress, onDone, noInternetIsNotErrorAfterDependenciesLoaded) {
-		
-		// verify config
-		try {
-			assertInitialized(config.currencies);
-			assertTrue(config.currencies.length > 0);
-			var encryptionInitialized = false;
-			for (var i = 0; i < config.currencies.length; i++) {
-				assertInitialized(config.currencies[i].ticker);
-				assertInitialized(config.currencies[i].numKeys);
-				assertDefined(config.currencies[i].encryption);
-				if (isInitialized(config.currencies[i].encryption)) encryptionInitialized = true;
-			}
-			if (!config.numPieces) config.numPieces = 1;
-			if (encryptionInitialized) assertInitialized(config.passphrase);
-		} catch (err) {
-			onDone(err);
-			return;
-		}
-		
-		// track done and total weight for progress
-		var doneWeight = 0;
-		var totalWeight = AppUtils.getWeightGenerateKeys(config);
-
-		// load dependencies
-		var dependencies = [];
-		for (var i = 0; i < config.currencies.length; i++) {
-			var currency = config.currencies[i];
-			var pluginDependencies = AppUtils.getCryptoPlugin(currency.ticker).getDependencies();
-			for (var j = 0; j < pluginDependencies.length; j++) {
-				dependencies.push(pluginDependencies[j]);
-			}
-		}
-		dependencies = toUniqueArray(dependencies);
-		if (onProgress) onProgress(0, "Loading dependencies");
-		LOADER.load(dependencies, function(err) {
-			
-			// check for error
-			if (err) {
-				onDone(err);
-				return;
-			}
-			
-			// internet is no longer required if accessing remotely
-			if (noInternetIsNotErrorAfterDependenciesLoaded) AppUtils.setNoInternetCanBeError(false);
-			
-			// collect key creation functions
-			var funcs = [];
-			for (var i = 0; i < config.currencies.length; i++) {
-				var currency = config.currencies[i];
-				for (var j = 0; j < currency.numKeys; j++) {
-					funcs.push(newKeyFunc(AppUtils.getCryptoPlugin(currency.ticker)));
-				}
-			}
-			
-			// generate keys
-			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
-			async.series(funcs, function(err, keys) {
-					
-				// check for error
-				if (err) {
-					onDone(err);
-					return;
-				}
-				
-				// collect keys and schemes to encrypt
-				var keysToEncrypt = [];
-				var encryptionSchemes = [];
-				var keyIdx = 0;
-				for (var i = 0; i < config.currencies.length; i++) {
-					for (var j = 0; j < config.currencies[i].numKeys; j++) {
-						if (config.currencies[i].encryption) {
-							keysToEncrypt.push(keys[keyIdx]);
-							encryptionSchemes.push(config.currencies[i].encryption);
-						}
-						keyIdx++;
-					}
-				}
-									
-				// encrypt keys
-				if (keysToEncrypt.length > 0) {
-					assertEquals(keysToEncrypt.length, encryptionSchemes.length);
-					
-					// compute encryption + verification weight
-					var encryptWeight = 0;
-					for (var i = 0; i < encryptionSchemes.length; i++) {
-						encryptWeight += AppUtils.getWeightEncryptKey(encryptionSchemes[i]) + (config.verifyEncryption ? AppUtils.getWeightDecryptKey(encryptionSchemes[i]) : 0);
-					}
-					
-					// start encryption
-					if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
-					AppUtils.encryptKeys(keysToEncrypt, encryptionSchemes, config.passphrase, config.verifyEncryption, function(percent, label) {
-						if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
-					}, function(err, encryptedKeys) {
-						if (err) {
-							onDone(err);
-						} else {
-							doneWeight += encryptWeight;
-							generatePieces(keys, config);
-						}
-					});
-				}
-				
-				// no encryption
-				else {
-					generatePieces(keys, config);
-				}
-			});
-		});
-		
-		function newKeyFunc(plugin, onDone) {
-			return function(onDone) {
-				setImmediate(function() {	// let UI breath
-					var key;
-					try {
-						key = plugin.newKey();
-					} catch(err) {
-						onDone(err);
-						return;
-					}
-					doneWeight += AppUtils.getWeightCreateKey();
-					if (onProgress) onProgress(doneWeight / totalWeight, "Generating keys");
-					onDone(null, key);
-				});
-			}
-		}
-		
-		function generatePieces(keys, config) {
-				
-			// convert keys to pieces
-			var pieces = AppUtils.keysToPieces(keys, config.numPieces, config.minPieces);
-			
-			// verify pieces recreate keys
-			var keysFromPieces = AppUtils.piecesToKeys(pieces);
-			assertEquals(keys.length, keysFromPieces.length);
-			for (var i = 0; i < keys.length; i++) {
-				assertTrue(keys[i].equals(keysFromPieces[i]));
-			}
-			
-			// render pieces to divs
-			var renderWeight = IndustrialPieceRenderer.getWeight(keys.length, config.numPieces, null);
-			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering");
-			new IndustrialPieceRenderer(pieces, null, config.renderConfig).render(function(percent) {
-				if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering");
-			}, function(err, pieceDivs) {
-				if (err) onDone(err);
-				else if (pieces.length !== pieceDivs.length) onDone(new Error("pieces.length !== pieceDivs.length"));
-				else {
-					if (onProgress) onProgress(1, "Complete");
-					onDone(null, keys, pieces, pieceDivs);
-				}
-			});
-		}
-	},
-	
-	/**
-	 * Encrypts the given key with the given scheme and passphrase.
-	 * 
-	 * Requires crypto-js.js and bitcoinjs.js.
-	 * 
-	 * @param key is an unencrypted key to encrypt
-	 * @param scheme is the scheme to encrypt the key
-	 * @param passphrase is the passphrase to encrypt with
-	 * @param onProgress(percent) is invoked as progress as made (optional)
-	 * @param onDone(err, encryptedKey) is invoked when done
-	 */
-	encryptKey: function(key, scheme, passphrase, onProgress, onDone) {
-		
-		// validate input
-		try {
-			if (!scheme) throw new Error("Scheme must be initialized");
-			if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-			if (!passphrase) throw new Error("Passphrase must be initialized");
-			assertInitialized(onDone);
-		} catch (err) {
-			if (onDone) onDone(err);
-			return;
-		}
-		
-		// encrypt key according to scheme
-		var encryptFunc;
-		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) encryptFunc = encryptKeyV0;
-		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) encryptFunc = encryptKeyV1;
-		else if (scheme === AppUtils.EncryptionScheme.BIP38) encryptFunc = encryptKeyBip38;
-		else {
-			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
-			return;
-		}
-		encryptFunc(key, scheme, passphrase, onProgress, onDone);
-		
-		function encryptKeyV1(key, scheme, passphrase, onProgress, onDone) {
-			try {
-				
-				// create random salt and replace first two characters with version
-				var salt = CryptoJS.lib.WordArray.random(AppUtils.ENCRYPTION_V1_BLOCK_SIZE);
-				var hexVersion = AppUtils.ENCRYPTION_V1_VERSION.toString(16);
-				salt = hexVersion + salt.toString().substring(hexVersion.length);
-				salt = CryptoJS.enc.Hex.parse(salt);
-				
-				// strengthen passphrase with passphrase key
-				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-		      keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
-		      iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
-		      hasher: CryptoJS.algo.SHA512
-		    });
-				
-				// encrypt
-				var iv = salt;
-				var encrypted = CryptoJS.AES.encrypt(key.getHex(), passphraseKey, { 
-			    iv: iv, 
-			    padding: CryptoJS.pad.Pkcs7,
-			    mode: CryptoJS.mode.CBC
-			  });
-				
-				// encrypted hex = salt + hex cipher text
-				var ctHex = CryptoJS.enc.Base64.parse(encrypted.toString()).toString(CryptoJS.enc.Hex);
-				var encryptedHex = salt.toString() + ctHex;
-				key.setState(Object.assign(key.getPlugin().newKey(encryptedHex).getState(), {address: key.getAddress()}));
-				if (onProgress) onProgress(1);
-				if (onDone) onDone(null, key);
-			} catch (err) {
-				onDone(err);
-			}
-		}
-		
-		function encryptKeyV0(key, scheme, passphrase, onProgress, onDone) {
-			try {
-				var b64 = CryptoJS.AES.encrypt(key.getHex(), passphrase).toString();
-				key.setState(Object.assign(key.getPlugin().newKey(b64).getState(), {address: key.getAddress()}));
-				if (onProgress) onProgress(1);
-				if (onDone) onDone(null, key);
-			} catch (err) {
-				if (onDone) onDone(err);
-			}
-		}
-		
-		function encryptKeyBip38(key, scheme, passphrase, onProgress, onDone) {
-			try {
-				var decoded = bitcoinjs.decode(key.getWif());
-				bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
-					if (onProgress) onProgress(progress.percent / 100);
-				}, null, function(err, encryptedWif) {
-					try {
-						if (err) throw err;
-						key.setState(Object.assign(key.getPlugin().newKey(encryptedWif).getState(), {address: key.getAddress()}));
-						if (onDone) onDone(null, key);
-					} catch (err) {
-						if (onDone) onDone(err);
-					}
-				});
-			} catch (err) {
-				if (onDone) onDone(err);
-			}
-		}
-	},
-	
-	/**
-	 * Decrypts the given key with the given passphrase.
-	 * 
-	 * Requires bitcoin.js and crypto-js.js.
-	 * 
-	 * @param key is the key to decrypt
-	 * @param passphrase is the passphrase to decrypt the key
-	 * @param onProgress(percent) is invoked as progress is made (optional)
-	 * @param onDone(err, decryptedKey) is invoked when done
-	 */
-	decryptKey: function(key, passphrase, onProgress, onDone) {
-		
-		// validate input
-		try {
-			if (!isObject(key, CryptoKey)) throw new Error("Given key must be of class 'CryptoKey' but was " + cryptoKey);
-			if (!passphrase) throw new Error("Passphrase must be initialized");
-			assertTrue(key.isEncrypted());
-			assertInitialized(onDone)
-		} catch (err) {
-			if (onDone) onDone(err);
-			return;
-		}
-		
-		// decrypt key according to scheme
-		var decryptFunc;
-		var scheme = key.getEncryptionScheme();
-		if (scheme === AppUtils.EncryptionScheme.V0_CRYPTOJS) decryptFunc = decryptKeyV0;
-		else if (scheme === AppUtils.EncryptionScheme.V1_CRYPTOJS) decryptFunc = decryptKeyV1;
-		else if (scheme === AppUtils.EncryptionScheme.BIP38) decryptFunc = decryptKeyBip38;
-		else {
-			onDone(new Error("Encryption scheme '" + scheme + "' not supported"));
-			return;
-		}
-		decryptFunc(key, scheme, passphrase, onProgress, onDone);
-		
-		function decryptKeyV1(key, scheme, passphrase, onProgress, onDone) {
-			try {
-				
-				// assert correct version
-				assertEquals(AppUtils.ENCRYPTION_V1_VERSION, parseInt(key.getHex().substring(0, AppUtils.ENCRYPTION_V1_VERSION.toString(16).length), 16));
-				
-				// get passphrase key
-				var salt = CryptoJS.enc.Hex.parse(key.getHex().substr(0, 32));
-			  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-			  	keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
-			  	iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
-			  	hasher: CryptoJS.algo.SHA512
-			  });
-			  
-			  // decrypt
-			  var iv = salt;
-			  var ctHex = key.getHex().substring(32);
-			  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
-			  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
-			  	iv: iv, 
-			    padding: CryptoJS.pad.Pkcs7,
-			    mode: CryptoJS.mode.CBC
-			  });
-			  var decryptedHex = decrypted.toString(CryptoJS.enc.Utf8);
-			  assertInitialized(decryptedHex);
-			  
-			  // update key
-			  key.setPrivateKey(decryptedHex);
-				if (onProgress) onProgress(1)
-				if (onDone) onDone(null, key);
-			} catch (err) {
-				onDone(new Error("Incorrect passphrase"));
-			}
-		}
-		
-		function decryptKeyV0(key, scheme, passphrase, onProgress, onDone) {
-			try {
-				var hex;
-				try {
-					hex = CryptoJS.AES.decrypt(key.getWif(), passphrase).toString(CryptoJS.enc.Utf8);
-				} catch (err) { }
-				if (!hex) throw new Error("Incorrect passphrase");
-				try {
-					key.setPrivateKey(hex);
-					if (onProgress) onProgress(1)
-					if (onDone) onDone(null, key);
-				} catch (err) {
-					throw new Error("Incorrect passphrase");
-				}
-			} catch (err) {
-				if (onDone) onDone(err);
-			}
-		}
-		
-		function decryptKeyBip38(key, scheme, passphrase, onProgress, onDone) {
-			bitcoinjs.decrypt(key.getWif(), passphrase, function(progress) {
-				if (onProgress) onProgress(progress.percent / 100);
-			}, null, function(err, decrypted) {
-				try {
-					if (err) throw new Error("Incorrect passphrase");
-					var privateKey = bitcoinjs.encode(0x80, decrypted.privateKey, true);
-					key.setPrivateKey(privateKey);
-					if (onDone) onDone(null, key);
-				} catch (err) {
-					if (onDone) onDone(err);
-				}
-			});
-		}
-	},
-	
-	/**
-	 * Encrypts the given keys with the given encryption schemes.
-	 * 
-	 * @param keys are the keys to encrypt
-	 * @param encryptionSchemes are the schemes to encrypt the keys
-	 * @param passphrase is the passphrase to encrypt the keys with
-	 * @param verifyEncryption specifies if encryption should be verified by decrypting
-	 * @param onProgress(percent, label) is invoked as progress is made (optional)
-	 * @param onDone(err, encryptedKeys) is invoked when encryption is done (optional)
-	 */
-	encryptKeys: function(keys, encryptionSchemes, passphrase, verifyEncryption, onProgress, onDone) {
-		
-		// verify input
-		try {
-			assertEquals(keys.length, encryptionSchemes.length);
-			assertInitialized(passphrase);
-		} catch (err) {
-			if (onDone) onDone(err);
-		}
-		
-		// collect originals if verifying encryption
-		var originals;
-		if (verifyEncryption) {
-			originals = [];
-			for (var i = 0; i < keys.length; i++) {
-				originals.push(keys[i].copy());
-			}
-		}
-		
-		// track weights for progress
-		var doneWeight = 0;
-		var verifyWeight = 0;
-		var totalWeight = 0;
-		
-		// collect encryption functions and weights
-		var funcs = [];
-		for (var i = 0; i < keys.length; i++) {
-			totalWeight += AppUtils.getWeightEncryptKey(encryptionSchemes[i]);
-			if (verifyEncryption) verifyWeight += AppUtils.getWeightDecryptKey(encryptionSchemes[i]);
-			funcs.push(encryptFunc(keys[i], encryptionSchemes[i], passphrase));
-		}
-		totalWeight += verifyWeight;
-		
-		// encrypt async
-		if (onProgress) onProgress(0, "Encrypting");
-		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeys) {
-			
-			// check for error
-			if (err) {
-				if (onDone) onDone(err);
-				return;
-			}
-			
-			// verify encryption
-			if (verifyEncryption) {
-				
-				// copy encrypted keys
-				var encryptedCopies = [];
-				for (var i = 0; i < encryptedKeys.length; i++) {
-					encryptedCopies.push(encryptedKeys[i].copy());
-				}
-				
-				// decrypt keys
-				if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
-				AppUtils.decryptKeys(encryptedCopies, passphrase, null, function(percent) {
-					if (onProgress) onProgress((doneWeight + percent * verifyWeight) / totalWeight, "Verifying encryption");
-				}, function(err, decryptedKeys) {
-					try {
-						
-						// check for error
-						if (err) throw err;
-						
-						// assert originals match decrypted keys
-						doneWeight += verifyWeight;
-						assertEquals(originals.length, decryptedKeys.length);
-						for (var j = 0; j < originals.length; j++) {
-							assertTrue(originals[j].equals(decryptedKeys[j]));
-						}
-						
-						// done
-						if (onDone) onDone(null, encryptedKeys);
-					} catch (err) {
-						if (onDone) onDone(err);
-					}
-				})
-			}
-			
-			// don't verify encryption
-			else {
-				if (onDone) onDone(err, encryptedKeys);
-			}
-		});
-		
-		function encryptFunc(key, scheme, passphrase) {
-			return function(onDone) {
-				key.encrypt(scheme, passphrase, function(percent) {
-					if (onProgress) onProgress((doneWeight +  AppUtils.getWeightEncryptKey(scheme) * percent) / totalWeight, "Encrypting");
-				}, function(err, key) {
-					if (err) onDone(err);
-					else {
-						doneWeight += AppUtils.getWeightEncryptKey(scheme);
-						if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
-						setImmediate(function() { onDone(null, key); });	// let UI breath
-					}
-				});
-			}
-		}
-	},
-	
-	/**
-	 * Decrypts the given keys.
-	 * 
-	 * @param keys are the encrypted keys to decrypt
-	 * @param phassphrase is the phassphrase to decrypt the keys
-	 * @param canceller.isCancelled specifies if decryption should be cancelled
-	 * @param onProgress(done, total) is called as progress is made
-	 * @param onDone(err, decryptedKeys) is called when decryption is complete
-	 */
-	decryptKeys: function(keys, passphrase, canceller, onProgress, onDone) {
-		
-		// validate input
-		try {
-			assertInitialized(keys);
-			assertTrue(keys.length > 0);
-			assertInitialized(passphrase);
-			assertInitialized(onDone);
-		} catch (err) {
-			if (onDone) onDone(err);
-		}
-		
-		// compute weight
-		var totalWeight = 0;
-		for (var i = 0; i < keys.length; i++) {
-			totalWeight += AppUtils.getWeightDecryptKey(keys[i].getEncryptionScheme());
-		}
-		
-		// decrypt keys
-		var funcs = [];
-		for (var i = 0; i < keys.length; i++) funcs.push(decryptFunc(keys[i], passphrase));
-		var doneWeight = 0;
-		if (onProgress) onProgress(0, "Decrypting");
-		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, result) {
-			if (canceller && canceller.isCancelled) return;
-			else if (err) onDone(err);
-			else onDone(null, keys);
-		});
-		
-		// decrypts one key
-		function decryptFunc(key, passphrase) {
-			return function(onDone) {
-				if (canceller && canceller.isCancelled) return;
-				var scheme = key.getEncryptionScheme();
-				key.decrypt(passphrase, function(percent) {
-					if (onProgress) onProgress((doneWeight + AppUtils.getWeightDecryptKey(scheme) * percent) / totalWeight, "Decrypting");
-				}, function(err, key) {
-					if (canceller && canceller.isCancelled) return;
-					if (err) onDone(err);
-					else {
-						doneWeight += AppUtils.getWeightDecryptKey(scheme);
-						if (onProgress) onProgress(doneWeight / totalWeight);
-						setImmediate(function() { onDone(err, key); });	// let UI breath
-					}
-				});
-			}
-		}
-	},
-	
-	// Relative weights of key generation derived from experimentation and used for representative progress bars
-	
-	/**
-	 * Computes the total weight for the given key generation configuration.
-	 * 
-	 * @param keyGenConfig is the key generation configuration to get the weight of
-	 * @return the weight of the given key genereation configuration
-	 */
-	getWeightGenerateKeys: function(keyGenConfig) {
-		var weight = 0;
-		var numKeys = 0;
-		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
-			var currency = keyGenConfig.currencies[i];
-			numKeys += currency.numKeys;
-			weight += currency.numKeys * AppUtils.getWeightCreateKey();
-			if (currency.encryption) weight += currency.numKeys * (AppUtils.getWeightEncryptKey(currency.encryption) + (keyGenConfig.verifyEncryption ? AppUtils.getWeightDecryptKey(currency.encryption) : 0));
-		}
-		return weight + IndustrialPieceRenderer.getWeight(numKeys, keyGenConfig.numPieces, null);
-	},
-	
-	/**
-	 * Returns the weight to encrypt a key with the given scheme.
-	 * 
-	 * @param scheme is the scheme to encrypt a key with
-	 * @returns weight is the weight to encrypt a key with the given scheme
-	 */
-	getWeightEncryptKey: function(scheme) {
-		switch (scheme) {
-			case AppUtils.EncryptionScheme.BIP38:
-				return 4187;
-			case AppUtils.EncryptionScheme.V0_CRYPTOJS:
-				return 10;
-			case AppUtils.EncryptionScheme.V1_CRYPTOJS:
-				return 540;
-			default: throw new Error("Unrecognized encryption scheme: " + scheme);
-		}
-	},
-	
-	/**
-	 * Returns the weight to decrypt the given keys.
-	 * 
-	 * @param encryptedKeys are encrypted keys to determine the weight of to decrypt
-	 * @returns the weight to decrypt the given keys
-	 */
-	getWeightDecryptKeys: function(encryptedKeys) {
-		var weight = 0;
-		for (var i = 0; i < encryptedKeys.length; i++) {
-			var key = encryptedKeys[i];
-			assertTrue(key.isEncrypted());
-			weight += AppUtils.getWeightDecryptKey(key.getEncryptionScheme());
-		}
-		return weight;
-	},
-
-	/**
-	 * Returns the weight to decrypt a key with the given scheme.
-	 * 
-	 * @param scheme is the scheme to decrypt a key with
-	 * @returns weight is the weigh tto decrypt a key with the given scheme
-	 */
-	getWeightDecryptKey: function(scheme) {
-		switch (scheme) {
-			case AppUtils.EncryptionScheme.BIP38:
-				return 4581;
-			case AppUtils.EncryptionScheme.V0_CRYPTOJS:
-				return 100;
-			case AppUtils.EncryptionScheme.V1_CRYPTOJS:
-				return 540;
-			default: throw new Error("Unrecognized encryption scheme: " + scheme);
-		}
-	},
-	
-	getWeightCreateKey: function() { return 63; },
-	
-	/**
-	 * Gets a formatted timestamp.
-	 */
-	getTimestamp: function() {
-		var date = new Date();
-		var year = date.getFullYear();
-		var month = date.getMonth() + 1;
-		if (month < 10) month = "0" + month;
-		var day = date.getDate();
-		if (day < 10) day = "0" + day;
-		var hour = date.getHours();
-		if (hour < 10) hour = "0" + hour;
-		var min = date.getMinutes();
-		if (min < 10) min = "0" + min;
-//		var sec = date.getSeconds();
-//		if (sec < 10) sec = "0" + sec;
-		return "" + year + month + day + hour + min;
-	},
-	
-	/**
-	 * Returns browser info.
-	 * 
-	 * Requires lib/ua-parser.js to be loaded.
-	 * 
-	 * @returns
-	 * 	{
-	 * 		name: "...",
-	 * 		version: "...",
-	 * 		major: e.g. 57
-	 * 	 	windowCryptoExists: true|false,
-	 * 		isOpenSource: true|false,
-	 * 	  isSupported: true|false
-	 * 	}
-	 */
-	getBrowserInfo: function() {
-		
-		// parse browser user agent
-		var parser = new UAParser();
-		var result = parser.getResult();
-		
-		// build info and return
-		var info = {};
-		info.name = result.browser.name;
-		if (info.name === "Chrome" && !isChrome()) info.name = "Chromium";	// check for chromium
-		info.version = result.browser.version;
-		info.major = Number(result.browser.major);
-		info.isOpenSource = isOpenSourceBrowser(info.name);
-		info.windowCryptoExists = window.crypto ? true : false;
-		info.isSupported = isSupportedBrowser(info);
-		return info;
-		
-		// determines if chrome by checking for in-built PDF viewer
-		function isChrome() {
-			for (var i = 0; i < navigator.plugins.length; i++) {
-				if (navigator.plugins[i].name === "Chrome PDF Viewer") return true;
-			}
-			return false;
-		}
-		
-		// determines if browser is open source
-		function isOpenSourceBrowser(browserName) {
-			if (arrayContains(AppUtils.OPEN_SOURCE_BROWSERS, browserName)) return true;
-			if (arrayContains(AppUtils.CLOSED_SOURCE_BROWSERS, browserName)) return false;
-			return null;
-		}
-		
-		// determines if the browser is supported
-		function isSupportedBrowser(browserInfo) {
-			if (!browserInfo.windowCryptoExists) return false;
-			if (browserInfo.name === "IE" && browserInfo.major < 11) return false;
-			return true;
-		}
-	},
-	
-	/**
-	 * Returns operating system info.
-	 * 
-	 * Requires lib/ua-parser.js to be loaded.
-	 * 
-	 * @returns
-	 * 	{
-	 * 		name: "...",
-	 * 		version: "...",
-	 * 		isOpenSource: true|false
-	 * 	}
-	 */
-	getOsInfo: function() {
-		
-		// parse browser user agent
-		var parser = new UAParser();
-		var result = parser.getResult();
-		
-		// build and return response
-		var info = {};
-		info.name = result.os.name;
-		info.version = result.os.version;
-		info.isOpenSource = isOpenSourceOs(info);
-		return info;
-		
-		function isOpenSourceOs(osInfo) {
-			if (arrayContains(AppUtils.OPEN_SOURCE_OPERATING_SYSTEMS, osInfo.name)) return true;
-			if (arrayContains(AppUtils.CLOSED_SOURCE_OPERATING_SYSTEMS, osInfo.name)) return false;
-			return null;
-		}
-	},
-
-	/**
-	 * Determines if this app is running locally or from a remote domain.
-	 * 
-	 * @returns true if running local, false otherwise
-	 */
-	isLocal: function() {
-		return window.location.href.indexOf("file://") > -1;
-	},
-	
-	/**
-	 * Determines if this app has an internet connection.
-	 * 
-	 * @param isOnline(true|false) is invoked when connectivity is determined
-	 * @returns true if this app is online, false otherwise
-	 */
-	isOnline: function(isOnline) {
-		isImageAccessible(AppUtils.ONLINE_IMAGE_URL, AppUtils.ONLINE_DETECTION_TIMEOUT, isOnline);
-	},
-	
-	/**
-	 * Gets all environment info that can be determined synchronously.
-	 * 
-	 * Requires lib/ua-parser.js to be loaded.
-	 * 
-	 * @returns info that can be acquired synchronously
-	 */
-	getEnvironmentSync: function() {		
-		var info = {};
-		info.browser = AppUtils.getBrowserInfo();
-		info.os = AppUtils.getOsInfo();
-		info.isLocal = AppUtils.isLocal();
-		info.runtimeError = AppUtils.RUNTIME_ERROR;
-		info.dependencyError = AppUtils.DEPENDENCY_ERROR;
-		info.tabError = AppUtils.TAB_ERROR;
-		if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = Object.assign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
-		info.checks = AppUtils.getEnvironmentChecks(info);
-		return info;
-	},
-	
-	/**
-	 * Gets all environment info.
-	 * 
-	 * Requires lib/ua-parser.js to be loaded.
-	 * 
-	 * @param onDone(info) is asynchronously invoked when all info is retrieved
-	 */
-	getEnvironment: function(onDone) {
-		AppUtils.isOnline(function(online) {
-			var info = AppUtils.getEnvironmentSync();
-			info.isOnline = online;
-			if (AppUtils.MOCK_ENVIRONMENT_ENABLED) info = Object.assign(info, AppUtils.MOCK_ENVIRONMENT);	// merge mock environment
-			info.checks = AppUtils.getEnvironmentChecks(info);
-			if (onDone) onDone(info);
-		});
-	},
-	
-	/**
-	 * Enumerates environment check codes.
-	 */
-	EnvironmentCode: {
-		BROWSER: "BROWSER",
-		OPERATING_SYSTEM: "OPERATING_SYSTEM",
-		INTERNET: "INTERNET",
-		IS_LOCAL: "IS_LOCAL",
-		RUNTIME_ERROR: "RUNTIME_ERROR",
-		OPEN_SOURCE: "OPEN_SOURCE",
-	},
-	
-	/**
-	 * Interprets the given environment info and returns pass/fail/warn checks.
-	 * 
-	 * @param info is output from getEnvironmentInfo()
-	 * @returns [{state: "pass|fail|warn", code: "..."}, ...]
-	 */
-	getEnvironmentChecks: function(info) {
-		var checks = [];
-		
-		// check if browser supported
-		if (info.browser && !info.browser.isSupported) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER});
-		
-		// check if runtime error
-		if (info.runtimeError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.RUNTIME_ERROR});
-		
-		// check if dependency error
-		if (info.dependencyError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.INTERNET});
-		
-		// check if tab error
-		if (info.tabError) checks.push({state: "fail", code: AppUtils.EnvironmentCode.BROWSER});
-		
-		// check if remote and not online
-		var internetRequiredError = false;
-		if (isInitialized(info.isOnline)) {
-			if (!info.isLocal && !info.isOnline && AppUtils.NO_INTERNET_CAN_BE_ERROR) {
-				internetRequiredError = true;
-				checks.push({state: "fail", code: AppUtils.EnvironmentCode.INTERNET});
-			}
-		}
-		
-		// check if online
-		if (!internetRequiredError && !info.dependencyError && isInitialized(info.isOnline)) {
-			if (!info.isOnline) checks.push({state: "pass", code: AppUtils.EnvironmentCode.INTERNET});
-			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.INTERNET});
-		}
-		
-		// check if local
-		if (isInitialized(info.isLocal)) {
-			if (info.isLocal) checks.push({state: "pass", code: AppUtils.EnvironmentCode.IS_LOCAL});
-			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.IS_LOCAL});
-		}
-		
-		// check open source browser
-		if (info.browser && info.browser.isSupported) {
-			if (info.browser.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.BROWSER});
-			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.BROWSER});
-		}
-		
-		// check open source os
-		if (isInitialized(info.os)) {
-			if (info.os.isOpenSource) checks.push({state: "pass", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
-			else checks.push({state: "warn", code: AppUtils.EnvironmentCode.OPERATING_SYSTEM});
-		}
-		
-		return checks;
-	},
-	
-	/**
-	 * Sets the cached environment info.
-	 * 
-	 * @param environment is the cached environment info to set
-	 */
-	setCachedEnvironment: function(environment) {
-		AppUtils.environment = environment;
-	},
-	
-	/**
-	 * Returns the cached environment info.
-	 */
-	getCachedEnvironment: function() {
-		return AppUtils.environment;
-	},
-	
-	/**
-	 * Polls environment info and notifies listeners on loop.
-	 * 
-	 * Requires lib/ua-parser.js to be loaded.
-	 * 
-	 * @param initialEnvironmentInfo is initial environment info to notify listeners
-	 */
-	pollEnvironment: function(initialEnvironmentInfo) {
-		
-		// notify listeners of initial environment info
-		if (initialEnvironmentInfo) setEnvironmentInfo(initialEnvironmentInfo);
-		
-		// refresh environment info on loop
-		refreshEnvironmentInfo();
-		function refreshEnvironmentInfo() {
-			AppUtils.getEnvironment(function(info) {
-				setEnvironmentInfo(info);
-			});
-			setTimeout(refreshEnvironmentInfo, AppUtils.ENVIRONMENT_REFRESH_RATE);
-		}
-		
-		function setEnvironmentInfo(info) {
-			AppUtils.environment = info;
-			AppUtils.notifyEnvironmentListeners(info);
-		}
-	},
-	
-	/**
-	 * Registers an environment listener to be notified when environment info is updated.
-	 * 
-	 * Synchronously calls the listener with the last known environment info.
-	 * 
-	 * @param listener(info) will be invoked as environment info is updated
-	 */
-	addEnvironmentListener: function(listener) {
-		assertInitialized(listener);
-		if (!AppUtils.environmentListeners) AppUtils.environmentListeners = [];
-		AppUtils.environmentListeners.push(listener);
-		if (AppUtils.environment) listener(AppUtils.environment);
-	},
-	
-	/**
-	 * Notifies all registered environment listeners of updated environment info.
-	 * 
-	 * @param info is the environment info to notify listeners of
-	 */
-	notifyEnvironmentListeners: function(info) {
-		if (!AppUtils.environmentListeners) return;
-		for (var i = 0; i < AppUtils.environmentListeners.length; i++) {
-			var listener = AppUtils.environmentListeners[i];
-			if (listener) listener(info);
-		}
-	},
-	
-	/**
-	 * Determines if the given environment info has the given state.
-	 * 
-	 * @param info is environment info with state
-	 * @param state is the state to check the environment info for
-	 * @returns true if the environment info has the given state, false otherwise
-	 */
-	hasEnvironmentState: function(state) {
-		for (var i = 0; i < AppUtils.environment.checks.length; i++) {
-			if (AppUtils.environment.checks[i].state === state) return true;
-		}
-		return false;
-	},
-	
-	/**
-	 * Set an unexpected runtime error and notifies all listeners of the updated environment.
-	 */
-	setRuntimeError: function(err) {
-		if (!AppUtils.environment) AppUtils.environment = {};
-		AppUtils.RUNTIME_ERROR = err;
-		AppUtils.environment.runtimeError = err;
-		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
-		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
-	},
-	
-	/**
-	 * Sets an error if cannot fetch dependencies.
-	 * 
-	 * @param bool specifies if the dependency error is enabled or disabled
-	 */
-	setDependencyError: function(bool) {
-		if (!AppUtils.environment) AppUtils.environment = {};
-		AppUtils.DEPENDENCY_ERROR = bool;
-		AppUtils.environment.dependencyError = bool;
-		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
-		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
-	},
-	
-	/**
-	 * Sets an error if a new tab cannot be opened.
-	 */
-	setTabError: function(bool) {
-		if (!AppUtils.environment) AppUtils.environment = {};
-		AppUtils.TAB_ERROR = bool;
-		AppUtils.environment.tabError = bool;
-		AppUtils.environment.checks = AppUtils.getEnvironmentChecks(AppUtils.environment);
-		AppUtils.notifyEnvironmentListeners(AppUtils.environment);
-	},
-	
-		/**
-	 * Sets if lack of internet can be a critical error if the site is running remotely.
-	 * 
-	 * After dependencies are done loading in the export page, internet is no longer required
-	 * even if the site is running remotely, so this method stops treating internet disconnection
-	 * as critical.
-	 * 
-	 * @param bool specifies if no internet can be a critical error
-	 */
-	setNoInternetCanBeError: function(bool) {
-		AppUtils.NO_INTERNET_CAN_BE_ERROR = bool;
-	},
-	
-	/**
-	 * Runs minimum tests to sanity check key generation, encryption, and splitting.
-	 * 
-	 * @param onDone(err) is invoked when done
-	 */
-	runMinimumTests: function(onDone) {
-		
-		// build key generation configuration
-		var config = {};
-		config.passphrase = Tests.PASSPHRASE;
-		config.numPieces = 3;
-		config.minPieces = 2;
-		config.verifyEncryption = false;
-		config.currencies = [];
-		config.currencies.push({
-			ticker: AppUtils.getCryptoPlugin("BTC").getTicker(),
-			numKeys: 1,
-			encryption: null
-		});
-		config.currencies.push({
-			ticker: AppUtils.getCryptoPlugin("XMR").getTicker(),
-			numKeys: 1,
-			encryption: AppUtils.EncryptionScheme.V0_CRYPTOJS	// just makes sure cryptojs is in place
-		});
-		config.currencies.push({
-			ticker: AppUtils.getCryptoPlugin("ETH").getTicker(),
-			numKeys: 1,
-			encryption: null
-		});
-		
-		// generate keys and test
-		AppUtils.generateKeys(config, null, function(err, keys, pieces, pieceDivs) {
-			if (err) onDone(err);
-			else {
-				try {
-					assertEquals(3, keys.length);
-					assertEquals(3, pieces.length);
-					assertEquals(3, pieceDivs.length);
-					onDone(null);
-				} catch (err) {
-					onDone(err);
-				}
-			}
-		});
 	},
 	
 	// ------------------------------ NEW KEYPAIRS ------------------------------
