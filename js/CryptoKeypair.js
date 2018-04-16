@@ -25,38 +25,39 @@
 /**
  * Encapsulates a crypto keypair which has a public and private component.
  * 
- * One of plugin, json, or splitKeypairs is required.
+ * One of plugin, keypairJson, or splitKeypairs is required.
  * 
- * @param plugin is the crypto plugin
- * @param json is exportable json to initialize from
- * @param splitKeypairs are split keypairs to combine and initialize from
- * @param privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
- * @param publicAddress is a public address to manually set if not unencrypted (optional)
- * @param shareNum is the share number (optional)
+ * @param config is initialization configuration
+ * 				config.plugin is the crypto plugin
+ * 				config.keypairJson is exportable json to initialize from
+ * 				config.splitKeypairs are split keypairs to combine and initialize from
+ * 				config.privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
+ * 				config.publicAddress is a public address to manually set if not unencrypted (optional)
+ * 				config.shareNum is the share number (optional)
  */
-function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, shareNum) {
+function CryptoKeypair(config) {
 	
 	var that = this;
-	var decoded;
+	var state;
 	
 	this.getPlugin = function() {
-		return plugin;
+		return state.plugin;
 	}
 	
 	this.getPublicAddress = function() {
-		return decoded.address;
+		return state.publicAddress;
 	}
 	
 	this.getPrivateLabel = function() {
-		return plugin.getPrivateLabel();
+		return state.plugin.getPrivateLabel();
 	}
 	
 	this.getPrivateHex = function() {
-		return decoded.hex;
+		return state.privateHex;
 	}
 	
 	this.getPrivateWif = function() {
-		return decoded.wif;
+		return state.privateWif;
 	}
 	
 	this.encrypt = function(scheme, passphrase, onProgress, onDone) {
@@ -76,7 +77,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	 * Returns null if unencrypted, undefined if unknown, or one of AppUtils.EncryptionScheme otherwise.
 	 */
 	this.getEncryptionScheme = function() {
-		return decoded.encryption;
+		return state.encryption;
 	}
 	
 	this.isEncrypted = function() {
@@ -85,7 +86,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	}
 	
 	this.decrypt = function(passphrase, onProgress, onDone) {
-		assertInitialized(decoded.encryption, "Keypair must be encrypted to decrypt");
+		assertInitialized(state.encryption, "Keypair must be encrypted to decrypt");
 		AppUtils.decryptHex(that.getPrivateHex(), that.getEncryptionScheme(), passphrase, onProgress, function(err, decryptedHex) {
 			if (err) onDone(err);
 			else {
@@ -114,7 +115,12 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		// create keypairs
 		var splitKeypairs = [];
 		for (var i = 0; i < shares.length; i++) {
-			splitKeypairs.push(new CryptoKeypair(plugin, null, null, shares[i], that.getPublicAddress(), i + 1));
+			splitKeypairs.push(new CryptoKeypair({
+				plugin: state.plugin,
+				privateKey: shares[i],
+				publicAddress: that.getPublicAddress(),
+				shareNum: i + 1
+			}));
 		}
 		return splitKeypairs;
 	}
@@ -125,25 +131,30 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	}
 	
 	this.getMinShares = function() {
-		return decoded.minShares;
+		return state.minShares;
 	}
 	
 	this.getShareNum = function() {
-		return decoded.shareNum;
+		return state.shareNum;
 	}
 	
 	this.getJson = function() {
 		return {
-			ticker: plugin.getTicker(),
-			address: that.getPublicAddress(),
-			wif: that.getPrivateWif(),
+			ticker: state.plugin.getTicker(),
+			publicAddress: that.getPublicAddress(),
+			privateWif: that.getPrivateWif(),
 			encryption: that.getEncryptionScheme(),
 			shareNum: that.getShareNum()
 		};
 	}
 	
 	this.copy = function() {
-		return new CryptoKeypair(plugin, null, null, that.getPrivateHex(), that.getPublicAddress(), that.getShareNum());
+		return new CryptoKeypair({
+			plugin: state.plugin,
+			privateKey: state.privateHex,
+			publicAddress: state.publicAddress,
+			shareNum: state.shareNum
+		});
 	}
 	
 	this.equals = function(keypair) {
@@ -151,53 +162,66 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		return objectsEqual(that.getJson(), keypair.getJson());
 	}
 	
-	this.getDecoded = function() {
-		return decoded;
+	this.getState = function() {
+		return state;
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	init();
 	function init() {
-		if (plugin) {
-			assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
-			setPrivateKey(privateKey);
-			if (publicAddress) setPublicAddress(publicAddress);
+		state = {};
+		if (config.plugin) {
+			assertTrue(isObject(config.plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
+			state.plugin = config.plugin;
+			if (isDefined(config.privateKey)) setPrivateKey(config.privateKey);
+			else setPrivateKey(config.plugin.randomPrivateKey());
+			if (config.publicAddress) setPublicAddress(config.publicAddress);
 		}
-		else if (json) fromJson(json);
-		else if (splitKeypairs) combine(splitKeypairs);
-		else throw new Error("One of plugin, json, or splitKeypairs is required");
+		else if (config.keypairJson) fromJson(config.keypairJson);
+		else if (config.splitKeypairs) combine(config.splitKeypairs);
 		
-		// verify decoding
-		verifyDecoded(decoded);
+		// verify state
+		verifyState();
 	}
 	
-	function verifyDecoded(decoded) {
-		if (decoded.wif) {
-			assertInitialized(decoded.hex);
-			assertDefined(decoded.minShares);
-			if (!decoded.minShares) assertDefined(decoded.encryption);
-			if (isNumber(decoded.minShares)) {
-				assertUndefined(decoded.encryption);
-				assertTrue(decoded.minShares >= 2);
-				assertTrue(decoded.minShares <= AppUtils.MAX_SHARES);
-				assertTrue(isUndefined(decoded.shareNum) || decoded.shareNum === null || isNumber(decoded.shareNum));
-				if (isNumber(decoded.shareNum)) {
-					assertTrue(decoded.shareNum >= 1);
-					assertTrue(decoded.shareNum <= AppUtils.MAX_SHARES);
+	// TODO: re-write this to veirfy whole state
+	function verifyState() {
+		if (!state.plugin && !state.keypairJson && !state.splitKeypairs) {
+			throw new Error("One of plugin, keypairJson, or splitKeypairs is required");
+		}
+		if (state.wif) {
+			assertInitialized(state.hex);
+			assertDefined(state.minShares);
+			if (!state.minShares) assertDefined(state.encryption);
+			if (isNumber(state.minShares)) {
+				assertUndefined(state.encryption);
+				assertTrue(state.minShares >= 2);
+				assertTrue(state.minShares <= AppUtils.MAX_SHARES);
+				assertTrue(isUndefined(state.shareNum) || state.shareNum === null || isNumber(state.shareNum));
+				if (isNumber(state.shareNum)) {
+					assertTrue(state.shareNum >= 1);
+					assertTrue(state.shareNum <= AppUtils.MAX_SHARES);
 				}
 			}
 		}
-		if (decoded.hex) assertInitialized(decoded.wif);
+		if (state.hex) assertInitialized(state.wif);
 	}
 	
 	function setPrivateKey(privateKey) {
+		assertInitialized(state.plugin);
+		assertString(privateKey);
+		assertInitialized(privateKey);
 
 		// decode with plugin
-		decoded = plugin.decode(privateKey);
+		var decoded = state.plugin.decode(privateKey);
 		if (decoded) {
-			decoded.minShares = null;
-			decoded.shareNum = null;
+			state.privateHex = decoded.privateHex;
+			state.privateWif = decoded.privateWif;
+			state.publicAddress = decoded.publicAddress;
+			state.encryption = decoded.encryption;
+			state.minShares = null;
+			state.shareNum = null;
 			return;
 		}
 		
@@ -205,37 +229,51 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		assertNotNull(privateKey);
 		
 		// encrypted with cryptostorage conventions
-		if ((decoded = AppUtils.decodeEncryptedKey(privateKey)) !== null) {
-			decoded.minShares = null;
-			decoded.shareNum = null;
+		decoded = decodeEncryptedKey(privateKey);
+		if (decoded) {
+			state.privateHex = decoded.privateHex;
+			state.privateWif = decoded.privateWif;
+			state.publicAddress = undefined;
+			state.encryption = decoded.encryption;
+			state.minShares = null;
+			state.shareNum = null;
 			return;
 		}
 		
 		// split share with cryptostorage conventions
-		var decodedShare = decodeWifShare(privateKey);
-		assertInitialized(decodedShare, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
-		decoded = {};
-		decoded.wif = privateKey;
-		decoded.hex = AppUtils.toBase(58, 16, decoded.wif);
-		decoded.minShares = decodedShare.minShares;
-		assertTrue(isUndefined(shareNum) || shareNum === null || isNumber(shareNum));
-		if (isNumber(shareNum)) assertTrue(shareNum >= 1 && shareNum <= AppUtils.MAX_SHARES);
-		decoded.shareNum = shareNum;
+		decoded = decodeWifShare(privateKey);
+		if (decoded) {
+			state.privateWif = privateKey;
+			state.privateHex = AppUtils.toBase(58, 16, state.privateWif);
+			state.publicAddress = undefined;
+			state.encryption = undefined;
+			state.minShares = decoded.minShares;
+			
+			// assign share num
+			assertTrue(isUndefined(config.shareNum) || config.shareNum === null || isNumber(config.shareNum));
+			if (isNumber(config.shareNum)) assertTrue(config.shareNum >= 1 && config.shareNum <= AppUtils.MAX_SHARES);
+			state.shareNum = config.shareNum;
+			return;
+		}
+		
+		// unrecognized private key
+		throw new Error("Unrecognized " + state.plugin.getTicker() + " private key");
 	}
 	
-	function fromJson(json) {
-		plugin = AppUtils.getCryptoPlugin(json.ticker);
-		assertInitialized(plugin);
-		if (json.wif) {
-			decoded = plugin.decode(json.wif);
-			assertInitialized(decoded, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
-			if (!decoded.address) decoded.address = json.address;
-			else if (json.address) assertEquals(decoded.address, json.address, "Derived and given addresses do not match");
-			if (!decoded.encryption) decoded.encryption = json.encryption;
-			else if (json.encryption) assertEquals(decoded.encryption, json.encryption, "Decoded and given encryption schemes do not match");			
+	// TODO: support old and new format
+	function fromJson(keypairJson) {
+		plugin = AppUtils.getCryptoPlugin(keypairJson.ticker);
+		assertInitialized(state.plugin);
+		if (keypairJson.wif) {
+			state = plugin.decode(keypairJson.wif);
+			assertInitialized(state, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
+			if (!state.publicAddress) state.publicAddress = keypairJson.address;
+			else if (keypairJson.address) assertEquals(state.address, keypairJson.address, "Derived and given addresses do not match");
+			if (!state.encryption) state.encryption = keypairJson.encryption;
+			else if (keypairJson.encryption) assertEquals(state.encryption, keypairJson.encryption, "Decoded and given encryption schemes do not match");			
 		} else {
-			decoded = {};
-			decoded.address = json.address;
+			state = {};
+			state.address = keypairJson.address;
 		}
 	}
 	
@@ -244,8 +282,8 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 		// verify keypairs and assign plugin
 		var publicAddress;
 		for (var i = 0; i < splitKeypairs.length; i++) {
-			if (!plugin) plugin = splitKeypairs[i].getPlugin();
-			else if (plugin !== splitKeypairs[i].getPlugin()) throw new Error("splitKeypairs[" + i + "] has inconsistent plugin");
+			if (!state.plugin) state.plugin = splitKeypairs[i].getPlugin();
+			else if (state.plugin !== splitKeypairs[i].getPlugin()) throw new Error("splitKeypairs[" + i + "] has inconsistent plugin");
 			if (!publicAddress) publicAddress = splitKeypairs[i].getPublicAddress();
 			else if (publicAddress !== splitKeypairs[i].getPublicAddress()) throw new Error("splitKeypairs[" + i + "] has inconsistent public address");
 		}
@@ -275,11 +313,73 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	}
 	
 	function setPublicAddress(address) {
-		if (decoded.address === address) return;
-		if (decoded.address) throw new Error("Cannot override known public address");
+		if (state.publicAddress === address) return;
+		if (state.publicAddress) throw new Error("Cannot override known public address");
 		if (that.getEncryptionScheme() === null) throw new Error("Cannot set public address of unencrypted keypair");
-		assertTrue(plugin.isAddress(address), "Invalid address: " + address);
-		decoded.address = address;
+		assertTrue(state.plugin.isAddress(address), "Invalid address: " + address);
+		state.publicAddress = address;
+	}
+	
+	/**
+	 * Decodes the given encrypted private key.
+	 * 
+	 * @param str is the encrypted private key to decode
+	 * @returns Object with hex, wif, and encryption fields or null if not recognized
+	 */
+	function decodeEncryptedKey(str) {
+		assertString(str);
+		
+		var decoded = null;
+		if ((decoded = decodeEncryptedHexV0(str)) !== null) return decoded;
+		if ((decoded = decodeEncryptedWifV0(str)) !== null) return decoded;
+		if ((decoded = decodeEncryptedHexV1(str)) !== null) return decoded;
+		if ((decoded = decodeEncryptedWifV1(str)) !== null) return decoded;
+		return null;
+		
+		function decodeEncryptedHexV0(str) {
+			
+			// determine if encrypted hex V0
+			if (!isHex(str)) return null;
+			if (str.length % 32 !== 0) return null;
+			var b64 = CryptoJS.enc.Hex.parse(str).toString(CryptoJS.enc.Base64).toString(CryptoJS.enc.Utf8);
+			if (!b64.startsWith("U2")) return null;
+
+			// decode
+			var state = {};
+			state.hex = str;
+			state.wif = b64;
+			state.encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
+			return state;
+		}
+		
+		function decodeEncryptedWifV0(str) {
+			if (!str.startsWith("U2")) return null;
+			if (!isBase64(str)) return null;
+			var hex = CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+			return decodeEncryptedHexV0(hex);
+		}
+		
+		function decodeEncryptedHexV1(str) {
+			
+			// determine if encrypted hex V1
+			if (!isHex(str)) return null;
+			if (str.length - 32 < 1 || str.length % 32 !== 0) return null;
+			var version = parseInt(str.substring(0, AppUtils.ENCRYPTION_V1_VERSION.toString(16).length), 16);
+			if (version !== AppUtils.ENCRYPTION_V1_VERSION) return null;
+			
+			// decode
+			var state = {};
+			state.hex = str;
+			state.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
+			state.encryption = AppUtils.EncryptionScheme.V1_CRYPTOJS;
+			return state;
+		}
+		
+		function decodeEncryptedWifV1(str) {
+			if (!isBase58(str)) return null;
+			var hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			return decodeEncryptedHexV1(hex);
+		}
 	}
 	
 	/**

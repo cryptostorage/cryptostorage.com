@@ -27,18 +27,20 @@
  * 
  * Initializes from the first non-null argument.
  * 
- * @param keypairs are keypairs to initialize with
- * @param pieceNum is the pieceNumber to assign to each piece (optional)
- * @param json is exportable json to initialize from
- * @param splitPieces are split pieces to combine and initialize from
- * @param piece is an existing piece to copy from
+ * @param config specifies initialization configuration
+ * 				config.keypairs keypairs are keypairs to initialize with
+ * 				config.pieceNum is the pieceNumber to assign to each piece (optional)
+ * 				config.pieceJson is exportable json to initialize from
+ * 				config.splitPieces are split pieces to combine and initialize from
+ * 				config.piece is an existing piece to copy from
  */
-function CryptoPiece(keypairs, json, splitPieces, piece) {
+function CryptoPiece(config) {
 	
 	var that = this;
+	var state;
 		
 	this.getKeypairs = function() {
-		return keypairs;
+		return state.keypairs;
 	}
 	
 	this.encrypt = function(passphrase, schemes, onProgress, onDone, verifyEncryption) {
@@ -46,7 +48,7 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		// verify input
 		try {
 			assertInitialized(passphrase);
-			assertEquals(keypairs.length, schemes.length);
+			assertEquals(state.keypairs.length, schemes.length);
 			assertInitialized(onDone);
 		} catch (err) {
 			onDone(err);
@@ -57,8 +59,8 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		var originals;
 		if (verifyEncryption) {
 			originals = [];
-			for (var i = 0; i < keypairs.length; i++) {
-				originals.push(keypairs[i].copy());
+			for (var i = 0; i < state.keypairs.length; i++) {
+				originals.push(state.keypairs[i].copy());
 			}
 		}
 		
@@ -69,8 +71,8 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		
 		// collect encryption functions
 		var funcs = [];
-		for (var i = 0; i < keypairs.length; i++) {
-			funcs.push(encryptFunc(keypairs[i], schemes[i], passphrase));
+		for (var i = 0; i < state.keypairs.length; i++) {
+			funcs.push(encryptFunc(state.keypairs[i], schemes[i], passphrase));
 		}
 		
 		// encrypt async
@@ -142,9 +144,9 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 	
 	this.isEncrypted = function() {
 		var bool = -1;
-		for (var i = 0; i < keypairs.length; i++) {
-			if (bool === -1) bool = keypairs[i].isEncrypted();
-			else if (bool !== keypairs[i].isEncrypted()) throw new Error("keypairs[" + i + "] encryption is inconsistent");
+		for (var i = 0; i < state.keypairs.length; i++) {
+			if (bool === -1) bool = state.keypairs[i].isEncrypted();
+			else if (bool !== state.keypairs[i].isEncrypted()) throw new Error("state.keypairs[" + i + "] encryption is inconsistent");
 		}
 		return bool;
 	}
@@ -153,7 +155,7 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 
 		// validate input
 		try {
-			assertTrue(keypairs.length > 0);
+			assertTrue(state.keypairs.length > 0);
 			assertInitialized(passphrase);
 			assertInitialized(onDone);
 		} catch (err) {
@@ -163,13 +165,13 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		
 		// compute total weight
 		var totalWeight = 0;
-		for (var i = 0; i < keypairs.length; i++) {
-			totalWeight += CryptoKeypair.getDecryptWeight(keypairs[i].getEncryptionScheme());
+		for (var i = 0; i < state.keypairs.length; i++) {
+			totalWeight += CryptoKeypair.getDecryptWeight(state.keypairs[i].getEncryptionScheme());
 		}
 		
 		// decrypt keys
 		var funcs = [];
-		for (var i = 0; i < keypairs.length; i++) funcs.push(decryptFunc(keypairs[i], passphrase));
+		for (var i = 0; i < state.keypairs.length; i++) funcs.push(decryptFunc(state.keypairs[i], passphrase));
 		var doneWeight = 0;
 		if (onProgress) onProgress(0, "Decrypting");
 		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
@@ -206,8 +208,8 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		// collect all split keypairs
 		var allSplitKeypairs = [];
 		for (var i = 0; i < numShares; i++) allSplitKeypairs.push([]);
-		for (var i = 0; i < keypairs.length; i++) {
-			var splitKeypairs = keypairs[i].split(numShares, minShares);
+		for (var i = 0; i < state.keypairs.length; i++) {
+			var splitKeypairs = state.keypairs[i].split(numShares, minShares);
 			for (var j = 0; j < splitKeypairs.length; j++) {
 				allSplitKeypairs[j].push(splitKeypairs[j]);
 			}
@@ -216,27 +218,27 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		// build split pieces
 		var splitPieces = [];
 		for (var i = 0; i < allSplitKeypairs.length; i++) {
-			splitPieces.push(new CryptoPiece(allSplitKeypairs[i]));
+			splitPieces.push(new CryptoPiece({keypairs: allSplitKeypairs[i]}));
 		}
 		return splitPieces;
 	}
 	
 	this.isSplit = function() {
-		assertTrue(keypairs.length > 0);
+		assertTrue(state.keypairs.length > 0);
 		var split = -1;
-		for (var i = 0; i < keypairs.length; i++) {
-			if (split === -1) split = keypairs[i].isSplit();
-			else if (split !== keypairs[i].isSplit()) throw new Error("keypair[" + i + "] has an inconsistent split state");
+		for (var i = 0; i < state.keypairs.length; i++) {
+			if (split === -1) split = state.keypairs[i].isSplit();
+			else if (split !== state.keypairs[i].isSplit()) throw new Error("keypair[" + i + "] has an inconsistent split state");
 		}
 		return split;
 	}
 	
 	this.getPieceNum = function() {
-		assertTrue(keypairs.length > 0);
+		assertTrue(state.keypairs.length > 0);
 		var pieceNum = -1;
-		for (var i = 0; i < keypairs.length; i++) {
-			if (pieceNum === -1) pieceNum = keypairs[i].getShareNum();
-			else if (pieceNum !== keypairs[i].getShareNum()) throw new Error("keypair[" + i + "] has an inconsistent share num");
+		for (var i = 0; i < state.keypairs.length; i++) {
+			if (pieceNum === -1) pieceNum = state.keypairs[i].getShareNum();
+			else if (pieceNum !== state.keypairs[i].getShareNum()) throw new Error("keypair[" + i + "] has an inconsistent share num");
 		}
 		return pieceNum;
 	}
@@ -246,16 +248,16 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		json.pieceNum = that.getPieceNum();
 		json.version = AppUtils.VERSION;
 		json.keypairs = [];
-		for (var i = 0; i < keypairs.length; i++) {
-			json.keypairs.push(keypairs[i].getJson());
+		for (var i = 0; i < state.keypairs.length; i++) {
+			json.keypairs.push(state.keypairs[i].getJson());
 		}
 		return json;
 	}
 	
 	this.copy = function() {
 		var keypairCopies = [];
-		for (var i = 0; i < keypairs.length; i++) keypairCopies.push(keypairs[i].copy());
-		return new CryptoPiece(keypairCopies);
+		for (var i = 0; i < state.keypairs.length; i++) keypairCopies.push(state.keypairs[i].copy());
+		return new CryptoPiece({keypairs: keypairCopies});
 	}
 	
 	this.equals = function(piece) {
@@ -263,23 +265,28 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		return objectsEqual(that.getJson(), piece.getJson());
 	}
 	
+	this.getState = function() {
+		return state;
+	}
+	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	init();
 	function init() {
-		if (keypairs) setKeypairs(keypairs);
-		else if (json) fromJson(json);
-		else if (splitPieces) combine(splitPieces);
-		else if (piece) fromPiece(piece);
+		state = {};
+		if (config.keypairs) setKeypairs(config.keypairs);
+		else if (config.pieceJson) fromJson(config.pieceJson);
+		else if (config.splitPieces) combine(config.splitPieces);
+		else if (config.piece) fromPiece(config.piece);
 		else throw new Error("All arguments null");
 	}
 	
-	function setKeypairs(_keypairs) {
-		assertTrue(_keypairs.length > 0);
-		for (var i = 0; i < _keypairs.length; i++) {
-			assertObject(_keypairs[i], CryptoKeypair);
+	function setKeypairs(keypairs) {
+		assertTrue(keypairs.length > 0);
+		for (var i = 0; i < keypairs.length; i++) {
+			assertObject(keypairs[i], CryptoKeypair);
 		}
-		keypairs = _keypairs;
+		state.keypairs = keypairs;
 	}
 	
 	function fromJson() {
@@ -292,7 +299,7 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		var numKeypairs;
 		for (var i = 0; i < splitPieces.length; i++) {
 			if (!numKeypairs) numKeypairs = splitPieces[i].getKeypairs().length;
-			else if (numKeypairs !== splitPieces[i].getKeypairs().length) throw new Error("splitPieces[" + i + "].getKeypairs() has inconsistent number of keypairs");
+			else if (numKeypairs !== splitPieces[i].getKeypairs().length) throw new Error("config.splitPieces[" + i + "].getKeypairs() has inconsistent number of keypairs");
 		}
 		assertTrue(numKeypairs > 0);
 		
@@ -301,7 +308,7 @@ function CryptoPiece(keypairs, json, splitPieces, piece) {
 		for (var i = 0; i < numKeypairs; i++) {
 			var splitKeypairs = [];
 			for (var j = 0; j < splitPieces.length; j++) splitKeypairs.push(splitPieces[j].getKeypairs()[i]);
-			combinedKeypairs.push(new CryptoKeypair(null, null, splitKeypairs));
+			combinedKeypairs.push(new CryptoKeypair({splitKeypairs: splitKeypairs}));
 		}
 		
 		// set keypairs to combined keypairs

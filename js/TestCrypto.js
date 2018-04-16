@@ -31,17 +31,17 @@ function TestCrypto() {
 	function getTestPlugins() {
 		var plugins = [];
 		plugins.push(new BitcoinPlugin());
-		plugins.push(new BitcoinCashPlugin());
-		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
-		plugins.push(new DashPlugin());
-		plugins.push(new LitecoinPlugin());
-		plugins.push(new ZcashPlugin());
-		plugins.push(new RipplePlugin());
-		plugins.push(new StellarPlugin());
-		plugins.push(new WavesPlugin());
-		plugins.push(new NeoPlugin());
-		plugins.push(new BIP39Plugin());
+//		plugins.push(new BitcoinCashPlugin());
+//		plugins.push(new EthereumPlugin());
+//		plugins.push(new MoneroPlugin());
+//		plugins.push(new DashPlugin());
+//		plugins.push(new LitecoinPlugin());
+//		plugins.push(new ZcashPlugin());
+//		plugins.push(new RipplePlugin());
+//		plugins.push(new StellarPlugin());
+//		plugins.push(new WavesPlugin());
+//		plugins.push(new NeoPlugin());
+//		plugins.push(new BIP39Plugin());
 		return plugins;
 	}
 	
@@ -58,7 +58,7 @@ function TestCrypto() {
 	
 	function testNewKeypairs(plugin) {
 		for (var j = 0; j < REPEAT_LONG; j++) {
-			var keypair = new CryptoKeypair(plugin);
+			var keypair = new CryptoKeypair({plugin: plugin});
 			assertInitialized(keypair.getPrivateHex());
 			assertInitialized(keypair.getPrivateWif());
 			assertFalse(keypair.isEncrypted());
@@ -73,13 +73,13 @@ function TestCrypto() {
 		// collect keypairs and schemes
 		var keypairs = [];
 		var schemes = [];
-		for (var j = 0; j < plugin.getEncryptionSchemes().length; j++) {
-			keypairs.push(new CryptoKeypair(plugin));
-			schemes.push(plugin.getEncryptionSchemes()[j]);
+		for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
+			keypairs.push(new CryptoKeypair({plugin: plugin}));
+			schemes.push(plugin.getEncryptionSchemes()[i]);
 		}
 		
 		// create piece
-		var piece = new CryptoPiece(keypairs);
+		var piece = new CryptoPiece({keypairs: keypairs});
 		var originalPiece = piece.copy();
 		
 		// test split
@@ -151,12 +151,16 @@ function TestCrypto() {
 		for (var i = 0; i < splitPieces.length; i++) {
 			assertTrue(splitPieces[i].isSplit());
 			assertEquals(i + 1, splitPieces[i].getPieceNum());
+			assertEquals(piece.getKeypairs().length, splitPieces[i].getKeypairs().length);
+			for (var j = 0; j < piece.getKeypairs().length; j++) {
+				assertEquals(piece.getKeypairs()[j].getPublicAddress(), splitPieces[i].getKeypairs()[j].getPublicAddress());
+			}
 		}
 		
 		// test that single pieces cannot create key
 		for (var i = 0; i < splitPieces.length; i++) {
 			try {
-				new CryptoPiece(null, null, [splitPieces[i]]);
+				new CryptoPiece({splitPieces: [splitPieces[i]]})
 				throw new Error("fail");
 			} catch (err) {
 				if (err.message === "fail") throw new Error("Cannot combine single split piece");
@@ -167,17 +171,17 @@ function TestCrypto() {
 		var combinations = getCombinations(splitPieces, MIN_PIECES);
 		for (var i = 0; i < combinations.length; i++) {
 			var combination = combinations[i];
-			var combined = new CryptoPiece(null, null, combination);
+			var combined = new CryptoPiece({splitPieces: combination});
 			assertTrue(original.equals(combined));
 		}
 		
 		// combine all pieces
-		var combined = new CryptoPiece(null, null, splitPieces);
+		var combined = new CryptoPiece({splitPieces: splitPieces});
 		assertTrue(original.equals(combined));
 		
 		// test split with max shares
 		splitPieces = combined.split(AppUtils.MAX_SHARES, AppUtils.MAX_SHARES - 10);
-		var combined = new CryptoPiece(null, null, splitPieces);
+		var combined = new CryptoPiece({splitPieces: splitPieces});
 		assertTrue(original.equals(combined));
 	}
 }

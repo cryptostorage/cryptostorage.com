@@ -168,14 +168,28 @@ CryptoPlugin.prototype.combine = function(shares) {
 }
 
 /**
+ * Generates and decodes a random private key.
+ */
+CryptoPlugin.prototype.decodeRandom = function() {
+	return this.prototype.decode(this.prototype.randomPrivateKey());
+}
+
+/**
+ * Generates a random private key in hex or wif format.
+ * 
+ * @returns a random private key string
+ */
+CryptoPlugin.prototype.randomPrivateKey = function() { throw new Error("Subclass must implement"); };
+
+/**
  * Decodes the given private key.  Decodes a randomly generated private key if not given.
  * 
  * @param privateKey is the private key to decode (optional)
  * 
  * @returns {
- *   address: str			// public address
- *   hex: str					// private hex
- *   wif: str					// private wif
+ *   publicAddress: str
+ *   privateHex: str
+ *   privateWif: str
  *   encryption: str	// encryption scheme, null if unencrypted
  * }
  */
@@ -240,28 +254,30 @@ function BitcoinPlugin() {
 		throw new Error("Unrecognized private key: " + str);		
 	}
 	
+	this.randomPrivateKey = function() {
+		return new Bitcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
+	}
+	
 	this.decode = function(str) {
-		
-		// create key if not given
-		if (!str) str = new Bitcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
-		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		assertString(str);
+		assertInitialized(str);
 		var decoded = {};
 		
 		// unencrypted
 		if (ninja.privateKey.isPrivateKey(str)) {
 			var key = new Bitcoin.ECKey(str);
 			key.setCompressed(true);
-			decoded.address = key.getBitcoinAddress();
-			decoded.hex = key.getBitcoinHexFormat();
-			decoded.wif = key.getBitcoinWalletImportFormat();
+			decoded.publicAddress = key.getBitcoinAddress();
+			decoded.privateHex = key.getBitcoinHexFormat();
+			decoded.privateWif = key.getBitcoinWalletImportFormat();
 			decoded.encryption = null;
 			return decoded;
 		}
 		
 		// bip38 wif
 		if (ninja.privateKey.isBIP38Format(str)) {
-			decoded.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
-			decoded.wif = str;
+			decoded.privateHex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			decoded.privateWif = str;
 			decoded.encryption = AppUtils.EncryptionScheme.BIP38;
 			return decoded;
 		}
