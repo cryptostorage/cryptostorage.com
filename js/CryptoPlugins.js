@@ -1098,7 +1098,7 @@ function NeoPlugin() {
 			decoded.wif = Neon.wallet.getWIFFromPrivateKey(decoded.hex);
 			decoded.address = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(decoded.hex)));
 			decoded.encryption = null;
-			return null;
+			return decoded;
 		}
 		
 		// unrecognized wif or hex

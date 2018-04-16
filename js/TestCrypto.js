@@ -48,11 +48,11 @@ function TestCrypto() {
 	}
 	
 	function testPlugin(plugin, onDone) {
+		console.log("Testing " + plugin.getTicker() + " plugin");
 		testNewKeypairs(plugin);
 		testEncryptAndSplit(plugin, function(err) {
 			if (err) onDone(err);
 			else {
-				console.log(plugin.getTicker() + " tests pass");
 				onDone();
 			}
 		});

@@ -324,6 +324,8 @@ var AppUtils = {
 	 * @returns Object with hex, wif, and encryption fields or null if not recognized
 	 */
 	decodeEncryptedKey: function(str) {
+		assertString(str);
+		
 		var decoded = null;
 		if ((decoded = decodeEncryptedHexV0(str)) !== null) return decoded;
 		if ((decoded = decodeEncryptedWifV0(str)) !== null) return decoded;

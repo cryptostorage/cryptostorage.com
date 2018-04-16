@@ -168,7 +168,7 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 	}
 	
 	function setPrivateKey(privateKey) {
-		
+
 		// decode with plugin
 		decoded = plugin.decode(privateKey);
 		if (decoded) {
@@ -176,6 +176,9 @@ function CryptoKeypair(plugin, json, splitKeypairs, privateKey, publicAddress, s
 			decoded.shareNum = null;
 			return;
 		}
+		
+		// private key must be initialized if encrypted or split
+		assertNotNull(privateKey);
 		
 		// encrypted with cryptostorage conventions
 		if ((decoded = AppUtils.decodeEncryptedKey(privateKey)) !== null) {
