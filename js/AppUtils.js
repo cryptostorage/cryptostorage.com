@@ -517,6 +517,8 @@ var AppUtils = {
 	/**
 	 * Renders a QR code to an image.
 	 * 
+	 * TODO: move this to DivControllers.js
+	 * 
 	 * @param text is the text to codify
 	 * @param config specifies configuration options
 	 * @param callback will be called with the image node after creation
