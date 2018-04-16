@@ -17,9 +17,7 @@ function TestCrypto() {
 		
 		// test plugins
 		var funcs = [];
-		for (var i = 0; i < PLUGINS.length; i++) {
-			funcs.push(testPluginFunc(PLUGINS[i]));
-		}
+		for (var i = 0; i < PLUGINS.length; i++) funcs.push(testPluginFunc(PLUGINS[i]));
 		function testPluginFunc(plugin) {
 			return function(onDone) { testPlugin(plugin, onDone); }
 		}
