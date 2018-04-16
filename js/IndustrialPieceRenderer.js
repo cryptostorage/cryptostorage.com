@@ -265,7 +265,7 @@ function IndustrialPieceRenderer(pieces, pieceDivs, config) {
 			
 			// add qr codes
 			if (leftCopyable) {
-				AppUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
+				UiUtils.renderQrCode(leftValue, getQrConfig(config), function(img) {
 					if (isCancelled) return;
 					img.attr("class", "key_div_qr");
 					keyDivLeft.append(img);
@@ -280,7 +280,7 @@ function IndustrialPieceRenderer(pieces, pieceDivs, config) {
 			}
 			function addPrivateQr() {
 				if (rightCopyable) {
-					AppUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
+					UiUtils.renderQrCode(rightValue, getQrConfig(config), function(img) {
 						if (isCancelled) return;
 						img.attr("class", "key_div_qr");
 						keyDivRight.append(img);

@@ -513,35 +513,6 @@ var AppUtils = {
 		margin: 0,
 		scale: null
 	},
-
-	/**
-	 * Renders a QR code to an image.
-	 * 
-	 * TODO: move this to DivControllers.js
-	 * 
-	 * @param text is the text to codify
-	 * @param config specifies configuration options
-	 * @param callback will be called with the image node after creation
-	 */
-	renderQrCode: function(text, config, callback) {
-		
-		// merge configs
-		config = Object.assign({}, AppUtils.DefaultQrConfig, config);
-
-		// generate QR code
-		var segments = [{data: text, mode: 'byte'}];	// manually specify mode
-		qrcodelib.toDataURL(segments, config, function(err, url) {
-			if (err) throw err;
-			var img = $("<img>");
-			if (config.size) img.css("width", config.size + "px");
-			if (config.size) img.css("height", config.size + "px");
-			img[0].onload = function() {
-				img[0].onload = null;	// prevent re-loading
-				callback(img);
-			}
-			img[0].src = url;
-		});
-	},
 	
 	/**
 	 * Applies the given config to the given keys.

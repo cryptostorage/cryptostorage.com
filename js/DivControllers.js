@@ -95,7 +95,36 @@ var UiUtils = {
 	DEBIAN_LINK: " <a target='_blank' href='https://www.debian.org/'>Debian</a>",
 	RASPBIAN_LINK: "<a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>",
 	INFO_TOOLTIP_MAX_WIDTH: "700px",
-	NOTICE_TOOLTIP_MAX_WIDTH: "700px"
+	NOTICE_TOOLTIP_MAX_WIDTH: "700px",
+	
+	/**
+	 * Renders a QR code to an image.
+	 * 
+	 * TODO: move this to DivControllers.js
+	 * 
+	 * @param text is the text to codify
+	 * @param config specifies configuration options
+	 * @param callback will be called with the image node after creation
+	 */
+	renderQrCode: function(text, config, callback) {
+		
+		// merge configs
+		config = Object.assign({}, AppUtils.DefaultQrConfig, config);
+
+		// generate QR code
+		var segments = [{data: text, mode: 'byte'}];	// manually specify mode
+		qrcodelib.toDataURL(segments, config, function(err, url) {
+			if (err) throw err;
+			var img = $("<img>");
+			if (config.size) img.css("width", config.size + "px");
+			if (config.size) img.css("height", config.size + "px");
+			img[0].onload = function() {
+				img[0].onload = null;	// prevent re-loading
+				callback(img);
+			}
+			img[0].src = url;
+		});
+	},
 }
 
 /**
@@ -1009,7 +1038,7 @@ function DonateController(div, appController) {
 			
 			// append the image
 			if (credit.image) setImage(credit.image);
-			else AppUtils.renderQrCode(credit.address, null, setImage);
+			else UiUtils.renderQrCode(credit.address, null, setImage);
 			function setImage(img) {
 				img.addClass("donate_img_left");
 				div.prepend(img);
@@ -1035,7 +1064,7 @@ function DonateController(div, appController) {
 			
 			// append the image
 			if (credit.image) setImage(credit.image);
-			else AppUtils.renderQrCode(credit.address, null, setImage);
+			else UiUtils.renderQrCode(credit.address, null, setImage);
 			function setImage(img) {
 				img.addClass("donate_img_right");
 				div.append(img);
@@ -3633,7 +3662,7 @@ function KeyPairController(div, config) {
 		
 		// add qr codes
 		if (config.leftValueCopyable) {
-			AppUtils.renderQrCode(config.leftValue, getQrConfig(config), function(img) {
+			UiUtils.renderQrCode(config.leftValue, getQrConfig(config), function(img) {
 				if (isCancelled) return;
 				img.attr("class", "key_div_qr");
 				keyDivLeft.append(img);
@@ -3648,7 +3677,7 @@ function KeyPairController(div, config) {
 		}
 		function addPrivateQr() {
 			if (config.rightValueCopyable) {
-				AppUtils.renderQrCode(config.rightValue, KeyPairController.QR_CONFIG, function(img) {
+				UiUtils.renderQrCode(config.rightValue, KeyPairController.QR_CONFIG, function(img) {
 					if (isCancelled) return;
 					img.attr("class", "key_div_qr");
 					keyDivRight.append(img);
