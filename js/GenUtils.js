@@ -375,7 +375,7 @@ function assertBoolean(arg, msg) {
  * @param msg is the message to throw if the argument is not a string
  */
 function assertString(arg, msg) {
-	if (!isString(arg)) throw new Error(msg ? msg : "Argument asserted as a string but is not a string");
+	if (!isString(arg)) throw new Error(msg ? msg : "Argument asserted as a string but is not a string: " + arg);
 }
 
 /**

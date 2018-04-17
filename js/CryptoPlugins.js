@@ -320,12 +320,16 @@ function BitcoinCashPlugin() {
 		return key;
 	}
 	
+	this.randomPrivateKey = function() {
+		return bitcoinPlugin.randomPrivateKey();
+	}
+	
 	this.decode = function(str) {
 		var decoded = bitcoinPlugin.decode(str);
 		if (!decoded) return null;
-		if (!decoded.address) return decoded;
-		var cashAddr =  bchaddr.toCashAddress(decoded.address);
-		decoded.address = cashAddr.substring(cashAddr.indexOf(':') + 1);
+		if (!decoded.publicAddress) return decoded;
+		var cashAddr =  bchaddr.toCashAddress(decoded.publicAddress);
+		decoded.publicAddress = cashAddr.substring(cashAddr.indexOf(':') + 1);
 		return decoded;
 	}
 	
@@ -372,23 +376,25 @@ function EthereumPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	
+	this.randomPrivateKey = function() {
+		return keythereum.create().privateKey.toString("hex");
+	}
+	
 	this.decode = function(str) {
-		
-		// create key if not given
-		if (!str) str = keythereum.create().privateKey.toString("hex");
-		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		assertString(str);
+		assertInitialized(str);
 			
 		// unencrypted hex 
 		if (str.length >= 63 && str.length <= 65 && isHex(str)) {
 			var decoded = {};
-			decoded.hex = str;
-			decoded.wif = str;
-			decoded.address = ethereumjsutil.toChecksumAddress(keythereum.privateKeyToAddress(decoded.hex));
+			decoded.privateHex = str;
+			decoded.privateWif = str;
+			decoded.publicAddress = ethereumjsutil.toChecksumAddress(keythereum.privateKeyToAddress(decoded.privateHex));
 			decoded.encryption = null;
 			return decoded;
 		}
 		
-		// otherwise key is not recognized
+		// otherwise cannot decode
 		return null;
 	}
 	
@@ -479,19 +485,21 @@ function LitecoinPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	
+	this.randomPrivateKey = function() {
+		return new litecore.PrivateKey().toString();
+	}
+	
 	this.decode = function(str) {
-		
-		// create key if not given
-		if (!str) str = new litecore.PrivateKey().toString();
-		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		assertString(str);
+		assertInitialized(str);
 		
 		// unencrypted
 		if (str.length >= 52 && litecore.PrivateKey.isValid(str)) {	// litecore says 'ab' is valid?
 			var decoded = {};
 			var key = new litecore.PrivateKey(str);
-			decoded.hex = key.toString();
-			decoded.wif = key.toWIF();
-			decoded.address = key.toAddress().toString();
+			decoded.privateHex = key.toString();
+			decoded.privateWif = key.toWIF();
+			decoded.publicAddress = key.toAddress().toString();
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -539,19 +547,21 @@ function DashPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	
+	this.randomPrivateKey = function() {
+		return new dashcore.PrivateKey().toString();
+	}
+	
 	this.decode = function(str) {
-		
-		// create key if not given
-		if (!str) str = new dashcore.PrivateKey().toString();		
-		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		assertString(str);
+		assertInitialized(str);
 		
 		// unencrypted
 		if (str.length >= 52 && dashcore.PrivateKey.isValid(str)) {	// dashcore says 'ab' is valid?
 			var decoded = {};
 			var key = new dashcore.PrivateKey(str);
-			decoded.hex = key.toString();
-			decoded.wif = key.toWIF();
-			decoded.address = key.toAddress().toString();
+			decoded.privateHex = key.toString();
+			decoded.privateWif = key.toWIF();
+			decoded.publicAddress = key.toAddress().toString();
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -610,18 +620,20 @@ function MoneroPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	
+	this.randomPrivateKey = function() {
+		return cnUtil.sc_reduce32(cnUtil.rand_32());
+	}
+	
 	this.decode = function(str) {
-		
-		// create key if not given
-		if (!str) str = cnUtil.sc_reduce32(cnUtil.rand_32());
-		assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		assertString(str);
+		assertInitialized(str);
 		var decoded = {};
 		
 		// unencrypted wif
 		if (str.indexOf(' ') !== -1) {
-			decoded.hex = mn_decode(str);
-			decoded.wif = str;
-			decoded.address = cnUtil.create_address(decoded.hex).public_addr;
+			decoded.privateHex = mn_decode(str);
+			decoded.privateWif = str;
+			decoded.publicAddress = cnUtil.create_address(decoded.privateHex).public_addr;
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -630,9 +642,9 @@ function MoneroPlugin() {
 		else if (str.length >= 63 && str.length <= 65 && isHex(str)) {
 			var address = cnUtil.create_address(str);
 			if (!cnUtil.valid_keys(address.view.pub, address.view.sec, address.spend.pub, address.spend.sec)) throw new Error("Invalid address keys derived from hex key");
-			decoded.hex = str;
-			decoded.wif = mn_encode(decoded.hex, 'english');
-			decoded.address = address.public_addr;
+			decoded.privateHex = str;
+			decoded.privateWif = mn_encode(decoded.privateHex, 'english');
+			decoded.publicAddress = address.public_addr;
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -686,19 +698,21 @@ function ZcashPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	
+	this.randomPrivateKey = function() {
+		return new zcashcore.PrivateKey().toString();
+	}
+	
 	this.decode = function(str) {
-		
-		// create key if not given
-		if (!str) str = new zcashcore.PrivateKey().toString();
-		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		assertString(str);
+		assertInitialized(str);
 		
 		// unencrypted
 		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// zcashcore says 'ab' is valid?
 			var decoded = {};
 			var key = new zcashcore.PrivateKey(str);
-			decoded.hex = key.toString();
-			decoded.wif = key.toWIF();
-			decoded.address = key.toAddress().toString();
+			decoded.privateHex = key.toString();
+			decoded.privateWif = key.toWIF();
+			decoded.publicAddress = key.toAddress().toString();
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -754,27 +768,29 @@ function RipplePlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	
+	this.randomPrivateKey = function() {
+		return ripple_key_pairs.generateSeed();
+	}
+	
 	this.decode = function(str) {
-		
-		// generate seed if not given
-		if (!str) str = ripple_key_pairs.generateSeed();
-		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		assertString(str);
+		assertInitialized(str);
 		var decoded = {};
 		
 		// unencrypted wif
 		if (str.length === 29 && isBase58(str)) {
-			decoded.hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
-			decoded.wif = str;
-			decoded.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(str).publicKey);
+			decoded.privateHex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			decoded.privateWif = str;
+			decoded.publicAddress = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(str).publicKey);
 			decoded.encryption = null;
 			return decoded;
 		}
 		
 		// unencrypted hex
 		if (str.length === 44 && isHex(str)) {
-			decoded.hex = str;
-			decoded.wif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
-			decoded.address = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(decoded.wif).publicKey);			
+			decoded.privateHex = str;
+			decoded.privateWif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
+			decoded.publicAddress = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(decoded.privateWif).publicKey);			
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -833,19 +849,21 @@ function StellarPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	
+	this.randomPrivateKey = function() {
+		return StellarBase.Keypair.random().secret();
+	}
+	
 	this.decode = function(str) {
-		
-		// generate seed if not given
-		if (!str) str = StellarBase.Keypair.random().secret();
-		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		assertString(str);
+		assertInitialized(str);
 		var decoded = {};
 		
 		// unencrypted wif
 		if (str.length === 56 && isUpperCase(str) && isBase32(str)) {
 			var keypair = StellarBase.Keypair.fromSecret(str);
-			decoded.hex = keypair.rawSecretKey().toString('hex');
-			decoded.wif = str;			
-			decoded.address = keypair.publicKey();
+			decoded.privateHex = keypair.rawSecretKey().toString('hex');
+			decoded.privateWif = str;			
+			decoded.publicAddress = keypair.publicKey();
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -854,9 +872,9 @@ function StellarPlugin() {
 		if (str.length === 64 && isHex(str)) {
 			var rawSecret = new Uint8Array(Crypto.util.hexToBytes(str));
 			var keypair = StellarBase.Keypair.fromRawEd25519Seed(rawSecret);
-			decoded.hex = str;
-			decoded.wif = keypair.secret();
-			decoded.address = keypair.publicKey();
+			decoded.privateHex = str;
+			decoded.privateWif = keypair.secret();
+			decoded.publicAddress = keypair.publicKey();
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -920,31 +938,36 @@ function BIP39Plugin() {
 		throw new Error("Unrecognized bip39 seed: " + str);
 	}
 	
+	var mnemonic;
+	var language = "english";
+	
+	this.randomPrivateKey = function() {
+		if (!mnemonic) mnemonic = new Mnemonic(language);
+		return mnemonic.generate(256);
+	}
+	
 	this.decode = function(str) {
-		
+
 		// initialize
-		var language = "english";
+		assertString(str);
+		assertInitialized(str);
 		var wordlist = WORDLISTS[language];
 		var shamir39 = new Shamir39();
-		var mnemonic = new Mnemonic(language);
-
-		// generate phrase if not given
-		if (!str) str = mnemonic.generate(256); 
-		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
-		var decoded = {address: AppUtils.NA};
+		if (!mnemonic) mnemonic = new Mnemonic(language);
+		var decoded = {publicAddress: AppUtils.NA};
 		
 		// unencrypted wif
 		if (mnemonic.check(str)) {
-			decoded.hex = shamir39.getHexFromWords(mnemonic.splitWords(str), wordlist);
-			decoded.wif = str;
+			decoded.privateHex = shamir39.getHexFromWords(mnemonic.splitWords(str), wordlist);
+			decoded.privateWif = str;
 			decoded.encryption = null;
 			return decoded;
 		}
 		
 		// unencrypted hex
 		if (str.length === 66 && isHex(str)) {
-			decoded.hex = str;
-			decoded.wif = mnemonic.joinWords(shamir39.getWordsFromHex(str, wordlist));
+			decoded.privateHex = str;
+			decoded.privateWif = mnemonic.joinWords(shamir39.getWordsFromHex(str, wordlist));
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -1006,32 +1029,37 @@ function WavesPlugin() {
 		throw new Error("Unrecognized wif or hex: " + str);
 	}
 	
+	var waves; 
+	
+	this.randomPrivateKey = function() {
+		if (!waves) waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
+		return waves.Seed.create().phrase;
+	}
+	
 	this.decode = function(str) {
 		
 		// initialize
-		var Waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
-		var wordlist = Waves.Seed.getSeedDictionary();
+		assertString(str);
+		assertInitialized(str);
+		if (!waves) waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
+		var wordlist = waves.Seed.getSeedDictionary();
 		var shamir39 = new Shamir39();
-
-		// generate phrase if not given
-		if (!str) str = Waves.Seed.create().phrase;
-		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
 		var decoded = {};
 
 		// unencrypted wif
 		if (str.indexOf(' ') !== -1 && str.split(' ').length === 15) {
-			decoded.hex = shamir39.getHexFromWords(str.split(' '), wordlist);
-			decoded.wif = str;
-			decoded.address = Waves.Seed.fromExistingPhrase(decoded.wif).address;
+			decoded.privateHex = shamir39.getHexFromWords(str.split(' '), wordlist);
+			decoded.privateWif = str;
+			decoded.publicAddress = waves.Seed.fromExistingPhrase(decoded.privateWif).address;
 			decoded.encryption = null;
 			return decoded;
 		}
 		
 		// unencrypted hex
 		if (str.length === 42 && isHex(str)) {
-			decoded.hex = str;
-			decoded.wif = shamir39.getWordsFromHex(str, wordlist).join(' ');
-			decoded.address = Waves.Seed.fromExistingPhrase(decoded.wif).address;
+			decoded.privateHex = str;
+			decoded.privateWif = shamir39.getWordsFromHex(str, wordlist).join(' ');
+			decoded.publicAddress = waves.Seed.fromExistingPhrase(decoded.privateWif).address;
 			decoded.encryption = null;
 			return decoded;
 		}
@@ -1092,27 +1120,29 @@ function NeoPlugin() {
 		throw new Error("Unrecognized private key: " + str);
 	}
 	
+	this.randomPrivateKey = function() {
+		return Neon.wallet.generatePrivateKey();
+	}
+	
 	this.decode = function(str) {
-
-		// generate phrase if not given
-		if (!str) str = Neon.wallet.generatePrivateKey();
-		else assertTrue(isString(str), "Argument to parse must be a string: " + str);
+		assertString(str);
+		assertInitialized(str);
 		var decoded = {};
 		
 		// unencrypted wif
 		if (Neon.wallet.isWIF(str)) {
-			decoded.hex = Neon.wallet.getPrivateKeyFromWIF(str);
-			decoded.wif = str;
-			decoded.address = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(decoded.hex)));
+			decoded.privateHex = Neon.wallet.getPrivateKeyFromWIF(str);
+			decoded.privateWif = str;
+			decoded.publicAddress = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(decoded.privateHex)));
 			decoded.encryption = null;
 			return null;
 		}
 		
 		// unencrypted hex
 		if (str.length === 64 && isHex(str)) {
-			decoded.hex = str;
-			decoded.wif = Neon.wallet.getWIFFromPrivateKey(decoded.hex);
-			decoded.address = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(decoded.hex)));
+			decoded.privateHex = str;
+			decoded.privateWif = Neon.wallet.getWIFFromPrivateKey(decoded.privateHex);
+			decoded.publicAddress = Neon.wallet.getAddressFromScriptHash(Neon.wallet.getScriptHashFromPublicKey(Neon.wallet.getPublicKeyFromPrivateKey(decoded.privateHex)));
 			decoded.encryption = null;
 			return decoded;
 		}
