@@ -290,8 +290,12 @@ function CryptoPiece(config) {
 		state.keypairs = keypairs;
 	}
 	
-	function fromJson() {
-		throw new Error("Not implemented");
+	function fromJson(json) {
+		var keypairs = [];
+		for (var i = 0; i < json.keypairs.length; i++) {
+			keypairs.push(new CryptoKeypair({json: json}));
+		}
+		setKeypairs(keypairs);
 	}
 	
 	function combine(splitPieces) {
@@ -316,7 +320,11 @@ function CryptoPiece(config) {
 		setKeypairs(combinedKeypairs);
 	}
 	
-	function fromPiece() {
-		throw new Error("Not implemented");
+	function fromPiece(piece) {
+		var keypairCopies = [];
+		for (var i = 0; i < piece.getKeypairs().length; i++) {
+			keypairCopies.push(piece.getKeypairs()[i].copy());
+		}
+		setKeypairs(keypairCopies);
 	}
 }

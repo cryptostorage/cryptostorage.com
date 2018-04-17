@@ -230,11 +230,12 @@ function TestCrypto() {
 		
 		// test split
 		var splitPieces = piece1.split(3, 2);
-		for (var i = 0; i < splitPieces.getKeyPairs(); i++) assertEquals(i + 1, splitPieces[i].getPieceNum());
+		for (var i = 0; i < splitPieces.length; i++) assertEquals(i + 1, splitPieces[i].getPieceNum());
 		var splitPiece = new CryptoPiece({piece: splitPieces[0]});
 		assertEquals(1, splitPiece.getPieceNum());
 		splitPiece = new CryptoPiece({keypairs: splitPieces[0].getKeypairs(), pieceNum: 5});
 		assertEquals(5, splitPiece.getPieceNum());
+		for (var i = 0; i < splitPiece.getKeyPairs(); i++) assertEquals(5, splitPiece.getKeypairs()[i].getShareNum());
 		piece2 = new CryptoPiece({splitPieces: splitPieces});
 		assertTrue(piece1.equals(piece2));
 	}

@@ -304,19 +304,20 @@ function CryptoKeypair(config) {
 	}
 	
 	// TODO: support old and new format
-	function fromJson(keypairJson) {
-		plugin = AppUtils.getCryptoPlugin(keypairJson.ticker);
+	function fromJson(json) {
+		throw new Error("Not implemented");
+		plugin = AppUtils.getCryptoPlugin(json.ticker);
 		assertInitialized(state.plugin);
-		if (keypairJson.wif) {
-			state = plugin.decode(keypairJson.wif);
+		if (json.privateWif) {
+			state = plugin.decode(json.privateWif);
 			assertInitialized(state, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
-			if (!state.publicAddress) state.publicAddress = keypairJson.address;
-			else if (keypairJson.address) assertEquals(state.address, keypairJson.address, "Derived and given addresses do not match");
-			if (!state.encryption) state.encryption = keypairJson.encryption;
-			else if (keypairJson.encryption) assertEquals(state.encryption, keypairJson.encryption, "Decoded and given encryption schemes do not match");			
+			if (!state.publicAddress) state.publicAddress = json.address;
+			else if (json.address) assertEquals(state.address, json.address, "Derived and given addresses do not match");
+			if (!state.encryption) state.encryption = json.encryption;
+			else if (json.encryption) assertEquals(state.encryption, json.encryption, "Decoded and given encryption schemes do not match");			
 		} else {
 			state = {};
-			state.address = keypairJson.address;
+			state.address = json.address;
 		}
 	}
 	
