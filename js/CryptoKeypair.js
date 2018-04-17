@@ -150,6 +150,55 @@ function CryptoKeypair(config) {
 		};
 	}
 	
+	this.toCsv = function(headers) {
+		
+		// build default headers
+		if (!headers) {
+			headers = [];
+			for (prop in CryptoKeypair.CsvHeader) {
+				if (CryptoKeypair.CsvHeader.hasOwnProperty(prop)) {
+		    	headers.push(CryptoKeypair.CsvHeader[prop.toString()]);
+		    }
+			}
+		}	
+		
+		// validate headers
+		assertArray(headers);
+		assertTrue(headers.length > 0);
+		
+		// collect values per headers
+		var keypairCsvArr = [];
+		for (var i = 0; i < headers.length; i++) {
+			switch(headers[i]) {
+				case CryptoKeypair.CsvHeader.TICKER:
+					keypairCsvArr.push(that.getPlugin().getTicker());
+				case CryptoKeypair.CsvHeader.PRIVATE_WIF:
+					keypairCsvArr.push(that.getPrivateWif());
+					break;
+				case CryptoKeypair.CsvHeader.PRIVATE_HEX:
+					keypairCsvArr.push(that.getPrivateHex());
+					break;
+				case CryptoKeypair.CsvHeader.PUBLIC_ADDRESS:
+					keypairCsvArr.push(that.getPublicAddress());
+					break;
+				case CryptoKeypair.CsvHeader.ENCRYPTION:
+					keypairCsvArr.push(that.getEncryptionScheme());
+					break;
+				case CryptoKeypair.CsvHeader.MIN_SHARES:
+					keypairCsvArr.push(that.getMinShares());
+					break;
+				case CryptoKeypair.CsvHeader.SHARE_NUM:
+					keypairCsvArr.push(that.getShareNum());
+					break;
+				default:
+					throw new Error("Unrecognized CSV header: " + headers[i]);
+			}
+		}
+		
+		// convert csv array to string
+		return arrToCsv([keypairCsvArr]);
+	}
+	
 	this.copy = function() {
 		return new CryptoKeypair({
 			plugin: state.plugin,
@@ -315,10 +364,6 @@ function CryptoKeypair(config) {
 		if (state.privateHex) setPrivateKey(state.privateHex);
 		else if (state.privateWif) setPrivateKey(state.privateWif);
 		if (state.publicAddress) setPublicAddress(state.publicAddress);
-	}
-	
-	this.toCsv = function() {
-		throw new Error("Not implemented");
 	}
 	
 	function combine(splitKeypairs) {
@@ -553,4 +598,14 @@ CryptoKeypair.getDecryptWeight = function(schemes) {
 			default: throw new Error("Unrecognized encryption scheme: " + scheme);
 		}
 	}
+}
+
+CryptoKeypair.CsvHeader = {
+		TICKER: "TICKER",
+		PRIVATE_HEX: "PRIVATE_HEX",
+		PRIVATE_WIF: "PRIVATE_WIF",
+		PUBLIC_ADDRESS: "PUBLIC_ADDRESS",
+		ENCRYPTION: "ENCRYPTION",
+		MIN_SHARES: "MIN_SHARES",
+		SHARE_NUM: "SHARE_NUM"
 }

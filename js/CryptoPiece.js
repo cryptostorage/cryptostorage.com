@@ -256,7 +256,22 @@ function CryptoPiece(config) {
 	}
 	
 	this.toCsv = function() {
-		throw new Error("Not implemented");
+		assertTrue(state.keypairs.length > 0);
+		
+		// build csv headers
+		var csvHeaders = [];
+		for (prop in CryptoKeypair.CsvHeader) {
+			if (CryptoKeypair.CsvHeader.hasOwnProperty(prop)) {
+	    	csvHeaders.push(CryptoKeypair.CsvHeader[prop.toString()]);
+	    }
+		}
+		
+		// build csv
+		var csv = arrToCsv([csvHeaders]);
+		for (var i = 0; i < state.keypairs.length; i++) {
+			csv += "\n" + state.keypairs[i].toCsv();
+		}
+		return csv;
 	}
 	
 	this.copy = function() {
@@ -283,6 +298,7 @@ function CryptoPiece(config) {
 		else if (config.json) fromJson(config.json);
 		else if (config.splitPieces) combine(config.splitPieces);
 		else if (config.piece) fromPiece(config.piece);
+		else if (config.csv) fromCsv(config.csv);
 		else throw new Error("All arguments null");
 	}
 	
@@ -304,6 +320,10 @@ function CryptoPiece(config) {
 			keypairs.push(new CryptoKeypair({json: json.keypairs[i]}));
 		}
 		setKeypairs(keypairs);
+	}
+	
+	function fromCsv(csv) {
+		throw new Error("Not implemented");
 	}
 	
 	function combine(splitPieces) {
