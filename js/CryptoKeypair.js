@@ -150,6 +150,10 @@ function CryptoKeypair(config) {
 		};
 	}
 	
+	this.toCsv = function() {
+		throw new Error("Not implemented");
+	}
+	
 	this.copy = function() {
 		return new CryptoKeypair({
 			plugin: state.plugin,
