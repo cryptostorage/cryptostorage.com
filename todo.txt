@@ -15,6 +15,7 @@ footer
 notice color gradient
 
 designer:
+passphrase confirmation
 split qr and lines white?
 display interoperability warning if passphrase or split
 how to make passphrase visible?
