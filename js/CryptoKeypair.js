@@ -25,7 +25,7 @@
 /**
  * Encapsulates a crypto keypair which has a public and private component.
  * 
- * One of plugin, keypairJson, or splitKeypairs is required.
+ * One of plugin, json, or splitKeypairs is required.
  * 
  * @param config is initialization configuration
  * 				config.plugin is the crypto plugin
