@@ -255,6 +255,10 @@ function CryptoPiece(config) {
 		return json;
 	}
 	
+	this.toCsv = function() {
+		throw new Error("Not implemented");
+	}
+	
 	this.copy = function() {
 		var keypairCopies = [];
 		for (var i = 0; i < state.keypairs.length; i++) keypairCopies.push(state.keypairs[i].copy());
@@ -291,9 +295,13 @@ function CryptoPiece(config) {
 	}
 	
 	function fromJson(json) {
+		assertArray(json.keypairs);
+		assertTrue(json.keypairs.length > 0);
+		state.pieceNum = json.pieceNum;
+		state.version = AppUtils.VERSION;
 		var keypairs = [];
 		for (var i = 0; i < json.keypairs.length; i++) {
-			keypairs.push(new CryptoKeypair({json: json}));
+			keypairs.push(new CryptoKeypair({json: json.keypairs[i]}));
 		}
 		setKeypairs(keypairs);
 	}

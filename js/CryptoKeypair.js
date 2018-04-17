@@ -202,11 +202,26 @@ function CryptoKeypair(config) {
 			assertTrue(state.shareNum >= 1 && state.shareNum <= AppUtils.MAX_SHARES);
 		}
 		
+		// hex and wif must both be initialized or undefined
+		if (isInitialized(state.privateHex)) {
+			assertInitialized(state.privateWif);
+		}
+		else {
+			assertUndefined(state.privateHex);
+			assertUndefined(state.privateWif);
+		}
+		
+		// public or private must be known
+		if (!state.publicAddress) assertInitialized(state.privateHex);
+		if (!state.privateHex) assertInitialized(publicAddress);
+				
 		// private key known
-		if (state.privateHex) assertInitialized(state.privateWif);
 		if (state.privateWif) {
-			assertInitialized(state.privateHex);
+			
+			// min shares is known or not applicable
 			assertDefined(state.minShares);
+			
+			// if not split then encryption is known
 			if (state.minShares === null) assertDefined(state.encryption);
 			
 			// unencrypted
@@ -235,23 +250,6 @@ function CryptoKeypair(config) {
 			assertUndefined(state.shareNum);
 			assertUndefined(state.encryption);
 		}
-		
-//		if (state.wif) {
-//			assertInitialized(state.hex);
-//			assertDefined(state.minShares);
-//			if (!state.minShares) assertDefined(state.encryption);
-//			if (isNumber(state.minShares)) {
-//				assertUndefined(state.encryption);
-//				assertTrue(state.minShares >= 2);
-//				assertTrue(state.minShares <= AppUtils.MAX_SHARES);
-//				assertTrue(isUndefined(state.shareNum) || state.shareNum === null || isNumber(state.shareNum));
-//				if (isNumber(state.shareNum)) {
-//					assertTrue(state.shareNum >= 1);
-//					assertTrue(state.shareNum <= AppUtils.MAX_SHARES);
-//				}
-//			}
-//		}
-//		if (state.hex) assertInitialized(state.wif);
 	}
 	
 	function setPrivateKey(privateKey) {
@@ -286,11 +284,12 @@ function CryptoKeypair(config) {
 		// split share with cryptostorage conventions
 		decoded = decodeWifShare(privateKey);
 		if (decoded) {
+			state.privateHex = AppUtils.toBase(58, 16, privateKey);
 			state.privateWif = privateKey;
-			state.privateHex = AppUtils.toBase(58, 16, state.privateWif);
 			state.publicAddress = undefined;
 			state.encryption = undefined;
 			state.minShares = decoded.minShares;
+			state.shareNum = undefined;
 			
 			// assign share num
 			assertTrue(isUndefined(config.shareNum) || config.shareNum === null || isNumber(config.shareNum));
@@ -305,20 +304,21 @@ function CryptoKeypair(config) {
 	
 	// TODO: support old and new format
 	function fromJson(json) {
+		assertInitialized(json.ticker);
+		state.plugin = AppUtils.getCryptoPlugin(json.ticker);
+		state.privateHex = json.privateHex;
+		state.privateWif = json.privateWif;
+		state.publicAddress = json.publicAddress;
+		state.encryption = json.encryption;
+		state.minShares = json.minShares;
+		state.shareNum = json.shareNum;
+		if (state.privateHex) setPrivateKey(state.privateHex);
+		else if (state.privateWif) setPrivateKey(state.privateWif);
+		if (state.publicAddress) setPublicAddress(state.publicAddress);
+	}
+	
+	this.toCsv = function() {
 		throw new Error("Not implemented");
-		plugin = AppUtils.getCryptoPlugin(json.ticker);
-		assertInitialized(state.plugin);
-		if (json.privateWif) {
-			state = plugin.decode(json.privateWif);
-			assertInitialized(state, "Cannot decode " + plugin.getTicker() + " private string: " + privateKey);
-			if (!state.publicAddress) state.publicAddress = json.address;
-			else if (json.address) assertEquals(state.address, json.address, "Derived and given addresses do not match");
-			if (!state.encryption) state.encryption = json.encryption;
-			else if (json.encryption) assertEquals(state.encryption, json.encryption, "Decoded and given encryption schemes do not match");			
-		} else {
-			state = {};
-			state.address = json.address;
-		}
 	}
 	
 	function combine(splitKeypairs) {
@@ -340,7 +340,7 @@ function CryptoKeypair(config) {
 			assertInitialized(decodedShare);
 			if (!minShares) minShares = decodedShare.minShares;
 			else if (minShares !== decodedShare.minShares) throw new Error("splitKeypairs[" + i + "] has inconsistent min shares");
-			decodedHexShares.push(decodedShare.hex);
+			decodedHexShares.push(decodedShare.privateHex);
 		}
 		
 		// ensure sufficient shares provided
@@ -480,7 +480,7 @@ function CryptoKeypair(config) {
 				if (!decoded.minShares) return null;
 				var wif = encodedShare.substring(encodedShare.indexOf('c') + 1);
 				if (!isBase58(wif)) return null;
-				decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif)));
+				decoded.privateHex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif)));
 				return decoded;
 			} catch (err) {
 				return null;
@@ -513,7 +513,7 @@ function CryptoKeypair(config) {
 			var decoded = {};
 			decoded.minShares = parseInt(hex.substring(2, 4), 16);
 			if (!isNumber(decoded.minShares) || decoded.minShares < 2 || decoded.minShares > AppUtils.MAX_SHARES) return null;
-			decoded.hex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
+			decoded.privateHex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
 			return decoded;
 		}
 	}
