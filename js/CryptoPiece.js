@@ -29,10 +29,11 @@
  * 
  * @param config specifies initialization configuration
  * 				config.keypairs keypairs are keypairs to initialize with
- * 				config.pieceNum is the pieceNumber to assign to each piece (optional)
- * 				config.pieceJson is exportable json to initialize from
+ * 				config.json is json to initialize from
+ * 				config.csv is csv to initialize from
  * 				config.splitPieces are split pieces to combine and initialize from
  * 				config.piece is an existing piece to copy from
+ *  			config.pieceNum is the pieceNumber to assign to each piece (optional)
  */
 function CryptoPiece(config) {
 	
@@ -243,13 +244,13 @@ function CryptoPiece(config) {
 		return pieceNum;
 	}
 	
-	this.getJson = function() {
+	this.toJson = function() {
 		var json = {};
 		json.pieceNum = that.getPieceNum();
 		json.version = AppUtils.VERSION;
 		json.keypairs = [];
 		for (var i = 0; i < state.keypairs.length; i++) {
-			json.keypairs.push(state.keypairs[i].getJson());
+			json.keypairs.push(state.keypairs[i].toJson());
 		}
 		return json;
 	}
@@ -262,7 +263,7 @@ function CryptoPiece(config) {
 	
 	this.equals = function(piece) {
 		assertObject(piece, CryptoPiece);
-		return objectsEqual(that.getJson(), piece.getJson());
+		return objectsEqual(that.toJson(), piece.toJson());
 	}
 	
 	this.getState = function() {
@@ -275,7 +276,7 @@ function CryptoPiece(config) {
 	function init() {
 		state = {};
 		if (config.keypairs) setKeypairs(config.keypairs);
-		else if (config.pieceJson) fromJson(config.pieceJson);
+		else if (config.json) fromJson(config.json);
 		else if (config.splitPieces) combine(config.splitPieces);
 		else if (config.piece) fromPiece(config.piece);
 		else throw new Error("All arguments null");

@@ -29,7 +29,7 @@
  * 
  * @param config is initialization configuration
  * 				config.plugin is the crypto plugin
- * 				config.keypairJson is exportable json to initialize from
+ * 				config.json is exportable json to initialize from
  * 				config.splitKeypairs are split keypairs to combine and initialize from
  * 				config.privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
  * 				config.publicAddress is a public address to manually set if not unencrypted (optional)
@@ -140,7 +140,7 @@ function CryptoKeypair(config) {
 		return state.shareNum;
 	}
 	
-	this.getJson = function() {
+	this.toJson = function() {
 		return {
 			ticker: state.plugin.getTicker(),
 			publicAddress: that.getPublicAddress(),
@@ -161,7 +161,7 @@ function CryptoKeypair(config) {
 	
 	this.equals = function(keypair) {
 		assertObject(keypair, CryptoKeypair);
-		return objectsEqual(that.getJson(), keypair.getJson());
+		return objectsEqual(that.toJson(), keypair.toJson());
 	}
 	
 	this.getState = function() {
@@ -180,7 +180,7 @@ function CryptoKeypair(config) {
 			else setPrivateKey(config.plugin.randomPrivateKey());
 			if (config.publicAddress) setPublicAddress(config.publicAddress);
 		}
-		else if (config.keypairJson) fromJson(config.keypairJson);
+		else if (config.json) fromJson(config.json);
 		else if (config.splitKeypairs) combine(config.splitKeypairs);
 		
 		// verify state
@@ -188,7 +188,7 @@ function CryptoKeypair(config) {
 	}
 	
 	function validateState() {
-		if (!state.plugin && !state.keypairJson && !state.splitKeypairs) {
+		if (!state.plugin && !state.json && !state.splitKeypairs) {
 			throw new Error("One of plugin, keypairJson, or splitKeypairs is required");
 		}
 		

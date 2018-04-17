@@ -15,6 +15,9 @@ function TestCrypto() {
 	 */
 	this.run = function(onDone) {
 		
+		// test piece initialization
+		testPieceInit(PLUGINS);
+		
 		// test plugins
 		var funcs = [];
 		for (var i = 0; i < PLUGINS.length; i++) funcs.push(testPluginFunc(PLUGINS[i]));
@@ -22,7 +25,13 @@ function TestCrypto() {
 			return function(onDone) { testPlugin(plugin, onDone); }
 		}
 		async.series(funcs, function(err) {
-			onDone(err);
+			if (err) {
+				onDone(err);
+				return;
+			}
+			
+			// tests pass
+			onDone();
 		});
 	}
 	
@@ -183,5 +192,50 @@ function TestCrypto() {
 		splitPieces = combined.split(AppUtils.MAX_SHARES, AppUtils.MAX_SHARES - 10);
 		var combined = new CryptoPiece({splitPieces: splitPieces});
 		assertTrue(original.equals(combined));
+	}
+	
+	function testPieceInit(plugins) {
+		
+		// create piece
+		var keypairs = [];
+		for (var i = 0; i < plugins.length; i++) keypairs.push(new CryptoKeypair({plugin: plugins[i]}));
+		var piece1 = new CryptoPiece({keypairs: keypairs});
+		
+		// test init from keypairs
+		var piece2 = new CryptoPiece({keypairs: keypairs});
+		assertTrue(piece1.equals(piece2));
+		
+		// test init from piece
+		piece2 = new CryptoPiece({piece: piece1});
+		assertTrue(piece1.equals(piece2));
+		for (var i = 0; i < piece1.getKeypairs().length; i++) {
+			assertFalse(piece1.getKeypairs()[i] === piece2.getKeypairs()[i]);
+		}
+		
+		// test init from json
+		piece2 = new CryptoPiece({json: piece1.toJson()});
+		assertTrue(piece1.equals(piece2));
+		
+		// test init from csv
+		piece2 = new CryptoPiece({csv: piece1.toCsv()});
+		assertTrue(piece1.equals(piece2));
+		
+		// test invalid init with pieceNum
+		try {
+			new CryptoPiece({keypairs: keypairs, pieceNum: 2});
+			throw new Error("fail");
+		} catch (err) {
+			if (err.message === "fail") throw new Error("Should not be able to set pieceNum on unencrypted keys");
+		}
+		
+		// test split
+		var splitPieces = piece1.split(3, 2);
+		for (var i = 0; i < splitPieces.getKeyPairs(); i++) assertEquals(i + 1, splitPieces[i].getPieceNum());
+		var splitPiece = new CryptoPiece({piece: splitPieces[0]});
+		assertEquals(1, splitPiece.getPieceNum());
+		splitPiece = new CryptoPiece({keypairs: splitPieces[0].getKeypairs(), pieceNum: 5});
+		assertEquals(5, splitPiece.getPieceNum());
+		piece2 = new CryptoPiece({splitPieces: splitPieces});
+		assertTrue(piece1.equals(piece2));
 	}
 }
