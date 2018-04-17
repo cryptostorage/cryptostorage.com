@@ -140,6 +140,12 @@ function CryptoKeypair(config) {
 		return state.shareNum;
 	}
 	
+	this.setShareNum = function(shareNum) {
+		assertUndefined(that.getShareNum());
+		assertTrue(that.isSplit());
+		state.shareNum = shareNum;
+	}
+	
 	this.toJson = function() {
 		return {
 			ticker: state.plugin.getTicker(),
@@ -150,53 +156,25 @@ function CryptoKeypair(config) {
 		};
 	}
 	
-	this.toCsv = function(headers) {
-		
-		// build default headers
-		if (!headers) {
-			headers = [];
-			for (prop in CryptoKeypair.CsvHeader) {
-				if (CryptoKeypair.CsvHeader.hasOwnProperty(prop)) {
-		    	headers.push(CryptoKeypair.CsvHeader[prop.toString()]);
-		    }
-			}
-		}	
-		
-		// validate headers
-		assertArray(headers);
-		assertTrue(headers.length > 0);
-		
-		// collect values per headers
-		var keypairCsvArr = [];
-		for (var i = 0; i < headers.length; i++) {
-			switch(headers[i]) {
-				case CryptoKeypair.CsvHeader.TICKER:
-					keypairCsvArr.push(that.getPlugin().getTicker());
-				case CryptoKeypair.CsvHeader.PRIVATE_WIF:
-					keypairCsvArr.push(that.getPrivateWif());
-					break;
-				case CryptoKeypair.CsvHeader.PRIVATE_HEX:
-					keypairCsvArr.push(that.getPrivateHex());
-					break;
-				case CryptoKeypair.CsvHeader.PUBLIC_ADDRESS:
-					keypairCsvArr.push(that.getPublicAddress());
-					break;
-				case CryptoKeypair.CsvHeader.ENCRYPTION:
-					keypairCsvArr.push(that.getEncryptionScheme());
-					break;
-				case CryptoKeypair.CsvHeader.MIN_SHARES:
-					keypairCsvArr.push(that.getMinShares());
-					break;
-				case CryptoKeypair.CsvHeader.SHARE_NUM:
-					keypairCsvArr.push(that.getShareNum());
-					break;
-				default:
-					throw new Error("Unrecognized CSV header: " + headers[i]);
-			}
+	this.getCsvValue = function(header) {
+		switch(header) {
+			case CryptoKeypair.CsvHeader.TICKER:
+				return that.getPlugin().getTicker();
+			case CryptoKeypair.CsvHeader.PRIVATE_WIF:
+				return that.getPrivateWif();
+			case CryptoKeypair.CsvHeader.PRIVATE_HEX:
+				return that.getPrivateHex();
+			case CryptoKeypair.CsvHeader.PUBLIC_ADDRESS:
+				return that.getPublicAddress();
+			case CryptoKeypair.CsvHeader.ENCRYPTION:
+				return that.getEncryptionScheme();
+			case CryptoKeypair.CsvHeader.MIN_SHARES:
+				return that.getMinShares();
+			case CryptoKeypair.CsvHeader.SHARE_NUM:
+				return that.getShareNum();
+			default:
+				throw new Error("Unrecognized CSV header: " + header);
 		}
-		
-		// convert csv array to string
-		return arrToCsv([keypairCsvArr]);
 	}
 	
 	this.copy = function() {
@@ -234,11 +212,12 @@ function CryptoKeypair(config) {
 		
 		// verify state
 		validateState();
+		if (isDefined(config.shareNum) && state.shareNum !== config.shareNum) throw new Error("Invalid initialization shareNum: " + config.shareNum);		
 	}
 	
 	function validateState() {
 		if (!state.plugin && !state.json && !state.splitKeypairs) {
-			throw new Error("One of plugin, keypairJson, or splitKeypairs is required");
+			throw new Error("One of plugin, json, or splitKeypairs is required");
 		}
 		
 		if (state.minShares) {
@@ -360,6 +339,7 @@ function CryptoKeypair(config) {
 		state.publicAddress = json.publicAddress;
 		state.encryption = json.encryption;
 		state.minShares = json.minShares;
+		if (json.encryption === null) assertUninitialized(json.shareNum);
 		state.shareNum = json.shareNum;
 		if (state.privateHex) setPrivateKey(state.privateHex);
 		else if (state.privateWif) setPrivateKey(state.privateWif);

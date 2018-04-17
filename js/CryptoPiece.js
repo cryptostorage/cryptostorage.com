@@ -256,22 +256,30 @@ function CryptoPiece(config) {
 	}
 	
 	this.toCsv = function() {
-		assertTrue(state.keypairs.length > 0);
 		
-		// build csv headers
-		var csvHeaders = [];
+		// collect headers
+		var headers = [];
 		for (prop in CryptoKeypair.CsvHeader) {
 			if (CryptoKeypair.CsvHeader.hasOwnProperty(prop)) {
-	    	csvHeaders.push(CryptoKeypair.CsvHeader[prop.toString()]);
+	    	headers.push(CryptoKeypair.CsvHeader[prop.toString()]);
 	    }
 		}
 		
-		// build csv
-		var csv = arrToCsv([csvHeaders]);
-		for (var i = 0; i < state.keypairs.length; i++) {
-			csv += "\n" + state.keypairs[i].toCsv();
+		// collect content
+		var csvArr = [headers];
+		for (i = 0; i < state.keypairs.length; i++) {
+			var keypairValues = [];
+			for (var j = 0; j < headers.length; j++) {
+				var value = state.keypairs[i].getCsvValue(headers[j]);
+				if (value === null) value = "null";
+				if (value === undefined) value = "";
+				keypairValues.push(value);
+			}
+			csvArr.push(keypairValues);
 		}
-		return csv;
+		
+		// convert array to csv
+		return arrToCsv(csvArr);
 	}
 	
 	this.copy = function() {
@@ -294,7 +302,7 @@ function CryptoPiece(config) {
 	init();
 	function init() {
 		state = {};
-		if (config.keypairs) setKeypairs(config.keypairs);
+		if (config.keypairs) setKeypairs(config.keypairs, config.pieceNum);
 		else if (config.json) fromJson(config.json);
 		else if (config.splitPieces) combine(config.splitPieces);
 		else if (config.piece) fromPiece(config.piece);
@@ -302,10 +310,11 @@ function CryptoPiece(config) {
 		else throw new Error("All arguments null");
 	}
 	
-	function setKeypairs(keypairs) {
+	function setKeypairs(keypairs, pieceNum) {
 		assertTrue(keypairs.length > 0);
 		for (var i = 0; i < keypairs.length; i++) {
 			assertObject(keypairs[i], CryptoKeypair);
+			if (isDefined(pieceNum)) keypairs[i].setShareNum(shareNum);
 		}
 		state.keypairs = keypairs;
 	}
@@ -323,7 +332,43 @@ function CryptoPiece(config) {
 	}
 	
 	function fromCsv(csv) {
-		throw new Error("Not implemented");
+		assertString(csv);
+		assertInitialized(csv);
+		
+		// convert csv to array
+		var csvArr = csvToArr(csv);
+		assertTrue(csvArr.length > 0);
+		assertTrue(csvArr[0].length > 0);
+		
+		// build keypairs
+		var keypairs = [];
+		for (var row = 1; row < csvArr.length; row++) {
+			var keypairConfig = {};
+			for (var col = 0; col < csvArr[0].length; col++) {
+				var value = csvArr[row][col];
+				if (value === "") value = undefined;
+				if (value === "null") value = null;
+				switch (csvArr[0][col]) {
+				case CryptoKeypair.CsvHeader.TICKER:
+					keypairConfig.plugin = AppUtils.getCryptoPlugin(value);
+					break;
+				case CryptoKeypair.CsvHeader.PRIVATE_WIF:
+				case CryptoKeypair.CsvHeader.PRIVATE_HEX:
+					keypairConfig.privateKey = value;
+					break;
+				case CryptoKeypair.CsvHeader.PUBLIC_ADDRESS:
+					keypairConfig.publicAddress = value;
+					break;
+				case CryptoKeypair.CsvHeader.SHARE_NUM:
+					keypairConfig.shareNum = value;
+					break;
+				}
+			}
+			keypairs.push(new CryptoKeypair(keypairConfig));
+		}
+		
+		// set internal keypars
+		setKeypairs(keypairs);
 	}
 	
 	function combine(splitPieces) {
