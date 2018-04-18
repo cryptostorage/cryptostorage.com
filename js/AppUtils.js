@@ -2281,9 +2281,7 @@ var AppUtils = {
 			totalWeight += (keypairWeight * keypair.numKeypairs);
 			numKeypairs += keypair.numKeypairs;
 		}
-		if (genConfig.pieceRenderer) totalWeight += (genConfig.pieceRenderer.getRenderWeight(numKeypairs) * genConfig.numPieces ? genConfig.numPieces : 1);
-		
-		
+		if (genConfig.pieceRendererClass) totalWeight += (genConfig.pieceRendererClass.getRenderWeight(numKeypairs) * genConfig.numPieces ? genConfig.numPieces : 1);
 		
 		
 		throw new Error("Not implemented");
@@ -2297,7 +2295,7 @@ var AppUtils = {
 	 * 	 			genConfig.passphrase: passphrase string
 	 * 	 			genConfig.numPieces: undefined or number
 	 * 				genConfig.minPieces: undefined or number
-	 * 				genConfig.pieceRenderer: piece renderer class to render
+	 * 				genConfig.pieceRendererClass: piece renderer class to render
 	 */
 	validateGenerateConfig: function(genConfig) {
 		assertObject(genConfig);
@@ -2339,6 +2337,11 @@ var AppUtils = {
 			assertTrue(config.minPieces >= 2);
 			assertTrue(config.minPieces <= AppUtils.MAX_SHARES);
 			assertTrue(config.minPieces <= config.numPieces);
+		}
+		
+		// validate piece renderer
+		if (genConfig.pieceRendererClass) {
+			assertDefined(genConfig.pieceRendererClass.getRenderWeight);
 		}
 	},
 	
