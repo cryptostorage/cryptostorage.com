@@ -288,9 +288,6 @@ function TestCrypto() {
 					onDone(err);
 					return;
 				}
-				
-				// all done
-				console.log("you tests pass bro");
 				onDone();
 			});
 		});
