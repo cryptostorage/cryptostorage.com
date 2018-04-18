@@ -2284,7 +2284,7 @@ var AppUtils = {
 		var totalWeight = createWeight + encryptWeight + renderWeight;
 		var doneWeight = 0;
 		
-		// create keypairs
+		// generate keypairs
 		if (onProgress) onProgress(0, "Generating keypairs");
 		var keypairs = [];
 		for (var i = 0; i < genConfig.keypairs.length; i++) {
