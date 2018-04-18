@@ -303,7 +303,6 @@ function TestCrypto() {
 			assertTrue(progressStart);
 			assertTrue(progressMiddle);
 			assertTrue(progressEnd);
-			console.log("all done here");
 			onDone();
 		});
 	}

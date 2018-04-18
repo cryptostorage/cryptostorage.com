@@ -3580,6 +3580,8 @@ function CompactPieceRenderer(div, piece, onRenderProgress) {
 		div.addClass("compact_piece_div flex_vertical");
 		
 		if (onRenderProgress) onRenderProgress(0, "Rendering keypairs");
+		if (onRenderProgress) onRenderProgress(.5, "Rendering keypairs");
+		if (onRenderProgress) onRenderProgress(1, "Rendering keypairs");
 		
 		div.append("Ok we're ready to render compact pieces");
 		

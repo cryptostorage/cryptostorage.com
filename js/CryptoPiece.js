@@ -430,7 +430,7 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 			var renderers = [];
 			for (var i = 0; i < pieces.length; i++) {
 				renderers.push(new genConfig.rendererClass(null, pieces[i], function(percent, label) {
-					throw new Error("Ready to handle render progress");
+					if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering keypairs");
 				}));
 			}
 			
@@ -451,6 +451,7 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 			async.series(renderFuncs, function(err, renderers) {
 				if (err) onDone(err);
 				else {
+					doneWeight += renderWeight;
 					assertEquals(doneWeight, totalWeight);
 					onDone(null, pieces, renderers);
 				}
