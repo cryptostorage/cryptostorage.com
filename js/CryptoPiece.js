@@ -408,6 +408,7 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 			}
 			
 			// split and render
+			fail("Shouldn't get here because schems is null");
 			splitAndRender();
 		});
 	}
