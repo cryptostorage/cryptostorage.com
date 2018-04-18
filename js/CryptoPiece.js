@@ -425,7 +425,25 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 		
 		// render each piece
 		if (genConfig.rendererClass) {
-			throw new Error("Ready to render each piece");
+			
+			// collect renderers
+			var renderers = [];
+			for (var i = 0; i < pieces.length; i++) {
+				renderers.push(new genConfig.rendererClass(null, pieces[i], function(percent, label) {
+					throw new Error("Ready to handle render progress");
+				}));
+			}
+			
+			// collect render callback functions
+			throw new Error("Play ball with bub");
+			function renderFunction(renderer) {
+				return function(onDone) { renderer.render(onDone); }
+			}
+			
+			// render async
+			//async.series();	
+			
+			throw new Error("Can remove this");
 		} else {
 			onDone(null, pieces, null);
 		}
