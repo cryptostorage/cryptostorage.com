@@ -384,12 +384,14 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 	// generate keypairs
 	if (onProgress) onProgress(0, "Generating keypairs");
 	var keypairs = [];
+	var schemes = [];
 	for (var i = 0; i < config.keypairs.length; i++) {
 		var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].ticker);
 		for (var j = 0; j < config.keypairs[i].numKeypairs; j++) {
 			keypairs.push(new CryptoKeypair({plugin: plugin}));
 			doneWeight += (1 / numKeypairs) * createWeight;
 			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keypairs");
+			schemes.push(config.keypairs[i].encryption);
 		}
 	}
 	
@@ -408,7 +410,6 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 			}
 			
 			// split and render
-			fail("Shouldn't get here because schems is null");
 			splitAndRender();
 		});
 	}
