@@ -127,6 +127,7 @@ function CryptoPiece(config) {
 				onDone(err);
 				return;
 			} else {
+				assertEquals(doneWeight, totalWeight);
 				onDone(null, that);
 			}
 		});
@@ -143,7 +144,7 @@ function CryptoPiece(config) {
 						return;
 					} else {
 						doneWeight += CryptoKeypair.getDecryptWeight(scheme);
-						if (onProgress) onProgress(doneWeight / totalWeight);
+						if (onProgress) onProgress(doneWeight / totalWeight, "Decrypting");
 						setImmediate(function() { onDone(err, encryptedKeypair); });	// let UI breath
 					}
 				});

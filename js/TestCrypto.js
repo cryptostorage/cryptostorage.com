@@ -3,7 +3,6 @@
  * 
  * TODO: test wrong passphrase
  * TODO: test fail not implementeds
- * TODO: decrypt throw vs pass to onDone
  */
 function TestCrypto() {
 	

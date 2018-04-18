@@ -2387,52 +2387,47 @@ var AppUtils = {
 		decryptFunc(hex, passphrase, onProgress, onDone);
 		
 		function decryptHexV1(hex, passphrase, onProgress, onDone) {
-			try {
+			
+			// assert correct version
+			assertEquals(AppUtils.ENCRYPTION_V1_VERSION, parseInt(hex.substring(0, AppUtils.ENCRYPTION_V1_VERSION.toString(16).length), 16));
 				
-				// assert correct version
-				assertEquals(AppUtils.ENCRYPTION_V1_VERSION, parseInt(hex.substring(0, AppUtils.ENCRYPTION_V1_VERSION.toString(16).length), 16));
-				
-				// get passphrase key
-				var salt = CryptoJS.enc.Hex.parse(hex.substr(0, 32));
-			  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-			  	keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
-			  	iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
-			  	hasher: CryptoJS.algo.SHA512
-			  });
-			  
-			  // decrypt
-			  var iv = salt;
-			  var ctHex = hex.substring(32);
-			  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
-			  var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
+			// get passphrase key
+			var salt = CryptoJS.enc.Hex.parse(hex.substr(0, 32));
+		  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+		  	keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
+		  	iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
+		  	hasher: CryptoJS.algo.SHA512
+		  });
+		  
+		  // decrypt
+		  var iv = salt;
+		  var ctHex = hex.substring(32);
+		  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
+		  var decrypted;
+		  try {
+			  decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
 			  	iv: iv, 
 			    padding: CryptoJS.pad.Pkcs7,
 			    mode: CryptoJS.mode.CBC
 			  });
-			  var decryptedHex = decrypted.toString(CryptoJS.enc.Utf8);
-			  assertInitialized(decryptedHex);
-				if (onProgress) onProgress(1)
-				onDone(null, decryptedHex);
-			} catch (err) {
-				onDone(new Error("Incorrect passphrase"));
-			}
+		  } catch (err) {
+		  	onDone(new Error("Incorrect passphrase"));
+		  }
+		  var decryptedHex = decrypted.toString(CryptoJS.enc.Utf8);
+		  assertInitialized(decryptedHex);
+			if (onProgress) onProgress(1)
+			onDone(null, decryptedHex);
 		}
 		
 		function decryptHexV0(hex, passphrase, onProgress, onDone) {
+			var decryptedHex;
 			try {
-				var decryptedHex;
-				try {
-					decryptedHex = CryptoJS.AES.decrypt(AppUtils.toBase(16, 64, hex), passphrase).toString(CryptoJS.enc.Utf8);
-				} catch (err) { }
-				if (!decryptedHex) throw new Error("Incorrect passphrase");
-				try {
-					if (onProgress) onProgress(1)
-					onDone(null, decryptedHex);
-				} catch (err) {
-					throw new Error("Incorrect passphrase");
-				}
-			} catch (err) {
-				onDone(err);
+				decryptedHex = CryptoJS.AES.decrypt(AppUtils.toBase(16, 64, hex), passphrase).toString(CryptoJS.enc.Utf8);
+			} catch (err) { }
+			if (!decryptedHex) onDone(new Error("Incorrect passphrase"));
+			else {
+				if (onProgress) onProgress(1)
+				onDone(null, decryptedHex);
 			}
 		}
 		
@@ -2440,15 +2435,13 @@ var AppUtils = {
 			bitcoinjs.decrypt(AppUtils.toBase(16, 58, hex), passphrase, function(progress) {
 				if (onProgress) onProgress(progress.percent / 100);
 			}, null, function(err, decryptedKey) {
-				try {
-					if (err) throw new Error("Incorrect passphrase");
+				if (err) onDone(new Error("Incorrect passphrase"));
+				else {
 					var decryptedB58 = bitcoinjs.encode(0x80, decryptedKey.privateKey, true);
 					key = new Bitcoin.ECKey(decryptedB58);
 					key.setCompressed(true);
 					if (onProgress) onProgress(1);
 					onDone(null, key.getBitcoinHexFormat());
-				} catch (err) {
-					onDone(err);
 				}
 			});
 		}
