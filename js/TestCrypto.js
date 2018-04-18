@@ -100,9 +100,10 @@ function TestCrypto() {
 		// encrypt piece
 		var progressStarted = false;
 		var progressComplete = false;
-		piece.encrypt(PASSPHRASE, schemes, function(percent) {
+		piece.encrypt(PASSPHRASE, schemes, function(percent, label) {
 			if (percent === 0) progressStarted = true;
 			if (percent === 1) progressComplete = true;
+			assertEquals("Encrypting", label);
 		}, function(err, encryptedPiece) {
 			
 			// test state
@@ -125,9 +126,10 @@ function TestCrypto() {
 			// decrypt piece
 			progressStarted = false;
 			progressCompleted = false;
-			piece.decrypt(PASSPHRASE, function(percent) {
+			piece.decrypt(PASSPHRASE, function(percent, label) {
 				if (percent === 0) progressStarted = true;
 				if (percent === 1) progressComplete = true;
+				assertEquals("Decrypting", label);
 			}, function(err, decryptedPiece) {
 				
 				// test state
@@ -247,7 +249,7 @@ function TestCrypto() {
 	function testGeneratePieces(plugins) {
 		console.log("Testing AppUtils.generatePieces()");
 		
-		// simple configuration
+		// simple generate config
 		var genConfig = {};
 		genConfig.keypairs = [];
 		for (var i = 0; i < plugins.length; i++) {

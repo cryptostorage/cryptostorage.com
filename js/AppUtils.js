@@ -2260,11 +2260,33 @@ var AppUtils = {
 	/**
 	 * Generates pieces according to the given configuration.
 	 * 
-	 * @param config configures the piece generation
+	 * @param genConfig is the piece generation configuration
 	 * @param onProgress(percent) is invoked as progress is made
 	 * @param onDone(err, pieces, pieceRenderers) is invoked when done
 	 */
-	generatePieces: function(config, onProgress, onDone) {
+	generatePieces: function(genConfig, onProgress, onDone) {
+		
+		// validate gen config
+		AppUtils.validateGenerateConfig(genConfig);
+		
+		
+		
+		
+		
+		throw new Error("Not implemented");
+	},
+	
+	/**
+	 * Validates a piece generation config.
+	 * 
+	 * @param genConfig is the generation config to define
+	 * 				genConfig.keypairs: [{ticker: ..., numKeys: ..., encryption: ...}, ...]
+	 * 				genConfig.minPieces: undefined or number
+	 * 				genConfig.numPieces: undefined or number
+	 * 				genConfig.passphrase: passphrase string
+	 */
+	validateGenerateConfig: function(genConfig) {
+		assertObject(genConfig);
 		throw new Error("Not implemented");
 	},
 	
