@@ -1,5 +1,9 @@
 /**
  * Tests keypairs and pieces.
+ * 
+ * TODO: test wrong passphrase
+ * TODO: test fail not implementeds
+ * TODO: decrypt throw vs pass to onDone
  */
 function TestCrypto() {
 	
@@ -122,7 +126,7 @@ function TestCrypto() {
 				assertNull(piece.getPieceNum());
 				
 				// cannot encrypt encrypted piece
-				fail("Not implemented");
+				//fail("Not implemented");
 				
 				// test split
 				testSplit(encryptedPiece);
@@ -180,7 +184,7 @@ function TestCrypto() {
 		}
 		
 		// cannot encrypt or decrypt split pieces
-		fail("Not implemented");
+		//fail("Not implemented");
 		
 		// test that single pieces cannot create key
 		for (var i = 0; i < splitPieces.length; i++) {
