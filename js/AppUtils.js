@@ -2270,20 +2270,19 @@ var AppUtils = {
 		// validate gen config
 		AppUtils.validateGenerateConfig(genConfig);
 		
-		// collect weights
-		var doneWeight = 0;
-		var totalWeight = 0;
-		var numKeypairs = 0;
+		// compute weights
+		var createWeight = 0;
+		var encryptWeight = 0;
 		for (var i = 0; i < genConfig.keypairs.length; i++) {
 			var keypair = genConfig.keypairs[i];
-			var keypairWeight = CryptoKeypair.getCreateWeight(keypair.ticker);
-			if (keypair.encryption) keypairWeight += CryptoKeypair.getEncryptWeight(keypair.encryption);
-			totalWeight += (keypairWeight * keypair.numKeypairs);
-			numKeypairs += keypair.numKeypairs;
+			createWeight += CryptoKeypair.getCreateWeight(keypair.ticker);
+			if (keypair.encryption) encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption);
 		}
-		if (genConfig.pieceRendererClass) totalWeight += (genConfig.pieceRendererClass.getRenderWeight(numKeypairs) * genConfig.numPieces ? genConfig.numPieces : 1);
+		var renderWeight = genConfig.rendererClass ? genConfig.rendererClass.getRenderWeight(genConfig.keypairs) * (genConfig.numPieces ? genConfig.numPieces : 1) : 0;
+		var totalWeight = createWeight + encryptWeight + renderWeight;
 		
 		
+
 		throw new Error("Not implemented");
 	},
 	
@@ -2295,7 +2294,7 @@ var AppUtils = {
 	 * 	 			genConfig.passphrase: passphrase string
 	 * 	 			genConfig.numPieces: undefined or number
 	 * 				genConfig.minPieces: undefined or number
-	 * 				genConfig.pieceRendererClass: piece renderer class to render
+	 * 				genConfig.rendererClass: piece renderer class to render
 	 */
 	validateGenerateConfig: function(genConfig) {
 		assertObject(genConfig);
@@ -2340,8 +2339,8 @@ var AppUtils = {
 		}
 		
 		// validate piece renderer
-		if (genConfig.pieceRendererClass) {
-			assertDefined(genConfig.pieceRendererClass.getRenderWeight);
+		if (genConfig.rendererClass) {
+			assertDefined(genConfig.rendererClass.getRenderWeight);
 		}
 	},
 	

@@ -3589,10 +3589,14 @@ function CompactPieceRenderer(div, piece, onRenderProgress) {
 	}
 }
 inheritsFrom(CompactPieceRenderer, DivController);
-CompactPieceRenderer.getRenderWeight = function(numKeypairs) {
-	assertNumber(numKeypairs);
-	assertTrue(numKeypairs > 0);
-	return numKeypairs * 15 * 2;	// 2 QRs per keypair with each QR having 15 weight
+CompactPieceRenderer.getRenderWeight = function(keypairsConfig) {
+	assertArray(keypairsConfig);
+	assertTrue(keypairsConfig.length > 0);
+	var weight = 0;
+	for (var i = 0; i < keypairsConfig.length; i++) {
+		weight += keypairsConfig[i].numKeypairs * 2 * 15;	// TODO: assumes 2 QRs per keypair, each having 15 weight
+	}
+	return weight;
 }
 
 /**

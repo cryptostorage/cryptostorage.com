@@ -264,6 +264,7 @@ function TestCrypto() {
 				numKeypairs: 1
 			});
 		}
+		genConfig.rendererClass = CompactPieceRenderer;
 		
 		// generate pieces
 		var progressStart = false;
