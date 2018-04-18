@@ -3570,6 +3570,7 @@ inheritsFrom(EditorActionsController, DivController);
  * @param onRenderProgress(percent) is invoked as render progress is made
  */
 function CompactPieceRenderer(div, piece, onRenderProgress) {
+	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	
 	this.render = function(onDone) {
@@ -3577,6 +3578,8 @@ function CompactPieceRenderer(div, piece, onRenderProgress) {
 		// div setup
 		div.empty();
 		div.addClass("compact_piece_div flex_vertical");
+		
+		if (onRenderProgress) onRenderProgress(0, "Rendering keypairs");
 		
 		div.append("Ok we're ready to render compact pieces");
 		

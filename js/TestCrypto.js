@@ -291,6 +291,11 @@ function TestCrypto() {
 				default: throw new Error("Unrecognized progress label: " + label);
 			}
 		}, function(err, pieces, pieceRenderers) {
+			if (err) {
+				onDone(err);
+				return;
+			}
+			
 			assertNull(err);
 			assertEquals(1, pieces.length);
 			assertEquals(plugins.length, pieces[0].getKeypairs().length);

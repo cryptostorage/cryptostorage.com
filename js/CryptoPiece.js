@@ -398,8 +398,8 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 	
 	// encrypt
 	if (encryptWeight > 0) {
-		// TODO: define schemes
-		piece.encrypt(getConfig.passphrase, schemes, function(percent, label) {
+		if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting keypairs");
+		piece.encrypt(getConfig.passphrase, schemes, function(percent, label) {		// TODO: define schemes
 			throw new Error("Ready to test progresss");
 		}, function(err, encryptedPiece) {
 			if (err) {
@@ -435,16 +435,30 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 			}
 			
 			// collect render callback functions
-			throw new Error("Play ball with bub");
+			var renderFuncs = [];
+			for (var i = 0; i < renderers.length; i++) {
+				renderFuncs.push(renderFunction(renderers[i]));
+			}
 			function renderFunction(renderer) {
-				return function(onDone) { renderer.render(onDone); }
+				return function(onDone) {
+					renderer.render(function(div) {
+						onDone(null, renderer);
+					});
+				}
 			}
 			
 			// render async
-			//async.series();	
+			async.series(renderFuncs, function(err, renderers) {
+				if (err) onDone(err);
+				else {
+					assertEquals(doneWeight, totalWeight);
+					onDone(null, pieces, renderers);
+				}
+			});	
 			
 			throw new Error("Can remove this");
 		} else {
+			assertEquals(doneWeight, totalWeight);
 			onDone(null, pieces, null);
 		}
 	}
