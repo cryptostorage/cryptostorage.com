@@ -263,11 +263,21 @@ function TestCrypto() {
 		var progressStart = false;
 		var progressMiddle = false;
 		var progressEnd = false;
-		var pieces = AppUtils.generatePieces(genConfig, function(percent) {
+		var pieces = AppUtils.generatePieces(genConfig, function(percent, label) {
 			if (percent === 0) progressStart = true;
 			else if (percent === 1) progressEnd = true;
 			else if (percent > 0 && percent < 1) progressMiddle = true;
 			else throw new Error("Invalid progress percent: " + percent);
+			
+			// test label
+			assertInitialized(label);
+			switch (label) {
+				case "Generating keypairs":
+				case "Encrypting keypairs":
+				case "Rendering keypairs":
+					break;
+				default: throw new Error("Unrecognized progress label: " + label);
+			}
 		}, function(err, pieces, pieceRenderers) {
 			assertNull(err);
 			assertEquals(1, pieces.length);
