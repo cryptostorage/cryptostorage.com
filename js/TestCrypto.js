@@ -16,26 +16,31 @@ function TestCrypto() {
 	this.run = function(onDone) {
 		
 		// test generate pieces
-		testGeneratePieces(PLUGINS);
-		
-		// test piece initialization
-		testPieceInit(PLUGINS);
-		
-		// test plugins
-		var funcs = [];
-		for (var i = 0; i < PLUGINS.length; i++) funcs.push(testPluginFunc(PLUGINS[i]));
-		function testPluginFunc(plugin) {
-			return function(onDone) { testPlugin(plugin, onDone); }
-		}
-		async.series(funcs, function(err) {
+		testGeneratePieces(PLUGINS, function(err) {
 			if (err) {
 				onDone(err);
 				return;
 			}
 			
-			// tests pass
-			onDone();
-		});
+			// test piece initialization
+			testPieceInit(PLUGINS);
+			
+			// test plugins
+			var funcs = [];
+			for (var i = 0; i < PLUGINS.length; i++) funcs.push(testPluginFunc(PLUGINS[i]));
+			function testPluginFunc(plugin) {
+				return function(onDone) { testPlugin(plugin, onDone); }
+			}
+			async.series(funcs, function(err) {
+				if (err) {
+					onDone(err);
+					return;
+				}
+				
+				// tests pass
+				onDone();
+			});
+		});		
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
@@ -252,7 +257,7 @@ function TestCrypto() {
 		assertTrue(piece1.equals(piece2));
 	}
 	
-	function testGeneratePieces(plugins) {
+	function testGeneratePieces(plugins, onDone) {
 		console.log("Testing CryptoPiece.generatePieces()");
 		
 		// simple generate config
@@ -290,6 +295,11 @@ function TestCrypto() {
 			assertEquals(1, pieces.length);
 			assertEquals(plugins.length, pieces[0].getKeypairs().length);
 			assertEquals(1, pieceRenderers.length);
+			assertTrue(progressStart);
+			assertTrue(progressMiddle);
+			assertTrue(progressEnd);
+			console.log("all done here");
+			onDone();
 		});
 	}
 }

@@ -357,7 +357,8 @@ function CryptoPiece(config) {
  * 	 			genConfig.passphrase: passphrase string
  * 	 			genConfig.numPieces: undefined or number
  * 				genConfig.minPieces: undefined or number
- * 				genConfig.rendererClass: piece renderer class to render
+ * 				genConfig.rendererClass: class to render pieces
+ * 
  * @param onProgress(percent, label) is invoked as progress is made
  * @param onDone(err, pieces, pieceRenderers) is invoked when done
  */
@@ -395,12 +396,39 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 	// initialize piece
 	var piece = new CryptoPiece({keypairs: keypairs});
 	
+	// encrypt
+	if (encryptWeight > 0) {
+		// TODO: define schemes
+		piece.encrypt(getConfig.passphrase, schemes, function(percent, label) {
+			throw new Error("Ready to test progresss");
+		}, function(err, encryptedPiece) {
+			if (err) {
+				onDone(err);
+				return;
+			}
+			
+			// split and render
+			splitAndRender();
+		});
+	}
 	
-	//passphrase, schemes, onProgress, onDone
-	//piece.encrypt
+	// otherwise split and render
+	else {
+		splitAndRender();
+	}
 	
-	// encrypt piece
-	throw new Error("Not implemented");
+	function splitAndRender() {
+		
+		// split pieces if applicable
+		var pieces = genConfig.numPieces ? pieces.split(genConfig.numPieces, genConfig.minPieces) : [piece];
+		
+		// render each piece
+		if (genConfig.rendererClass) {
+			throw new Error("Ready to render each piece");
+		} else {
+			onDone(null, pieces, null);
+		}
+	}
 }
 
 /**
