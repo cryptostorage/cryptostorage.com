@@ -322,9 +322,14 @@ function TestCrypto() {
 					return;
 				}
 				assertNull(err);
-				assertEquals(1, pieces.length);
+				if (config.numPieces) {
+					assertEquals(config.numPieces, pieces.length);
+					assertEquals(config.numPieces, pieceRenderers.length);
+				} else {
+					assertEquals(1, pieces.length);
+					assertEquals(1, pieceRenderers.length);
+				}
 				assertEquals(plugins.length, pieces[0].getKeypairs().length);
-				assertEquals(1, pieceRenderers.length);
 				for (var i = 0; i < pieceRenderers.length; i++) assertInitialized(pieceRenderers[i].getDiv());
 				assertTrue(progressStart);
 				assertTrue(progressMiddle);

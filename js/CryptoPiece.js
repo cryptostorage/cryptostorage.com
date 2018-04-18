@@ -408,8 +408,7 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 				onDone(err);
 				return;
 			}
-			
-			// split and render			
+			doneWeight += encryptWeight;
 			splitAndRender();
 		});
 	}
