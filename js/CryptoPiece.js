@@ -353,6 +353,12 @@ function CryptoPiece(config) {
  * Utility to generate pieces according to the given configuration.
  * 
  * @param genConfig is the piece generation configuration
+ * 				genConfig.keypairs: [{ticker: ..., numKeypairs: ..., encryption: ...}, ...]
+ * 	 			genConfig.passphrase: passphrase string
+ * 	 			genConfig.numPieces: undefined or number
+ * 				genConfig.minPieces: undefined or number
+ * 				genConfig.rendererClass: piece renderer class to render
+ * 
  * @param onProgress(percent, label) is invoked as progress is made
  * @param onDone(err, pieces, pieceRenderers) is invoked when done
  */
@@ -397,12 +403,7 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 /**
  * Validates piece generation configuration.
  * 
- * @param genConfig is the generation config to define
- * 				genConfig.keypairs: [{ticker: ..., numKeypairs: ..., encryption: ...}, ...]
- * 	 			genConfig.passphrase: passphrase string
- * 	 			genConfig.numPieces: undefined or number
- * 				genConfig.minPieces: undefined or number
- * 				genConfig.rendererClass: piece renderer class to render
+ * @param genConfig is the config to validate
  */
 CryptoPiece.validateGenerateConfig = function(genConfig) {
 	assertObject(genConfig);

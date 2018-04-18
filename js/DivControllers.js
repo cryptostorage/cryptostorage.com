@@ -3594,7 +3594,7 @@ CompactPieceRenderer.getRenderWeight = function(keypairsConfig) {
 	assertTrue(keypairsConfig.length > 0);
 	var weight = 0;
 	for (var i = 0; i < keypairsConfig.length; i++) {
-		weight += keypairsConfig[i].numKeypairs * 2 * 15;	// TODO: assumes 2 QRs per keypair, each having 15 weight
+		weight += keypairsConfig[i].numKeypairs * 2 * 15;	// TODO: assumes 2 QRs per keypair when can be 1, each having 15 weight
 	}
 	return weight;
 }
