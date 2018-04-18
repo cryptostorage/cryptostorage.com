@@ -116,6 +116,9 @@ function TestCrypto() {
 				assertFalse(piece.isSplit());
 				assertNull(piece.getPieceNum());
 				
+				// cannot encrypt encrypted piece
+				fail("Not implemented");
+				
 				// test split
 				testSplit(encryptedPiece);
 			} catch (err) {
@@ -170,6 +173,9 @@ function TestCrypto() {
 				assertEquals(piece.getKeypairs()[j].getPublicAddress(), splitPieces[i].getKeypairs()[j].getPublicAddress());
 			}
 		}
+		
+		// cannot encrypt or decrypt split pieces
+		fail("Not implemented");
 		
 		// test that single pieces cannot create key
 		for (var i = 0; i < splitPieces.length; i++) {
@@ -270,7 +276,7 @@ function TestCrypto() {
 			else throw new Error("Invalid progress percent: " + percent);
 			
 			// test label
-			assertInitialized(label);
+			assertString(label);
 			switch (label) {
 				case "Generating keypairs":
 				case "Encrypting keypairs":
