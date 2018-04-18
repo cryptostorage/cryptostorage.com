@@ -314,7 +314,7 @@ function CryptoPiece(config) {
 		assertTrue(keypairs.length > 0);
 		for (var i = 0; i < keypairs.length; i++) {
 			assertObject(keypairs[i], CryptoKeypair);
-			if (isDefined(pieceNum)) keypairs[i].setShareNum(shareNum);
+			if (isDefined(pieceNum)) keypairs[i].setShareNum(pieceNum);
 		}
 		state.keypairs = keypairs;
 	}

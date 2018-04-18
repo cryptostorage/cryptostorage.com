@@ -141,8 +141,8 @@ function CryptoKeypair(config) {
 	}
 	
 	this.setShareNum = function(shareNum) {
-		assertUndefined(that.getShareNum());
 		assertTrue(that.isSplit());
+		assertTrue(shareNum !== null);
 		state.shareNum = shareNum;
 	}
 	
@@ -150,6 +150,7 @@ function CryptoKeypair(config) {
 		return {
 			ticker: state.plugin.getTicker(),
 			publicAddress: that.getPublicAddress(),
+			privateHex: that.getPrivateHex(),
 			privateWif: that.getPrivateWif(),
 			encryption: that.getEncryptionScheme(),
 			shareNum: that.getShareNum()
@@ -310,10 +311,10 @@ function CryptoKeypair(config) {
 		}
 		
 		// split share with cryptostorage conventions
-		decoded = decodeWifShare(privateKey);
+		decoded = decodeShare(privateKey);
 		if (decoded) {
-			state.privateHex = AppUtils.toBase(58, 16, privateKey);
-			state.privateWif = privateKey;
+			state.privateHex = decoded.privateHex;
+			state.privateWif = decoded.privateWif;
 			state.publicAddress = undefined;
 			state.encryption = undefined;
 			state.minShares = decoded.minShares;
@@ -359,13 +360,13 @@ function CryptoKeypair(config) {
 		
 		// collect decoded hex shares and verify consistent min shares
 		var minShares;
-		var decodedHexShares = [];
+		var shamirHexes = [];
 		for (var i = 0; i < splitKeypairs.length; i++) {
-			var decodedShare = decodeWifShare(splitKeypairs[i].getPrivateWif());
+			var decodedShare = decodeShare(splitKeypairs[i].getPrivateWif());
 			assertInitialized(decodedShare);
 			if (!minShares) minShares = decodedShare.minShares;
 			else if (minShares !== decodedShare.minShares) throw new Error("splitKeypairs[" + i + "] has inconsistent min shares");
-			decodedHexShares.push(decodedShare.privateHex);
+			shamirHexes.push(decodedShare.shamirHex);
 		}
 		
 		// ensure sufficient shares provided
@@ -375,7 +376,7 @@ function CryptoKeypair(config) {
 		}
 		
 		// combine hex shares
-		var privateHex = secrets.combine(decodedHexShares);
+		var privateHex = secrets.combine(shamirHexes);
 		assertHex(privateHex);
 		setPrivateKey(privateHex);
 		setPublicAddress(publicAddress);
@@ -487,17 +488,24 @@ function CryptoKeypair(config) {
 	/**
 	 * Decodes the given encoded share.
 	 * 
-	 * @param share is the wif encoded share to decode
-	 * @returns Object with minShares and hex fields or null if cannot decode
+	 * @param share is the encoded wif or hex share to decode
+	 * @returns Object with privateHex, privateWif, shamirHex, and minShares initialized
 	 */
-	function decodeWifShare(encodedShare) {
+	function decodeShare(encodedShare) {
 		if (!isString(encodedShare)) return null;
 		var decoded;
-		if ((decoded = decodeShareV0(encodedShare))) return decoded;
-		if ((decoded = decodeShareV1(encodedShare))) return decoded;
+		if ((decoded = decodeShareHexV0(encodedShare))) return decoded;
+		if ((decoded = decodeShareWifV0(encodedShare))) return decoded;
+		if ((decoded = decodeShareHexV1(encodedShare))) return decoded;
+		if ((decoded = decodeShareWifV1(encodedShare))) return decoded;
 		return null;
 		
-		function decodeShareV0(encodedShare) {
+		function decodeShareHexV0(encodedShare) {
+			if (!isHex(encodedShare)) return null;
+			return decodeShareWifV0(AppUtils.toBase(16, 58, encodedShare));
+		}
+		
+		function decodeShareWifV0(encodedShare) {
 			try {
 				if (encodedShare.length < 34) return null;
 				var decoded = {};
@@ -505,7 +513,9 @@ function CryptoKeypair(config) {
 				if (!decoded.minShares) return null;
 				var wif = encodedShare.substring(encodedShare.indexOf('c') + 1);
 				if (!isBase58(wif)) return null;
-				decoded.privateHex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif)));
+				decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif)));
+				decoded.privateWif = encodedShare;
+				decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
 				return decoded;
 			} catch (err) {
 				return null;
@@ -528,7 +538,12 @@ function CryptoKeypair(config) {
 			}
 		}
 		
-		function decodeShareV1(encodedShare) {
+		function decodeShareHexV1(encodedShare) {
+			if (!isHex(encodedShare)) return null;
+			return decodeShareWifV1(AppUtils.toBase(16, 58, encodedShare));
+		}
+		
+		function decodeShareWifV1(encodedShare) {
 			if (encodedShare.length < 33) return null;
 			if (!isBase58(encodedShare)) return null;
 			var hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(encodedShare));
@@ -538,7 +553,9 @@ function CryptoKeypair(config) {
 			var decoded = {};
 			decoded.minShares = parseInt(hex.substring(2, 4), 16);
 			if (!isNumber(decoded.minShares) || decoded.minShares < 2 || decoded.minShares > AppUtils.MAX_SHARES) return null;
-			decoded.privateHex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
+			decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
+			decoded.privateWif = encodedShare;
+			decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
 			return decoded;
 		}
 	}

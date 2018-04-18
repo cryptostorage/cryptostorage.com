@@ -195,6 +195,7 @@ function TestCrypto() {
 	}
 	
 	function testPieceInit(plugins) {
+		console.log("Testing piece initialization");
 		
 		// create piece
 		var keypairs = [];
@@ -235,7 +236,7 @@ function TestCrypto() {
 		assertEquals(1, splitPiece.getPieceNum());
 		splitPiece = new CryptoPiece({keypairs: splitPieces[0].getKeypairs(), pieceNum: 5});
 		assertEquals(5, splitPiece.getPieceNum());
-		for (var i = 0; i < splitPiece.getKeyPairs(); i++) assertEquals(5, splitPiece.getKeypairs()[i].getShareNum());
+		for (var i = 0; i < splitPiece.getKeypairs(); i++) assertEquals(5, splitPiece.getKeypairs()[i].getShareNum());
 		piece2 = new CryptoPiece({splitPieces: splitPieces});
 		assertTrue(piece1.equals(piece2));
 	}
