@@ -561,6 +561,10 @@ function CryptoKeypair(config) {
 	}
 }
 
+CryptoKeypair.getCreateWeight = function() {
+	return 63;
+}
+
 CryptoKeypair.getEncryptWeight = function(schemes) {
 	schemes = listify(schemes)
 	var weight = 0;

@@ -2270,6 +2270,18 @@ var AppUtils = {
 		// validate gen config
 		AppUtils.validateGenerateConfig(genConfig);
 		
+		// collect weights
+		var doneWeight = 0;
+		var totalWeight = 0;
+		var numKeypairs = 0;
+		for (var i = 0; i < genConfig.keypairs.length; i++) {
+			var keypair = genConfig.keypairs[i];
+			var keypairWeight = CryptoKeypair.getCreateWeight(keypair.ticker);
+			if (keypair.encryption) keypairWeight += CryptoKeypair.getEncryptWeight(keypair.encryption);
+			totalWeight += (keypairWeight * keypair.numKeypairs);
+			numKeypairs += keypair.numKeypairs;
+		}
+		if (genConfig.pieceRenderer) totalWeight += (genConfig.pieceRenderer.getRenderWeight(numKeypairs) * genConfig.numPieces ? genConfig.numPieces : 1);
 		
 		
 		
@@ -2278,10 +2290,10 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Validates a piece generation config.
+	 * Validates piece generation configuration.
 	 * 
 	 * @param genConfig is the generation config to define
-	 * 				genConfig.keypairs: [{ticker: ..., numKeys: ..., encryption: ...}, ...]
+	 * 				genConfig.keypairs: [{ticker: ..., numKeypairs: ..., encryption: ...}, ...]
 	 * 	 			genConfig.passphrase: passphrase string
 	 * 	 			genConfig.numPieces: undefined or number
 	 * 				genConfig.minPieces: undefined or number
@@ -2296,13 +2308,13 @@ var AppUtils = {
 		assertTrue(genConfig.keypairs.length > 0);
 		for (var i = 0; i < genConfig.keypairs.length; i++) {
 			assertInitialized(genConfig.keypairs[i].ticker);
-			assertNumber(genConfig.keypairs[i].numKeys);
-			assertTrue(genConfig.keypairs[i].numKeys > 0);
-			assertTrue(genConfig.keypairs[i].numKeys <= AppUtils.MAX_KEYPAIRS);
+			assertNumber(genConfig.keypairs[i].numKeypairs);
+			assertTrue(genConfig.keypairs[i].numKeypairs > 0);
+			assertTrue(genConfig.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
 			schemes.push(genConfig.keypairs[i].encryption);
 		}
 		
-		// validate consistent encryption
+		// validate encryption
 		var useEncryption = -1;
 		for (var i = 0; i < schemes.length; i++) {
 			if (useEncryption === -1) useEncryption = schemes[i] === null ? null : schemes[i] === undefined ? undefined : true;

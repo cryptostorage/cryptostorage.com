@@ -261,7 +261,7 @@ function TestCrypto() {
 		for (var i = 0; i < plugins.length; i++) {
 			genConfig.keypairs.push({
 				ticker: plugins[i].getTicker(),
-				numKeys: 1
+				numKeypairs: 1
 			});
 		}
 		
