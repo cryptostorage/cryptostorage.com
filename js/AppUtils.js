@@ -2273,16 +2273,33 @@ var AppUtils = {
 		// compute weights
 		var createWeight = 0;
 		var encryptWeight = 0;
+		var numKeypairs = 0;
 		for (var i = 0; i < genConfig.keypairs.length; i++) {
 			var keypair = genConfig.keypairs[i];
+			numKeypairs += keypair.numKeypairs;
 			createWeight += CryptoKeypair.getCreateWeight(keypair.ticker);
 			if (keypair.encryption) encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption);
 		}
 		var renderWeight = genConfig.rendererClass ? genConfig.rendererClass.getRenderWeight(genConfig.keypairs) * (genConfig.numPieces ? genConfig.numPieces : 1) : 0;
 		var totalWeight = createWeight + encryptWeight + renderWeight;
+		var doneWeight = 0;
 		
+		// create keypairs
+		if (onProgress) onProgress(0, "Generating keypairs");
+		var keypairs = [];
+		for (var i = 0; i < genConfig.keypairs.length; i++) {
+			var plugin = AppUtils.getCryptoPlugin(genConfig.keypairs[i].ticker);
+			for (var j = 0; j < genConfig.keypairs[i].numKeypairs; j++) {
+				keypairs.push(new CryptoKeypair({plugin: plugin}));
+				doneWeight += (1 / numKeypairs) * createWeight;
+				if (onProgress) onProgress(doneWeight / totalWeight, "Generating keypairs");
+			}
+		}
 		
-
+		// initialize piece
+		var piece = new CryptoPiece({keypairs: keypairs});
+		
+		// encrypt piece
 		throw new Error("Not implemented");
 	},
 	
