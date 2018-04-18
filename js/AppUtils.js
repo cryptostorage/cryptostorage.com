@@ -2291,7 +2291,7 @@ var AppUtils = {
 		assertObject(genConfig);
 		
 		// validate keypairs
-		var encryptions = [];
+		var schemes = [];
 		assertArray(genConfig.keypairs);
 		assertTrue(genConfig.keypairs.length > 0);
 		for (var i = 0; i < genConfig.keypairs.length; i++) {
@@ -2319,6 +2319,15 @@ var AppUtils = {
 		}
 		
 		// validate split config
+		if (isDefined(genConfig.numPieces) || isDefined(genConfig.minPieces)) {
+			assertNumber(config.numPieces);
+			assertNumber(config.minPieces);
+			assertTrue(config.numPieces >= 2);
+			assertTrue(config.numPieces <= AppUtils.MAX_SHARES);
+			assertTrue(config.minPieces >= 2);
+			assertTrue(config.minPieces <= AppUtils.MAX_SHARES);
+			assertTrue(config.minPieces <= config.numPieces);
+		}
 	},
 	
 	/**
