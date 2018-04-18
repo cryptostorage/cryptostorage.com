@@ -2258,6 +2258,17 @@ var AppUtils = {
 	// ------------------------------ NEW KEYPAIRS ------------------------------
 	
 	/**
+	 * Generates pieces according to the given configuration.
+	 * 
+	 * @param config configures the piece generation
+	 * @param onProgress(percent) is invoked as progress is made
+	 * @param onDone(err, pieces, pieceRenderers) is invoked when done
+	 */
+	generatePieces: function(config, onProgress, onDone) {
+		throw new Error("Not implemented");
+	},
+	
+	/**
 	 * Encrypts hex with the given scheme and passphrase.
 	 * 
 	 * @param hex is the hex to encrypt

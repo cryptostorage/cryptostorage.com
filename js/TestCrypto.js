@@ -15,6 +15,9 @@ function TestCrypto() {
 	 */
 	this.run = function(onDone) {
 		
+		// test generate pieces
+		testGeneratePieces(PLUGINS);
+		
 		// test piece initialization
 		testPieceInit(PLUGINS);
 		
@@ -239,5 +242,35 @@ function TestCrypto() {
 		for (var i = 0; i < splitPiece.getKeypairs(); i++) assertEquals(5, splitPiece.getKeypairs()[i].getShareNum());
 		piece2 = new CryptoPiece({splitPieces: splitPieces});
 		assertTrue(piece1.equals(piece2));
+	}
+	
+	function testGeneratePieces(plugins) {
+		console.log("Testing AppUtils.generatePieces()");
+		
+		// simple configuration
+		var genConfig = {};
+		genConfig.keypairs = [];
+		for (var i = 0; i < plugins.length; i++) {
+			genConfig.keypairs.push({
+				ticker: plugins[i].getTicker(),
+				numKeys: 1
+			});
+		}
+		
+		// generate pieces
+		var progressStart = false;
+		var progressMiddle = false;
+		var progressEnd = false;
+		var pieces = AppUtils.generatePieces(genConfig, function(percent) {
+			if (percent === 0) progressStart = true;
+			else if (percent === 1) progressEnd = true;
+			else if (percent > 0 && percent < 1) progressMiddle = true;
+			else throw new Error("Invalid progress percent: " + percent);
+		}, function(err, pieces, pieceRenderers) {
+			assertNull(err);
+			assertEquals(1, pieces.length);
+			assertEquals(plugins.length, pieces[0].getKeypairs().length);
+			assertEquals(1, pieceRenderers.length);
+		});
 	}
 }

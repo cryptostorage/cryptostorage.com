@@ -3583,6 +3583,10 @@ function CompactPieceRenderer(div, piece, onRenderProgress) {
 		// done
 		if (onDone) onDone(div);
 	}
+	
+	this.getRenderWeight = function() {
+		throw new Error("Not implemented");
+	}
 }
 inheritsFrom(CompactPieceRenderer, DivController);
 
