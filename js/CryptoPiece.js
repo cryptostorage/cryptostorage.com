@@ -348,3 +348,106 @@ function CryptoPiece(config) {
 		setKeypairs(keypairCopies);
 	}
 }
+
+/**
+ * Utility to generate pieces according to the given configuration.
+ * 
+ * @param genConfig is the piece generation configuration
+ * @param onProgress(percent, label) is invoked as progress is made
+ * @param onDone(err, pieces, pieceRenderers) is invoked when done
+ */
+CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
+	
+	// validate gen config
+	CryptoPiece.validateGenerateConfig(genConfig);
+	
+	// compute weights
+	var createWeight = 0;
+	var encryptWeight = 0;
+	var numKeypairs = 0;
+	for (var i = 0; i < genConfig.keypairs.length; i++) {
+		var keypair = genConfig.keypairs[i];
+		numKeypairs += keypair.numKeypairs;
+		createWeight += CryptoKeypair.getCreateWeight(keypair.ticker);
+		if (keypair.encryption) encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption);
+	}
+	var renderWeight = genConfig.rendererClass ? genConfig.rendererClass.getRenderWeight(genConfig.keypairs) * (genConfig.numPieces ? genConfig.numPieces : 1) : 0;
+	var totalWeight = createWeight + encryptWeight + renderWeight;
+	var doneWeight = 0;
+	
+	// generate keypairs
+	if (onProgress) onProgress(0, "Generating keypairs");
+	var keypairs = [];
+	for (var i = 0; i < genConfig.keypairs.length; i++) {
+		var plugin = AppUtils.getCryptoPlugin(genConfig.keypairs[i].ticker);
+		for (var j = 0; j < genConfig.keypairs[i].numKeypairs; j++) {
+			keypairs.push(new CryptoKeypair({plugin: plugin}));
+			doneWeight += (1 / numKeypairs) * createWeight;
+			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keypairs");
+		}
+	}
+	
+	// initialize piece
+	var piece = new CryptoPiece({keypairs: keypairs});
+	
+	// encrypt piece
+	throw new Error("Not implemented");
+}
+
+/**
+ * Validates piece generation configuration.
+ * 
+ * @param genConfig is the generation config to define
+ * 				genConfig.keypairs: [{ticker: ..., numKeypairs: ..., encryption: ...}, ...]
+ * 	 			genConfig.passphrase: passphrase string
+ * 	 			genConfig.numPieces: undefined or number
+ * 				genConfig.minPieces: undefined or number
+ * 				genConfig.rendererClass: piece renderer class to render
+ */
+CryptoPiece.validateGenerateConfig = function(genConfig) {
+	assertObject(genConfig);
+	
+	// validate keypairs
+	var schemes = [];
+	assertArray(genConfig.keypairs);
+	assertTrue(genConfig.keypairs.length > 0);
+	for (var i = 0; i < genConfig.keypairs.length; i++) {
+		assertInitialized(genConfig.keypairs[i].ticker);
+		assertNumber(genConfig.keypairs[i].numKeypairs);
+		assertTrue(genConfig.keypairs[i].numKeypairs > 0);
+		assertTrue(genConfig.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
+		schemes.push(genConfig.keypairs[i].encryption);
+	}
+	
+	// validate encryption
+	var useEncryption = -1;
+	for (var i = 0; i < schemes.length; i++) {
+		if (useEncryption === -1) useEncryption = schemes[i] === null ? null : schemes[i] === undefined ? undefined : true;
+		else {
+			if (isInitialized(schemes[i])) assertTrue(useEncryption);
+			else assertEquals(useEncryption, schemes[i]);
+		}
+	}
+	
+	// validate passphrase
+	if (useEncryption) {
+		assertString(genConfig.passphrase);
+		assertTrue(genConfig.passphrase.length >= AppUtils.MIN_PASSPHRASE_LENGTH)
+	}
+	
+	// validate split config
+	if (isDefined(genConfig.numPieces) || isDefined(genConfig.minPieces)) {
+		assertNumber(config.numPieces);
+		assertNumber(config.minPieces);
+		assertTrue(config.numPieces >= 2);
+		assertTrue(config.numPieces <= AppUtils.MAX_SHARES);
+		assertTrue(config.minPieces >= 2);
+		assertTrue(config.minPieces <= AppUtils.MAX_SHARES);
+		assertTrue(config.minPieces <= config.numPieces);
+	}
+	
+	// validate piece renderer
+	if (genConfig.rendererClass) {
+		assertDefined(genConfig.rendererClass.getRenderWeight);
+	}
+}

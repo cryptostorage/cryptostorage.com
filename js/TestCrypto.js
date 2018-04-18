@@ -253,7 +253,7 @@ function TestCrypto() {
 	}
 	
 	function testGeneratePieces(plugins) {
-		console.log("Testing AppUtils.generatePieces()");
+		console.log("Testing CryptoPiece.generatePieces()");
 		
 		// simple generate config
 		var genConfig = {};
@@ -270,7 +270,7 @@ function TestCrypto() {
 		var progressStart = false;
 		var progressMiddle = false;
 		var progressEnd = false;
-		var pieces = AppUtils.generatePieces(genConfig, function(percent, label) {
+		var pieces = CryptoPiece.generatePieces(genConfig, function(percent, label) {
 			if (percent === 0) progressStart = true;
 			else if (percent === 1) progressEnd = true;
 			else if (percent > 0 && percent < 1) progressMiddle = true;
