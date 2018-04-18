@@ -358,7 +358,6 @@ function CryptoPiece(config) {
  * 	 			genConfig.numPieces: undefined or number
  * 				genConfig.minPieces: undefined or number
  * 				genConfig.rendererClass: piece renderer class to render
- * 
  * @param onProgress(percent, label) is invoked as progress is made
  * @param onDone(err, pieces, pieceRenderers) is invoked when done
  */
@@ -395,6 +394,10 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 	
 	// initialize piece
 	var piece = new CryptoPiece({keypairs: keypairs});
+	
+	
+	//passphrase, schemes, onProgress, onDone
+	//piece.encrypt
 	
 	// encrypt piece
 	throw new Error("Not implemented");
