@@ -60,6 +60,7 @@ var AppUtils = {
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
 	MAX_SHARES: 127,									// maximum number of split shares
+	MAX_KEYPAIRS: 1000,								// limit max keypairs to prevent inadequately tested scenarios
 	SPLIT_V1_VERSION: 1,							// split encoding config version
 	
 	// encryption v1 constants
@@ -2281,13 +2282,43 @@ var AppUtils = {
 	 * 
 	 * @param genConfig is the generation config to define
 	 * 				genConfig.keypairs: [{ticker: ..., numKeys: ..., encryption: ...}, ...]
+	 * 	 			genConfig.passphrase: passphrase string
+	 * 	 			genConfig.numPieces: undefined or number
 	 * 				genConfig.minPieces: undefined or number
-	 * 				genConfig.numPieces: undefined or number
-	 * 				genConfig.passphrase: passphrase string
+	 * 				genConfig.pieceRenderer: piece renderer class to render
 	 */
 	validateGenerateConfig: function(genConfig) {
 		assertObject(genConfig);
-		throw new Error("Not implemented");
+		
+		// validate keypairs
+		var encryptions = [];
+		assertArray(genConfig.keypairs);
+		assertTrue(genConfig.keypairs.length > 0);
+		for (var i = 0; i < genConfig.keypairs.length; i++) {
+			assertInitialized(genConfig.keypairs[i].ticker);
+			assertNumber(genConfig.keypairs[i].numKeys);
+			assertTrue(genConfig.keypairs[i].numKeys > 0);
+			assertTrue(genConfig.keypairs[i].numKeys <= AppUtils.MAX_KEYPAIRS);
+			schemes.push(genConfig.keypairs[i].encryption);
+		}
+		
+		// validate consistent encryption
+		var useEncryption = -1;
+		for (var i = 0; i < schemes.length; i++) {
+			if (useEncryption === -1) useEncryption = schemes[i] === null ? null : schemes[i] === undefined ? undefined : true;
+			else {
+				if (isInitialized(schemes[i])) assertTrue(useEncryption);
+				else assertEquals(useEncryption, schemes[i]);
+			}
+		}
+		
+		// validate passphrase
+		if (useEncryption) {
+			assertString(genConfig.passphrase);
+			assertTrue(genConfig.passphrase.length >= AppUtils.MIN_PASSPHRASE_LENGTH)
+		}
+		
+		// validate split config
 	},
 	
 	/**
