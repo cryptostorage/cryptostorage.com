@@ -3640,16 +3640,16 @@ function KeypairRenderer(div, keypair) {
 		// crypto logo and label
 		var keypairCrypto = $("<div class='keypair_crypto flex_horizontal'>").appendTo(keypairCenterDiv);
 		if (decoded.logo) {
-			keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keyDivCurrency);
+			keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
 			keypairCryptoLogo.append(decoded.cryptoLogo);
 		}
-		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(keyDivCurrency);
+		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(keypairCrypto);
 		keypairCryptoLabel.html(decoded.cryptoLabel);
 		
 		// right label and value
-		var keypairRightLabel = $("<div class='keypair_right_label'>").appendTo(keyDivCenter);
+		var keypairRightLabel = $("<div class='keypair_right_label'>").appendTo(keypairCenterDiv);
 		keypairRightLabel.html(decoded.rightLabel);
-		keypairRightValue = $("<div class='keypair_right_value'>").appendTo(keyDivCenter);
+		keypairRightValue = $("<div class='keypair_right_value'>").appendTo(keypairCenterDiv);
 		if (!decoded.leftLabel) keypairRightValue.css("margin-left", "-90px");
 		if (!hasWhitespace(decoded.rightValue)) keypairRightValue.css("word-break", "break-all");
 		keypairRightValue.html(decoded.rightValue);
@@ -3676,7 +3676,7 @@ function KeypairRenderer(div, keypair) {
 			});
 		} else {
 			if (decoded.leftLabel) {
-				var omitted = $("<div class='keypair_qr_omitted flex_horizontal'>").appendTo(keyDivLeft);
+				var omitted = $("<div class='keypair_qr_omitted flex_horizontal'>").appendTo(keypairLeftDiv);
 				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
 			}
 			addPrivateQr();
@@ -3690,7 +3690,7 @@ function KeypairRenderer(div, keypair) {
 					if (onDone) onDone(div);
 				});
 			} else {
-				var omitted = $("<div class='keypair_qr_omitted flex_horizontal'>").appendTo(keyDivRight);
+				var omitted = $("<div class='keypair_qr_omitted flex_horizontal'>").appendTo(keypairRightDiv);
 				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
 				if (onDone) onDone(div);
 			}
