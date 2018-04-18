@@ -349,19 +349,19 @@ function CryptoPiece(config) {
 				if (value === "") value = undefined;
 				if (value === "null") value = null;
 				switch (csvArr[0][col]) {
-				case CryptoKeypair.CsvHeader.TICKER:
-					keypairConfig.plugin = AppUtils.getCryptoPlugin(value);
-					break;
-				case CryptoKeypair.CsvHeader.PRIVATE_WIF:
-				case CryptoKeypair.CsvHeader.PRIVATE_HEX:
-					keypairConfig.privateKey = value;
-					break;
-				case CryptoKeypair.CsvHeader.PUBLIC_ADDRESS:
-					keypairConfig.publicAddress = value;
-					break;
-				case CryptoKeypair.CsvHeader.SHARE_NUM:
-					keypairConfig.shareNum = value;
-					break;
+					case CryptoKeypair.CsvHeader.TICKER:
+						keypairConfig.plugin = AppUtils.getCryptoPlugin(value);
+						break;
+					case CryptoKeypair.CsvHeader.PRIVATE_WIF:
+					case CryptoKeypair.CsvHeader.PRIVATE_HEX:
+						keypairConfig.privateKey = value;
+						break;
+					case CryptoKeypair.CsvHeader.PUBLIC_ADDRESS:
+						keypairConfig.publicAddress = value;
+						break;
+					case CryptoKeypair.CsvHeader.SHARE_NUM:
+						keypairConfig.shareNum = value;
+						break;
 				}
 			}
 			keypairs.push(new CryptoKeypair(keypairConfig));
