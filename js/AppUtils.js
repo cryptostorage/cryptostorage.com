@@ -2261,7 +2261,7 @@ var AppUtils = {
 	 * Generates pieces according to the given configuration.
 	 * 
 	 * @param genConfig is the piece generation configuration
-	 * @param onProgress(percent) is invoked as progress is made
+	 * @param onProgress(percent, label) is invoked as progress is made
 	 * @param onDone(err, pieces, pieceRenderers) is invoked when done
 	 */
 	generatePieces: function(genConfig, onProgress, onDone) {

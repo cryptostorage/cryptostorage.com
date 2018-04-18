@@ -44,7 +44,7 @@ function CryptoPiece(config) {
 		return state.keypairs;
 	}
 	
-	this.encrypt = function(passphrase, schemes, onProgress, onDone, verifyEncryption) {
+	this.encrypt = function(passphrase, schemes, onProgress, onDone) {
 		
 		// verify input
 		try {
@@ -56,19 +56,9 @@ function CryptoPiece(config) {
 			return;
 		}
 		
-		// collect originals if verifying encryption
-		var originals;
-		if (verifyEncryption) {
-			originals = [];
-			for (var i = 0; i < state.keypairs.length; i++) {
-				originals.push(state.keypairs[i].copy());
-			}
-		}
-		
 		// track weights for progress
 		var doneWeight = 0;
-		var verifyWeight = verifyEncryption ? CryptoKeypair.getDecryptWeight(schemes) : 0;
-		var totalWeight = CryptoKeypair.getEncryptWeight(schemes) + verifyWeight;
+		var totalWeight = CryptoKeypair.getEncryptWeight(schemes);
 		
 		// collect encryption functions
 		var funcs = [];
@@ -79,51 +69,8 @@ function CryptoPiece(config) {
 		// encrypt async
 		if (onProgress) onProgress(0, "Encrypting");
 		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
-			
-			// check for error
-			if (err) {
-				onDone(err);
-				return;
-			}
-			
-			// verify encryption
-			if (verifyEncryption) {
-				
-				// copy encrypted keypairs
-				var encryptedCopies = [];
-				for (var i = 0; i < encryptedKeypairs.length; i++) {
-					encryptedCopies.push(encryptedKeypairs[i].copy());
-				}
-				
-				// decrypt keypairs
-				if (onProgress) onProgress(doneWeight / totalWeight, "Verifying encryption");
-				AppUtils.decryptKeys(encryptedCopies, passphrase, null, function(percent) {
-					if (onProgress) onProgress((doneWeight + percent * verifyWeight) / totalWeight, "Verifying encryption");
-				}, function(err, decryptedKeys) {
-					try {
-						
-						// check for error
-						if (err) throw err;
-						
-						// assert originals match decrypted keypairs
-						doneWeight += verifyWeight;
-						assertEquals(originals.length, decryptedKeys.length);
-						for (var j = 0; j < originals.length; j++) {
-							assertTrue(originals[j].equals(decryptedKeys[j]));
-						}
-						
-						// done
-						onDone(null, that);
-					} catch (err) {
-						onDone(err);
-					}
-				})
-			}
-			
-			// don't verify encryption
-			else {
-				onDone(err, that);
-			}
+			if (err) onDone(err);
+			else onDone(null, that);
 		});
 		
 		function encryptFunc(keypair, scheme, passphrase) {
