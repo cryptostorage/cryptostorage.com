@@ -3563,164 +3563,185 @@ function EditorActionsController(div, editorController) {
 inheritsFrom(EditorActionsController, DivController);
 
 /**
- * Renders and controls displayed pieces in the editor.
+ * Renders a piece with compact keypairs.
  * 
  * @param div is the div to render to
- * @param pieces are the pieces to render
- * @param onRenderProgress(percent) is invoked as rendering progress is made
+ * @param piece is the piece to render
+ * @param onRenderProgress(percent) is invoked as render progress is made
  */
-function EditorPiecesController(div, pieces, onRenderProgress) {
+function CompactPieceRenderer(div, piece, onRenderProgress) {
 	DivController.call(this, div);
 	
 	this.render = function(onDone) {
 		
 		// div setup
 		div.empty();
-		div.addClass("editor_pieces_div flex_vertical");
+		div.addClass("compact_piece_div flex_vertical");
 		
-		div.append("Ok we render pieces here");
+		div.append("Ok we're ready to render compact pieces");
 		
 		// done
 		if (onDone) onDone(div);
 	}
 }
-inheritsFrom(EditorPiecesController, DivController);
+inheritsFrom(CompactPieceRenderer, DivController);
 
 /**
- * Renders and controls a single keypair.
+ * Renders a single keypair.
  * 
  * @param div is the div to render to
- * @param config is the keypair configuration to render
- * 				config.leftLabel is the upper left label
- * 				config.leftValue is the upper left value
- * 				config.leftValueCopyable specifies if the left value is copyable and should be QR
- * 				config.logo is the center logo to render
- * 				config.label is the center label of the keypair
- * 				config.rightLabel is the lower right label
- * 				config.rightValue is the lower right value
- * 				config.rightValueCopyable specifies if the right value is copyable and should be QR
- * 				config.keyPairId is the keypair identifier
+ * @param keypair is the keypair to render
  */
-function KeyPairController(div, config) {
+function KeypairRenderer(div, keypair) {
 	DivController.call(this, div);
 	
 	var that = this;
 	var isCancelled;
-	var keyDivLogo;
-	var keyDivLeftValue;
-	var keyDivRightValue;
+	var keypairLeftValue;
+	var keypairRightValue;
+	var keypairCryptoLogo;
 	
 	this.render = function(onDone) {
-		if (isCancelled) return;
+		
+		// cancel and reset render
+		if (isCancelled) {
+			isCancelled = false;
+			if (onDone) onDone();
+			return;
+		}
 		
 		// div setup
 		div.empty();
-		div.addClass("key_div");
+		div.addClass("keypair_div flex_horizontal");
 		
-		// left qr code
-		var keyDivLeft = $("<div class='key_div_left'>").appendTo(div);
+		// left, center, right divs
+		var keypairLeftDiv = $("<div class='keypair_left_div flex_horizontal flex_align_start flex_justify_center'>").appendTo(div);
+		var keypairCenterDiv = $("<div class='keypair_center_div flex_vertical'>").appendTo(div);
+		var keypairRightDiv = $("<div class='keypair_right_div flex_horizontal flex_align_end flex_justify_center'>").appendTo(div);
+		
+		// decode keypair for rendering
+		var decoded = KeypairController.decodeKeypair(keypair);
 		
 		// keypair id
-		var keyDivCenter = $("<div class='key_div_center'>").appendTo(div);
-		var idDiv = $("<div class='key_div_center_id'>").appendTo(keyDivCenter);
+		var idDiv = $("<div class='keypair_center_id'>").appendTo(keypairCenterDiv);
 		if (config.leftLabel) idDiv.css("position", "absolute");
-		idDiv.html(config.keyPairId);
+		idDiv.html(config.decoded.keypairId);
 		
 		// left label and value
-		if (config.leftLabel) {
-			var keyDivLeftLabel = $("<div class='key_div_left_label'>").appendTo(keyDivCenter);
-			keyDivLeftLabel.html(config.leftLabel);
-			keyDivLeftValue = $("<div class='key_div_left_value'>").appendTo(keyDivCenter);
-			if (!hasWhitespace(config.leftValue)) keyDivLeftValue.css("word-break", "break-all");
-			keyDivLeftValue.html(value);
-			if (config.leftValueCopyable) keyDivLeftValue.addClass("copyable");
+		if (decoded.leftLabel) {
+			var keypairLeftLabel = $("<div class='keypair_left_label'>").appendTo(keypairCenterDiv);
+			keypairLeftLabel.html(decoded.leftLabel);
+			keypairLeftValue = $("<div class='keypair_left_value'>").appendTo(keypairCenterDiv);
+			if (!hasWhitespace(decoded.leftValue)) keypairLeftValue.css("word-break", "break-all");
+			keypairLeftValue.html(value);
+			if (decoded.leftValueCopyable) keypairLeftValue.addClass("copyable");
 		}
 		
-		// center logo and label
-		var keyDivCurrency = $("<div class='key_div_currency'>").appendTo(keyDivCenter);
-		if (config.logo) {
-			keyDivLogo = $("<div class='key_div_currency_logo'>").appendTo(keyDivCurrency);
-			keyDivLogo.append(config.logo);
+		// crypto logo and label
+		var keypairCrypto = $("<div class='keypair_crypto flex_horizontal'>").appendTo(keypairCenterDiv);
+		if (decoded.logo) {
+			keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keyDivCurrency);
+			keypairCryptoLogo.append(decoded.cryptoLogo);
 		}
-		var keyDivLabel = $("<div class='key_div_currency_label'>").appendTo(keyDivCurrency);
-		keyDivLabel.html(config.label);
+		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(keyDivCurrency);
+		keypairCryptoLabel.html(decoded.cryptoLabel);
 		
 		// right label and value
-		var keyDivRightLabel = $("<div class='key_div_right_label'>").appendTo(keyDivCenter);
-		keyDivRightLabel.html(config.rightLabel);
-		keyDivRightValue = $("<div class='key_div_right_value'>").appendTo(keyDivCenter);
-		if (!config.leftLabel) keyDivRightValue.css("margin-left", "-90px");
-		if (!hasWhitespace(config.rightValue)) keyDivRightValue.css("word-break", "break-all");
-		keyDivRightValue.html(config.rightValue);
-		if (config.rightValueCopyable) keyDivRightValue.addClass("copyable");
+		var keypairRightLabel = $("<div class='keypair_right_label'>").appendTo(keyDivCenter);
+		keypairRightLabel.html(decoded.rightLabel);
+		keypairRightValue = $("<div class='keypair_right_value'>").appendTo(keyDivCenter);
+		if (!decoded.leftLabel) keypairRightValue.css("margin-left", "-90px");
+		if (!hasWhitespace(decoded.rightValue)) keypairRightValue.css("word-break", "break-all");
+		keypairRightValue.html(decoded.rightValue);
+		if (decoded.rightValueCopyable) keypairRightValue.addClass("copyable");
 		
 		// collapse spacing for long keys
-		if (config.leftLabel) {
-			if (config.leftValue.length > 71) {
-				keyDivCurrency.css("margin-top", "-15px");
+		if (decoded.leftLabel) {
+			if (decoded.leftValue.length > 71) {
+				keypairCrypto.css("margin-top", "-15px");
 			}
-			if (config.rightValue.length > 140) {
-				keyDivCurrency.css("margin-top", "-10px");
-				keyDivRightLabel.css("margin-top", "-15px");
+			if (decoded.rightValue.length > 140) {
+				keypairCrypto.css("margin-top", "-10px");
+				keypairRightLabel.css("margin-top", "-15px");
 			}
 		}
 		
-		// right qr code
-		var keyDivRight = $("<div class='key_div_right'>").appendTo(div);
-		
 		// add qr codes
-		if (config.leftValueCopyable) {
-			UiUtils.renderQrCode(config.leftValue, getQrConfig(config), function(img) {
+		if (decoded.leftValueCopyable) {
+			UiUtils.renderQrCode(decoded.leftValue, getQrConfig(config), function(img) {
 				if (isCancelled) return;
-				img.attr("class", "key_div_qr");
-				keyDivLeft.append(img);
+				img.attr("class", "keypair_qr");
+				keypairLeftDiv.append(img);
 				addPrivateQr();
 			});
 		} else {
-			if (config.leftLabel) {
-				var omitted = $("<div class='key_div_qr_omitted flex_horizontal'>").appendTo(keyDivLeft);
-				omitted.append($("<img src='img/restricted.png' class='key_div_qr_omitted_img'>"));
+			if (decoded.leftLabel) {
+				var omitted = $("<div class='keypair_qr_omitted flex_horizontal'>").appendTo(keyDivLeft);
+				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
 			}
 			addPrivateQr();
 		}
 		function addPrivateQr() {
-			if (config.rightValueCopyable) {
-				UiUtils.renderQrCode(config.rightValue, KeyPairController.QR_CONFIG, function(img) {
+			if (decoded.rightValueCopyable) {
+				UiUtils.renderQrCode(decoded.rightValue, KeypairController.QR_CONFIG, function(img) {
 					if (isCancelled) return;
-					img.attr("class", "key_div_qr");
-					keyDivRight.append(img);
-					onDone(div);
+					img.attr("class", "keypair_qr");
+					keypairRightDiv.append(img);
+					if (onDone) onDone(div);
 				});
 			} else {
-				var omitted = $("<div class='key_div_qr_omitted flex_horizontal'>").appendTo(keyDivRight);
-				omitted.append($("<img src='img/restricted.png' class='key_div_qr_omitted_img'>"));
-				onDone(div);
+				var omitted = $("<div class='keypair_qr_omitted flex_horizontal'>").appendTo(keyDivRight);
+				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
+				if (onDone) onDone(div);
 			}
 		}
 	}
 	
-	this.cancel = function() {
+	this.cancelRender = function() {
 		isCancelled = true;
+	}
+	
+	this.setPublicVisible = function(visible) {
+		throw new Error("Not implemented");
+	}
+	
+	this.setPrivateVisible = function(visible) {
+		throw new Error("Not implemented");
 	}
 	
 	this.setLogoVisible = function(visible) {
 		throw new Error("Not implemented");
 	}
-	
-	this.setLeftValueVisible = function(visible) {
-		throw new Error("Not implemented");
-	}
-	
-	this.setRightValueVisible = function(visible) {
-		throw new Error("Not implemented");
-	}
 }
-inheritsFrom(KeyPairController, DivController);
-KeyPairController.QR_CONFIG = {
+inheritsFrom(KeypairRenderer, DivController);
+
+/**
+ * Default keypair QR config.
+ */
+KeypairRenderer.QR_CONFIG = {
 		size: 90,
 		version: null,
 		errorCorrectionLevel: 'H',
 		scale: 4,
+}
+
+/**
+ * Decodes the given keypair for rendering.
+ * 
+ * @param keypair is the keypair to decode
+ * @returns a decoded object with fields which inform rendering
+ * 					decoded.leftLabel is the upper left label
+ * 					decoded.leftValue is the upper left value
+ * 					decoded.leftValueCopyable indicates if the left value is copyable and should be QR
+ * 					decoded.cryptoLogo is the center logo to render
+ * 					decoded.cryptoLabel is the center label to render
+ * 					decoded.rightLabel is the lower right label
+ * 					decoded.rightValue is the lower right value
+ * 					decoded.rightValueCopyable indicates if the right value is copyable and should be QR
+ * 					decoded.keypairId is the keypair identifier to render
+ */
+KeypairRenderer.decodeKeypair = function(keypair, config) {
+	throw new Error("Not implemented");
 }
 
 /**
