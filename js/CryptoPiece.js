@@ -352,41 +352,41 @@ function CryptoPiece(config) {
 /**
  * Utility to generate pieces according to the given configuration.
  * 
- * @param genConfig is the piece generation configuration
- * 				genConfig.keypairs: [{ticker: ..., numKeypairs: ..., encryption: ...}, ...]
- * 	 			genConfig.passphrase: passphrase string
- * 	 			genConfig.numPieces: undefined or number
- * 				genConfig.minPieces: undefined or number
- * 				genConfig.rendererClass: class to render pieces
+ * @param config is the piece generation configuration
+ * 				config.keypairs: [{ticker: ..., numKeypairs: ..., encryption: ...}, ...]
+ * 	 			config.passphrase: passphrase string
+ * 	 			config.numPieces: undefined or number
+ * 				config.minPieces: undefined or number
+ * 				config.rendererClass: class to render pieces
  * 
  * @param onProgress(percent, label) is invoked as progress is made
  * @param onDone(err, pieces, pieceRenderers) is invoked when done
  */
-CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
+CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 	
 	// validate gen config
-	CryptoPiece.validateGenerateConfig(genConfig);
+	CryptoPiece.validateGenerateConfig(config);
 	
 	// compute weights
 	var createWeight = 0;
 	var encryptWeight = 0;
 	var numKeypairs = 0;
-	for (var i = 0; i < genConfig.keypairs.length; i++) {
-		var keypair = genConfig.keypairs[i];
+	for (var i = 0; i < config.keypairs.length; i++) {
+		var keypair = config.keypairs[i];
 		numKeypairs += keypair.numKeypairs;
 		createWeight += CryptoKeypair.getCreateWeight(keypair.ticker);
 		if (keypair.encryption) encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption);
 	}
-	var renderWeight = genConfig.rendererClass ? genConfig.rendererClass.getRenderWeight(genConfig.keypairs) * (genConfig.numPieces ? genConfig.numPieces : 1) : 0;
+	var renderWeight = config.rendererClass ? config.rendererClass.getRenderWeight(config.keypairs) * (config.numPieces ? config.numPieces : 1) : 0;
 	var totalWeight = createWeight + encryptWeight + renderWeight;
 	var doneWeight = 0;
 	
 	// generate keypairs
 	if (onProgress) onProgress(0, "Generating keypairs");
 	var keypairs = [];
-	for (var i = 0; i < genConfig.keypairs.length; i++) {
-		var plugin = AppUtils.getCryptoPlugin(genConfig.keypairs[i].ticker);
-		for (var j = 0; j < genConfig.keypairs[i].numKeypairs; j++) {
+	for (var i = 0; i < config.keypairs.length; i++) {
+		var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].ticker);
+		for (var j = 0; j < config.keypairs[i].numKeypairs; j++) {
 			keypairs.push(new CryptoKeypair({plugin: plugin}));
 			doneWeight += (1 / numKeypairs) * createWeight;
 			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keypairs");
@@ -399,7 +399,7 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 	// encrypt
 	if (encryptWeight > 0) {
 		if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting keypairs");
-		piece.encrypt(getConfig.passphrase, schemes, function(percent, label) {		// TODO: define schemes
+		piece.encrypt(config.passphrase, schemes, function(percent, label) {
 			throw new Error("Ready to test progresss");
 		}, function(err, encryptedPiece) {
 			if (err) {
@@ -421,15 +421,15 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 	function splitAndRender() {
 		
 		// split pieces if applicable
-		var pieces = genConfig.numPieces ? pieces.split(genConfig.numPieces, genConfig.minPieces) : [piece];
+		var pieces = config.numPieces ? pieces.split(config.numPieces, config.minPieces) : [piece];
 		
 		// render each piece
-		if (genConfig.rendererClass) {
+		if (config.rendererClass) {
 			
 			// collect renderers
 			var renderers = [];
 			for (var i = 0; i < pieces.length; i++) {
-				renderers.push(new genConfig.rendererClass(null, pieces[i], function(percent, label) {
+				renderers.push(new config.rendererClass(null, pieces[i], function(percent, label) {
 					if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering keypairs");
 				}));
 			}
@@ -468,21 +468,21 @@ CryptoPiece.generatePieces = function(genConfig, onProgress, onDone) {
 /**
  * Validates piece generation configuration.
  * 
- * @param genConfig is the config to validate
+ * @param config is the config to validate
  */
-CryptoPiece.validateGenerateConfig = function(genConfig) {
-	assertObject(genConfig);
+CryptoPiece.validateGenerateConfig = function(config) {
+	assertObject(config);
 	
 	// validate keypairs
 	var schemes = [];
-	assertArray(genConfig.keypairs);
-	assertTrue(genConfig.keypairs.length > 0);
-	for (var i = 0; i < genConfig.keypairs.length; i++) {
-		assertInitialized(genConfig.keypairs[i].ticker);
-		assertNumber(genConfig.keypairs[i].numKeypairs);
-		assertTrue(genConfig.keypairs[i].numKeypairs > 0);
-		assertTrue(genConfig.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
-		schemes.push(genConfig.keypairs[i].encryption);
+	assertArray(config.keypairs);
+	assertTrue(config.keypairs.length > 0);
+	for (var i = 0; i < config.keypairs.length; i++) {
+		assertInitialized(config.keypairs[i].ticker);
+		assertNumber(config.keypairs[i].numKeypairs);
+		assertTrue(config.keypairs[i].numKeypairs > 0);
+		assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
+		schemes.push(config.keypairs[i].encryption);
 	}
 	
 	// validate encryption
@@ -497,12 +497,12 @@ CryptoPiece.validateGenerateConfig = function(genConfig) {
 	
 	// validate passphrase
 	if (useEncryption) {
-		assertString(genConfig.passphrase);
-		assertTrue(genConfig.passphrase.length >= AppUtils.MIN_PASSPHRASE_LENGTH)
+		assertString(config.passphrase);
+		assertTrue(config.passphrase.length >= AppUtils.MIN_PASSPHRASE_LENGTH)
 	}
 	
 	// validate split config
-	if (isDefined(genConfig.numPieces) || isDefined(genConfig.minPieces)) {
+	if (isDefined(config.numPieces) || isDefined(config.minPieces)) {
 		assertNumber(config.numPieces);
 		assertNumber(config.minPieces);
 		assertTrue(config.numPieces >= 2);
@@ -513,7 +513,7 @@ CryptoPiece.validateGenerateConfig = function(genConfig) {
 	}
 	
 	// validate piece renderer
-	if (genConfig.rendererClass) {
-		assertDefined(genConfig.rendererClass.getRenderWeight);
+	if (config.rendererClass) {
+		assertDefined(config.rendererClass.getRenderWeight);
 	}
 }

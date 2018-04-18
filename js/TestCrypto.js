@@ -261,49 +261,76 @@ function TestCrypto() {
 		console.log("Testing CryptoPiece.generatePieces()");
 		
 		// simple generate config
-		var genConfig = {};
-		genConfig.keypairs = [];
+		var config = {};
+		config.keypairs = [];
 		for (var i = 0; i < plugins.length; i++) {
-			genConfig.keypairs.push({
+			config.keypairs.push({
 				ticker: plugins[i].getTicker(),
 				numKeypairs: 1
 			});
 		}
-		genConfig.rendererClass = CompactPieceRenderer;
-		
-		// generate pieces
-		var progressStart = false;
-		var progressMiddle = false;
-		var progressEnd = false;
-		var pieces = CryptoPiece.generatePieces(genConfig, function(percent, label) {
-			if (percent === 0) progressStart = true;
-			else if (percent === 1) progressEnd = true;
-			else if (percent > 0 && percent < 1) progressMiddle = true;
-			else throw new Error("Invalid progress percent: " + percent);
-			
-			// test label
-			assertString(label);
-			switch (label) {
-				case "Generating keypairs":
-				case "Encrypting keypairs":
-				case "Rendering keypairs":
-					break;
-				default: throw new Error("Unrecognized progress label: " + label);
-			}
-		}, function(err, pieces, pieceRenderers) {
+		config.rendererClass = CompactPieceRenderer;
+		testGenerateConfig(config, function(err) {
 			if (err) {
 				onDone(err);
 				return;
 			}
 			
-			assertNull(err);
-			assertEquals(1, pieces.length);
-			assertEquals(plugins.length, pieces[0].getKeypairs().length);
-			assertEquals(1, pieceRenderers.length);
-			assertTrue(progressStart);
-			assertTrue(progressMiddle);
-			assertTrue(progressEnd);
-			onDone();
+			// test encryption and splitting
+			config.passphrase = PASSPHRASE;
+			for (var i = 0; i < config.keypairs.length; i++) {
+				config.keypairs[i].encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
+			}
+			config.numPieces = NUM_PIECES;
+			config.minPieces = MIN_PIECES;
+			testGenerateConfig(config, function(err) {
+				if (err) {
+					onDone(err);
+					return;
+				}
+				
+				// all done
+				console.log("you tests pass bro");
+				onDone();
+			});
 		});
+		
+		function testGenerateConfig(config, onDone) {
+			
+			// generate pieces
+			var progressStart = false;
+			var progressMiddle = false;
+			var progressEnd = false;
+			var pieces = CryptoPiece.generatePieces(config, function(percent, label) {
+				if (percent === 0) progressStart = true;
+				else if (percent === 1) progressEnd = true;
+				else if (percent > 0 && percent < 1) progressMiddle = true;
+				else throw new Error("Invalid progress percent: " + percent);
+				
+				// test label
+				assertString(label);
+				switch (label) {
+					case "Generating keypairs":
+					case "Encrypting keypairs":
+					case "Rendering keypairs":
+						break;
+					default: throw new Error("Unrecognized progress label: " + label);
+				}
+			}, function(err, pieces, pieceRenderers) {
+				if (err) {
+					onDone(err);
+					return;
+				}
+				assertNull(err);
+				assertEquals(1, pieces.length);
+				assertEquals(plugins.length, pieces[0].getKeypairs().length);
+				assertEquals(1, pieceRenderers.length);
+				for (var i = 0; i < pieceRenderers.length; i++) assertInitialized(pieceRenderers[i].getDiv());
+				assertTrue(progressStart);
+				assertTrue(progressMiddle);
+				assertTrue(progressEnd);
+				onDone();
+			});
+		}
 	}
 }
