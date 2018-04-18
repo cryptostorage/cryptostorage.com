@@ -402,14 +402,14 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 	if (encryptWeight > 0) {
 		if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting keypairs");
 		piece.encrypt(config.passphrase, schemes, function(percent, label) {
-			throw new Error("Ready to test progresss");
+			if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, "Encrypting keypairs");
 		}, function(err, encryptedPiece) {
 			if (err) {
 				onDone(err);
 				return;
 			}
 			
-			// split and render
+			// split and render			
 			splitAndRender();
 		});
 	}
@@ -422,7 +422,7 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 	function splitAndRender() {
 		
 		// split pieces if applicable
-		var pieces = config.numPieces ? pieces.split(config.numPieces, config.minPieces) : [piece];
+		var pieces = config.numPieces ? piece.split(config.numPieces, config.minPieces) : [piece];
 		
 		// render each piece
 		if (config.rendererClass) {
@@ -431,7 +431,7 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 			var renderers = [];
 			for (var i = 0; i < pieces.length; i++) {
 				renderers.push(new config.rendererClass(null, pieces[i], function(percent, label) {
-					if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, "Rendering keypairs");
+					if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, label);
 				}));
 			}
 			
@@ -449,6 +449,7 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 			}
 			
 			// render async
+			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering keypairs");
 			async.series(renderFuncs, function(err, renderers) {
 				if (err) onDone(err);
 				else {
@@ -456,9 +457,7 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 					assertEquals(doneWeight, totalWeight);
 					onDone(null, pieces, renderers);
 				}
-			});	
-			
-			throw new Error("Can remove this");
+			});
 		} else {
 			assertEquals(doneWeight, totalWeight);
 			onDone(null, pieces, null);
