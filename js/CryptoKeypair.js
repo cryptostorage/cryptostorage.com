@@ -101,10 +101,11 @@ function CryptoKeypair(config) {
 	this.split = function(numShares, minShares) {
 		
 		// validate input
+		assertFalse(that.isSplit());
 		assertTrue(numShares >= 2);
+		assertTrue(numShares <= AppUtils.MAX_SHARES);
 		assertTrue(minShares >= 2);
 		assertTrue(minShares <= numShares);
-		assertTrue(numShares <= AppUtils.MAX_SHARES);
 		
 		// split private hex into shares
 		var shares = secrets.share(that.getPrivateHex(), numShares, minShares);

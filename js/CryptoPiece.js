@@ -47,14 +47,10 @@ function CryptoPiece(config) {
 	this.encrypt = function(passphrase, schemes, onProgress, onDone) {
 		
 		// verify input
-		try {
-			assertInitialized(passphrase);
-			assertEquals(state.keypairs.length, schemes.length);
-			assertInitialized(onDone);
-		} catch (err) {
-			onDone(err);
-			return;
-		}
+		assertFalse(that.isEncrypted());
+		assertInitialized(passphrase);
+		assertEquals(state.keypairs.length, schemes.length);
+		assertInitialized(onDone);
 		
 		// track weights for progress
 		var doneWeight = 0;
@@ -102,14 +98,10 @@ function CryptoPiece(config) {
 	this.decrypt = function(passphrase, onProgress, onDone) {
 
 		// validate input
-		try {
-			assertTrue(state.keypairs.length > 0);
-			assertInitialized(passphrase);
-			assertInitialized(onDone);
-		} catch (err) {
-			onDone(err);
-			return;
-		}
+		assertTrue(that.isEncrypted());
+		assertTrue(state.keypairs.length > 0);
+		assertInitialized(passphrase);
+		assertInitialized(onDone);
 		
 		// compute total weight
 		var totalWeight = 0;
@@ -123,10 +115,8 @@ function CryptoPiece(config) {
 		var doneWeight = 0;
 		if (onProgress) onProgress(0, "Decrypting");
 		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
-			if (err) {
-				onDone(err);
-				return;
-			} else {
+			if (err) onDone(err);
+			else {
 				assertEquals(doneWeight, totalWeight);
 				onDone(null, that);
 			}
@@ -139,10 +129,8 @@ function CryptoPiece(config) {
 				keypair.decrypt(passphrase, function(percent) {
 					if (onProgress) onProgress((doneWeight + CryptoKeypair.getDecryptWeight(scheme) * percent) / totalWeight, "Decrypting");
 				}, function(err, encryptedKeypair) {
-					if (err) {
-						onDone(err);
-						return;
-					} else {
+					if (err) onDone(err);
+					else {
 						doneWeight += CryptoKeypair.getDecryptWeight(scheme);
 						if (onProgress) onProgress(doneWeight / totalWeight, "Decrypting");
 						setImmediate(function() { onDone(err, encryptedKeypair); });	// let UI breath
@@ -405,12 +393,11 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 		piece.encrypt(config.passphrase, schemes, function(percent, label) {
 			if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, "Encrypting keypairs");
 		}, function(err, encryptedPiece) {
-			if (err) {
-				onDone(err);
-				return;
+			if (err) onDone(err);
+			else {
+				doneWeight += encryptWeight;
+				splitAndRender();
 			}
-			doneWeight += encryptWeight;
-			splitAndRender();
 		});
 	}
 	

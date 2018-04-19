@@ -113,26 +113,26 @@ function TestCrypto() {
 			if (percent === 1) progressComplete = true;
 			assertEquals("Encrypting", label);
 		}, function(err, encryptedPiece) {
+			if (err) throw err;
 			
 			// test state
+			assertTrue(piece === encryptedPiece);
+			assertTrue(progressStarted, "Progress was not started");
+			assertTrue(progressComplete, "Progress was not completed");
+			assertTrue(piece.isEncrypted());
+			assertFalse(piece.isSplit());
+			assertNull(piece.getPieceNum());
+			
+			// cannot encrypt encrypted piece
 			try {
-				if (err) throw err;
-				assertTrue(piece === encryptedPiece);
-				assertTrue(progressStarted, "Progress was not started");
-				assertTrue(progressComplete, "Progress was not completed");
-				assertTrue(piece.isEncrypted());
-				assertFalse(piece.isSplit());
-				assertNull(piece.getPieceNum());
-				
-				// cannot encrypt encrypted piece
-				//fail("Not implemented");
-				
-				// test split
-				testSplit(encryptedPiece);
+				piece.encrypt(PASSPHRASE, schemes, function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
+				fail("fail");
 			} catch (err) {
-				onDone(err)
-				return;
+				if (err.message === "fail") throw new Error("Cannot encrypt encrypted piece");
 			}
+			
+			// test split
+			testSplit(encryptedPiece);
 			
 			// decrypt piece
 			progressStarted = false;
@@ -142,20 +142,15 @@ function TestCrypto() {
 				if (percent === 1) progressComplete = true;
 				assertEquals("Decrypting", label);
 			}, function(err, decryptedPiece) {
+				if (err) throw err;
 				
 				// test state
-				try {
-					if (err) throw err;
-					assertTrue(progressStarted, "Progress was not started");
-					assertTrue(progressComplete, "Progress was not completed");
-					assertTrue(piece.equals(originalPiece));
-					assertFalse(piece.isEncrypted());
-					assertFalse(piece.isSplit());
-					assertNull(piece.getPieceNum());
-				} catch (err) {
-					onDone(err)
-					return;
-				}
+				assertTrue(progressStarted, "Progress was not started");
+				assertTrue(progressComplete, "Progress was not completed");
+				assertTrue(piece.equals(originalPiece));
+				assertFalse(piece.isEncrypted());
+				assertFalse(piece.isSplit());
+				assertNull(piece.getPieceNum());
 				
 				// done testing
 				onDone();
@@ -182,8 +177,21 @@ function TestCrypto() {
 			}
 		}
 		
-		// cannot encrypt or decrypt split pieces
-		//fail("Not implemented");
+		// cannot encrypt split pieces
+		try {
+			splitPieces[0].encrypt(PASSPHRASE, [], function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
+			fail("fail");
+		} catch (err) {
+			if (err.message === "fail") throw new Error("Cannot encrypt split piece");
+		}
+		
+		// cannot split split piece
+		try {
+			var temps = splitPieces[0].split(NUM_PIECES, MIN_PIECES);
+			fail("fail");
+		} catch (err) {
+			if (err.message === "fail") throw new Error("Cannot split split piece");
+		}
 		
 		// test that single pieces cannot create key
 		for (var i = 0; i < splitPieces.length; i++) {
