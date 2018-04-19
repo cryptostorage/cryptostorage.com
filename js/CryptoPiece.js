@@ -370,85 +370,96 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 	var totalWeight = createWeight + encryptWeight + renderWeight;
 	var doneWeight = 0;
 	
-	// generate keypairs
-	if (onProgress) onProgress(0, "Generating keypairs");
-	var keypairs = [];
+	// collect functions to generate keypairs
+	var newKeypairFuncs = [];
 	var schemes = [];
 	for (var i = 0; i < config.keypairs.length; i++) {
 		var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].ticker);
 		for (var j = 0; j < config.keypairs[i].numKeypairs; j++) {
-			keypairs.push(new CryptoKeypair({plugin: plugin}));
-			doneWeight += (1 / numKeypairs) * createWeight;
+			newKeypairFuncs.push(newKeypairFunc(plugin));
 			schemes.push(config.keypairs[i].encryption);
+		}
+	}
+	function newKeypairFunc(plugin) {
+		return function(onDone) {
+			var keypair = new CryptoKeypair({plugin: plugin});
+			doneWeight += (1 / numKeypairs) * createWeight;
 			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keypairs");
+			setImmediate(function() { onDone(null, keypair) });	// let UI breath
 		}
 	}
 	
-	// initialize piece
-	var piece = new CryptoPiece({keypairs: keypairs});
-	
-	// encrypt
-	if (encryptWeight > 0) {
-		if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting keypairs");
-		piece.encrypt(config.passphrase, schemes, function(percent, label) {
-			if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, "Encrypting keypairs");
-		}, function(err, encryptedPiece) {
-			if (err) onDone(err);
-			else {
-				doneWeight += encryptWeight;
-				splitAndRender();
-			}
-		});
-	}
-	
-	// otherwise split and render
-	else {
-		splitAndRender();
-	}
-	
-	function splitAndRender() {
+	// generate keypairs
+	if (onProgress) onProgress(0, "Generating keypairs");
+	async.series(newKeypairFuncs, function(err, keypairs) {
+		assertNull(err);
 		
-		// split pieces if applicable
-		var pieces = config.numPieces ? piece.split(config.numPieces, config.minPieces) : [piece];
+		// initialize piece
+		var piece = new CryptoPiece({keypairs: keypairs});
 		
-		// render each piece
-		if (config.rendererClass) {
-			
-			// collect renderers
-			var renderers = [];
-			for (var i = 0; i < pieces.length; i++) {
-				renderers.push(new config.rendererClass(null, pieces[i], function(percent, label) {
-					if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, label);
-				}));
-			}
-			
-			// collect render callback functions
-			var renderFuncs = [];
-			for (var i = 0; i < renderers.length; i++) {
-				renderFuncs.push(renderFunction(renderers[i]));
-			}
-			function renderFunction(renderer) {
-				return function(onDone) {
-					renderer.render(function(div) {
-						onDone(null, renderer);
-					});
-				}
-			}
-			
-			// render async
-			async.series(renderFuncs, function(err, renderers) {
+		// encrypt
+		if (encryptWeight > 0) {
+			if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting keypairs");
+			piece.encrypt(config.passphrase, schemes, function(percent, label) {
+				if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, "Encrypting keypairs");
+			}, function(err, encryptedPiece) {
 				if (err) onDone(err);
 				else {
-					doneWeight += renderWeight;
-					assertEquals(doneWeight, totalWeight);
-					onDone(null, pieces, renderers);
+					doneWeight += encryptWeight;
+					splitAndRender();
 				}
 			});
-		} else {
-			assertEquals(doneWeight, totalWeight);
-			onDone(null, pieces, null);
 		}
-	}
+		
+		// otherwise split and render
+		else {
+			splitAndRender();
+		}
+		
+		function splitAndRender() {
+			
+			// split pieces if applicable
+			var pieces = config.numPieces ? piece.split(config.numPieces, config.minPieces) : [piece];
+			
+			// render each piece
+			if (config.rendererClass) {
+				
+				// collect renderers
+				var renderers = [];
+				for (var i = 0; i < pieces.length; i++) {
+					renderers.push(new config.rendererClass(null, pieces[i], function(percent, label) {
+						if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, label);
+					}));
+				}
+				
+				// collect render callback functions
+				var renderFuncs = [];
+				for (var i = 0; i < renderers.length; i++) {
+					renderFuncs.push(renderFunction(renderers[i]));
+				}
+				function renderFunction(renderer) {
+					return function(onDone) {
+						renderer.render(function(div) {
+							onDone(null, renderer);
+						});
+					}
+				}
+				
+				// render async
+				async.series(renderFuncs, function(err, renderers) {
+					if (err) onDone(err);
+					else {
+						doneWeight += renderWeight;
+						assertEquals(doneWeight, totalWeight);
+						onDone(null, pieces, renderers);
+					}
+				});
+			} else {
+				assertEquals(doneWeight, totalWeight);
+				onDone(null, pieces, null);
+			}
+		}
+	});
 }
 
 /**

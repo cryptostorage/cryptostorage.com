@@ -2748,7 +2748,6 @@ function EditorController(div, config) {
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function setGenerateProgress(percent, label) {
-		console.log(percent + " " + label);
 		progressBar.set(percent);
 		progressBar.setText(Math.round(percent * 100)  + "%");
 		progressLabel.html(label);
