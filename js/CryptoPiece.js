@@ -441,6 +441,7 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 					return function(onDone) {
 						renderer.render(function(div) {
 							doneWeight += renderWeight / pieces.length;
+							if (Math.abs(1 - doneWeight) < .000001) doneWeight = totalWeight;	// prevent precision error
 							onDone(null, renderer);
 						});
 					}
@@ -450,7 +451,7 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 				async.series(renderFuncs, function(err, renderers) {
 					if (err) onDone(err);
 					else {
-						assertEquals(doneWeight, totalWeight);
+						assertEquals(totalWeight, doneWeight);
 						onDone(null, pieces, renderers);
 					}
 				});
