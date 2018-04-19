@@ -3645,7 +3645,6 @@ function CompactPieceRenderer(div, piece, onProgress) {
 			div.append("Ok we're done rendering keypairs");
 			
 			// done
-			if (onProgress) onProgress(1, "Rendering keypairs");
 			if (onDone) onDone(div);
 		});
 	}

@@ -436,7 +436,6 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 			}
 			
 			// render async
-			if (onProgress) onProgress(doneWeight / totalWeight, "Rendering keypairs");
 			async.series(renderFuncs, function(err, renderers) {
 				if (err) onDone(err);
 				else {
