@@ -3651,11 +3651,16 @@ function CompactPieceRenderer(div, piece, onProgress) {
 	}
 }
 inheritsFrom(CompactPieceRenderer, DivController);
+
+/**
+ * Relative weight to render a piece generation config.
+ */
 CompactPieceRenderer.getRenderWeight = function(config) {
 	CryptoPiece.validateGenerateConfig(config);
+	var numPieces = config.numPieces ? config.numPieces : 1;
 	var weight = 0;
 	for (var i = 0; i < config.keypairs.length; i++) {
-		weight += config.keypairs[i].numKeypairs * KeypairRenderer.getRenderWeight(config.keypairs[i].ticker);
+		weight += config.keypairs[i].numKeypairs * KeypairRenderer.getRenderWeight(config.keypairs[i].ticker) * numPieces;
 	}
 	return weight;
 }
