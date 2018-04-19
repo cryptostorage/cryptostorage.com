@@ -3,7 +3,6 @@
  */
 function TestCrypto() {
 	
-	var PLUGINS = getTestPlugins();
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_LONG = 10;
 	var REPEAT_SHORT = 2;
@@ -14,33 +13,21 @@ function TestCrypto() {
 	 * Runs the tests.
 	 */
 	this.run = function(onDone) {
+		var plugins = getTestPlugins();
 		
 		// test generate pieces
-		testGeneratePieces(PLUGINS, function(err) {
-			if (err) {
-				onDone(err);
-				return;
-			}
+		testGeneratePieces(plugins, function(err) {
+			if (err) throw err;
 			
 			// test piece initialization
-			testPieceInit(PLUGINS);
+			testPieceInit(plugins);
 			
-			// test plugins
-			var funcs = [];
-			for (var i = 0; i < PLUGINS.length; i++) funcs.push(testPluginFunc(PLUGINS[i]));
-			function testPluginFunc(plugin) {
-				return function(onDone) { testPlugin(plugin, onDone); }
-			}
-			async.series(funcs, function(err) {
-				if (err) {
-					onDone(err);
-					return;
-				}
-				
-				// tests pass
+			// test piece encryption and splitting
+			testEncryptAndSplit(plugins, function(err) {
+				if (err) throw err;
 				onDone();
 			});
-		});		
+		});
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
@@ -62,104 +49,106 @@ function TestCrypto() {
 		return plugins;
 	}
 	
-	function testPlugin(plugin, onDone) {
-		console.log("Testing " + plugin.getTicker() + " plugin");
-		testNewKeypairs(plugin);
-		testEncryptAndSplit(plugin, function(err) {
-			if (err) onDone(err);
-			else {
-				onDone();
+	function testEncryptAndSplit(plugins, onDone) {
+		
+		// collect test functions
+		var testFuncs = [];
+		for (var i = 0; i < plugins.length; i++) {
+			testFuncs.push(testFunc(plugins[i]));
+		}
+		function testFunc(plugin) {
+			return function(onDone) {
+				testEncryptAndSplitPlugin(plugin, onDone);
 			}
-		});
-	}
-	
-	function testNewKeypairs(plugin) {
-		for (var j = 0; j < REPEAT_LONG; j++) {
-			var keypair = new CryptoKeypair({plugin: plugin});
-			assertInitialized(keypair.getPrivateHex());
-			assertInitialized(keypair.getPrivateWif());
-			assertFalse(keypair.isEncrypted());
-			assertNull(keypair.getEncryptionScheme());
-			assertFalse(keypair.isSplit());
-			assertNull(keypair.getMinShares());
-		}
-	}
-	
-	function testEncryptAndSplit(plugin, onDone) {
-		
-		// collect keypairs and schemes
-		var keypairs = [];
-		var schemes = [];
-		for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
-			keypairs.push(new CryptoKeypair({plugin: plugin}));
-			schemes.push(plugin.getEncryptionSchemes()[i]);
 		}
 		
-		// create piece
-		var piece = new CryptoPiece({keypairs: keypairs});
-		var originalPiece = piece.copy();
-		
-		// test split
-		testSplit(piece);
-		
-		// encrypt piece
-		var progressStarted = false;
-		var progressComplete = false;
-		piece.encrypt(PASSPHRASE, schemes, function(percent, label) {
-			if (percent === 0) progressStarted = true;
-			if (percent === 1) progressComplete = true;
-			assertEquals("Encrypting", label);
-		}, function(err, encryptedPiece) {
+		// execute test functions
+		async.series(testFuncs, function(err) {
 			if (err) throw err;
+			onDone();
+		});
+		
+		function testEncryptAndSplitPlugin(plugin, onDone) {
+			console.log("Testing " + plugin.getTicker() + " encryption and splitting");
 			
-			// test state
-			assertTrue(piece === encryptedPiece);
-			assertTrue(progressStarted, "Progress was not started");
-			assertTrue(progressComplete, "Progress was not completed");
-			assertTrue(piece.isEncrypted());
+			// collect keypair per encryption scheme
+			var keypairs = [];
+			var schemes = [];
+			for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
+				keypairs.push(new CryptoKeypair({plugin: plugin}));
+				schemes.push(plugin.getEncryptionSchemes()[i]);
+			}
+			
+			// create piece from keypairs
+			var piece = new CryptoPiece({keypairs: keypairs});
+			assertFalse(piece.isEncrypted());
 			assertFalse(piece.isSplit());
-			assertNull(piece.getPieceNum());
+			testPieceState(piece);
+			var original = piece.copy();
 			
 			// test split
-			testSplit(encryptedPiece);
+			testSplit(piece);
 			
-			// cannot encrypt encrypted piece
-			try {
-				piece.encrypt(PASSPHRASE, schemes, function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
-				fail("fail");
-			} catch (err) {
-				if (err.message === "fail") throw new Error("Cannot encrypt encrypted piece");
-			}
-			
-			// decrypt with wrong password
-			piece.decrypt("wrongPassphrase123", function(percent, label) {}, function(err, decryptedPiece) {
-				assertInitialized(err);
-				assertEquals("Incorrect passphrase", err.message);
-				assertUndefined(decryptedPiece);
+			// encrypt piece
+			var progressStarted = false;
+			var progressComplete = false;
+			piece.encrypt(PASSPHRASE, schemes, function(percent, label) {
+				if (percent === 0) progressStarted = true;
+				if (percent === 1) progressComplete = true;
+				assertEquals("Encrypting", label);
+			}, function(err, encryptedPiece) {
+				if (err) throw err;
 				
-				// decrypt piece
-				progressStarted = false;
-				progressCompleted = false;
-				piece.decrypt(PASSPHRASE, function(percent, label) {
-					if (percent === 0) progressStarted = true;
-					if (percent === 1) progressComplete = true;
-					assertEquals("Decrypting", label);
-				}, function(err, decryptedPiece) {
-					if (err) throw err;
+				// test state
+				assertTrue(piece === encryptedPiece);
+				testPieceState(piece);
+				assertTrue(progressStarted, "Progress was not started");
+				assertTrue(progressComplete, "Progress was not completed");
+				assertTrue(piece.isEncrypted());
+				assertFalse(piece.isSplit());
+				assertNull(piece.getPieceNum());
+				
+				// test split
+				testSplit(encryptedPiece);
+				
+				// cannot encrypt encrypted piece
+				try {
+					piece.encrypt(PASSPHRASE, schemes, function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
+					fail("fail");
+				} catch (err) {
+					if (err.message === "fail") throw new Error("Cannot encrypt encrypted piece");
+				}
+				
+				// decrypt with wrong password
+				piece.decrypt("wrongPassphrase123", function(percent, label) {}, function(err, decryptedPiece) {
+					assertInitialized(err);
+					assertEquals("Incorrect passphrase", err.message);
+					assertUndefined(decryptedPiece);
 					
-					// test state
-					assertTrue(progressStarted, "Progress was not started");
-					assertTrue(progressComplete, "Progress was not completed");
-					assertTrue(piece.equals(originalPiece));
-					assertFalse(piece.isEncrypted());
-					assertFalse(piece.isSplit());
-					assertNull(piece.getPieceNum());
-					
-					// done testing
-					onDone();
+					// decrypt piece
+					progressStarted = false;
+					progressCompleted = false;
+					piece.decrypt(PASSPHRASE, function(percent, label) {
+						if (percent === 0) progressStarted = true;
+						if (percent === 1) progressComplete = true;
+						assertEquals("Decrypting", label);
+					}, function(err, decryptedPiece) {
+						if (err) throw err;
+						
+						// test state
+						assertTrue(progressStarted, "Progress was not started");
+						assertTrue(progressComplete, "Progress was not completed");
+						assertTrue(piece.equals(original));
+						assertFalse(piece.isEncrypted());
+						assertFalse(piece.isSplit());
+						assertNull(piece.getPieceNum());
+						
+						// done testing
+						onDone();
+					});
 				});
 			});
-		});
+		}
 	}
 	
 	function testSplit(piece) {
@@ -173,9 +162,14 @@ function TestCrypto() {
 		var splitPieces = piece.split(NUM_PIECES, MIN_PIECES);
 		assertEquals(splitPieces.length, NUM_PIECES);
 		for (var i = 0; i < splitPieces.length; i++) {
+			
+			// test split piece state
+			testPieceState(splitPieces[i]);
 			assertTrue(splitPieces[i].isSplit());
 			assertEquals(i + 1, splitPieces[i].getPieceNum());
 			assertEquals(piece.getKeypairs().length, splitPieces[i].getKeypairs().length);
+			
+			// test that public addresses are equal
 			for (var j = 0; j < piece.getKeypairs().length; j++) {
 				assertEquals(piece.getKeypairs()[j].getPublicAddress(), splitPieces[i].getKeypairs()[j].getPublicAddress());
 			}
@@ -224,6 +218,60 @@ function TestCrypto() {
 		var combined = new CryptoPiece({splitPieces: splitPieces});
 		assertTrue(original.equals(combined));
 	}
+	
+	function testPieceState(piece) {
+		for (var i = 0; i < piece.getKeypairs().length; i++) {
+			testKeypairState(piece.getKeypairs()[i]);
+		}
+	}
+	
+	function testKeypairState(keypair) {
+		assertInitialized(keypair.getPlugin());
+		
+		// test split keypair
+		if (keypair.isSplit()) {
+			assertInitialized(keypair.getPrivateHex());
+			assertInitialized(keypair.getPrivateWif());
+			assertEquals(undefined, keypair.isEncrypted());
+			assertEquals(undefined, keypair.getEncryptionScheme());
+			assertNumber(keypair.getMinShares());
+			assertTrue(keypair.getMinShares() >= 2);
+			assertTrue(keypair.getMinShares() <= AppUtils.MAX_SHARES);
+		}
+		
+		// test encrypted keypair
+		else if (keypair.isEncrypted()) {
+			assertFalse(keypair.isSplit());
+			assertNull(keypair.getMinShares());
+			assertNull(keypair.getShareNum());
+			if (keypair.isPublicApplicable()) assertTrue(keypair.getPublicAddress() === undefined || isInitialized(keypair.getPublicAddress()));
+			else assertEquals(null, keypair.getPublicAddress());
+		}
+		
+		// test unencrypted keypair
+		else {
+			assertInitialized(keypair.getPrivateHex());
+			assertInitialized(keypair.getPrivateWif());
+			assertFalse(keypair.isEncrypted());
+			assertNull(keypair.getEncryptionScheme());
+			assertFalse(keypair.isSplit());
+			assertNull(keypair.getMinShares());
+			if (keypair.isPublicApplicable()) assertTrue(isInitialized(keypair.getPublicAddress()));
+			else assertEquals(null, keypair.getPublicAddress());
+		}
+	}
+	
+//	function testNewKeypairs(plugin) {
+//		for (var j = 0; j < REPEAT_LONG; j++) {
+//			var keypair = new CryptoKeypair({plugin: plugin});
+//			assertInitialized(keypair.getPrivateHex());
+//			assertInitialized(keypair.getPrivateWif());
+//			assertFalse(keypair.isEncrypted());
+//			assertNull(keypair.getEncryptionScheme());
+//			assertFalse(keypair.isSplit());
+//			assertNull(keypair.getMinShares());
+//		}
+//	}
 	
 	function testPieceInit(plugins) {
 		console.log("Testing piece initialization");

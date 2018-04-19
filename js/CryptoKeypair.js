@@ -44,6 +44,10 @@ function CryptoKeypair(config) {
 		return state.plugin;
 	}
 	
+	this.isPublicApplicable = function() {
+		return state.plugin.hasPublicAddress();
+	}
+	
 	this.getPublicAddress = function() {
 		return state.publicAddress;
 	}
@@ -82,7 +86,7 @@ function CryptoKeypair(config) {
 	}
 	
 	this.isEncrypted = function() {
-		assertDefined(that.getEncryptionScheme(), "Keypair encryption is unknown");
+		if (isUndefined(that.getEncryptionScheme())) return undefined;
 		return that.getEncryptionScheme() !== null;
 	}
 	

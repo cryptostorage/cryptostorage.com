@@ -201,6 +201,11 @@ CryptoPlugin.prototype.decode = function(privateKey) { throw new Error("Subclass
 CryptoPlugin.prototype.newKey = function(str) { throw new Error("Subclass must implement"); }
 
 /**
+ * Indicates if the plugin has public addresses (e.g. BIP39 does not)
+ */
+CryptoPlugin.prototype.hasPublicAddress = function() { return true; };
+
+/**
  * Determines if the given string is a valid address.
  */
 CryptoPlugin.prototype.isAddress = function(str) { throw new Error("Subclass must implement"); }

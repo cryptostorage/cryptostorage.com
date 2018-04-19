@@ -87,12 +87,12 @@ function CryptoPiece(config) {
 	}
 	
 	this.isEncrypted = function() {
-		var bool = -1;
+		var encryption = -1;
 		for (var i = 0; i < state.keypairs.length; i++) {
-			if (bool === -1) bool = state.keypairs[i].isEncrypted();
-			else if (bool !== state.keypairs[i].isEncrypted()) throw new Error("state.keypairs[" + i + "] encryption is inconsistent");
+			if (encryption === -1) encryption = state.keypairs[i].isEncrypted();
+			else if (encryption !== state.keypairs[i].isEncrypted()) throw new Error("state.keypairs[" + i + "] encryption is inconsistent");
 		}
-		return bool;
+		return encryption;
 	}
 	
 	this.decrypt = function(passphrase, onProgress, onDone) {
