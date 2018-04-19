@@ -3599,11 +3599,14 @@ inheritsFrom(EditorActionsController, DivController);
  * 
  * @param div is the div to render to
  * @param piece is the piece to render
- * @param onRenderProgress(percent) is invoked as render progress is made
+ * @param onProgress(percent) is invoked as render progress is made
  */
-function CompactPieceRenderer(div, piece, onRenderProgress) {
+function CompactPieceRenderer(div, piece, onProgress) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
+	assertObject(piece, CryptoPiece);
+	
+	var keypairRenderers;
 	
 	this.render = function(onDone) {
 		
@@ -3611,27 +3614,48 @@ function CompactPieceRenderer(div, piece, onRenderProgress) {
 		div.empty();
 		div.addClass("compact_piece_div flex_vertical");
 		
-		if (onRenderProgress) onRenderProgress(0, "Rendering keypairs");
-		if (onRenderProgress) onRenderProgress(.5, "Rendering keypairs");
-		if (onRenderProgress) onRenderProgress(1, "Rendering keypairs");
+		// compute weights
+		var doneWeight = 0;
+		var totalWeight  = 0;
+		for (var i = 0; i < piece.getKeypairs().length; i++) {
+			totalWeight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker());
+		}
 		
-		div.append("Ok we're ready to render compact pieces");
+		// collect functions to render keypairs
+		var renderFuncs = [];
+		for (var i = 0; i < piece.getKeypairs().length; i++) {
+			renderFuncs.push(renderFunc(new KeypairRenderer($("<div>"), piece.getKeypairs()[i])));
+		}
+		function renderFunc(keypairRenderer) {
+			return function(onDone) {
+				keypairRenderer.render(function(div) {
+					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
+					if (onProgress) onProgress(doneWeight / totalWeight, "Rendering keypairs");
+					onDone(keypairRenderer);
+				});
+			}
+		}
 		
-		// done
-		if (onDone) onDone(div);
-	}
-	
-	this.getRenderWeight = function() {
-		throw new Error("Not implemented");
+		// render keypairs
+		if (onProgress) onProgress(0, "Rendering keypairs");
+		async.series(renderFuncs, function(err, _keypairRenderers) {
+			if (err) throw err;
+			keypairRenderers = _keypairRenderers;
+			
+			div.append("Ok we're done rendering keypairs");
+			
+			// done
+			if (onProgress) onProgress(1, "Rendering keypairs");
+			if (onDone) onDone(div);
+		});
 	}
 }
 inheritsFrom(CompactPieceRenderer, DivController);
-CompactPieceRenderer.getRenderWeight = function(keypairsConfig) {
-	assertArray(keypairsConfig);
-	assertTrue(keypairsConfig.length > 0);
+CompactPieceRenderer.getRenderWeight = function(config) {
+	CryptoPiece.validateGenerateConfig(config);
 	var weight = 0;
-	for (var i = 0; i < keypairsConfig.length; i++) {
-		weight += keypairsConfig[i].numKeypairs * 2 * 15;	// TODO: assumes 2 QRs per keypair when can be 1, each having 15 weight
+	for (var i = 0; i < config.keypairs.length; i++) {
+		weight += config.keypairs[i].numKeypairs * KeypairRenderer.getRenderWeight(config.keypairs[i].ticker);
 	}
 	return weight;
 }
@@ -3646,17 +3670,17 @@ function KeypairRenderer(div, keypair) {
 	DivController.call(this, div);
 	
 	var that = this;
-	var isCancelled;
+	var isCancelled = false;
 	var keypairLeftValue;
 	var keypairRightValue;
 	var keypairCryptoLogo;
 	
 	this.render = function(onDone) {
 		
-		// cancel and reset render
+		// cancel render
 		if (isCancelled) {
 			isCancelled = false;
-			if (onDone) onDone();
+			if (onDone) onDone(div);
 			return;
 		}
 		
@@ -3670,7 +3694,7 @@ function KeypairRenderer(div, keypair) {
 		var keypairRightDiv = $("<div class='keypair_right_div flex_horizontal flex_align_end flex_justify_center'>").appendTo(div);
 		
 		// decode keypair for rendering
-		var decoded = KeypairController.decodeKeypair(keypair);
+		var decoded = KeypairRenderer.decodeKeypair(keypair);
 		
 		// keypair id
 		var idDiv = $("<div class='keypair_center_id'>").appendTo(keypairCenterDiv);
@@ -3764,6 +3788,9 @@ function KeypairRenderer(div, keypair) {
 	}
 }
 inheritsFrom(KeypairRenderer, DivController);
+KeypairRenderer.getRenderWeight = function(ticker) {
+	return 2 * 15;	// TODO: assumes 2 QR codes, 15 weight each
+}
 
 /**
  * Default keypair QR config.
@@ -3791,7 +3818,9 @@ KeypairRenderer.QR_CONFIG = {
  * 					decoded.keypairId is the keypair identifier to render
  */
 KeypairRenderer.decodeKeypair = function(keypair, config) {
-	throw new Error("Not implemented");
+	var decoded = {};
+	throw new Error("Not implemented");	// TODO: decode but consider cryptos without public address
+	return decoded;
 }
 
 /**
