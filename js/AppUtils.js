@@ -2403,19 +2403,20 @@ var AppUtils = {
 		  var iv = salt;
 		  var ctHex = hex.substring(32);
 		  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
-		  var decrypted;
+		  var decryptedHex;
 		  try {
-			  decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
+		  	var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
 			  	iv: iv, 
 			    padding: CryptoJS.pad.Pkcs7,
 			    mode: CryptoJS.mode.CBC
 			  });
+		  	decryptedHex = decrypted.toString(CryptoJS.enc.Utf8);
+		  	assertInitialized(decryptedHex);
 		  } catch (err) {
 		  	onDone(new Error("Incorrect passphrase"));
+		  	return;
 		  }
-		  var decryptedHex = decrypted.toString(CryptoJS.enc.Utf8);
-		  assertInitialized(decryptedHex);
-			if (onProgress) onProgress(1)
+		  if (onProgress) onProgress(1)
 			onDone(null, decryptedHex);
 		}
 		

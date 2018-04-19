@@ -1,8 +1,5 @@
 /**
  * Tests keypairs and pieces.
- * 
- * TODO: test wrong passphrase
- * TODO: test fail not implementeds
  */
 function TestCrypto() {
 	
@@ -123,6 +120,9 @@ function TestCrypto() {
 			assertFalse(piece.isSplit());
 			assertNull(piece.getPieceNum());
 			
+			// test split
+			testSplit(encryptedPiece);
+			
 			// cannot encrypt encrypted piece
 			try {
 				piece.encrypt(PASSPHRASE, schemes, function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
@@ -131,29 +131,33 @@ function TestCrypto() {
 				if (err.message === "fail") throw new Error("Cannot encrypt encrypted piece");
 			}
 			
-			// test split
-			testSplit(encryptedPiece);
-			
-			// decrypt piece
-			progressStarted = false;
-			progressCompleted = false;
-			piece.decrypt(PASSPHRASE, function(percent, label) {
-				if (percent === 0) progressStarted = true;
-				if (percent === 1) progressComplete = true;
-				assertEquals("Decrypting", label);
-			}, function(err, decryptedPiece) {
-				if (err) throw err;
+			// decrypt with wrong password
+			piece.decrypt("wrongPassphrase123", function(percent, label) {}, function(err, decryptedPiece) {
+				assertInitialized(err);
+				assertEquals("Incorrect passphrase", err.message);
+				assertUndefined(decryptedPiece);
 				
-				// test state
-				assertTrue(progressStarted, "Progress was not started");
-				assertTrue(progressComplete, "Progress was not completed");
-				assertTrue(piece.equals(originalPiece));
-				assertFalse(piece.isEncrypted());
-				assertFalse(piece.isSplit());
-				assertNull(piece.getPieceNum());
-				
-				// done testing
-				onDone();
+				// decrypt piece
+				progressStarted = false;
+				progressCompleted = false;
+				piece.decrypt(PASSPHRASE, function(percent, label) {
+					if (percent === 0) progressStarted = true;
+					if (percent === 1) progressComplete = true;
+					assertEquals("Decrypting", label);
+				}, function(err, decryptedPiece) {
+					if (err) throw err;
+					
+					// test state
+					assertTrue(progressStarted, "Progress was not started");
+					assertTrue(progressComplete, "Progress was not completed");
+					assertTrue(piece.equals(originalPiece));
+					assertFalse(piece.isEncrypted());
+					assertFalse(piece.isSplit());
+					assertNull(piece.getPieceNum());
+					
+					// done testing
+					onDone();
+				});
 			});
 		});
 	}
