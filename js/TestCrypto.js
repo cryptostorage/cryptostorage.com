@@ -48,7 +48,7 @@ function TestCrypto() {
 	function getTestPlugins() {
 		var plugins = [];
 		plugins.push(new BitcoinPlugin());
-		plugins.push(new BitcoinCashPlugin());
+		//plugins.push(new BitcoinCashPlugin());
 		plugins.push(new EthereumPlugin());
 		plugins.push(new MoneroPlugin());
 		plugins.push(new DashPlugin());

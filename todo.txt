@@ -1,15 +1,15 @@
-v0.2.4
-export editor
-	click outside dropdown only works if click within container
-	interoperability disclaimer if passphrase/split checked
-	split lines bolder
-	precise static and dynamic dependencies
-	direct link to editor
-	cancel button on generate
-	tweak floating button colors
-	piece incompatibilities: shareNum, currencies -> keypairs
-	prolly change CryptoPiece and CryptoKeypair to take in single config
-	ability to cancel encryption / decryption
+v0.3.0
+click outside dropdown only works if click within container
+interoperability disclaimer if passphrase/split checked
+split lines bolder
+precise static and dynamic dependencies
+direct link to editor
+cancel button on generate
+tweak floating button colors
+piece incompatibilities: shareNum, currencies -> keypairs
+prolly change CryptoPiece and CryptoKeypair to take in single config
+ability to cancel encryption / decryption
+increase test repeat
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient
