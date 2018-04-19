@@ -419,13 +419,13 @@ function HomeController(div) {
 			
 			// div setup
 			div.empty();
-			div.attr("class", "content_div flex_vertical");
+			div.attr("class", "content_div flex_vertical flex_align_center");
 			
 			// notice container
 			var noticeContainer = $("<div class='notice_container'>").appendTo(div);
 			
 			// home content
-			var pageDiv = $("<div class='page_div home_div flex_vertical'>").appendTo(div);
+			var pageDiv = $("<div class='page_div home_div flex_vertical flex_align_center'>").appendTo(div);
 			
 			// supported currencies
 			var numVisible = 15;
@@ -500,9 +500,9 @@ function HomeController(div) {
 			// footer
 			var footerDiv = $("<div class='home_footer_div flex_horizontal'>").appendTo(div);
 			footerDiv.append($("<div class='home_footer_version flex_horizontal'></div>"));
-			var descriptionDiv = $("<div class='home_footer_description flex_vertical'>").appendTo(footerDiv);
+			var descriptionDiv = $("<div class='home_footer_description flex_vertical flex_justify_center'>").appendTo(footerDiv);
 			descriptionDiv.append("<div><a href='./LICENSE.txt'>MIT licensed.</a></div>JavaScript copyrights included in the source. No warranty.");
-			var versionDiv = $("<div class='home_footer_version flex_horizontal flex_justify_end'>").appendTo(footerDiv);
+			var versionDiv = $("<div class='home_footer_version flex_horizontal flex_align_center flex_justify_end'>").appendTo(footerDiv);
 			versionDiv.append("<a href='./versions.txt' target='_blank'>version " + AppUtils.VERSION + AppUtils.VERSION_POSTFIX + "</a>");
 			
 			// done rendering
@@ -576,7 +576,7 @@ function FaqController(div) {
 			
 			// div setup
 			div.empty();
-			div.attr("class", "content_div flex_vertical");
+			div.attr("class", "content_div flex_vertical flex_align_center");
 			var pageDiv = $("<div class='page_div'>").appendTo(div);
 			
 			// title
@@ -903,7 +903,7 @@ function DonateController(div, appController) {
 			
 			// div setup
 			div.empty();
-			div.attr("class", "content_div flex_vertical");
+			div.attr("class", "content_div flex_vertical flex_align_center");
 			var pageDiv = $("<div class='page_div'>").appendTo(div);
 
 			// build donate section
@@ -1029,7 +1029,7 @@ function DonateController(div, appController) {
 		}
 		
 		function renderLeft(div, credit, onDone) {
-			div.attr("class", "donate_div flex_horizontal");
+			div.attr("class", "donate_div flex_horizontal flex_align_center");
 
 			// append the title
 			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_start width_100'>").appendTo(div);
@@ -1055,7 +1055,7 @@ function DonateController(div, appController) {
 		}
 		
 		function renderRight(div, credit, onDone) {
-			div.attr("class", "donate_div flex_horizontal");
+			div.attr("class", "donate_div flex_horizontal flex_align_center");
 			
 			// append the title
 			var titleSubtitleDiv = $("<div class='flex_vertical flex_align_end width_100'>").appendTo(div);
@@ -1114,7 +1114,7 @@ function FormController(div) {
 	
 	this.render = function(onDone) {
 		div.empty();
-		div.attr("class", "content_div flex_vertical");
+		div.attr("class", "content_div flex_vertical flex_align_center");
 		
 		// load dependencies
 		LOADER.load(AppUtils.getAppDependencies(), function(err) {
@@ -1551,7 +1551,7 @@ function ImportController(div) {
 			
 			// div setup
 			div.empty();
-			div.attr("class", "content_div flex_vertical");
+			div.attr("class", "content_div flex_vertical flex_align_center");
 			
 			// notice div
 			var noticeDiv = $("<div>").appendTo(div);
@@ -1618,7 +1618,7 @@ function ImportFileController(div) {
 		importInputDiv = $("<div class='import_input_div'>").appendTo(div);
 		
 		// warning div
-		warningDiv = $("<div class='import_warning_div flex_horizontal'>").appendTo(importInputDiv);
+		warningDiv = $("<div class='import_warning_div flex_horizontal flex_justify_center'>").appendTo(importInputDiv);
 		warningDiv.hide();
 		
 		// all file importing
@@ -1631,7 +1631,7 @@ function ImportFileController(div) {
 		// drag and drop div
 		var dragDropDiv = $("<div class='import_drag_drop flex_horizontal'>").appendTo(fileInputDiv);
 		var dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
-		var dragDropText = $("<div class='drag_drop_text flex_vertical flex_justify_start'>").appendTo(dragDropDiv);
+		var dragDropText = $("<div class='drag_drop_text flex_vertical flex_align_center flex_justify_center'>").appendTo(dragDropDiv);
 		var dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
 		dragDropLabel.append("Drag and Drop Files To Import");
 		var dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
@@ -2066,7 +2066,7 @@ function ImportTextController(div, plugins) {
 		importInputDiv = $("<div class='import_input_div'>").appendTo(div);
 		
 		// warning div
-		warningDiv = $("<div class='import_warning_div flex_horizontal'>").appendTo(importInputDiv);
+		warningDiv = $("<div class='import_warning_div flex_horizontal flex_justify_center'>").appendTo(importInputDiv);
 		warningDiv.hide();
 		
 		// all text importing
@@ -2659,13 +2659,13 @@ function EditorController(div, config) {
 		
 		// init
 		div.empty();
-		div.addClass("editor_div, flex_vertical");
+		div.addClass("editor_div flex_vertical flex_align_center");
 		
 		// header
-		var headerDiv = $("<div class='editor_header flex_vertical'>").appendTo(div);
+		var headerDiv = $("<div class='editor_header flex_vertical flex_align_center'>").appendTo(div);
 		
 		// passphrase and split input div
-		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal'>").appendTo(headerDiv);
+		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal flex_align_center flex_justify_center'>").appendTo(headerDiv);
 		
 		// passphrase controller
 		passphraseController = new EditorPassphraseController($("<div>").appendTo(passphraseSplitDiv), that.update);
@@ -3031,7 +3031,7 @@ function EditorSplitController(div, onChange) {
 		
 		// div setup
 		div.empty();
-		div.addClass("editor_split_div flex_horizontal flex_justify_start");
+		div.addClass("editor_split_div flex_horizontal flex_align_center flex_justify_start");
 		
 		// split input
 		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(div);
@@ -3543,13 +3543,13 @@ function EditorActionsController(div, editorController) {
 		div.addClass("editor_floating_controls");
 		
 		// generate button
-		btnGenerate = $("<div class='editor_btn_green flex_horizontal user_select_none'>");
+		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
 		btnGenerate.append("Generate");
 		btnGenerate.hide();
 		btnGenerate.appendTo(div);
 		
 		// reset button
-		btnReset =  $("<div class='editor_btn_red flex_horizontal user_select_none'>");
+		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
 		btnReset.append("Reset");
 		btnReset.click(function() { editorController.reset(); });
 		btnReset.hide();
@@ -3557,11 +3557,11 @@ function EditorActionsController(div, editorController) {
 		
 		// save and print buttons
 		savePrintDiv = $("<div class='flex_horizontal width_100'>");
-		btnSave = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
+		btnSave = $("<div class='editor_btn_blue flex_horizontal flex_justify_center user_select_none'>").appendTo(savePrintDiv);
 		btnSave.append("Save");
 		btnSave.click(function() { editorController.save(); });
 		$("<div style='width:30px;'>").appendTo(savePrintDiv);
-		btnPrint = $("<div class='editor_btn_blue flex_horizontal user_select_none'>").appendTo(savePrintDiv);
+		btnPrint = $("<div class='editor_btn_blue flex_horizontal flex_justify_center user_select_none'>").appendTo(savePrintDiv);
 		btnPrint.append("Print");
 		btnPrint.click(function() { editorController.print(); });
 		savePrintDiv.hide();
@@ -3712,7 +3712,7 @@ function KeypairRenderer(div, keypair) {
 		}
 		
 		// crypto logo and label
-		var keypairCrypto = $("<div class='keypair_crypto flex_horizontal'>").appendTo(keypairCenterDiv);
+		var keypairCrypto = $("<div class='keypair_crypto flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairCenterDiv);
 		if (decoded.logo) {
 			keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
 			keypairCryptoLogo.append(decoded.cryptoLogo);
@@ -4678,7 +4678,7 @@ function NoticeController(div, config) {
 		
 		// render notice left
 		function renderLeft(div, info) {
-			div.addClass("notice_bar_left flex_horizontal flex_justify_start");
+			div.addClass("notice_bar_left flex_horizontal flex_align_center flex_justify_start");
 			div.css("min-width", width);
 			div.css("max-width", width);
 			for (var i = 0; i < info.checks.length; i++) {
@@ -4689,13 +4689,13 @@ function NoticeController(div, config) {
 		
 		// render notice center
 		function renderCenter(div, info) {
-			div.addClass("notice_bar_center flex_horizontal");
+			div.addClass("notice_bar_center flex_horizontal flex_justify_center");
 			renderCheckDescription(div, info, getFirstNonPassCheck(info));
 		}
 		
 		// render notice right
 		function renderRight(div, info) {
-			div.addClass("notice_bar_right flex_horizontal flex_justify_end");
+			div.addClass("notice_bar_right flex_horizontal flex_align_center flex_justify_end");
 			div.css("min-width", width);
 			div.css("max-width", width);
 			for (var i = 0; i < info.checks.length; i++) {
@@ -4898,7 +4898,7 @@ function LoadController(renderer, config) {
 			$(loadingImg).addClass("loading");
 			
 			// wrap renderer's div
-			renderer.getDiv().wrap("<div class='flex_vertical'>");	// wrap div with loading
+			renderer.getDiv().wrap("<div class='flex_vertical flex_align_center'>");	// wrap div with loading
 			wrapper = renderer.getDiv().parent();
 			wrapper.prepend(loadingImg);
 			if (config && config.enableScroll) wrapper.css("margin-bottom", "1200px");
