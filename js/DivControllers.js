@@ -3641,7 +3641,9 @@ function CompactPieceRenderer(div, piece, onProgress) {
 			assertNull(err);
 			keypairRenderers = _keypairRenderers;
 			
-			div.append("Ok we're done rendering keypairs");
+			for (var i = 0; i < keypairRenderers.length; i++) {
+				div.append(keypairRenderers[i].getDiv());
+			}
 			
 			// done
 			if (onDone) onDone(div);
