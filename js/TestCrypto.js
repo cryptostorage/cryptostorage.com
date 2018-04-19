@@ -110,10 +110,13 @@ function TestCrypto() {
 			// encrypt piece
 			var progressStarted = false;
 			var progressComplete = false;
+			var lastPercent = 0;
 			piece.encrypt(PASSPHRASE, schemes, function(percent, label) {
 				if (percent === 0) progressStarted = true;
 				if (percent === 1) progressComplete = true;
 				assertEquals("Encrypting", label);
+				assertTrue(percent >= lastPercent);
+				lastPercent = percent;
 			}, function(err, encryptedPiece) {
 				if (err) throw err;
 				
@@ -369,11 +372,16 @@ function TestCrypto() {
 			var progressStart = false;
 			var progressMiddle = false;
 			var progressEnd = false;
+			var lastPercent = 0;
 			var pieces = CryptoPiece.generatePieces(config, function(percent, label) {
 				if (percent === 0) progressStart = true;
 				else if (percent === 1) progressEnd = true;
 				else if (percent > 0 && percent < 1) progressMiddle = true;
 				else throw new Error("Invalid progress percent: " + percent);
+				
+				// assert percent increases
+				assertTrue(percent >= lastPercent);
+				lastPercent = percent;
 				
 				// test label
 				assertString(label);

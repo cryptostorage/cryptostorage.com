@@ -4691,7 +4691,7 @@ function NoticeController(div, config) {
 		
 		// render notice center
 		function renderCenter(div, info) {
-			div.addClass("notice_bar_center flex_horizontal flex_justify_center");
+			div.addClass("notice_bar_center flex_horizontal flex_align_center flex_justify_center");
 			renderCheckDescription(div, info, getFirstNonPassCheck(info));
 		}
 		
