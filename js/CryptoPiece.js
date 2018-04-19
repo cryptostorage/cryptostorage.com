@@ -363,8 +363,8 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 	for (var i = 0; i < config.keypairs.length; i++) {
 		var keypair = config.keypairs[i];
 		numKeypairs += keypair.numKeypairs;
-		createWeight += CryptoKeypair.getCreateWeight(keypair.ticker);
-		if (keypair.encryption) encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption);
+		createWeight += CryptoKeypair.getCreateWeight(keypair.ticker) * numKeypairs;
+		if (keypair.encryption) encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption) * numKeypairs;
 	}
 	var renderWeight = config.rendererClass ? config.rendererClass.getRenderWeight(config.keypairs) * (config.numPieces ? config.numPieces : 1) : 0;
 	var totalWeight = createWeight + encryptWeight + renderWeight;
