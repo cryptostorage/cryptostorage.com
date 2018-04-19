@@ -2702,15 +2702,18 @@ function EditorController(div, config) {
 		
 		// generate keys
 		piecesDiv.empty();
-		AppUtils.generateKeys(getKeyGenConfig(), setGenerateProgress, function(err, keys, pieces, pieceDivs) {
+		CryptoPiece.generatePieces(getGenerateConfig(), setGenerateProgress, function(err, pieces, pieceRenderers) {
+			if (err) throw err;
+			assertArray(pieces);
+			assertArray(pieceRenderers);
 			progressDiv.hide();
 			currenciesDiv.show();
-			for (var i = 0; i < pieceDivs.length; i++) {
-				piecesDiv.append(pieceDivs[i]);
+			for (var i = 0; i < pieceRenderers.length; i++) {
+				piecesDiv.append(pieceRenderers[i].getDiv());
 			}
 			piecesDiv.show();
 			if (onDone) onDone();
-		}, true);
+		});
 	}
 	
 	this.reset = function() {
@@ -2765,6 +2768,34 @@ function EditorController(div, config) {
 		
 		// set currencies
 		currenciesController.setConfig(keyGenConfig.currencies);
+	}
+	
+	function getGenerateConfig() {
+		assertFalse(that.hasFormError());
+		var config = {};
+		
+		// keypairs
+		config.keypairs = currenciesController.getConfig();	// TODO: rename to something better
+		
+		// encryption config
+		if (passphraseController.getUsePassphrase()) {
+			config.passphrase = passphraseController.getPassphrase();
+		}
+		for (var i = 0; i < config.keypairs.length; i++) {
+			var keypair = config.keypairs[i];
+			keypair.encryption = passphraseController.getUsePassphrase() ? AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
+		}
+
+		// split config
+		if (splitController.getUseSplit()) {
+			config.numPieces = splitController.getNumPieces();
+			config.minPieces = splitController.getMinPieces();
+		}
+		
+		// piece renderer
+		config.rendererClass = CompactPieceRenderer;
+
+		return config;
 	}
 	
 	function getKeyGenConfig() {
@@ -3438,7 +3469,7 @@ function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorCha
 		for (var i = 0; i < currencyInputs.length; i++) {
 			config.push({
 				ticker: currencyInputs[i].getSelectedPlugin() ? currencyInputs[i].getSelectedPlugin().getTicker() : null,
-				numKeys: currencyInputs[i].getNumKeys()
+				numKeypairs: currencyInputs[i].getNumKeys()
 			});
 		}
 		return config;

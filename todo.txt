@@ -1,4 +1,7 @@
 v0.3.0
+put homepage text in index.html and dynamically hide for seo
+footer
+notice color gradient
 click outside dropdown only works if click within container
 interoperability disclaimer if passphrase/split checked
 split lines bolder
@@ -10,9 +13,7 @@ piece incompatibilities: shareNum, currencies -> keypairs
 prolly change CryptoPiece and CryptoKeypair to take in single config
 ability to cancel encryption / decryption
 increase test repeat
-put homepage text in index.html and dynamically hide for seo
-footer
-notice color gradient
+standalone generation page
 
 designer:
 passphrase confirmation
