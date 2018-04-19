@@ -15,6 +15,12 @@ function TestCrypto() {
 	this.run = function(onDone) {
 		var plugins = getTestPlugins();
 		
+		// test new keypairs
+		console.log("Testing new keypairs");
+		for (var i = 0; i < plugins.length; i++) {
+			testNewKeypairs(plugins[i]);
+		}
+		
 		// test generate pieces
 		testGeneratePieces(plugins, function(err) {
 			if (err) throw err;
@@ -47,6 +53,18 @@ function TestCrypto() {
 		plugins.push(new NeoPlugin());
 		plugins.push(new BIP39Plugin());
 		return plugins;
+	}
+	
+	function testNewKeypairs(plugin) {
+		for (var i = 0; i < REPEAT_LONG; i++) {
+			var keypair = new CryptoKeypair({plugin: plugin});
+			assertInitialized(keypair.getPrivateHex());
+			assertInitialized(keypair.getPrivateWif());
+			assertFalse(keypair.isEncrypted());
+			assertNull(keypair.getEncryptionScheme());
+			assertFalse(keypair.isSplit());
+			assertNull(keypair.getMinShares());
+		}
 	}
 	
 	function testEncryptAndSplit(plugins, onDone) {
@@ -237,6 +255,8 @@ function TestCrypto() {
 			assertNumber(keypair.getMinShares());
 			assertTrue(keypair.getMinShares() >= 2);
 			assertTrue(keypair.getMinShares() <= AppUtils.MAX_SHARES);
+			if (keypair.isPublicApplicable()) assertTrue(keypair.getPublicAddress() === undefined || isInitialized(keypair.getPublicAddress()));
+			else assertNull(keypair.getPublicAddress());
 		}
 		
 		// test encrypted keypair
@@ -245,7 +265,7 @@ function TestCrypto() {
 			assertNull(keypair.getMinShares());
 			assertNull(keypair.getShareNum());
 			if (keypair.isPublicApplicable()) assertTrue(keypair.getPublicAddress() === undefined || isInitialized(keypair.getPublicAddress()));
-			else assertEquals(null, keypair.getPublicAddress());
+			else assertNull(keypair.getPublicAddress());
 		}
 		
 		// test unencrypted keypair
@@ -260,18 +280,6 @@ function TestCrypto() {
 			else assertEquals(null, keypair.getPublicAddress());
 		}
 	}
-	
-//	function testNewKeypairs(plugin) {
-//		for (var j = 0; j < REPEAT_LONG; j++) {
-//			var keypair = new CryptoKeypair({plugin: plugin});
-//			assertInitialized(keypair.getPrivateHex());
-//			assertInitialized(keypair.getPrivateWif());
-//			assertFalse(keypair.isEncrypted());
-//			assertNull(keypair.getEncryptionScheme());
-//			assertFalse(keypair.isSplit());
-//			assertNull(keypair.getMinShares());
-//		}
-//	}
 	
 	function testPieceInit(plugins) {
 		console.log("Testing piece initialization");
@@ -321,7 +329,7 @@ function TestCrypto() {
 	}
 	
 	function testGeneratePieces(plugins, onDone) {
-		console.log("Testing CryptoPiece.generatePieces()");
+		console.log("Testing generating pieces from config");
 		
 		// simple config
 		var config = {};
@@ -377,10 +385,6 @@ function TestCrypto() {
 					default: throw new Error("Unrecognized progress label: " + label);
 				}
 			}, function(err, pieces, pieceRenderers) {
-				if (err) {
-					onDone(err);
-					return;
-				}
 				assertNull(err);
 				if (config.numPieces) {
 					assertEquals(config.numPieces, pieces.length);

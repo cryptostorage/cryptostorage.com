@@ -3631,7 +3631,7 @@ function CompactPieceRenderer(div, piece, onProgress) {
 				keypairRenderer.render(function(div) {
 					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
 					if (onProgress) onProgress(doneWeight / totalWeight, "Rendering keypairs");
-					onDone(keypairRenderer);
+					onDone(null, keypairRenderer);
 				});
 			}
 		}
@@ -3639,7 +3639,7 @@ function CompactPieceRenderer(div, piece, onProgress) {
 		// render keypairs
 		if (onProgress) onProgress(0, "Rendering keypairs");
 		async.series(renderFuncs, function(err, _keypairRenderers) {
-			if (err) throw err;
+			assertNull(err);
 			keypairRenderers = _keypairRenderers;
 			
 			div.append("Ok we're done rendering keypairs");
@@ -3698,8 +3698,8 @@ function KeypairRenderer(div, keypair) {
 		
 		// keypair id
 		var idDiv = $("<div class='keypair_center_id'>").appendTo(keypairCenterDiv);
-		if (config.leftLabel) idDiv.css("position", "absolute");
-		idDiv.html(config.decoded.keypairId);
+		if (decoded.leftLabel) idDiv.css("position", "absolute");
+		idDiv.html(decoded.keypairId);
 		
 		// left label and value
 		if (decoded.leftLabel) {
@@ -3707,7 +3707,7 @@ function KeypairRenderer(div, keypair) {
 			keypairLeftLabel.html(decoded.leftLabel);
 			keypairLeftValue = $("<div class='keypair_left_value'>").appendTo(keypairCenterDiv);
 			if (!hasWhitespace(decoded.leftValue)) keypairLeftValue.css("word-break", "break-all");
-			keypairLeftValue.html(value);
+			keypairLeftValue.html(decoded.leftValue);
 			if (decoded.leftValueCopyable) keypairLeftValue.addClass("copyable");
 		}
 		
@@ -3742,7 +3742,7 @@ function KeypairRenderer(div, keypair) {
 		
 		// add qr codes
 		if (decoded.leftValueCopyable) {
-			UiUtils.renderQrCode(decoded.leftValue, getQrConfig(config), function(img) {
+			UiUtils.renderQrCode(decoded.leftValue, KeypairRenderer.QR_CONFIG, function(img) {
 				if (isCancelled) return;
 				img.attr("class", "keypair_qr");
 				keypairLeftDiv.append(img);
@@ -3757,7 +3757,7 @@ function KeypairRenderer(div, keypair) {
 		}
 		function addPrivateQr() {
 			if (decoded.rightValueCopyable) {
-				UiUtils.renderQrCode(decoded.rightValue, KeypairController.QR_CONFIG, function(img) {
+				UiUtils.renderQrCode(decoded.rightValue, KeypairRenderer.QR_CONFIG, function(img) {
 					if (isCancelled) return;
 					img.attr("class", "keypair_qr");
 					keypairRightDiv.append(img);
@@ -3769,6 +3769,10 @@ function KeypairRenderer(div, keypair) {
 				if (onDone) onDone(div);
 			}
 		}
+	}
+	
+	this.getKeypair = function() {
+		return keypair;
 	}
 	
 	this.cancelRender = function() {
@@ -3806,6 +3810,8 @@ KeypairRenderer.QR_CONFIG = {
  * Decodes the given keypair for rendering.
  * 
  * @param keypair is the keypair to decode
+ * @param config is custom configuration
+ * 				config.keypairId is the id if the keypair
  * @returns a decoded object with fields which inform rendering
  * 					decoded.leftLabel is the upper left label
  * 					decoded.leftValue is the upper left value
@@ -3819,7 +3825,32 @@ KeypairRenderer.QR_CONFIG = {
  */
 KeypairRenderer.decodeKeypair = function(keypair, config) {
 	var decoded = {};
-	throw new Error("Not implemented");	// TODO: decode but consider cryptos without public address
+	decoded.cryptoLogo = keypair.getPlugin().getLogo();
+	decoded.cryptoLabel = keypair.getPlugin().getName();
+	decoded.keypairId = config ? config.keypairId : undefined;
+	
+	// initialize left values
+	if (keypair.isPublicApplicable()) {
+		decoded.leftLabel = "Public Address";
+		if (keypair.getPublicAddress()) {
+			decoded.leftValueCopyable = true;
+			decoded.leftValue = keypair.getPublicAddress();
+		} else {
+			decoded.leftValueCopyable = false;
+			if (keypair.isSplit()) decoded.leftValue = "Combine shares to view";
+			else if (keypair.isEncrypted()) decoded.leftValue = "Decrypt to view";
+			else throw new Error("Public address should be known");
+		}
+	} else {
+		decoded.leftLabel = null;
+		decoded.leftValue = null;
+		decoded.leftValueCopyable = false;
+	}
+	
+	// initialize right values
+	decoded.rightLabel = keypair.getPlugin().getPrivateLabel();
+	decoded.rightValue = keypair.getPrivateWif();
+	decoded.rightValueCopyable = isInitialized(keypair.getPrivateWif());
 	return decoded;
 }
 
