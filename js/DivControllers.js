@@ -3713,7 +3713,9 @@ function KeypairRenderer(div, keypair) {
 		
 		// crypto logo and label
 		var keypairCrypto = $("<div class='keypair_crypto flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairCenterDiv);
-		if (decoded.logo) {
+		if (decoded.cryptoLogo) {
+			decoded.cryptoLogo.attr("width", "100%");
+			decoded.cryptoLogo.attr("height", "100%");
 			keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
 			keypairCryptoLogo.append(decoded.cryptoLogo);
 		}

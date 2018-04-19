@@ -15,6 +15,7 @@ ability to cancel encryption / decryption
 increase test repeat
 standalone generation page
 progress bar not correct
+optimize private functions for performance
 
 designer:
 passphrase confirmation
