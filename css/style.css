@@ -1176,8 +1176,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_body {
-	padding: 45px;
-	width: 875px;
+	width: 750px;
 }
 
 .editor_body, .editor_body * {

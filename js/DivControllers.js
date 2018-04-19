@@ -2676,7 +2676,7 @@ function EditorController(div, config) {
 		splitController.render();
 		
 		// load body
-		var bodyDiv = $("<div class='editor_body flex_vertical'>").appendTo(div);
+		var bodyDiv = $("<div class='editor_body flex_vertical flex_align_center'>").appendTo(div);
 		new LoadController(new EditorBodyController(bodyDiv)).render();
 		
 		// done rendering
@@ -2875,7 +2875,7 @@ function EditorController(div, config) {
 				progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
 				
 				// pieces div
-				piecesDiv = $("<div class='export_pieces_div flex_vertical flex_align_center'>").appendTo(div);
+				piecesDiv = $("<div class='export_pieces_div flex_vertical'>").appendTo(div);
 				piecesDiv.hide();
 				
 				// currency inputs controller
