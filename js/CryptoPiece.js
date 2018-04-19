@@ -379,8 +379,8 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 		for (var j = 0; j < config.keypairs[i].numKeypairs; j++) {
 			keypairs.push(new CryptoKeypair({plugin: plugin}));
 			doneWeight += (1 / numKeypairs) * createWeight;
-			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keypairs");
 			schemes.push(config.keypairs[i].encryption);
+			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keypairs");
 		}
 	}
 	

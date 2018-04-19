@@ -14,6 +14,7 @@ prolly change CryptoPiece and CryptoKeypair to take in single config
 ability to cancel encryption / decryption
 increase test repeat
 standalone generation page
+progress bar not correct
 
 designer:
 passphrase confirmation
