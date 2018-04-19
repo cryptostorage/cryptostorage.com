@@ -1366,7 +1366,7 @@ input[type='checkbox'][disabled] +label {
 
 .export_pieces_div {
 	background-color: white;
-	padding: 40px 25px 40px 25px;
+	padding: 40px 0 40px 0;
 }
 
 .piece_div {
@@ -1576,6 +1576,11 @@ input[type='checkbox'][disabled] +label {
 }
 
 /* NEW KEYPAIR */
+
+.compact_piece_div {
+	width: 750px;
+}
+
 .keypair_div {
 	height: 128px;
 	box-sizing: border-box;

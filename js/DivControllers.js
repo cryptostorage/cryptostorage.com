@@ -2875,7 +2875,7 @@ function EditorController(div, config) {
 				progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
 				
 				// pieces div
-				piecesDiv = $("<div class='export_pieces_div'>").appendTo(div);
+				piecesDiv = $("<div class='export_pieces_div flex_vertical flex_align_center'>").appendTo(div);
 				piecesDiv.hide();
 				
 				// currency inputs controller
