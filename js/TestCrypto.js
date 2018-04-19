@@ -275,7 +275,7 @@ function TestCrypto() {
 	function testGeneratePieces(plugins, onDone) {
 		console.log("Testing CryptoPiece.generatePieces()");
 		
-		// simple generate config
+		// simple config
 		var config = {};
 		config.keypairs = [];
 		for (var i = 0; i < plugins.length; i++) {
@@ -291,7 +291,7 @@ function TestCrypto() {
 				return;
 			}
 			
-			// test encryption and splitting
+			// config with encryption and split
 			config.passphrase = PASSPHRASE;
 			for (var i = 0; i < config.keypairs.length; i++) {
 				config.keypairs[i].encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
