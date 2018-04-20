@@ -1587,6 +1587,11 @@ input[type='checkbox'][disabled] +label {
 	padding: 7px 7px 7px 7px;
 	border: 2px solid;
 	border-color: green;
+	border-bottom: none;
+}
+
+.keypair_div:last-child {
+	border-bottom: 2px solid green;
 }
 
 .keypair_qr {

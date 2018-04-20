@@ -3684,7 +3684,7 @@ function CompactPieceRenderer(div, piece, onProgress) {
 			
 			// add keypair to page
 			pageDiv.append(config.keypairRenderers[i].getDiv());
-			if (config.spaceBetween) config.keypairRenderers[i].getDiv().addClass("key_div_spaced");
+			if (config.spaceBetween) config.keypairRenderers[i].getDiv().addClass("keypair_div_spaced");
 		}
 		
 		// add cryptostoarge logos
