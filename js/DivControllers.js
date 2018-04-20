@@ -3047,11 +3047,13 @@ function EditorSplitController(div, onChange) {
 		div.empty();
 		div.addClass("editor_split_div flex_horizontal flex_align_center flex_justify_start");
 		
+		// split tooltip
+		var splitTooltip = "Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>" +
+											 "This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br> +" +
+											 "For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.";
+		
 		// split input
-		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(div);
-		var splitCheckboxLabel = $("<label class='user_select_none' for='split_checkbox'>").appendTo(div);
-		splitCheckboxLabel.html("Split Keys?");
-		var splitInfo = $("<img src='img/information_white.png' class='info_tooltip_img'>").appendTo(div);
+		splitCheckbox = new CheckboxController($("<div>").appendTo(div), "Split Keypairs?", splitTooltip).render();
 		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(div);
 		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(div);
 		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(div);
@@ -3068,28 +3070,9 @@ function EditorSplitController(div, onChange) {
 		var splitMinLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitMinDiv);
 		splitMinLabelBottom.html("To Recover");		
 		
-		// split tooltip
-		var splitTooltip = $("<div>");
-		splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
-		splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
-		splitTooltip.append("For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
-		tippy(splitInfo.get(0), {
-			arrow: true,
-			html: splitTooltip.get(0),
-			interactive: true,
-			placement: 'bottom',
-			theme: 'translucent',
-			trigger: "mouseenter",
-			multiple: 'false',
-			maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
-			distance: 20,
-			arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-			offset: '-180, 0'
-		});
-		
 		// register inputs
 		splitCheckbox.click(function() {
-			if (splitCheckbox.prop("checked")) numPiecesInput.focus();
+			if (splitCheckbox.isChecked()) numPiecesInput.focus();
 			else that.validate();
 			if (onChange) onChange();
 		});
@@ -3106,7 +3089,7 @@ function EditorSplitController(div, onChange) {
 	}
 	
 	this.reset = function() {
-		splitCheckbox.prop("checked", false);
+		splitCheckbox.setChecked(false);
 		numPiecesInput.val("3");
 		minPiecesInput.val("2");
 		that.validate();
@@ -3175,11 +3158,11 @@ function EditorSplitController(div, onChange) {
 	}
 	
 	this.getUseSplit = function() {
-		return splitCheckbox.prop("checked");
+		return splitCheckbox.isChecked();
 	}
 	
 	this.setUseSplit = function(bool) {
-		splitCheckbox.prop("checked", bool);
+		splitCheckbox.setChecked(bool);
 	}
 	
 	this.getNumPieces = function() {
@@ -3654,6 +3637,7 @@ function CheckboxController(div, label, tooltip) {
 		
 		// done
 		if (onDone) onDone(div);
+		return that;
 	}
 	
 	this.click = function(callback) {
