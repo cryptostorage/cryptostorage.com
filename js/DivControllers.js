@@ -2742,17 +2742,16 @@ function EditorController(div, config) {
 	}
 	
 	this.save = function() {
-		var fullDiv = $("<div class='fullscreen_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
-		fullDiv.click(function() {
-			fullDiv.detach();
-		});
-		var saveDiv = $("<div class='flex_horizontal flex_align_center flex_justify_center' style='padding: 20px; width:200px; height:200px; background-color:white; opacity:1; z-index:10001'>").appendTo(fullDiv);
-		saveDiv.append("Save stuff goes here");
-		saveDiv.click(function(e) {
-			e.stopPropagation();
-		});
-		
 		console.log("EditorController.save()");
+		
+		// fullscreen div
+		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
+		popupDiv.click(function() { popupDiv.detach(); });
+		
+		// save controller
+		new EditorSaveController($("<div>").appendTo(popupDiv), that).render(function(div) {
+			div.click(function(e) { e.stopPropagation(); });	// clicking export div does not close popup
+		});
 	}
 	
 	this.print = function() {
@@ -3615,6 +3614,29 @@ function EditorActionsController(div, editorController) {
 	}
 }
 inheritsFrom(EditorActionsController, DivController);
+
+/**
+ * Save controller.
+ * 
+ * @param div is the div to render to
+ * @param editorController is the editor controller from which this save controller is created
+ */
+function EditorSaveController(div, editorController) {
+	DivController.call(this, div);
+	
+	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("editor_export_div")
+
+		div.append("Save stuff goes here");
+		
+		// done
+		if (onDone) onDone(div);
+	}
+}
+inheritsFrom(EditorSaveController, DivController);
 
 /**
  * Controls a single checkbox.
