@@ -1266,10 +1266,31 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_export_div {
-	padding: 20px;
-	width:200px;
-	height:200px;
+	max-width: 700px;
 	background-color: white;	
+}
+
+.editor_export_div > div {
+	padding: 25px;
+}
+
+.editor_export_header {
+	width: 100%;
+	color: white;
+	font-size: 28px;
+	background-color: rgb(17, 119, 184);
+}
+
+.editor_export_checkbox {
+	padding-right: 25px;
+}
+
+.editor_export_checkbox:last-child {
+	padding-right: 0px;
+}
+
+.editor_export_checkbox * {
+	font-size: 25px;
 }
 
 .export_div {

@@ -3624,13 +3624,24 @@ inheritsFrom(EditorActionsController, DivController);
 function EditorSaveController(div, editorController) {
 	DivController.call(this, div);
 	
+	var that = this;
+	var includePublicCheckbox;
+	var includePrivateCheckbox;
+	
 	this.render = function(onDone) {
 		
 		// div setup
 		div.empty();
-		div.addClass("editor_export_div")
-
-		div.append("Save stuff goes here");
+		div.addClass("editor_export_div flex_vertical flex_align_items_center")
+		
+		// header
+		var header = $("<div class='editor_export_header'>").appendTo(div);
+		header.append("Save");
+		
+		// checkboxes
+		var checkboxesDiv = $("<div class='flex_horizontal flex_justify_center'>").appendTo(div);
+		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Include public addresses").render();
+		includePrivateChecbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Include private keys").render();
 		
 		// done
 		if (onDone) onDone(div);
