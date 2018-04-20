@@ -1127,6 +1127,11 @@ input[type='checkbox'][disabled] +label {
 	color: black;
 }
 
+.editor_bip38_div * {
+	font-size: 20px;
+	margin-top: 5px;
+}
+
 .split_input_div {
 	margin: 20px 20px 0px 20px;
 }
@@ -1947,13 +1952,13 @@ input[type='checkbox'][disabled] +label {
 	height: 30px;
 }
 
-.information_img {
+.info_tooltip_img {
 	width: 22px;
 	height: 22px;
 	margin-left: 5px;
 }
 
-.information_img:hover {
+.info_tooltip_img:hover {
 	cursor: pointer;
 }
 

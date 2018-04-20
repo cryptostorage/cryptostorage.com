@@ -1211,7 +1211,7 @@ function FormController(div) {
 			});
 			
 			// bip38 tooltip
-			var bip38Info = $("<img src='img/information.png' class='information_img'>").appendTo(bip38CheckboxDiv);
+			var bip38Info = $("<img src='img/information.png' class='info_tooltip_img'>").appendTo(bip38CheckboxDiv);
 			var bip38Tooltip = $("<div>");
 			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys with a passphrase.<br><br>");
 			bip38Tooltip.append("BIP38 requires significantly more time and energy to encrypt/decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default encryption scheme), which makes it more secure against brute-force attacks.");
@@ -1246,7 +1246,7 @@ function FormController(div) {
 			});
 			
 			// split checkbox tooltip
-			var splitInfo = $("<img src='img/information.png' class='information_img'>").appendTo(splitCheckboxDiv);
+			var splitInfo = $("<img src='img/information.png' class='info_tooltip_img'>").appendTo(splitCheckboxDiv);
 			var splitTooltip = $("<div>");
 			splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
 			splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
@@ -2916,6 +2916,7 @@ function EditorPassphraseController(div, onChange) {
 	var that = this;
 	var passphraseCheckbox;
 	var passphraseInput;
+	var bip38Div;
 	var formError;
 
 	this.render = function(onDone) {
@@ -2924,12 +2925,18 @@ function EditorPassphraseController(div, onChange) {
 		div.empty();
 		div.addClass("editor_passphrase_div flex_horizontal flex_align_center flex_justify_start");
 		
-		// passphrase input
+		// passphrase checkbox
 		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(div);
 		var passphraseCheckboxLabel = $("<label class='user_select_none' for='passphrase_checkbox'>").appendTo(div);
 		passphraseCheckboxLabel.html("Use Passphrase?");
+		
+		// passphrase input
 		var passphraseInputVertical = $("<div class='editor_passphrase_vertical flex_vertical flex_justify_center'>").appendTo(div);
 		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseInputVertical);
+		
+		// bip38 checkbox
+		var bip38CheckboxCtl = new CheckboxController($("<div>").appendTo(passphraseInputVertical), "Use BIP38 for BTC & BCH", "this is my label");
+		bip38CheckboxCtl.render();
 		
 		// password error tooltip
 		tippy(passphraseInput.get(0), {
@@ -2996,7 +3003,7 @@ function EditorPassphraseController(div, onChange) {
 	}
 	
 	this.setBip38Visible = function(bool) {
-		throw new Error("Not implemented");
+		bool ? bip38Div.show() : bip38Div.hide();
 	}
 	
 	this.getUseBip38 = function() {
@@ -3046,7 +3053,7 @@ function EditorSplitController(div, onChange) {
 		splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(div);
 		var splitCheckboxLabel = $("<label class='user_select_none' for='split_checkbox'>").appendTo(div);
 		splitCheckboxLabel.html("Split Keys?");
-		var splitInfo = $("<img src='img/information_white.png' class='information_img'>").appendTo(div);
+		var splitInfo = $("<img src='img/information_white.png' class='info_tooltip_img'>").appendTo(div);
 		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(div);
 		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(div);
 		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(div);
@@ -3603,6 +3610,77 @@ function EditorActionsController(div, editorController) {
 inheritsFrom(EditorActionsController, DivController);
 
 /**
+ * Controls a single checkbox.
+ * 
+ * @param div is the div to render to
+ * @param label is the checkbox label
+ * @param tooltip is the tooltip text
+ */
+function CheckboxController(div, label, tooltip) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var checkbox;
+	var infoImg;
+	
+	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("editor_bip38_div flex_horizontal flex_align_center");
+		
+		// build div
+		var id = uuidv4();
+		checkbox = $("<input type='checkbox' id='" + id + "'>").appendTo(div);
+		var checkboxLabel = $("<label class='user_select_none' for='" + id + "'>").appendTo(div);
+		checkboxLabel.html(label);
+		
+		// info tooltip
+		if (tooltip) {
+			infoImg = $("<img src='img/information_white.png' class='info_tooltip_img'>").appendTo(div);
+			var tooltipDiv = $("<div>");
+			tooltipDiv.append(tooltip);
+			tippy(infoImg.get(0), {
+				arrow: true,
+				html: tooltipDiv.get(0),
+				placement: 'bottom',
+				theme: 'translucent',
+				trigger: "mouseenter",
+				multiple: 'false',
+				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
+				distance: 20,
+				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+				offset: '0, 0'
+			});
+		}
+		
+		// done
+		if (onDone) onDone(div);
+	}
+	
+	this.getCheckbox = function() {
+		return checkbox;
+	}
+	
+	this.setChecked = function(bool) {
+		throw new Error("Not implemented");
+	}
+	
+	this.isChecked = function() {
+		throw new Error("Not implemented");
+	}
+	
+	this.setEnabled = function(bool) {
+		throw new Error("Not implemented");
+	}
+	
+	this.isEnabled = function() {
+		throw new Error("Not implemented");
+	}
+}
+inheritsFrom(EditorActionsController, DivController);
+
+/**
  * Renders a piece with compact keypairs.
  * 
  * @param div is the div to render to
@@ -4107,7 +4185,7 @@ function ExportController(div, window, config) {
 			// info tooltip
 			var infoImg;
 			if (info) {
-				infoImg = $("<img src='img/information_white.png' class='information_img'>").appendTo(span);
+				infoImg = $("<img src='img/information_white.png' class='info_tooltip_img'>").appendTo(span);
 				var tooltip = $("<div>");
 				tooltip.append(info);
 				tippy(infoImg.get(0), {
