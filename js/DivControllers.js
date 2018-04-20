@@ -3657,7 +3657,8 @@ function CompactPieceRenderer(div, piece, onProgress) {
 		// validate config
 		assertInitialized(config);
 		if (config.infoBack) {
-			assertFalse(config.pageBreaks);
+			assertFalse(config.piece.isSplit());
+			assertTrue(config.pageBreaks);
 			assertTrue(config.spaceBetween);
 		}
 		
