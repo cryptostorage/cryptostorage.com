@@ -2995,7 +2995,7 @@ function EditorPassphraseController(div, onChange) {
 		passphraseInput.val(passphrase);
 	}
 	
-	this.setShowBip38 = function(bool) {
+	this.setBip38Visible = function(bool) {
 		throw new Error("Not implemented");
 	}
 	
