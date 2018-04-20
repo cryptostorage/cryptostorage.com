@@ -3642,6 +3642,7 @@ function CompactPieceRenderer(div, piece, onProgress) {
 				piece: piece,
 				keypairRenderers: keypairRenderers,
 				showLogos: true,
+				spaceBetween: false
 			});
 
 			// done
@@ -3673,7 +3674,7 @@ function CompactPieceRenderer(div, piece, onProgress) {
 					if (config.spaceBetween && config.infoBack) div.append(getSweepInstructionsPage(tickers));
 				}
 				pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-				if (!config.spaceBetween && (piece.getPieceNum() || config.showLogos)) {
+				if (piece.getPieceNum() || config.showLogos) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
 					if (config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));

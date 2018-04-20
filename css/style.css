@@ -1594,6 +1594,12 @@ input[type='checkbox'][disabled] +label {
 	border-bottom: 2px solid green;
 }
 
+.keypair_div_spaced {
+	border-bottom: 2px solid;
+	border-color: green;
+	margin-bottom: 34px;
+}
+
 .keypair_qr {
 	width: 90px;
 	height: 90px;
