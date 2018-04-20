@@ -2924,6 +2924,7 @@ function EditorPassphraseController(div, editorController, onChange) {
 		bip38Checkbox = new CheckboxController(bip38Div, "Use BIP38 for BTC & BCH", bip38Tooltip);
 		bip38Checkbox.render();
 		bip38Checkbox.setEnabled(false);
+		bip38Div.hide();
 		
 		// password error tooltip
 		tippy(passphraseInput.get(0), {
@@ -2953,6 +2954,9 @@ function EditorPassphraseController(div, editorController, onChange) {
 		
 		// register text input
 		passphraseInput.on("input", function(e) { setPassphraseError(false); });
+		
+		// done
+		if (onDone) onDone(div);
 	}
 	
 	this.reset = function() {
