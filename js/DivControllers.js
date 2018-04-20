@@ -2679,7 +2679,7 @@ function EditorController(div, config) {
 		splitController.render();
 		
 		// load body controller
-		bodyController = new EditorBodyController($("<div class='editor_body flex_vertical flex_align_center'>").appendTo(div));
+		bodyController = new EditorBodyController($("<div>").appendTo(div));
 		new LoadController(bodyController).render();
 		
 		// done rendering
@@ -2832,6 +2832,10 @@ function EditorController(div, config) {
 		DivController.call(this, div);
 		
 		this.render = function(onDone) {
+			
+			// div setup
+			div.empty();
+			div.addClass("editor_body flex_vertical flex_align_center");
 			
 			// load dependencies TODO: load correct dependencies
 			LOADER.load(AppUtils.getAppDependencies(), function(err) {
