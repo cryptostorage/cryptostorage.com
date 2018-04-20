@@ -2934,7 +2934,7 @@ function EditorPassphraseController(div, onChange) {
 		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseInputVertical);
 		
 		// bip38 checkbox
-		var bip38Checkbox = new CheckboxController($("<div>").appendTo(passphraseInputVertical), "Use BIP38 for BTC & BCH", "this is my label");
+		var bip38Checkbox = new CheckboxController($("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical), "Use BIP38 for BTC & BCH", "this is my label");
 		bip38Checkbox.render();
 		bip38Checkbox.setEnabled(false);
 		
@@ -3625,7 +3625,7 @@ function CheckboxController(div, label, tooltip) {
 		
 		// div setup
 		div.empty();
-		div.addClass("editor_bip38_div flex_horizontal flex_align_center");
+		div.addClass("flex_horizontal flex_align_center");
 		
 		// build div
 		var id = uuidv4();
