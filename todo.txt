@@ -18,6 +18,7 @@ editor:
 	split lines bolder
 	tweak floating button colors
 	click outside dropdown only works if click within container
+	keypair labels arrows
 
 designer:
 passphrase confirmation
