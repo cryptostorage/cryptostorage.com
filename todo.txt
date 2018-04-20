@@ -2,20 +2,22 @@ v0.3.0
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient
-click outside dropdown only works if click within container
 interoperability disclaimer if passphrase/split checked
-split lines bolder
 precise static and dynamic dependencies
 direct link to editor
-cancel button on generate
-tweak floating button colors
 piece incompatibilities: shareNum, currencies -> keypairs
-prolly change CryptoPiece and CryptoKeypair to take in single config
-ability to cancel encryption / decryption
 increase test repeat
-standalone generation page
-progress bar not correct
 optimize private functions for performance
+editor:
+	generate disabled, cancel enabled during generation
+	floating forms bottom center if not enough width
+	copied tooltip
+	bip38 support
+	dev mode one of each button
+	split lines bolder
+	tweak floating button colors
+	click outside dropdown only works if click within container
+	save/print pop-ups
 
 designer:
 passphrase confirmation
