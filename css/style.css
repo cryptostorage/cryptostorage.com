@@ -2097,3 +2097,14 @@ input[type='checkbox'][disabled] +label {
 .btn_disabled:active {
 	background-color: grey;
 }
+
+.fullscreen_div {
+	height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    position: fixed;
+    background-color: rgb(0, 0, 0, .5);
+    z-index: 10000;
+}

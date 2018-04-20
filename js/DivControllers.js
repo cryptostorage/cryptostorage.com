@@ -2742,6 +2742,16 @@ function EditorController(div, config) {
 	}
 	
 	this.save = function() {
+		var fullDiv = $("<div class='fullscreen_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
+		fullDiv.click(function() {
+			fullDiv.detach();
+		});
+		var saveDiv = $("<div class='flex_horizontal flex_align_center flex_justify_center' style='padding: 20px; width:200px; height:200px; background-color:white; opacity:1; z-index:10001'>").appendTo(fullDiv);
+		saveDiv.append("Save stuff goes here");
+		saveDiv.click(function(e) {
+			e.stopPropagation();
+		});
+		
 		console.log("EditorController.save()");
 	}
 	
