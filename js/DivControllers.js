@@ -3609,10 +3609,6 @@ function CompactPieceRenderer(div, piece, onProgress) {
 	
 	this.render = function(onDone) {
 		
-		// div setup
-		div.empty();
-		div.addClass("compact_piece_div flex_vertical");
-		
 		// compute weights
 		var doneWeight = 0;
 		var totalWeight  = 0;
@@ -3641,13 +3637,62 @@ function CompactPieceRenderer(div, piece, onProgress) {
 			assertNull(err);
 			keypairRenderers = _keypairRenderers;
 			
-			for (var i = 0; i < keypairRenderers.length; i++) {
-				div.append(keypairRenderers[i].getDiv());
-			}
-			
+			// render keypairs to pages
+			renderPages({
+				piece: piece,
+				keypairRenderers: keypairRenderers,
+				showLogos: true,
+			});
+
 			// done
 			if (onDone) onDone(div);
 		});
+	}
+	
+	function renderPages(config) {
+		
+		// div setup
+		div.empty();
+		div.addClass("piece_div");
+		
+		// compute pairs per page
+		var pairsPerPage = config.spaceBetween ? 6 : 7;
+
+		// setup pages and collect functions to render keys
+		var pageDiv;
+		var funcs = [];
+		var tickers;
+		for (var i = 0; i < piece.getKeypairs().length; i++) {
+			
+			// add new page
+			if (i % pairsPerPage === 0) {
+				if (i > 0) {
+					div.append($("<div>"));
+					tickers = [];
+					for (var j = 0; j < pairsPerPage; j++) tickers.push(config.piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
+					if (config.spaceBetween && config.infoBack) div.append(getSweepInstructionsPage(tickers));
+				}
+				pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+				if (!config.spaceBetween && (piece.getPieceNum() || config.showLogos)) {
+					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
+					headerDiv.append($("<div class='piece_page_header_left'>"));
+					if (config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
+					if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
+				}
+			}
+			
+			// add keypair to page
+			pageDiv.append(config.keypairRenderers[i].getDiv());
+			if (config.spaceBetween) config.keypairRenderers[i].getDiv().addClass("key_div_spaced");
+		}
+		
+		// add cryptostoarge logos
+		var numPairsLastPage = piece.getKeypairs().length % pairsPerPage;
+		if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
+		tickers = [];
+		for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.getKeypairs()[piece.getKeypairs().length - (numPairsLastPage - i)].getPlugin().getTicker());
+		if (config.spaceBetween && config.infoBack) div.append(getSweepInstructionsPage(tickers));
 	}
 }
 inheritsFrom(CompactPieceRenderer, DivController);

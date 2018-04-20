@@ -380,7 +380,7 @@ function TestCrypto() {
 				else throw new Error("Invalid progress percent: " + percent);
 				
 				// assert percent increases
-				assertTrue(percent >= lastPercent);
+				assertTrue(percent >= lastPercent, "Percent " + percent + " is less than last percent " + lastPercent);
 				lastPercent = percent;
 				
 				// test label

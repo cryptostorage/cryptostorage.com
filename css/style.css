@@ -1176,6 +1176,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_body {
+	padding-top: 40px;
 	width: 750px;
 }
 
@@ -1365,7 +1366,7 @@ input[type='checkbox'][disabled] +label {
 
 .export_pieces_div {
 	background-color: white;
-	padding: 40px 0 40px 0;
+	padding: 0 0 40px 0;
 }
 
 .piece_div {

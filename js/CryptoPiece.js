@@ -425,10 +425,11 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 			if (config.rendererClass) {
 				
 				// collect renderers
+				var numRendered = 0;
 				var renderers = [];
 				for (var i = 0; i < pieces.length; i++) {
 					renderers.push(new config.rendererClass(null, pieces[i], function(percent, label) {
-						if (onProgress) onProgress((doneWeight + percent * (renderWeight / pieces.length)) / totalWeight, label);
+						if (onProgress) onProgress((doneWeight + (numRendered + percent) * renderWeight / pieces.length) / totalWeight, label);
 					}));
 				}
 				
@@ -440,8 +441,7 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 				function renderFunction(renderer) {
 					return function(onDone) {
 						renderer.render(function(div) {
-							doneWeight += renderWeight / pieces.length;
-							if (Math.abs(1 - doneWeight) < .000001) doneWeight = totalWeight;	// prevent precision error
+							numRendered++;
 							onDone(null, renderer);
 						});
 					}
@@ -449,11 +449,11 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 				
 				// render async
 				async.series(renderFuncs, function(err, renderers) {
-					if (err) onDone(err);
-					else {
-						assertEquals(totalWeight, doneWeight);
-						onDone(null, pieces, renderers);
-					}
+					assertNull(err);
+					doneWeight += renderWeight;
+					assertEquals(totalWeight, doneWeight);
+					assertEquals(numRendered, pieces.length);
+					onDone(null, pieces, renderers);
 				});
 			} else {
 				assertEquals(doneWeight, totalWeight);
