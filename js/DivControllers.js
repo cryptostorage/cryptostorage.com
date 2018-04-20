@@ -2646,6 +2646,7 @@ function EditorController(div, config) {
 	var that = this;
 	var passphraseController
 	var splitController;
+	var bodyController;
 	var progressDiv;
 	var progressBar;
 	var progressLabel;
@@ -2654,6 +2655,8 @@ function EditorController(div, config) {
 	var currenciesDiv;
 	var currenciesController;
 	var actionsController;
+	var pieces;
+	var pieceRenderers;
 	
 	this.render = function(onDone) {
 		
@@ -2675,12 +2678,24 @@ function EditorController(div, config) {
 		splitController = new EditorSplitController($("<div>").appendTo(passphraseSplitDiv), that.update);
 		splitController.render();
 		
-		// load body
-		var bodyDiv = $("<div class='editor_body flex_vertical flex_align_center'>").appendTo(div);
-		new LoadController(new EditorBodyController(bodyDiv)).render();
+		// load body controller
+		bodyController = new EditorBodyController($("<div class='editor_body flex_vertical flex_align_center'>").appendTo(div));
+		new LoadController(bodyController).render();
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	this.getPieces = function() {
+		return pieces;
+	}
+	
+	this.getPieceRendereres = function() {
+		return pieceRenderers;
+	}
+	
+	this.getCurrenciesController = function() {
+		return currenciesController;
 	}
 	
 	this.validate = function() {
@@ -2702,21 +2717,23 @@ function EditorController(div, config) {
 		
 		// generate keys
 		piecesDiv.empty();
-		CryptoPiece.generatePieces(getGenerateConfig(), setGenerateProgress, function(err, pieces, pieceRenderers) {
+		CryptoPiece.generatePieces(getGenerateConfig(), setGenerateProgress, function(err, _pieces, _pieceRenderers) {
 			if (err) throw err;
+			pieces = _pieces;
 			assertArray(pieces);
+			assertTrue(pieces.length > 0);
+			pieceRenderers = _pieceRenderers;
 			assertArray(pieceRenderers);
+			assertTrue(pieceRenderers.length > 0);
 			progressDiv.hide();
-			currenciesDiv.show();
-			for (var i = 0; i < pieceRenderers.length; i++) {
-				piecesDiv.append(pieceRenderers[i].getDiv());
-			}
-			piecesDiv.show();
+			that.update();
 			if (onDone) onDone();
 		});
 	}
 	
 	this.reset = function() {
+		pieces = null;
+		pieceRenderers = null;
 		piecesDiv.empty();
 		piecesDiv.hide();
 		passphraseController.reset();
@@ -2740,13 +2757,10 @@ function EditorController(div, config) {
 	}
 	
 	this.update = function() {
+		if (bodyController) bodyController.update();
 		if (passphraseController) passphraseController.update();
 		if (splitController) splitController.update();
 		if (actionsController) actionsController.update();
-	}
-	
-	this.getCurrenciesController = function() {
-		return currenciesController;
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -2857,6 +2871,16 @@ function EditorController(div, config) {
 					if (onDone) onDone(div);
 				}
 			});
+		}
+		
+		this.update = function() {
+			currenciesDiv.show();
+			if (isArray(pieceRenderers) && pieceRenderers.length > 0) {
+				piecesDiv.empty();
+				for (var i = 0; i < pieceRenderers.length; i++) piecesDiv.append(pieceRenderers[i].getDiv());
+				piecesDiv.show();
+			}
+			else piecesDiv.hide();
 		}
 	}
 	inheritsFrom(EditorBodyController, DivController);
@@ -3568,6 +3592,9 @@ function EditorActionsController(div, editorController) {
 		
 		// reset button
 		btnReset.show();
+		
+		// print and save buttons
+		editorController.getPieces() ? savePrintDiv.show() : savePrintDiv.hide();
 	}
 }
 inheritsFrom(EditorActionsController, DivController);
