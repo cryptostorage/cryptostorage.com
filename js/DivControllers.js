@@ -2975,15 +2975,14 @@ function EditorPassphraseController(div, editorController, onChange) {
 	}
 	
 	this.update = function() {
-		if (editorController.getCurrenciesController()) {
-			that.setBip38Visible(editorController.getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]));
-		}
 		if (that.getUsePassphrase()) {
 			passphraseInput.removeAttr("disabled")
 			bip38Checkbox.setEnabled(true);
+			if (editorController.getCurrenciesController()) that.setBip38Visible(editorController.getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]));
 		} else {
 			passphraseInput.attr("disabled", "disabled");
 			bip38Checkbox.setEnabled(false);
+			that.setBip38Visible(false);
 		}
 	}
 	
