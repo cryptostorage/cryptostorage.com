@@ -2774,82 +2774,37 @@ function EditorController(div, config) {
 		assertFalse(that.hasFormError());
 		var config = {};
 		
-		// keypairs
+		// set keypairs
 		config.keypairs = currenciesController.getConfig();	// TODO: rename to something better
 		
-		// encryption config
+		// set passphrase
 		if (passphraseController.getUsePassphrase()) {
 			config.passphrase = passphraseController.getPassphrase();
 		}
+		
+		// set keypair encryption
 		for (var i = 0; i < config.keypairs.length; i++) {
 			var keypair = config.keypairs[i];
-			keypair.encryption = passphraseController.getUsePassphrase() ? AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
+			if (passphraseController.getUsePassphrase()) {
+				if ((keypair.ticker === "BTC" || keypair.ticker === "BCH") && passphraseController.getBip38Checkbox().isChecked()) {
+					keypair.encryption = AppUtils.EncryptionScheme.BIP38;
+				} else {
+					keypair.encryption = AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0]
+				}
+			} else {
+				keypair.encryption = null;
+			}
 		}
 
-		// split config
+		// set split config
 		if (splitController.getUseSplit()) {
 			config.numPieces = splitController.getNumPieces();
 			config.minPieces = splitController.getMinPieces();
 		}
 		
-		// piece renderer
+		// set piece renderer class
 		config.rendererClass = CompactPieceRenderer;
-
 		return config;
-	}
-	
-	function getKeyGenConfig() {
-		assertFalse(that.hasFormError());
-		var keyGenConfig = {};
-		
-		// currencies config
-		keyGenConfig.currencies = currenciesController.getConfig();
-		
-		// encryption config
-		if (passphraseController.getUsePassphrase()) {
-			keyGenConfig.passphrase = passphraseController.getPassphrase();
-			keyGenConfig.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
-		}
-		for (var i = 0; i < keyGenConfig.currencies.length; i++) {
-			var currency = keyGenConfig.currencies[i];
-			currency.encryption = passphraseController.getUsePassphrase() ? AppUtils.getCryptoPlugin(currency.ticker).getEncryptionSchemes()[0] : null;	// TODO: bip38
-		}
-
-		// split config
-		if (splitController.getUseSplit()) {
-			keyGenConfig.numPieces = splitController.getNumPieces();
-			keyGenConfig.minPieces = splitController.getMinPieces();
-		}
-
-		// validate and return
-		validateKeyGenConfig(keyGenConfig);
-		return keyGenConfig;
-		
-		function validateKeyGenConfig(config) {
-			assertInitialized(config);
-			assertObject(config);
-			if (config.passphrase) {
-				assertString(config.passphrase, "config.passphrase is not a string");
-				assertTrue(config.passphrase.length >= 7, "config.passphrase.length is not >= 7");
-				assertDefined(config.verifyEncryption, "config.verifyEncryption is not defined");
-			}
-			if (config.numPieces || config.minPieces) {
-				assertNumber(config.numPieces, "config.numPieces is not a number");
-				assertNumber(config.minPieces, "config.minPieces is not a number");
-				assertTrue(config.numPieces >= 2, "config.numPieces is not >= 2");
-				assertTrue(config.minPieces >= 2, "config.minPieces is not >= 2");
-				assertTrue(config.minPieces <= config.numPieces, "config.minPieces is not <= config.numPieces");
-			}
-			assertInitialized(config.currencies, "config.currencies is not initialized");
-			assertTrue(config.currencies.length >= 1, "config.currencies.length is not >= 1");
-			for (var i = 0; i < config.currencies.length; i++) {
-				var currency = config.currencies[i];
-				assertDefined(currency.ticker, "config.currencies[" + i + "].ticker is not defined");
-				assertDefined(currency.numKeys, "config.currencies[" + i + "].numKeys is not defined");
-				assertDefined(currency.encryption, "config.currencies[" + i + "].encryption is not defined");
-				if (config.passphrase) assertInitialized(currency.encryption, "config.currencies[" + i + "].encryption is not initialized");
-			}
-		}
 	}
 	
 	/**
@@ -2917,6 +2872,7 @@ function EditorPassphraseController(div, onChange) {
 	var passphraseCheckbox;
 	var passphraseInput;
 	var bip38Div;
+	var bip38Checkbox;
 	var formError;
 
 	this.render = function(onDone) {
@@ -2934,7 +2890,9 @@ function EditorPassphraseController(div, onChange) {
 		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseInputVertical);
 		
 		// bip38 checkbox
-		var bip38Checkbox = new CheckboxController($("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical), "Use BIP38 for BTC & BCH", "this is my label");
+		var bip38Tooltip = "<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys with a passphrase.<br><br>" +
+											 "BIP38 requires significantly more time and energy to encrypt/decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default encryption scheme), which makes it more secure against brute-force attacks.";
+		bip38Checkbox = new CheckboxController($("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical), "Use BIP38 for BTC & BCH", bip38Tooltip);
 		bip38Checkbox.render();
 		bip38Checkbox.setEnabled(false);
 		
@@ -2981,7 +2939,13 @@ function EditorPassphraseController(div, onChange) {
 	}
 	
 	this.update = function() {
-		that.getUsePassphrase() ? passphraseInput.removeAttr("disabled") : passphraseInput.attr("disabled", "disabled");
+		if (that.getUsePassphrase()) {
+			passphraseInput.removeAttr("disabled")
+			bip38Checkbox.setEnabled(true);
+		} else {
+			passphraseInput.attr("disabled", "disabled");
+			bip38Checkbox.setEnabled(false);
+		}
 	}
 	
 	this.getUsePassphrase = function() {
@@ -3004,8 +2968,8 @@ function EditorPassphraseController(div, onChange) {
 		bool ? bip38Div.show() : bip38Div.hide();
 	}
 	
-	this.getUseBip38 = function() {
-		throw new Error("Not implemented");
+	this.getBip38Checkbox = function() {
+		return bip38Checkbox;
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
@@ -3484,10 +3448,16 @@ function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorCha
 		}
 	}
 	
-	this.hasCurrencySelected = function(ticker) {
-		assertInitialized(ticker);
+	/**
+	 * Indicates if any of the given cryptos are selected.
+	 */
+	this.hasCurrenciesSelected = function(tickers) {
+		tickers = listify(tickers);
+		assertTrue(tickers.length > 0);
 		for (var i = 0; i < currencyInputs.length; i++) {
-			if (currencyInputs[i].getSelectedPlugin() && currencyInputs[i].getSelectedPlugin().getTicker() === ticker) return true;
+			for (var j = 0; j < tickers.length; j++) {
+				if (currencyInputs[i].getSelectedPlugin() && currencyInputs[i].getSelectedPlugin().getTicker() === tickers[j]) return true;
+			}
 		}
 		return false;
 	};
