@@ -9,9 +9,9 @@ piece incompatibilities: shareNum, currencies -> keypairs
 increase test repeat
 optimize private functions for performance
 editor:
+	bip38 support
 	generate disabled, cancel enabled during generation
 	save/print pop-ups
-	bip38 support
 	floating forms bottom center if not enough width
 	copied tooltip
 	dev mode one of each button
