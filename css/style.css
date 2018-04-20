@@ -1113,11 +1113,18 @@ input[type='checkbox'][disabled] +label {
 	margin: 10px 20px 10px 20px;
 }
 
+.editor_passphrase_div {
+	white-space: nowrap;
+}
+
+.editor_passphrase_vertical {
+	margin-left: 25px;
+}
+
 .editor_passphrase_input {
 	padding: 5px;
 	border: 2.5px solid;
 	color: black;
-	margin-left: 25px;
 }
 
 .split_input_div {

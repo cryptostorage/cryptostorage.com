@@ -2922,13 +2922,14 @@ function EditorPassphraseController(div, onChange) {
 		
 		// div setup
 		div.empty();
-		div.addClass("flex_horizonal flex_justify_start");
+		div.addClass("editor_passphrase_div flex_horizontal flex_align_center flex_justify_start");
 		
 		// passphrase input
 		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(div);
 		var passphraseCheckboxLabel = $("<label class='user_select_none' for='passphrase_checkbox'>").appendTo(div);
 		passphraseCheckboxLabel.html("Use Passphrase?");
-		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(div);
+		var passphraseInputVertical = $("<div class='editor_passphrase_vertical flex_vertical flex_justify_center'>").appendTo(div);
+		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseInputVertical);
 		
 		// password error tooltip
 		tippy(passphraseInput.get(0), {
@@ -2992,6 +2993,14 @@ function EditorPassphraseController(div, onChange) {
 	
 	this.setPassphrase = function(passphrase) {
 		passphraseInput.val(passphrase);
+	}
+	
+	this.setShowBip38 = function(bool) {
+		throw new Error("Not implemented");
+	}
+	
+	this.getUseBip38 = function() {
+		throw new Error("Not implemented");
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
