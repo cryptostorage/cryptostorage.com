@@ -4029,14 +4029,24 @@ KeypairRenderer.QR_CONFIG = {
  * 					decoded.keypairId is the keypair identifier to render
  */
 KeypairRenderer.decodeKeypair = function(keypair, config) {
+	
+	// default render config
+	var defaultConfig = {
+		includePublic: true,
+		includePrivate: true,	
+		showLogo: true
+	};
+	config = Object.assign(defaultConfig, config);
+	
+	// decode
 	var decoded = {};
-	decoded.cryptoLogo = keypair.getPlugin().getLogo();
+	decoded.cryptoLogo = config.showLogo ? keypair.getPlugin().getLogo() : null;
 	decoded.cryptoLabel = keypair.getPlugin().getName();
-	decoded.keypairId = config ? config.keypairId : undefined;
+	decoded.keypairId = config.keypairId;
 	
 	// initialize left values
 	if (keypair.isPublicApplicable()) {
-		decoded.leftLabel = "Public Address";
+		decoded.leftLabel = "\u25C4 Public Address";
 		if (keypair.getPublicAddress()) {
 			decoded.leftValueCopyable = true;
 			decoded.leftValue = keypair.getPublicAddress();
@@ -4054,6 +4064,7 @@ KeypairRenderer.decodeKeypair = function(keypair, config) {
 	
 	// initialize right values
 	decoded.rightLabel = keypair.getPlugin().getPrivateLabel();
+	decoded.rightLabel += " " + (config.includePrivate ? keypair.isSplit() ? "(split)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
 	decoded.rightValue = keypair.getPrivateWif();
 	decoded.rightValueCopyable = isInitialized(keypair.getPrivateWif());
 	return decoded;
