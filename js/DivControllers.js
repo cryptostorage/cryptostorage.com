@@ -2668,7 +2668,7 @@ function EditorController(div, config) {
 		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal flex_align_center flex_justify_center'>").appendTo(headerDiv);
 		
 		// passphrase controller
-		passphraseController = new EditorPassphraseController($("<div>").appendTo(passphraseSplitDiv), that.update);
+		passphraseController = new EditorPassphraseController($("<div>").appendTo(passphraseSplitDiv), that, that.update);
 		passphraseController.render();
 		
 		// split controller
@@ -2743,6 +2743,10 @@ function EditorController(div, config) {
 		if (passphraseController) passphraseController.update();
 		if (splitController) splitController.update();
 		if (actionsController) actionsController.update();
+	}
+	
+	this.getCurrenciesController = function() {
+		return currenciesController;
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -2865,7 +2869,7 @@ inheritsFrom(EditorController, DivController);
  * @param div is the div to render to
  * @param onChange() is invoked when the state changes
  */
-function EditorPassphraseController(div, onChange) {
+function EditorPassphraseController(div, editorController, onChange) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -2890,9 +2894,10 @@ function EditorPassphraseController(div, onChange) {
 		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseInputVertical);
 		
 		// bip38 checkbox
+		bip38Div = $("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical);
 		var bip38Tooltip = "<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys with a passphrase.<br><br>" +
 											 "BIP38 requires significantly more time and energy to encrypt/decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default encryption scheme), which makes it more secure against brute-force attacks.";
-		bip38Checkbox = new CheckboxController($("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical), "Use BIP38 for BTC & BCH", bip38Tooltip);
+		bip38Checkbox = new CheckboxController(bip38Div, "Use BIP38 for BTC & BCH", bip38Tooltip);
 		bip38Checkbox.render();
 		bip38Checkbox.setEnabled(false);
 		
@@ -2919,6 +2924,9 @@ function EditorPassphraseController(div, onChange) {
 			if (onChange) onChange();
 		});
 		
+		// initial state
+		formError = false;
+		
 		// register text input
 		passphraseInput.on("input", function(e) { setPassphraseError(false); });
 	}
@@ -2939,6 +2947,9 @@ function EditorPassphraseController(div, onChange) {
 	}
 	
 	this.update = function() {
+		if (editorController.getCurrenciesController()) {
+			that.setBip38Visible(editorController.getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]));
+		}
 		if (that.getUsePassphrase()) {
 			passphraseInput.removeAttr("disabled")
 			bip38Checkbox.setEnabled(true);
@@ -3375,6 +3386,7 @@ function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorCha
 		var onInputsChangeBkp = onInputsChange;
 		onInputsChange = null;	// disable notifications
 		currencyInputs = [];
+		formError = false;
 		that.reset();
 		onInputsChange = onInputsChangeBkp;
 		
