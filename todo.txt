@@ -10,14 +10,14 @@ increase test repeat
 optimize private functions for performance
 editor:
 	generate disabled, cancel enabled during generation
+	save/print pop-ups
+	bip38 support
 	floating forms bottom center if not enough width
 	copied tooltip
-	bip38 support
 	dev mode one of each button
 	split lines bolder
 	tweak floating button colors
 	click outside dropdown only works if click within container
-	save/print pop-ups
 
 designer:
 passphrase confirmation
