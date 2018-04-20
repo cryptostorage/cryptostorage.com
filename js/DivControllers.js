@@ -2926,17 +2926,17 @@ function EditorPassphraseController(div, onChange) {
 		div.addClass("editor_passphrase_div flex_horizontal flex_align_center flex_justify_start");
 		
 		// passphrase checkbox
-		passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(div);
-		var passphraseCheckboxLabel = $("<label class='user_select_none' for='passphrase_checkbox'>").appendTo(div);
-		passphraseCheckboxLabel.html("Use Passphrase?");
+		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?");
+		passphraseCheckbox.render();
 		
 		// passphrase input
 		var passphraseInputVertical = $("<div class='editor_passphrase_vertical flex_vertical flex_justify_center'>").appendTo(div);
 		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseInputVertical);
 		
 		// bip38 checkbox
-		var bip38CheckboxCtl = new CheckboxController($("<div>").appendTo(passphraseInputVertical), "Use BIP38 for BTC & BCH", "this is my label");
-		bip38CheckboxCtl.render();
+		var bip38Checkbox = new CheckboxController($("<div>").appendTo(passphraseInputVertical), "Use BIP38 for BTC & BCH", "this is my label");
+		bip38Checkbox.render();
+		bip38Checkbox.setEnabled(false);
 		
 		// password error tooltip
 		tippy(passphraseInput.get(0), {
@@ -2955,11 +2955,9 @@ function EditorPassphraseController(div, onChange) {
 		
 		// register clicks
 		passphraseCheckbox.click(function() {
-			if (passphraseCheckbox.prop("checked")) passphraseInput.focus();
-			else {
-				passphraseInput.val("");
-				that.validate();
-			}
+			bip38Checkbox.setEnabled(passphraseCheckbox.isChecked());
+			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
+			else that.validate();
 			if (onChange) onChange();
 		});
 		
@@ -2968,7 +2966,7 @@ function EditorPassphraseController(div, onChange) {
 	}
 	
 	this.reset = function() {
-		passphraseCheckbox.prop("checked", false);
+		passphraseCheckbox.setChecked(false);
 		passphraseInput.val("");
 		that.validate();
 		that.update();
@@ -2987,11 +2985,11 @@ function EditorPassphraseController(div, onChange) {
 	}
 	
 	this.getUsePassphrase = function() {
-		return passphraseCheckbox.prop("checked");
+		return passphraseCheckbox.isChecked();
 	}
 	
 	this.setUsePassphrase = function(checked) {
-		passphraseCheckbox.prop("checked", checked);
+		passphraseCheckbox.setChecked(checked);
 	}
 	
 	this.getPassphrase = function() {
@@ -3658,24 +3656,38 @@ function CheckboxController(div, label, tooltip) {
 		if (onDone) onDone(div);
 	}
 	
+	this.click = function(callback) {
+		return checkbox.click(callback);
+	}
+	
 	this.getCheckbox = function() {
 		return checkbox;
 	}
 	
 	this.setChecked = function(bool) {
-		throw new Error("Not implemented");
+		assertBoolean(bool);
+		checkbox.prop("checked", bool);
 	}
 	
 	this.isChecked = function() {
-		throw new Error("Not implemented");
+		return checkbox.prop("checked");
 	}
 	
 	this.setEnabled = function(bool) {
-		throw new Error("Not implemented");
+		assertBoolean(bool);
+		if (bool) {
+			checkbox.removeAttr("disabled");
+			infoImg.removeClass("info_tooltip_img_disabled");
+			infoImg.get(0)._tippy.enable();
+		} else {
+			checkbox.attr("disabled", "disabled");
+			infoImg.addClass("info_tooltip_img_disabled");
+			infoImg.get(0)._tippy.disable();
+		}
 	}
 	
 	this.isEnabled = function() {
-		throw new Error("Not implemented");
+		return isInitialized(checkbox.attr("disabled"));
 	}
 }
 inheritsFrom(EditorActionsController, DivController);

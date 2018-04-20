@@ -1129,7 +1129,7 @@ input[type='checkbox'][disabled] +label {
 
 .editor_bip38_div * {
 	font-size: 20px;
-	margin-top: 5px;
+	margin-top: 8px;
 }
 
 .split_input_div {
@@ -1960,6 +1960,14 @@ input[type='checkbox'][disabled] +label {
 
 .info_tooltip_img:hover {
 	cursor: pointer;
+}
+
+.info_tooltip_img_disabled {
+	opacity: 0.5;
+}
+
+.info_tooltip_img_disabled:hover {
+	cursor: auto;
 }
 
 .refresh_img {
