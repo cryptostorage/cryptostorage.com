@@ -3640,11 +3640,19 @@ function EditorSaveController(div, editorController) {
 		
 		// checkboxes
 		var checkboxesDiv = $("<div class='flex_horizontal flex_justify_center'>").appendTo(div);
-		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Include public addresses").render();
-		includePrivateChecbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Include private keys").render();
+		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save public addresses").render();
+		includePrivateChecbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
+		
+		// save as selector
+		var saveSelectorDiv = $("<div class='save_selector_div'>").appendTo(div);
+		saveSelectorDiv.append("Save as");
 		
 		// done
 		if (onDone) onDone(div);
+	}
+	
+	this.getSaveType = function() {
+		return "JSON";	// TODO: implement this
 	}
 }
 inheritsFrom(EditorSaveController, DivController);
