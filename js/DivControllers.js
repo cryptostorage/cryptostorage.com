@@ -3203,6 +3203,50 @@ function EditorSplitController(div, onChange) {
 inheritsFrom(EditorSplitController, DivController);
 
 /**
+ * Controls a dropdown selector.
+ * 
+ * @param div is the div to render to
+ */
+function DropdownController(div, ddslickConfig) {
+	DivController.call(this, div);
+	
+	var callbackFn;
+
+	this.render = function(onDone) {
+		throw new Error("Not implemented");
+	}
+	
+	this.reset = function() {
+		throw new Error("Not implemented");
+	}
+	
+	this.getSelectedText = function() {
+		throw new Error("Not implemented");
+	}
+	
+	this.getSelectedIndex = function() {
+		throw new Error("Not implemented");
+	}
+	
+	this.setSelectedIndex = function(index) {
+		throw new Error("Not implemented");
+	}
+	
+	this.getSelectionOptions = function() {
+		throw new Error("Not implemented");
+	}
+	
+	this.setEnabled = function(bool) {
+		throw new Error("Not implemented");
+	}
+	
+	this.onSelected = function(_callbackFn) {
+		callbackFn = _callbackFn;
+	}
+}
+inheritsFrom(DropdownController, DivController);
+
+/**
  * Manages a single currency input.
  * 
  * @param div is the div to render to
