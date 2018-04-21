@@ -3761,7 +3761,7 @@ function CompactPieceRenderer(div, piece, onProgress) {
 		// collect functions to render keypairs
 		var renderFuncs = [];
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			renderFuncs.push(renderFunc(new KeypairRenderer($("<div>"), piece.getKeypairs()[i])));
+			renderFuncs.push(renderFunc(new KeypairRenderer($("<div>"), piece.getKeypairs()[i], "#" + (i + 1))));
 		}
 		function renderFunc(keypairRenderer) {
 			return function(onDone) {
@@ -3914,8 +3914,9 @@ CompactPieceRenderer.getRenderWeight = function(config) {
  * 
  * @param div is the div to render to
  * @param keypair is the keypair to render
+ * @param id is an id to render with the keypair (optional)
  */
-function KeypairRenderer(div, keypair) {
+function KeypairRenderer(div, keypair, id) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -3948,7 +3949,7 @@ function KeypairRenderer(div, keypair) {
 		// keypair id
 		var idDiv = $("<div class='keypair_center_id'>").appendTo(keypairCenterDiv);
 		if (decoded.leftLabel) idDiv.css("position", "absolute");
-		idDiv.html(decoded.keypairId);
+		if (id) idDiv.html(id);
 		
 		// left label and value
 		if (decoded.leftLabel) {

@@ -1680,7 +1680,6 @@ input[type='checkbox'][disabled] +label {
 	font-size: 13px;
 	font-family: monospace;
 	word-break: break-all;
-	z-index: 1000;
 }
 
 .keypair_center_div {
