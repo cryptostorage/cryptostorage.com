@@ -3788,6 +3788,32 @@ function CompactPieceRenderer(div, piece, onProgress) {
 				pageBreaks: false,
 				infoBack: false
 			});
+			
+			// copy keys to clipboard
+			new Clipboard(".copyable", {
+				text: function(trigger) {
+					return $(trigger).html();
+				}
+			});
+			
+			// copied tooltip
+			div.find(".copyable").each(function(i, copyable) {
+				tippy(copyable, {
+					arrow : true,
+					html : $("<div>Copied!</div>").get(0),
+					interactive : true,
+					placement : "top",
+					theme : 'translucent',
+					trigger : "click",
+					distance : 10,
+					arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+					onShow : function() {
+						setTimeout(function() {
+							copyable._tippy.hide();
+						}, 2000)
+					}
+				});
+			});
 
 			// done
 			if (onDone) onDone(div);
