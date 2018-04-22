@@ -1534,6 +1534,112 @@ function FormController(div) {
 inheritsFrom(FormController, DivController);
 
 /**
+ * Controls a dropdown selector.
+ * 
+ * @param div is the div to render to
+ * @param ddslickConfig is config to pass to ddslick
+ * @param defaultText is the default dropdown selection, selects index 0 if not given
+ */
+function DropdownController(div, ddslickConfig, defaultText) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var selectorContainer;
+	var selector;
+	var selectorId;
+	var selectorDisabler;
+	var onSelectedFn;
+
+	this.render = function(onDone) {
+		
+		// verify config
+		assertObject(ddslickConfig);
+		assertArray(ddslickConfig.data);
+		assertTrue(ddslickConfig.data.length > 0);
+		for (var i = 0; i < ddslickConfig.data.length; i++) {
+			assertInitialized(ddslickConfig.data[i].text);
+		}
+		
+		// customize config
+		var defaultConfig = {
+				background: "white",
+				imagePosition: "left",
+				width:'100%',
+		}
+		ddslickConfig = Object.assign(defaultConfig, ddslickConfig);
+		ddslickConfig.onSelected = function(selection) {
+			if (onSelectedFn) onSelectedFn(selection.selectedIndex);
+		}
+		if (defaultText) {
+			ddslickConfig.selectText = defaultText;
+			ddslickConfig.defaultSelectedIndex = null;
+		}
+		
+		// div setup
+		div.empty();
+		selectorContainer = $("<div class='ddslick_container'>").appendTo(div);
+		
+		// initialize selector
+		selectorId = uuidv4();
+		selector = $("<div id='" + selectorId + "' class='ddslick_selector'>").appendTo(selectorContainer);
+		
+		// initialize disabler		
+		selectorDisabler = $("<div class='ddslick_disabler'>").appendTo(selectorContainer);
+		
+		// initial state
+		that.reset();
+		
+		// done
+		if (onDone) onDone(div);
+		return that;
+	}
+	
+	this.reset = function() {
+		selector.ddslick("destroy");
+		selector = $("#" + selectorId, div);	// ddslick requires id reference
+		selector.ddslick(ddslickConfig);
+		selector = $("#" + selectorId, div);	// ddslick requires reference to be reassigned
+		if (!defaultText) that.setSelectedIndex(0);
+		that.setEnabled(true);
+	}
+	
+	this.getSelectedText = function() {
+		return ddslickConfig.data[currentIndex].text;
+	}
+	
+	this.getSelectedIndex = function() {
+		return currentIndex;
+	}
+	
+	this.setSelectedIndex = function(index) {
+		assertNumber(index);
+		assertTrue(index >= 0);
+		assertTrue(index < ddslickConfig.data.length);
+		selector.ddslick("select", {index: index});
+		currentIndex = index;
+	}
+	
+	this.getSelectorData = function() {
+		return ddslickConfig.data;
+	}
+	
+	this.setEnabled = function(bool) {
+		if (bool) {
+			$("*", selector).removeClass("disabled_text");
+			selectorDisabler.hide();
+		} else {
+			$("*", selector).addClass("disabled_text");
+			selectorDisabler.show();
+		}
+	}
+	
+	this.onSelected = function(_onSelectedFn) {
+		onSelectedFn = _onSelectedFn;
+	}
+}
+inheritsFrom(DropdownController, DivController);
+
+/**
  * Import page.
  */
 function ImportController(div) {
@@ -3206,111 +3312,6 @@ function EditorSplitController(div, onChange) {
 inheritsFrom(EditorSplitController, DivController);
 
 /**
- * Controls a dropdown selector.
- * 
- * @param div is the div to render to
- * @param ddslickConfig is config to pass to ddslick
- * @param defaultText is the default dropdown selection, selects index 0 if not given
- */
-function DropdownController(div, ddslickConfig, defaultText) {
-	DivController.call(this, div);
-	
-	var that = this;
-	var selectorContainer;
-	var selector;
-	var selectorId;
-	var selectorDisabler;
-	var onSelectedFn;
-
-	this.render = function(onDone) {
-		
-		// verify config
-		assertObject(ddslickConfig);
-		assertArray(ddslickConfig.data);
-		assertTrue(ddslickConfig.data.length > 0);
-		for (var i = 0; i < ddslickConfig.data.length; i++) {
-			assertInitialized(ddslickConfig.data[i].text);
-		}
-		
-		// customize config
-		var defaultConfig = {
-				background: "white",
-				imagePosition: "left",
-				width:'100%',
-		}
-		ddslickConfig = Object.assign(defaultConfig, ddslickConfig);
-		ddslickConfig.onSelected = function(selection) {
-			if (onSelectedFn) onSelectedFn(selection.selectedIndex);
-		}
-		if (defaultText) {
-			ddslickConfig.selectText = defaultText;
-			ddslickConfig.defaultSelectedIndex = null;
-		}
-		
-		// div setup
-		div.empty();
-		selectorContainer = $("<div class='ddslick_container'>").appendTo(div);
-		
-		// initialize selector
-		selectorId = uuidv4();
-		selector = $("<div id='" + selectorId + "' class='ddslick_selector'>").appendTo(selectorContainer);
-		
-		// initialize disabler		
-		selectorDisabler = $("<div class='ddslick_disabler'>").appendTo(selectorContainer);
-		
-		// initial state
-		that.reset();
-		
-		// done
-		if (onDone) onDone(div);
-	}
-	
-	this.reset = function() {
-		selector.ddslick("destroy");
-		selector = $("#" + selectorId, div);	// ddslick requires id reference
-		selector.ddslick(ddslickConfig);
-		selector = $("#" + selectorId, div);	// ddslick requires reference to be reassigned
-		if (!defaultText) that.setSelectedIndex(0);
-		that.setEnabled(true);
-	}
-	
-	this.getSelectedText = function() {
-		return ddslickConfig.data[currentIndex].text;
-	}
-	
-	this.getSelectedIndex = function() {
-		return currentIndex;
-	}
-	
-	this.setSelectedIndex = function(index) {
-		assertNumber(index);
-		assertTrue(index >= 0);
-		assertTrue(index < ddslickConfig.data.length);
-		selector.ddslick("select", {index: index});
-		currentIndex = index;
-	}
-	
-	this.getSelectorData = function() {
-		return ddslickConfig.data;
-	}
-	
-	this.setEnabled = function(bool) {
-		if (bool) {
-			$("*", selector).removeClass("disabled_text");
-			selectorDisabler.hide();
-		} else {
-			$("*", selector).addClass("disabled_text");
-			selectorDisabler.show();
-		}
-	}
-	
-	this.onSelected = function(_onSelectedFn) {
-		onSelectedFn = _onSelectedFn;
-	}
-}
-inheritsFrom(DropdownController, DivController);
-
-/**
  * Manages a single currency input.
  * 
  * @param div is the div to render to
@@ -3735,6 +3736,7 @@ function EditorSaveController(div, editorController) {
 	var that = this;
 	var includePublicCheckbox;
 	var includePrivateCheckbox;
+	var dropdownController;
 	var callbackFnSave;
 	var callbackFnCancel;
 	
@@ -3761,7 +3763,11 @@ function EditorSaveController(div, editorController) {
 		for (var i = 0; i < selectorOptions.length; i++) ddslickData.push({text: selectorOptions[i]});
 		var saveSelectorDiv = $("<div>").appendTo(div);
 		var ddslickConfig = {data: ddslickData};
-		new DropdownController(saveSelectorDiv, ddslickConfig).render();
+		dropdownController = new DropdownController(saveSelectorDiv, ddslickConfig).render();
+		dropdownController.onSelected(function(index) {
+			console.log("Index " + index + " selected");
+			dropdownController.setSelectedIndex(1);
+		});
 		
 		// cancel and save buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
