@@ -4100,6 +4100,7 @@ function EditorSaveController(div, pieces) {
 	function setSaveEnabled(bool) {
 		if (bool) {
 			saveBtn.removeClass("btn_disabled");
+			saveBtn.unbind("click");
 			saveBtn.click(function() {
 				save();
 				if (callbackFnSave) callbackFnSave();
