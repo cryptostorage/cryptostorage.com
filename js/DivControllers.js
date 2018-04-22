@@ -3206,42 +3206,103 @@ inheritsFrom(EditorSplitController, DivController);
  * Controls a dropdown selector.
  * 
  * @param div is the div to render to
+ * @param ddslickConfig is config to pass to ddslick
+ * @param defaultText is the default dropdown selection, selects index 0 if not given
  */
-function DropdownController(div, ddslickConfig) {
+function DropdownController(div, ddslickConfig, defaultText) {
 	DivController.call(this, div);
 	
-	var callbackFn;
+	var that = this;
+	var selectorContainer;
+	var selector;
+	var selectorId;
+	var selectorDisabler;
+	var onSelectedFn;
 
 	this.render = function(onDone) {
-		throw new Error("Not implemented");
+		
+		// verify config
+		assertObject(ddslickConfig);
+		assertArray(ddslickConfig.data);
+		assertTrue(ddslickConfig.data.length > 0);
+		for (var i = 0; i < ddslickConfig.data.length; i++) {
+			assertInitialized(ddslickConfig.data[i].text);
+		}
+		
+		// customize config
+		var defaultConfig = {
+				background: "white",
+				imagePosition: "left",
+				width:'100%',
+		}
+		ddslickConfig = Object.assign(defaultConfig, ddslickConfig);
+		ddslickConfig.onSelected = function(selection) {
+			if (onSelectedFn) onSelectedFn(selection.selectedIndex);
+		}
+		if (defaultText) {
+			ddslickConfig.selectText = defaultText;
+			ddslickConfig.defaultSelectedIndex = null;
+		}
+		
+		// div setup
+		div.empty();
+		selectorContainer = $("<div class='ddslick_container'>").appendTo(div);
+		
+		// initialize selector
+		selectorId = uuidv4();
+		selector = $("<div id='" + selectorId + "' class='ddslick_selector'>").appendTo(selectorContainer);
+		
+		// initialize disabler		
+		selectorDisabler = $("<div class='ddslick_disabler'>").appendTo(selectorContainer);
+		
+		// initial state
+		that.reset();
+		
+		// done
+		if (onDone) onDone(div);
 	}
 	
 	this.reset = function() {
-		throw new Error("Not implemented");
+		selector.ddslick("destroy");
+		selector = $("#" + selectorId, div);	// ddslick requires id reference
+		selector.ddslick(ddslickConfig);
+		selector = $("#" + selectorId, div);	// ddslick requires reference to be reassigned
+		if (!defaultText) that.setSelectedIndex(0);
+		that.setEnabled(true);
 	}
 	
 	this.getSelectedText = function() {
-		throw new Error("Not implemented");
+		return ddslickConfig.data[currentIndex].text;
 	}
 	
 	this.getSelectedIndex = function() {
-		throw new Error("Not implemented");
+		return currentIndex;
 	}
 	
 	this.setSelectedIndex = function(index) {
-		throw new Error("Not implemented");
+		assertNumber(index);
+		assertTrue(index >= 0);
+		assertTrue(index < ddslickConfig.data.length);
+		selector.ddslick("select", {index: index});
+		currentIndex = index;
 	}
 	
-	this.getSelectionOptions = function() {
-		throw new Error("Not implemented");
+	this.getSelectorData = function() {
+		return ddslickConfig.data;
 	}
 	
 	this.setEnabled = function(bool) {
-		throw new Error("Not implemented");
+		if (bool) {
+			$("*", selector).removeClass("disabled_text");
+			selectorDisabler.hide();
+		} else {
+			$("*", selector).addClass("disabled_text");
+			selectorDisabler.show();
+		}
 	}
 	
-	this.onSelected = function(_callbackFn) {
-		callbackFn = _callbackFn;
+	this.onSelected = function(_onSelectedFn) {
+		onSelectedFn = _onSelectedFn;
 	}
 }
 inheritsFrom(DropdownController, DivController);
@@ -3688,16 +3749,35 @@ function EditorSaveController(div, editorController) {
 		includePrivateChecbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
 		
 		// save as selector
-		var saveSelectorDiv = $("<div class='save_selector_div'>").appendTo(div);
-		saveSelectorDiv.append("Save as");
+		var selectorOptions = ["Save as JSON", "Save as CSV", "Save as TXT"];
+		var ddslickData = [];
+		for (var i = 0; i < selectorOptions.length; i++) ddslickData.push({text: selectorOptions[i]});
+		var saveSelectorDiv = $("<div>").appendTo(div);
+		var ddslickConfig = {data: ddslickData};
+		new DropdownController(saveSelectorDiv, ddslickConfig).render();
+		
+		// cancel and save buttons
+		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
+		var cancelBtn = $("<div class='editor_export_btn_red flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
+		cancelBtn.html("Cancel");
+		var saveBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
+		saveBtn.html("Save");
 		
 		// done
 		if (onDone) onDone(div);
 	}
 	
+	this.savePublic = function() {
+		throw new Error("Not implemented");
+	}
+	
+	this.savePrivate = function() {
+		throw new Error("Not implemented");
+	}
+	
 	this.getSaveType = function() {
 		return "JSON";	// TODO: implement this
-	}
+	}	
 }
 inheritsFrom(EditorSaveController, DivController);
 

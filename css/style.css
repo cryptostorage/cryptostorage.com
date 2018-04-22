@@ -1251,6 +1251,40 @@ input[type='checkbox'][disabled] +label {
 	background-color: rgb(56, 106, 174);
 }
 
+.editor_export_btn_green {
+	color: white;
+	background-color: rgb(144, 212, 66);
+	padding: 10px;
+	font-size: 28px;
+	font-weight: bold;
+	width: 225px;
+	margin-left: auto;
+}
+
+.editor_export_btn_green:hover {
+	background-color: rgb(164, 232, 86);
+}
+
+.editor_export_btn_green:active {
+	background-color: rgb(134, 202, 56);
+}
+
+.editor_export_btn_red {
+	color: white;
+	background-color: rgb(224, 112, 82);
+	padding: 10px;
+	font-size: 28px;
+	width: 225px;
+}
+
+.editor_export_btn_red:hover {
+	background-color: rgb(244, 132, 102);
+}
+
+.editor_export_btn_red:active {
+	background-color: rgb(214, 102, 72);
+}
+
 .editor_pieces_div {
 	width: 750px;
 }
@@ -1266,12 +1300,20 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_export_div {
-	max-width: 700px;
-	background-color: white;	
+	background-color: white;
+	min-width: 700px;	
 }
 
 .editor_export_div > div {
-	padding: 25px;
+	padding: 40px 80px 0px 80px;
+}
+
+.editor_export_div >div:first-child {
+	padding: 20px 20px 20px 20px;
+}
+
+.editor_export_div >div:last-child {
+	padding-bottom: 40px;
 }
 
 .editor_export_header {
@@ -1292,6 +1334,8 @@ input[type='checkbox'][disabled] +label {
 .editor_export_checkbox * {
 	font-size: 25px;
 }
+
+.editor_export_btn_red:active {}
 
 .export_div {
 	align-items: center;
@@ -2133,4 +2177,22 @@ input[type='checkbox'][disabled] +label {
 
 .btn_disabled:active {
 	background-color: grey;
+}
+
+.ddslick_container {
+	width: 100%;	/** TODO: manually override? **/
+	height: 62px;
+	position: relative;
+}
+
+.ddslick_selector, .ddslick_disabler {
+	width: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+.ddslick_disabler {
+	z-index: 10;
+	height: 100%;
 }
