@@ -3921,7 +3921,7 @@ function EditorSaveController(div, pieces) {
 		switch (config.fileType) {
 			case AppUtils.FileType.JSON:
 				extension = ".json";
-				transformFunc = "toJson";
+				transformFunc = "toJsonStr";
 				break;
 			case AppUtils.FileType.CSV:
 				extension = ".csv";

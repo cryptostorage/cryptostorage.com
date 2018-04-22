@@ -180,7 +180,7 @@ function CryptoPiece(config) {
 		return pieceNum;
 	}
 	
-	this.toJson = function() {
+	this.toJson = function(config) {
 		var json = {};
 		json.pieceNum = that.getPieceNum();
 		json.version = AppUtils.VERSION;
@@ -189,6 +189,10 @@ function CryptoPiece(config) {
 			json.keypairs.push(state.keypairs[i].toJson());
 		}
 		return json;
+	}
+	
+	this.toJsonStr = function(config) {
+		return JSON.stringify(that.toJson(config));
 	}
 	
 	this.toCsv = function() {
