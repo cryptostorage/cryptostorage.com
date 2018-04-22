@@ -2942,7 +2942,7 @@ function EditorController(div, config) {
 		
 		// save controller
 		var saveController = new EditorSaveController($("<div>").appendTo(popupDiv), pieces);
-		saveController.onSave(function() { alert("Save not implemented"); });
+		saveController.onSave(function() { popupDiv.detach(); });
 		saveController.onCancel(function() { popupDiv.detach(); })
 		saveController.render(function(div) {
 			div.click(function(e) { e.stopPropagation(); });	// clicking export div does not close popup
@@ -3828,8 +3828,11 @@ function EditorSaveController(div, pieces) {
 	var includePublicCheckbox;
 	var includePrivateCheckbox;
 	var saveAsDropdown;
+	var saveBtn;
 	var callbackFnSave;
 	var callbackFnCancel;
+	var saveBlob;
+	var saveName;
 	
 	this.render = function(onDone) {
 		
@@ -3862,17 +3865,16 @@ function EditorSaveController(div, pieces) {
 		cancelBtn.html("Cancel");
 		cancelBtn.click(function() { if (callbackFnCancel) callbackFnCancel(); });
 		buttonsDiv.append($("<div style='width:150px;'>"));
-		var saveBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
+		saveBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
 		saveBtn.html("Save");
-		saveBtn.click(function() { if (callbackFnSave) callbackFnSave(); });
 		
 		// register changes
-		includePublicCheckbox.onChecked(update);
-		includePrivateCheckbox.onChecked(update);
-		saveAsDropdown.onSelected(update);
+		includePublicCheckbox.onChecked(prepareSavedFile);
+		includePrivateCheckbox.onChecked(prepareSavedFile);
+		saveAsDropdown.onSelected(prepareSavedFile);
 		
-		// initialize
-		update();
+		// prepare saved file
+		prepareSavedFile();
 		
 		// done
 		if (onDone) onDone(div);
@@ -3889,8 +3891,53 @@ function EditorSaveController(div, pieces) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
-	function update() {
-		console.log(getConfig());
+	function prepareSavedFile(onDone) {
+		
+		// disable save button
+		setSaveEnabled(false);
+		
+		// prepare save blob and name
+		piecesToSaveBlobAndName(pieces, getConfig, function(err, saveBlob, saveName) {
+			throw new Error("Now what");
+		});
+		
+		// read config
+		var config = getConfig();
+		switch (config.fileType) {
+			case AppUtils.FileType.JSON:
+				break;
+			case AppUtils.FileType.CSV:
+				break;
+			case AppUtils.FileType.TXT:
+				break;
+			default: throw new Error("Unrecognized file type: " + config.fileType);
+		}
+	}
+	
+	function piecesToSaveBlobAndName(pieces, config, onDone) {
+		
+		// validate input
+		assertArray(pieces);
+		assertTrue(pieces.length > 0);
+		assertObject(pieces[0], CryptoPiece);
+		
+		// save single piece
+		if (pieces.length === 1) {
+			
+		}
+		
+		// save multiple pieces
+		else {
+			throw new Error("Not implemented");
+		}
+	}
+	
+	function save() {
+		assertInitialized(saveBlob);
+		assertInitialized(saveName);
+		if (getConfig().includePrivate || confirm("Funds CANNOT be recovered from the saved file because the private keys are not included.\n\nContinue?")) {
+			saveAs(saveBlob, saveName);
+		}
 	}
 	
 	function getConfig() {
@@ -3916,6 +3963,18 @@ function EditorSaveController(div, pieces) {
 			includePublic: includePublicCheckbox.isChecked(),
 			includePrivate: includePrivateCheckbox.isChecked(),
 			fileType: fileType
+		}
+	}
+	
+	function setSaveEnabled(bool) {
+		if (bool) {
+			saveBtn.removeClass("btn_disabled");
+			saveBtn.click(function() {
+				save();
+				if (callbackFnSave) callbackFnSave();
+			});
+		} else {
+			saveBtn.addClass("btn_disabled");
 		}
 	}
 }
