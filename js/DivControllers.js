@@ -267,7 +267,8 @@ function DropdownController(div, ddslickConfig, defaultText) {
 		}
 		ddslickConfig = Object.assign(defaultConfig, ddslickConfig);
 		ddslickConfig.onSelected = function(selection) {
-			if (onSelectedFn) onSelectedFn(selection.selectedIndex);
+			currentIndex = selection.selectedIndex;
+			if (onSelectedFn) onSelectedFn(currentIndex);
 		}
 		if (defaultText) {
 			ddslickConfig.selectText = defaultText;
@@ -3870,9 +3871,9 @@ function EditorSaveController(div, pieces) {
 		saveBtn.html("Save");
 		
 		// register changes
-		includePublicCheckbox.onChecked(prepareSavedFile);
-		includePrivateCheckbox.onChecked(prepareSavedFile);
-		saveAsDropdown.onSelected(prepareSavedFile);
+		includePublicCheckbox.onChecked(function() { prepareSavedFile(); });
+		includePrivateCheckbox.onChecked(function() { prepareSavedFile(); });
+		saveAsDropdown.onSelected(function(idx) { prepareSavedFile(); });
 		
 		// prepare saved file
 		prepareSavedFile();
@@ -3917,7 +3918,6 @@ function EditorSaveController(div, pieces) {
 		// get piece transformation function and name extension
 		var extension;
 		var tranformFunc;
-		console.log(config);
 		switch (config.fileType) {
 			case AppUtils.FileType.JSON:
 				extension = ".json";
@@ -3936,15 +3936,11 @@ function EditorSaveController(div, pieces) {
 		
 		// handle single piece
 		if (pieces.length === 1) {
-			try {
-				var commonPlugin = CryptoPiece.getCommonPlugin(pieces[0]);
-				var commonTicker = commonPlugin ? commonPlugin.getTicker().toLowerCase() : "mix";
-				var name = "cryptostorage_" + commonTicker + "_" + AppUtils.getTimestamp() + extension;
-				var blob = new Blob([pieces[0][transformFunc](config)], {type: "text/plain;charset=utf-8"});
-				if (onDone) onDone(null, blob, name);
-			} catch (err) {
-				if (onDone) onDone(err);
-			}
+			var commonPlugin = CryptoPiece.getCommonPlugin(pieces[0]);
+			var commonTicker = commonPlugin ? commonPlugin.getTicker().toLowerCase() : "mix";
+			var name = "cryptostorage_" + commonTicker + "_" + AppUtils.getTimestamp() + extension;
+			var blob = new Blob([pieces[0][transformFunc](config)], {type: "text/plain;charset=utf-8"});
+			if (onDone) onDone(null, blob, name);
 		}
 		
 		// handle multiple pieces

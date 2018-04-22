@@ -222,6 +222,10 @@ function CryptoPiece(config) {
 		return arrToCsv(csvArr);
 	}
 	
+	this.toTxt = function(config) {
+		throw new Error("Not implemented");
+	}
+	
 	this.copy = function() {
 		var keypairCopies = [];
 		for (var i = 0; i < state.keypairs.length; i++) keypairCopies.push(state.keypairs[i].copy());
