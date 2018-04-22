@@ -2749,7 +2749,10 @@ function EditorController(div, config) {
 		popupDiv.click(function() { popupDiv.detach(); });
 		
 		// save controller
-		new EditorSaveController($("<div>").appendTo(popupDiv), that).render(function(div) {
+		var saveController = new EditorSaveController($("<div>").appendTo(popupDiv), that);
+		saveController.onSave(function() { alert("Save not implemented"); });
+		saveController.onCancel(function() { popupDiv.detach(); })
+		saveController.render(function(div) {
 			div.click(function(e) { e.stopPropagation(); });	// clicking export div does not close popup
 		});
 	}
@@ -3732,6 +3735,8 @@ function EditorSaveController(div, editorController) {
 	var that = this;
 	var includePublicCheckbox;
 	var includePrivateCheckbox;
+	var callbackFnSave;
+	var callbackFnCancel;
 	
 	this.render = function(onDone) {
 		
@@ -3746,7 +3751,9 @@ function EditorSaveController(div, editorController) {
 		// checkboxes
 		var checkboxesDiv = $("<div class='flex_horizontal flex_justify_center'>").appendTo(div);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save public addresses").render();
+		includePublicCheckbox.setChecked(true);
 		includePrivateChecbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
+		includePrivateChecbox.setChecked(true);
 		
 		// save as selector
 		var selectorOptions = ["Save as JSON", "Save as CSV", "Save as TXT"];
@@ -3760,8 +3767,11 @@ function EditorSaveController(div, editorController) {
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
 		var cancelBtn = $("<div class='editor_export_btn_red flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
 		cancelBtn.html("Cancel");
+		cancelBtn.click(function() { if (callbackFnCancel) callbackFnCancel(); });
+		buttonsDiv.append($("<div style='width:150px;'>"));
 		var saveBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
 		saveBtn.html("Save");
+		saveBtn.click(function() { if (callbackFnSave) callbackFnSave(); });
 		
 		// done
 		if (onDone) onDone(div);
@@ -3777,7 +3787,15 @@ function EditorSaveController(div, editorController) {
 	
 	this.getSaveType = function() {
 		return "JSON";	// TODO: implement this
-	}	
+	}
+	
+	this.onSave = function(callbackFn) {
+		callbackFnSave = callbackFn;
+	}
+	
+	this.onCancel = function(callbackFn) {
+		callbackFnCancel = callbackFn;
+	}
 }
 inheritsFrom(EditorSaveController, DivController);
 

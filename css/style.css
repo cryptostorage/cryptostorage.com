@@ -1257,8 +1257,7 @@ input[type='checkbox'][disabled] +label {
 	padding: 10px;
 	font-size: 28px;
 	font-weight: bold;
-	width: 225px;
-	margin-left: auto;
+	width: 100%;
 }
 
 .editor_export_btn_green:hover {
@@ -1274,7 +1273,7 @@ input[type='checkbox'][disabled] +label {
 	background-color: rgb(224, 112, 82);
 	padding: 10px;
 	font-size: 28px;
-	width: 225px;
+	width: 100%;
 }
 
 .editor_export_btn_red:hover {
@@ -1301,7 +1300,7 @@ input[type='checkbox'][disabled] +label {
 
 .editor_export_div {
 	background-color: white;
-	min-width: 700px;	
+	min-width: 800px;	
 }
 
 .editor_export_div > div {
