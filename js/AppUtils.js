@@ -40,7 +40,7 @@ var OperatingSystems = {
 var AppUtils = {
 		
 	// app constants
-	VERSION: "0.2.3",
+	VERSION: "0.3.0",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
 	RUN_FULL_TESTS: false,
