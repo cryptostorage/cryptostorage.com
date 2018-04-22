@@ -2938,15 +2938,16 @@ function EditorController(div, config) {
 		
 		// fullscreen div
 		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
-		popupDiv.click(function() { popupDiv.detach(); });
+		popupDiv.click(function(e) {
+			if (e.target !== this) return;
+			popupDiv.detach();
+		});
 		
 		// save controller
 		var saveController = new EditorSaveController($("<div>").appendTo(popupDiv), pieces);
 		saveController.onSave(function() { popupDiv.detach(); });
 		saveController.onCancel(function() { popupDiv.detach(); })
-		saveController.render(function(div) {
-			div.click(function(e) { e.stopPropagation(); });	// clicking export div does not close popup
-		});
+		saveController.render();
 	}
 	
 	this.print = function() {
@@ -3923,7 +3924,7 @@ function EditorSaveController(div, pieces) {
 		
 		// save single piece
 		if (pieces.length === 1) {
-			
+			throw new Error("not implemented");
 		}
 		
 		// save multiple pieces
