@@ -8,6 +8,9 @@ direct link to editor
 piece incompatibilities: shareNum, currencies -> keypairs
 increase test repeat
 optimize private functions for performance
+update bip38 cryptojs description with pbkdf if necessary
+add support for dogecoin
+tippls
 editor:
 	bip38 support
 	generate disabled, cancel enabled during generation
