@@ -193,6 +193,7 @@ var AppUtils = {
 			"lib/progressbar.js",
 			"lib/bitaddress.js",
 			"lib/clipboard.js",
+			"lib/jquery.ddslick.js",
 			"lib/polyfill.js",
 			"js/CryptoKey.js",
 			"js/CryptoKeypair.js",

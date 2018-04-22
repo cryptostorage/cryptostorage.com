@@ -2831,6 +2831,7 @@ inheritsFrom(TwoTabController, DivController);
  * 				config.keys are keys to generate pieces from
  * 				config.pieces are pieces to export and generate pieceDivs from
  * 				config.pieceDivs are pre-generated piece divs ready for display
+ * 				config.showNotices specifies whether or not to show the notice bar
  */
 function EditorController(div, config) {
 	DivController.call(this, div);
@@ -2839,7 +2840,7 @@ function EditorController(div, config) {
 	var that = this;
 	var passphraseController
 	var splitController;
-	var bodyController;
+	var contentController;
 	var progressDiv;
 	var progressBar;
 	var progressLabel;
@@ -2857,6 +2858,11 @@ function EditorController(div, config) {
 		div.empty();
 		div.addClass("editor_div flex_vertical flex_align_center");
 		
+		// copy config with defaults
+		config = Object.assign({
+			showNotices: true
+		}, config);
+		
 		// header
 		var headerDiv = $("<div class='editor_header flex_vertical flex_align_center'>").appendTo(div);
 		
@@ -2872,8 +2878,8 @@ function EditorController(div, config) {
 		splitController.render();
 		
 		// load body controller
-		bodyController = new EditorBodyController($("<div>").appendTo(div));
-		new LoadController(bodyController).render();
+		contentController = new EditorContentController($("<div>").appendTo(div), config);
+		new LoadController(contentController).render();
 		
 		// done rendering
 		if (onDone) onDone(div);
@@ -2963,7 +2969,7 @@ function EditorController(div, config) {
 	}
 	
 	this.update = function() {
-		if (bodyController) bodyController.update();
+		if (contentController) contentController.update();
 		if (passphraseController) passphraseController.update();
 		if (splitController) splitController.update();
 		if (actionsController) actionsController.update();
@@ -3034,51 +3040,71 @@ function EditorController(div, config) {
 	/**
 	 * Inner body controller.
 	 */
-	function EditorBodyController(div) {
+	function EditorContentController(div, config) {
 		DivController.call(this, div);
 		
 		this.render = function(onDone) {
 			
 			// div setup
 			div.empty();
-			div.addClass("editor_body flex_vertical flex_align_center");
+			div.addClass("editor_content_div flex_vertical flex_align_center");
 			
 			// load dependencies TODO: load correct dependencies
-			LOADER.load(AppUtils.getAppDependencies(), function(err) {
+			LOADER.load(AppUtils.getDynamicExportDependencies(), function(err) {
 				if (err) throw err;
 				
-				// cryptostorage logo
-				logoHeader = $("<div class='piece_page_header_div'>").appendTo(div);
-				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
-				
-				// progress bar
-				progressDiv = $("<div class='export_progress_div'>").appendTo(div);
-				progressDiv.hide();
-				progressBar = UiUtils.getProgressBar(progressDiv);
-				progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
-				
-				// pieces div
-				piecesDiv = $("<div class='export_pieces_div flex_vertical'>").appendTo(div);
-				piecesDiv.hide();
-				
-				// currency inputs controller
-				currenciesDiv = $("<div>").appendTo(div);
-				currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins(), that.update, that.update);
-				currenciesController.render();
-				
-				// actions controller
-				actionsController = new EditorActionsController($("<div>").appendTo(div), that);
-				actionsController.render();
-				
-				// initial state
-				if (config.keyGenConfig) {
-					setKeyGenConfig(config.keyGenConfig);
-					that.generate(function() { if (onDone) onDone(); });
+				// notices
+				if (config.showNotices) {
+					
+					// poll environment info on loop
+					AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
+					
+					// notice div
+					var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
+					var noticeDiv = $("<div>").appendTo(noticeDivContainer);
+					new NoticeController(noticeDiv).render(function() { renderAux(); });
+				} else {
+					renderAux();
 				}
-				else {
-					that.reset();
-					if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
-					if (onDone) onDone(div);
+				
+				function renderAux() {
+					
+					// editor body div
+					var bodyDiv = $("<div class='editor_body_div flex_vertical flex_align_center'>").appendTo(div);
+					
+					// cryptostorage logo
+					logoHeader = $("<div class='piece_page_header_div'>").appendTo(bodyDiv);
+					$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
+					
+					// progress bar
+					progressDiv = $("<div class='export_progress_div'>").appendTo(bodyDiv);
+					progressDiv.hide();
+					progressBar = UiUtils.getProgressBar(progressDiv);
+					progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
+					
+					// pieces bodyDiv
+					piecesDiv = $("<div class='export_pieces_div flex_vertical'>").appendTo(bodyDiv);
+					piecesDiv.hide();
+					
+					// currency inputs controller
+					currenciesDiv = $("<div>").appendTo(bodyDiv);
+					currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins(), that.update, that.update);
+					currenciesController.render();
+					
+					// actions controller
+					actionsController = new EditorActionsController($("<div>").appendTo(bodyDiv), that);
+					actionsController.render();
+					
+					// initial state
+					if (config.keyGenConfig) {
+						setKeyGenConfig(config.keyGenConfig);
+						that.generate(function() { if (onDone) onDone(); });
+					}
+					else {
+						that.reset();
+						if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
+						if (onDone) onDone(div);
+					}
 				}
 			});
 		}
@@ -3093,7 +3119,7 @@ function EditorController(div, config) {
 			else piecesDiv.hide();
 		}
 	}
-	inheritsFrom(EditorBodyController, DivController);
+	inheritsFrom(EditorContentController, DivController);
 }
 inheritsFrom(EditorController, DivController);
 

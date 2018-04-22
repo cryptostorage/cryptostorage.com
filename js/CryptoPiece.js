@@ -388,11 +388,14 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 			schemes.push(config.keypairs[i].encryption);
 		}
 	}
+	
+	// callback function to generate a keypair
+	var numCreated = 0;
 	function newKeypairFunc(plugin) {
 		return function(onDone) {
 			var keypair = new CryptoKeypair({plugin: plugin});
-			doneWeight += (1 / numKeypairs) * createWeight;
-			if (onProgress) onProgress(doneWeight / totalWeight, "Generating keypairs");
+			numCreated++;
+			if (onProgress) onProgress((numCreated / numKeypairs) * createWeight / totalWeight, "Generating keypairs");
 			setImmediate(function() { onDone(null, keypair) });	// let UI breath
 		}
 	}
@@ -401,6 +404,8 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 	if (onProgress) onProgress(0, "Generating keypairs");
 	async.series(newKeypairFuncs, function(err, keypairs) {
 		assertNull(err);
+		doneWeight += createWeight;
+		assertEquals(doneWeight, createWeight);
 		
 		// initialize piece
 		var piece = new CryptoPiece({keypairs: keypairs});
