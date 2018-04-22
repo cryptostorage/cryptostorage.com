@@ -3898,38 +3898,172 @@ function EditorSaveController(div, pieces) {
 		setSaveEnabled(false);
 		
 		// prepare save blob and name
-		piecesToSaveBlobAndName(pieces, getConfig, function(err, saveBlob, saveName) {
-			throw new Error("Now what");
+		piecesToBlob(pieces, getConfig(), function(err, blob, name) {
+			assertNull(err);
+			saveBlob = blob;
+			saveName = name;
+			setSaveEnabled(true);
+			if (onDone) onDone();
 		});
-		
-		// read config
-		var config = getConfig();
-		switch (config.fileType) {
-			case AppUtils.FileType.JSON:
-				break;
-			case AppUtils.FileType.CSV:
-				break;
-			case AppUtils.FileType.TXT:
-				break;
-			default: throw new Error("Unrecognized file type: " + config.fileType);
-		}
 	}
 	
-	function piecesToSaveBlobAndName(pieces, config, onDone) {
+	function piecesToBlob(pieces, config, onDone) {
 		
 		// validate input
 		assertArray(pieces);
 		assertTrue(pieces.length > 0);
 		assertObject(pieces[0], CryptoPiece);
 		
-		// save single piece
-		if (pieces.length === 1) {
-			throw new Error("not implemented");
+		// get piece transformation function and name extension
+		var extension;
+		var tranformFunc;
+		console.log(config);
+		switch (config.fileType) {
+			case AppUtils.FileType.JSON:
+				extension = ".json";
+				transformFunc = "toJson";
+				break;
+			case AppUtils.FileType.CSV:
+				extension = ".csv";
+				transformFunc = "toCsv";
+				break;
+			case AppUtils.FileType.TXT:
+				extension = ".txt";
+				transformFunc = "toTxt";
+				break;
+			default: throw new Error("Unrecognized file type: " + config.fileType);
 		}
 		
-		// save multiple pieces
+		// handle single piece
+		if (pieces.length === 1) {
+			try {
+				var commonPlugin = CryptoPiece.getCommonPlugin(pieces[0]);
+				var commonTicker = commonPlugin ? commonPlugin.getTicker().toLowerCase() : "mix";
+				var name = "cryptostorage_" + commonTicker + "_" + AppUtils.getTimestamp() + extension;
+				var blob = new Blob([pieces[0][transformFunc](config)], {type: "text/plain;charset=utf-8"});
+				if (onDone) onDone(null, blob, name);
+			} catch (err) {
+				if (onDone) onDone(err);
+			}
+		}
+		
+		// handle multiple pieces
 		else {
-			throw new Error("Not implemented");
+			throw new Error("Save multiple pieces not implemented");
+		}
+	}
+	
+	/**
+	 * Caches file content and names for saving.
+	 * 
+	 * @param pieces are the pieces to transform and save per the configuration
+	 * @param onDone() is invoked when ready
+	 */
+	function prepareExportFiles(pieces, onDone) {
+		assertInitialized(pieces);
+		assertTrue(pieces.length > 0);
+		
+		// transform pieces according to export config
+		var transformedPieces = [];
+		var config = getExportConfig();
+		for (var i = 0; i < pieces.length; i++) {
+			transformedPieces.push(AppUtils.transformPiece(pieces[i], config));
+		}
+		
+		// generate exports
+		var name = "cryptostorage_" + AppUtils.getCommonTicker(pieces[0]).toLowerCase() + "_" + AppUtils.getTimestamp();
+		if (pieces.length === 1) {
+			exportFiles.saveAllBlob = new Blob([AppUtils.pieceToJson(transformedPieces[0])], {type: "text/plain;charset=utf-8"});
+			exportFiles.saveAllName = name + ".json";
+			exportFiles.csvBlob = new Blob([AppUtils.pieceToCsv(transformedPieces[0])], {type: "text/plain;charset=utf-8"});
+			exportFiles.csvName = name + ".csv";
+			exportFiles.txtBlob = new Blob([AppUtils.pieceToTxt(transformedPieces[0])], {type: "text/plain;charset=utf-8"});
+			exportFiles.txtName = name + ".txt";
+			onDone();
+		} else {
+			
+			// json zip
+			AppUtils.piecesToZip(transformedPieces, "json", function(blob) {
+				exportFiles.saveAllBlob = blob;
+				exportFiles.saveAllName = name + ".zip";
+				
+				// csv zip
+				AppUtils.piecesToZip(transformedPieces, "csv", function(blob) {
+					exportFiles.csvBlob = blob;
+					exportFiles.csvName = name + "_csv.zip";
+					
+					// txt zip
+					AppUtils.piecesToZip(transformedPieces, "txt", function(blob) {
+						exportFiles.txtBlob = blob;
+						exportFiles.txtName = name + "_txt.zip";
+						onDone();
+					});
+				});
+			});
+		}
+	}
+	
+	/**
+	 * Creates a zip with the given pieces.
+	 * 
+	 * @param pieces are the pieces to zip
+	 * @param zipType specifies the file contents of the zip: json | csv | txt
+	 * @param onDone(blob) is called when zipping is complete
+	 */
+	function piecesToZip(pieces, zipType, callback) {
+		assertTrue(pieces.length > 0, "Pieces cannot be empty");
+		
+		// get common ticker
+		var ticker = AppUtils.getCommonTicker(pieces[0]).toLowerCase();
+		
+		// get extension and transform function
+		var extension;
+		var transformFunc;
+		if (zipType === "json") {
+			extension = ".json";
+			transformFunc = AppUtils.pieceToJson;
+		} else if (zipType === "csv") {
+			extension = ".csv";
+			transformFunc = AppUtils.pieceToCsv;
+		} else if (zipType === "txt") {
+			extension = ".txt";
+			transformFunc = AppUtils.pieceToTxt;
+		} else throw new Error("Invalid zip type: " + zipType);
+		
+		// build names for pieces
+		var pieceNames = [];
+		for (var i = 0; i < pieces.length; i++) {
+			var name = "cryptostorage_" + ticker + (pieces[i].pieceNum ? "_piece_" + pieces[i].pieceNum : "");
+			pieceNames.push(getNextAvailableName(pieceNames, name));
+		}
+
+		// prepare zip
+		var zip = JSZip();
+		for (var i = 0; i < pieces.length; i++) {
+			var name = pieceNames[i];
+			zip.file(name + extension, transformFunc(pieces[i]));
+		}
+		
+		// create zip
+		zip.generateAsync({type:"blob"}).then(function(blob) {
+			callback(blob);
+		});
+		
+		/**
+		 * Gets the next available name, adding a postfix to prevent duplicates.
+		 * 
+		 * @param names is the list of existing names
+		 * @param name is the desired name to add
+		 * @returns a name which will be postfixed if necessary to prevent duplicates
+		 */
+		function getNextAvailableName(names, name) {
+			if (!arrayContains(names, name)) return name;
+			var idx = 2;
+			while (true) {
+				var postfixedName = name + "_" + idx;
+				if (!arrayContains(names, postfixedName)) return postfixedName;
+				idx++;
+			}
 		}
 	}
 	

@@ -515,3 +515,23 @@ CryptoPiece.validateGenerateConfig = function(config) {
 		assertDefined(config.rendererClass.getRenderWeight);
 	}
 }
+
+/**
+ * Returns the single common crypto plugin among the given pieces.
+ * 
+ * @param pieces is a piece or pieces to get a common plugin from
+ * @returns CryptoPlugin if a single common plugin exists, null if multiple plugins are used
+ */
+CryptoPiece.getCommonPlugin = function(pieces) {
+	pieces = listify(pieces);
+	assertTrue(pieces.length > 0);
+	var plugin;
+	for (var i = 0; i < pieces.length; i++) {
+		assertObject(pieces[i], CryptoPiece);
+		for (var j = 0; j < pieces[i].getKeypairs().length; j++) {
+			if (!plugin) plugin = pieces[i].getKeypairs()[j].getPlugin();
+			else if (plugin.getTicker() !== pieces[i].getKeypairs()[j].getPlugin().getTicker()) return null;
+		}
+	}
+	return plugin;
+}
