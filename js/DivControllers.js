@@ -147,6 +147,198 @@ DivController.prototype.onShow = function() { }
 DivController.prototype.onHide = function() { }
 
 /**
+ * Controls a single checkbox.
+ * 
+ * @param div is the div to render to
+ * @param label is the checkbox label
+ * @param tooltip is the tooltip text
+ */
+function CheckboxController(div, label, tooltip) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var checkbox;
+	var infoImg;
+	
+	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("flex_horizontal flex_align_center");
+		
+		// build div
+		var id = uuidv4();
+		checkbox = $("<input type='checkbox' id='" + id + "'>").appendTo(div);
+		var checkboxLabel = $("<label class='user_select_none' for='" + id + "'>").appendTo(div);
+		checkboxLabel.html(label);
+		
+		// info tooltip
+		if (tooltip) {
+			infoImg = $("<img src='img/information_white.png' class='info_tooltip_img'>").appendTo(div);
+			var tooltipDiv = $("<div>");
+			tooltipDiv.append(tooltip);
+			tippy(infoImg.get(0), {
+				arrow: true,
+				html: tooltipDiv.get(0),
+				placement: 'bottom',
+				theme: 'translucent',
+				trigger: "mouseenter",
+				multiple: 'false',
+				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
+				distance: 20,
+				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+				offset: '0, 0'
+			});
+		}
+		
+		// done
+		if (onDone) onDone(div);
+		return that;
+	}
+	
+	this.onChecked = function(callback) {
+		return checkbox.click(callback);
+	}
+	
+	this.getCheckbox = function() {
+		return checkbox;
+	}
+	
+	this.setChecked = function(bool) {
+		assertBoolean(bool);
+		checkbox.prop("checked", bool);
+	}
+	
+	this.isChecked = function() {
+		return checkbox.prop("checked");
+	}
+	
+	this.setEnabled = function(bool) {
+		assertBoolean(bool);
+		if (bool) {
+			checkbox.removeAttr("disabled");
+			infoImg.removeClass("info_tooltip_img_disabled");
+			infoImg.get(0)._tippy.enable();
+		} else {
+			checkbox.attr("disabled", "disabled");
+			infoImg.addClass("info_tooltip_img_disabled");
+			infoImg.get(0)._tippy.disable();
+		}
+	}
+	
+	this.isEnabled = function() {
+		return isInitialized(checkbox.attr("disabled"));
+	}
+}
+inheritsFrom(EditorActionsController, DivController);
+
+/**
+ * Controls a dropdown selector.
+ * 
+ * @param div is the div to render to
+ * @param ddslickConfig is config to pass to ddslick
+ * @param defaultText is the default dropdown selection, selects index 0 if not given
+ */
+function DropdownController(div, ddslickConfig, defaultText) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var selectorContainer;
+	var selector;
+	var selectorId;
+	var selectorDisabler;
+	var onSelectedFn;
+
+	this.render = function(onDone) {
+		
+		// verify config
+		assertObject(ddslickConfig);
+		assertArray(ddslickConfig.data);
+		assertTrue(ddslickConfig.data.length > 0);
+		for (var i = 0; i < ddslickConfig.data.length; i++) {
+			assertInitialized(ddslickConfig.data[i].text);
+		}
+		
+		// customize config
+		var defaultConfig = {
+				background: "white",
+				imagePosition: "left",
+				width:'100%',
+		}
+		ddslickConfig = Object.assign(defaultConfig, ddslickConfig);
+		ddslickConfig.onSelected = function(selection) {
+			if (onSelectedFn) onSelectedFn(selection.selectedIndex);
+		}
+		if (defaultText) {
+			ddslickConfig.selectText = defaultText;
+			ddslickConfig.defaultSelectedIndex = null;
+		}
+		
+		// div setup
+		div.empty();
+		selectorContainer = $("<div class='ddslick_container'>").appendTo(div);
+		
+		// initialize selector
+		selectorId = uuidv4();
+		selector = $("<div id='" + selectorId + "' class='ddslick_selector'>").appendTo(selectorContainer);
+		
+		// initialize disabler		
+		selectorDisabler = $("<div class='ddslick_disabler'>").appendTo(selectorContainer);
+		
+		// initial state
+		that.reset();
+		
+		// done
+		if (onDone) onDone(div);
+		return that;
+	}
+	
+	this.reset = function() {
+		selector.ddslick("destroy");
+		selector = $("#" + selectorId, div);	// ddslick requires id reference
+		selector.ddslick(ddslickConfig);
+		selector = $("#" + selectorId, div);	// ddslick requires reference to be reassigned
+		if (!defaultText) that.setSelectedIndex(0);
+		that.setEnabled(true);
+	}
+	
+	this.getSelectedText = function() {
+		return ddslickConfig.data[currentIndex].text;
+	}
+	
+	this.getSelectedIndex = function() {
+		return currentIndex;
+	}
+	
+	this.setSelectedIndex = function(index) {
+		assertNumber(index);
+		assertTrue(index >= 0);
+		assertTrue(index < ddslickConfig.data.length);
+		selector.ddslick("select", {index: index});
+		currentIndex = index;
+	}
+	
+	this.getSelectorData = function() {
+		return ddslickConfig.data;
+	}
+	
+	this.setEnabled = function(bool) {
+		if (bool) {
+			$("*", selector).removeClass("disabled_text");
+			selectorDisabler.hide();
+		} else {
+			$("*", selector).addClass("disabled_text");
+			selectorDisabler.show();
+		}
+	}
+	
+	this.onSelected = function(_onSelectedFn) {
+		onSelectedFn = _onSelectedFn;
+	}
+}
+inheritsFrom(DropdownController, DivController);
+
+/**
  * Controls the entire application.
  * 
  * @param div is the div to render the application to
@@ -1534,112 +1726,6 @@ function FormController(div) {
 inheritsFrom(FormController, DivController);
 
 /**
- * Controls a dropdown selector.
- * 
- * @param div is the div to render to
- * @param ddslickConfig is config to pass to ddslick
- * @param defaultText is the default dropdown selection, selects index 0 if not given
- */
-function DropdownController(div, ddslickConfig, defaultText) {
-	DivController.call(this, div);
-	
-	var that = this;
-	var selectorContainer;
-	var selector;
-	var selectorId;
-	var selectorDisabler;
-	var onSelectedFn;
-
-	this.render = function(onDone) {
-		
-		// verify config
-		assertObject(ddslickConfig);
-		assertArray(ddslickConfig.data);
-		assertTrue(ddslickConfig.data.length > 0);
-		for (var i = 0; i < ddslickConfig.data.length; i++) {
-			assertInitialized(ddslickConfig.data[i].text);
-		}
-		
-		// customize config
-		var defaultConfig = {
-				background: "white",
-				imagePosition: "left",
-				width:'100%',
-		}
-		ddslickConfig = Object.assign(defaultConfig, ddslickConfig);
-		ddslickConfig.onSelected = function(selection) {
-			if (onSelectedFn) onSelectedFn(selection.selectedIndex);
-		}
-		if (defaultText) {
-			ddslickConfig.selectText = defaultText;
-			ddslickConfig.defaultSelectedIndex = null;
-		}
-		
-		// div setup
-		div.empty();
-		selectorContainer = $("<div class='ddslick_container'>").appendTo(div);
-		
-		// initialize selector
-		selectorId = uuidv4();
-		selector = $("<div id='" + selectorId + "' class='ddslick_selector'>").appendTo(selectorContainer);
-		
-		// initialize disabler		
-		selectorDisabler = $("<div class='ddslick_disabler'>").appendTo(selectorContainer);
-		
-		// initial state
-		that.reset();
-		
-		// done
-		if (onDone) onDone(div);
-		return that;
-	}
-	
-	this.reset = function() {
-		selector.ddslick("destroy");
-		selector = $("#" + selectorId, div);	// ddslick requires id reference
-		selector.ddslick(ddslickConfig);
-		selector = $("#" + selectorId, div);	// ddslick requires reference to be reassigned
-		if (!defaultText) that.setSelectedIndex(0);
-		that.setEnabled(true);
-	}
-	
-	this.getSelectedText = function() {
-		return ddslickConfig.data[currentIndex].text;
-	}
-	
-	this.getSelectedIndex = function() {
-		return currentIndex;
-	}
-	
-	this.setSelectedIndex = function(index) {
-		assertNumber(index);
-		assertTrue(index >= 0);
-		assertTrue(index < ddslickConfig.data.length);
-		selector.ddslick("select", {index: index});
-		currentIndex = index;
-	}
-	
-	this.getSelectorData = function() {
-		return ddslickConfig.data;
-	}
-	
-	this.setEnabled = function(bool) {
-		if (bool) {
-			$("*", selector).removeClass("disabled_text");
-			selectorDisabler.hide();
-		} else {
-			$("*", selector).addClass("disabled_text");
-			selectorDisabler.show();
-		}
-	}
-	
-	this.onSelected = function(_onSelectedFn) {
-		onSelectedFn = _onSelectedFn;
-	}
-}
-inheritsFrom(DropdownController, DivController);
-
-/**
  * Import page.
  */
 function ImportController(div) {
@@ -2855,7 +2941,7 @@ function EditorController(div, config) {
 		popupDiv.click(function() { popupDiv.detach(); });
 		
 		// save controller
-		var saveController = new EditorSaveController($("<div>").appendTo(popupDiv), that);
+		var saveController = new EditorSaveController($("<div>").appendTo(popupDiv), pieces);
 		saveController.onSave(function() { alert("Save not implemented"); });
 		saveController.onCancel(function() { popupDiv.detach(); })
 		saveController.render(function(div) {
@@ -3064,7 +3150,7 @@ function EditorPassphraseController(div, editorController, onChange) {
 		});
 		
 		// register clicks
-		passphraseCheckbox.click(function() {
+		passphraseCheckbox.onChecked(function() {
 			bip38Checkbox.setEnabled(passphraseCheckbox.isChecked());
 			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
 			else that.validate();
@@ -3195,7 +3281,7 @@ function EditorSplitController(div, onChange) {
 		splitMinLabelBottom.html("To Recover");		
 		
 		// register inputs
-		splitCheckbox.click(function() {
+		splitCheckbox.onChecked(function() {
 			if (splitCheckbox.isChecked()) numPiecesInput.focus();
 			else that.validate();
 			if (onChange) onChange();
@@ -3728,15 +3814,20 @@ inheritsFrom(EditorActionsController, DivController);
  * Save controller.
  * 
  * @param div is the div to render to
- * @param editorController is the editor controller from which this save controller is created
+ * @param pieces are the pieces to save
  */
-function EditorSaveController(div, editorController) {
+function EditorSaveController(div, pieces) {
 	DivController.call(this, div);
+	
+	// validate input
+	assertArray(pieces);
+	assertTrue(pieces.length > 0);
+	assertObject(pieces[0], CryptoPiece);
 	
 	var that = this;
 	var includePublicCheckbox;
 	var includePrivateCheckbox;
-	var dropdownController;
+	var saveAsDropdown;
 	var callbackFnSave;
 	var callbackFnCancel;
 	
@@ -3754,8 +3845,8 @@ function EditorSaveController(div, editorController) {
 		var checkboxesDiv = $("<div class='flex_horizontal flex_justify_center'>").appendTo(div);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save public addresses").render();
 		includePublicCheckbox.setChecked(true);
-		includePrivateChecbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
-		includePrivateChecbox.setChecked(true);
+		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
+		includePrivateCheckbox.setChecked(true);
 		
 		// save as selector
 		var selectorOptions = ["Save as JSON", "Save as CSV", "Save as TXT"];
@@ -3763,11 +3854,7 @@ function EditorSaveController(div, editorController) {
 		for (var i = 0; i < selectorOptions.length; i++) ddslickData.push({text: selectorOptions[i]});
 		var saveSelectorDiv = $("<div>").appendTo(div);
 		var ddslickConfig = {data: ddslickData};
-		dropdownController = new DropdownController(saveSelectorDiv, ddslickConfig).render();
-		dropdownController.onSelected(function(index) {
-			console.log("Index " + index + " selected");
-			dropdownController.setSelectedIndex(1);
-		});
+		saveAsDropdown = new DropdownController(saveSelectorDiv, ddslickConfig).render();
 		
 		// cancel and save buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
@@ -3779,20 +3866,17 @@ function EditorSaveController(div, editorController) {
 		saveBtn.html("Save");
 		saveBtn.click(function() { if (callbackFnSave) callbackFnSave(); });
 		
+		// register changes
+		includePublicCheckbox.onChecked(update);
+		includePrivateCheckbox.onChecked(update);
+		saveAsDropdown.onSelected(update);
+		
+		// initialize
+		update();
+		
 		// done
 		if (onDone) onDone(div);
-	}
-	
-	this.savePublic = function() {
-		throw new Error("Not implemented");
-	}
-	
-	this.savePrivate = function() {
-		throw new Error("Not implemented");
-	}
-	
-	this.getSaveType = function() {
-		return "JSON";	// TODO: implement this
+		return that;
 	}
 	
 	this.onSave = function(callbackFn) {
@@ -3802,94 +3886,40 @@ function EditorSaveController(div, editorController) {
 	this.onCancel = function(callbackFn) {
 		callbackFnCancel = callbackFn;
 	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function update() {
+		console.log(getConfig());
+	}
+	
+	function getConfig() {
+		
+		// get selected file type
+		var fileType;
+		var selectedText = saveAsDropdown.getSelectedText();
+		switch (selectedText) {
+			case "Save as JSON":
+				fileType = AppUtils.FileType.JSON;
+				break;
+			case "Save as CSV":
+				fileType = AppUtils.FileType.CSV;
+				break;
+			case "Save as TXT":
+				fileType = AppUtils.FileType.TXT;
+				break;
+			default: throw new Error("Unrecognized save type selection: " + selectedText);
+		}
+		
+		// return config
+		return {
+			includePublic: includePublicCheckbox.isChecked(),
+			includePrivate: includePrivateCheckbox.isChecked(),
+			fileType: fileType
+		}
+	}
 }
 inheritsFrom(EditorSaveController, DivController);
-
-/**
- * Controls a single checkbox.
- * 
- * @param div is the div to render to
- * @param label is the checkbox label
- * @param tooltip is the tooltip text
- */
-function CheckboxController(div, label, tooltip) {
-	DivController.call(this, div);
-	
-	var that = this;
-	var checkbox;
-	var infoImg;
-	
-	this.render = function(onDone) {
-		
-		// div setup
-		div.empty();
-		div.addClass("flex_horizontal flex_align_center");
-		
-		// build div
-		var id = uuidv4();
-		checkbox = $("<input type='checkbox' id='" + id + "'>").appendTo(div);
-		var checkboxLabel = $("<label class='user_select_none' for='" + id + "'>").appendTo(div);
-		checkboxLabel.html(label);
-		
-		// info tooltip
-		if (tooltip) {
-			infoImg = $("<img src='img/information_white.png' class='info_tooltip_img'>").appendTo(div);
-			var tooltipDiv = $("<div>");
-			tooltipDiv.append(tooltip);
-			tippy(infoImg.get(0), {
-				arrow: true,
-				html: tooltipDiv.get(0),
-				placement: 'bottom',
-				theme: 'translucent',
-				trigger: "mouseenter",
-				multiple: 'false',
-				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
-				distance: 20,
-				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-				offset: '0, 0'
-			});
-		}
-		
-		// done
-		if (onDone) onDone(div);
-		return that;
-	}
-	
-	this.click = function(callback) {
-		return checkbox.click(callback);
-	}
-	
-	this.getCheckbox = function() {
-		return checkbox;
-	}
-	
-	this.setChecked = function(bool) {
-		assertBoolean(bool);
-		checkbox.prop("checked", bool);
-	}
-	
-	this.isChecked = function() {
-		return checkbox.prop("checked");
-	}
-	
-	this.setEnabled = function(bool) {
-		assertBoolean(bool);
-		if (bool) {
-			checkbox.removeAttr("disabled");
-			infoImg.removeClass("info_tooltip_img_disabled");
-			infoImg.get(0)._tippy.enable();
-		} else {
-			checkbox.attr("disabled", "disabled");
-			infoImg.addClass("info_tooltip_img_disabled");
-			infoImg.get(0)._tippy.disable();
-		}
-	}
-	
-	this.isEnabled = function() {
-		return isInitialized(checkbox.attr("disabled"));
-	}
-}
-inheritsFrom(EditorActionsController, DivController);
 
 /**
  * Renders a piece with compact keypairs.

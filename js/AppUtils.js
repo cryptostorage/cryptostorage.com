@@ -317,6 +317,16 @@ var AppUtils = {
 		V0_CRYPTOJS: "V0_CRYPTOJS",
 		V1_CRYPTOJS: "V1_CRYPTOJS",
 	},
+	
+	/**
+	 * Gobal file types.
+	 */
+	FileType: {
+		JSON: "JSON",
+		CSV: "CSV",
+		TXT: "TXT",
+		ZIP: "ZIP"
+	},
 		
 	/**
 	 * Returns the version numbers from a string of the format NN.NN.NN.
