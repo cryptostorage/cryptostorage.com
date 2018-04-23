@@ -217,12 +217,16 @@ function CheckboxController(div, label, tooltip) {
 		assertBoolean(bool);
 		if (bool) {
 			checkbox.removeAttr("disabled");
-			infoImg.removeClass("info_tooltip_img_disabled");
-			infoImg.get(0)._tippy.enable();
+			if (infoImg) {
+				infoImg.removeClass("info_tooltip_img_disabled");
+				infoImg.get(0)._tippy.enable();
+			}
 		} else {
 			checkbox.attr("disabled", "disabled");
-			infoImg.addClass("info_tooltip_img_disabled");
-			infoImg.get(0)._tippy.disable();
+			if (infoImg) {
+				infoImg.addClass("info_tooltip_img_disabled");
+				infoImg.get(0)._tippy.disable();
+			}
 		}
 	}
 	
@@ -3897,12 +3901,12 @@ function EditorSaveController(div, pieces) {
 		saveBtn.html("Save");
 		
 		// register changes
-		includePublicCheckbox.onChecked(function() { prepareSavedFile(); });
-		includePrivateCheckbox.onChecked(function() { prepareSavedFile(); });
-		saveAsDropdown.onSelected(function(idx) { prepareSavedFile(); });
+		includePublicCheckbox.onChecked(function() { update(); });
+		includePrivateCheckbox.onChecked(function() { update(); });
+		saveAsDropdown.onSelected(function(idx) { update(); });
 		
-		// prepare saved file
-		prepareSavedFile();
+		// initialize
+		update();
 		
 		// done
 		if (onDone) onDone(div);
@@ -3919,7 +3923,11 @@ function EditorSaveController(div, pieces) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
-	function prepareSavedFile(onDone) {
+	function update(onDone) {
+		
+		// toggle include checkboxes
+		includePrivateCheckbox.setEnabled(includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(includePrivateCheckbox.isChecked());
 		
 		// disable save button
 		setSaveEnabled(false);
@@ -4108,6 +4116,7 @@ function EditorSaveController(div, pieces) {
 		assertInitialized(saveName);
 		if (getConfig().includePrivate || confirm("Funds CANNOT be recovered from the saved file because the private keys are not included.\n\nContinue?")) {
 			saveAs(saveBlob, saveName);
+			if (callbackFnSave) callbackFnSave();
 		}
 	}
 	
@@ -4141,10 +4150,7 @@ function EditorSaveController(div, pieces) {
 		if (bool) {
 			saveBtn.removeClass("btn_disabled");
 			saveBtn.unbind("click");
-			saveBtn.click(function() {
-				save();
-				if (callbackFnSave) callbackFnSave();
-			});
+			saveBtn.click(function() { save(); });
 		} else {
 			saveBtn.addClass("btn_disabled");
 		}
