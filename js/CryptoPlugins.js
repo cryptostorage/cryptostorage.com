@@ -960,7 +960,7 @@ function BIP39Plugin() {
 		var wordlist = WORDLISTS[language];
 		var shamir39 = new Shamir39();
 		if (!mnemonic) mnemonic = new Mnemonic(language);
-		var decoded = {publicAddress: null};
+		var decoded = {};
 		
 		// unencrypted wif
 		if (mnemonic.check(str)) {

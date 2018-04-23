@@ -52,6 +52,10 @@ function CryptoKeypair(config) {
 		return state.publicAddress;
 	}
 	
+	this.hasPublicAddress = function() {
+		return isDefined(state.publicAddress);
+	}
+	
 	this.getPrivateLabel = function() {
 		return state.plugin.getPrivateLabel();
 	}
@@ -65,7 +69,7 @@ function CryptoKeypair(config) {
 	}
 	
 	this.hasPrivateKey = function() {
-		return isDefined(that.getPrivateHex()) && isDefined(that.getPrivateWif());
+		return isDefined(that.getPrivateHex());
 	}
 	
 	this.encrypt = function(scheme, passphrase, onProgress, onDone) {
@@ -161,12 +165,34 @@ function CryptoKeypair(config) {
 		state.shareNum = shareNum;
 	}
 	
-	this.toJson = function(config) {
+	this.removePublicAddress = function() {
+		assertTrue(that.hasPrivateKey());
+		state.publicAddress = undefined;
+	}
+	
+	this.removePrivateKey = function() {
+		that.isPublicApplicable() ? assertDefined(that.getPublicAddress()) : assertUndefined(that.getPublicAddress());
+		state.privateHex = undefined;
+		state.privateWif = undefined;
+		state.encryption = undefined;
+		state.minShares = undefined;
+		state.shareNum = undefined;
+	}
+	
+	this.copy = function() {
+		var copied = new CryptoKeypair({
+			plugin: state.plugin,
+			privateKey: state.privateHex,
+			publicAddress: state.publicAddress,
+			shareNum: state.shareNum
+		});
 		
-		// check for config
-		if (config) return that.copy(config).toJson();
-		
-		// build json
+		// remove derived address if not in this keypair
+		if (isUndefined(state.publicAddress)) copied.removePublicAddress();
+		return copied;
+	}
+	
+	this.toJson = function() {
 		return {
 			ticker: state.plugin.getTicker(),
 			publicAddress: that.getPublicAddress(),
@@ -196,23 +222,6 @@ function CryptoKeypair(config) {
 			default:
 				throw new Error("Unrecognized CSV header: " + header);
 		}
-	}
-	
-	this.copy = function(config) {
-		
-		// default config
-		config = Object.assign({
-			includePublic: true,
-			includePrivate: true
-		}, config);
-		
-		// return new key
-		return new CryptoKeypair({
-			plugin: state.plugin,
-			privateKey: config.includePrivate ? state.privateHex : undefined,
-			publicAddress: config.includePublic ? state.publicAddress : undefined,
-			shareNum: config.includePrivate ? state.shareNum : undefined
-		});
 	}
 	
 	this.equals = function(keypair) {
@@ -272,10 +281,7 @@ function CryptoKeypair(config) {
 		
 		// public or private must be known
 		if (isUndefined(state.publicAddress)) assertTrue(that.hasPrivateKey());
-		if (!that.hasPrivateKey()) {
-			assertInitialized(state.publicAddress);
-			fail("Public address is not initialized for BIP39 so why didn't this fail");
-		}
+		if (!that.hasPrivateKey()) assertInitialized(state.publicAddress);
 				
 		// private key known
 		if (that.hasPrivateKey()) {
@@ -288,7 +294,7 @@ function CryptoKeypair(config) {
 			
 			// unencrypted
 			if (state.encryption === null) {
-				state.plugin.hasPublicAddress() ? assertInitialized(state.publicAddress) : assertNull(state.publicAddress);
+				state.plugin.hasPublicAddress() ? assertInitialized(state.publicAddress) : assertUndefined(state.publicAddress);
 				assertNull(state.minShares);
 				assertNull(state.shareNum);
 			}
@@ -339,7 +345,7 @@ function CryptoKeypair(config) {
 		if (decoded) {
 			state.privateHex = decoded.privateHex;
 			state.privateWif = decoded.privateWif;
-			state.publicAddress = that.isPublicApplicable() ? undefined : null,
+			state.publicAddress = undefined;
 			state.encryption = decoded.encryption;
 			state.minShares = null;
 			state.shareNum = null;
@@ -351,7 +357,7 @@ function CryptoKeypair(config) {
 		if (decoded) {
 			state.privateHex = decoded.privateHex;
 			state.privateWif = decoded.privateWif;
-			state.publicAddress = that.isPublicApplicable() ? undefined : null,
+			state.publicAddress = undefined;
 			state.encryption = undefined;
 			state.minShares = decoded.minShares;
 			state.shareNum = undefined;
@@ -414,12 +420,12 @@ function CryptoKeypair(config) {
 		var privateHex = secrets.combine(shamirHexes);
 		assertHex(privateHex);
 		setPrivateKey(privateHex);
-		setPublicAddress(publicAddress);
+		if (isDefined(publicAddress)) setPublicAddress(publicAddress);
 	}
 	
 	function setPublicAddress(address) {
 		if (state.publicAddress === address) return;
-		if (state.publicAddress) throw new Error("Cannot override known public address: " + state.publicAddress + " vs " + address);
+		if (isDefined(state.publicAddress)) throw new Error("Cannot override known public address: " + state.publicAddress + " vs " + address);
 		if (that.getEncryptionScheme() === null) throw new Error("Cannot set public address of unencrypted keypair");
 		assertTrue(state.plugin.isAddress(address), "Invalid address: " + address);
 		state.publicAddress = address;

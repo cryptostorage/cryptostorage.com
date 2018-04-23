@@ -44,6 +44,25 @@ function CryptoPiece(config) {
 		return state.keypairs;
 	}
 	
+	this.hasPublicAddresses = function() {
+		var bool;
+		for (var i = 0; i < state.keypairs.length; i++) {
+			if (!state.keypairs[i].isPublicApplicable()) continue;
+			if (isUndefined(bool)) bool = state.keypairs[i].hasPublicAddress();
+			else if (bool !== state.keypairs[i].hasPublicAddress()) throw new Error("Inconsistent hasPublicAddress() on keypair[" + i + "]");
+		}
+		return isDefined(bool) ? bool : false;
+	}
+	
+	this.hasPrivateKeys = function() {
+		var bool;
+		for (var i = 0; i < state.keypairs.length; i++) {
+			if (isUndefined(bool)) bool = state.keypairs[i].hasPrivateKey();
+			else if (bool !== state.keypairs[i].hasPrivateKey()) throw new Error("Inconsistent hasPrivateKey() on keypair[" + i + "]");
+		}
+		return bool;
+	}
+	
 	this.encrypt = function(passphrase, schemes, onProgress, onDone) {
 		
 		// verify input
@@ -180,10 +199,25 @@ function CryptoPiece(config) {
 		return pieceNum;
 	}
 	
-	this.toJson = function(config) {
-		
-		// check for config
-		if (config) return that.copy(config).toJson();
+	this.removePublicAddresses = function() {
+		for (var i = 0; i < state.keypairs.length; i++) {
+			state.keypairs[i].removePublicAddress();
+		}
+	}
+	
+	this.removePrivateKeys = function() {
+		for (var i = 0; i < state.keypairs.length; i++) {
+			state.keypairs[i].removePrivateKey();
+		}
+	}
+	
+	this.copy = function() {
+		var keypairCopies = [];
+		for (var i = 0; i < state.keypairs.length; i++) keypairCopies.push(state.keypairs[i].copy());
+		return new CryptoPiece({keypairs: keypairCopies});
+	}
+	
+	this.toJson = function() {
 		
 		// build json
 		var json = {};
@@ -196,14 +230,11 @@ function CryptoPiece(config) {
 		return json;
 	}
 	
-	this.toJsonStr = function(config) {
-		return JSON.stringify(that.toJson(config));
+	this.toJsonStr = function() {
+		return JSON.stringify(that.toJson());
 	}
 	
-	this.toCsv = function(config) {
-		
-		// check for config
-		if (config) return that.copy(config).toCsv();
+	this.toCsv = function() {
 		
 		// collect headers
 		var headers = [];
@@ -230,7 +261,7 @@ function CryptoPiece(config) {
 		return arrToCsv(csvArr);
 	}
 	
-	this.toTxt = function(config) {
+	this.toTxt = function() {
 		var str = "";
 		for (var i = 0; i < state.keypairs.length; i++) {
 			str += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\n\n";
@@ -238,12 +269,6 @@ function CryptoPiece(config) {
 			if (state.keypairs[i].getPrivateWif()) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPieceNum() ? "(split)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\n" + state.keypairs[i].getPrivateWif() + "\n\n";
 		}
 		return str.trim();
-	}
-	
-	this.copy = function(config) {
-		var keypairCopies = [];
-		for (var i = 0; i < state.keypairs.length; i++) keypairCopies.push(state.keypairs[i].copy(config));
-		return new CryptoPiece({keypairs: keypairCopies});
 	}
 	
 	this.equals = function(piece) {
