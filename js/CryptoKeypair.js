@@ -25,9 +25,10 @@
 /**
  * Encapsulates a crypto keypair which has a public and private component.
  * 
- * One of plugin, json, or splitKeypairs is required.
+ * One of keypair, plugin, json, or splitKeypairs is required.
  * 
  * @param config is initialization configuration
+ * 				config.keypair is a keypair to copy from
  * 				config.plugin is the crypto plugin
  * 				config.json is exportable json to initialize from
  * 				config.splitKeypairs are split keypairs to combine and initialize from
@@ -182,14 +183,7 @@ function CryptoKeypair(config) {
 	}
 	
 	this.copy = function() {
-		var copied = new CryptoKeypair({
-			plugin: state.plugin,
-			privateKey: state.privateHex,
-			publicAddress: state.publicAddress,
-			shareNum: state.shareNum
-		});
-		
-		// remove derived address if not in this keypair
+		var copied = new CryptoKeypair({keypair: that});
 		if (isUndefined(state.publicAddress)) copied.removePublicAddress();
 		return copied;
 	}
@@ -231,7 +225,7 @@ function CryptoKeypair(config) {
 		return objectsEqual(that.toJson(), keypair.toJson());
 	}
 	
-	this.getState = function() {
+	this.getInternalState = function() {
 		return state;
 	}
 	
@@ -240,6 +234,19 @@ function CryptoKeypair(config) {
 	init();
 	function init() {
 		state = {};
+		
+		// copy from keypair
+		if (config.keypair) {
+			assertUndefined(config.json);
+			assertUndefined(config.splitKeypairs);
+			assertUndefined(config.privateKey);
+			assertUndefined(config.publicAddress);
+			assertUndefined(config.shareNum);
+			state = Object.assign({}, config.keypair.getInternalState());
+			return;
+		}
+		
+		// create from pugin
 		if (config.plugin) {
 			assertTrue(isObject(config.plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
 			state.plugin = config.plugin;
@@ -247,7 +254,11 @@ function CryptoKeypair(config) {
 			else if (isUndefined(config.publicAddress)) setPrivateKey(config.plugin.randomPrivateKey());
 			if (config.publicAddress) setPublicAddress(config.publicAddress);
 		}
+		
+		// create from json
 		else if (config.json) fromJson(config.json);
+		
+		// create from splitKeypairs
 		else if (config.splitKeypairs) combine(config.splitKeypairs);
 		
 		// set share num

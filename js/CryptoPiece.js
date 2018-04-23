@@ -274,7 +274,7 @@ function CryptoPiece(config) {
 		return objectsEqual(that.toJson(), piece.toJson());
 	}
 	
-	this.getState = function() {
+	this.getInternalState = function() {
 		return state;
 	}
 	
