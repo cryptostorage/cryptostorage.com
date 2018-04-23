@@ -200,15 +200,13 @@ function CryptoPiece(config) {
 	}
 	
 	this.removePublicAddresses = function() {
-		for (var i = 0; i < state.keypairs.length; i++) {
-			state.keypairs[i].removePublicAddress();
-		}
+		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].removePublicAddress();
+		return this;
 	}
 	
 	this.removePrivateKeys = function() {
-		for (var i = 0; i < state.keypairs.length; i++) {
-			state.keypairs[i].removePrivateKey();
-		}
+		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].removePrivateKey();
+		return this;
 	}
 	
 	this.copy = function() {

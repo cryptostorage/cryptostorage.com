@@ -168,6 +168,7 @@ function CryptoKeypair(config) {
 	this.removePublicAddress = function() {
 		assertTrue(that.hasPrivateKey());
 		state.publicAddress = undefined;
+		return this;
 	}
 	
 	this.removePrivateKey = function() {
@@ -177,6 +178,7 @@ function CryptoKeypair(config) {
 		state.encryption = undefined;
 		state.minShares = undefined;
 		state.shareNum = undefined;
+		return this;
 	}
 	
 	this.copy = function() {

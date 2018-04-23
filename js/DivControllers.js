@@ -3924,8 +3924,20 @@ function EditorSaveController(div, pieces) {
 		// disable save button
 		setSaveEnabled(false);
 		
+		// transform pieces per configuration
+		var transformedPieces = [];
+		for (var i = 0; i < pieces.length; i++) {
+			if (!includePublicCheckbox.isChecked()) {
+				transformedPieces.push(pieces[i].copy().removePublicAddresses());
+			} else if (!includePrivateCheckbox.isChecked()) {
+				transformedPieces.push(pieces[i].copy().removePrivateKeys());
+			} else {
+				transformedPieces.push(pieces[i]);
+			}
+		}
+		
 		// prepare save blob and name
-		piecesToBlob(pieces, getConfig(), function(err, blob, name) {
+		piecesToBlob(transformedPieces, getConfig(), function(err, blob, name) {
 			assertNull(err);
 			saveBlob = blob;
 			saveName = name;
