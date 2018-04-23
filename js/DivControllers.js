@@ -3928,8 +3928,10 @@ function EditorSaveController(div, pieces) {
 		var transformedPieces = [];
 		for (var i = 0; i < pieces.length; i++) {
 			if (!includePublicCheckbox.isChecked()) {
+				assertTrue(includePrivateCheckbox.isChecked());
 				transformedPieces.push(pieces[i].copy().removePublicAddresses());
 			} else if (!includePrivateCheckbox.isChecked()) {
+				assertTrue(includePublicCheckbox.isChecked());
 				transformedPieces.push(pieces[i].copy().removePrivateKeys());
 			} else {
 				transformedPieces.push(pieces[i]);
