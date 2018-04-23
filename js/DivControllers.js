@@ -2251,7 +2251,7 @@ function ImportTextController(div, plugins) {
 	var lastKeys;
 	var decryptionController;
 	var importedStorageDiv;			// inline storage
-	var selectDefault = false;	// dropdown selection is assigned a defaultd
+	var selectDefault = false;	// dropdown selection is assigned a default
 	
 	this.render = function(onDone) {
 		
