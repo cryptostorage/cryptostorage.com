@@ -1305,7 +1305,7 @@ input[type='checkbox'][disabled] +label {
 .editor_export_div {
 	background-color: white;
 	min-width: 700px;
-	max-width: 950px;
+	max-width: 980px;
 	z-index: 1;
 }
 
@@ -1330,11 +1330,11 @@ input[type='checkbox'][disabled] +label {
 
 .editor_export_checkboxes {
 	flex-wrap: wrap;
-	padding: 20px 70px 0px 70px !important;
+	padding: 20px 68px 0px 68px !important;
 }
 
 .editor_export_checkboxes > div {
-	margin: 20px 10px 0px 10px;
+	margin: 20px 12px 0px 12px;
 }
 
 .editor_export_checkbox * {
