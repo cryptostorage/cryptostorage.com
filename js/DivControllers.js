@@ -252,6 +252,7 @@ function DropdownController(div, ddslickConfig, defaultText) {
 	var selectorId;
 	var selectorDisabler;
 	var onSelectedFn;
+	var currentIndex;
 
 	this.render = function(onDone) {
 		
@@ -303,7 +304,8 @@ function DropdownController(div, ddslickConfig, defaultText) {
 		selector = $("#" + selectorId, div);	// ddslick requires id reference
 		selector.ddslick(ddslickConfig);
 		selector = $("#" + selectorId, div);	// ddslick requires reference to be reassigned
-		if (!defaultText) that.setSelectedIndex(0);
+		if (defaultText) currentIndex = -1;
+		else that.setSelectedIndex(0);
 		that.setEnabled(true);
 	}
 	
@@ -2241,9 +2243,7 @@ function ImportTextController(div, plugins) {
 	var warningDiv;
 	var textInputDiv;						// all text input
 	var decryptionDiv;					// decryption div
-	var selector;
-	var selectorDisabler;
-	var selectedPlugin;
+	var cryptoSelector;
 	var textArea;
 	var importedPieces = [];		// string[]
 	var importedPiecesDiv;			// div for imported pieces
@@ -2273,7 +2273,7 @@ function ImportTextController(div, plugins) {
 		decryptionDiv = $("<div>").appendTo(importInputDiv);
 		decryptionDiv.hide();
 		
-		// currency selector data
+		// crypto selector data
 		selectorData = [];
 		for (var i = 0; i < plugins.length; i++) {
 			var plugin = plugins[i];
@@ -2283,10 +2283,8 @@ function ImportTextController(div, plugins) {
 			});
 		}
 		
-		// currency selector
-		var selectorContainer = $("<div class='import_selector_container'>").appendTo(textInputDiv);
-		selector = $("<div id='import_selector'>").appendTo(selectorContainer);
-		selectorDisabler = $("<div class='import_selector_disabler'>").appendTo(selectorContainer);
+		// crypto selector
+		cryptoSelector = new DropdownController($("<div>").appendTo(textInputDiv), {data: selectorData}, "Select a Currency").render();
 		
 		// text area
 		textArea = $("<textarea class='import_textarea'>").appendTo(textInputDiv);
@@ -2330,7 +2328,6 @@ function ImportTextController(div, plugins) {
 	}
 	
 	this.startOver = function() {
-		selectedPlugin = null;
 		setWarning("");
 		textArea.val("");
 		importedStorageDiv.hide();
@@ -2340,53 +2337,23 @@ function ImportTextController(div, plugins) {
 		importedPiecesDiv.hide();
 		controlsDiv.hide();
 		removePieces();
-		setSelectorEnabled(true);
-		setSelectedCurrency(null);
+		cryptoSelector.setEnabled(true);
+		cryptoSelector.reset();
 		if (decryptionController) decryptionController.cancel();
 	}
 	
-	function setSelectorEnabled(bool) {
-		if (bool) {
-			$("*", selector).removeClass("disabled_text");
-			selectorDisabler.hide();
-		} else {
-			$("*", selector).addClass("disabled_text");
-			selectorDisabler.show();
-		}
+	function getSelectedPlugin() {
+		return plugins[cryptoSelector.getSelectedIndex()];
 	}
 	
 	function setSelectedCurrency(ticker) {
-		
-		// reset dropdown
-		if (ticker === null) {
-			selector.ddslick("destroy");
-			selector = $("#import_selector", div);	// ddslick requires id reference
-			selector.ddslick({
-				data: selectorData,
-				background: "white",
-				imagePosition: "left",
-				selectText: "Select a Currency...",
-				width:'100%',
-				defeaultSelectedIndex: null,
-				onSelected: function(selection) {
-					selectedPlugin = plugins[selection.selectedIndex];
-				}
-			});
-			selectedPlugin: null,
-			selector = $("#import_selector", div);	// ddslick requires id reference
-		}
-		
-		// set to currency
-		else {
-			var name = AppUtils.getCryptoPlugin(ticker).getName();
-			for (var i = 0; i < selectorData.length; i++) {
-				if (selectorData[i].text === name) {
-					selector.ddslick('select', {index: i});
-					selectedPlugin = plugins[i];
-					break;
-				}
+		for (var i = 0; i < plugins.length; i++) {
+			if (plugins[i].getTicker() === ticker) {
+				cryptoSelector.selectIndex(ticker);
+				return;
 			}
 		}
+		throw new Error("No plugin for ticker: " + ticker);
 	}
 	
 	function onKeysImported(pieces, keys) {
@@ -2504,7 +2471,7 @@ function ImportTextController(div, plugins) {
 		
 		// get pieces from input text
 		try {
-			var piece = AppUtils.parsePieceFromText(text, selectedPlugin);
+			var piece = AppUtils.parsePieceFromText(text, getSelectedPlugin());
 		} catch (err) {
 			if (err.message.indexOf("Plugin required") !== -1) {
 				setWarning("No currency selected");
@@ -2589,7 +2556,7 @@ function ImportTextController(div, plugins) {
 	function renderImportedPieces(pieces) {
 		
 		// selector enabled iff no pieces
-		setSelectorEnabled(pieces.length === 0 || !selectedPlugin);
+		cryptoSelector.setEnabled(pieces.length === 0 || !getSelectedPlugin());
 
 		importedPiecesDiv.empty();
 		if (pieces.length === 0) {
