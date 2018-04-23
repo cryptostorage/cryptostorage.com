@@ -598,3 +598,14 @@ CryptoPiece.getCommonPlugin = function(pieces) {
 	}
 	return plugin;
 }
+
+/**
+ * Parses a string to a piece.
+ * 
+ * @param str is the string to parse to a piece
+ * @param plugin is the plugin associated with the keys to parse
+ * @returns a CryptoPiece parsed from the string, null if cannot parse
+ */
+CryptoPiece.parse = function(str, plugin) {
+	throw new Error("Not implemented");
+}

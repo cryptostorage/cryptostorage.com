@@ -1793,436 +1793,10 @@ inheritsFrom(ImportController, DivController);
 function ImportFileController(div) {
 	DivController.call(this, div);
 	
-	var that = this;
-	var importInputDiv;						// all import input
-	var warningDiv;
-	var warningMsg;
-	var fileInputDiv;							// drag and drop and imported pieces
-	var inputFiles;
-	var decryptionDiv;						// password input and decryption
-	var importedNamedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
-	var importedPiecesDiv;				// shows imported items
-	var controlsDiv;							// div for all control links
-	var importedStorageDiv;				// inline storage
-	var lastKeys;
-	var decryptionController;
-	
 	this.render = function(onDone) {
-		
-		// div setup
-		div.empty();
-		div.addClass("import_content_div");
-		
-		// div to collect all import input
-		importInputDiv = $("<div class='import_input_div'>").appendTo(div);
-		
-		// warning div
-		warningDiv = $("<div class='import_warning_div flex_horizontal flex_justify_center'>").appendTo(importInputDiv);
-		warningDiv.hide();
-		
-		// all file importing
-		fileInputDiv = $("<div>").appendTo(importInputDiv);
-		
-		// decryption div
-		decryptionDiv = $("<div>").appendTo(importInputDiv);
-		decryptionDiv.hide();
-		
-		// drag and drop div
-		var dragDropDiv = $("<div class='import_drag_drop flex_horizontal'>").appendTo(fileInputDiv);
-		var dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
-		var dragDropText = $("<div class='drag_drop_text flex_vertical flex_align_center flex_justify_center'>").appendTo(dragDropDiv);
-		var dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
-		dragDropLabel.append("Drag and Drop Files To Import");
-		var dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
-		dragDropBrowse.append("or click to browse");
-		
-		// register browse link with hidden input
-		inputFiles = $("<input type='file' multiple accept='.json,.csv,.zip'>").appendTo(dragDropDiv);
-		inputFiles.change(function() { onFilesImported($(this).get(0).files); });
-		inputFiles.hide();
-		dragDropBrowse.click(function() {
-			inputFiles.click();
-		});
-		
-		// setup drag and drop
-		setupDragAndDrop(dragDropDiv, onFilesImported);
-		
-		// imported files
-		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(fileInputDiv);
-		importedPiecesDiv.hide();
-		
-		// controls
-		controlsDiv = $("<div class='import_controls'>").appendTo(importInputDiv);
-		controlsDiv.hide();
-		resetControls();
-		
-		// div for inline storage
-		importedStorageDiv = $("<div class='imported_storage_div'>").appendTo(div);
-		importedStorageDiv.hide();
 		
 		// done rendering
 		if (onDone) onDone(div);
-	}
-	
-	this.getWarning = function() {
-		return that.warningMsg;
-	}
-	
-	this.setWarning = function(str, img) {
-		that.warningMsg = str;
-		warningDiv.hide();
-		warningDiv.empty();
-		if (str) {
-			if (!img) img = $("<img src='img/caution.png'>");
-			warningDiv.append(img);
-			img.addClass("import_warning_div_icon");
-			warningDiv.append(str);
-			warningDiv.show();
-		} else {
-			warningDiv.hide();
-		}
-	}
-	
-	this.addNamedPieces = function(namedPieces, onDone) {
-		for (var i = 0; i < namedPieces.length; i++) {
-			var namedPiece = namedPieces[i];
-			try {
-				AppUtils.validatePiece(namedPiece.piece, true);
-				if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
-			} catch (err) {
-				if (!AppUtils.DEV_MODE) console.log(err);
-				that.setWarning("Invalid piece '" + namedPiece.name + "': " + err.message);
-			}
-		}
-		updatePieces(onDone);
-	}
-	
-	this.startOver = function() {
-		that.setWarning("");
-		inputFiles.val("");
-		importedStorageDiv.hide();
-		importInputDiv.show();
-		fileInputDiv.show();
-		decryptionDiv.hide();
-		importedPiecesDiv.hide();
-		controlsDiv.hide();
-		removePieces();
-		if (decryptionController) decryptionController.cancel();
-	}
-	
-	// ------------------------ PRIVATE ------------------
-	
-	function resetControls() {
-		controlsDiv.empty();
-		addControl("start over", that.startOver);
-	}
-	
-	function addControl(text, onClick) {
-		var linkDiv = $("<div class='import_control_link_div'>").appendTo(controlsDiv);
-		var link = $("<div class='import_control_link'>").appendTo(linkDiv);
-		link.append(text);
-		link.click(function() { onClick(); });
-	}
-	
-	function onKeysImported(pieces, keys) {
-		resetControls();
-		that.setWarning("");
-		keys = listify(keys);
-		assertTrue(keys.length > 0);
-		if (keys[0].hasPrivateKey() && keys[0].isEncrypted()) {
-			
-			// create decryption controller and register callbacks
-			decryptionController = new DecryptionController(decryptionDiv, keys, function(warning) {
-				that.setWarning(warning);
-			}, function(decryptedKeys, decryptedPieces, decryptedPieceDivs) {
-				showInlineStorage(pieces, decryptedKeys, decryptedPieces, decryptedPieceDivs);
-			});
-			
-			// render decryption controller
-			decryptionController.render(function() {
-				
-				// replace file input div with decryption
-				fileInputDiv.hide();
-				decryptionDiv.show();
-				controlsDiv.show();
-				decryptionController.focus();
-				
-				// add control to view encrypted keys
-				addControl("view encrypted keys", function() {
-					UiUtils.openEditorTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
-				});
-			});
-		} else {
-			showInlineStorage(pieces, keys);
-		}
-	}
-	
-	function showInlineStorage(importedPieces, keys, pieces, pieceDivs) {
-		resetControls();
-		importInputDiv.hide();
-		importedStorageDiv.empty();
-		importedStorageDiv.show();
-		
-		// import success message
-		var successDiv = $("<div class='import_success_div flex_vertical'>").appendTo(importedStorageDiv);
-		var successTitle = $("<div class='import_success_title flex_horizontal'>").appendTo(successDiv);
-		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
-		successTitle.append("Imported Successfully");
-		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successDiv);
-		if (importedPieces.length > 1) successLinks.append("<div class='import_success_checkmark'>");	// filler to center control links under title text
-		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
-		startOver.append("start over");
-		startOver.click(function() { that.startOver(); });
-		if (importedPieces.length > 1) {
-			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
-			viewSplit.append("view split pieces");
-			viewSplit.click(function() { UiUtils.openEditorTab("Imported Pieces", {pieces: importedPieces}); });
-		}
-		
-		// inline storage
-		var storageDiv = $("<div>").appendTo(importedStorageDiv);
-		new ExportController(storageDiv, window, {
-			keys: keys,
-			pieces: pieces,
-			pieceDivs: pieceDivs,
-			isInline: true
-		}).render();
-	}
-	
-	// handle imported files
-	function onFilesImported(files) {
-		
-		// collect functions to read files
-		var funcs = [];
-		for (var i = 0; i < files.length; i++) {
-			funcs.push(readFileFunc(files[i]));
-		};
-		
-		function readFileFunc(file) {
-			return function(onDone) { readFile(file, onDone); }
-		}
-		
-		// read files asynchronously
-		async.parallel(funcs, function(err, results) {
-			if (err) throw err;
-			
-			// collect named pieces from results
-			var namedPieces = [];
-			for (var i = 0; i < results.length; i++) {
-				if (results[i]) namedPieces = namedPieces.concat(results[i]);
-			}
-			
-			// add all named pieces
-			if (namedPieces.length) that.addNamedPieces(namedPieces);
-		});
-		
-		// reads the given file and calls onNamedPieces(err, namedPieces) when done
-		function readFile(file, onNamedPieces) {
-			var reader = new FileReader();
-			reader.onload = function() {
-				getNamedPiecesFromFile(file, reader.result, function(err, namedPieces) {
-					if (err) {
-						that.setWarning(err.message);
-						onNamedPieces(null, null);
-					}
-					else if (namedPieces.length === 0) {
-						if (isJsonFile(file)) that.setWarning("File '" + file.name + "' is not a valid json piece");
-						if (isCsvFile(file)) that.setWarning("File '" + file.name + "' is not a valid csv piece");
-						else if (isZipFile(file)) that.setWarning("Zip '" + file.name + "' does not contain any valid pieces");
-						else throw new Error("Unrecognized file type: " + file.type);
-					} else {
-						onNamedPieces(null, namedPieces);
-					}
-				});
-			}
-			if (isJsonFile(file) || isCsvFile(file)) reader.readAsText(file);
-			else if (isZipFile(file)) reader.readAsArrayBuffer(file);
-			else that.setWarning("File is not a json, csv, or zip file");
-		}
-		
-		function getNamedPiecesFromFile(file, data, onNamedPieces) {
-			
-			// handle json file
-			if (isJsonFile(file)) {
-				var piece;
-				try {
-					piece = JSON.parse(data);
-					var namedPiece = {name: file.name, piece: piece};
-					onNamedPieces(null, [namedPiece]);
-				} catch (err) {
-					onNamedPieces(Error("Could not parse JSON content from '" + file.name + "'"));
-				}
-			}
-			
-			// handle csv file
-			else if (isCsvFile(file)) {
-				try {
-					piece = AppUtils.csvToPiece(data);
-					var namedPiece = {name: file.name, piece: piece};
-					onNamedPieces(null, [namedPiece]);
-				} catch (err) {
-					onNamedPieces(Error("'" + file.name + "' is not a valid piece"));
-				}
-			}
-			
-			// handle zip file
-			else if (isZipFile(file)) {
-				AppUtils.zipToPieces(data, function(namedPieces) {
-					onNamedPieces(null, namedPieces);
-				});
-			}
-		}
-	}
-	
-	function isPieceImported(name) {
-		for (var i = 0; i < importedNamedPieces.length; i++) {
-			if (importedNamedPieces[i].name === name) return true;
-		}
-		return false;
-	}
-	
-	function removePieces() {
-		importedNamedPieces = [];
-		lastKeys = undefined;
-		updatePieces();
-	}
-	
-	function removePiece(name) {
-		for (var i = 0; i < importedNamedPieces.length; i++) {
-			if (importedNamedPieces[i].name === name) {
-				importedNamedPieces.splice(i, 1);
-				that.setWarning("");
-				updatePieces();
-				return;
-			}
-		}
-		throw new Error("No piece with name '" + name + "' imported");
-	}
-	
-	function updatePieces(onDone) {
-		
-		// update UI
-		renderImportedPieces(importedNamedPieces);
-		
-		// collect all pieces
-		var pieces = [];
-		for (var i = 0; i < importedNamedPieces.length; i++) pieces.push(importedNamedPieces[i].piece);
-		if (!pieces.length) {
-			if (onDone) onDone();
-			return;
-		}
-		
-		// collect tickers being imported
-		var tickers = [];
-		for (var i = 0; i < pieces[0].keys.length; i++) tickers.push(pieces[0].keys[i].ticker);
-		tickers = toUniqueArray(tickers);
-		
-		// add control to view pieces
-		addControl("view imported pieces", function() {
-			UiUtils.openEditorTab("Imported Storage", {pieces: pieces});
-		});
-		
-		// attempt to get keys
-		var keys;
-		try {
-			var keys = AppUtils.piecesToKeys(pieces);
-		} catch (err) {
-			if (!AppUtils.DEV_MODE) console.log(err);
-			var img = err.message.indexOf("additional piece") > -1 ? $("<img src='img/files.png'>") : null;
-			that.setWarning(err.message, img);
-		}
-		
-		// import keys
-		if (keys && keys.length && keysDifferent(lastKeys, keys)) onKeysImported(pieces, keys);
-		lastKeys = keys;
-		
-		// done rendering
-		if (onDone) onDone();
-		
-		function keysDifferent(keys1, keys2) {
-			if (!keys1 && keys2) return true;
-			if (keys1 && !keys2) return true;
-			if (keys1.length !== keys2.length) return true;
-			for (var i = 0; i < keys1.length; i++) {
-				if (!keys1[i].equals(keys2[i])) return true;
-			}
-			return false;
-		}
-	}
-	
-	function renderImportedPieces(namedPieces) {
-		
-		// reset state
-		resetControls();
-		importedPiecesDiv.empty();
-		
-		// hide imported pieces and controls if no pieces
-		if (namedPieces.length === 0) {
-			importedPiecesDiv.hide();
-			controlsDiv.hide();
-			return;
-		}
-		
-		// render imported pieces
-		for (var i = 0; i < namedPieces.length; i++) {
-			importedPiecesDiv.append(getImportedPieceDiv(namedPieces[i]));
-		}
-		function getImportedPieceDiv(namedPiece) {
-			var importedPieceDiv = $("<div class='import_file_imported_piece'>").appendTo(importedPiecesDiv);
-			var icon = $("<img src='img/file.png' class='import_imported_icon'>").appendTo(importedPieceDiv);
-			importedPieceDiv.append(namedPiece.name);
-			var trash = $("<img src='img/trash.png' class='import_imported_trash'>").appendTo(importedPieceDiv);
-			trash.click(function() { removePiece(namedPiece.name); });
-			return importedPieceDiv;
-		}
-		
-		// show imported pieces and controls
-		importedPiecesDiv.show();
-		controlsDiv.show();
-	}
-	
-	/**
-	 * Sets up a drag and drop zone.
-	 * 
-	 * @param div is the drop zone as a jquery node
-	 * @param onFilesImported(files) is called when files are dropped into the drop zone
-	 */
-	function setupDragAndDrop(div, onFilesImported) {
-		
-		// register drag and drop events
-		div.get(0).ondrop = function(event) {
-			event.preventDefault();  
-	    event.stopPropagation();
-			div.removeClass("inner_outline");
-			var dt = event.dataTransfer;
-			
-			// use DataTransferItemList interface to access file(s)
-			if (dt.items) {
-				var files = [];
-				for (var i = 0; i < dt.items.length; i++) {
-					if (dt.items[i].kind == 'file') {
-						files.push(dt.items[i].getAsFile());
-					}
-				}
-				onFilesImported(files);
-			}
-			
-			// use DataTransfer interface to access file(s)
-			else {
-				onFilesImported(dt.files);
-			}
-		}
-		div.get(0).ondragenter = function(event) {
-			div.addClass("inner_outline");
-		}
-		div.get(0).ondragexit = function(event) {
-			div.removeClass("inner_outline");
-		}
-		div.get(0).ondragover = function(event) {
-			event.preventDefault();  
-	    event.stopPropagation();
-	    event.dataTransfer.dropEffect = 'copy';
-		}
 	}
 }
 inheritsFrom(ImportFileController, DivController);
@@ -2273,7 +1847,7 @@ function ImportTextController(div, plugins) {
 		decryptionDiv = $("<div>").appendTo(importInputDiv);
 		decryptionDiv.hide();
 		
-		// crypto selector data
+		// crypto selector
 		selectorData = [];
 		for (var i = 0; i < plugins.length; i++) {
 			var plugin = plugins[i];
@@ -2282,8 +1856,6 @@ function ImportTextController(div, plugins) {
 				imageSrc: plugin.getLogo().get(0).src
 			});
 		}
-		
-		// crypto selector
 		cryptoSelector = new DropdownController($("<div>").appendTo(textInputDiv), {data: selectorData}, "Select a Currency").render();
 		
 		// text area
@@ -2356,22 +1928,16 @@ function ImportTextController(div, plugins) {
 		throw new Error("No plugin for ticker: " + ticker);
 	}
 	
-	function onKeysImported(pieces, keys) {
+	function onPieceImported(importedPieces, piece) {
+		assertObject(piece, CryptoPiece);
 		resetControls();
 		setWarning("");
-		keys = listify(keys);
-		assertTrue(keys.length > 0);
-		if (keys[0].hasPrivateKey() && keys[0].isEncrypted()) {
+		
+		// encrypted piece
+		if (piece.isEncrypted()) {
 			
-			// create decryption controller and register callbacks
-			decryptionController = new DecryptionController(decryptionDiv, keys, function(warning) {
-				setWarning(warning);
-			}, function(decryptedKeys, decryptedPieces, decryptedPieceDivs) {
-				showInlineStorage(pieces, decryptedKeys, decryptedPieces, decryptedPieceDivs);
-			});
-			
-			// render decryption controller
-			decryptionController.render(function() {
+			// create decryption controller
+			decryptionController = new DecryptionController(decryptionDiv, piece).render(function() {
 				
 				// replace text input div with decryption
 				textInputDiv.hide();
@@ -2380,27 +1946,37 @@ function ImportTextController(div, plugins) {
 				decryptionController.focus();
 				
 				// add control to view encrypted keys
-				addControl("view encrypted keys", function() {
-					UiUtils.openEditorTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
+				addControl("view encrypted keypairs", function() {
+					throw new Error("View encrypted keypairs not implemented");
+					//UiUtils.openEditorTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
 				});
 			});
-		} else {
-			showInlineStorage(pieces, keys);
+			
+			// register decryption controller callbacks
+			decryptionController.onWarning(function(warning) { setWarning(warning); });
+			decryptionController.onDecrypted(function(piece, pieceRenderer) {
+				showInlineStorage(imporedPieces, piece, pieceRenderer);
+			});
+		}
+		
+		// unencrypted piece
+		else {
+			showInlineStorage(importedPieces, piece);
 		}
 	}
 	
-	function showInlineStorage(importedPieces, keys, pieces, pieceDivs) {
+	function showInlineStorage(importedPieces, piece, pieceRenderer) {
 		resetControls();
 		importInputDiv.hide();
 		importedStorageDiv.empty();
 		importedStorageDiv.show();
 		
 		// import success message
-		var successDiv = $("<div class='import_success_div flex_vertical'>").appendTo(importedStorageDiv);
-		var successTitle = $("<div class='import_success_title flex_horizontal'>").appendTo(successDiv);
+		var successDiv = $("<div class='import_success_div flex_vertical flex_align_center'>").appendTo(importedStorageDiv);
+		var successTitle = $("<div class='import_success_title flex_horizontal flex_align_center'>").appendTo(successDiv);
 		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
 		successTitle.append("Imported Successfully");
-		var successLinks = $("<div class='flex_horizontal import_success_links'>").appendTo(successDiv);
+		var successLinks = $("<div class='import_success_links flex_horizontal flex_justify_center'>").appendTo(successDiv);
 		if (importedPieces.length > 1) successLinks.append("<div class='import_success_checkmark'>");	// filler to center control links under title text
 		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
@@ -2408,17 +1984,15 @@ function ImportTextController(div, plugins) {
 		if (importedPieces.length > 1) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
 			viewSplit.append("view split pieces");
-			viewSplit.click(function() { UiUtils.openEditorTab("Imported Pieces", {pieces: importedPieces}); });
+			viewSplit.click(function() { throw new Error("View split pieces not implemented"); });
 		}
 		
 		// inline storage
-		var storageDiv = $("<div>").appendTo(importedStorageDiv);
-		new ExportController(storageDiv, window, {
-			keys: keys,
-			pieces: pieces,
-			pieceDivs: pieceDivs,
-			isInline: true
-		}).render();
+		if (pieceRenderer) {
+			pieceRenderer.getDiv().appendTo(importedStorageDiv);
+		} else {
+			new CompactPieceRenderer($("<div>").appendTo(importedStorageDiv), piece).render();
+		}
 	}
 	
 	function setWarning(str, img) {
@@ -2436,13 +2010,13 @@ function ImportTextController(div, plugins) {
 	
 	function removePieces() {
 		importedPieces = [];
-		lastKeys = undefined;
+		lastKeys = undefined;	// TODO: this needs removed
 		processPieces();
 	}
 	
 	function removePiece(piece) {
 		for (var i = 0; i < importedPieces.length; i++) {
-			if (equals(importedPieces[i], piece)) {
+			if (importedPieces[i].equals(piece)) {
 				importedPieces.splice(i, 1);
 				processPieces();
 				return;
@@ -2471,7 +2045,7 @@ function ImportTextController(div, plugins) {
 		
 		// get pieces from input text
 		try {
-			var piece = AppUtils.parsePieceFromText(text, getSelectedPlugin());
+			var piece = CryptoPiece.parse(text, getSelectedPlugin());
 		} catch (err) {
 			if (err.message.indexOf("Plugin required") !== -1) {
 				setWarning("No currency selected");
@@ -2494,7 +2068,10 @@ function ImportTextController(div, plugins) {
 		}
 		
 		// assign pieceNum if not given
-		if (!piece.pieceNum) piece.pieceNum = getNextAvailablePieceNum(importedPieces);
+		if (!piece.getPieceNum()) {
+			throw new Error("Need to assign piece num");
+			//piece.pieceNum = getNextAvailablePieceNum(importedPieces);
+		}
 		
 		// accept piece into imported pieces
 		textArea.val("");
@@ -2519,7 +2096,9 @@ function ImportTextController(div, plugins) {
 		function getCompatibilityError(piece, pieces) {
 			
 			// check if piece already added
-			if (arrayContains(pieces, piece)) return "Piece already imported";
+			for (var i = 0; i < pieces.length; i++) {
+				if (pieces[i].equals(piece)) return "Piece already imported";
+			}
 			
 			// no issues adding private key
 			return null;
@@ -2540,13 +2119,14 @@ function ImportTextController(div, plugins) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openEditorTab("Imported Storage", {pieces: importedPieces});
+			throw new Error("View imported pieces not supported");
+			//UiUtils.openEditorTab("Imported Storage", {pieces: importedPieces});
 		});
 		
 		// check if pieces combine to make private keys
 		try {
-			var keys = AppUtils.piecesToKeys(importedPieces);
-			onKeysImported(importedPieces, keys);
+			throw new Error("How to combine pieces with error below?");
+			onPieceImported(importedPieces, piece);
 		} catch (err) {
 			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 			else setWarning(err.message);
@@ -2574,8 +2154,8 @@ function ImportTextController(div, plugins) {
 		function getImportedPieceDiv(piece) {
 			var importedPieceDiv = $("<div class='import_text_imported_piece'>").appendTo(importedPiecesDiv);
 			var icon = $("<img src='img/file.png' class='import_imported_icon'>").appendTo(importedPieceDiv);
-			assertTrue(piece.keys.length > 0);
-			var pieceLabel = piece.keys.length === 1 ? (piece.keys[0].wif ? piece.keys[0].wif : piece.keys[0].address) : "Imported piece" + (piece.pieceNum ? " " + piece.pieceNum : "");
+			assertTrue(piece.getKeypairs().length > 0);
+			var pieceLabel = piece.getKeypairs().length === 1 ? (piece.getKeypairs()[0].hasPrivateKey() ? piece.getKeypairs()[0].getPrivateWif() : piece.getKeypairs()[0].getPublicAddress()) : "Imported piece" + (piece.getPieceNum() ? " " + piece.getPieceNum() : "");
 			importedPieceDiv.append(AppUtils.getShortenedString(pieceLabel, MAX_PIECE_LENGTH));
 			var trash = $("<img src='img/trash.png' class='import_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
