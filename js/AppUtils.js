@@ -328,6 +328,20 @@ var AppUtils = {
 		TXT: "TXT",
 		ZIP: "ZIP"
 	},
+	
+	/**
+	 * Returns the file extension for the given type.
+	 */
+	getExtension: function(fileType) {
+		assertString(fileType);
+		switch (fileType) {
+			case AppUtils.FileType.JSON: return ".json";
+			case AppUtils.FileType.CSV: return ".csv";
+			case AppUtils.FileType.TXT: return ".txt";
+			case AppUtils.FileType.ZIP: return ".zip";
+			default: throw new Error("Unrecognized file type: " + fileType);
+		}
+	},
 		
 	/**
 	 * Returns the version numbers from a string of the format NN.NN.NN.

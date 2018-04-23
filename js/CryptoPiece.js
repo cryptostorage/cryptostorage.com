@@ -215,6 +215,19 @@ function CryptoPiece(config) {
 		return new CryptoPiece({keypairs: keypairCopies});
 	}
 	
+	this.toString = function(fileType) {
+		assertString(fileType);
+		switch (fileType) {
+			case AppUtils.FileType.CSV:
+				return that.toCsv();
+			case AppUtils.FileType.TXT:
+				return that.toTxt();
+			case AppUtils.FileType.JSON:
+			default:
+				return that.toJsonStr();
+		}
+	}
+	
 	this.toJson = function() {
 		
 		// build json
