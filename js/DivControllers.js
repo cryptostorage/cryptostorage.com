@@ -2963,6 +2963,19 @@ function EditorController(div, config) {
 	
 	this.print = function() {
 		console.log("EditorController.print()");
+		
+		// fullscreen div
+		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
+		popupDiv.click(function(e) {
+			if (e.target !== this) return;
+			popupDiv.detach();
+		});
+		
+		// print controller
+		var printController = new EditorPrintController($("<div>").appendTo(popupDiv), pieces);
+		printController.onPrint(function() { popupDiv.detach(); });
+		printController.onCancel(function() { popupDiv.detach(); })
+		printController.render();
 	}
 	
 	this.hasFormError = function() {
@@ -4054,6 +4067,103 @@ function EditorSaveController(div, pieces) {
 	}
 }
 inheritsFrom(EditorSaveController, DivController);
+
+/**
+ * Print controller.
+ * 
+ * @param div is the div to render to
+ * @param pieceRenderers are rendered pieces
+ */
+function EditorPrintController(div, pieceRenderers) {
+	DivController.call(this, div);
+	
+	// validate input
+	assertArray(pieceRenderers);
+	assertTrue(pieceRenderers.length > 0);
+	
+	var that = this;
+	var includePublicCheckbox;
+	var includePrivateCheckbox;
+	var printBtn;
+	var callbackFnPrint;
+	var callbackFnCancel;
+	
+	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("editor_export_div flex_vertical flex_align_items_center")
+		
+		// header
+		var header = $("<div class='editor_export_header'>").appendTo(div);
+		header.append("Print");
+		
+		// checkboxes
+		var checkboxesDiv = $("<div class='flex_horizontal flex_justify_center'>").appendTo(div);
+		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save public addresses").render();
+		includePublicCheckbox.setChecked(true);
+		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
+		includePrivateCheckbox.setChecked(true);
+		
+		// cancel and print buttons
+		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
+		var cancelBtn = $("<div class='editor_export_btn_red flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
+		cancelBtn.html("Cancel");
+		cancelBtn.click(function() { if (callbackFnCancel) callbackFnCancel(); });
+		buttonsDiv.append($("<div style='width:150px;'>"));
+		printBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
+		printBtn.html("Print");
+		
+		// register changes
+		includePublicCheckbox.onChecked(function() { update(); });
+		includePrivateCheckbox.onChecked(function() { update(); });
+		
+		// initialize
+		update();
+		
+		// done
+		if (onDone) onDone(div);
+		return that;
+	}
+	
+	this.onPrint = function(callbackFn) {
+		callbackFnPrint = callbackFn;
+	}
+	
+	this.onCancel = function(callbackFn) {
+		callbackFnCancel = callbackFn;
+	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function update(onDone) {
+		
+		// toggle include checkboxes
+		includePrivateCheckbox.setEnabled(includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(includePrivateCheckbox.isChecked());
+		
+		// disable print button
+		setPrintEnabled(false);
+		
+		// render pieces
+		throw new Error("Not implemented");
+	}
+	
+	function print() {
+		throw new Error("Not implemented");
+	}
+	
+	function setPrintEnabled(bool) {
+		if (bool) {
+			printBtn.removeClass("btn_disabled");
+			printBtn.unbind("click");
+			printBtn.click(function() { print(); });
+		} else {
+			printBtn.addClass("btn_disabled");
+		}
+	}
+}
+inheritsFrom(EditorPrintController, DivController);
 
 /**
  * Renders a piece with compact keypairs.
