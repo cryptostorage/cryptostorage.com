@@ -25,11 +25,8 @@ function TestCrypto() {
 		testGeneratePieces(plugins, function(err) {
 			if (err) throw err;
 			
-			// test piece initialization
-			testPieceInit(plugins);
-			
 			// test piece encryption and splitting
-			testEncryptAndSplit(plugins, function(err) {
+			testPieceEncryption(plugins, function(err) {
 				if (err) throw err;
 				onDone();
 			});
@@ -67,7 +64,7 @@ function TestCrypto() {
 		}
 	}
 	
-	function testEncryptAndSplit(plugins, onDone) {
+	function testPieceEncryption(plugins, onDone) {
 		
 		// collect test functions
 		var testFuncs = [];
@@ -76,7 +73,7 @@ function TestCrypto() {
 		}
 		function testFunc(plugin) {
 			return function(onDone) {
-				testEncryptAndSplitPlugin(plugin, onDone);
+				testPieceEncryptionPlugin(plugin, onDone);
 			}
 		}
 		
@@ -86,7 +83,7 @@ function TestCrypto() {
 			onDone();
 		});
 		
-		function testEncryptAndSplitPlugin(plugin, onDone) {
+		function testPieceEncryptionPlugin(plugin, onDone) {
 			console.log("Testing " + plugin.getTicker() + " encryption and splitting");
 			
 			// collect keypair per encryption scheme
@@ -99,13 +96,12 @@ function TestCrypto() {
 			
 			// create piece from keypairs
 			var piece = new CryptoPiece({keypairs: keypairs});
-			assertFalse(piece.isEncrypted());
-			assertFalse(piece.isSplit());
-			testPieceState(piece);
 			var original = piece.copy();
 			
-			// test split
-			testSplit(piece);
+			// test piece
+			assertFalse(piece.isEncrypted());
+			assertFalse(piece.isSplit());
+			testPieceWithoutEncryption(piece);
 			
 			// encrypt piece
 			var progressStarted = false;
@@ -122,15 +118,12 @@ function TestCrypto() {
 				
 				// test state
 				assertTrue(piece === encryptedPiece);
-				testPieceState(piece);
 				assertTrue(progressStarted, "Progress was not started");
 				assertTrue(progressComplete, "Progress was not completed");
 				assertTrue(piece.isEncrypted());
 				assertFalse(piece.isSplit());
 				assertNull(piece.getPieceNum());
-				
-				// test split
-				testSplit(encryptedPiece);
+				testPiece(encryptedPiece);
 				
 				// cannot encrypt encrypted piece
 				try {
@@ -172,15 +165,26 @@ function TestCrypto() {
 		}
 	}
 	
-	function testSplit(piece) {
-		assertObject(piece, CryptoPiece);
+	// tests piece splitting, initialization, and conversion
+	function testPieceWithoutEncryption(piece) {
+		assertObject(piece);
+		if (piece.isSplit() === false) testPieceSplit(piece);
+		testPieceState(piece);
+		testPieceInit(piece);
+		testPieceConversion(piece);
+		testPieceExclude(piece);
+	}
+	
+	function testPieceSplit(unsplitPiece) {
+		assertObject(unsplitPiece, CryptoPiece);
+		assertFalse(unsplitPiece.isSplit());
 		
 		// copy original for later testing
-		var original = piece.copy();
-		assertTrue(original.equals(piece));
+		var original = unsplitPiece.copy();
+		assertTrue(original.equals(unsplitPiece));
 		
 		// split piece
-		var splitPieces = piece.split(NUM_PIECES, MIN_PIECES);
+		var splitPieces = unsplitPiece.split(NUM_PIECES, MIN_PIECES);
 		assertEquals(splitPieces.length, NUM_PIECES);
 		for (var i = 0; i < splitPieces.length; i++) {
 			
@@ -188,11 +192,11 @@ function TestCrypto() {
 			testPieceState(splitPieces[i]);
 			assertTrue(splitPieces[i].isSplit());
 			assertEquals(i + 1, splitPieces[i].getPieceNum());
-			assertEquals(piece.getKeypairs().length, splitPieces[i].getKeypairs().length);
+			assertEquals(unsplitPiece.getKeypairs().length, splitPieces[i].getKeypairs().length);
 			
 			// test that public addresses are equal
-			for (var j = 0; j < piece.getKeypairs().length; j++) {
-				assertEquals(piece.getKeypairs()[j].getPublicAddress(), splitPieces[i].getKeypairs()[j].getPublicAddress());
+			for (var j = 0; j < unsplitPiece.getKeypairs().length; j++) {
+				assertEquals(unsplitPiece.getKeypairs()[j].getPublicAddress(), splitPieces[i].getKeypairs()[j].getPublicAddress());
 			}
 		}
 		
@@ -201,7 +205,7 @@ function TestCrypto() {
 			splitPieces[0].encrypt(PASSPHRASE, [], function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
 			fail("fail");
 		} catch (err) {
-			if (err.message === "fail") throw new Error("Cannot encrypt split piece");
+			if (err.message === "fail") throw new Error("Cannot encrypt split unsplitPiece");
 		}
 		
 		// cannot split split piece
@@ -284,34 +288,34 @@ function TestCrypto() {
 		}
 	}
 	
-	function testPieceInit(plugins) {
-		console.log("Testing piece initialization");
-		
-		// create piece
-		var keypairs = [];
-		for (var i = 0; i < plugins.length; i++) keypairs.push(new CryptoKeypair({plugin: plugins[i]}));
-		var piece1 = new CryptoPiece({keypairs: keypairs});
+	function testPieceInit(piece) {
+		assertObject(piece, CryptoPiece);
 		
 		// test init from keypairs
-		var piece2 = new CryptoPiece({keypairs: keypairs});
-		assertTrue(piece1.equals(piece2));
+		var piece2 = new CryptoPiece({keypairs: piece.getKeypairs()});
+		assertTrue(piece.equals(piece2));
 		
 		// test init from piece
-		piece2 = new CryptoPiece({piece: piece1});
-		assertTrue(piece1.equals(piece2));
-		for (var i = 0; i < piece1.getKeypairs().length; i++) {
-			assertFalse(piece1.getKeypairs()[i] === piece2.getKeypairs()[i]);
+		piece2 = new CryptoPiece({piece: piece});
+		assertTrue(piece.equals(piece2));
+		for (var i = 0; i < piece.getKeypairs().length; i++) {
+			assertFalse(piece.getKeypairs()[i] === piece2.getKeypairs()[i]);
 		}
 		
-		// test init from json
-		piece2 = new CryptoPiece({json: piece1.toJson()});
-		assertTrue(piece1.equals(piece2));
+		// test init from split pieces
+		if (piece.isSplit() === false) {
+			var splitPieces = piece.split(3, 2);
+			for (var i = 0; i < splitPieces.length; i++) assertEquals(i + 1, splitPieces[i].getPieceNum());
+			var splitPiece = new CryptoPiece({piece: splitPieces[0]});
+			assertEquals(1, splitPiece.getPieceNum());
+			splitPiece = new CryptoPiece({keypairs: splitPieces[0].getKeypairs(), pieceNum: 5});
+			assertEquals(5, splitPiece.getPieceNum());
+			for (var i = 0; i < splitPiece.getKeypairs(); i++) assertEquals(5, splitPiece.getKeypairs()[i].getShareNum());
+			piece2 = new CryptoPiece({splitPieces: splitPieces});
+			assertTrue(piece.equals(piece2));
+		}
 		
-		// test init from csv
-		piece2 = new CryptoPiece({csv: piece1.toCsv()});
-		assertTrue(piece1.equals(piece2));
-		
-		// test invalid init with pieceNum
+		// test init with invalid pieceNum
 		try {
 			new CryptoPiece({keypairs: keypairs, pieceNum: 2});
 			throw new Error("fail");
@@ -319,16 +323,75 @@ function TestCrypto() {
 			if (err.message === "fail") throw new Error("Should not be able to set pieceNum on unencrypted keys");
 		}
 		
-		// test split
-		var splitPieces = piece1.split(3, 2);
-		for (var i = 0; i < splitPieces.length; i++) assertEquals(i + 1, splitPieces[i].getPieceNum());
-		var splitPiece = new CryptoPiece({piece: splitPieces[0]});
-		assertEquals(1, splitPiece.getPieceNum());
-		splitPiece = new CryptoPiece({keypairs: splitPieces[0].getKeypairs(), pieceNum: 5});
-		assertEquals(5, splitPiece.getPieceNum());
-		for (var i = 0; i < splitPiece.getKeypairs(); i++) assertEquals(5, splitPiece.getKeypairs()[i].getShareNum());
-		piece2 = new CryptoPiece({splitPieces: splitPieces});
-		assertTrue(piece1.equals(piece2));
+		// test json conversion
+		piece2 = new CryptoPiece({json: piece.toJson()});
+		assertTrue(piece.equals(piece2));
+		
+		// test csv conversion
+		piece2 = new CryptoPiece({csv: piece.toCsv()});
+		assertTrue(piece.equals(piece2));
+		
+		// test txt conversion
+		piece2 = new CryptoPiece({txt: piece.toTxt()});
+		assertTrue(piece.equals(piece2));
+	}
+	
+	function testPieceExclude(piece) {
+		assertObject(piece, CryptoPiece);
+		
+		// don't text exclusion if public or private missing
+		if (!piece.getKeypairs()[0].getPublicAddress() || !piece.getKeypairs()[0].hasPrivateKey()) return;
+		
+		// test exclude public
+		var modifiedPiece = testPieceExclusionWithConfig(piece, {includePublicAddresses: false, includePrivateKeys: true});
+		testPiece(modifiedPiece);
+		
+		// test exclude private
+		var modifiedPiece = testPieceExclusionWithConfig(piece, {includePublicAddresses: true, includePrivateKeys: false});
+		testPiece(modifiedPiece);
+		
+		function testPieceExclusionWithConfig(piece, config) {
+			
+			// validate config
+			assertBoolean(config.includePublicAddresses);
+			assertBoolean(config.includePrivateKeys);
+			if (!config.includePublicAddresses) assertTrue(config.includePrivateKeys);
+			if (!config.includePrivateWifs) assertTrue(config.includePublicAddresses);
+			
+			// build modified keypairs
+			var modifiedKeypairs = [];
+			for (var i = 0; i < piece.getKeypairs().length; i++) {
+				var keypair = piece.getKeypairs()[i];
+				
+				// validate config is valid for keypair
+				if (!config.includePrivateKeys) assertInitialized(keypair.getPublicAddress());
+				if (!config.includePublicAddresses) assertInitialized(keypair.getPrivateWif());
+				
+				// create new keypair according to config
+				var modifiedKeypair = new CryptoKeypair({
+					plugin: keypair.getPlugin(),
+					publicAddress: config.includePublicAddress ? keypair.getPublicAddress() : undefined,
+					privateKey: config.includePrivateWif ? keypair.getPrivateWif() : undefined
+				});
+				
+				// test modified keypair
+				if (modifiedKeypair.isEncrypted() || modifiedKeypair.isSplit()) {
+					assertUndefined(modifiedKeypair.getPublicAddress());
+					assertDefined(modifiedKeypair.getPrivateWif());
+				}
+				if (modifiedKeypair.getEncryptionScheme() === null) assertInitialized(modifiedKeypair.getPublicAddress());
+			}
+			
+			// build modified piece
+			var modifiedPiece = new CryptoPiece({keypairs: modifiedKeypairs, pieceNum: piece.getPieceNum()});
+			
+			// test conversion
+			assertTrue(modifiedPiece.equals(piece.copy(config)));
+			assertTrue(modifiedPiece.equals(new CryptoPiece({piece: modifiedPiece})));
+			assertTrue(modifiedPiece.equals(new CryptoPiece({json: piece.toJson(config)})));
+			assertTrue(modifiedPiece.equals(new CryptoPiece({csv: piece.toCsv(config)})));
+			assertTrue(modifiedPiece.equals(new CryptoPiece({txt: piece.toTxt(config)})));
+		}
 	}
 	
 	function testGeneratePieces(plugins, onDone) {
