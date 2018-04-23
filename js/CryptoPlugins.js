@@ -904,6 +904,7 @@ function BIP39Plugin() {
 	this.getLogoPath = function() { return "img/usb.png"; }
 	this.getDependencies = function() { return ["lib/bip39.js"]; }
 	this.getDonationAddress = function() { return null; }
+	this.hasPublicAddress = function() { return false; }
 	this.newKey = function(str) {
 		
 		// initialize
@@ -959,7 +960,7 @@ function BIP39Plugin() {
 		var wordlist = WORDLISTS[language];
 		var shamir39 = new Shamir39();
 		if (!mnemonic) mnemonic = new Mnemonic(language);
-		var decoded = {publicAddress: AppUtils.NA};
+		var decoded = {publicAddress: null};
 		
 		// unencrypted wif
 		if (mnemonic.check(str)) {
@@ -982,7 +983,7 @@ function BIP39Plugin() {
 	}
 	
 	this.isAddress = function(str) {
-		return str === AppUtils.NA;
+		return str === null;
 	}
 }
 inheritsFrom(BIP39Plugin, CryptoPlugin);

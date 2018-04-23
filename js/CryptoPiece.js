@@ -181,6 +181,11 @@ function CryptoPiece(config) {
 	}
 	
 	this.toJson = function(config) {
+		
+		// check for config
+		if (config) return that.copy(config).toJson();
+		
+		// build json
 		var json = {};
 		json.pieceNum = that.getPieceNum();
 		json.version = AppUtils.VERSION;
@@ -195,7 +200,10 @@ function CryptoPiece(config) {
 		return JSON.stringify(that.toJson(config));
 	}
 	
-	this.toCsv = function() {
+	this.toCsv = function(config) {
+		
+		// check for config
+		if (config) return that.copy(config).toCsv();
 		
 		// collect headers
 		var headers = [];
@@ -223,12 +231,18 @@ function CryptoPiece(config) {
 	}
 	
 	this.toTxt = function(config) {
-		throw new Error("Not implemented");
+		var str = "";
+		for (var i = 0; i < state.keypairs.length; i++) {
+			str += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\n\n";
+			if (state.keypairs[i].getPublicAddress()) str += "Public Address:\n" + state.keypairs[i].getPublicAddress() + "\n\n";
+			if (state.keypairs[i].getPrivateWif()) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPieceNum() ? "(split)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\n" + state.keypairs[i].getPrivateWif() + "\n\n";
+		}
+		return str.trim();
 	}
 	
-	this.copy = function() {
+	this.copy = function(config) {
 		var keypairCopies = [];
-		for (var i = 0; i < state.keypairs.length; i++) keypairCopies.push(state.keypairs[i].copy());
+		for (var i = 0; i < state.keypairs.length; i++) keypairCopies.push(state.keypairs[i].copy(config));
 		return new CryptoPiece({keypairs: keypairCopies});
 	}
 	

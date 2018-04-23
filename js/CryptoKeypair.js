@@ -64,6 +64,10 @@ function CryptoKeypair(config) {
 		return state.privateWif;
 	}
 	
+	this.hasPrivateKey = function() {
+		return isDefined(that.getPrivateHex()) && isDefined(that.getPrivateWif());
+	}
+	
 	this.encrypt = function(scheme, passphrase, onProgress, onDone) {
 		assertNull(state.encryption, "Keypair must be unencrypted to encrypt");
 		var address = that.getPublicAddress();
@@ -133,7 +137,8 @@ function CryptoKeypair(config) {
 	}
 	
 	this.isSplit = function() {
-		assertDefined(that.getMinShares(), "Keypair split is unknown");
+		if (!that.hasPrivateKey()) return undefined;
+		assertDefined(that.getMinShares(), "Min shares is unknown despite private key being known");
 		return that.getMinShares() !== null;
 	}
 	
@@ -146,12 +151,22 @@ function CryptoKeypair(config) {
 	}
 	
 	this.setShareNum = function(shareNum) {
-		assertTrue(that.isSplit());
-		assertTrue(shareNum !== null);
+		if (that.isSplit()) {
+			assertNumber(shareNum);
+		} else if (that.isSplit() === false) {
+			assertNull(shareNum);
+		} else if (that.isSplit() === undefined) {
+			assertUndefined(shareNum);
+		}
 		state.shareNum = shareNum;
 	}
 	
-	this.toJson = function() {
+	this.toJson = function(config) {
+		
+		// check for config
+		if (config) return that.copy(config).toJson();
+		
+		// build json
 		return {
 			ticker: state.plugin.getTicker(),
 			publicAddress: that.getPublicAddress(),
@@ -183,12 +198,20 @@ function CryptoKeypair(config) {
 		}
 	}
 	
-	this.copy = function() {
+	this.copy = function(config) {
+		
+		// default config
+		config = Object.assign({
+			includePublic: true,
+			includePrivate: true
+		}, config);
+		
+		// return new key
 		return new CryptoKeypair({
 			plugin: state.plugin,
-			privateKey: state.privateHex,
-			publicAddress: state.publicAddress,
-			shareNum: state.shareNum
+			privateKey: config.includePrivate ? state.privateHex : undefined,
+			publicAddress: config.includePublic ? state.publicAddress : undefined,
+			shareNum: config.includePrivate ? state.shareNum : undefined
 		});
 	}
 	
@@ -210,15 +233,17 @@ function CryptoKeypair(config) {
 			assertTrue(isObject(config.plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
 			state.plugin = config.plugin;
 			if (isDefined(config.privateKey)) setPrivateKey(config.privateKey);
-			else setPrivateKey(config.plugin.randomPrivateKey());
+			else if (isUndefined(config.publicAddress)) setPrivateKey(config.plugin.randomPrivateKey());
 			if (config.publicAddress) setPublicAddress(config.publicAddress);
 		}
 		else if (config.json) fromJson(config.json);
 		else if (config.splitKeypairs) combine(config.splitKeypairs);
 		
+		// set share num
+		if (isDefined(config.shareNum)) that.setShareNum(config.shareNum);
+		
 		// verify state
 		validateState();
-		if (isDefined(config.shareNum) && state.shareNum !== config.shareNum) throw new Error("Invalid initialization shareNum: " + config.shareNum);		
 	}
 	
 	function validateState() {
@@ -246,11 +271,14 @@ function CryptoKeypair(config) {
 		}
 		
 		// public or private must be known
-		if (!state.publicAddress) assertInitialized(state.privateHex);
-		if (!state.privateHex) assertInitialized(publicAddress);
+		if (isUndefined(state.publicAddress)) assertTrue(that.hasPrivateKey());
+		if (!that.hasPrivateKey()) {
+			assertInitialized(state.publicAddress);
+			fail("Public address is not initialized for BIP39 so why didn't this fail");
+		}
 				
 		// private key known
-		if (state.privateWif) {
+		if (that.hasPrivateKey()) {
 			
 			// min shares is known or not applicable
 			assertDefined(state.minShares);
@@ -260,7 +288,7 @@ function CryptoKeypair(config) {
 			
 			// unencrypted
 			if (state.encryption === null) {
-				assertInitialized(state.publicAddress);
+				state.plugin.hasPublicAddress() ? assertInitialized(state.publicAddress) : assertNull(state.publicAddress);
 				assertNull(state.minShares);
 				assertNull(state.shareNum);
 			}
@@ -279,10 +307,13 @@ function CryptoKeypair(config) {
 		}
 		
 		// private key unknown
-		if (!state.privateHex) {
+		if (!that.hasPrivateKey()) {
+			assertUndefined(state.privateHex);
+			assertUndefined(state.privateWif);
 			assertUndefined(state.minShares);
 			assertUndefined(state.shareNum);
 			assertUndefined(state.encryption);
+			assertDefined(state.publicAddress);
 		}
 	}
 	
@@ -308,7 +339,7 @@ function CryptoKeypair(config) {
 		if (decoded) {
 			state.privateHex = decoded.privateHex;
 			state.privateWif = decoded.privateWif;
-			state.publicAddress = undefined;
+			state.publicAddress = that.isPublicApplicable() ? undefined : null,
 			state.encryption = decoded.encryption;
 			state.minShares = null;
 			state.shareNum = null;
@@ -320,7 +351,7 @@ function CryptoKeypair(config) {
 		if (decoded) {
 			state.privateHex = decoded.privateHex;
 			state.privateWif = decoded.privateWif;
-			state.publicAddress = undefined;
+			state.publicAddress = that.isPublicApplicable() ? undefined : null,
 			state.encryption = undefined;
 			state.minShares = decoded.minShares;
 			state.shareNum = undefined;
@@ -342,14 +373,13 @@ function CryptoKeypair(config) {
 		state.plugin = AppUtils.getCryptoPlugin(json.ticker);
 		state.privateHex = json.privateHex;
 		state.privateWif = json.privateWif;
-		state.publicAddress = json.publicAddress;
 		state.encryption = json.encryption;
 		state.minShares = json.minShares;
 		if (json.encryption === null) assertUninitialized(json.shareNum);
 		state.shareNum = json.shareNum;
 		if (state.privateHex) setPrivateKey(state.privateHex);
 		else if (state.privateWif) setPrivateKey(state.privateWif);
-		if (state.publicAddress) setPublicAddress(state.publicAddress);
+		if (json.publicAddress) setPublicAddress(json.publicAddress);
 	}
 	
 	function combine(splitKeypairs) {

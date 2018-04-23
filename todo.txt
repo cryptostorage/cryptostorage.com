@@ -11,6 +11,7 @@ optimize private functions for performance
 update bip38 cryptojs description with pbkdf if necessary
 add support for dogecoin
 tippls
+import from txt string
 editor:
 	bip38 support
 	generate disabled, cancel enabled during generation
