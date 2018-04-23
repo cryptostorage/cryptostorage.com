@@ -1304,7 +1304,8 @@ input[type='checkbox'][disabled] +label {
 
 .editor_export_div {
 	background-color: white;
-	min-width: 800px;
+	min-width: 700px;
+	max-width: 950px;
 	z-index: 1;
 }
 
@@ -1312,11 +1313,11 @@ input[type='checkbox'][disabled] +label {
 	padding: 40px 80px 0px 80px;
 }
 
-.editor_export_div >div:first-child {
+.editor_export_div > div:first-child {
 	padding: 20px 20px 20px 20px;
 }
 
-.editor_export_div >div:last-child {
+.editor_export_div > div:last-child {
 	padding-bottom: 40px;
 }
 
@@ -1327,12 +1328,13 @@ input[type='checkbox'][disabled] +label {
 	background-color: rgb(17, 119, 184);
 }
 
-.editor_export_checkbox {
-	padding-right: 25px;
+.editor_export_checkboxes {
+	flex-wrap: wrap;
+	padding: 20px 70px 0px 70px !important;
 }
 
-.editor_export_checkbox:last-child {
-	padding-right: 0px;
+.editor_export_checkboxes > div {
+	margin: 20px 10px 0px 10px;
 }
 
 .editor_export_checkbox * {

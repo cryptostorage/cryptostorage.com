@@ -169,7 +169,7 @@ function CheckboxController(div, label, tooltip) {
 		// build div
 		var id = uuidv4();
 		checkbox = $("<input type='checkbox' id='" + id + "'>").appendTo(div);
-		var checkboxLabel = $("<label class='user_select_none' for='" + id + "'>").appendTo(div);
+		var checkboxLabel = $("<label style='white-space: nowrap;' class='user_select_none' for='" + id + "'>").appendTo(div);
 		checkboxLabel.html(label);
 		
 		// info tooltip
@@ -3890,7 +3890,7 @@ function EditorSaveController(div, pieces) {
 		header.append("Save");
 		
 		// checkboxes
-		var checkboxesDiv = $("<div class='flex_horizontal flex_justify_center'>").appendTo(div);
+		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(div);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save public addresses").render();
 		includePublicCheckbox.setChecked(true);
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
@@ -4102,7 +4102,7 @@ function EditorPrintController(div, pieceRenderers) {
 		header.append("Print");
 		
 		// checkboxes
-		var checkboxesDiv = $("<div class='flex_horizontal flex_justify_center'>").appendTo(div);
+		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(div);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show public addresses").render();
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show private keys").render();
 		includeLogosCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show currency logos").render();
@@ -4112,7 +4112,7 @@ function EditorPrintController(div, pieceRenderers) {
 		// initial state
 		includePublicCheckbox.setChecked(true);
 		includePrivateCheckbox.setChecked(true);
-
+		includeLogosCheckbox.setChecked(true);
 		
 		// cancel and print buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
