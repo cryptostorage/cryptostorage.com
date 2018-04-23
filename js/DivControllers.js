@@ -4084,6 +4084,9 @@ function EditorPrintController(div, pieceRenderers) {
 	var that = this;
 	var includePublicCheckbox;
 	var includePrivateCheckbox;
+	var includeLogosCheckbox;
+	var cryptoCashCheckbox;
+	var includeInstructionsCheckbox
 	var printBtn;
 	var callbackFnPrint;
 	var callbackFnCancel;
@@ -4100,10 +4103,16 @@ function EditorPrintController(div, pieceRenderers) {
 		
 		// checkboxes
 		var checkboxesDiv = $("<div class='flex_horizontal flex_justify_center'>").appendTo(div);
-		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save public addresses").render();
+		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show public addresses").render();
+		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show private keys").render();
+		includeLogosCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show currency logos").render();
+		cryptoCashCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "CryptoCash").render();
+		includeInstructionsCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Print Instructions (Two Sided)").render();
+		
+		// initial state
 		includePublicCheckbox.setChecked(true);
-		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
 		includePrivateCheckbox.setChecked(true);
+
 		
 		// cancel and print buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
