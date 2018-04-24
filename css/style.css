@@ -816,7 +816,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .import_success_div {
-	padding: 25px 0 10px 0;
+	padding: 25px 0 25px 0;
 }
 
 .import_success_title {
@@ -1082,6 +1082,11 @@ input[type='checkbox'][disabled] +label {
 .import_progress_div {
 	height: 50px;
 	background-color: white;
+}
+
+.import_inline_pieces_div {
+	background-color: white;
+	padding: 40px 0 40px 0;
 }
 
 .editor_div {

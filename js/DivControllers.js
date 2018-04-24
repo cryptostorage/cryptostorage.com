@@ -1987,11 +1987,14 @@ function ImportTextController(div, plugins) {
 			viewSplit.click(function() { throw new Error("View split pieces not implemented"); });
 		}
 		
+		// imported pieces div
+		var inlinePiecesDiv = $("<div class='import_inline_pieces_div flex_vertical flex_align_center'>").appendTo(importedStorageDiv);
+		
 		// inline storage
 		if (pieceRenderer) {
-			pieceRenderer.getDiv().appendTo(importedStorageDiv);
+			pieceRenderer.getDiv().appendTo(inlinePiecesDiv);
 		} else {
-			new CompactPieceRenderer($("<div>").appendTo(importedStorageDiv), piece).render();
+			new CompactPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece).render();
 		}
 	}
 	
@@ -3751,7 +3754,7 @@ function CompactPieceRenderer(div, piece, onProgress) {
 		// collect functions to render keypairs
 		var renderFuncs = [];
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			renderFuncs.push(renderFunc(new KeypairRenderer($("<div>"), piece.getKeypairs()[i], "#" + (i + 1))));
+			renderFuncs.push(renderFunc(new KeypairRenderer($("<div>"), piece.getKeypairs()[i], piece.getKeypairs().length > 1 ? "#" + (i + 1) : null)));
 		}
 		function renderFunc(keypairRenderer) {
 			return function(onDone) {
