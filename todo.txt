@@ -14,6 +14,7 @@ tippls
 import from txt string
 test setPieceNum
 ability to cancel import decryption, piece generation
+on decrypt decrypt progress bar should show 0%, not getting 0% onProgress()
 editor:
 	bip38 support
 	generate disabled, cancel enabled during generation

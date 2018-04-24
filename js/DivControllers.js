@@ -1893,7 +1893,7 @@ function ImportTextController(div, plugins) {
 	}
 	
 	function addControl(text, onClick) {
-		var linkDiv = $("<div class='import_control_link_div'>").appendTo(controlsDiv);
+		var linkDiv = $("<div class='import_control_link_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(controlsDiv);
 		var link = $("<div class='import_control_link'>").appendTo(linkDiv);
 		link.append(text);
 		link.click(function() { onClick(); });
@@ -1947,9 +1947,8 @@ function ImportTextController(div, plugins) {
 				decryptionController.focus();
 				
 				// add control to view encrypted keys
-				addControl("view encrypted keypairs", function() {
-					throw new Error("View encrypted keypairs not implemented");
-					//UiUtils.openEditorTab("Encrypted Keys", {keys: keys, splitPieces: pieces.length > 1 ? pieces : null});
+				addControl("view encrypted keys", function() {
+					UiUtils.openEditorTab("Encrypted keys", {pieces: [piece], sourcePieces: importedPieces.length > 1 ? importedPieces : null});
 				});
 			});
 			
