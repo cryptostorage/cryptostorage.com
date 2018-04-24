@@ -2121,9 +2121,15 @@ function ImportTextController(div, plugins) {
 			//UiUtils.openEditorTab("Imported Storage", {pieces: importedPieces});
 		});
 		
-		// check if pieces combine to make private keys
+		// handle non-split piece
+		if (importedPieces.length === 1 && importedPieces[0].isSplit() === false) {
+			onPieceImported(importedPieces, importedPieces[0]);
+			return;
+		}
+		
+		// try to combine pieces
 		try {
-			throw new Error("How to combine pieces with error below?");
+			var piece = new CryptoPiece({splitPieces: importedPieces});
 			onPieceImported(importedPieces, piece);
 		} catch (err) {
 			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
