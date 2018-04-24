@@ -60,10 +60,11 @@ window.exportToBody = function(window, config) {
 	// pagination requires div attached to dom
 	var body = $("body", window.document);
 	
+	// TODO: rendered piece and keypair copying
 	// clone piece divs because IE cannot transfer elements across windows
-	if (config.pieceRenderers) {
-		throw new Error("Transfer renderer divs not implemented");
-	}
+//	if (config.pieceRenderers) {
+//		throw new Error("Transfer renderer divs not implemented");
+//	}
 //	if (config.pieceDivs) {
 //		var clonedDivs = [];
 //		for (var i = 0; i < config.pieceDivs.length; i++) {

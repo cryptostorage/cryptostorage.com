@@ -1984,6 +1984,10 @@ function ImportTextController(div, plugins) {
 		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
+		var editor = $("<div class='import_control_link'>").appendTo(successLinks);
+		editor.append("export");
+		
+		// TODO: this moved to editor?
 		if (importedPieces.length > 1) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
 			viewSplit.append("view split pieces");
@@ -1997,8 +2001,14 @@ function ImportTextController(div, plugins) {
 		if (pieceRenderer) {
 			pieceRenderer.getDiv().appendTo(inlinePiecesDiv);
 		} else {
-			new CompactPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece).render();
+			pieceRenderer = new CompactPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
+			pieceRenderer.render();
 		}
+		
+		// export link opens editor
+		editor.click(function() {
+			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceRenderers: (pieceRenderer ? [pieceRenderer] : undefined)});
+		});
 	}
 	
 	function setWarning(str, img) {
@@ -2463,7 +2473,7 @@ function EditorController(div, config) {
 		return pieces;
 	}
 	
-	this.getPieceRendereres = function() {
+	this.getPieceRenderers = function() {
 		return pieceRenderers;
 	}
 	
@@ -2682,12 +2692,32 @@ function EditorController(div, config) {
 					actionsController = new EditorActionsController($("<div>").appendTo(bodyDiv), that);
 					actionsController.render();
 					
-					// initial state
+					// generate pieces from config
 					if (config.keyGenConfig) {
 						setKeyGenConfig(config.keyGenConfig);
 						that.generate(function() { if (onDone) onDone(); });
-					} else {
-						if (config.pieces) throw new Error("You ready to render dem pieces");
+					}
+					
+					// show given rendered pieces
+					else if (config.pieceRenderers) {
+						assertArray(config.pieceRenderers);
+						assertTrue(config.pieceRenderers.length > 0);
+						pieceRenderers = config.pieceRenderers;	// assign global piece renderers		// TODO: really?
+						pieces = [];														// assign global pieces	// TODO: really?
+						for (var i = 0; i < pieceRenderers.length; i++) {
+							pieces.push(pieceRenderers[i].getPiece());
+						}
+						that.update();
+						if (onDone) onDone(div);
+					}
+					
+					// render pieces then show
+					else if (config.pieces) {
+						throw new Error("Editor rendering pieces not implemented");
+					}
+					
+					// empty editor
+					else {
 						that.reset();
 						if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
 						if (onDone) onDone(div);
@@ -3827,6 +3857,10 @@ function CompactPieceRenderer(div, piece) {
 			// done
 			if (onDone) onDone(div);
 		});
+	}
+	
+	this.getPiece = function() {
+		return piece;
 	}
 	
 	this.onProgress = function(callbackFn) {
