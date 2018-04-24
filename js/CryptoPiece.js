@@ -199,6 +199,11 @@ function CryptoPiece(config) {
 		return pieceNum;
 	}
 	
+	this.setPieceNum = function(pieceNum) {
+		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].setShareNum(pieceNum);
+		return this;
+	}
+	
 	this.removePublicAddresses = function() {
 		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].removePublicAddress();
 		return this;
@@ -607,5 +612,41 @@ CryptoPiece.getCommonPlugin = function(pieces) {
  * @returns a CryptoPiece parsed from the string, null if cannot parse
  */
 CryptoPiece.parse = function(str, plugin) {
-	throw new Error("Not implemented");
+	
+	// validate non-empty string
+	assertTrue(isString(str));
+	assertFalse(str.trim() === "");
+	
+	// try to parse json
+	try { return new CryptoPiece({json: str}); }
+	catch (err) { }
+	
+	// try to parse csv
+	try { return new CryptoPiece({csv: str}); }
+	catch (err) {}
+	
+	// try to parse txt
+	try { return new CryptoPiece({txt: str}); }
+	catch (err) {}
+	
+	// otherwise must have plugin
+	if (!plugin) throw new Error("Plugin required to parse pieces");
+	
+	// get lines
+	var lines = getLines(str);
+	for (var i = 0; i < lines.length; i++) lines[i] = lines[i].trim();
+	lines.removeVal("");
+	
+	// build keypairs treating lines as private keys
+	var keypairs = [];
+	for (var i = 0; i < lines.length; i++) {
+		try {
+			keypairs.push(new CryptoKeypair({plugin: plugin, privateKey: lines[i]}));
+		} catch (err) {
+			return null;	// bail if invalid key given
+		}
+	}
+	
+	// return piece
+	return new CryptoPiece({keypairs: keypairs});
 }

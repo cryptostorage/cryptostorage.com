@@ -2043,9 +2043,10 @@ function ImportTextController(div, plugins) {
 			return;
 		}
 		
-		// get pieces from input text
+		// get piece from input text
+		var piece;
 		try {
-			var piece = CryptoPiece.parse(text, getSelectedPlugin());
+			piece = CryptoPiece.parse(text, getSelectedPlugin());
 		} catch (err) {
 			if (err.message.indexOf("Plugin required") !== -1) {
 				setWarning("No currency selected");
@@ -2067,11 +2068,8 @@ function ImportTextController(div, plugins) {
 			return;
 		}
 		
-		// assign pieceNum if not given
-		if (!piece.getPieceNum()) {
-			throw new Error("Need to assign piece num");
-			//piece.pieceNum = getNextAvailablePieceNum(importedPieces);
-		}
+		// assign piece num if not given
+		if (piece.isSplit() && !piece.getPieceNum()) piece.setPieceNum(getNextAvailablePieceNum(importedPieces));
 		
 		// accept piece into imported pieces
 		textArea.val("");
@@ -2083,7 +2081,7 @@ function ImportTextController(div, plugins) {
 			while (true) {
 				var found = false;
 				for (var i = 0; i < pieces.length; i++) {
-					if (pieces[i].pieceNum === pieceNum) {
+					if (pieces[i].getPieceNum() === pieceNum) {
 						found = true;
 						break;
 					} 

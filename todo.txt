@@ -12,6 +12,7 @@ update bip38 cryptojs description with pbkdf if necessary
 add support for dogecoin
 tippls
 import from txt string
+test setPieceNum
 editor:
 	bip38 support
 	generate disabled, cancel enabled during generation
