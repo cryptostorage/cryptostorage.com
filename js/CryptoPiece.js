@@ -296,6 +296,18 @@ function CryptoPiece(config) {
 		return state;
 	}
 	
+	this.getEncryptWeight = function() {
+		assertFalse(this.isEncryped(), "Cannot get encrypt weight if piece is unencrypted");
+		throw new Error("Not implemented");
+	}
+	
+	this.getDecryptWeight = function() {
+		assertTrue(this.isEncrypted(), "Cannot get decrypt weight if piece is encrypted");
+		var schemes = [];
+		for (var i = 0; i < state.keypairs.length; i++) schemes.push(state.keypairs[i].getEncryptionScheme());
+		return CryptoKeypair.getDecryptWeight(schemes);
+	}
+	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	init();
@@ -496,9 +508,11 @@ CryptoPiece.generatePieces = function(config, onProgress, onDone) {
 				var numRendered = 0;
 				var renderers = [];
 				for (var i = 0; i < pieces.length; i++) {
-					renderers.push(new config.rendererClass(null, pieces[i], function(percent, label) {
+					var renderer = new config.rendererClass(null, pieces[i]);
+					renderer.onProgress(function(percent, label) {
 						if (onProgress) onProgress((doneWeight + (numRendered + percent) * renderWeight / pieces.length) / totalWeight, label);
-					}));
+					});
+					renderers.push(renderer);
 				}
 				
 				// collect render callback functions

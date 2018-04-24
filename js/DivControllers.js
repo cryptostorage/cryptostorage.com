@@ -1937,7 +1937,8 @@ function ImportTextController(div, plugins) {
 		if (piece.isEncrypted()) {
 			
 			// create decryption controller
-			decryptionController = new DecryptionController(decryptionDiv, piece).render(function() {
+			decryptionController = new DecryptionController(decryptionDiv, piece);
+			decryptionController.render(function() {
 				
 				// replace text input div with decryption
 				textInputDiv.hide();
@@ -1955,7 +1956,7 @@ function ImportTextController(div, plugins) {
 			// register decryption controller callbacks
 			decryptionController.onWarning(function(warning) { setWarning(warning); });
 			decryptionController.onDecrypted(function(piece, pieceRenderer) {
-				showInlineStorage(imporedPieces, piece, pieceRenderer);
+				showInlineStorage(importedPieces, piece, pieceRenderer);
 			});
 		}
 		
@@ -2173,14 +2174,12 @@ function ImportTextController(div, plugins) {
 inheritsFrom(ImportTextController, DivController);
 
 /**
- * Controls passphrase input and key decryption on import.
+ * Controls passphrase input and piece decryption on import.
  * 
  * @param div is the div to render to
- * @param encrypted keys is an array of encrypted CryptoKeys
- * @param onWarning(msg) is called when this controller reports a warning
- * @param onKeysDecrypted(keys, pieces, pieceDivs) is invoked on successful decryption
+ * @param encryptedPiece is an encrypted piece to decrypt
  */
-function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
+function DecryptionController(div, encryptedPiece) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -2190,6 +2189,8 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	var progressDiv;
 	var submitButton;
 	var canceller = {};
+	var onWarningFn;
+	var onDecryptedFn;
 	
 	this.render = function(onDone) {
 		
@@ -2223,7 +2224,9 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	    }
 		});
 		
+		// done
 		if (onDone) onDone(div);
+		return that;
 	}
 	
 	this.focus = function() {
@@ -2232,6 +2235,19 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	
 	this.cancel = function() {
 		canceller.isCancelled = true;
+	}
+	
+	this.onWarning = function(callbackFn) {
+		onWarningFn = callbackFn;
+	}
+	
+	/**
+	 * Registers a callback function when a piece is decrypted.
+	 * 
+	 * @param callbackFn(decryptedPiece, pieceRenderer) is invoked when the piece is decrypted
+	 */
+	this.onDecrypted = function(callbackFn) {
+		onDecryptedFn = callbackFn;
 	}
 	
 	function init() {
@@ -2245,7 +2261,7 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 	function onSubmit() {
 		
 		// clear warning
-		onWarning("");
+		if (onWarningFn) onWarningFn("");
 		
 		// get passphrase
 		var passphrase = passphraseInput.val();
@@ -2258,8 +2274,9 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		}
 		
 		// compute weights for progress bar
-		var decryptWeight = AppUtils.getWeightDecryptKeys(encryptedKeys);
-		var renderWeight = IndustrialPieceRenderer.getWeight(encryptedKeys.length, 1, null);
+		var renderer = new CompactPieceRenderer(null, encryptedPiece);
+		var decryptWeight = encryptedPiece.getDecryptWeight();
+		var renderWeight = renderer.getRenderWeight();
 		var totalWeight = decryptWeight + renderWeight;
 		
 		// switch content div to progress bar
@@ -2271,30 +2288,26 @@ function DecryptionController(div, encryptedKeys, onWarning, onKeysDecrypted) {
 		// let UI breath
 		setImmediate(function() {
 			
-			// decrypt keys async
-			var copies = [];
-			for (var i = 0; i < encryptedKeys.length; i++) copies.push(encryptedKeys[i].copy());
-			AppUtils.decryptKeys(copies, passphrase, canceller, function(percent, label) {
+			// decrypt piece TODO: ability to cancel decryption
+			encryptedPiece.decrypt(passphrase, function(percent, label) {
 				setProgress(percent * decryptWeight / totalWeight, label);
-			}, function(err, decryptedKeys) {
-				if (canceller && canceller.isCancelled) return;
+			}, function(err, decryptedPiece) {
 				
 				// if error, switch back to input div
 				if (err) {
-					onWarning(err.message);
+					if (onWarningFn) onWarningFn(err.message);
 					init();
 					return;
 				}
 				
-				// convert keys to pieces
-				var pieces = AppUtils.keysToPieces(decryptedKeys);
+				// register renderer progress
+				renderer.onProgress(function(percent, label) {
+					setProgress((decryptWeight + percent * renderWeight) / totalWeight, "Rendering");
+				});
 				
-				// render pieces
-				new IndustrialPieceRenderer(pieces, null, null).render(function(percentDone) {
-					setProgress((decryptWeight + percentDone * renderWeight) / totalWeight, "Rendering");
-				}, function(err, pieceDivs) {
-					if (err) throw err;
-					onKeysDecrypted(decryptedKeys, pieces, pieceDivs);
+				// render piece
+				renderer.render(function(pieceDiv) {
+					if (onDecryptedFn) onDecryptedFn(decryptedPiece, renderer);
 				});
 			});
 		});
@@ -3733,14 +3746,14 @@ inheritsFrom(EditorPrintController, DivController);
  * 
  * @param div is the div to render to
  * @param piece is the piece to render
- * @param onProgress(percent) is invoked as render progress is made
  */
-function CompactPieceRenderer(div, piece, onProgress) {
+function CompactPieceRenderer(div, piece) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
 	
 	var keypairRenderers;
+	var onProgressFn;
 	
 	this.render = function(onDone) {
 		
@@ -3760,14 +3773,14 @@ function CompactPieceRenderer(div, piece, onProgress) {
 			return function(onDone) {
 				keypairRenderer.render(function(div) {
 					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
-					if (onProgress) onProgress(doneWeight / totalWeight, "Rendering keypairs");
+					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
 					onDone(null, keypairRenderer);
 				});
 			}
 		}
 		
 		// render keypairs
-		if (onProgress) onProgress(0, "Rendering keypairs");
+		if (onProgressFn) onProgressFn(0, "Rendering keypairs");
 		async.series(renderFuncs, function(err, _keypairRenderers) {
 			assertNull(err);
 			keypairRenderers = _keypairRenderers;
@@ -3811,6 +3824,16 @@ function CompactPieceRenderer(div, piece, onProgress) {
 			// done
 			if (onDone) onDone(div);
 		});
+	}
+	
+	this.onProgress = function(callbackFn) {
+		onProgressFn = callbackFn;
+	}
+	
+	this.getRenderWeight = function() {
+		var weight = 0;
+		for (var i = 0; i < piece.getKeypairs().length; i++) weight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i]);
+		return weight;
 	}
 	
 	function update(config) {
@@ -4063,8 +4086,22 @@ function KeypairRenderer(div, keypair, id) {
 	}
 }
 inheritsFrom(KeypairRenderer, DivController);
-KeypairRenderer.getRenderWeight = function(ticker) {
-	return 2 * 10;	// TODO: assumes 2 QR codes, 15 weight each
+
+/**
+ * Returns the weight to render the given ticker or keypair.
+ * 
+ * @param tickerOrKeypair can be a ticker or initialized keypair
+ * @returns the relative weight to render the keypair
+ */
+KeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
+	assertInitialized(tickerOrKeypair);
+	if (isString(tickerOrKeypair)) {
+		var plugin = AppUtils.getCryptoPlugin(tickerOrKeypair);
+		return 10 * plugin.hasPublicAddress() ? 2 : 1;
+	} else {
+		assertObject(tickerOrKeypair, CryptoKeypair);
+		return (tickerOrKeypair.hasPublicAddress() ? 10 : 0) + tickerOrKeypair.hasPrivateKey() ? 10 : 0; 
+	}
 }
 
 /**

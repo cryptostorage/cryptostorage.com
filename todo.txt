@@ -13,6 +13,7 @@ add support for dogecoin
 tippls
 import from txt string
 test setPieceNum
+ability to cancel import decryption, piece generation
 editor:
 	bip38 support
 	generate disabled, cancel enabled during generation
