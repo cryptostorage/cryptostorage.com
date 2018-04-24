@@ -66,7 +66,7 @@ var UiUtils = {
 	 * @param config specifies editor configuration
 	 * 				config.keyGenConfig is configuration to generate keypairs
 	 * 				config.pieces are pre-generated pieces to display
-	 * 				config.pieceRenderers are pre-rendered pieces to display
+	 * 				config.renderedPieces are pre-rendered pieces to display
 	 * 				config.sourcePieces are source pieces that the given piece was generated from
 	 * 				config.showNotices specifies whether or not to show the notice bar
 	 */
@@ -2007,7 +2007,7 @@ function ImportTextController(div, plugins) {
 		
 		// export link opens editor
 		editor.click(function() {
-			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceRenderers: (pieceRenderer ? [pieceRenderer] : undefined)});
+			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, renderedPieces: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
 		});
 	}
 	
@@ -2412,7 +2412,7 @@ inheritsFrom(TwoTabController, DivController);
  * @param config specifies editor configuration
  * 				config.keyGenConfig is configuration to generate keypairs
  * 				config.pieces are pre-generated pieces to display
- * 				config.pieceRenderers are pre-rendered pieces to display
+ * 				config.renderedPieces are pre-rendered pieces to display
  * 				config.sourcePieces are source pieces that the given piece was generated from
  * 				config.showNotices specifies whether or not to show the notice bar
  *  			config.environmentInfo is initial environment to display
@@ -2698,17 +2698,11 @@ function EditorController(div, config) {
 						that.generate(function() { if (onDone) onDone(); });
 					}
 					
-					// show given rendered pieces
-					else if (config.pieceRenderers) {
-						assertArray(config.pieceRenderers);
-						assertTrue(config.pieceRenderers.length > 0);
-						pieceRenderers = config.pieceRenderers;	// assign global piece renderers		// TODO: really?
-						pieces = [];														// assign global pieces	// TODO: really?
-						for (var i = 0; i < pieceRenderers.length; i++) {
-							pieces.push(pieceRenderers[i].getPiece());
-						}
+					// handle pre-rendered pieces
+					else if (config.pieces && config.renderedPieces) {
+						pieces = config.pieces;
 						that.update();
-						if (onDone) onDone(div);
+						if (onDone) onDone();
 					}
 					
 					// render pieces then show
@@ -2727,12 +2721,27 @@ function EditorController(div, config) {
 		}
 		
 		this.update = function() {
+			
+			// show crypto selector
 			currenciesDiv.show();
+			
+			// TODO: rebuilding piecesDiv unecessarily on every update
+			
+			// show divs from renderers
 			if (isArray(pieceRenderers) && pieceRenderers.length > 0) {
 				piecesDiv.empty();
-				for (var i = 0; i < pieceRenderers.length; i++) piecesDiv.append(pieceRenderers[i].getDiv());
 				piecesDiv.show();
+				for (var i = 0; i < pieceRenderers.length; i++) piecesDiv.append(pieceRenderers[i].getDiv());
 			}
+			
+			// show provided divs
+			else if (config.renderedPieces) {
+				piecesDiv.empty();
+				piecesDiv.show();
+				for (var i = 0; i < config.renderedPieces.length; i++) piecesDiv.append(config.renderedPieces[i]);
+			}
+			
+			// nothing to render
 			else piecesDiv.hide();
 		}
 	}
