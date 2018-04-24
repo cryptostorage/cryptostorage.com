@@ -26,12 +26,13 @@
  * Renders an editor to the given window's body.
  * 
  * @param window is the window to export to
- * @param config is the export configuration
- * 				config.splitPieces are imported split pieces
- * 				config.keys are keys to generate pieces from
- * 				config.pieces are pieces to export and generate pieceDivs from
- * 				config.pieceDivs are pre-generated piece divs ready for display
- * 				config.environmentInfo is initial info for the export (optional)
+ * @param config specifies editor configuration
+ * 				config.keyGenConfig is configuration to generate keypairs
+ * 				config.pieces are pre-generated pieces to display
+ * 				config.pieceRenderers are pre-rendered pieces to display
+ * 				config.sourcePieces are source pieces that the given piece was generated from
+ * 				config.showNotices specifies whether or not to show the notice bar
+ *  			config.environmentInfo is initial environment to display
  */
 window.exportToBody = function(window, config) {
 
@@ -60,15 +61,18 @@ window.exportToBody = function(window, config) {
 	var body = $("body", window.document);
 	
 	// clone piece divs because IE cannot transfer elements across windows
-	if (config.pieceDivs) {
-		var clonedDivs = [];
-		for (var i = 0; i < config.pieceDivs.length; i++) {
-			var clonedDiv = $("<div>", window.document);
-			clonedDiv[0].innerHTML = config.pieceDivs[i][0].outerHTML;
-			clonedDivs.push(clonedDiv);
-		}
-		config.pieceDivs = clonedDivs;
+	if (config.pieceRenderers) {
+		throw new Error("Transfer renderer divs not implemented");
 	}
+//	if (config.pieceDivs) {
+//		var clonedDivs = [];
+//		for (var i = 0; i < config.pieceDivs.length; i++) {
+//			var clonedDiv = $("<div>", window.document);
+//			clonedDiv[0].innerHTML = config.pieceDivs[i][0].outerHTML;
+//			clonedDivs.push(clonedDiv);
+//		}
+//		config.pieceDivs = clonedDivs;
+//	}
 	
 	// render editor
 	new EditorController($("<div>").appendTo(body), config).render();

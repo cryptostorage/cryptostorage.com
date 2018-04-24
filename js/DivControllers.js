@@ -30,6 +30,8 @@ var UiUtils = {
 	/**
 	 * Renders a progress bar to the given div.
 	 * 
+	 * TODO: make this its own controller
+	 * 
 	 * @param div is the div to render to
 	 * @returns a progress bar instance
 	 */
@@ -61,11 +63,12 @@ var UiUtils = {
 	 * Opens the editor in a new tab.
 	 * 
 	 * @param browserTabName is the name of the tab
-	 * @param config is the storage configuration
-	 * 				config.splitPieces are imported split pieces
-	 * 				config.keys are keys to generate pieces from
-	 * 				config.pieces are pieces to export and generate pieceDivs from
-	 * 				config.pieceDivs are pre-generated piece divs ready for display
+	 * @param config specifies editor configuration
+	 * 				config.keyGenConfig is configuration to generate keypairs
+	 * 				config.pieces are pre-generated pieces to display
+	 * 				config.pieceRenderers are pre-rendered pieces to display
+	 * 				config.sourcePieces are source pieces that the given piece was generated from
+	 * 				config.showNotices specifies whether or not to show the notice bar
 	 */
 	openEditorTab: function(browserTabName, config) {
 		
@@ -718,7 +721,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (!environmentFailure) UiUtils.openEditorTab(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin), confirmExit: true, showRegenerate: true}); 
+			if (!environmentFailure) UiUtils.openEditorTab(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin)}); 
 		}
 		
 		function getKeyGenConfig(plugin) {
@@ -2396,12 +2399,13 @@ inheritsFrom(TwoTabController, DivController);
  * Editor controller.
  * 
  * @param div is the div to render to
- * @param config specifies export page behavior
- * 				config.splitPieces are imported split pieces
- * 				config.keys are keys to generate pieces from
- * 				config.pieces are pieces to export and generate pieceDivs from
- * 				config.pieceDivs are pre-generated piece divs ready for display
+ * @param config specifies editor configuration
+ * 				config.keyGenConfig is configuration to generate keypairs
+ * 				config.pieces are pre-generated pieces to display
+ * 				config.pieceRenderers are pre-rendered pieces to display
+ * 				config.sourcePieces are source pieces that the given piece was generated from
  * 				config.showNotices specifies whether or not to show the notice bar
+ *  			config.environmentInfo is initial environment to display
  */
 function EditorController(div, config) {
 	DivController.call(this, div);
@@ -2682,8 +2686,8 @@ function EditorController(div, config) {
 					if (config.keyGenConfig) {
 						setKeyGenConfig(config.keyGenConfig);
 						that.generate(function() { if (onDone) onDone(); });
-					}
-					else {
+					} else {
+						if (config.pieces) throw new Error("You ready to render dem pieces");
 						that.reset();
 						if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
 						if (onDone) onDone(div);
