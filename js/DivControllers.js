@@ -2425,22 +2425,22 @@ function EditorController(div, config) {
 	var passphraseController
 	var splitController;
 	var contentController;
-	var progressDiv;
-	var progressBar;
-	var progressLabel;
-	var piecesDiv;
-	var logoHeader;
-	var currenciesDiv;
-	var currenciesController;
-	var actionsController;
 	var pieces;
-	var pieceRenderers;
+	var pieceDivs;
+	var hasError;
+	var formErrorChangeListeners;
+	var setPiecesListeners;
+	var generateListeners;
 	
 	this.render = function(onDone) {
 		
 		// init
 		div.empty();
 		div.addClass("editor_div flex_vertical flex_align_center");
+		hasError = false;
+		formErrorChangeListeners = [];
+		setPiecesListeners = [];
+		generateListeners = [];
 		
 		// copy config with defaults
 		config = Object.assign({
@@ -2454,155 +2454,50 @@ function EditorController(div, config) {
 		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal flex_align_center flex_justify_center'>").appendTo(headerDiv);
 		
 		// passphrase controller
-		passphraseController = new EditorPassphraseController($("<div>").appendTo(passphraseSplitDiv), that, that.update);
+		passphraseController = new EditorPassphraseController($("<div>").appendTo(passphraseSplitDiv), that);
 		passphraseController.render();
+		passphraseController.setUsePassphrase(false);
 		
 		// split controller
 		splitController = new EditorSplitController($("<div>").appendTo(passphraseSplitDiv), that.update);
 		splitController.render();
+		splitController.setUseSplit(false);
 		
 		// load body controller
-		contentController = new EditorContentController($("<div>").appendTo(div), config);
-		new LoadController(contentController).render();
+		contentController = new EditorContentController($("<div>").appendTo(div), that, config);
+		new LoadController(contentController).render(function() {
+			
+			// register callbacks
+			contentController.getActionsController().onGenerate(generate);
+			contentController.getActionsController().onReset(reset);
+			contentController.getActionsController().onCancel(cancel);
+			contentController.getActionsController().onSave(save);
+			contentController.getActionsController().onPrint(print);
+			passphraseController.onFormErrorChange(updateFormErrors);
+		});
 		
 		// done rendering
 		if (onDone) onDone(div);
 	}
 	
-	this.getPieces = function() {
-		return pieces;
+	this.getPassphraseController = function() {
+		return passphraseController;
 	}
 	
-	this.getPieceRenderers = function() {
-		return pieceRenderers;
+	this.getSplitController = function() {
+		return splitController;
 	}
 	
-	this.getCurrenciesController = function() {
-		return currenciesController;
+	this.getContentController = function() {
+		return contentController;
 	}
 	
-	this.validate = function() {
-		passphraseController.validate();
-		splitController.validate();
-		currenciesController.validate();
-	}
-	
-	this.generate = function(onDone) {
-		console.log("EditorController.generate()");
-		that.validate();
-		that.update();
-		if (that.hasFormError()) return;
-		
-		// hide body elems
-		logoHeader.hide();
-		currenciesDiv.hide();
-		piecesDiv.hide();
-		
-		// generate keys
-		piecesDiv.empty();
-		CryptoPiece.generatePieces(getGenerateConfig(), setGenerateProgress, function(err, _pieces, _pieceRenderers) {
-			if (err) throw err;
-			pieces = _pieces;
-			assertArray(pieces);
-			assertTrue(pieces.length > 0);
-			pieceRenderers = _pieceRenderers;
-			assertArray(pieceRenderers);
-			assertTrue(pieceRenderers.length > 0);
-			progressDiv.hide();
-			that.update();
-			if (onDone) onDone();
-		});
-	}
-	
-	this.reset = function() {
-		pieces = null;
-		pieceRenderers = null;
-		piecesDiv.empty();
-		piecesDiv.hide();
-		passphraseController.reset();
-		splitController.reset();
-		currenciesController.reset();
-	}
-	
-	this.save = function() {
-		console.log("EditorController.save()");
-		
-		// fullscreen div
-		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
-		popupDiv.click(function(e) {
-			if (e.target !== this) return;
-			popupDiv.detach();
-		});
-		
-		// save controller
-		var saveController = new EditorSaveController($("<div>").appendTo(popupDiv), pieces);
-		saveController.onSave(function() { popupDiv.detach(); });
-		saveController.onCancel(function() { popupDiv.detach(); })
-		saveController.render();
-	}
-	
-	this.print = function() {
-		console.log("EditorController.print()");
-		
-		// fullscreen div
-		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
-		popupDiv.click(function(e) {
-			if (e.target !== this) return;
-			popupDiv.detach();
-		});
-		
-		// print controller
-		var printController = new EditorPrintController($("<div>").appendTo(popupDiv), pieces);
-		printController.onPrint(function() { popupDiv.detach(); });
-		printController.onCancel(function() { popupDiv.detach(); })
-		printController.render();
-	}
-	
-	this.hasFormError = function() {
-		if (passphraseController.hasFormError()) return true;
-		if (splitController.hasFormError()) return true;
-		if (currenciesController.hasFormError()) return true;
-		return false;
-	}
-	
-	this.update = function() {
-		if (contentController) contentController.update();
-		if (passphraseController) passphraseController.update();
-		if (splitController) splitController.update();
-		if (actionsController) actionsController.update();
-	}
-	
-	// -------------------------------- PRIVATE ---------------------------------
-	
-	function setGenerateProgress(percent, label) {
-		progressBar.set(percent);
-		progressBar.setText(Math.round(percent * 100)  + "%");
-		progressLabel.html(label);
-		progressDiv.show();
-	}
-	
-	function setKeyGenConfig(keyGenConfig) {		
-		
-		// set passphrase
-		if (keyGenConfig.passphrase) passphraseController.setPassphrase(keyGenConfig.passphrase);
-		
-		// set split
-		if (keyGenConfig.numPieces) splitController.setNumPieces(keyGenConfig.numPieces);
-		if (keyGenConfig.minPieces) {
-			splitController.setMinPieces(keyGenConfig.minPieces);
-			splitController.setUseSplit(true);
-		}
-		
-		// set currencies
-		currenciesController.setConfig(keyGenConfig.currencies);
-	}
-	
-	function getGenerateConfig() {
+	this.getGenerateConfig = function() {
 		assertFalse(that.hasFormError());
 		var config = {};
 		
 		// set keypairs
-		config.keypairs = currenciesController.getConfig();	// TODO: rename to something better
+		config.keypairs = contentController.getCurrenciesController.getConfig();	// TODO: rename to something better
 		
 		// set passphrase
 		if (passphraseController.getUsePassphrase()) {
@@ -2634,128 +2529,310 @@ function EditorController(div, config) {
 		return config;
 	}
 	
-	/**
-	 * Inner body controller.
-	 */
-	function EditorContentController(div, config) {
-		DivController.call(this, div);
-		
-		this.render = function(onDone) {
-			
-			// div setup
-			div.empty();
-			div.addClass("editor_content_div flex_vertical flex_align_center");
-			
-			// load dependencies TODO: load correct dependencies
-			LOADER.load(AppUtils.getDynamicExportDependencies(), function(err) {
-				if (err) throw err;
-				
-				// notices
-				if (config.showNotices) {
-					
-					// poll environment info on loop
-					AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
-					
-					// notice div
-					var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
-					var noticeDiv = $("<div>").appendTo(noticeDivContainer);
-					new NoticeController(noticeDiv).render(function() { renderAux(); });
-				} else {
-					renderAux();
-				}
-				
-				function renderAux() {
-					
-					// editor body div
-					var bodyDiv = $("<div class='editor_body_div flex_vertical flex_align_center'>").appendTo(div);
-					
-					// cryptostorage logo
-					logoHeader = $("<div class='piece_page_header_div'>").appendTo(bodyDiv);
-					$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
-					
-					// progress bar
-					progressDiv = $("<div class='export_progress_div'>").appendTo(bodyDiv);
-					progressDiv.hide();
-					progressBar = UiUtils.getProgressBar(progressDiv);
-					progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
-					
-					// pieces bodyDiv
-					piecesDiv = $("<div class='export_pieces_div flex_vertical'>").appendTo(bodyDiv);
-					piecesDiv.hide();
-					
-					// currency inputs controller
-					currenciesDiv = $("<div>").appendTo(bodyDiv);
-					currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins(), that.update, that.update);
-					currenciesController.render();
-					
-					// actions controller
-					actionsController = new EditorActionsController($("<div>").appendTo(bodyDiv), that);
-					actionsController.render();
-					
-					// generate pieces from config
-					if (config.keyGenConfig) {
-						setKeyGenConfig(config.keyGenConfig);
-						that.generate(function() { if (onDone) onDone(); });
-					}
-					
-					// handle pre-rendered pieces
-					else if (config.pieces && config.renderedPieces) {
-						pieces = config.pieces;
-						that.update();
-						if (onDone) onDone();
-					}
-					
-					// render pieces then show
-					else if (config.pieces) {
-						throw new Error("Editor rendering pieces not implemented");
-					}
-					
-					// empty editor
-					else {
-						that.reset();
-						if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
-						if (onDone) onDone(div);
-					}
-				}
-			});
-		}
-		
-		this.update = function() {
-			
-			// show crypto selector
-			currenciesDiv.show();
-			
-			// TODO: rebuilding piecesDiv unecessarily on every update
-			
-			// show divs from renderers
-			if (isArray(pieceRenderers) && pieceRenderers.length > 0) {
-				piecesDiv.empty();
-				piecesDiv.show();
-				for (var i = 0; i < pieceRenderers.length; i++) piecesDiv.append(pieceRenderers[i].getDiv());
-			}
-			
-			// show provided divs
-			else if (config.renderedPieces) {
-				piecesDiv.empty();
-				piecesDiv.show();
-				for (var i = 0; i < config.renderedPieces.length; i++) piecesDiv.append(config.renderedPieces[i]);
-			}
-			
-			// nothing to render
-			else piecesDiv.hide();
-		}
+	this.setPieces = function(_pieces, _pieceDivs) {
+		pieces = _pieces;
+		pieceDivs = _pieceDivs;
+		invoke(setPiecesListeneres, piece, pieceDivs);
 	}
-	inheritsFrom(EditorContentController, DivController);
+	
+	this.getPieces = function() {
+		return [pieces, pieceDivs];
+	}
+	
+	this.onSetPieces = function(listener) {
+		assertFunction(listener);
+		setPiecesListeners.push(listener);
+	}
+	
+	this.onFormErrorChange = function(listener) {
+		assertFunction(listener);
+		formErrorChangeListeners.push(listener);
+	}
+	
+	this.hasFormError = function() {
+		return hasError;
+	}
+	
+	this.onGenerateProgress = function(listener) {
+		assertFunction(listener);
+		generateListeners.push(listener);
+	}
+	
+//	this.validate = function() {
+//		passphraseController.validate();
+//		splitController.validate();
+//		currenciesController.validate();
+//	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function setKeyGenConfig(keyGenConfig) {		
+		
+		// set passphrase
+		if (keyGenConfig.passphrase) passphraseController.setPassphrase(keyGenConfig.passphrase);
+		
+		// set split
+		if (keyGenConfig.numPieces) splitController.setNumPieces(keyGenConfig.numPieces);
+		if (keyGenConfig.minPieces) {
+			splitController.setMinPieces(keyGenConfig.minPieces);
+			splitController.setUseSplit(true);
+		}
+		
+		// set currencies
+		currenciesController.setConfig(keyGenConfig.currencies);
+	}
+	
+	function updateFormErrors() {
+		throw new Error("Not implemented");
+	}
+	
+	function generate() {
+		throw new Error("Generate not implemented");
+		
+		// validate form
+		that.validate();
+		if (that.hasFormError()) return;
+		
+		// hide body elems
+		logoHeader.hide();
+		currenciesDiv.hide();
+		piecesDiv.hide();
+		
+		// generate keys
+		piecesDiv.empty();
+		CryptoPiece.generatePieces(getGenerateConfig(), setGenerateProgress, function(err, _pieces, _pieceRenderers) {
+			if (err) throw err;
+			pieces = _pieces;
+			assertArray(pieces);
+			assertTrue(pieces.length > 0);
+			pieceRenderers = _pieceRenderers;
+			assertArray(pieceRenderers);
+			assertTrue(pieceRenderers.length > 0);
+			progressDiv.hide();
+			that.update();
+			if (onDone) onDone();
+		});
+	}
+	
+	function save() {
+		throw new Error("Save not implemented");
+		
+		// fullscreen div
+		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
+		popupDiv.click(function(e) {
+			if (e.target !== this) return;
+			popupDiv.detach();
+		});
+		
+		// save controller
+		var saveController = new EditorSaveController($("<div>").appendTo(popupDiv), pieces);
+		saveController.onSave(function() { popupDiv.detach(); });
+		saveController.onCancel(function() { popupDiv.detach(); })
+		saveController.render();
+	}
+		
+	function print() {
+		throw new Error("Print not implemented");
+		
+		// fullscreen div
+		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
+		popupDiv.click(function(e) {
+			if (e.target !== this) return;
+			popupDiv.detach();
+		});
+		
+		// print controller
+		var printController = new EditorPrintController($("<div>").appendTo(popupDiv), pieces);
+		printController.onPrint(function() { popupDiv.detach(); });
+		printController.onCancel(function() { popupDiv.detach(); });
+		printController.render();
+	}
+	
+	function reset() {
+		throw new Error("Reset not implemented");
+		
+		pieces = null;
+		pieceRenderers = null;
+		piecesDiv.empty();
+		piecesDiv.hide();
+		passphraseController.reset();
+		splitController.reset();
+		currenciesController.reset();
+	}
+	
+	function cancel() {
+		throw new Error("Cancel not implemented");
+	}
 }
 inheritsFrom(EditorController, DivController);
+
+/**
+ * Controls the editor content panel.
+ * 
+ * @param div is the div to render to
+ * @param editorController is the governing editor controller
+ * @param config specifies rendering config
+ * 				config.showNotices specifies if the notices bar should be shown
+ */
+function EditorContentController(div, editorController, config) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var hasError;
+	var formErrorChangeListeners;
+	var progressDiv;
+	var progressBar;
+	var progressLabel;
+	var piecesDiv;
+	var logoHeader;
+	var currenciesDiv;
+	var currenciesController;
+	var actionsController;
+	var pieceRenderers;
+	
+	this.render = function(onDone) {
+		
+		// init
+		div.empty();
+		div.addClass("editor_content_div flex_vertical flex_align_center");
+		lastError = false;
+		formErrorChangeListeners = [];
+		
+		// load dependencies TODO: load correct dependencies
+		LOADER.load(AppUtils.getDynamicExportDependencies(), function(err) {
+			if (err) throw err;
+			
+			// notices
+			if (config.showNotices) {
+				
+				// poll environment info on loop
+				AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
+				
+				// notice div
+				var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);
+				var noticeDiv = $("<div>").appendTo(noticeDivContainer);
+				new NoticeController(noticeDiv).render(function() { renderAux(); });
+			} else {
+				renderAux();
+			}
+			
+			function renderAux() {
+				
+				// editor body div
+				var bodyDiv = $("<div class='editor_body_div flex_vertical flex_align_center'>").appendTo(div);
+				
+				// cryptostorage logo
+				logoHeader = $("<div class='piece_page_header_div'>").appendTo(bodyDiv);
+				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
+				
+				// progress bar
+				progressDiv = $("<div class='export_progress_div'>").appendTo(bodyDiv);
+				progressDiv.hide();
+				progressBar = UiUtils.getProgressBar(progressDiv);
+				progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
+				
+				// pieces div
+				piecesDiv = $("<div class='export_pieces_div flex_vertical'>").appendTo(bodyDiv);
+				piecesDiv.hide();
+				
+				// currency inputs controller
+				currenciesDiv = $("<div>").appendTo(bodyDiv);
+				currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins());
+				currenciesController.render();
+				currenciesController.onFormErrorChange(function(hasError) { throw new Error("Not implemented"); });
+				//currenciesController.onInputChange(function() { throw new Error("Not implemented"); });
+				
+				// actions controller
+				actionsController = new EditorActionsController($("<div>").appendTo(bodyDiv), that);
+				actionsController.render();
+				
+				// select crypto if in dev mode
+				if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");
+				
+				// register callbacks
+				editorController.onSetPieces(setPieces);
+				editorController.onGenerateProgress(setGenerateProgress);
+				currenciesController.onFormErrorChange(setFormError);
+				
+				// set global pieces
+				if (config.pieces) editorController.setPieces(config.pieces, config.pieceDivs);
+				
+				// done
+				if (onDone) onDone(div);
+			}
+		});
+	}
+	
+	this.getCurrenciesController = function() {
+		return currenciesController;
+	}
+	
+	this.getActionsController = function() {
+		return actionsController;
+	}
+	
+	this.hasFormError = function() {
+		return hasError;
+	}
+	
+	this.onFormErrorChange = function(listener) {
+		formErrorChangeListeners.push(listener);
+	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function setPieces(pieces, pieceDivs) {
+		throw new Error("ContentController.onSetPieces() not implemented");
+	}
+	
+	function setGenerateProgress(percent, label) {
+		throw new Error("ContentController.onGenerateProgress() not implemented");
+		progressBar.set(percent);
+		progressBar.setText(Math.round(percent * 100)  + "%");
+		progressLabel.html(label);
+		progressDiv.show();
+	}
+	
+	function setFormError(_hasError) {
+		var change = hasError !== _hasError;
+		hasError = _hasError;
+		if (change) invoke(formErrorChangeListeners, hasError);
+	}
+	
+//	this.update = function() {
+//		
+//		// show crypto selector
+//		currenciesDiv.show();
+//		
+//		// TODO: rebuilding piecesDiv unecessarily on every update
+//		
+//		// show divs from renderers
+//		if (isArray(pieceRenderers) && pieceRenderers.length > 0) {
+//			piecesDiv.empty();
+//			piecesDiv.show();
+//			for (var i = 0; i < pieceRenderers.length; i++) piecesDiv.append(pieceRenderers[i].getDiv());
+//		}
+//		
+//		// show provided divs
+//		else if (config.renderedPieces) {
+//			piecesDiv.empty();
+//			piecesDiv.show();
+//			for (var i = 0; i < config.renderedPieces.length; i++) piecesDiv.append(config.renderedPieces[i]);
+//		}
+//		
+//		// nothing to render
+//		else piecesDiv.hide();
+//	}
+}
+inheritsFrom(EditorContentController, DivController);
 
 /**
  * Controls passphrase input and validation.
  * 
  * @param div is the div to render to
- * @param onChange() is invoked when the state changes
+ * @param editorController is a reference to the top-level editor
  */
-function EditorPassphraseController(div, editorController, onChange) {
+function EditorPassphraseController(div, editorController) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -2763,13 +2840,16 @@ function EditorPassphraseController(div, editorController, onChange) {
 	var passphraseInput;
 	var bip38Div;
 	var bip38Checkbox;
-	var formError;
+	var hasError;
+	var formErrorChangeListeners;
 
 	this.render = function(onDone) {
 		
-		// div setup
+		// init
 		div.empty();
 		div.addClass("editor_passphrase_div flex_horizontal flex_align_center flex_justify_start");
+		hasError = false;
+		formErrorChangeListeners = [];
 		
 		// passphrase checkbox
 		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?");
@@ -2803,49 +2883,43 @@ function EditorPassphraseController(div, editorController, onChange) {
 			offset: '0, 0'
 		});
 		
-		// register clicks
+		// register callback
 		passphraseCheckbox.onChecked(function() {
-			bip38Checkbox.setEnabled(passphraseCheckbox.isChecked());
 			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
-			else that.validate();
-			if (onChange) onChange();
+			update();
 		});
+		passphraseInput.on("input", function(e) { setFormError(false); });
 		
 		// initial state
-		formError = false;
-		
-		// register text input
-		passphraseInput.on("input", function(e) { setPassphraseError(false); });
+		update();
 		
 		// done
 		if (onDone) onDone(div);
 	}
 	
-	this.reset = function() {
-		passphraseCheckbox.setChecked(false);
-		passphraseInput.val("");
-		that.validate();
-		that.update();
+	this.hasFormError = function() {
+		return hasError;
+	}
+	
+	this.onFormErrorChange = function(listener) {
+		assertFunction(listener);
+		formErrorChangeListeners.push(listener);
 	}
 	
 	this.validate = function() {
-		setPassphraseError(that.getUsePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH);
-	}
-	
-	this.hasFormError = function() {
-		return formError;
-	}
-	
-	this.update = function() {
-		if (that.getUsePassphrase()) {
-			passphraseInput.removeAttr("disabled")
-			bip38Checkbox.setEnabled(true);
-			if (editorController.getCurrenciesController()) that.setBip38Visible(editorController.getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]));
+		var lastError = hasError;
+		if (that.getUsePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH) {
+			hasError = true;
+			passphraseInput.addClass("form_input_error_div");
+			passphraseInput.focus();
+			setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
 		} else {
-			passphraseInput.attr("disabled", "disabled");
-			bip38Checkbox.setEnabled(false);
-			that.setBip38Visible(false);
+			hasError = false;
+			passphraseInput.removeClass("form_input_error_div");
+			hasError = false;
+			passphraseInput.get(0)._tippy.hide();
 		}
+		if (hasError !== lastError) invoke(hasErrorChangeListeners, hasError);
 	}
 	
 	this.getUsePassphrase = function() {
@@ -2853,6 +2927,7 @@ function EditorPassphraseController(div, editorController, onChange) {
 	}
 	
 	this.setUsePassphrase = function(checked) {
+		console.log("setUsePassphrase(" + checked + ")");
 		passphraseCheckbox.setChecked(checked);
 	}
 	
@@ -2874,19 +2949,30 @@ function EditorPassphraseController(div, editorController, onChange) {
 	
 	// --------------------------------- PRIVATE --------------------------------
 	
-	function setPassphraseError(bool) {
-		var lastError = formError;
-		if (bool) {
-			formError = true;
-			passphraseInput.addClass("form_input_error_div");
-			passphraseInput.focus();
-			setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
+	function update() {
+		if (that.getUsePassphrase()) {
+			passphraseInput.removeAttr("disabled")
+			bip38Checkbox.setEnabled(true);
+			if (editorController.getContentController().getCurrenciesController()) that.setBip38Visible(editorController.getContentController().getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]));
 		} else {
-			passphraseInput.removeClass("form_input_error_div");
-			formError = false;
-			passphraseInput.get(0)._tippy.hide();
+			passphraseInput.attr("disabled", "disabled");
+			bip38Checkbox.setEnabled(false);
+			that.setBip38Visible(false);
+			that.validate();
 		}
-		if (formError !== lastError && onChange) onChange();
+	}
+	
+	function setFormError(_hasError) {
+		var change = hasError !== _hasError;
+		hasError = _hasError;
+		if (change) invoke(formErrorChangeListeners, hasError);
+	}
+	
+	function reset() {
+		passphraseCheckbox.setChecked(false);
+		passphraseInput.val("");
+		that.validate();
+		that.update();
 	}
 }
 inheritsFrom(EditorPassphraseController, DivController);
@@ -2895,21 +2981,23 @@ inheritsFrom(EditorPassphraseController, DivController);
  * Controls split input and validation.
  * 
  * @param div is the div to render to
- * @param onChange() is invoked when the state changes
  */
-function EditorSplitController(div, onChange) {
+function EditorSplitController(div) {
 	DivController.call(this, div);
 	
 	var that = this;
 	var splitCheckbox;
 	var splitInput;
-	var formError;
+	var hasError;
+	var formErrorChangeListeners;
 	
 	this.render = function(onDone) {
 		
-		// div setup
+		// init
 		div.empty();
 		div.addClass("editor_split_div flex_horizontal flex_align_center flex_justify_start");
+		hasError = false;
+		formErrorChangeListeners = [];
 		
 		// split tooltip
 		var splitTooltip = "Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>" +
@@ -2937,8 +3025,7 @@ function EditorSplitController(div, onChange) {
 		// register inputs
 		splitCheckbox.onChecked(function() {
 			if (splitCheckbox.isChecked()) numPiecesInput.focus();
-			else that.validate();
-			if (onChange) onChange();
+			update();
 		});
 		numPiecesInput.on("input", function(e) { that.validate(true); });
 		numPiecesInput.on("focusout", function(e) { that.validate(false); });
@@ -2946,23 +3033,24 @@ function EditorSplitController(div, onChange) {
 		minPiecesInput.on("focusout", function(e) { that.validate(false); });
 		
 		// initial state
-		that.reset();
+		reset();
 		
 		// done
 		if (onDone) onDone(div);
 	}
 	
-	this.reset = function() {
-		splitCheckbox.setChecked(false);
-		numPiecesInput.val("3");
-		minPiecesInput.val("2");
-		that.validate();
-		that.update();
+	this.hasFormError = function() {
+		return hasError;
+	}
+	
+	this.onFormErrorChange = function(listener) {
+		assertFunction(listener);
+		formErrorChangeListeners.push(listener);
 	}
 	
 	this.validate = function(lenientBlankAndRange) {
-		var lastError = formError;
-		formError = false;
+		var lastError = hasError;
+		hasError = false;
 		if (that.getUseSplit()) {
 			
 			// validate num pieces
@@ -2971,12 +3059,12 @@ function EditorSplitController(div, onChange) {
 				if (!numPiecesInput.val() || isInt(numPieces)) {
 					numPiecesInput.removeClass("form_input_error_div");
 				} else {
-					formError = true;
+					hasError = true;
 					numPiecesInput.addClass("form_input_error_div");
 				}
 			} else {
 				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
-					formError = true;
+					hasError = true;
 					numPiecesInput.addClass("form_input_error_div");
 				} else {
 					numPiecesInput.removeClass("form_input_error_div");
@@ -2989,12 +3077,12 @@ function EditorSplitController(div, onChange) {
 				if (!minPiecesInput.val() || isInt(minPieces)) {
 					minPiecesInput.removeClass("form_input_error_div");
 				} else {
-					formError = true;
+					hasError = true;
 					minPiecesInput.addClass("form_input_error_div");
 				}
 			} else {
-				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!formError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
-					formError = true;
+				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!hasError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
+					hasError = true;
 					minPiecesInput.addClass("form_input_error_div");
 				} else {
 					minPiecesInput.removeClass("form_input_error_div");
@@ -3004,21 +3092,11 @@ function EditorSplitController(div, onChange) {
 			numPiecesInput.removeClass("form_input_error_div");
 			minPiecesInput.removeClass("form_input_error_div");
 		}
-		if (formError !== lastError && onChange) onChange();	// notify of change
+		if (hasError !== lastError) invoke(formErrorChangeListeners, hasError);
 	}
 	
 	this.hasFormError = function() {
-		return formError;
-	}
-	
-	this.update = function() {
-		if (that.getUseSplit()) {
-			numPiecesInput.removeAttr("disabled");
-			minPiecesInput.removeAttr("disabled");
-		} else {
-			numPiecesInput.attr("disabled", "disabled");
-			minPiecesInput.attr("disabled", "disabled");
-		}
+		return hasError;
 	}
 	
 	this.getUseSplit = function() {
@@ -3048,6 +3126,26 @@ function EditorSplitController(div, onChange) {
 	this.setMinPieces = function(minPieces) {
 		minPiecesInout.val(minPieces);
 	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function update() {
+		if (that.getUseSplit()) {
+			numPiecesInput.removeAttr("disabled");
+			minPiecesInput.removeAttr("disabled");
+		} else {
+			numPiecesInput.attr("disabled", "disabled");
+			minPiecesInput.attr("disabled", "disabled");
+		}
+	}
+	
+	function reset() {
+		splitCheckbox.setChecked(false);
+		numPiecesInput.val("3");
+		minPiecesInput.val("2");
+		that.validate();
+		update();
+	}
 }
 inheritsFrom(EditorSplitController, DivController);
 
@@ -3057,11 +3155,8 @@ inheritsFrom(EditorSplitController, DivController);
  * @param div is the div to render to
  * @param plugins are crypto plugins to select from
  * @param defaultTicker is the ticker of the initial selected currency
- * @param onCurrencyChange(ticker) is invoked when the user changes the currency selection
- * @param onDelete is invoked when the user delets this input
- * @param onFormErrorChange(hasError) is invoked when the validity state changes
  */
-function EditorCurrencyController(div, plugins, defaultTicker, onCurrencyChange, onDelete, onFormErrorChange) {
+function EditorCurrencyController(div, plugins, defaultTicker) {
 	DivController.call(this, div);
 	
 	assertInitialized(div);
@@ -3076,14 +3171,24 @@ function EditorCurrencyController(div, plugins, defaultTicker, onCurrencyChange,
 	var selectorData;
 	var trashDiv;
 	var trashImg;
-	var initializing = true;
-	var formError = false;
-	var currencyError = false;
-	var numKeysError = false;
+	var hasError;
+	var currencyError;
+	var numKeysError;
+	var currencyChangeListeners;
+	var deleteListeners;
+	var formErrorChangeListeners;
 	
 	this.render = function(onDone) {
+		
+		// init
 		div.empty();
 		div.attr("class", "currency_input_div flex_horizontal width_100");
+		hasError = false;
+		currencyError = false;
+		numKeysError = false;
+		currencyChangeListeners = [];
+		deleteListeners = [];
+		formErrorChangeListeners = [];
 		
 		// format pull down plugin data
 		selectorData = [];
@@ -3108,13 +3213,27 @@ function EditorCurrencyController(div, plugins, defaultTicker, onCurrencyChange,
 		numKeysInput.on("focusout", function(e) { validateNumKeys(false); });
 		rightDiv.append("&nbsp;&nbsp;");
 		trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
-		trashDiv.click(function() { onDelete(); });
+		trashDiv.click(function() { invoke(deleteListeners); });
 		trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
 		
-		// no longer initializing
-		initializing = false;
+		// done
 		if (onDone) onDone(div);
 	};
+	
+	this.onCurrencyChange = function(listener) {
+		assertFunction(listener);
+		currencyChangeListeners.push(listener);
+	}
+	
+	this.onDelete = function(listener) {
+		assertFunction(listener);
+		deleteListeners.push(listener);
+	}
+	
+	this.onFormErrorChange = function(listener) {
+		assertFunction(listener);
+		formErrorChangeListeners.push(listener);
+	}
 	
 	this.getSelectedPlugin = function() {
 		return selectedPlugin;
@@ -3134,7 +3253,7 @@ function EditorCurrencyController(div, plugins, defaultTicker, onCurrencyChange,
 				defeaultSelectedIndex: null,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
-					if (!initializing && onCurrencyChange) onCurrencyChange(ticker);
+					invoke(currencyChangeListeners, ticker);
 					validateCurrency();
 				}
 			});
@@ -3149,7 +3268,7 @@ function EditorCurrencyController(div, plugins, defaultTicker, onCurrencyChange,
 				if (selectorData[i].text === name) {
 					selector.ddslick('select', {index: i});
 					selectedPlugin = plugins[i];
-					if (!initializing && onCurrencyChange) onCurrencyChange(ticker);
+					invoke(currencyChangeListeners, ticker);
 					validateCurrency();
 					break;
 				}
@@ -3183,7 +3302,7 @@ function EditorCurrencyController(div, plugins, defaultTicker, onCurrencyChange,
 	 * @returns true if any form errors are visible, false otherwise
 	 */
 	this.hasFormError = function() {
-		return formError;
+		return hasError;
 	};
 	
 	/**
@@ -3232,9 +3351,9 @@ function EditorCurrencyController(div, plugins, defaultTicker, onCurrencyChange,
 	}
 	
 	function updateFormError() {
-		var lastError = formError;
-		formError = currencyError || numKeysError;
-		if (!currencyError && numKeysError !== lastError) onFormErrorChange(formError);	// notify of form error change
+		var lastError = hasError;
+		hasError = currencyError || numKeysError;
+		if (!currencyError && numKeysError !== lastError) onFormErrorChange(hasError);	// notify of form error change
 	}
 }
 inheritsFrom(EditorCurrencyController, DivController);
@@ -3244,23 +3363,27 @@ inheritsFrom(EditorCurrencyController, DivController);
  * 
  * @param div is the div to render to
  * @param plugins are crypto plugins to select from
- * @param onInputsChange() is invoked when one of the inputs change
- * @param onFormErrorChange(hasError) is invoked when the validity state changes
  */
-function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorChange) {
+function EditorCurrenciesController(div, plugins) {
 	DivController.call(this, div);
 	
 	// state variables
 	var that = this;
 	var currencyInputsDiv;
 	var currencyInputs;
-	var formError;
+	var hasError;
+	var formErrorChangeListeners;
+	var inputChangeListeners;
 	
 	this.render = function(onDone) {
 		
-		// div setup
+		// init
 		div.empty();
 		div.css("width", "100%");
+		currencyInputs = [];
+		hasError = false;
+		formErrorChangeListeners = [];
+		inputChangeListeners = [];
 		
 		// currency inputs div
 		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(div);
@@ -3272,12 +3395,7 @@ function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorCha
 		addCurrencySpan.click(function() { that.add(); });
 		
 		// initial state
-		var onInputsChangeBkp = onInputsChange;
-		onInputsChange = null;	// disable notifications
-		currencyInputs = [];
-		formError = false;
 		that.reset();
-		onInputsChange = onInputsChangeBkp;
 		
 		// done
 		if (onDone) onDone();
@@ -3288,20 +3406,36 @@ function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorCha
 	};
 	
 	this.add = function(ticker) {
-		var currencyInput = new EditorCurrencyController($("<div>"), plugins, ticker, onInputsChange, function() {
-			remove(currencyInput);
-		}, function(hasError) {
-			updateFormError();
-		});
+		var currencyInput = new EditorCurrencyController($("<div>"), plugins, ticker)
 		currencyInput.render();
+		currencyInput.onCurrencyChange(function() { invoke(inputChangeListeners); });
+		currencyInput.onDelete(function() { throw new Error("Not implemented"); });
+		currencyInput.onFormErrorChange(function(hasError) { throw new Error("Not implemented"); });
+		
+//		onInputsChange, function() {
+//			remove(currencyInput);
+//		}, function(hasError) {
+//			updateFormError();
+//		});
 		currencyInput.getDiv().appendTo(currencyInputsDiv);
 		currencyInputs.push(currencyInput);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
-		if (onInputsChange) onInputsChange();
+		assertArray(inputChangeListeners);
+		invoke(inputChangeListeners, ticker);
 	};
 	
+	this.onFormErrorChange = function(listener) {
+		assertFunction(listener);
+		formErrorChangeListeners.push(listener);
+	}
+	
+	this.onInputChange = function(listener) {
+		assertFunction(listener);
+		inputChangeListeners.push(listener);
+	}
+	
 	this.hasFormError = function() {
-		return formError;
+		return hasError;
 	}
 	
 	this.validate = function() {
@@ -3368,7 +3502,7 @@ function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorCha
 	function remove(currencyInput) {
 		var idx = currencyInputs.indexOf(currencyInput);
 		if (idx < 0) throw new Error("Could not find currency input");
-		var formErrorBeforeRemoved = that.hasFormError();
+		var hasErrorBeforeRemoved = that.hasFormError();
 		currencyInputs.splice(idx, 1);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().remove();
@@ -3377,15 +3511,15 @@ function EditorCurrenciesController(div, plugins, onInputsChange, onFormErrorCha
 	}
 	
 	function updateFormError() {
-		var lastError = formError;
-		formError = false;
+		var lastError = hasError;
+		hasError = false;
 		for (var i = 0; i < currencyInputs.length; i++) {
 			if (currencyInputs[i].hasFormError()) {
-				formError = true;
+				hasError = true;
 				break;
 			}
 		}
-		if (formError !== lastError && onFormErrorChange) onFormErrorChange(formError);	// notify of form error change
+		if (hasError !== lastError && onFormErrorChange) onFormErrorChange(hasError);	// notify of form error change
 	}
 }
 inheritsFrom(EditorCurrenciesController, DivController);
@@ -3393,7 +3527,7 @@ inheritsFrom(EditorCurrenciesController, DivController);
 /**
  * Editor actions controller.
  */
-function EditorActionsController(div, editorController) {
+function EditorActionsController(div) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -3403,23 +3537,34 @@ function EditorActionsController(div, editorController) {
 	var savePrintDiv;
 	var btnSave;
 	var btnPrint;
+	var generateListeners;
+	var resetListeners;
+	var cancelListeners;
+	var saveListeners;
+	var printListeners;
 	
 	this.render = function(onDone) {
 		
-		// div setup
+		// init
 		div.empty();
 		div.addClass("editor_floating_controls");
+		generateListeners = [];
+		resetListeners = [];
+		cancelListeners = [];
+		saveListeners = [];
+		printListeners = [];
 		
 		// generate button
 		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
 		btnGenerate.append("Generate");
 		btnGenerate.hide();
 		btnGenerate.appendTo(div);
+		btnGenerate.click(function() { invoke(generateListeners); });
 		
 		// reset button
 		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
 		btnReset.append("Reset");
-		btnReset.click(function() { editorController.reset(); });
+		btnReset.click(function() { invoke(resetListeners); });
 		btnReset.hide();
 		btnReset.appendTo(div);
 		
@@ -3427,40 +3572,62 @@ function EditorActionsController(div, editorController) {
 		savePrintDiv = $("<div class='flex_horizontal width_100'>");
 		btnSave = $("<div class='editor_btn_blue flex_horizontal flex_justify_center user_select_none'>").appendTo(savePrintDiv);
 		btnSave.append("Save");
-		btnSave.click(function() { editorController.save(); });
+		btnSave.click(function() { invoke(saveListeners) });
 		$("<div style='width:30px;'>").appendTo(savePrintDiv);
 		btnPrint = $("<div class='editor_btn_blue flex_horizontal flex_justify_center user_select_none'>").appendTo(savePrintDiv);
 		btnPrint.append("Print");
-		btnPrint.click(function() { editorController.print(); });
+		btnPrint.click(function() { invoke(printListeners); });
 		savePrintDiv.hide();
 		savePrintDiv.appendTo(div);
-		
-		// initial state
-		that.update();
 		
 		// done rendering
 		if (onDone) onDone();
 	}
 	
-	this.update = function() {
-		console.log("EditorActionsController.update()");
-		
-		// generate button
-		btnGenerate.show();
-		btnGenerate.unbind("click");
-		if (editorController.hasFormError()) {
-			btnGenerate.addClass("btn_disabled");
-		} else {
-			btnGenerate.removeClass("btn_disabled");
-			btnGenerate.click(function() { editorController.generate(); });
-		}
-		
-		// reset button
-		btnReset.show();
-		
-		// print and save buttons
-		editorController.getPieces() ? savePrintDiv.show() : savePrintDiv.hide();
+	this.onGenerate = function(listener) {
+		assertFunction(listener);
+		generateListeners.push(listener);
 	}
+	
+	this.onReset = function(listener) {
+		assertFunction(listener);
+		resetListeners.push(listener);
+	}
+	
+	this.onCancel = function(listener) {
+		assertFunction(listener);
+		cancelListeners.push(listener);
+	}
+	
+	this.onSave = function(listener) {
+		assertFunction(listener);
+		saveListeners.push(listener);
+	}
+	
+	this.onPrint = function(listener) {
+		assertFunction(listener);
+		printListeners.push(listener);
+	}
+	
+//	this.update = function() {
+//		console.log("EditorActionsController.update()");
+//		
+//		// generate button
+//		btnGenerate.show();
+//		btnGenerate.unbind("click");
+//		if (editorController.hasFormError()) {
+//			btnGenerate.addClass("btn_disabled");
+//		} else {
+//			btnGenerate.removeClass("btn_disabled");
+//			btnGenerate.click(function() { editorController.generate(); });
+//		}
+//		
+//		// reset button
+//		btnReset.show();
+//		
+//		// print and save buttons
+//		editorController.getPieces() ? savePrintDiv.show() : savePrintDiv.hide();
+//	}
 }
 inheritsFrom(EditorActionsController, DivController);
 

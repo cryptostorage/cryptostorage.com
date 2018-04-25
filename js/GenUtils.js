@@ -116,6 +116,16 @@ function isBoolean(arg) {
 }
 
 /**
+ * Determines if the given argument is a function.
+ * 
+ * @param arg is the argument to test as being a function
+ * @returns true if the argument is a function, false otherwise
+ */
+function isFunction(arg) {
+	return typeof arg === "function";
+}
+
+/**
  * Indicates if the given argument is an object and optionally if it has the given constructor name.
  * 
  * @param arg is the argument to test
@@ -389,6 +399,16 @@ function assertArray(arg, msg) {
 }
 
 /**
+ * Asserts that the given argument is a function.
+ * 
+ * @param arg is the argument to assert as a function
+ * @param msg is the message to throw if the argument is not a function
+ */
+function assertFunction(arg, msg) {
+	if (!isFunction(arg)) throw new Error(msg ? msg : "Argument asserted as a function but is not a function");
+}
+
+/**
  * Asserts that the given argument is an object with the given name.
  * 
  * @param arg is the argument to test
@@ -412,6 +432,22 @@ function assertObject(arg, obj, msg) {
  */
 function inheritsFrom(child, parent) {
 	child.prototype = Object.create(parent.prototype);
+}
+
+/**
+ * Invokes functions with arguments.
+ * 
+ * arguments[0] is assumed to be an array of functions to invoke
+ * arguments[1...n] are args to invoke the functions with
+ */
+function invoke() {
+	var fns = arguments[0];
+	var args = [];
+	for (var i = 1; i < arguments.length; i++) args.push(arguments[i]);
+	for (var i = 0; i < fns.length; i++) {
+		assertFunction(fns[i], "Functions[" + i + "] is not a function");
+		fns[i](args);
+	}
 }
 
 /**
