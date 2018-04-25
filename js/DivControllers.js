@@ -2699,6 +2699,7 @@ function EditorContentController(div, editorController, config) {
 		div.addClass("editor_content_div flex_vertical flex_align_center");
 		hasError = false;
 		formErrorChangeListeners = [];
+		inputChangeListeners = [];
 		
 		// load dependencies TODO: load correct dependencies
 		LOADER.load(AppUtils.getDynamicExportDependencies(), function(err) {
