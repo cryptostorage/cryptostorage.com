@@ -2942,19 +2942,7 @@ function EditorPassphraseController(div, editorController) {
 	}
 	
 	this.validate = function() {
-		var lastError = hasError;
-		if (that.getUsePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH) {
-			hasError = true;
-			passphraseInput.addClass("form_input_error_div");
-			passphraseInput.focus();
-			setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
-		} else {
-			hasError = false;
-			passphraseInput.removeClass("form_input_error_div");
-			hasError = false;
-			passphraseInput.get(0)._tippy.hide();
-		}
-		if (hasError !== lastError) invoke(formErrorChangeListeners, hasError);
+		setFormError(that.getUsePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH);
 	}
 	
 	this.reset = function() {
@@ -2992,6 +2980,7 @@ function EditorPassphraseController(div, editorController) {
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function update() {
+		
 		if (that.getUsePassphrase()) {
 			passphraseInput.removeAttr("disabled")
 			bip38Checkbox.setEnabled(true);
@@ -3000,13 +2989,22 @@ function EditorPassphraseController(div, editorController) {
 			passphraseInput.attr("disabled", "disabled");
 			bip38Checkbox.setEnabled(false);
 			that.setBip38Visible(false);
-			that.validate();
+		}
+		
+		if (hasError) {
+			passphraseInput.addClass("form_input_error_div");
+			passphraseInput.focus();
+			setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
+		} else {
+			passphraseInput.removeClass("form_input_error_div");
+			passphraseInput.get(0)._tippy.hide();
 		}
 	}
 	
 	function setFormError(_hasError) {
 		var change = hasError !== _hasError;
 		hasError = _hasError;
+		update();
 		if (change) invoke(formErrorChangeListeners, hasError);
 	}
 }
