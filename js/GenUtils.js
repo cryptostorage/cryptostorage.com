@@ -446,7 +446,7 @@ function invoke() {
 	for (var i = 1; i < arguments.length; i++) args.push(arguments[i]);
 	for (var i = 0; i < fns.length; i++) {
 		assertFunction(fns[i], "Functions[" + i + "] is not a function");
-		fns[i](args);
+		fns[i].apply(null, args);
 	}
 }
 

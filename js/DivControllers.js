@@ -2427,17 +2427,16 @@ function EditorController(div, config) {
 	var contentController;
 	var pieces;
 	var pieceDivs;
-	var hasError;
 	var formErrorChangeListeners;
 	var setPiecesListeners;
 	var generateListeners;
+	var lastFormError;
 	
 	this.render = function(onDone) {
 		
 		// init
 		div.empty();
 		div.addClass("editor_div flex_vertical flex_align_center");
-		hasError = false;
 		formErrorChangeListeners = [];
 		setPiecesListeners = [];
 		generateListeners = [];
@@ -2473,7 +2472,9 @@ function EditorController(div, config) {
 			contentController.getActionsController().onCancel(cancel);
 			contentController.getActionsController().onSave(save);
 			contentController.getActionsController().onPrint(print);
-			passphraseController.onFormErrorChange(updateFormErrors);
+			passphraseController.onFormErrorChange(updateFormError);
+			splitController.onFormErrorChange(updateFormError);
+			contentController.onFormErrorChange(updateFormError);
 		});
 		
 		// done rendering
@@ -2492,7 +2493,67 @@ function EditorController(div, config) {
 		return contentController;
 	}
 	
-	this.getGenerateConfig = function() {
+	this.setPieces = function(_pieces, _pieceDivs) {
+		pieces = _pieces;
+		pieceDivs = _pieceDivs;
+		invoke(setPiecesListeneres, piece, pieceDivs);
+	}
+	
+	this.getPieces = function() {
+		return pieces;
+	}
+	
+	this.getPieceDivs = function() {
+		return pieceDivs;
+	}
+	
+	this.onSetPieces = function(listener) {
+		assertFunction(listener);
+		setPiecesListeners.push(listener);
+	}
+	
+	this.onFormErrorChange = function(listener) {
+		assertFunction(listener);
+		formErrorChangeListeners.push(listener);
+	}
+	
+	this.hasFormError = function() {
+		if (passphraseController.hasFormError()) return true;
+		if (splitController.hasFormError()) return true;
+		if (contentController.hasFormError()) return true;
+		return false;
+	}
+	
+	this.onGenerateProgress = function(listener) {
+		assertFunction(listener);
+		generateListeners.push(listener);
+	}
+	
+	this.validate = function() {
+		passphraseController.validate();
+		splitController.validate();
+		contentController.getCurrenciesController().validate();
+	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function setGenerateConfig(config) {		
+		
+		// set passphrase
+		if (config.passphrase) passphraseController.setPassphrase(config.passphrase);
+		
+		// set split
+		if (config.numPieces) splitController.setNumPieces(config.numPieces);
+		if (config.minPieces) {
+			splitController.setMinPieces(config.minPieces);
+			splitController.setUseSplit(true);
+		}
+		
+		// set currencies
+		currenciesController.setConfig(config.currencies);
+	}
+	
+	function getGenerateConfig() {
 		assertFalse(that.hasFormError());
 		var config = {};
 		
@@ -2529,69 +2590,21 @@ function EditorController(div, config) {
 		return config;
 	}
 	
-	this.setPieces = function(_pieces, _pieceDivs) {
-		pieces = _pieces;
-		pieceDivs = _pieceDivs;
-		invoke(setPiecesListeneres, piece, pieceDivs);
-	}
-	
-	this.getPieces = function() {
-		return [pieces, pieceDivs];
-	}
-	
-	this.onSetPieces = function(listener) {
-		assertFunction(listener);
-		setPiecesListeners.push(listener);
-	}
-	
-	this.onFormErrorChange = function(listener) {
-		assertFunction(listener);
-		formErrorChangeListeners.push(listener);
-	}
-	
-	this.hasFormError = function() {
-		return hasError;
-	}
-	
-	this.onGenerateProgress = function(listener) {
-		assertFunction(listener);
-		generateListeners.push(listener);
-	}
-	
-//	this.validate = function() {
-//		passphraseController.validate();
-//		splitController.validate();
-//		currenciesController.validate();
-//	}
-	
-	// -------------------------------- PRIVATE ---------------------------------
-	
-	function setKeyGenConfig(keyGenConfig) {		
-		
-		// set passphrase
-		if (keyGenConfig.passphrase) passphraseController.setPassphrase(keyGenConfig.passphrase);
-		
-		// set split
-		if (keyGenConfig.numPieces) splitController.setNumPieces(keyGenConfig.numPieces);
-		if (keyGenConfig.minPieces) {
-			splitController.setMinPieces(keyGenConfig.minPieces);
-			splitController.setUseSplit(true);
-		}
-		
-		// set currencies
-		currenciesController.setConfig(keyGenConfig.currencies);
-	}
-	
-	function updateFormErrors() {
-		throw new Error("Not implemented");
+	function updateFormError() {
+		if (passphraseController.getUsePassphrase()) throw new Error("k");
+		var formError = that.hasFormError();
+		if (lastFormError !== formError) invoke(formErrorChangeListeners, formError);
+		lastFormError = formError;
 	}
 	
 	function generate() {
-		throw new Error("Generate not implemented");
 		
 		// validate form
 		that.validate();
 		if (that.hasFormError()) return;
+		
+		throw new Error("Not implemented");
+
 		
 		// hide body elems
 		logoHeader.hide();
@@ -2695,7 +2708,7 @@ function EditorContentController(div, editorController, config) {
 		// init
 		div.empty();
 		div.addClass("editor_content_div flex_vertical flex_align_center");
-		lastError = false;
+		hasError = false;
 		formErrorChangeListeners = [];
 		
 		// load dependencies TODO: load correct dependencies
@@ -2739,11 +2752,9 @@ function EditorContentController(div, editorController, config) {
 				currenciesDiv = $("<div>").appendTo(bodyDiv);
 				currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins());
 				currenciesController.render();
-				currenciesController.onFormErrorChange(function(hasError) { throw new Error("Not implemented"); });
-				//currenciesController.onInputChange(function() { throw new Error("Not implemented"); });
 				
 				// actions controller
-				actionsController = new EditorActionsController($("<div>").appendTo(bodyDiv), that);
+				actionsController = new EditorActionsController($("<div>").appendTo(bodyDiv), editorController);
 				actionsController.render();
 				
 				// select crypto if in dev mode
@@ -2794,6 +2805,7 @@ function EditorContentController(div, editorController, config) {
 	}
 	
 	function setFormError(_hasError) {
+		assertBoolean(_hasError);
 		var change = hasError !== _hasError;
 		hasError = _hasError;
 		if (change) invoke(formErrorChangeListeners, hasError);
@@ -3289,7 +3301,7 @@ function EditorCurrencyController(div, plugins, defaultTicker) {
 	this.setTrashEnabled = function(enabled) {
 		trashDiv.unbind("click");
 		if (enabled) {
-			trashDiv.click(function() { onDelete(); });
+			trashDiv.click(function() { invoke(deleteListeners); });
 			trashImg.removeClass("trash_div_disabled");
 		} else {
 			trashImg.addClass("trash_div_disabled");
@@ -3313,7 +3325,7 @@ function EditorCurrencyController(div, plugins, defaultTicker) {
 		validateNumKeys(false);
 	};
 	
-	// ---------------------- PRIVATE ------------------------
+	// -------------------------------- PRIVATE ---------------------------------
 	
 	function validateCurrency() {
 		if (selectedPlugin) {
@@ -3353,7 +3365,7 @@ function EditorCurrencyController(div, plugins, defaultTicker) {
 	function updateFormError() {
 		var lastError = hasError;
 		hasError = currencyError || numKeysError;
-		if (!currencyError && numKeysError !== lastError) onFormErrorChange(hasError);	// notify of form error change
+		if (!currencyError && numKeysError !== lastError) invoke(formErrorChangeListeners, hasError);	// notify of form error change
 	}
 }
 inheritsFrom(EditorCurrencyController, DivController);
@@ -3409,8 +3421,8 @@ function EditorCurrenciesController(div, plugins) {
 		var currencyInput = new EditorCurrencyController($("<div>"), plugins, ticker)
 		currencyInput.render();
 		currencyInput.onCurrencyChange(function() { invoke(inputChangeListeners); });
-		currencyInput.onDelete(function() { throw new Error("Not implemented"); });
-		currencyInput.onFormErrorChange(function(hasError) { throw new Error("Not implemented"); });
+		currencyInput.onDelete(function() { remove(currencyInput); });
+		currencyInput.onFormErrorChange(updateFormError);
 		
 //		onInputsChange, function() {
 //			remove(currencyInput);
@@ -3507,7 +3519,7 @@ function EditorCurrenciesController(div, plugins) {
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
 		currencyInput.getDiv().remove();
 		updateFormError();
-		if (onInputsChange) onInputsChange();
+		invoke(inputChangeListeners);
 	}
 	
 	function updateFormError() {
@@ -3519,15 +3531,18 @@ function EditorCurrenciesController(div, plugins) {
 				break;
 			}
 		}
-		if (hasError !== lastError && onFormErrorChange) onFormErrorChange(hasError);	// notify of form error change
+		if (hasError !== lastError) invoke(formErrorChangeListeners, hasError);
 	}
 }
 inheritsFrom(EditorCurrenciesController, DivController);
 
 /**
  * Editor actions controller.
+ * 
+ * @param div is the div to render to
+ * @param editorController is the top-level controller
  */
-function EditorActionsController(div) {
+function EditorActionsController(div, editorController) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -3557,15 +3572,12 @@ function EditorActionsController(div) {
 		// generate button
 		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
 		btnGenerate.append("Generate");
-		btnGenerate.hide();
 		btnGenerate.appendTo(div);
-		btnGenerate.click(function() { invoke(generateListeners); });
 		
 		// reset button
 		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
 		btnReset.append("Reset");
 		btnReset.click(function() { invoke(resetListeners); });
-		btnReset.hide();
 		btnReset.appendTo(div);
 		
 		// save and print buttons
@@ -3577,8 +3589,14 @@ function EditorActionsController(div) {
 		btnPrint = $("<div class='editor_btn_blue flex_horizontal flex_justify_center user_select_none'>").appendTo(savePrintDiv);
 		btnPrint.append("Print");
 		btnPrint.click(function() { invoke(printListeners); });
-		savePrintDiv.hide();
 		savePrintDiv.appendTo(div);
+		
+		// register callbacks
+		editorController.onSetPieces(update);
+		editorController.onFormErrorChange(update);
+		
+		// initial state
+		update();
 		
 		// done rendering
 		if (onDone) onDone();
@@ -3609,25 +3627,22 @@ function EditorActionsController(div) {
 		printListeners.push(listener);
 	}
 	
-//	this.update = function() {
-//		console.log("EditorActionsController.update()");
-//		
-//		// generate button
-//		btnGenerate.show();
-//		btnGenerate.unbind("click");
-//		if (editorController.hasFormError()) {
-//			btnGenerate.addClass("btn_disabled");
-//		} else {
-//			btnGenerate.removeClass("btn_disabled");
-//			btnGenerate.click(function() { editorController.generate(); });
-//		}
-//		
-//		// reset button
-//		btnReset.show();
-//		
-//		// print and save buttons
-//		editorController.getPieces() ? savePrintDiv.show() : savePrintDiv.hide();
-//	}
+	// ------------------------------ PRIVATE -----------------------------
+	
+	function update() {
+				
+		// update generate button
+		btnGenerate.unbind("click");
+		if (editorController.hasFormError()) {
+			btnGenerate.addClass("btn_disabled");
+		} else {
+			btnGenerate.removeClass("btn_disabled");
+			btnGenerate.click(function() { invoke(generateListeners); });
+		}
+		
+		// update save print buttons
+		editorController.getPieces() ? savePrintDiv.show() : savePrintDiv.hide();
+	}
 }
 inheritsFrom(EditorActionsController, DivController);
 
