@@ -2591,7 +2591,6 @@ function EditorController(div, config) {
 	}
 	
 	function updateFormError() {
-		if (passphraseController.getUsePassphrase()) throw new Error("k");
 		var formError = that.hasFormError();
 		if (lastFormError !== formError) invoke(formErrorChangeListeners, formError);
 		lastFormError = formError;
@@ -2955,7 +2954,7 @@ function EditorPassphraseController(div, editorController) {
 			hasError = false;
 			passphraseInput.get(0)._tippy.hide();
 		}
-		if (hasError !== lastError) invoke(hasErrorChangeListeners, hasError);
+		if (hasError !== lastError) invoke(formErrorChangeListeners, hasError);
 	}
 	
 	this.reset = function() {
