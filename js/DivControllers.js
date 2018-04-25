@@ -2623,7 +2623,6 @@ function EditorController(div, config) {
 	}
 	
 	function save() {
-		throw new Error("Save not implemented");
 		
 		// fullscreen div
 		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
@@ -2640,7 +2639,6 @@ function EditorController(div, config) {
 	}
 		
 	function print() {
-		throw new Error("Print not implemented");
 		
 		// fullscreen div
 		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
@@ -2683,6 +2681,7 @@ function EditorContentController(div, editorController, config) {
 	var that = this;
 	var hasError;
 	var formErrorChangeListeners;
+	var inputChangeListeners;
 	var progressDiv;
 	var progressBar;
 	var progressLabel;
@@ -2754,6 +2753,7 @@ function EditorContentController(div, editorController, config) {
 				editorController.onSetPieces(setPieces);
 				editorController.onGenerateProgress(setGenerateProgress);
 				currenciesController.onFormErrorChange(setFormError);
+				currenciesController.onInputChange(function() { invoke(inputChangeListeners); });
 				
 				// set global pieces
 				if (config.pieces) editorController.setPieces(config.pieces, config.pieceDivs);
@@ -2777,7 +2777,13 @@ function EditorContentController(div, editorController, config) {
 	}
 	
 	this.onFormErrorChange = function(listener) {
+		assertFunction(listener);
 		formErrorChangeListeners.push(listener);
+	}
+	
+	this.onInputChange = function(listener) {
+		assertFunction(listener);
+		inputChangeListeners.push(listener);
 	}
 	
 	this.reset = function() {
@@ -2918,12 +2924,13 @@ function EditorPassphraseController(div, editorController) {
 			offset: '0, 0'
 		});
 		
-		// register callback
+		// register callbacks
 		passphraseCheckbox.onChecked(function() {
 			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
 			update();
 		});
 		passphraseInput.on("input", function(e) { setFormError(false); });
+		//	editorController.getContentController().getCurrenciesController().onInputChange(function() { update(); });  TODO: need to listen for update to content
 		
 		// initial state
 		update();
