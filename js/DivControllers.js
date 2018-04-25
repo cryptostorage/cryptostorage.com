@@ -2429,7 +2429,7 @@ function EditorController(div, config) {
 	var pieceDivs;
 	var formErrorChangeListeners;
 	var setPiecesListeners;
-	var generateListeners;
+	var generateProgressListeners;
 	var lastFormError;
 	
 	this.render = function(onDone) {
@@ -2439,7 +2439,7 @@ function EditorController(div, config) {
 		div.addClass("editor_div flex_vertical flex_align_center");
 		formErrorChangeListeners = [];
 		setPiecesListeners = [];
-		generateListeners = [];
+		generateProgressListeners = [];
 		
 		// copy config with defaults
 		config = Object.assign({
@@ -2496,7 +2496,7 @@ function EditorController(div, config) {
 	this.setPieces = function(_pieces, _pieceDivs) {
 		pieces = _pieces;
 		pieceDivs = _pieceDivs;
-		invoke(setPiecesListeneres, piece, pieceDivs);
+		invoke(setPiecesListeners, pieces, pieceDivs);
 	}
 	
 	this.getPieces = function() {
@@ -2507,6 +2507,13 @@ function EditorController(div, config) {
 		return pieceDivs;
 	}
 	
+	this.hasFormError = function() {
+		if (passphraseController.hasFormError()) return true;
+		if (splitController.hasFormError()) return true;
+		if (contentController.hasFormError()) return true;
+		return false;
+	}
+	
 	this.onSetPieces = function(listener) {
 		assertFunction(listener);
 		setPiecesListeners.push(listener);
@@ -2515,18 +2522,11 @@ function EditorController(div, config) {
 	this.onFormErrorChange = function(listener) {
 		assertFunction(listener);
 		formErrorChangeListeners.push(listener);
-	}
-	
-	this.hasFormError = function() {
-		if (passphraseController.hasFormError()) return true;
-		if (splitController.hasFormError()) return true;
-		if (contentController.hasFormError()) return true;
-		return false;
-	}
+	}	
 	
 	this.onGenerateProgress = function(listener) {
 		assertFunction(listener);
-		generateListeners.push(listener);
+		generateProgressListeners.push(listener);
 	}
 	
 	this.validate = function() {
@@ -2558,7 +2558,7 @@ function EditorController(div, config) {
 		var config = {};
 		
 		// set keypairs
-		config.keypairs = contentController.getCurrenciesController.getConfig();	// TODO: rename to something better
+		config.keypairs = contentController.getCurrenciesController().getConfig();	// TODO: rename to something better
 		
 		// set passphrase
 		if (passphraseController.getUsePassphrase()) {
@@ -2597,32 +2597,28 @@ function EditorController(div, config) {
 		lastFormError = formError;
 	}
 	
-	function generate() {
+	function generate(onDone) {
 		
 		// validate form
 		that.validate();
 		if (that.hasFormError()) return;
 		
-		throw new Error("Not implemented");
-
-		
-		// hide body elems
-		logoHeader.hide();
-		currenciesDiv.hide();
-		piecesDiv.hide();
-		
 		// generate keys
-		piecesDiv.empty();
-		CryptoPiece.generatePieces(getGenerateConfig(), setGenerateProgress, function(err, _pieces, _pieceRenderers) {
-			if (err) throw err;
-			pieces = _pieces;
-			assertArray(pieces);
-			assertTrue(pieces.length > 0);
-			pieceRenderers = _pieceRenderers;
-			assertArray(pieceRenderers);
-			assertTrue(pieceRenderers.length > 0);
-			progressDiv.hide();
-			that.update();
+		CryptoPiece.generatePieces(getGenerateConfig(), function(percent, label) {
+			invoke(generateProgressListeners, percent, label);
+		}, function(err, _pieces, _pieceRenderers) {
+			assertNull(err);
+			assertArray(_pieces);
+			assertTrue(_pieces.length > 0);
+			assertArray(_pieceRenderers);
+			assertTrue(_pieceRenderers.length > 0);
+			
+			// set pieces and piece divs
+			var pieceDivs = [];
+			for (var i = 0; i < _pieceRenderers.length; i++) pieceDivs.push(_pieceRenderers[i].getDiv());
+			that.setPieces(_pieces, pieceDivs);
+			
+			// done
 			if (onDone) onDone();
 		});
 	}
@@ -2662,15 +2658,10 @@ function EditorController(div, config) {
 	}
 	
 	function reset() {
-		throw new Error("Reset not implemented");
-		
-		pieces = null;
-		pieceRenderers = null;
-		piecesDiv.empty();
-		piecesDiv.hide();
 		passphraseController.reset();
 		splitController.reset();
-		currenciesController.reset();
+		contentController.reset();
+		that.setPieces(null, null);
 	}
 	
 	function cancel() {
@@ -2790,18 +2781,51 @@ function EditorContentController(div, editorController, config) {
 		formErrorChangeListeners.push(listener);
 	}
 	
+	this.reset = function() {
+		currenciesController.reset();
+	}
+	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function setPieces(pieces, pieceDivs) {
-		throw new Error("ContentController.onSetPieces() not implemented");
+		piecesDiv.empty()
+		currenciesController.getDiv().show();
+
+		// handle no pieces
+		if (!pieces || !pieces.length) {
+			piecesDiv.hide();
+			logoHeader.show();
+		}
+		
+		// handle pieces
+		else {
+			piecesDiv.show();
+			progressDiv.hide();
+			logoHeader.hide();
+			
+			// pieces pre-rendered
+			if (pieceDivs) {
+				for (var i = 0; i < pieceDivs.length; i++) {
+					piecesDiv.append(pieceDivs[i]);
+				}
+			}
+			
+			// render pieces
+			else {
+				throw new Error("Need to render pieces here");
+			}
+		}
 	}
 	
 	function setGenerateProgress(percent, label) {
-		throw new Error("ContentController.onGenerateProgress() not implemented");
 		progressBar.set(percent);
 		progressBar.setText(Math.round(percent * 100)  + "%");
 		progressLabel.html(label);
 		progressDiv.show();
+		
+		// hide other elements
+		piecesDiv.hide();
+		currenciesController.getDiv().hide();
 	}
 	
 	function setFormError(_hasError) {
@@ -2934,6 +2958,13 @@ function EditorPassphraseController(div, editorController) {
 		if (hasError !== lastError) invoke(hasErrorChangeListeners, hasError);
 	}
 	
+	this.reset = function() {
+		passphraseCheckbox.setChecked(false);
+		passphraseInput.val("");
+		that.validate();
+		update();
+	}
+	
 	this.getUsePassphrase = function() {
 		return passphraseCheckbox.isChecked();
 	}
@@ -2978,13 +3009,6 @@ function EditorPassphraseController(div, editorController) {
 		var change = hasError !== _hasError;
 		hasError = _hasError;
 		if (change) invoke(formErrorChangeListeners, hasError);
-	}
-	
-	function reset() {
-		passphraseCheckbox.setChecked(false);
-		passphraseInput.val("");
-		that.validate();
-		that.update();
 	}
 }
 inheritsFrom(EditorPassphraseController, DivController);
@@ -3045,7 +3069,7 @@ function EditorSplitController(div) {
 		minPiecesInput.on("focusout", function(e) { that.validate(false); });
 		
 		// initial state
-		reset();
+		that.reset();
 		
 		// done
 		if (onDone) onDone(div);
@@ -3111,6 +3135,14 @@ function EditorSplitController(div) {
 		return hasError;
 	}
 	
+	this.reset = function() {
+		splitCheckbox.setChecked(false);
+		numPiecesInput.val("3");
+		minPiecesInput.val("2");
+		that.validate();
+		update();
+	}
+	
 	this.getUseSplit = function() {
 		return splitCheckbox.isChecked();
 	}
@@ -3149,14 +3181,6 @@ function EditorSplitController(div) {
 			numPiecesInput.attr("disabled", "disabled");
 			minPiecesInput.attr("disabled", "disabled");
 		}
-	}
-	
-	function reset() {
-		splitCheckbox.setChecked(false);
-		numPiecesInput.val("3");
-		minPiecesInput.val("2");
-		that.validate();
-		update();
 	}
 }
 inheritsFrom(EditorSplitController, DivController);
