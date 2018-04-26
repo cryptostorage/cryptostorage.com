@@ -2813,10 +2813,41 @@ function EditorContentController(div, editorController, config) {
 					for (var i = 0; i < config.pieces.length; i++) copies.push(new CryptoPiece({json: config.pieces[i].toJson()}));
 					config.pieces = copies;
 					
-					// set the pieces and make copyable
-					assertInitialized(config.pieceDivs);
-					CompactPieceRenderer.makeCopyable(config.pieceDivs);
-					editorController.setPieces(config.pieces, config.pieceDivs);
+					// add pre-existing piece divs
+					if (config.pieceDivs) {
+						CompactPieceRenderer.makeCopyable(config.pieceDivs);
+						editorController.setPieces(config.pieces, config.pieceDivs);
+					}
+					
+					// render piece divs
+					else {
+						
+						// collect piece divs and piece renderers
+						var pieceDivs = [];
+						var pieceRenderers = [];
+						for (var i = 0; i < config.pieces.length; i++) {
+							var pieceDiv = $("<div>");
+							pieceDivs.push(pieceDiv);
+							pieceRenderers.push(new CompactPieceRenderer(pieceDiv, config.pieces[i]));
+						}
+						
+						// set pieces and divs
+						editorController.setPieces(config.pieces, pieceDivs);
+						
+						// start rendering pieces but don't wait
+						var renderFuncs = [];
+						for (var i = 0; i < pieceRenderers.length; i++) renderFuncs.push(renderFunc(pieceRenderers[i]));
+						async.series(renderFuncs, function(err, pieceRenderers) {
+							assertNull(err);
+						});
+						function renderFunc(pieceRenderer) {
+							return function(onDone) {
+								pieceRenderer.render(function() { onDone(null, pieceRenderer); });
+							}
+						}
+					}
+					
+					// done
 					if (onDone) onDone(div);
 				}
 				
