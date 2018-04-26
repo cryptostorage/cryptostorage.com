@@ -13,6 +13,7 @@
 function PackageGenerator(config) {
 	config = Object.assign({}, config);
 	PackageGenerator.validateGenerateConfig(config);
+	var isCancelled = false;
 
 	/**
 	 * Generates a package and/or piece renderers according to the config.
@@ -21,6 +22,7 @@ function PackageGenerator(config) {
 	 * @param onDone(err, piecePkg, pieceRenderers) is invoked when done
 	 */
 	this.generatePackage = function(onProgress, onDone) {
+		assertFalse(isCancelled);
 		
 		// get weights
 		var weights = computeWeights(config);
@@ -32,30 +34,34 @@ function PackageGenerator(config) {
 		
 		// create unencrypted package
 		var doneWeight = 0;
-		create(function(percent, label) {
+		createIfApplicable(function(percent, label) {
 			if (onProgress) onProgress((doneWeight + percent * createWeight) / totalWeight, label);
 		}, function(err, pkg) {
+			if (isCancelled) return;
 			assertNull(err);
 			doneWeight += createWeight;
 			
 			// encrypt
-			encrypt(pkg, function(percent, label) {
+			encryptIfApplicable(pkg, function(percent, label) {
 				if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
 			}, function(err, pkg) {
+				if (isCancelled) return;
 				assertNull(err);
 				doneWeight += encryptWeight;
 				
 				// split
-				split(pkg, function(percent, label) {
+				splitIfApplicable(pkg, function(percent, label) {
 					if (onProgress) onProgress((doneWeight + percent * splitWeight) / totalWeight, label);
 				}, function(err, pkg) {
+					if (isCancelled) return;
 					assertNull(err);
 					doneWeight += splitWeight;
 					
 					// render
-					render(pkg, function(percent, label) {
+					renderIfApplicable(pkg, function(percent, label) {
 						if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, label);
 					}, function(err, pieceRenderers) {
+						if (isCancelled) return;
 						assertNull(err);
 						doneWeight += renderWeight;
 						assertEquals(doneWeight, totalWeight);
@@ -67,20 +73,21 @@ function PackageGenerator(config) {
 	}
 	
 	this.cancel = function() {
-		throw new Error("Not implemented");
+		isCanclled = true;
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function computeWeights() {
+		throw new Error("computeWeights() not implemented");
 		var weights = {};
 		weights.createWeight = 0;
 		weights.encryptWeight = 0;
-		var numKeypairs = 0;
+		weights.splitWeight = 0;
+		weights.renderWeight = 0;
 		for (var i = 0; i < config.keypairs.length; i++) {
 			var keypair = config.keypairs[i];
-			numKeypairs += keypair.numKeypairs;
-			createWeight += CryptoKeypair.getCreateWeight(keypair.ticker) * numKeypairs;
+			weights.createWeight += CryptoKeypair.getCreateWeight(keypair.ticker) * keypair.numKeypairs;
 			throw new Error("update to new config schema");
 			if (keypair.encryption) encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption) * numKeypairs;	// TODO: update to new config schema
 		}
@@ -89,19 +96,19 @@ function PackageGenerator(config) {
 		return weights;
 	}
 	
-	function create(onProgress, onDone) {
+	function createIfApplicable(onProgress, onDone) {
 		throw new Error("Not implemented");
 	}
 
-	function encrypt(pkg, onProgress, onDone) {
+	function encryptIfApplicable(pkg, onProgress, onDone) {
 		throw new Error("Not implemented");
 	}
 	
-	function split(pkg, onProgress, onDone) {
+	function splitIfApplicable(pkg, onProgress, onDone) {
 		throw new Error("Not implemented");
 	}
 	
-	function render(pkg, onProgress, onDone) {
+	function renderIfApplicable(pkg, onProgress, onDone) {
 		throw new Error("Not implemented");
 	}
 }
@@ -111,6 +118,8 @@ function PackageGenerator(config) {
  */
 PackageGenerator.validateGenerateConfig = function(genConfig) {
 	
+	throw new Error("PackageGenerator.validateGenerateConfig not implemented");
+	
 	if (genConfig.keypairs) {
 		assertUndefined(genConfig.piecePkg);
 	}
@@ -118,6 +127,4 @@ PackageGenerator.validateGenerateConfig = function(genConfig) {
 	if (genConfig.piecePkg) {
 		assertUndefined(genConfig.keypairs);
 	}
-	
-	throw new Error("PackageGenerator.validateGenerateConfig not implemented");
 }
