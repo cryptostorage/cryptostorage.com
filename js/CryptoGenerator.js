@@ -13,63 +13,51 @@ function CryptoGenerator(config) {
 	 * Generates a package and rendered pieces according to the configuration.
 	 * 
 	 * @param onProgress(percent, label) is invoked as progress is made
-	 * @param onDone(err, package, pieceRenderers) is invoked when done
+	 * @param onDone(err, piecePkg, pieceRenderers) is invoked when done
 	 */
 	this.generate = function(onProgress, onDone) {
+			
+		// get weights
+		var createWeight = getCreateWeight();
+		var encryptWeight = getEncryptWeight();
+		var splitWeight = getSplitWeight();
+		var renderWeight = getRenderWeight();
+		var totalWeight = createWeight + encryptWeight + splitWeight + renderWeight;
 		
-		// start with package
-		if (config.piecePkg) {
-			throw new Error("Not implemented");
-		}
-		
-		// start with generation config
-		else if (config.genConfig) {
+		// generate
+		var doneWeight = 0;
+		create(function(percent, label) {
+			if (onProgress) onProgress((doneWeight + percent * createWeight) / totalWeight, label);
+		}, function(err, pkg) {
+			assertNull(err);
+			doneWeight += createWeight;
 			
-			// validate gen config
-			CryptoGenerator.validateGenerateConfig(config.genConfig);
-			
-			// get weights
-			var generateWeight = getGenerateWeight();
-			var encryptWeight = getEncryptWeight();
-			var splitWeight = getSplitWeight();
-			var renderWeight = getRenderWeight();
-			
-			// generate
-			var doneWeight = 0;
-			generateUnencryptedPkg(function(percent, label) {
-				if (onProgress) onProgress(doneWeight + percent * generateWeight, label);
+			// encrypt
+			encrypt(pkg, function(percent, label) {
+				if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
 			}, function(err, pkg) {
 				assertNull(err);
-				doneWeight += generateWeight;
+				doneWeight += encryptWeight;
 				
-				// encrypt
-				encryptPkg(pkg, function(percent, label) {
-					if (onProgress) onProgress(doneWeight + percent * encryptWeight, label);
+				// split
+				split(pkg, function(percent, label) {
+					if (onProgress) onProgress((doneWeight + percent * splitWeight) / totalWeight, label);
 				}, function(err, pkg) {
 					assertNull(err);
-					doneWeight += encryptWeight;
+					doneWeight += splitWeight;
 					
-					// split
-					splitPkg(pkg, function(percent, label) {
-						if (onProgress) onProgress(doneWeight + percent * splitWeight, label);
-					}, function(err, pkg) {
+					// render
+					render(pkg, function(percent, label) {
+						if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, label);
+					}, function(err, pieceRenderers) {
 						assertNull(err);
-						doneWeight += splitWeight;
-						
-						// render
-						renderPkg(function(percent, label) {
-							if (onProgress) onProgress(doneWeight + percent * renderWeight, label);
-						}, function(err, pieceRenderers) {
-							assertNull(err);
-							doneWeight += renderWeight;
-						})
+						doneWeight += renderWeight;
+						assertEquals(doneWeight, totalWeight);
+						if (onDone) onDone(null, pkg, pieceRenderers);
 					});
 				});
 			});
-		}
-		
-		// invalid config
-		else throw new Error("Neither genConfig nor piecePkg given");
+		});
 	}
 	
 	this.cancel = function() {
@@ -81,7 +69,39 @@ function CryptoGenerator(config) {
 	init();
 	function init() {
 		config = Object.assign({}, config);
-		assertTrue(isInitialized(config.genConfig) || isInitialized(config.piecePkg));
+		CryptoGenerator.validateGenerateConfig(config);
+	}
+	
+	function getCreateWeight() {
+		throw new Error("Not implemented");
+	}
+	
+	function create(onProgress, onDone) {
+		throw new Error("Not implemented");
+	}
+	
+	function getEncryptWeight() {
+		throw new Error("Not implemented");
+	}
+	
+	function encrypt(pkg, onProgress, onDone) {
+		throw new Error("Not implemented");
+	}
+	
+	function getSplitWeight() {
+		throw new Error("Not implemented");
+	}
+	
+	function split(pkg, onProgress, onDone) {
+		throw new Error("Not implemented");
+	}
+	
+	function getRenderWeight() {
+		throw new Error("Not implemented");
+	}
+	
+	function render(pkg, onProgress, onDone) {
+		throw new Error("Not implemented");
 	}
 }
 

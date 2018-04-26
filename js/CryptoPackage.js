@@ -17,10 +17,15 @@ function CryptoPackage(config) {
 	this.split = function(numShares, minShare) {
 		assertTrue(state.pieces.length === 1);
 		assertFalse(state.pieces[0].isSplit());
-		state.pieces = state.pieces[0].split()
+		state.pieces = state.pieces[0].split(numShares, minShares)
 	}
 	
 	this.combine = function() {
+		assertTrue(state.pieces.length >= 2);
+		state.pieces = [new CryptoPiece({splitPieces: state.pieces})];
+	}
+	
+	this.toBlob = function(fileType, onDone) {
 		
 	}
 
