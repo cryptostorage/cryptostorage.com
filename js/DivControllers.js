@@ -2967,7 +2967,7 @@ function EditorPassphraseController(div, editorController) {
 			editorController.getContentController().getActionsController().onGenerate(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
 			editorController.getContentController().onInputChange(update);
-			that.setEnabled(true);
+			update();
 		});
 		
 		// initial state
@@ -3013,20 +3013,41 @@ function EditorPassphraseController(div, editorController) {
 	
 	this.setEnabled = function(bool) {
 		passphraseCheckbox.setEnabled(bool);
-		update();
+		if (bool && passphraseCheckbox.isChecked()) passphraseInput.removeAttr("disabled")
+		else passphraseInput.attr("disabled", "disabled");
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function update() {
-		if (!passphraseCheckbox.isEnabled() || !that.getUsePassphrase()) {
-			passphraseInput.attr("disabled", "disabled");
-			that.setBip38Visible(false);
-		} else {
-			passphraseInput.removeAttr("disabled")
-			if (editorController.getContentController().getCurrenciesController()) that.setBip38Visible(editorController.getContentController().getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]));
+		
+		// enable passphrase unless split or encrypted imported piece
+		if (!editorController.getImportedPieces() || (!editorController.getImportedPieces()[0].isSplit() && !editorController.getImportedPieces()[0].isEncrypted())) {
+			that.setEnabled(true);
+			
+			// set bip38 checkbox visible
+			var bip38Visible = false;
+			if (that.getUsePassphrase()) {
+			
+				// look for bip38 in imported piece
+				if (editorController.getImportedPieces()) {
+					for (var i = 0; i < editorController.getImportedPieces()[0].getKeypairs().length; i++) {
+						if (arrayContains(editorController.getImportedPieces()[0].getKeypairs()[i].getPlugin().getEncryptionSchemes(), AppUtils.EncryptionScheme.BIP38)) {
+							bip38Visible = true;
+							break;
+						}
+					}
+				}
+				
+				// else look for bip38 in crypto inputs
+				else if (that.getUsePassphrase()) {
+					bip38Visible = editorController.getContentController().getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]);
+				}
+			}
+			that.setBip38Visible(bip38Visible);
 		}
 		
+		// handle error
 		if (hasError) {
 			passphraseInput.addClass("form_input_error_div");
 			passphraseInput.focus();
