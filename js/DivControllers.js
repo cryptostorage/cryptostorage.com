@@ -2475,6 +2475,7 @@ function EditorController(div, config) {
 			
 			// register callbacks
 			contentController.getActionsController().onGenerate(that.generate);
+			contentController.getActionsController().onApply(apply);
 			contentController.getActionsController().onReset(reset);
 			contentController.getActionsController().onCancel(cancel);
 			contentController.getActionsController().onSave(save);
@@ -2657,6 +2658,10 @@ function EditorController(div, config) {
 		var formError = that.hasFormError();
 		if (lastFormError !== formError) invoke(formErrorChangeListeners, formError);
 		lastFormError = formError;
+	}
+	
+	function apply() {
+		throw new Error("Apply not implemented");
 	}
 	
 	function save() {
@@ -2915,6 +2920,7 @@ function EditorPassphraseController(div, editorController) {
 	var bip38Checkbox;
 	var hasError;
 	var formErrorChangeListeners;
+	var usePassphraseListeners;
 
 	this.render = function(onDone) {
 		
@@ -2923,6 +2929,7 @@ function EditorPassphraseController(div, editorController) {
 		div.addClass("editor_passphrase_div flex_horizontal flex_align_center flex_justify_start");
 		hasError = false;
 		formErrorChangeListeners = [];
+		usePassphraseListeners = [];
 		
 		// passphrase checkbox
 		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?");
@@ -2959,6 +2966,7 @@ function EditorPassphraseController(div, editorController) {
 		passphraseCheckbox.onChecked(function() {
 			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
 			update();
+			invoke(usePassphraseListeners);
 		});
 		passphraseInput.on("input", function(e) { setFormError(false); });
 		
@@ -2985,6 +2993,11 @@ function EditorPassphraseController(div, editorController) {
 	this.onFormErrorChange = function(listener) {
 		assertFunction(listener);
 		formErrorChangeListeners.push(listener);
+	}
+	
+	this.onUsePassphraseChange = function(listener) {
+		assertFunction(listener);
+		usePassphraseListeners.push(listener);
 	}
 	
 	this.getUsePassphrase = function() {
@@ -3653,6 +3666,7 @@ function EditorActionsController(div, editorController) {
 	
 	var that = this;
 	var btnGenerate;
+	var btnApply;
 	var btnReset;
 	var btnCancel;
 	var savePrintDiv;
@@ -3670,6 +3684,7 @@ function EditorActionsController(div, editorController) {
 		div.empty();
 		div.addClass("editor_floating_controls");
 		generateListeners = [];
+		applyListeners = [];
 		resetListeners = [];
 		cancelListeners = [];
 		saveListeners = [];
@@ -3679,6 +3694,11 @@ function EditorActionsController(div, editorController) {
 		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
 		btnGenerate.append("Generate");
 		btnGenerate.appendTo(div);
+		
+		// apply button
+		btnApply = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
+		btnApply.append("Apply");
+		btnApply.appendTo(div);
 		
 		// reset button
 		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
@@ -3700,6 +3720,7 @@ function EditorActionsController(div, editorController) {
 		// register callbacks
 		editorController.onSetPieces(update);
 		editorController.onFormErrorChange(update);
+		editorController.getPassphraseController().onUsePassphraseChange(update);
 		
 		// initial state
 		update();
@@ -3711,6 +3732,11 @@ function EditorActionsController(div, editorController) {
 	this.onGenerate = function(listener) {
 		assertFunction(listener);
 		generateListeners.push(listener);
+	}
+	
+	this.onApply = function(listener) {
+		assertFunction(listener);
+		applyListeners.push(listener);
 	}
 	
 	this.onReset = function(listener) {
@@ -3736,8 +3762,10 @@ function EditorActionsController(div, editorController) {
 	// ------------------------------ PRIVATE -----------------------------
 	
 	function update() {
+		
+		console.log("Updating!");
 				
-		// update generate button
+		// handle no imported pieces
 		if (!editorController.getImportedPieces()) {
 			btnGenerate.show();
 			btnGenerate.unbind("click");
@@ -3747,8 +3775,12 @@ function EditorActionsController(div, editorController) {
 				btnGenerate.removeClass("btn_disabled");
 				btnGenerate.click(function() { invoke(generateListeners); });
 			}
-		} else {
+		}
+		
+		// handle imported pieces
+		else {
 			btnGenerate.hide();
+			editorController.getPassphraseController().getUsePassphrase() || editorController.getSplitController().getUseSplit() ? btnApply.show() : btnApply.hide();
 		}
 		
 		// update save print buttons
