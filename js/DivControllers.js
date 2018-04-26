@@ -2661,7 +2661,11 @@ function EditorController(div, config) {
 	}
 	
 	function apply() {
-		throw new Error("Apply not implemented");
+		
+		// validate no errors
+		if (that.hasFormError()) return;
+		
+		throw new Error("Ready to implement apply");
 	}
 	
 	function save() {
@@ -2973,6 +2977,7 @@ function EditorPassphraseController(div, editorController) {
 		// listen for actions when editor ready
 		editorController.onReady(function() {
 			editorController.getContentController().getActionsController().onGenerate(validate);
+			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
 			editorController.getContentController().onInputChange(update);
 			update();
@@ -3153,6 +3158,7 @@ function EditorSplitController(div, editorController) {
 		// listen for actions when editor ready
 		editorController.onReady(function() {
 			editorController.getContentController().getActionsController().onGenerate(validate);
+			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
 			editorController.getContentController().onInputChange(update);
 			that.setEnabled(true);
@@ -3779,6 +3785,7 @@ function EditorActionsController(div, editorController) {
 			btnApply.hide();
 			btnGenerate.show();
 			btnGenerate.unbind("click");
+			btnReset.show();
 			if (editorController.hasFormError()) {
 				btnGenerate.addClass("btn_disabled");
 			} else {
@@ -3790,7 +3797,17 @@ function EditorActionsController(div, editorController) {
 		// handle imported pieces
 		else {
 			btnGenerate.hide();
-			editorController.getPassphraseController().getUsePassphrase() || editorController.getSplitController().getUseSplit() ? btnApply.show() : btnApply.hide();
+			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getSplitController().getUseSplit()) {
+				btnApply.show()
+				btnReset.show();
+			} else {
+				btnApply.hide();
+				if (editorController.getPieces()[0] !== editorController.getImportedPieces()[0]) {
+					btnReset.show();
+				} else {
+					btnReset.hide();
+				}
+			}
 		}
 		
 		// update save print buttons
