@@ -378,7 +378,7 @@ function CryptoPiece(config) {
 			keypairs.push(new CryptoKeypair(keypairConfig));
 		}
 		
-		// set internal keypars
+		// set internal keypairs
 		setKeypairs(keypairs);
 	}
 	
