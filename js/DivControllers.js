@@ -64,7 +64,7 @@ var UiUtils = {
 	 * 
 	 * @param browserTabName is the name of the tab
 	 * @param config specifies editor configuration
-	 * 				config.keyGenConfig is configuration to generate keypairs
+	 * 				config.genConfig is configuration to generate keypairs
 	 * 				config.pieces are pre-generated pieces to display
 	 * 				config.pieceDivs are pre-rendered pieces to display
 	 * 				config.sourcePieces are source pieces that the given piece was generated from
@@ -721,10 +721,10 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (!environmentFailure) UiUtils.openEditorTab(plugin.getName() + " Storage", {keyGenConfig: getKeyGenConfig(plugin)}); 
+			if (!environmentFailure) UiUtils.openEditorTab(plugin.getName() + " Storage", {genConfig: getGenConfig(plugin)}); 
 		}
 		
-		function getKeyGenConfig(plugin) {
+		function getGenConfig(plugin) {
 			var config = {};
 			config.numPieces = null;
 			config.minPieces = null;
@@ -1539,12 +1539,12 @@ function FormController(div) {
 	// handle when generate button clicked
 	function onGenerate(onDone) {
 		validateForm(true);
-		if (!hasFormErrors()) UiUtils.openEditorTab("Export Storage", {keyGenConfig: getKeyGenConfig(), confirmExit: true});
+		if (!hasFormErrors()) UiUtils.openEditorTab("Export Storage", {genConfig: getGenConfig(), confirmExit: true});
 		if (onDone) onDone();
 	}
 	
 	// get current form configuration
-	function getKeyGenConfig() {
+	function getGenConfig() {
 		var config = {};
 		config.passphrase = passphraseCheckbox.prop('checked') ? passphraseInput.val() : null;
 		config.numPieces = splitCheckbox.prop('checked') ? parseFloat(numPiecesInput.val()) : 1;
@@ -2410,7 +2410,7 @@ inheritsFrom(TwoTabController, DivController);
  * 
  * @param div is the div to render to
  * @param config specifies editor configuration
- * 				config.keyGenConfig is configuration to generate keypairs
+ * 				config.genConfig is configuration to generate keypairs
  * 				config.pieces are pre-generated pieces to display
  * 				config.pieceDivs are pre-rendered pieces to display
  * 				config.sourcePieces are source pieces that the given piece was generated from
@@ -2469,7 +2469,7 @@ function EditorController(div, config) {
 		new LoadController(contentController).render(function() {
 			
 			// register callbacks
-			contentController.getActionsController().onGenerate(generate);
+			contentController.getActionsController().onGenerate(that.generate);
 			contentController.getActionsController().onReset(reset);
 			contentController.getActionsController().onCancel(cancel);
 			contentController.getActionsController().onSave(save);
@@ -2545,9 +2545,7 @@ function EditorController(div, config) {
 		contentController.getCurrenciesController().validate();
 	}
 	
-	// -------------------------------- PRIVATE ---------------------------------
-	
-	function setGenerateConfig(config) {		
+	this.setGenerateConfig = function(config) {		
 		
 		// set passphrase
 		if (config.passphrase) passphraseController.setPassphrase(config.passphrase);
@@ -2560,10 +2558,10 @@ function EditorController(div, config) {
 		}
 		
 		// set currencies
-		currenciesController.setConfig(config.currencies);
+		contentController.getCurrenciesController().setConfig(config.currencies);
 	}
 	
-	function getGenerateConfig() {
+	this.getGenerateConfig = function() {
 		assertFalse(that.hasFormError());
 		var config = {};
 		
@@ -2600,20 +2598,14 @@ function EditorController(div, config) {
 		return config;
 	}
 	
-	function updateFormError() {
-		var formError = that.hasFormError();
-		if (lastFormError !== formError) invoke(formErrorChangeListeners, formError);
-		lastFormError = formError;
-	}
-	
-	function generate(onDone) {
+	this.generate = function(onDone) {
 		
 		// validate form
 		that.validate();
 		if (that.hasFormError()) return;
 		
 		// generate keys
-		CryptoPiece.generatePieces(getGenerateConfig(), function(percent, label) {
+		CryptoPiece.generatePieces(that.getGenerateConfig(), function(percent, label) {
 			invoke(generateProgressListeners, percent, label);
 		}, function(err, _pieces, _pieceRenderers) {
 			assertNull(err);
@@ -2630,6 +2622,14 @@ function EditorController(div, config) {
 			// done
 			if (onDone) onDone();
 		});
+	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function updateFormError() {
+		var formError = that.hasFormError();
+		if (lastFormError !== formError) invoke(formErrorChangeListeners, formError);
+		lastFormError = formError;
 	}
 	
 	function save() {
@@ -2769,8 +2769,18 @@ function EditorContentController(div, editorController, config) {
 				// set global pieces
 				if (config.pieces) editorController.setPieces(config.pieces, config.pieceDivs);
 				
-				// done
-				if (onDone) onDone(div);
+				// set config and generate if given
+				if (config.genConfig) {
+					editorController.setGenerateConfig(config.genConfig);
+					editorController.generate(function() {
+						if (onDone) onDone(div);
+					});
+				}
+				
+				// otherwise done
+				else {
+					if (onDone) onDone(div);
+				}
 			}
 		});
 	}
