@@ -29,7 +29,7 @@
  * @param config specifies editor configuration
  * 				config.keyGenConfig is configuration to generate keypairs
  * 				config.pieces are pre-generated pieces to display
- * 				config.renderedPieces are pre-rendered pieces to display
+ * 				config.pieceDivs are pre-rendered pieces to display
  * 				config.sourcePieces are source pieces that the given piece was generated from
  * 				config.showNotices specifies whether or not to show the notice bar
  *  			config.environmentInfo is initial environment to display
@@ -61,16 +61,17 @@ window.exportToBody = function(window, config) {
 	var body = $("body", window.document);
 	
 	// clone piece divs because IE cannot transfer elements across windows
-	if (config.renderedPieces) {
+	if (config.pieceDivs) {
 		var clonedDivs = [];
-		for (var i = 0; i < config.renderedPieces.length; i++) {
+		for (var i = 0; i < config.pieceDivs.length; i++) {
 			var clonedDiv = $("<div>", window.document);
-			clonedDiv[0].innerHTML = config.renderedPieces[i][0].outerHTML;
+			clonedDiv[0].innerHTML = config.pieceDivs[i][0].outerHTML;
 			clonedDivs.push(clonedDiv);
 		}
-		config.renderedPieces = clonedDivs;
+		config.pieceDivs = clonedDivs;
 	}
 	
 	// render editor
+	console.log(config);
 	new EditorController($("<div>").appendTo(body), config).render();
 }

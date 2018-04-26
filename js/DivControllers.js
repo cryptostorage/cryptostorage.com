@@ -66,7 +66,7 @@ var UiUtils = {
 	 * @param config specifies editor configuration
 	 * 				config.keyGenConfig is configuration to generate keypairs
 	 * 				config.pieces are pre-generated pieces to display
-	 * 				config.renderedPieces are pre-rendered pieces to display
+	 * 				config.pieceDivs are pre-rendered pieces to display
 	 * 				config.sourcePieces are source pieces that the given piece was generated from
 	 * 				config.showNotices specifies whether or not to show the notice bar
 	 */
@@ -2007,7 +2007,7 @@ function ImportTextController(div, plugins) {
 		
 		// export link opens editor
 		editor.click(function() {
-			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, renderedPieces: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
+			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
 		});
 	}
 	
@@ -2412,7 +2412,7 @@ inheritsFrom(TwoTabController, DivController);
  * @param config specifies editor configuration
  * 				config.keyGenConfig is configuration to generate keypairs
  * 				config.pieces are pre-generated pieces to display
- * 				config.renderedPieces are pre-rendered pieces to display
+ * 				config.pieceDivs are pre-rendered pieces to display
  * 				config.sourcePieces are source pieces that the given piece was generated from
  * 				config.showNotices specifies whether or not to show the notice bar
  *  			config.environmentInfo is initial environment to display
@@ -2749,22 +2749,22 @@ function EditorContentController(div, editorController, config) {
 				piecesDiv.hide();
 				
 				// currency inputs controller
-				currenciesDiv = $("<div>").appendTo(bodyDiv);
-				currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins());
-				currenciesController.render();
+				if (!config.pieces) {
+					currenciesDiv = $("<div>").appendTo(bodyDiv);
+					currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins());
+					currenciesController.render();
+					if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mdoe convenience
+					currenciesController.onFormErrorChange(setFormError);
+					currenciesController.onInputChange(function() { invoke(inputChangeListeners); });
+				}
 				
 				// actions controller
 				actionsController = new EditorActionsController($("<div>").appendTo(bodyDiv), editorController);
 				actionsController.render();
 				
-				// select crypto if in dev mode
-				if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");
-				
 				// register callbacks
 				editorController.onSetPieces(setPieces);
 				editorController.onGenerateProgress(setGenerateProgress);
-				currenciesController.onFormErrorChange(setFormError);
-				currenciesController.onInputChange(function() { invoke(inputChangeListeners); });
 				
 				// set global pieces
 				if (config.pieces) editorController.setPieces(config.pieces, config.pieceDivs);
@@ -2798,14 +2798,14 @@ function EditorContentController(div, editorController, config) {
 	}
 	
 	this.reset = function() {
-		currenciesController.reset();
+		if (currenciesController) currenciesController.reset();
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function setPieces(pieces, pieceDivs) {
 		piecesDiv.empty()
-		currenciesController.getDiv().show();
+		if (currenciesController) currenciesController.getDiv().show();
 
 		// handle no pieces
 		if (!pieces || !pieces.length) {
@@ -2866,10 +2866,10 @@ function EditorContentController(div, editorController, config) {
 //		}
 //		
 //		// show provided divs
-//		else if (config.renderedPieces) {
+//		else if (config.pieceDivs) {
 //			piecesDiv.empty();
 //			piecesDiv.show();
-//			for (var i = 0; i < config.renderedPieces.length; i++) piecesDiv.append(config.renderedPieces[i]);
+//			for (var i = 0; i < config.pieceDivs.length; i++) piecesDiv.append(config.pieceDivs[i]);
 //		}
 //		
 //		// nothing to render
