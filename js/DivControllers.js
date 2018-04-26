@@ -3681,6 +3681,7 @@ function EditorActionsController(div, editorController) {
 	var btnSave;
 	var btnPrint;
 	var generateListeners;
+	var applyLiseners;
 	var resetListeners;
 	var cancelListeners;
 	var saveListeners;
@@ -3706,6 +3707,7 @@ function EditorActionsController(div, editorController) {
 		// apply button
 		btnApply = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
 		btnApply.append("Apply");
+		btnApply.click(function() { invoke(applyListeners); });
 		btnApply.appendTo(div);
 		
 		// reset button
