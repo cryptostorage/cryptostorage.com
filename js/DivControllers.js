@@ -234,7 +234,7 @@ function CheckboxController(div, label, tooltip) {
 	}
 	
 	this.isEnabled = function() {
-		return isInitialized(checkbox.attr("disabled"));
+		return !isInitialized(checkbox.attr("disabled"));
 	}
 }
 inheritsFrom(EditorActionsController, DivController);
@@ -2525,7 +2525,7 @@ function EditorController(div, config) {
 	this.setPieces = function(_pieces, _pieceDivs) {
 		
 		// set and notify null pieces
-		if (_pieces === null && _pieceDivs === null) {
+		if (_pieces === undefined && _pieceDivs === undefined) {
 			setAndNotify();
 			return;
 		}
@@ -2938,7 +2938,6 @@ function EditorPassphraseController(div, editorController) {
 											 "BIP38 requires significantly more time and energy to encrypt/decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default encryption scheme), which makes it more secure against brute-force attacks.";
 		bip38Checkbox = new CheckboxController(bip38Div, "Use BIP38 for BTC & BCH", bip38Tooltip);
 		bip38Checkbox.render();
-		bip38Checkbox.setEnabled(false);
 		bip38Div.hide();
 		
 		// password error tooltip
@@ -2967,12 +2966,13 @@ function EditorPassphraseController(div, editorController) {
 		editorController.onReady(function() {
 			editorController.getContentController().getActionsController().onGenerate(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
-			update();
+			editorController.getContentController().onInputChange(update);
+			that.setEnabled(true);
 		});
 		
 		// initial state
+		reset();
 		that.setEnabled(false);
-		update();
 		
 		// done
 		if (onDone) onDone(div);
@@ -3013,20 +3013,18 @@ function EditorPassphraseController(div, editorController) {
 	
 	this.setEnabled = function(bool) {
 		passphraseCheckbox.setEnabled(bool);
-		bip38Checkbox.setEnabled(bool);
+		update();
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function update() {
-		if (that.getUsePassphrase()) {
-			passphraseInput.removeAttr("disabled")
-			bip38Checkbox.setEnabled(true);
-			if (editorController.getContentController().getCurrenciesController()) that.setBip38Visible(editorController.getContentController().getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]));
-		} else {
+		if (!passphraseCheckbox.isEnabled() || !that.getUsePassphrase()) {
 			passphraseInput.attr("disabled", "disabled");
-			bip38Checkbox.setEnabled(false);
 			that.setBip38Visible(false);
+		} else {
+			passphraseInput.removeAttr("disabled")
+			if (editorController.getContentController().getCurrenciesController()) that.setBip38Visible(editorController.getContentController().getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]));
 		}
 		
 		if (hasError) {
@@ -3119,10 +3117,13 @@ function EditorSplitController(div, editorController) {
 		editorController.onReady(function() {
 			editorController.getContentController().getActionsController().onGenerate(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
+			editorController.getContentController().onInputChange(update);
+			that.setEnabled(true);
 		});
 		
 		// initial state
 		reset();
+		that.setEnabled(false);
 		
 		// done
 		if (onDone) onDone(div);
