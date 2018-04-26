@@ -1840,7 +1840,7 @@ function ImportTextController(div, plugins) {
 		importInputDiv = $("<div class='import_input_div'>").appendTo(div);
 		
 		// warning div
-		warningDiv = $("<div class='import_warning_div flex_horizontal flex_justify_center'>").appendTo(importInputDiv);
+		warningDiv = $("<div class='import_warning_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(importInputDiv);
 		warningDiv.hide();
 		
 		// all text importing

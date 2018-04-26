@@ -18,6 +18,7 @@ on decrypt decrypt progress bar should show 0%, not getting 0% onProgress()
 split validation should fail on -1
 split form error remains highlighted after split disabled
 see if there are wasteful loops in editor listeners
+able to add duplicate keys on text import: bip39 2xpTFr7i6SY1Cd7SLEcKSEU4FTeML2qcdUSLVkMg364iAjw7Wt
 editor:
 	bip38 support
 	generate disabled, cancel enabled during generation
