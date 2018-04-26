@@ -24,7 +24,7 @@ function CryptoGenerator(config) {
 		var renderWeight = getRenderWeight();
 		var totalWeight = createWeight + encryptWeight + splitWeight + renderWeight;
 		
-		// generate
+		// create unencrypted package
 		var doneWeight = 0;
 		create(function(percent, label) {
 			if (onProgress) onProgress((doneWeight + percent * createWeight) / totalWeight, label);
