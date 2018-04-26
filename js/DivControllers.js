@@ -3105,6 +3105,7 @@ function EditorSplitController(div, editorController) {
 	var splitInput;
 	var hasError;
 	var formErrorChangeListeners;
+	var useSplitListeners;
 	
 	this.render = function(onDone) {
 		
@@ -3113,6 +3114,7 @@ function EditorSplitController(div, editorController) {
 		div.addClass("editor_split_div flex_horizontal flex_align_center flex_justify_start");
 		hasError = false;
 		formErrorChangeListeners = [];
+		useSplitListeners = [];
 		
 		// split tooltip
 		var splitTooltip = "Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>" +
@@ -3141,6 +3143,7 @@ function EditorSplitController(div, editorController) {
 		splitCheckbox.onChecked(function() {
 			if (splitCheckbox.isChecked()) numPiecesInput.focus();
 			update();
+			invoke(useSplitListeners);
 		});
 		numPiecesInput.on("input", function(e) { validate(true); });
 		numPiecesInput.on("focusout", function(e) { validate(false); });
@@ -3174,6 +3177,11 @@ function EditorSplitController(div, editorController) {
 	
 	this.hasFormError = function() {
 		return hasError;
+	}
+	
+	this.onUseSplitChange = function(listener) {
+		assertFunction(listener);
+		useSplitListeners.push(listener);
 	}
 	
 	this.getUseSplit = function() {
@@ -3721,6 +3729,7 @@ function EditorActionsController(div, editorController) {
 		editorController.onSetPieces(update);
 		editorController.onFormErrorChange(update);
 		editorController.getPassphraseController().onUsePassphraseChange(update);
+		editorController.getSplitController().onUseSplitChange(update);
 		
 		// initial state
 		update();
