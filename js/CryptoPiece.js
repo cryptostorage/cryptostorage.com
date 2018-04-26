@@ -23,7 +23,7 @@
  */
 
 /**
- * Encapsulates a 'piece' which is a collection of keypairs.
+ * Encapsulates a collection of keypairs.
  * 
  * Initializes from the first non-null argument.
  * 
