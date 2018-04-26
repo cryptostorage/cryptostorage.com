@@ -2759,16 +2759,20 @@ function EditorContentController(div, editorController, config) {
 				editorController.onSetPieces(setPieces);
 				editorController.onGenerateProgress(setGenerateProgress);
 				
-				// set global pieces
-				if (config.pieces) editorController.setPieces(config.pieces, config.pieceDivs);
-				
 				// handle when editor ready
 				editorController.onReady(function() {
 					actionsController.onGenerate(validate);	// validate content when generate clicked
 				});
 				
+				// set pre-existing pieces
+				if (config.pieces) {
+					editorController.setPieces(config.pieces, config.pieceDivs);
+					CompactPieceRenderer.makeCopyable(config.pieceDivs);
+					if (onDone) onDone(div);
+				}
+				
 				// set config and generate if given
-				if (config.genConfig) {
+				else if (config.genConfig) {
 					editorController.setGenerateConfig(config.genConfig);
 					editorController.generate(function() {
 						if (onDone) onDone(div);
@@ -4202,6 +4206,42 @@ function CompactPieceRenderer(div, piece) {
 	}
 }
 inheritsFrom(CompactPieceRenderer, DivController);
+
+/**
+ * Makes the given divs copyable assuming it is a rendered piece(s).
+ */
+CompactPieceRenderer.makeCopyable = function(pieceDivs) {
+	pieceDivs = listify(pieceDivs);
+	
+	// copy keys to clipboard
+	new Clipboard(".copyable", {
+		text: function(trigger) {
+			return $(trigger).html();
+		}
+	});
+	
+	// copied tooltips
+	for (var i = 0; i < pieceDivs.length; i++) {
+		var pieceDiv = pieceDivs[i];
+		pieceDiv.find(".copyable").each(function(i, copyable) {
+			tippy(copyable, {
+				arrow : true,
+				html : $("<div>Copied!</div>").get(0),
+				interactive : true,
+				placement : "top",
+				theme : 'translucent',
+				trigger : "click",
+				distance : 10,
+				arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+				onShow : function() {
+					setTimeout(function() {
+						copyable._tippy.hide();
+					}, 2000)
+				}
+			});
+		});
+	}
+}
 
 /**
  * Relative weight to render a piece generation config.
