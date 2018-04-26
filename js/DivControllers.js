@@ -2577,6 +2577,12 @@ function EditorController(div, config) {
 	
 	this.setPieces = function(_pieces, _pieceDivs) {
 		
+		// set and notify null pieces
+		if (_pieces === null && _pieceDivs === null) {
+			setAndNotify();
+			return;
+		}
+		
 		// validate input
 		assertArray(_pieces);
 		assertTrue(_pieces.length > 0);
@@ -2591,9 +2597,12 @@ function EditorController(div, config) {
 		}
 		
 		// set and notify
-		pieces = _pieces;
-		pieceDivs = _pieceDivs;
-		invoke(setPiecesListeners, pieces, pieceDivs);
+		setAndNotify();
+		function setAndNotify() {
+			pieces = _pieces;
+			pieceDivs = _pieceDivs;
+			invoke(setPiecesListeners, pieces, pieceDivs);
+		}
 	}
 	
 	this.onSetPieces = function(listener) {
