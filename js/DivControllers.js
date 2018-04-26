@@ -3773,11 +3773,10 @@ function EditorActionsController(div, editorController) {
 	// ------------------------------ PRIVATE -----------------------------
 	
 	function update() {
-		
-		console.log("Updating!");
 				
 		// handle no imported pieces
 		if (!editorController.getImportedPieces()) {
+			btnApply.hide();
 			btnGenerate.show();
 			btnGenerate.unbind("click");
 			if (editorController.hasFormError()) {
