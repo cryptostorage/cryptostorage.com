@@ -2753,7 +2753,7 @@ function EditorContentController(div, editorController, config) {
 					currenciesDiv = $("<div>").appendTo(bodyDiv);
 					currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins());
 					currenciesController.render();
-					if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mdoe convenience
+					if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
 					currenciesController.onFormErrorChange(setFormError);
 					currenciesController.onInputChange(function() { invoke(inputChangeListeners); });
 				}
