@@ -2431,6 +2431,7 @@ function EditorController(div, config) {
 	var setPiecesListeners;
 	var generateProgressListeners;
 	var lastFormError;
+	var readyListeners;
 	
 	this.render = function(onDone) {
 		
@@ -2440,6 +2441,7 @@ function EditorController(div, config) {
 		formErrorChangeListeners = [];
 		setPiecesListeners = [];
 		generateProgressListeners = [];
+		readyListeners = [];
 		
 		// copy config with defaults
 		config = Object.assign({
@@ -2475,10 +2477,18 @@ function EditorController(div, config) {
 			passphraseController.onFormErrorChange(updateFormError);
 			splitController.onFormErrorChange(updateFormError);
 			contentController.onFormErrorChange(updateFormError);
+			
+			// announce ready
+			invoke(readyListeners);
 		});
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	this.onReady = function(listener) {
+		assertFunction(listener);
+		readyListeners.push(listener);
 	}
 	
 	this.getPassphraseController = function() {
@@ -2931,7 +2941,9 @@ function EditorPassphraseController(div, editorController) {
 			update();
 		});
 		passphraseInput.on("input", function(e) { setFormError(false); });
-		//	editorController.getContentController().getCurrenciesController().onInputChange(function() { update(); });  TODO: need to listen for update to content
+		editorController.onReady(function() {
+			editorController.getContentController().getCurrenciesController().onInputChange(function() { update(); });
+		})
 		
 		// initial state
 		update();
