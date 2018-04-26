@@ -2967,7 +2967,6 @@ function EditorPassphraseController(div, editorController) {
 	}
 	
 	this.setUsePassphrase = function(checked) {
-		console.log("setUsePassphrase(" + checked + ")");
 		passphraseCheckbox.setChecked(checked);
 	}
 	
