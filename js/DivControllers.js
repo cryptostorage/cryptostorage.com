@@ -2425,6 +2425,8 @@ function EditorController(div, config) {
 	var passphraseController
 	var splitController;
 	var contentController;
+	var importedPieces;
+	var importedPieceDivs;
 	var pieces;
 	var pieceDivs;
 	var formErrorChangeListeners;
@@ -2503,20 +2505,6 @@ function EditorController(div, config) {
 		return contentController;
 	}
 	
-	this.setPieces = function(_pieces, _pieceDivs) {
-		pieces = _pieces;
-		pieceDivs = _pieceDivs;
-		invoke(setPiecesListeners, pieces, pieceDivs);
-	}
-	
-	this.getPieces = function() {
-		return pieces;
-	}
-	
-	this.getPieceDivs = function() {
-		return pieceDivs;
-	}
-	
 	this.hasFormError = function() {
 		if (passphraseController.hasFormError()) return true;
 		if (splitController.hasFormError()) return true;
@@ -2524,15 +2512,10 @@ function EditorController(div, config) {
 		return false;
 	}
 	
-	this.onSetPieces = function(listener) {
-		assertFunction(listener);
-		setPiecesListeners.push(listener);
-	}
-	
 	this.onFormErrorChange = function(listener) {
 		assertFunction(listener);
 		formErrorChangeListeners.push(listener);
-	}	
+	}
 	
 	this.onGenerateProgress = function(listener) {
 		assertFunction(listener);
@@ -2590,6 +2573,40 @@ function EditorController(div, config) {
 		// set piece renderer class
 		config.rendererClass = CompactPieceRenderer;
 		return config;
+	}
+	
+	this.setPieces = function(_pieces, _pieceDivs) {
+		
+		// validate input
+		assertArray(_pieces);
+		assertTrue(_pieces.length > 0);
+		assertObject(_pieces[0], CryptoPiece);
+		assertArray(_pieceDivs);
+		assertTrue(_pieceDivs.length > 0);
+		
+		// assign imported pieces if not given
+		if (config.pieces && !importedPieces) {
+			importedPieces = _pieces;
+			importedPieceDivs = _pieceDivs;
+		}
+		
+		// set and notify
+		pieces = _pieces;
+		pieceDivs = _pieceDivs;
+		invoke(setPiecesListeners, pieces, pieceDivs);
+	}
+	
+	this.onSetPieces = function(listener) {
+		assertFunction(listener);
+		setPiecesListeners.push(listener);
+	}
+	
+	this.getPieces = function() {
+		return pieces;
+	}
+	
+	this.getPieceDivs = function() {
+		return pieceDivs;
 	}
 	
 	this.generate = function(onDone) {
@@ -2658,10 +2675,7 @@ function EditorController(div, config) {
 	}
 	
 	function reset() {
-		passphraseController.reset();
-		splitController.reset();
-		contentController.reset();
-		that.setPieces(null, null);
+		that.setPieces(importedPieces, importedPieceDivs);
 	}
 	
 	function cancel() {
@@ -2707,13 +2721,6 @@ function EditorContentController(div, editorController, config) {
 		// load dependencies TODO: load correct dependencies
 		LOADER.load(AppUtils.getDynamicExportDependencies(), function(err) {
 			if (err) throw err;
-			
-			// re-initialize transferred pieces so instanceof, etc works
-			if (config.pieces) {
-				var copies = [];
-				for (var i = 0; i < config.pieces.length; i++) copies.push(new CryptoPiece({json: config.pieces[i].toJson()}));
-				config.pieces = copies;
-			}
 			
 			// notices
 			if (config.showNotices) {
@@ -2766,19 +2773,28 @@ function EditorContentController(div, editorController, config) {
 				editorController.onSetPieces(setPieces);
 				editorController.onGenerateProgress(setGenerateProgress);
 				
-				// handle when editor ready
+				// listen for actions when editor ready
 				editorController.onReady(function() {
-					actionsController.onGenerate(validate);	// validate content when generate clicked
+					actionsController.onGenerate(validate);
+					actionsController.onReset(reset);
 				});
 				
-				// set pre-existing pieces
+				// handle pre-existing pieces
 				if (config.pieces) {
-					editorController.setPieces(config.pieces, config.pieceDivs);
+					
+					// re-initialize pieces in this thread so instanceof, etc work in new tab
+					var copies = [];
+					for (var i = 0; i < config.pieces.length; i++) copies.push(new CryptoPiece({json: config.pieces[i].toJson()}));
+					config.pieces = copies;
+					
+					// set the pieces and make copyable
+					assertInitialized(config.pieceDivs);
 					CompactPieceRenderer.makeCopyable(config.pieceDivs);
+					editorController.setPieces(config.pieces, config.pieceDivs);
 					if (onDone) onDone(div);
 				}
 				
-				// set config and generate if given
+				// handle generate config
 				else if (config.genConfig) {
 					editorController.setGenerateConfig(config.genConfig);
 					editorController.generate(function() {
@@ -2787,9 +2803,7 @@ function EditorContentController(div, editorController, config) {
 				}
 				
 				// otherwise done
-				else {
-					if (onDone) onDone(div);
-				}
+				else if (onDone) onDone(div);
 			}
 		});
 	}
@@ -2816,11 +2830,11 @@ function EditorContentController(div, editorController, config) {
 		inputChangeListeners.push(listener);
 	}
 	
-	this.reset = function() {
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function reset() {
 		if (currenciesController) currenciesController.reset();
 	}
-	
-	// -------------------------------- PRIVATE ---------------------------------
 	
 	function setPieces(pieces, pieceDivs) {
 		piecesDiv.empty()
@@ -2940,9 +2954,10 @@ function EditorPassphraseController(div, editorController) {
 		});
 		passphraseInput.on("input", function(e) { setFormError(false); });
 		
-		// handle when editor ready
+		// listen for actions when editor ready
 		editorController.onReady(function() {
-			editorController.getContentController().getActionsController().onGenerate(validate);	// validate when generate clicked
+			editorController.getContentController().getActionsController().onGenerate(validate);
+			editorController.getContentController().getActionsController().onReset(reset);
 			update();
 		});
 		
@@ -2960,13 +2975,6 @@ function EditorPassphraseController(div, editorController) {
 	this.onFormErrorChange = function(listener) {
 		assertFunction(listener);
 		formErrorChangeListeners.push(listener);
-	}
-	
-	this.reset = function() {
-		passphraseCheckbox.setChecked(false);
-		passphraseInput.val("");
-		validate();
-		update();
 	}
 	
 	this.getUsePassphrase = function() {
@@ -3027,6 +3035,13 @@ function EditorPassphraseController(div, editorController) {
 		update();
 		if (change) invoke(formErrorChangeListeners, hasError);
 	}
+	
+	function reset() {
+		passphraseCheckbox.setChecked(false);
+		passphraseInput.val("");
+		validate();
+		update();
+	}
 }
 inheritsFrom(EditorPassphraseController, DivController);
 
@@ -3086,13 +3101,14 @@ function EditorSplitController(div, editorController) {
 		minPiecesInput.on("input", function(e) { validate(true); });
 		minPiecesInput.on("focusout", function(e) { validate(false); });
 		
-		// handle when editor ready
+		// listen for actions when editor ready
 		editorController.onReady(function() {
-			editorController.getContentController().getActionsController().onGenerate(validate);	// validate when generate clicked
+			editorController.getContentController().getActionsController().onGenerate(validate);
+			editorController.getContentController().getActionsController().onReset(reset);
 		});
 		
 		// initial state
-		that.reset();
+		reset();
 		
 		// done
 		if (onDone) onDone(div);
@@ -3109,14 +3125,6 @@ function EditorSplitController(div, editorController) {
 	
 	this.hasFormError = function() {
 		return hasError;
-	}
-	
-	this.reset = function() {
-		splitCheckbox.setChecked(false);
-		numPiecesInput.val("3");
-		minPiecesInput.val("2");
-		validate();
-		update();
 	}
 	
 	this.getUseSplit = function() {
@@ -3157,6 +3165,14 @@ function EditorSplitController(div, editorController) {
 			numPiecesInput.attr("disabled", "disabled");
 			minPiecesInput.attr("disabled", "disabled");
 		}
+	}
+
+	function reset() {
+		splitCheckbox.setChecked(false);
+		numPiecesInput.val("3");
+		minPiecesInput.val("2");
+		validate();
+		update();
 	}
 	
 	function validate(lenientBlankAndRange) {

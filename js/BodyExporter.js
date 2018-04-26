@@ -61,6 +61,7 @@ window.exportToBody = function(window, config) {
 	var body = $("body", window.document);
 	
 	// clone piece divs because IE cannot transfer elements across windows
+	config = Object.assign({}, config);
 	if (config.pieceDivs) {
 		var clonedDivs = [];
 		for (var i = 0; i < config.pieceDivs.length; i++) {
