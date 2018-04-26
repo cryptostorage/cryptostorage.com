@@ -11,7 +11,6 @@
  * 				config.pieceRendererClass specifies a class to render pieces, skips rendering if not given
  */
 function PackageGenerator(config) {
-	
 	config = Object.assign({}, config);
 	PackageGenerator.validateGenerateConfig(config);
 
@@ -24,11 +23,12 @@ function PackageGenerator(config) {
 	this.generatePackage = function(onProgress, onDone) {
 		
 		// get weights
-		var createWeight = getCreateWeight();
-		var encryptWeight = getEncryptWeight();
-		var splitWeight = getSplitWeight();
-		var renderWeight = getRenderWeight();
-		var totalWeight = createWeight + encryptWeight + splitWeight + renderWeight;
+		var weights = computeWeights(config);
+		var createWeight = weights.createWeight;
+		var encryptWeight = weights.encryptWeight
+		var splitWeight = weights.splitWeight();
+		var renderWeight = weights.renderWeight;
+		var totalWeight = weights.totalWeight;
 		
 		// create unencrypted package
 		var doneWeight = 0;
@@ -72,31 +72,32 @@ function PackageGenerator(config) {
 	
 	// --------------------------------- PRIVATE --------------------------------
 	
-	function getCreateWeight() {
-		throw new Error("Not implemented");
+	function computeWeights() {
+		var weights = {};
+		weights.createWeight = 0;
+		weights.encryptWeight = 0;
+		var numKeypairs = 0;
+		for (var i = 0; i < config.keypairs.length; i++) {
+			var keypair = config.keypairs[i];
+			numKeypairs += keypair.numKeypairs;
+			createWeight += CryptoKeypair.getCreateWeight(keypair.ticker) * numKeypairs;
+			throw new Error("update to new config schema");
+			if (keypair.encryption) encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption) * numKeypairs;	// TODO: update to new config schema
+		}
+		weights.renderWeight = config.pieceRendererClass ? config.pieceRendererClass.getRenderWeight(config) : 0;
+		weights.totalWeight = weights.createWeight + weights.encryptWeight + weights.renderWeight;
+		return weights;
 	}
 	
 	function create(onProgress, onDone) {
 		throw new Error("Not implemented");
 	}
-	
-	function getEncryptWeight() {
-		throw new Error("Not implemented");
-	}
-	
+
 	function encrypt(pkg, onProgress, onDone) {
 		throw new Error("Not implemented");
 	}
 	
-	function getSplitWeight() {
-		throw new Error("Not implemented");
-	}
-	
 	function split(pkg, onProgress, onDone) {
-		throw new Error("Not implemented");
-	}
-	
-	function getRenderWeight() {
 		throw new Error("Not implemented");
 	}
 	
@@ -110,4 +111,13 @@ function PackageGenerator(config) {
  */
 PackageGenerator.validateGenerateConfig = function(genConfig) {
 	
+	if (genConfig.keypairs) {
+		assertUndefined(genConfig.piecePkg);
+	}
+	
+	if (genConfig.piecePkg) {
+		assertUndefined(genConfig.keypairs);
+	}
+	
+	throw new Error("PackageGenerator.validateGenerateConfig not implemented");
 }
