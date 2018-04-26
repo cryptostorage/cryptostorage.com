@@ -2460,13 +2460,16 @@ function EditorController(div, config) {
 		passphraseController.setUsePassphrase(false);
 		
 		// split controller
-		splitController = new EditorSplitController($("<div>").appendTo(passphraseSplitDiv), that.update);
+		splitController = new EditorSplitController($("<div>").appendTo(passphraseSplitDiv), that);
 		splitController.render();
 		splitController.setUseSplit(false);
 		
 		// load body controller
 		contentController = new EditorContentController($("<div>").appendTo(div), that, config);
 		new LoadController(contentController).render(function() {
+			
+			// announce ready
+			invoke(readyListeners);
 			
 			// register callbacks
 			contentController.getActionsController().onGenerate(that.generate);
@@ -2477,9 +2480,6 @@ function EditorController(div, config) {
 			passphraseController.onFormErrorChange(updateFormError);
 			splitController.onFormErrorChange(updateFormError);
 			contentController.onFormErrorChange(updateFormError);
-			
-			// announce ready
-			invoke(readyListeners);
 		});
 		
 		// done rendering
@@ -2539,12 +2539,6 @@ function EditorController(div, config) {
 		generateProgressListeners.push(listener);
 	}
 	
-	this.validate = function() {
-		passphraseController.validate();
-		splitController.validate();
-		contentController.getCurrenciesController().validate();
-	}
-	
 	this.setGenerateConfig = function(config) {		
 		
 		// set passphrase
@@ -2600,8 +2594,7 @@ function EditorController(div, config) {
 	
 	this.generate = function(onDone) {
 		
-		// validate form
-		that.validate();
+		// validate no errors
 		if (that.hasFormError()) return;
 		
 		// generate keys
@@ -2769,6 +2762,11 @@ function EditorContentController(div, editorController, config) {
 				// set global pieces
 				if (config.pieces) editorController.setPieces(config.pieces, config.pieceDivs);
 				
+				// handle when editor ready
+				editorController.onReady(function() {
+					actionsController.onGenerate(validate);	// validate content when generate clicked
+				});
+				
 				// set config and generate if given
 				if (config.genConfig) {
 					editorController.setGenerateConfig(config.genConfig);
@@ -2861,30 +2859,9 @@ function EditorContentController(div, editorController, config) {
 		if (change) invoke(formErrorChangeListeners, hasError);
 	}
 	
-//	this.update = function() {
-//		
-//		// show crypto selector
-//		currenciesDiv.show();
-//		
-//		// TODO: rebuilding piecesDiv unecessarily on every update
-//		
-//		// show divs from renderers
-//		if (isArray(pieceRenderers) && pieceRenderers.length > 0) {
-//			piecesDiv.empty();
-//			piecesDiv.show();
-//			for (var i = 0; i < pieceRenderers.length; i++) piecesDiv.append(pieceRenderers[i].getDiv());
-//		}
-//		
-//		// show provided divs
-//		else if (config.pieceDivs) {
-//			piecesDiv.empty();
-//			piecesDiv.show();
-//			for (var i = 0; i < config.pieceDivs.length; i++) piecesDiv.append(config.pieceDivs[i]);
-//		}
-//		
-//		// nothing to render
-//		else piecesDiv.hide();
-//	}
+	function validate() {
+		if (currenciesController) currenciesController.validate();
+	}
 }
 inheritsFrom(EditorContentController, DivController);
 
@@ -2951,7 +2928,12 @@ function EditorPassphraseController(div, editorController) {
 			update();
 		});
 		passphraseInput.on("input", function(e) { setFormError(false); });
-		editorController.onReady(update);
+		
+		// handle when editor ready
+		editorController.onReady(function() {
+			editorController.getContentController().getActionsController().onGenerate(validate);	// validate when generate clicked
+			update();
+		});
 		
 		// initial state
 		update();
@@ -2969,14 +2951,10 @@ function EditorPassphraseController(div, editorController) {
 		formErrorChangeListeners.push(listener);
 	}
 	
-	this.validate = function() {
-		setFormError(that.getUsePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH);
-	}
-	
 	this.reset = function() {
 		passphraseCheckbox.setChecked(false);
 		passphraseInput.val("");
-		that.validate();
+		validate();
 		update();
 	}
 	
@@ -3029,6 +3007,10 @@ function EditorPassphraseController(div, editorController) {
 		}
 	}
 	
+	function validate() {
+		setFormError(that.getUsePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH);
+	}
+	
 	function setFormError(_hasError) {
 		var change = hasError !== _hasError;
 		hasError = _hasError;
@@ -3042,8 +3024,9 @@ inheritsFrom(EditorPassphraseController, DivController);
  * Controls split input and validation.
  * 
  * @param div is the div to render to
+ * @param editorController is the top-level editor controller
  */
-function EditorSplitController(div) {
+function EditorSplitController(div, editorController) {
 	DivController.call(this, div);
 	
 	var that = this;
@@ -3088,10 +3071,15 @@ function EditorSplitController(div) {
 			if (splitCheckbox.isChecked()) numPiecesInput.focus();
 			update();
 		});
-		numPiecesInput.on("input", function(e) { that.validate(true); });
-		numPiecesInput.on("focusout", function(e) { that.validate(false); });
-		minPiecesInput.on("input", function(e) { that.validate(true); });
-		minPiecesInput.on("focusout", function(e) { that.validate(false); });
+		numPiecesInput.on("input", function(e) { validate(true); });
+		numPiecesInput.on("focusout", function(e) { validate(false); });
+		minPiecesInput.on("input", function(e) { validate(true); });
+		minPiecesInput.on("focusout", function(e) { validate(false); });
+		
+		// handle when editor ready
+		editorController.onReady(function() {
+			editorController.getContentController().getActionsController().onGenerate(validate);	// validate when generate clicked
+		});
 		
 		// initial state
 		that.reset();
@@ -3109,7 +3097,59 @@ function EditorSplitController(div) {
 		formErrorChangeListeners.push(listener);
 	}
 	
-	this.validate = function(lenientBlankAndRange) {
+	this.hasFormError = function() {
+		return hasError;
+	}
+	
+	this.reset = function() {
+		splitCheckbox.setChecked(false);
+		numPiecesInput.val("3");
+		minPiecesInput.val("2");
+		validate();
+		update();
+	}
+	
+	this.getUseSplit = function() {
+		return splitCheckbox.isChecked();
+	}
+	
+	this.setUseSplit = function(bool) {
+		splitCheckbox.setChecked(bool);
+	}
+	
+	this.getNumPieces = function() {
+		var numPieces = Number(numPiecesInput.val());
+		if (!isInt(numPieces)) return null;
+		return numPieces;
+	}
+	
+	this.setNumPieces = function(numPieces) {
+		numPiecesInput.val(numPieces);
+	}
+	
+	this.getMinPieces = function() {
+		var minPieces = Number(minPiecesInput.val());
+		if (!isInt(minPieces)) return null;
+		return minPieces;
+	}
+	
+	this.setMinPieces = function(minPieces) {
+		minPiecesInout.val(minPieces);
+	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function update() {
+		if (that.getUseSplit()) {
+			numPiecesInput.removeAttr("disabled");
+			minPiecesInput.removeAttr("disabled");
+		} else {
+			numPiecesInput.attr("disabled", "disabled");
+			minPiecesInput.attr("disabled", "disabled");
+		}
+	}
+	
+	function validate(lenientBlankAndRange) {
 		var lastError = hasError;
 		hasError = false;
 		if (that.getUseSplit()) {
@@ -3154,58 +3194,6 @@ function EditorSplitController(div) {
 			minPiecesInput.removeClass("form_input_error_div");
 		}
 		if (hasError !== lastError) invoke(formErrorChangeListeners, hasError);
-	}
-	
-	this.hasFormError = function() {
-		return hasError;
-	}
-	
-	this.reset = function() {
-		splitCheckbox.setChecked(false);
-		numPiecesInput.val("3");
-		minPiecesInput.val("2");
-		that.validate();
-		update();
-	}
-	
-	this.getUseSplit = function() {
-		return splitCheckbox.isChecked();
-	}
-	
-	this.setUseSplit = function(bool) {
-		splitCheckbox.setChecked(bool);
-	}
-	
-	this.getNumPieces = function() {
-		var numPieces = Number(numPiecesInput.val());
-		if (!isInt(numPieces)) return null;
-		return numPieces;
-	}
-	
-	this.setNumPieces = function(numPieces) {
-		numPiecesInput.val(numPieces);
-	}
-	
-	this.getMinPieces = function() {
-		var minPieces = Number(minPiecesInput.val());
-		if (!isInt(minPieces)) return null;
-		return minPieces;
-	}
-	
-	this.setMinPieces = function(minPieces) {
-		minPiecesInout.val(minPieces);
-	}
-	
-	// -------------------------------- PRIVATE ---------------------------------
-	
-	function update() {
-		if (that.getUseSplit()) {
-			numPiecesInput.removeAttr("disabled");
-			minPiecesInput.removeAttr("disabled");
-		} else {
-			numPiecesInput.attr("disabled", "disabled");
-			minPiecesInput.attr("disabled", "disabled");
-		}
 	}
 }
 inheritsFrom(EditorSplitController, DivController);
