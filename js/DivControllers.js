@@ -2941,9 +2941,7 @@ function EditorPassphraseController(div, editorController) {
 			update();
 		});
 		passphraseInput.on("input", function(e) { setFormError(false); });
-		editorController.onReady(function() {
-			editorController.getContentController().getCurrenciesController().onInputChange(function() { update(); });
-		})
+		editorController.onReady(update);
 		
 		// initial state
 		update();
