@@ -2708,6 +2708,13 @@ function EditorContentController(div, editorController, config) {
 		LOADER.load(AppUtils.getDynamicExportDependencies(), function(err) {
 			if (err) throw err;
 			
+			// re-initialize transferred pieces so instanceof, etc works
+			if (config.pieces) {
+				var copies = [];
+				for (var i = 0; i < config.pieces.length; i++) copies.push(new CryptoPiece({json: config.pieces[i].toJson()}));
+				config.pieces = copies;
+			}
+			
 			// notices
 			if (config.showNotices) {
 				
