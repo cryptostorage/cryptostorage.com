@@ -82,7 +82,7 @@ function CryptoPiece(config) {
 		}
 		
 		// encrypt async
-		if (onProgress) onProgress(0, "Encrypting");
+		if (onProgress) onProgress(0, "Encrypting keypairs");
 		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
 			if (err) onDone(err);
 			else onDone(null, that);
@@ -91,13 +91,13 @@ function CryptoPiece(config) {
 		function encryptFunc(keypair, scheme, passphrase) {
 			return function(onDone) {
 				keypair.encrypt(scheme, passphrase, function(percent) {
-					if (onProgress) onProgress((doneWeight +  CryptoKeypair.getEncryptWeight(scheme) * percent) / totalWeight, "Encrypting");
+					if (onProgress) onProgress((doneWeight +  CryptoKeypair.getEncryptWeight(scheme) * percent) / totalWeight, "Encrypting keypairs");
 				}, function(err, keypair) {
 					if (err) onDone(err);
 					else {
 						assertTrue(keypair.isEncrypted());
 						doneWeight += CryptoKeypair.getEncryptWeight(scheme);
-						if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting");
+						if (onProgress) onProgress(doneWeight / totalWeight, "Encrypting keypairs");
 						setImmediate(function() { onDone(null, keypair); });	// let UI breath
 					}
 				});

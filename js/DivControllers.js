@@ -1618,7 +1618,7 @@ function ImportTextController(div, plugins) {
 		}
 		
 		// check if piece can be added to imported pieces
-		var msg = getCompatibilityError(piece, importedPieces);
+		var msg = getCompatibilityError(importedPieces, piece);
 		if (msg) {
 			setWarning(msg);
 			return;
@@ -1647,7 +1647,7 @@ function ImportTextController(div, plugins) {
 			}
 		}
 		
-		function getCompatibilityError(piece, pieces) {
+		function getCompatibilityError(pieces, piece) {
 			
 			// check if piece already added
 			for (var i = 0; i < pieces.length; i++) {

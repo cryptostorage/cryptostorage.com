@@ -28,7 +28,6 @@ function PieceGenerator(config) {
 		
 		// get weights
 		var weights = computeWeights(config);
-		console.log(weights);
 		var createWeight = weights.createWeight;
 		var encryptWeight = weights.encryptWeight
 		var splitWeight = weights.splitWeight;

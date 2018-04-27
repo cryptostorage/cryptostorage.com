@@ -110,7 +110,7 @@ function TestCrypto() {
 			piece.encrypt(PASSPHRASE, schemes, function(percent, label) {
 				if (percent === 0) progressStarted = true;
 				if (percent === 1) progressComplete = true;
-				assertEquals("Encrypting", label);
+				assertEquals("Encrypting keypairs", label);
 				assertTrue(percent >= lastPercent);
 				lastPercent = percent;
 			}, function(err, encryptedPiece) {
@@ -414,7 +414,7 @@ function TestCrypto() {
 				numKeypairs: 1
 			});
 		}
-		config.rendererClass = CompactPieceRenderer;
+		config.pieceRendererClass = CompactPieceRenderer;
 		testGenerateConfig(config, function(err) {
 			if (err) {
 				onDone(err);
@@ -424,7 +424,7 @@ function TestCrypto() {
 			// config with encryption and split
 			config.passphrase = PASSPHRASE;
 			for (var i = 0; i < config.keypairs.length; i++) {
-				config.keypairs[i].encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
+				config.keypairs[i].encryptionScheme = AppUtils.EncryptionScheme.V0_CRYPTOJS;
 			}
 			config.numPieces = NUM_PIECES;
 			config.minPieces = MIN_PIECES;
@@ -444,7 +444,8 @@ function TestCrypto() {
 			var progressMiddle = false;
 			var progressEnd = false;
 			var lastPercent = 0;
-			var pieces = CryptoPiece.generatePieces(config, function(percent, label) {
+			var generator = new PieceGenerator(config);
+			generator.generatePieces(function(percent, label) {
 				if (percent === 0) progressStart = true;
 				else if (percent === 1) progressEnd = true;
 				else if (percent > 0 && percent < 1) progressMiddle = true;
@@ -463,7 +464,7 @@ function TestCrypto() {
 						break;
 					default: throw new Error("Unrecognized progress label: " + label);
 				}
-			}, function(err, pieces, pieceRenderers) {
+			}, function (err, pieces, pieceRenderers) {
 				assertNull(err);
 				if (config.numPieces) {
 					assertEquals(config.numPieces, pieces.length);
