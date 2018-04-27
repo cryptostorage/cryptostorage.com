@@ -342,6 +342,17 @@ function TestCrypto() {
 			}
 		}
 		
+		// test combining duplicate shares
+		var invalidCombination = [];
+		for (var i = 0; i < MIN_PIECES; i++) invalidCombination.push(splitPieces[0]);
+		try {
+			new CryptoPiece({splitPieces: invalidCombination});
+			throw new Error("fail");
+		} catch (err) {
+			if (err.message === "fail") throw new Error("Cannot create key from duplicate shares");
+			assertEquals("Pieces do not combine to create valid keypairs", err.message);
+		}
+		
 		// test each piece combination
 		var combinations = getCombinations(splitPieces, MIN_PIECES);
 		for (var i = 0; i < combinations.length; i++) {

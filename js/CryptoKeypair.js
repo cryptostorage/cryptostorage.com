@@ -429,11 +429,14 @@ function CryptoKeypair(config) {
 			throw new Error("Need " + additional + " additional " + (additional === 1 ? "share" : "shares") + " to recover private key");
 		}
 		
-		// combine hex shares
-		var privateHex = secrets.combine(shamirHexes);
-		assertHex(privateHex);
-		setPrivateKey(privateHex);
-		if (isDefined(publicAddress)) setPublicAddress(publicAddress);
+		// try to combine shares to create private key and public address, which might be invalid or incompatible
+		try {
+			var privateHex = secrets.combine(shamirHexes);
+			setPrivateKey(privateHex);
+			if (isDefined(publicAddress)) setPublicAddress(publicAddress);
+		} catch (err) {
+			throw new Error("Pieces do not combine to create valid keypairs");
+		}
 	}
 	
 	function setPublicAddress(address) {
