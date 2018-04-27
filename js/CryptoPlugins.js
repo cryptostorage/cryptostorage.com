@@ -983,7 +983,7 @@ function BIP39Plugin() {
 	}
 	
 	this.isAddress = function(str) {
-		return str === null;
+		return isUndefined(str);
 	}
 }
 inheritsFrom(BIP39Plugin, CryptoPlugin);
