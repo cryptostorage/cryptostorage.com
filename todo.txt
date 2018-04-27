@@ -19,6 +19,10 @@ split validation should fail on -1
 split form error remains highlighted after split disabled
 see if there are wasteful loops in editor listeners
 able to add duplicate keys on text import: bip39 2xpTFr7i6SY1Cd7SLEcKSEU4FTeML2qcdUSLVkMg364iAjw7Wt
+xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share even though not same length as proper split share
+	auto detect length? LTC different hex sizes:
+		48adb31f61c9d82c54cde60789dfeb57ed9998074c691a847516edaae964b11c
+		67a87e6c0038dccf8092a2b3685f35c98cb9ac0b56b197055edcd1d76fc857
 editor:
 	bip38 support
 	generate disabled, cancel enabled during generation

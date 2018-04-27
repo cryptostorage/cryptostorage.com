@@ -636,7 +636,8 @@ function MoneroPlugin() {
 		
 		// unencrypted wif
 		if (str.indexOf(' ') !== -1) {
-			decoded.privateHex = mn_decode(str);
+			try { decoded.privateHex = mn_decode(str); }
+			catch (err) { return null };
 			decoded.privateWif = str;
 			decoded.publicAddress = cnUtil.create_address(decoded.privateHex).public_addr;
 			decoded.encryption = null;
@@ -865,7 +866,9 @@ function StellarPlugin() {
 		
 		// unencrypted wif
 		if (str.length === 56 && isUpperCase(str) && isBase32(str)) {
-			var keypair = StellarBase.Keypair.fromSecret(str);
+			var keypair;
+			try { keypair = StellarBase.Keypair.fromSecret(str) }
+			catch (err) { return null; }
 			decoded.privateHex = keypair.rawSecretKey().toString('hex');
 			decoded.privateWif = str;			
 			decoded.publicAddress = keypair.publicKey();

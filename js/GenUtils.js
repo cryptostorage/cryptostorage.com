@@ -526,6 +526,19 @@ function toUniqueArray(arr) {
 }
 
 /**
+ * Copies the given array.
+ * 
+ * @param arr is the array to copy
+ * @returns a copy of the given array
+ */
+function copyArray(arr) {
+	assertArray(arr);
+	var copy = [];
+	for (var i = 0; i < arr.length; i++) copy.push(arr[i]);
+	return copy;
+}
+
+/**
  * Returns a copy of the given array where each element is lowercase.
  * 
  * @param arr is the array to convert to lowercase
