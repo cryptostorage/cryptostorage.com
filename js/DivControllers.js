@@ -4439,7 +4439,7 @@ CompactPieceRenderer.getRenderWeight = function(config) {
 	// compute weight from pre-existing pieces
 	if (config.pieces) {
 		for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
-			weight += KeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker()) * numPieces;
+			weight += (KeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker()) * numPieces);
 		}
 	}
 	
@@ -4598,10 +4598,10 @@ KeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
 	assertInitialized(tickerOrKeypair);
 	if (isString(tickerOrKeypair)) {
 		var plugin = AppUtils.getCryptoPlugin(tickerOrKeypair);
-		return 10 * plugin.hasPublicAddress() ? 2 : 1;
+		return 10 * (plugin.hasPublicAddress() ? 2 : 1);
 	} else {
 		assertObject(tickerOrKeypair, CryptoKeypair);
-		return (tickerOrKeypair.hasPublicAddress() ? 10 : 0) + tickerOrKeypair.hasPrivateKey() ? 10 : 0; 
+		return (tickerOrKeypair.hasPublicAddress() ? 10 : 0) + (tickerOrKeypair.hasPrivateKey() ? 10 : 0); 
 	}
 }
 
