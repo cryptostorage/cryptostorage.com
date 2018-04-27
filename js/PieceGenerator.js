@@ -6,8 +6,9 @@
  *  			config.useBip38 specifies whether or not to use BIP38 when available, otherwise uses first registered encryption scheme
  * 				config.numPieces causes splitting with this field as the number of split pieces
  * 				config.minPieces specifies the minimum number of split pieces necessary to reconstitute private keys
- * 				config.keypairs[{ticker: "BCH", numKeypairs: 7}, ...] specifies the keypair generation configuration
+ * 				config.keypairs[{ticker: "BCH", numKeypairs: 7, encryptionScheme: "BIP38"}, ...] specifies the keypair generation configuration
  * 				config.pieces are existing pieces to start with instead of generating new keypairs
+ *				config.encryptionSchemes are encryption schemes to encrypt existing pieces if passphrase is set
  * 				config.pieceRendererClass specifies a class to render pieces, skips rendering if not given
  */
 function PieceGenerator(config) {
@@ -122,8 +123,9 @@ function PieceGenerator(config) {
  * Validates a piece generation config.
  */
 PieceGenerator.validateGenerateConfig = function(genConfig) {
+	assertObject(genConfig);
 	
-	throw new Error("PieceGenerator.validateGenerateConfig not implemented");
+	throw new Error("Ready to implement validate generate config");
 	
 	if (genConfig.keypairs) {
 		assertUndefined(genConfig.pieces);
@@ -131,5 +133,54 @@ PieceGenerator.validateGenerateConfig = function(genConfig) {
 	
 	if (genConfig.pieces) {
 		assertUndefined(genConfig.keypairs);
+	}
+	
+	
+	
+	
+	assertObject(config);
+	
+	// validate keypairs
+	var schemes = [];
+	assertArray(config.keypairs);
+	assertTrue(config.keypairs.length > 0);
+	for (var i = 0; i < config.keypairs.length; i++) {
+		assertInitialized(config.keypairs[i].ticker);
+		assertNumber(config.keypairs[i].numKeypairs);
+		assertTrue(config.keypairs[i].numKeypairs > 0);
+		assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
+		schemes.push(config.keypairs[i].encryption);
+	}
+	
+	// validate encryption
+	var useEncryption = -1;
+	for (var i = 0; i < schemes.length; i++) {
+		if (useEncryption === -1) useEncryption = schemes[i] === null ? null : schemes[i] === undefined ? undefined : true;
+		else {
+			if (isInitialized(schemes[i])) assertTrue(useEncryption);
+			else assertEquals(useEncryption, schemes[i]);
+		}
+	}
+	
+	// validate passphrase
+	if (useEncryption) {
+		assertString(config.passphrase);
+		assertTrue(config.passphrase.length >= AppUtils.MIN_PASSPHRASE_LENGTH)
+	}
+	
+	// validate split config
+	if (isDefined(config.numPieces) || isDefined(config.minPieces)) {
+		assertNumber(config.numPieces);
+		assertNumber(config.minPieces);
+		assertTrue(config.numPieces >= 2);
+		assertTrue(config.numPieces <= AppUtils.MAX_SHARES);
+		assertTrue(config.minPieces >= 2);
+		assertTrue(config.minPieces <= AppUtils.MAX_SHARES);
+		assertTrue(config.minPieces <= config.numPieces);
+	}
+	
+	// validate piece renderer
+	if (config.rendererClass) {
+		assertDefined(config.rendererClass.getRenderWeight);
 	}
 }

@@ -2619,27 +2619,49 @@ function EditorController(div, config) {
 		assertFalse(that.hasFormError());
 		var config = {};
 		
-		// set keypairs
-		config.keypairs = contentController.getCurrenciesController().getConfig();	// TODO: rename to something better
-		
 		// set passphrase
 		if (passphraseController.getUsePassphrase()) {
 			config.passphrase = passphraseController.getPassphrase();
 		}
 		
-		// set keypair encryption
-		for (var i = 0; i < config.keypairs.length; i++) {
-			var keypair = config.keypairs[i];
-			if (passphraseController.getUsePassphrase()) {
-				if ((keypair.ticker === "BTC" || keypair.ticker === "BCH") && passphraseController.getBip38Checkbox().isChecked()) {
-					keypair.encryption = AppUtils.EncryptionScheme.BIP38;
-				} else {
-					keypair.encryption = AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0]
+		// handle imported pieces
+		if (that.getImportedPieces()) {
+			config.pieces = that.getImportedPieces();	// TODO: need to copy these so original stay in tact
+			
+			// set encryption schemes
+			if (config.passphrase) {
+				config.encryptionSchemes = [];
+				for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
+					var keypair = config.pieces[0].getKeypairs()[i];
+					if (passphraseController.getBip38Checkbox().isChecked() && arrayContains(keypair.getPlugin().getEncryptionSchemes(), AppUtils.EncryptionScheme.BIP38)) {
+						config.encryptionSchemes.push(AppUtils.EncryptionScheme.BIP38);
+					} else {
+						config.encryptionSchemes.push(keypair.getPlugin().getEncryptionSchemes()[0]);
+					}
 				}
-			} else {
-				keypair.encryption = null;
 			}
 		}
+		
+		// handle no imported pieces
+		else {
+			
+			// set keypairs
+			config.keypairs = contentController.getCurrenciesController().getConfig();
+			
+			// set keypair encryption
+			for (var i = 0; i < config.keypairs.length; i++) {
+				var keypair = config.keypairs[i];
+				if (passphraseController.getUsePassphrase()) {
+					if ((keypair.ticker === "BTC" || keypair.ticker === "BCH") && passphraseController.getBip38Checkbox().isChecked()) {
+						keypair.encryption = AppUtils.EncryptionScheme.BIP38;
+					} else {
+						keypair.encryption = AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0]
+					}
+				} else {
+					keypair.encryption = null;
+				}
+			}
+		}		
 
 		// set split config
 		if (splitController.getUseSplit()) {
@@ -2665,14 +2687,8 @@ function EditorController(div, config) {
 		// validate no errors
 		if (that.hasFormError()) return;
 		
-		// generation config
-		throw new Error("Need to decide final config encryption");
-		var genConfig = that.getGenerateConfig();
-		genConfig.pieces = pieces;
-		genConfig.keypairs = undefined;
-		
 		// generate package and rendered pieces
-		var pieceGenerator = new PieceGenerator(genConfig);
+		var pieceGenerator = new PieceGenerator(that.getGenerateConfig());
 		pieceGenerator.generate(function(percent, label) {
 			throw new Error("Handle progress not implemented");
 		}, function(err, generatedPieces, pieceRenderers) {
@@ -3011,9 +3027,9 @@ function EditorPassphraseController(div, editorController) {
 		
 		// register callbacks
 		passphraseCheckbox.onChecked(function() {
-			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
 			update();
 			invoke(usePassphraseListeners);
+			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
 		});
 		passphraseInput.on("input", function(e) { setFormError(false); });
 		
