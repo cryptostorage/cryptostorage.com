@@ -1666,6 +1666,7 @@ function ImportTextController(div, plugins) {
 		
 		// update UI
 		setWarning("");
+		resetControls();
 		renderImportedPieces(importedPieces);
 		
 		// done if no pieces
