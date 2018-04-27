@@ -577,7 +577,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .num_keys_input {
-	width: 85px;
+	width: 75px;
 	text-align: right;
 	border: 2.5px solid;
 	padding: 5px;
