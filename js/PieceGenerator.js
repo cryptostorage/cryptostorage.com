@@ -11,7 +11,7 @@
  * 				config.pieceRendererClass specifies a class to render pieces, skips rendering if not given
  */
 function PieceGenerator(config) {
-	
+		
 	// init
 	PieceGenerator.validateGenerateConfig(config);
 	config = Object.assign({}, config);
@@ -44,7 +44,7 @@ function PieceGenerator(config) {
 			doneWeight += createWeight;
 			
 			// encrypt
-			encryptIfApplicable(unencryptedPiece, function(percent, label) {
+			encryptIfApplicable(pieces, function(percent, label) {
 				if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
 			}, function(err, pieces) {
 				if (isCancelled) return;
@@ -52,7 +52,7 @@ function PieceGenerator(config) {
 				doneWeight += encryptWeight;
 				
 				// split
-				splitIfApplicable(piece, function(percent, label) {
+				splitIfApplicable(pieces, function(percent, label) {
 					if (onProgress) onProgress((doneWeight + percent * splitWeight) / totalWeight, label);
 				}, function(err, pieces) {
 					if (isCancelled) return;
@@ -95,7 +95,7 @@ function PieceGenerator(config) {
 			for (var i = 0; i < config.keypairs.length; i++) {
 				var keypair = config.keypairs[i];
 				weights.createWeight += CryptoKeypair.getCreateWeight(keypair.ticker) * keypair.numKeypairs;
-				if (keypair.encryptionScheme) weights.encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryptionScheme) * numKeypairs;
+				if (keypair.encryptionScheme) weights.encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryptionScheme) * keypair.numKeypairs;
 			}
 		}
 		
@@ -112,19 +112,122 @@ function PieceGenerator(config) {
 	}
 	
 	function createIfApplicable(onProgress, onDone) {
-		throw new Error("Not implemented");
+		
+		// no keypair generation
+		if (config.pieces) {
+			onDone(null, config.pieces);
+			return;
+		}
+		
+		// collect functions to generate keypairs
+		var newKeypairFuncs = [];
+		for (var i = 0; i < config.keypairs.length; i++) {
+			var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].ticker);
+			for (var j = 0; j < config.keypairs[i].numKeypairs; j++) {
+				newKeypairFuncs.push(newKeypairFunc(plugin));
+			}
+		}
+		
+		// callback function to generate a keypair
+		var numCreated = 0;
+		function newKeypairFunc(plugin) {
+			return function(onDone) {
+				var keypair = new CryptoKeypair({plugin: plugin});
+				numCreated++;
+				if (onProgress) onProgress(numCreated / newKeypairFuncs.length, "Generating keypairs");
+				setImmediate(function() { onDone(null, keypair) });	// let UI breath
+			}
+		}
+		
+		// generate keypairs
+		if (onProgress) onProgress(0, "Generating keypairs");
+		async.series(newKeypairFuncs, function(err, keypairs) {
+			assertNull(err);
+			onDone(null, [new CryptoPiece({keypairs: keypairs})]);
+		});
 	}
 
 	function encryptIfApplicable(pieces, onProgress, onDone) {
-		throw new Error("Not implemented");
+		
+		// no encryption
+		if (!config.passphrase) {
+			onDone(null, pieces);
+			return;
+		}
+		
+		// get encryption schemes
+		assertEquals(1, pieces.length);
+		assertFalse(pieces[0].isEncrypted());
+		var encryptionSchemes = [];
+		if (config.encryptionSchemes) {
+			encryptionSchemes = config.encryptionSchemes;
+		} else {
+			for (var i = 0; i < config.keypairs.length; i++) {
+				var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].ticker);
+				for (var j = 0; j < config.keypairs[i].numKeypairs; j++) {
+					encryptionSchemes.push(config.keypairs[i].encryptionScheme);
+				}
+			}
+		}
+		
+		// encrypt piece
+		pieces[0].encrypt(config.passphrase, encryptionSchemes, onProgress, function(err, encryptedPiece) {
+			assertNull(err);
+			onDone(err, [encryptedPiece]);
+		});
 	}
 	
 	function splitIfApplicable(pieces, onProgress, onDone) {
-		throw new Error("Not implemented");
+		
+		// no splitting
+		if (!isDefined(config.numPieces)) {
+			onDone(null, pieces);
+			return;
+		}
+		
+		// split
+		assertEquals(1, pieces.length);
+		assertFalse(pieces[0].isSplit());
+		onDone(null, pieces[0].split(config.numPieces, config.minPieces));
 	}
 	
 	function renderIfApplicable(pieces, onProgress, onDone) {
-		throw new Error("Not implemented");
+		
+		// no rendering
+		if (!config.pieceRendererClass) {
+			onDone(null, pieces);
+			return;
+		}
+			
+		// collect renderers
+		var numRendered = 0;
+		var renderers = [];
+		for (var i = 0; i < pieces.length; i++) {
+			var renderer = new config.pieceRendererClass(null, pieces[i]);
+			renderer.onProgress(function(percent, label) {
+				if (onProgress) onProgress((numRendered + percent) / pieces.length, label);
+			});
+			renderers.push(renderer);
+		}
+		
+		// collect render callback functions
+		var renderFuncs = [];
+		for (var i = 0; i < renderers.length; i++) renderFuncs.push(renderFunction(renderers[i]));
+		function renderFunction(renderer) {
+			return function(onDone) {
+				renderer.render(function(div) {
+					numRendered++;
+					onDone(null, renderer);
+				});
+			}
+		}
+		
+		// render async
+		async.series(renderFuncs, function(err, renderers) {
+			assertNull(err);
+			assertEquals(pieces.length, renderers.length);
+			onDone(null, pieces, renderers);
+		});
 	}
 }
 
@@ -135,6 +238,8 @@ function PieceGenerator(config) {
  */
 PieceGenerator.validateGenerateConfig = function(config) {
 	assertObject(config);
+	
+	console.log(config);
 	
 	// validate passphrase
 	if (config.passphrase) {
@@ -169,8 +274,8 @@ PieceGenerator.validateGenerateConfig = function(config) {
 			assertTrue(config.keypairs[i].numKeypairs > 0);
 			assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
 			if (config.passphrase) {
-				var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].getTicker());
-				assertTrue(arrayContains(pluglin.getEncryptionSchemes(), config.keypairs[i].encryptionScheme));
+				var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].ticker);
+				assertTrue(arrayContains(plugin.getEncryptionSchemes(), config.keypairs[i].encryptionScheme));
 			}
 		}
 	}

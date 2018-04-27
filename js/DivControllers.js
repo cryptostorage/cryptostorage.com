@@ -2475,7 +2475,7 @@ function EditorController(div, config) {
 			
 			// register callbacks
 			contentController.getActionsController().onGenerate(that.generate);
-			contentController.getActionsController().onApply(apply);
+			contentController.getActionsController().onApply(that.generate);
 			contentController.getActionsController().onReset(reset);
 			contentController.getActionsController().onCancel(cancel);
 			contentController.getActionsController().onSave(save);
@@ -2574,31 +2574,6 @@ function EditorController(div, config) {
 		return importedPieceDivs;
 	}
 	
-	this.generate = function(onDone) {
-		
-		// validate no errors
-		if (that.hasFormError()) return;
-		
-		// generate keys
-		CryptoPiece.generatePieces(that.getGenerateConfig(), function(percent, label) {
-			invoke(generateProgressListeners, percent, label);
-		}, function(err, _pieces, _pieceRenderers) {
-			assertNull(err);
-			assertArray(_pieces);
-			assertTrue(_pieces.length > 0);
-			assertArray(_pieceRenderers);
-			assertTrue(_pieceRenderers.length > 0);
-			
-			// set pieces and piece divs
-			var pieceDivs = [];
-			for (var i = 0; i < _pieceRenderers.length; i++) pieceDivs.push(_pieceRenderers[i].getDiv());
-			that.setPieces(_pieces, pieceDivs);
-			
-			// done
-			if (onDone) onDone();
-		});
-	}
-	
 	this.setGenerateConfig = function(config) {		
 		
 		// set passphrase
@@ -2653,12 +2628,12 @@ function EditorController(div, config) {
 				var keypair = config.keypairs[i];
 				if (passphraseController.getUsePassphrase()) {
 					if ((keypair.ticker === "BTC" || keypair.ticker === "BCH") && passphraseController.getBip38Checkbox().isChecked()) {
-						keypair.encryption = AppUtils.EncryptionScheme.BIP38;
+						keypair.encryptionScheme = AppUtils.EncryptionScheme.BIP38;
 					} else {
-						keypair.encryption = AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0]
+						keypair.encryptionScheme = AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0]
 					}
 				} else {
-					keypair.encryption = null;
+					keypair.encryptionScheme = null;
 				}
 			}
 		}		
@@ -2670,8 +2645,44 @@ function EditorController(div, config) {
 		}
 		
 		// set piece renderer class
-		config.rendererClass = CompactPieceRenderer;
+		config.pieceRendererClass = CompactPieceRenderer;
 		return config;
+	}
+	
+	this.generate = function(onDone) {
+		
+		// validate no errors
+		if (that.hasFormError()) return;
+		
+		// get generation config based on current state
+		var genConfig = that.getGenerateConfig()
+		
+		// copy pieces so originals are unchanged
+		if (genConfig.pieces) {
+			var copies = [];
+			for (var i = 0; i < config.pieces.length; i++) copies.push(config.pieces[i].copy());
+			genConfig.pieces = copies;
+		}
+		
+		// apply config to pieces and render
+		var pieceGenerator = new PieceGenerator(genConfig);
+		pieceGenerator.generatePieces(function(percent, label) {
+			invoke(generateProgressListeners, percent, label);
+		}, function(err, pieces, pieceRenderers) {
+			
+			// validate
+			assertNull(err);
+			assertArray(pieces);
+			assertTrue(pieces.length > 0);
+			assertArray(pieceRenderers);
+			assertTrue(pieceRenderers.length > 0);
+			
+			// set pieces and divs
+			var pieceDivs = [];
+			for (var i = 0; i < pieceRenderers.length; i++) pieceDivs.push(pieceRenderers[i].getDiv());
+			that.setPieces(pieces, pieceDivs);
+			if (onDone) onDone();
+		});
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -2680,20 +2691,6 @@ function EditorController(div, config) {
 		var formError = that.hasFormError();
 		if (lastFormError !== formError) invoke(formErrorChangeListeners, formError);
 		lastFormError = formError;
-	}
-	
-	function apply() {
-		
-		// validate no errors
-		if (that.hasFormError()) return;
-		
-		// generate package and rendered pieces
-		var pieceGenerator = new PieceGenerator(that.getGenerateConfig());
-		pieceGenerator.generatePieces(function(percent, label) {
-			throw new Error("Handle progress not implemented");
-		}, function(err, generatedPieces, pieceRenderers) {
-			throw new Error("Handle done not implemented");
-		});
 	}
 	
 	function save() {
@@ -2951,7 +2948,7 @@ function EditorContentController(div, editorController, config) {
 		
 		// hide other elements
 		piecesDiv.hide();
-		currenciesController.getDiv().hide();
+		if (currenciesController) currenciesController.getDiv().hide();
 	}
 	
 	function setFormError(_hasError) {
@@ -4435,11 +4432,22 @@ CompactPieceRenderer.makeCopyable = function(pieceDivs) {
  * Relative weight to render a piece generation config.
  */
 CompactPieceRenderer.getRenderWeight = function(config) {
-	CryptoPiece.validateGenerateConfig(config);
+	PieceGenerator.validateGenerateConfig(config);
 	var numPieces = config.numPieces ? config.numPieces : 1;
 	var weight = 0;
-	for (var i = 0; i < config.keypairs.length; i++) {
-		weight += config.keypairs[i].numKeypairs * KeypairRenderer.getRenderWeight(config.keypairs[i].ticker) * numPieces;
+	
+	// compute weight from pre-existing pieces
+	if (config.pieces) {
+		for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
+			weight += KeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker()) * numPieces;
+		}
+	}
+	
+	// compute weight from keypair generation config
+	else {
+		for (var i = 0; i < config.keypairs.length; i++) {
+			weight += config.keypairs[i].numKeypairs * KeypairRenderer.getRenderWeight(config.keypairs[i].ticker) * numPieces;
+		}
 	}
 	return weight;
 }
@@ -4537,7 +4545,7 @@ function KeypairRenderer(div, keypair, id) {
 			});
 		} else {
 			if (decoded.leftLabel) {
-				var omitted = $("<div class='keypair_qr_omitted flex_horizontal'>").appendTo(keypairLeftDiv);
+				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairLeftDiv);
 				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
 			}
 			addPrivateQr();
@@ -4551,7 +4559,7 @@ function KeypairRenderer(div, keypair, id) {
 					if (onDone) onDone(div);
 				});
 			} else {
-				var omitted = $("<div class='keypair_qr_omitted flex_horizontal'>").appendTo(keypairRightDiv);
+				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairRightDiv);
 				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
 				if (onDone) onDone(div);
 			}
