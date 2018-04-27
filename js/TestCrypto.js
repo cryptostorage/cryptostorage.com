@@ -140,6 +140,16 @@ function TestCrypto() {
 				}
 			}
 		}
+		
+		// verify shamirs is initialized with 7 bits
+		if (plugin.getTicker() === "BTC") {
+			var keypair = new CryptoKeypair({plugin: plugin});
+			var shares = secrets.share(keypair.getPrivateHex(), NUM_PIECES, MIN_PIECES);
+			for (var i = 0; i < shares.length; i++)  {
+				var b58 = AppUtils.toBase(16, 58, shares[i]);
+				assertTrue(b58.startsWith("3X") || b58.startsWith("3Y"));
+			}
+		}
 	}
 	
 	function testKeypairs(plugin) {
