@@ -30,7 +30,7 @@ function PieceGenerator(config) {
 		var weights = computeWeights(config);
 		var createWeight = weights.createWeight;
 		var encryptWeight = weights.encryptWeight
-		var splitWeight = weights.splitWeight();
+		var splitWeight = weights.splitWeight;
 		var renderWeight = weights.renderWeight;
 		var totalWeight = weights.totalWeight;
 		
@@ -84,20 +84,30 @@ function PieceGenerator(config) {
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function computeWeights() {
-		throw new Error("computeWeights() not implemented");
 		var weights = {};
 		weights.createWeight = 0;
 		weights.encryptWeight = 0;
 		weights.splitWeight = 0;
-		weights.renderWeight = 0;
-		for (var i = 0; i < config.keypairs.length; i++) {
-			var keypair = config.keypairs[i];
-			weights.createWeight += CryptoKeypair.getCreateWeight(keypair.ticker) * keypair.numKeypairs;
-			throw new Error("update to new config schema");
-			if (keypair.encryption) encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption) * numKeypairs;	// TODO: update to new config schema
-		}
 		weights.renderWeight = config.pieceRendererClass ? config.pieceRendererClass.getRenderWeight(config) : 0;
-		weights.totalWeight = weights.createWeight + weights.encryptWeight + weights.renderWeight;
+		
+		// compute weights with key generation
+		if (config.keypairs) {
+			for (var i = 0; i < config.keypairs.length; i++) {
+				var keypair = config.keypairs[i];
+				weights.createWeight += CryptoKeypair.getCreateWeight(keypair.ticker) * keypair.numKeypairs;
+				if (keypair.encryptionScheme) weights.encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryptionScheme) * numKeypairs;
+			}
+		}
+		
+		// compute weights with existing pieces
+		else if (config.pieces && config.passphrase) {
+			for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
+				weights.encryptWeight += CryptoKeypair.getEncryptWeight(config.encryptionSchemes[i]);
+			}
+		}
+		
+		// compute total and return
+		weights.totalWeight = weights.createWeight + weights.encryptWeight + weights.splitWeight + weights.renderWeight;
 		return weights;
 	}
 	
@@ -158,7 +168,10 @@ PieceGenerator.validateGenerateConfig = function(config) {
 			assertNumber(config.keypairs[i].numKeypairs);
 			assertTrue(config.keypairs[i].numKeypairs > 0);
 			assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
-			if (config.passphrase) assertTrue(arrayContains(AppUtils.getCryptoPlugin(config.keypairs[i].getTicker()), config.keypairs[i].encryptionScheme));
+			if (config.passphrase) {
+				var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].getTicker());
+				assertTrue(arrayContains(pluglin.getEncryptionSchemes(), config.keypairs[i].encryptionScheme));
+			}
 		}
 	}
 	
