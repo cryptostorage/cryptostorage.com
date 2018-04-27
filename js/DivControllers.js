@@ -361,7 +361,6 @@ function AppController(div) {
 	var introController;
 	var contentDiv;
 	var homeLoader;
-	var formLoader;
 	var importLoader;
 	var faqLoader;
 	var donateLoader;
@@ -428,7 +427,6 @@ function AppController(div) {
 		
 		// initialize controllers
 		homeLoader = new LoadController(new HomeController($("<div>")));
-		formLoader = new LoadController(new FormController($("<div>")));
 		importLoader = new LoadController(new ImportController($("<div>")));
 		faqLoader = new LoadController(new FaqController($("<div>")), {enableScroll: true});
 		donateLoader = new LoadController(new DonateController($("<div>")), {enableScroll: true});
@@ -436,7 +434,6 @@ function AppController(div) {
 		// map pages to show functions
 		showFuncs = {
 				"home": that.showHome,
-				"new": that.showForm,
 				"import": that.showImport,
 				"faq": that.showFaq,
 				"donate": that.showDonate
@@ -478,17 +475,6 @@ function AppController(div) {
 			});
 		}, function() {
 			setContentDiv(homeLoader.getDiv());
-			formLoader.getRenderer().startOver();
-			importLoader.getRenderer().startOver();
-		});
-	}
-	
-	this.showForm = function(onDone) {
-		if (AppUtils.DEV_MODE) console.log("showForm()");
-		currentPage = "form";
-		formLoader.render(onDone, function() {
-			introDiv.hide();
-			setContentDiv(formLoader.getDiv());
 			importLoader.getRenderer().startOver();
 		});
 	}
@@ -502,7 +488,6 @@ function AppController(div) {
 		}, function() {
 			introDiv.hide();
 			setContentDiv(faqLoader.getDiv());
-			formLoader.getRenderer().startOver();
 			importLoader.getRenderer().startOver();
 		});
 	}
@@ -513,7 +498,6 @@ function AppController(div) {
 		donateLoader.render(onDone, function() {
 			introDiv.hide();
 			setContentDiv(donateLoader.getDiv());
-			formLoader.getRenderer().startOver();
 			importLoader.getRenderer().startOver();
 		});
 	}
@@ -524,7 +508,6 @@ function AppController(div) {
 		importLoader.render(onDone, function() {
 			introDiv.hide();
 			setContentDiv(importLoader.getDiv());
-			formLoader.getRenderer().startOver();
 		});
 	}
 	
@@ -1291,449 +1274,6 @@ function DonateController(div, appController) {
 	}
 }
 inheritsFrom(DonateController, DivController);
-
-/**
- * Form page.
- */
-function FormController(div) {
-	DivController.call(this, div);
-	
-	var that = this;
-	var currencyInputsController;
-	var passphraseCheckbox;
-	var passphraseInputDiv;
-	var passphraseInput;
-	var bip38CheckboxDiv;
-	var bip38Checkbox;
-	var showPassphraseCheckbox;
-	var splitCheckbox;
-	var splitInputDiv;
-	var numPiecesInput;
-	var minPiecesInput;
-	var	btnGenerate;
-	var formErrors = {};
-	var plugins = AppUtils.getCryptoPlugins();
-	
-	this.render = function(onDone) {
-		div.empty();
-		div.attr("class", "content_div flex_vertical flex_align_center");
-		
-		// load dependencies
-		LOADER.load(AppUtils.getAppDependencies(), function(err) {
-			if (err) throw err;
-			
-			// notice div
-			var noticeDiv = $("<div>").appendTo(div);
-			new NoticeController(noticeDiv).render();
-			
-			// page div
-			var pageDiv = $("<div class='page_div'>").appendTo(div);
-			
-			// top links
-			if (AppUtils.DEV_MODE) {
-				var formLinks = $("<div class='form_links_div'>").appendTo(pageDiv);
-				var oneOfEachLink = $("<div class='form_link'>").appendTo(formLinks);
-				oneOfEachLink.html("One of each");
-				oneOfEachLink.click(function() { onOneOfEach(); });
-			}
-			
-			// currency inputs
-			var currencyDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-			currencyInputsController = new EditorCurrenciesController($("<div>").appendTo(currencyDiv), plugins, function() {
-				updateBip38Checkbox();
-			}, function(hasError) {
-				validateCurrencyInputs();
-				updateGenerateButton();
-			});
-			currencyInputsController.render();
-			
-			// link to add currency
-			var addCurrencyDiv = $("<div class='add_currency_div'>").appendTo(currencyDiv);
-			var addCurrencySpan = $("<span class='add_currency_span'>").appendTo(addCurrencyDiv);
-			addCurrencySpan.html("+ Add another currency");
-			addCurrencySpan.click(function() {
-				currencyInputsController.add();
-			});
-			
-			// passphrase checkbox
-			var passphraseDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-			var passphraseCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(passphraseDiv);
-			passphraseCheckbox = $("<input type='checkbox' id='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
-			var passphraseCheckboxLabel = $("<label for='passphrase_checkbox'>").appendTo(passphraseCheckboxDiv);
-			passphraseCheckboxLabel.html("Do you want to protect your private keys with a passphrase?");
-			passphraseCheckbox.click(function() {
-				if (passphraseCheckbox.prop('checked')) {
-					passphraseInputDiv.show();
-					passphraseInput.focus();
-				} else {
-					resetPassphrase();
-				}
-			});
-			
-			// passphrase input
-			passphraseInputDiv = $("<div class='passphrase_input_div flex_vertical flex_justify_start'>").appendTo(passphraseDiv);
-			renderInteroperabilityDisclaimer($("<div>").appendTo(passphraseInputDiv), "Passphrase encryption is not interoperable with other tools.");
-			var passphraseWarnDiv = $("<div class='passphrase_warn_div'>").appendTo(passphraseInputDiv);
-			passphraseWarnDiv.append("This passphrase is required to access funds later on.  <b>Do not lose it.</b>");
-			passphraseInputDiv.append($("<div style='width:100%'>Passphrase</div>"));
-			passphraseInput = $("<input type='password' class='passphrase_input'>").appendTo(passphraseInputDiv);
-			passphraseInput.on("input", function(e) { setPassphraseError(false); });
-			
-			// password error tooltip
-			tippy(passphraseInput.get(0), {
-				arrow: true,
-				html: $("<div>Passphrase must be at least 7 characters</div>").get(0),
-				interactive: false,
-				placement: 'bottom',
-				theme: 'error',
-				trigger: "manual",
-				multiple: 'false',
-				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
-				distance: 20,
-				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateX(250) translateY(-2px)',
-				offset: '-220, 0'
-			});
-			
-			// passphrase config
-			var passphraseConfigDiv = $("<div class='passphrase_config_div flex_horizontal flex_justify_start'>").appendTo(passphraseInputDiv);
-			bip38CheckboxDiv = $("<div class='bip38_checkbox_div flex_horizontal'>").appendTo(passphraseConfigDiv);
-			bip38Checkbox = $("<input type='checkbox' id='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
-			var bip38CheckboxLabel = $("<label for='bip38_checkbox'>").appendTo(bip38CheckboxDiv);
-			bip38CheckboxLabel.html("Use BIP38 for Bitcoin and Bitcoin Cash");
-			var showPassphraseCheckboxDiv = $("<div class='show_passphrase_checkbox_div flex_horizontal'>").appendTo(passphraseConfigDiv);
-			showPassphraseCheckbox = $("<input type='checkbox' id='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
-			var showPassphraseCheckboxLabel = $("<label for='show_passphrase'>").appendTo(showPassphraseCheckboxDiv);
-			showPassphraseCheckboxLabel.html("Show passphrase");
-			showPassphraseCheckbox.click(function() {
-				if (showPassphraseCheckbox.prop('checked')) {
-					passphraseInput.attr("type", "text");
-				} else {
-					passphraseInput.attr("type", "password");
-				}
-			});
-			
-			// bip38 tooltip
-			var bip38Info = $("<img src='img/information.png' class='info_tooltip_img'>").appendTo(bip38CheckboxDiv);
-			var bip38Tooltip = $("<div>");
-			bip38Tooltip.append("<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys with a passphrase.<br><br>");
-			bip38Tooltip.append("BIP38 requires significantly more time and energy to encrypt/decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default encryption scheme), which makes it more secure against brute-force attacks.");
-			tippy(bip38Info.get(0), {
-				arrow: true,
-				html: bip38Tooltip.get(0),
-				interactive: true,
-				placement: 'bottom',
-				theme: 'translucent',
-				trigger: "mouseenter",
-				multiple: 'false',
-				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
-				distance: 20,
-				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-				offset: '0, 0'
-			});
-			
-			// split checkbox
-			var splitDiv = $("<div class='form_section_div'>").appendTo(pageDiv);
-			var splitCheckboxDiv = $("<div class='flex_horizontal flex_justify_start'>").appendTo(splitDiv);
-			splitCheckbox = $("<input type='checkbox' id='split_checkbox'>").appendTo(splitCheckboxDiv);
-			var splitCheckboxLabel = $("<label for='split_checkbox'>").appendTo(splitCheckboxDiv);
-			splitCheckboxLabel.html("Do you want to split your storage into separate pieces?");
-			splitCheckbox.click(function() {
-				if (splitCheckbox.prop('checked')) {
-					splitInputDiv.show();
-					validateSplit(true);
-				} else {
-					splitInputDiv.hide();
-					validateSplit(false);
-				}
-			});
-			
-			// split checkbox tooltip
-			var splitInfo = $("<img src='img/information.png' class='info_tooltip_img'>").appendTo(splitCheckboxDiv);
-			var splitTooltip = $("<div>");
-			splitTooltip.append("Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>");
-			splitTooltip.append("This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>");
-			splitTooltip.append("For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.");
-			tippy(splitInfo.get(0), {
-				arrow: true,
-				html: splitTooltip.get(0),
-				interactive: true,
-				placement: 'bottom',
-				theme: 'translucent',
-				trigger: "mouseenter",
-				multiple: 'false',
-				maxWidth: UiUtils.INFO_TOOLTIP_MAX_WIDTH,
-				distance: 20,
-				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-				offset: '-180, 0'
-			});
-			
-			// split input
-			splitInputDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(splitDiv);
-			renderInteroperabilityDisclaimer($("<div>").appendTo(splitInputDiv), "Split storage is not interoperable with other tools.");
-			var splitConfigDiv = $("<div class='flex_horizontal'>").appendTo(splitInputDiv);
-			var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(splitConfigDiv);
-			var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(splitConfigDiv);
-			var splitNumDiv = $("<div class='split_num_div flex_vertical flex_justify_start'>").appendTo(splitConfigDiv);
-			var splitNumLabelTop = $("<div class='split_num_label_top'>").appendTo(splitNumDiv);
-			splitNumLabelTop.html("Split Each Key Into");
-			numPiecesInput = $("<input type='tel' value='3' min='2'>").appendTo(splitNumDiv);
-			var splitNumLabelBottom = $("<div class='split_num_label_bottom'>").appendTo(splitNumDiv);
-			splitNumLabelBottom.html("Pieces");
-			var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(splitConfigDiv);
-			var splitMinDiv = $("<div class='split_min_div flex_vertical flex_justify_start'>").appendTo(splitConfigDiv);
-			var splitMinLabelTop = $("<div class='split_min_label_top'>").appendTo(splitMinDiv);
-			splitMinLabelTop.html("Require");
-			minPiecesInput = $("<input type='tel' value='2' min='2'>").appendTo(splitMinDiv);
-			var splitMinLabelBottom = $("<div class='split_min_label_bottom'>").appendTo(splitMinDiv);
-			splitMinLabelBottom.html("To Recover");
-			numPiecesInput.on("input", function(e) { validateSplit(false); });
-			numPiecesInput.on("focusout", function(e) { validateSplit(true); });
-			minPiecesInput.on("input", function(e) { validateSplit(false); });
-			minPiecesInput.on("focusout", function(e) { validateSplit(true); });
-			
-			// add generate button
-			var generateDiv = $("<div class='form_generate_div flex_horizontal'>").appendTo(pageDiv);
-			btnGenerate = $("<div class='dark_green_btn flex_horizontal'>").appendTo(generateDiv);
-			btnGenerate.append("Generate Keys");
-			
-			// start over
-			var startOverLink = $("<div class='form_start_over'>").appendTo(pageDiv);
-			startOverLink.html("or start over")
-			startOverLink.click(function() { that.startOver(); });
-			
-			// disable generate button if environment failure
-			AppUtils.addEnvironmentListener(function() {
-				formErrors.environment = AppUtils.hasEnvironmentState("fail");
-				updateGenerateButton();
-			});
-			
-			// initialize state
-			that.startOver();
-			
-			// done rendering
-			onDone(div);
-		});
-	}
-	
-	this.startOver = function() {
-		
-		// ignore if not initialized
-		if (!currencyInputsController) return;
-		
-		// reset currency inputs
-		currencyInputsController.reset();
-		
-		// reset passphrase
-		resetPassphrase();
-		
-		// reset split
-		splitCheckbox.prop('checked', false);
-		splitInputDiv.hide();
-		numPiecesInput.val(3);
-		minPiecesInput.val(2);
-		
-		// update form
-		validateForm();
-	}
-	
-	// handle when generate button clicked
-	function onGenerate(onDone) {
-		validateForm(true);
-		if (!hasFormErrors()) UiUtils.openEditorTab("Export Storage", {genConfig: getGenConfig(), confirmExit: true});
-		if (onDone) onDone();
-	}
-	
-	// get current form configuration
-	function getGenConfig() {
-		var config = {};
-		config.passphrase = passphraseCheckbox.prop('checked') ? passphraseInput.val() : null;
-		config.numPieces = splitCheckbox.prop('checked') ? parseFloat(numPiecesInput.val()) : 1;
-		config.minPieces = splitCheckbox.prop('checked') ? parseFloat(minPiecesInput.val()) : null;
-		config.verifyEncryption = AppUtils.VERIFY_ENCRYPTION;
-		config.currencies = currencyInputsController.getConfig();
-		for (var i = 0; i < config.currencies.length; i++) {
-			config.currencies[i].encryption = passphraseCheckbox.prop('checked') ? getEncryptionScheme(currencyInputsController.getCurrencyInputs()[i]) : null;
-		}
-		verifyConfig(config);
-		return config;
-		
-		function getEncryptionScheme(currencyInput) {
-			if (currencyInput.getSelectedPlugin().getTicker() === "BTC" && bip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
-			if (currencyInput.getSelectedPlugin().getTicker() === "BCH" && bip38Checkbox.prop('checked')) return AppUtils.EncryptionScheme.BIP38;
-			return currencyInput.getSelectedPlugin().getEncryptionSchemes()[0];
-		}
-		
-		function verifyConfig(config) {
-			assertDefined(config.verifyEncryption);
-			for (var i = 0; i < config.currencies.length; i++) {
-				var currency = config.currencies[i];
-				assertDefined(currency.ticker);
-				assertDefined(currency.numKeys);
-				assertDefined(currency.encryption);
-			}
-		}
-	}
-	
-	// -------------------------------- PRIVATE ---------------------------------
-	
-	function renderInteroperabilityDisclaimer(div, msg) {
-		div.empty();
-		div.addClass("interoperability_disclaimer flex_horizontal");
-		$("<img class='interoperability_caution' src='img/caution_solid.png'>").appendTo(div);
-		var msgDiv = $("<div>").appendTo(div);
-		msg = "&nbsp;" + msg;
-		msgDiv.append(msg);
-		div.append("&nbsp;");
-		var readMoreLink = $("<a target='_blank' href='#faq_interoperable'>Read more</a>").appendTo(div);
-	}
-	
-	function onOneOfEach() {
-		currencyInputsController.empty();
-		for (var i = 0; i < plugins.length; i++) {
-			currencyInputsController.add(plugins[i].getTicker());
-		}
-		validateCurrencyInputs();
-		updateBip38Checkbox();
-	}
-	
-	function resetPassphrase() {
-		passphraseCheckbox.prop('checked', false);
-		passphraseInput.get(0)._tippy.hide(0);
-		passphraseInput.val("");
-		passphraseInput.attr("type", "password");
-		showPassphraseCheckbox.prop('checked', false);
-		bip38Checkbox.prop('checked', false);
-		passphraseInputDiv.hide();
-		setPassphraseError(false);
-		if (AppUtils.DEV_MODE) passphraseInput.val(AppUtils.DEV_MODE_PASSPHRASE);	// dev mode default passphrase
-	}
-	
-	function updateBip38Checkbox() {
-		if (currencyInputsController.hasCurrencySelected("BCH") || currencyInputsController.hasCurrencySelected("BTC")) {
-			bip38CheckboxDiv.show();
-		} else {
-			bip38CheckboxDiv.hide();
-		}
-	}
-	
-	function updateGenerateButton() {
-		setGenerateEnabled(!hasFormErrors());
-	}
-	
-	function hasFormErrors() {
-		return (formErrors.environment && !AppUtils.DEV_MODE) || formErrors.currencyInputs || formErrors.passphrase || formErrors.split;
-	}
-	
-	function validateForm(validateCurrencySelection) {
-		validateCurrencyInputs(validateCurrencySelection);
-		validatePassphrase();
-		validateSplit(true);
-	}
-	
-	function validateCurrencyInputs(validateCurrencySelection) {
-		if (validateCurrencySelection) currencyInputsController.validate();
-		formErrors.currencyInputs = currencyInputsController.hasFormError();
-		updateGenerateButton();
-	}
-	
-	function validatePassphrase() {
-		
-		// handle passphrase not checked
-		if (!passphraseCheckbox.is(":checked")) {
-			formErrors.passphrase = false;
-			passphraseInput.removeClass("form_input_error_div");
-		}
-		
-		// handle passphrase checked
-		else {
-			var passphrase = passphraseInput.val();
-			setPassphraseError(!passphrase || passphrase.length < AppUtils.MIN_PASSPHRASE_LENGTH);
-		}
-
-		updateGenerateButton();
-	}
-	
-	function setPassphraseError(bool) {
-		if (bool) {
-			formErrors.passphrase = true;
-			passphraseInput.addClass("form_input_error_div");
-			passphraseInput.focus();
-			setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
-		} else {
-			passphraseInput.removeClass("form_input_error_div");
-			formErrors.passphrase = false;
-			passphraseInput.get(0)._tippy.hide();
-		}
-		updateGenerateButton();
-	}
-	
-	function validateSplit(strictBlankAndRange) {
-		
-		// handle split not checked
-		if (!splitCheckbox.is(":checked")) {
-			formErrors.split = false;
-			numPiecesInput.removeClass("form_input_error_div");
-			minPiecesInput.removeClass("form_input_error_div");
-		}
-		
-		// handle if split checked
-		else {
-			formErrors.split = false;
-			
-			// validate num pieces
-			var numPiecesError = false;
-			var numPieces = Number(numPiecesInput.val());
-			if (strictBlankAndRange) {
-				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
-					numPiecesError = true;
-					formErrors.split = true;
-					numPiecesInput.addClass("form_input_error_div");
-				} else {
-					numPiecesInput.removeClass("form_input_error_div");
-				}
-			} else {
-				if (!numPiecesInput.val() || isInt(numPieces)) {
-					numPiecesInput.removeClass("form_input_error_div");
-				} else {
-					numPiecesError = true;
-					formErrors.split = true;
-					numPiecesInput.addClass("form_input_error_div");
-				}
-			}
-			
-			// validate min pieces
-			var minPieces = Number(minPiecesInput.val());
-			if (strictBlankAndRange) {
-				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!numPiecesError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
-					formErrors.split = true;
-					minPiecesInput.addClass("form_input_error_div");
-				} else {
-					minPiecesInput.removeClass("form_input_error_div");
-				}
-			} else {
-				if (!minPiecesInput.val() || isInt(minPieces)) {
-					minPiecesInput.removeClass("form_input_error_div");
-				} else {
-					formErrors.split = true;
-					minPiecesInput.addClass("form_input_error_div");
-				}
-			}
-		}
-		
-		updateGenerateButton();
-	}
-	
-	function setGenerateEnabled(generateEnabled) {
-		btnGenerate.unbind("click");
-		if (generateEnabled) {
-			btnGenerate.removeClass("dark_green_btn_disabled");
-			btnGenerate.click(function() { onGenerate(); });
-		} else {
-			btnGenerate.addClass("dark_green_btn_disabled");
-		}
-	}
-}
-inheritsFrom(FormController, DivController);
 
 /**
  * Import page.
