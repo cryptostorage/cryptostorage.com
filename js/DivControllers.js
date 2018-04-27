@@ -2665,7 +2665,19 @@ function EditorController(div, config) {
 		// validate no errors
 		if (that.hasFormError()) return;
 		
-		throw new Error("Ready to implement apply");
+		// generation config
+		throw new Error("Need to decide final config encryption");
+		var genConfig = that.getGenerateConfig();
+		genConfig.pieces = pieces;
+		genConfig.keypairs = undefined;
+		
+		// generate package and rendered pieces
+		var pieceGenerator = new PieceGenerator(genConfig);
+		pieceGenerator.generate(function(percent, label) {
+			throw new Error("Handle progress not implemented");
+		}, function(err, generatedPieces, pieceRenderers) {
+			throw new Error("Handle done not implemented");
+		});
 	}
 	
 	function save() {

@@ -1,27 +1,29 @@
 /**
- * Generates a CryptoPackage and/or rendered PieceRenderers.
+ * Generates pieces and/or rendered pieces according to a config.
  *  
- * @param config specifies package generation configuration
+ * @param config specifies piece generation configuration
  * 				config.passphrase causes encryption with this field as the passphrase
  *  			config.useBip38 specifies whether or not to use BIP38 when available, otherwise uses first registered encryption scheme
  * 				config.numPieces causes splitting with this field as the number of split pieces
  * 				config.minPieces specifies the minimum number of split pieces necessary to reconstitute private keys
  * 				config.keypairs[{ticker: "BCH", numKeypairs: 7}, ...] specifies the keypair generation configuration
- * 				config.piecePkg is an existing package to start with instead of generating new keypairs
+ * 				config.pieces are existing pieces to start with instead of generating new keypairs
  * 				config.pieceRendererClass specifies a class to render pieces, skips rendering if not given
  */
-function PackageGenerator(config) {
+function PieceGenerator(config) {
+	
+	// init
+	PieceGenerator.validateGenerateConfig(config);
 	config = Object.assign({}, config);
-	PackageGenerator.validateGenerateConfig(config);
 	var isCancelled = false;
 
 	/**
-	 * Generates a package and/or piece renderers according to the config.
+	 * Starts generating pieces and/or piece renderers according to the config.
 	 * 
 	 * @param onProgress(percent, label) is invoked as progress is made
-	 * @param onDone(err, piecePkg, pieceRenderers) is invoked when done
+	 * @param onDone(err, pieces, pieceRenderers) is invoked when done
 	 */
-	this.generatePackage = function(onProgress, onDone) {
+	this.generatePieces = function(onProgress, onDone) {
 		assertFalse(isCancelled);
 		
 		// get weights
@@ -32,48 +34,51 @@ function PackageGenerator(config) {
 		var renderWeight = weights.renderWeight;
 		var totalWeight = weights.totalWeight;
 		
-		// create unencrypted package
+		// generate keypairs
 		var doneWeight = 0;
 		createIfApplicable(function(percent, label) {
 			if (onProgress) onProgress((doneWeight + percent * createWeight) / totalWeight, label);
-		}, function(err, pkg) {
+		}, function(err, pieces) {
 			if (isCancelled) return;
 			assertNull(err);
 			doneWeight += createWeight;
 			
 			// encrypt
-			encryptIfApplicable(pkg, function(percent, label) {
+			encryptIfApplicable(unencryptedPiece, function(percent, label) {
 				if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
-			}, function(err, pkg) {
+			}, function(err, pieces) {
 				if (isCancelled) return;
 				assertNull(err);
 				doneWeight += encryptWeight;
 				
 				// split
-				splitIfApplicable(pkg, function(percent, label) {
+				splitIfApplicable(piece, function(percent, label) {
 					if (onProgress) onProgress((doneWeight + percent * splitWeight) / totalWeight, label);
-				}, function(err, pkg) {
+				}, function(err, pieces) {
 					if (isCancelled) return;
 					assertNull(err);
 					doneWeight += splitWeight;
 					
 					// render
-					renderIfApplicable(pkg, function(percent, label) {
+					renderIfApplicable(pieces, function(percent, label) {
 						if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, label);
-					}, function(err, pieceRenderers) {
+					}, function(err, pieces, pieceRenderers) {
 						if (isCancelled) return;
 						assertNull(err);
 						doneWeight += renderWeight;
 						assertEquals(doneWeight, totalWeight);
-						if (onDone) onDone(null, pkg, pieceRenderers);
+						if (onDone) onDone(null, pieces, pieceRenderers);
 					});
 				});
 			});
 		});
 	}
 	
+	/**
+	 * Cancels piece generation.
+	 */
 	this.cancel = function() {
-		isCanclled = true;
+		isCancelled = true;
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
@@ -100,31 +105,31 @@ function PackageGenerator(config) {
 		throw new Error("Not implemented");
 	}
 
-	function encryptIfApplicable(pkg, onProgress, onDone) {
+	function encryptIfApplicable(pieces, onProgress, onDone) {
 		throw new Error("Not implemented");
 	}
 	
-	function splitIfApplicable(pkg, onProgress, onDone) {
+	function splitIfApplicable(pieces, onProgress, onDone) {
 		throw new Error("Not implemented");
 	}
 	
-	function renderIfApplicable(pkg, onProgress, onDone) {
+	function renderIfApplicable(pieces, onProgress, onDone) {
 		throw new Error("Not implemented");
 	}
 }
 
 /**
- * Validates a package generation config.
+ * Validates a piece generation config.
  */
-PackageGenerator.validateGenerateConfig = function(genConfig) {
+PieceGenerator.validateGenerateConfig = function(genConfig) {
 	
-	throw new Error("PackageGenerator.validateGenerateConfig not implemented");
+	throw new Error("PieceGenerator.validateGenerateConfig not implemented");
 	
 	if (genConfig.keypairs) {
-		assertUndefined(genConfig.piecePkg);
+		assertUndefined(genConfig.pieces);
 	}
 	
-	if (genConfig.piecePkg) {
+	if (genConfig.pieces) {
 		assertUndefined(genConfig.keypairs);
 	}
 }

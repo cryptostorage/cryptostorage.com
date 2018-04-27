@@ -611,3 +611,56 @@ CryptoPiece.parse = function(str, plugin) {
 	// return piece
 	return new CryptoPiece({keypairs: keypairs});
 }
+
+/**
+ * Validates piece generation configuration.
+ * 
+ * @param config is the config to validate
+ */
+CryptoPiece.validateGenerateConfig = function(config) {
+	assertObject(config);
+	
+	// validate keypairs
+	var schemes = [];
+	assertArray(config.keypairs);
+	assertTrue(config.keypairs.length > 0);
+	for (var i = 0; i < config.keypairs.length; i++) {
+		assertInitialized(config.keypairs[i].ticker);
+		assertNumber(config.keypairs[i].numKeypairs);
+		assertTrue(config.keypairs[i].numKeypairs > 0);
+		assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
+		schemes.push(config.keypairs[i].encryption);
+	}
+	
+	// validate encryption
+	var useEncryption = -1;
+	for (var i = 0; i < schemes.length; i++) {
+		if (useEncryption === -1) useEncryption = schemes[i] === null ? null : schemes[i] === undefined ? undefined : true;
+		else {
+			if (isInitialized(schemes[i])) assertTrue(useEncryption);
+			else assertEquals(useEncryption, schemes[i]);
+		}
+	}
+	
+	// validate passphrase
+	if (useEncryption) {
+		assertString(config.passphrase);
+		assertTrue(config.passphrase.length >= AppUtils.MIN_PASSPHRASE_LENGTH)
+	}
+	
+	// validate split config
+	if (isDefined(config.numPieces) || isDefined(config.minPieces)) {
+		assertNumber(config.numPieces);
+		assertNumber(config.minPieces);
+		assertTrue(config.numPieces >= 2);
+		assertTrue(config.numPieces <= AppUtils.MAX_SHARES);
+		assertTrue(config.minPieces >= 2);
+		assertTrue(config.minPieces <= AppUtils.MAX_SHARES);
+		assertTrue(config.minPieces <= config.numPieces);
+	}
+	
+	// validate piece renderer
+	if (config.rendererClass) {
+		assertDefined(config.rendererClass.getRenderWeight);
+	}
+}
