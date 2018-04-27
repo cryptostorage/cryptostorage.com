@@ -3,7 +3,6 @@
  *  
  * @param config specifies piece generation configuration
  * 				config.passphrase causes encryption with this field as the passphrase
- *  			config.useBip38 specifies whether or not to use BIP38 when available, otherwise uses first registered encryption scheme
  * 				config.numPieces causes splitting with this field as the number of split pieces
  * 				config.minPieces specifies the minimum number of split pieces necessary to reconstitute private keys
  * 				config.keypairs[{ticker: "BCH", numKeypairs: 7, encryptionScheme: "BIP38"}, ...] specifies the keypair generation configuration
@@ -121,49 +120,14 @@ function PieceGenerator(config) {
 
 /**
  * Validates a piece generation config.
+ * 
+ * @param config is the generation configuration to validate
  */
-PieceGenerator.validateGenerateConfig = function(genConfig) {
-	assertObject(genConfig);
-	
-	throw new Error("Ready to implement validate generate config");
-	
-	if (genConfig.keypairs) {
-		assertUndefined(genConfig.pieces);
-	}
-	
-	if (genConfig.pieces) {
-		assertUndefined(genConfig.keypairs);
-	}
-	
-	
-	
-	
+PieceGenerator.validateGenerateConfig = function(config) {
 	assertObject(config);
 	
-	// validate keypairs
-	var schemes = [];
-	assertArray(config.keypairs);
-	assertTrue(config.keypairs.length > 0);
-	for (var i = 0; i < config.keypairs.length; i++) {
-		assertInitialized(config.keypairs[i].ticker);
-		assertNumber(config.keypairs[i].numKeypairs);
-		assertTrue(config.keypairs[i].numKeypairs > 0);
-		assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
-		schemes.push(config.keypairs[i].encryption);
-	}
-	
-	// validate encryption
-	var useEncryption = -1;
-	for (var i = 0; i < schemes.length; i++) {
-		if (useEncryption === -1) useEncryption = schemes[i] === null ? null : schemes[i] === undefined ? undefined : true;
-		else {
-			if (isInitialized(schemes[i])) assertTrue(useEncryption);
-			else assertEquals(useEncryption, schemes[i]);
-		}
-	}
-	
 	// validate passphrase
-	if (useEncryption) {
+	if (config.passphrase) {
 		assertString(config.passphrase);
 		assertTrue(config.passphrase.length >= AppUtils.MIN_PASSPHRASE_LENGTH)
 	}
@@ -180,7 +144,44 @@ PieceGenerator.validateGenerateConfig = function(genConfig) {
 	}
 	
 	// validate piece renderer
-	if (config.rendererClass) {
-		assertDefined(config.rendererClass.getRenderWeight);
+	if (config.pieceRendererClass) {
+		assertDefined(config.pieceRendererClass.getRenderWeight);
 	}
+	
+	// validate keypair config
+	if (config.keypairs) {
+		assertUndefined(config.pieces);
+		assertArray(config.keypairs);
+		assertTrue(config.keypairs.length > 0);
+		for (var i = 0; i < config.keypairs.length; i++) {
+			assertInitialized(config.keypairs[i].ticker);
+			assertNumber(config.keypairs[i].numKeypairs);
+			assertTrue(config.keypairs[i].numKeypairs > 0);
+			assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
+			if (config.passphrase) assertTrue(arrayContains(AppUtils.getCryptoPlugin(config.keypairs[i].getTicker()), config.keypairs[i].encryptionScheme));
+		}
+	}
+	
+	// validate pieces and schemes
+	else if (config.pieces) {
+		assertUndefined(config.keypairs);
+		assertArray(config.pieces);
+		assertTrue(config.pieces.length > 0);
+		if (config.passphrase) {
+			assertEquals(1, config.pieces.length);
+			assertFalse(config.pieces[0].isEncrypted());
+			assertFalse(config.pieces[0].isSplit());
+			assertEquals(config.pieces[0].getKeypairs().length, config.encryptionSchemes.length);
+			for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
+				assertTrue(arrayContains(config.pieces[0].getKeypairs()[i].getPlugin().getEncryptionSchemes(), config.encryptionSchemes[i]));
+			}
+		}
+		if (isDefined(config.numPieces)) {
+			assertEquals(1, config.pieces.length);
+			assertFalse(config.pieces[0].isSplit());
+		}
+	}
+	
+	// missing keypairs config and pieces
+	else throw new Error("Must define config.keypairs or config.pieces")
 }

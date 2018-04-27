@@ -2689,7 +2689,7 @@ function EditorController(div, config) {
 		
 		// generate package and rendered pieces
 		var pieceGenerator = new PieceGenerator(that.getGenerateConfig());
-		pieceGenerator.generate(function(percent, label) {
+		pieceGenerator.generatePieces(function(percent, label) {
 			throw new Error("Handle progress not implemented");
 		}, function(err, generatedPieces, pieceRenderers) {
 			throw new Error("Handle done not implemented");
