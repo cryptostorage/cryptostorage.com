@@ -1525,7 +1525,7 @@ function ImportTextController(div, plugins) {
 		startOver.append("start over");
 		startOver.click(function() { that.startOver(); });
 		var editor = $("<div class='import_control_link'>").appendTo(successLinks);
-		editor.append("export");
+		editor.append("re-export");
 		
 		// TODO: this moved to editor?
 		if (importedPieces.length > 1) {
