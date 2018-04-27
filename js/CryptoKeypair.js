@@ -344,7 +344,7 @@ function CryptoKeypair(config) {
 		// decode with plugin
 		var decoded = state.plugin.decode(privateKey);
 		if (decoded) {
-			state.privateHex = decoded.privateHex;
+			state.privateHex = decoded.privateHex.toLowerCase();
 			state.privateWif = decoded.privateWif;
 			state.publicAddress = decoded.publicAddress;
 			state.encryption = decoded.encryption;
@@ -356,7 +356,7 @@ function CryptoKeypair(config) {
 		// encrypted with cryptostorage conventions
 		decoded = decodeEncryptedKey(privateKey);
 		if (decoded) {
-			state.privateHex = decoded.privateHex;
+			state.privateHex = decoded.privateHex.toLowerCase();
 			state.privateWif = decoded.privateWif;
 			state.publicAddress = undefined;
 			state.encryption = decoded.encryption;
@@ -368,7 +368,7 @@ function CryptoKeypair(config) {
 		// split share with cryptostorage conventions
 		decoded = decodeShare(privateKey);
 		if (decoded) {
-			state.privateHex = decoded.privateHex;
+			state.privateHex = decoded.privateHex.toLowerCase();
 			state.privateWif = decoded.privateWif;
 			state.publicAddress = undefined;
 			state.encryption = undefined;

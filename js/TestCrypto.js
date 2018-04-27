@@ -15,6 +15,9 @@ function TestCrypto() {
 	this.run = function(onDone) {
 		var plugins = getTestPlugins();
 		
+		// test utils
+		testUtils();
+		
 		// test new keypairs
 		console.log("Testing keypair creation");
 		for (var i = 0; i < plugins.length; i++) {
@@ -50,6 +53,62 @@ function TestCrypto() {
 		plugins.push(new NeoPlugin());
 		plugins.push(new BIP39Plugin());
 		return plugins;
+	}
+	
+	function testUtils() {
+		assertTrue(isString("abctesting123"));
+		assertFalse(isString(null));
+		assertFalse(isString(undefined));
+		assertFalse(isString(123));
+		
+		// test valid versions
+		var validVersions = [[0, 0, 1], [12, 23, 4], [16, 1, 5]];
+		for (var i = 0; i < validVersions.length; i++) {
+			var versionNumbers = AppUtils.getVersionNumbers(validVersions[i][0] + "." + validVersions[i][1] + "." + validVersions[i][2]);
+			for (var j = 0; j < validVersions[0].length; j++) {
+				assertEquals(validVersions[i][j], versionNumbers[j], "Unexpected version number at [" + i + "][" + j + "]: " + validVersions[i][j] + " vs " + versionNumbers[j]);
+			}
+		}
+		
+		// test invalid versions
+		var invalidVersions = ["3.0.1.0", "3.0.-1", "3.0", "4", "asdf", "4.f.2", "0.0.0"];
+		for (var i = 0; i < invalidVersions.length; i++) {
+			try {
+				AppUtils.getVersionNumbers(invalidVersions[i]);
+				throw new Error("fail");
+			} catch (err) {
+				if (err.message === "fail") throw new Error("Should have thrown exception on version string: " + invalidVersions[i]);
+			}
+		}
+		
+		// test base encoding
+		assertFalse(isHex(false));
+		assertFalse(isHex(true));
+		assertFalse(isHex("hello there"));
+		assertTrue(isBase58("abcd"))
+		assertFalse(isBase58("abcd0"))
+		assertTrue(isHex("fcc256cbc5a180831956fba7b9b7de5f521037c39980921ebe6dbd822f791007"));
+		var keypair = new CryptoKeypair({plugin: getTestPlugins()[0]});
+		var bases = [16, 58, 64];
+		var converted = keypair.getPrivateHex();
+		for (var i = 0; i < bases.length; i++) {
+			if (i === bases.length - 1) {
+				converted = AppUtils.toBase(bases[i], bases[0], converted);
+				assertEquals(keypair.getPrivateHex(), converted);
+			} else {
+				converted = AppUtils.toBase(bases[i], bases[i + 1], converted)
+			}
+		}
+		bases = [16, 64, 58];
+		converted = keypair.getPrivateHex();
+		for (var i = 0; i < bases.length; i++) {
+			if (i === bases.length - 1) {
+				converted = AppUtils.toBase(bases[i], bases[0], converted);
+				assertEquals(keypair.getPrivateHex(), converted);
+			} else {
+				converted = AppUtils.toBase(bases[i], bases[i + 1], converted)
+			}
+		}
 	}
 	
 	function testNewKeypairs(plugin) {
