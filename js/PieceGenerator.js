@@ -28,6 +28,7 @@ function PieceGenerator(config) {
 		
 		// get weights
 		var weights = computeWeights(config);
+		console.log(weights);
 		var createWeight = weights.createWeight;
 		var encryptWeight = weights.encryptWeight
 		var splitWeight = weights.splitWeight;
@@ -238,8 +239,6 @@ function PieceGenerator(config) {
  */
 PieceGenerator.validateGenerateConfig = function(config) {
 	assertObject(config);
-	
-	console.log(config);
 	
 	// validate passphrase
 	if (config.passphrase) {
