@@ -1266,7 +1266,7 @@ function DonateController(div, appController) {
 		}
 		
 		function getIconNameDiv(plugin) {
-			var iconNameDiv = $("<div class='donate_icon_name flex_horizontal flex_justify_start'>");
+			var iconNameDiv = $("<div class='donate_icon_name flex_horizontal flex_align_center flex_justify_start'>");
 			iconNameDiv.append($("<img class='donate_icon' src='" + plugin.getLogo().get(0).src + "'>"));
 			iconNameDiv.append(plugin.getName());
 			return iconNameDiv;
