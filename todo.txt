@@ -23,6 +23,11 @@ xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b
 	auto detect length? LTC different hex sizes:
 		48adb31f61c9d82c54cde60789dfeb57ed9998074c691a847516edaae964b11c
 		67a87e6c0038dccf8092a2b3685f35c98cb9ac0b56b197055edcd1d76fc857
+"Need one additional share to recover private key" is from keypair, but imported piece contains multiple private keys
+tippy jerk when editor first loaded
+compatability disclosure
+backwards compatibility
+
 editor:
 	bip38 support
 	generate disabled, cancel enabled during generation
