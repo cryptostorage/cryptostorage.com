@@ -1336,10 +1336,442 @@ inheritsFrom(ImportController, DivController);
 function ImportFileController(div) {
 	DivController.call(this, div);
 	
+	var that = this;
+	var importInputDiv;						// all import input
+	var warningDiv;
+	var warningMsg;
+	var fileInputDiv;							// drag and drop and imported pieces
+	var inputFiles;
+	var decryptionDiv;						// password input and decryption
+	var importedNamedPieces = [];	// [{name: 'btc.json', value: {...}}, ...]
+	var importedPiecesDiv;				// shows imported items
+	var controlsDiv;							// div for all control links
+	var importedStorageDiv;				// inline storage
+	var lastUnspliPiece;
+	var decryptionController;
+	
 	this.render = function(onDone) {
+		
+		// div setup
+		div.empty();
+		div.addClass("import_content_div");
+		
+		// div to collect all import input
+		importInputDiv = $("<div class='import_input_div'>").appendTo(div);
+		
+		// warning div
+		warningDiv = $("<div class='import_warning_div flex_horizontal flex_justify_center'>").appendTo(importInputDiv);
+		warningDiv.hide();
+		
+		// all file importing
+		fileInputDiv = $("<div>").appendTo(importInputDiv);
+		
+		// decryption div
+		decryptionDiv = $("<div>").appendTo(importInputDiv);
+		decryptionDiv.hide();
+		
+		// drag and drop div
+		var dragDropDiv = $("<div class='import_drag_drop flex_horizontal'>").appendTo(fileInputDiv);
+		var dragDropImg = $("<img class='drag_drop_img' src='img/drag_and_drop.png'>").appendTo(dragDropDiv);
+		var dragDropText = $("<div class='drag_drop_text flex_vertical flex_align_center flex_justify_center'>").appendTo(dragDropDiv);
+		var dragDropLabel = $("<div class='drag_drop_label'>").appendTo(dragDropText);
+		dragDropLabel.append("Drag and Drop Files To Import");
+		var dragDropBrowse = $("<div class='drag_drop_browse'>").appendTo(dragDropText);
+		dragDropBrowse.append("or click to browse");
+		
+		// register browse link with hidden input
+		inputFiles = $("<input type='file' multiple accept='.json,.csv,.zip'>").appendTo(dragDropDiv);
+		inputFiles.change(function() { onFilesImported($(this).get(0).files); });
+		inputFiles.hide();
+		dragDropBrowse.click(function() {
+			inputFiles.click();
+		});
+		
+		// setup drag and drop
+		setupDragAndDrop(dragDropDiv, onFilesImported);
+		
+		// imported files
+		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(fileInputDiv);
+		importedPiecesDiv.hide();
+		
+		// controls
+		controlsDiv = $("<div class='import_controls'>").appendTo(importInputDiv);
+		controlsDiv.hide();
+		resetControls();
+		
+		// div for inline storage
+		importedStorageDiv = $("<div class='imported_storage_div'>").appendTo(div);
+		importedStorageDiv.hide();
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	this.getWarning = function() {
+		return that.warningMsg;
+	}
+	
+	this.setWarning = function(str, img) {
+		that.warningMsg = str;
+		warningDiv.hide();
+		warningDiv.empty();
+		if (str) {
+			if (!img) img = $("<img src='img/caution.png'>");
+			warningDiv.append(img);
+			img.addClass("import_warning_div_icon");
+			warningDiv.append(str);
+			warningDiv.show();
+		} else {
+			warningDiv.hide();
+		}
+	}
+	
+	this.addNamedPieces = function(namedPieces, onDone) {
+		for (var i = 0; i < namedPieces.length; i++) {
+			var namedPiece = namedPieces[i];
+			assertObject(namedPiece.piece, CryptoPiece);
+			if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
+		}
+		updatePieces(onDone);
+	}
+	
+	this.startOver = function() {
+		that.setWarning("");
+		inputFiles.val("");
+		importedStorageDiv.hide();
+		importInputDiv.show();
+		fileInputDiv.show();
+		decryptionDiv.hide();
+		importedPiecesDiv.hide();
+		controlsDiv.hide();
+		removePieces();
+		if (decryptionController) decryptionController.cancel();
+	}
+	
+	// ------------------------ PRIVATE ------------------
+	
+	function resetControls() {
+		controlsDiv.empty();
+		addControl("start over", that.startOver);
+	}
+	
+	function addControl(text, onClick) {
+		var linkDiv = $("<div class='import_control_link_div'>").appendTo(controlsDiv);
+		var link = $("<div class='import_control_link'>").appendTo(linkDiv);
+		link.append(text);
+		link.click(function() { onClick(); });
+	}
+	
+	function onUnsplitPieceImported(importedPieces, piece) {
+		assertObject(piece, CryptoPiece);
+		resetControls();
+		that.setWarning("");
+		
+		// encrypted piece
+		if (piece.isEncrypted()) {
+			
+			// create decryption controller
+			decryptionController = new DecryptionController(decryptionDiv, piece);
+			decryptionController.render(function() {
+				
+				// replace file input div with decryption
+				fileInputDiv.hide();
+				decryptionDiv.show();
+				controlsDiv.show();
+				decryptionController.focus();
+				
+				// add control to view encrypted keys
+				addControl("view encrypted keys", function() {
+					UiUtils.openEditorTab("Encrypted keys", {pieces: [piece], sourcePieces: importedPieces.length > 1 ? importedPieces : null});
+				});
+			});
+			
+			// register decryption controller callbacks
+			decryptionController.onWarning(function(warning) { that.setWarning(warning); });
+			decryptionController.onDecrypted(function(piece, pieceRenderer) {
+				showInlineStorage(importedPieces, piece, pieceRenderer);
+			});
+		}
+		
+		// unencrypted piece
+		else {
+			showInlineStorage(importedPieces, piece);
+		}
+	}
+	
+	function showInlineStorage(importedPieces, piece, pieceRenderer) {
+		resetControls();
+		importInputDiv.hide();
+		importedStorageDiv.empty();
+		importedStorageDiv.show();
+		
+		// import success message
+		var successDiv = $("<div class='import_success_div flex_vertical flex_align_center'>").appendTo(importedStorageDiv);
+		var successTitle = $("<div class='import_success_title flex_horizontal'>").appendTo(successDiv);
+		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
+		successTitle.append("Imported Successfully");
+		var successLinks = $("<div class='import_success_links flex_horizontal flex_align_center flex_justify_center'>").appendTo(successDiv);
+		if (importedPieces.length > 1) successLinks.append("<div class='import_success_checkmark'>");	// filler to center control links under title text
+		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
+		startOver.append("start over");
+		startOver.click(function() { that.startOver(); });
+		var editor = $("<div class='import_control_link'>").appendTo(successLinks);
+		editor.append("re-export");
+		
+		// TODO: move this to editor?
+		if (importedPieces.length > 1) {
+			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
+			viewSplit.append("view split pieces");
+			viewSplit.click(function() { UiUtils.openEditorTab("Imported Pieces", {pieces: importedPieces}); });
+		}
+		
+		// imported pieces div
+		var inlinePiecesDiv = $("<div class='import_inline_pieces_div flex_vertical flex_align_center'>").appendTo(importedStorageDiv);
+		
+		// inline storage
+		if (pieceRenderer) {
+			pieceRenderer.getDiv().appendTo(inlinePiecesDiv);
+		} else {
+			pieceRenderer = new CompactPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
+			pieceRenderer.render();
+		}
+		
+		// export link opens editor
+		editor.click(function() {
+			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
+		});
+	}
+	
+	// handle imported files
+	function onFilesImported(files) {
+		
+		// collect functions to read files
+		var funcs = [];
+		for (var i = 0; i < files.length; i++) {
+			funcs.push(readFileFunc(files[i]));
+		};
+		
+		function readFileFunc(file) {
+			return function(onDone) { readFile(file, onDone); }
+		}
+		
+		// read files asynchronously
+		async.parallel(funcs, function(err, results) {
+			if (err) throw err;
+			
+			// collect named pieces from results
+			var namedPieces = [];
+			for (var i = 0; i < results.length; i++) {
+				if (results[i]) namedPieces = namedPieces.concat(results[i]);
+			}
+			
+			// add all named pieces
+			if (namedPieces.length) that.addNamedPieces(namedPieces);
+		});
+		
+		// reads the given file and calls onNamedPieces(err, namedPieces) when done
+		function readFile(file, onNamedPieces) {
+			var reader = new FileReader();
+			reader.onload = function() {
+				getNamedPiecesFromFile(file, reader.result, function(err, namedPieces) {
+					if (err) {
+						that.setWarning(err.message);
+						onNamedPieces(null, null);
+					}
+					else if (namedPieces.length === 0) {
+						if (isJsonFile(file)) that.setWarning("File '" + file.name + "' is not a valid json piece");
+						if (isCsvFile(file)) that.setWarning("File '" + file.name + "' is not a valid csv piece");
+						else if (isZipFile(file)) that.setWarning("Zip '" + file.name + "' does not contain any valid pieces");
+						else throw new Error("Unrecognized file type: " + file.type);
+					} else {
+						onNamedPieces(null, namedPieces);
+					}
+				});
+			}
+			if (isJsonFile(file) || isCsvFile(file)) reader.readAsText(file);
+			else if (isZipFile(file)) reader.readAsArrayBuffer(file);
+			else that.setWarning("File is not a json, csv, or zip file");
+		}
+		
+		function getNamedPiecesFromFile(file, data, onNamedPieces) {
+			try {
+				
+				// read non-zip files
+				if (isJsonFile(file)) piece = new CryptoPiece({json: data});
+				else if (isCsvFile(file)) piece = new CryptoPiece({csv: data});
+				else if (isTxtFile(file)) throw new Error("Txt import not implemented");
+				if (piece) {
+					var namedPiece = {name: file.name, piece: piece};
+					onNamedPieces(null, [namedPiece]);
+					return;
+				}
+				
+				// read zip file
+				else if (isZipFile(file)) throw new Error("Zip import not implemented");
+				else throw new Error("File is not recognized type (json, csv, txt, or zip)");
+			} catch (err) {
+				console.log(err);
+				onNamedPieces(new Error("Could not read valid pieces from file"));
+			}
+//			// handle zip file
+//			else if (isZipFile(file)) {
+//				AppUtils.zipToPieces(data, function(namedPieces) {
+//					onNamedPieces(null, namedPieces);
+//				});
+//			}
+		}
+	}
+	
+	function isPieceImported(name) {
+		for (var i = 0; i < importedNamedPieces.length; i++) {
+			if (importedNamedPieces[i].name === name) return true;
+		}
+		return false;
+	}
+	
+	function removePieces() {
+		importedNamedPieces = [];
+		lastUnsplitPiece = undefined;
+		updatePieces();
+	}
+	
+	function removePiece(name) {
+		for (var i = 0; i < importedNamedPieces.length; i++) {
+			if (importedNamedPieces[i].name === name) {
+				importedNamedPieces.splice(i, 1);
+				that.setWarning("");
+				updatePieces();
+				return;
+			}
+		}
+		throw new Error("No piece with name '" + name + "' imported");
+	}
+	
+	function updatePieces(onDone) {
+		
+		// update UI
+		that.setWarning("");
+		renderImportedPieces(importedNamedPieces);
+		resetControls();
+		
+		// collect all pieces
+		var importedPieces = [];
+		for (var i = 0; i < importedNamedPieces.length; i++) importedPieces.push(importedNamedPieces[i].piece);
+		
+		// done if no pieces
+		if (importedPieces.length === 0) {
+			if (onDone) onDone();
+			return;
+		}
+		
+		// add control to view pieces
+		addControl("view imported pieces", function() {
+			UiUtils.openEditorTab("Imported Storage", {pieces: pieces});
+		});
+		
+		// handle unsplit piece
+		if (importedPieces.length === 1 && importedPieces[0].isSplit() === false) {
+			onUnsplitPieceImported(importedPieces, importedPieces[0]);
+			return;
+		}
+		
+		// try to combine pieces
+		try {
+			var piece = new CryptoPiece({splitPieces: importedPieces});
+			onUnsplitPieceImported(importedPieces, piece);
+		} catch (err) {
+			if (err.message.indexOf("additional piece") > -1) that.setWarning(err.message, $("<img src='img/files.png'>"));
+			else that.setWarning(err.message);
+		}
+		
+		// done rendering
+		if (onDone) onDone();
+		
+		// TODO: unused?
+//		function keysDifferent(keys1, keys2) {
+//			if (!keys1 && keys2) return true;
+//			if (keys1 && !keys2) return true;
+//			if (keys1.length !== keys2.length) return true;
+//			for (var i = 0; i < keys1.length; i++) {
+//				if (!keys1[i].equals(keys2[i])) return true;
+//			}
+//			return false;
+//		}
+	}
+	
+	function renderImportedPieces(namedPieces) {
+		
+		// reset state
+		resetControls();
+		importedPiecesDiv.empty();
+		
+		// hide imported pieces and controls if no pieces
+		if (namedPieces.length === 0) {
+			importedPiecesDiv.hide();
+			controlsDiv.hide();
+			return;
+		}
+		
+		// render imported pieces
+		for (var i = 0; i < namedPieces.length; i++) {
+			importedPiecesDiv.append(getImportedPieceDiv(namedPieces[i]));
+		}
+		function getImportedPieceDiv(namedPiece) {
+			var importedPieceDiv = $("<div class='import_file_imported_piece'>").appendTo(importedPiecesDiv);
+			var icon = $("<img src='img/file.png' class='import_imported_icon'>").appendTo(importedPieceDiv);
+			importedPieceDiv.append(namedPiece.name);
+			var trash = $("<img src='img/trash.png' class='import_imported_trash'>").appendTo(importedPieceDiv);
+			trash.click(function() { removePiece(namedPiece.name); });
+			return importedPieceDiv;
+		}
+		
+		// show imported pieces and controls
+		importedPiecesDiv.show();
+		controlsDiv.show();
+	}
+	
+	/**
+	 * Sets up a drag and drop zone.
+	 * 
+	 * @param div is the drop zone as a jquery node
+	 * @param onFilesImported(files) is called when files are dropped into the drop zone
+	 */
+	function setupDragAndDrop(div, onFilesImported) {
+		
+		// register drag and drop events
+		div.get(0).ondrop = function(event) {
+			event.preventDefault();  
+	    event.stopPropagation();
+			div.removeClass("inner_outline");
+			var dt = event.dataTransfer;
+			
+			// use DataTransferItemList interface to access file(s)
+			if (dt.items) {
+				var files = [];
+				for (var i = 0; i < dt.items.length; i++) {
+					if (dt.items[i].kind == 'file') {
+						files.push(dt.items[i].getAsFile());
+					}
+				}
+				onFilesImported(files);
+			}
+			
+			// use DataTransfer interface to access file(s)
+			else {
+				onFilesImported(dt.files);
+			}
+		}
+		div.get(0).ondragenter = function(event) {
+			div.addClass("inner_outline");
+		}
+		div.get(0).ondragexit = function(event) {
+			div.removeClass("inner_outline");
+		}
+		div.get(0).ondragover = function(event) {
+			event.preventDefault();  
+	    event.stopPropagation();
+	    event.dataTransfer.dropEffect = 'copy';
+		}
 	}
 }
 inheritsFrom(ImportFileController, DivController);
@@ -1365,7 +1797,6 @@ function ImportTextController(div, plugins) {
 	var importedPieces = [];		// string[]
 	var importedPiecesDiv;			// div for imported pieces
 	var controlsDiv;
-	var lastKeys;
 	var decryptionController;
 	var importedStorageDiv;			// inline storage
 	var selectDefault = false;	// dropdown selection is assigned a default
@@ -1471,7 +1902,7 @@ function ImportTextController(div, plugins) {
 		throw new Error("No plugin for ticker: " + ticker);
 	}
 	
-	function onPieceImported(importedPieces, piece) {
+	function onUnsplitPieceImported(importedPieces, piece) {
 		assertObject(piece, CryptoPiece);
 		resetControls();
 		setWarning("");
@@ -1519,7 +1950,7 @@ function ImportTextController(div, plugins) {
 		var successTitle = $("<div class='import_success_title flex_horizontal flex_align_center'>").appendTo(successDiv);
 		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
 		successTitle.append("Imported Successfully");
-		var successLinks = $("<div class='import_success_links flex_horizontal flex_justify_center'>").appendTo(successDiv);
+		var successLinks = $("<div class='import_success_links flex_horizontal flex_align_center flex_justify_center'>").appendTo(successDiv);
 		if (importedPieces.length > 1) successLinks.append("<div class='import_success_checkmark'>");	// filler to center control links under title text
 		var startOver = $("<div class='import_control_link'>").appendTo(successLinks);
 		startOver.append("start over");
@@ -1527,7 +1958,7 @@ function ImportTextController(div, plugins) {
 		var editor = $("<div class='import_control_link'>").appendTo(successLinks);
 		editor.append("re-export");
 		
-		// TODO: this moved to editor?
+		// TODO: move this to editor?
 		if (importedPieces.length > 1) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
 			viewSplit.append("view split pieces");
@@ -1566,7 +1997,6 @@ function ImportTextController(div, plugins) {
 	
 	function removePieces() {
 		importedPieces = [];
-		lastKeys = undefined;	// TODO: this needs removed
 		processPieces();
 	}
 	
@@ -1666,8 +2096,8 @@ function ImportTextController(div, plugins) {
 		
 		// update UI
 		setWarning("");
-		resetControls();
 		renderImportedPieces(importedPieces);
+		resetControls();
 		
 		// done if no pieces
 		if (importedPieces.length === 0) return;
@@ -1678,16 +2108,16 @@ function ImportTextController(div, plugins) {
 			//UiUtils.openEditorTab("Imported Storage", {pieces: importedPieces});
 		});
 		
-		// handle non-split piece
+		// handle unsplit piece
 		if (importedPieces.length === 1 && importedPieces[0].isSplit() === false) {
-			onPieceImported(importedPieces, importedPieces[0]);
+			onUnsplitPieceImported(importedPieces, importedPieces[0]);
 			return;
 		}
 		
 		// try to combine pieces
 		try {
 			var piece = new CryptoPiece({splitPieces: importedPieces});
-			onPieceImported(importedPieces, piece);
+			onUnsplitPieceImported(importedPieces, piece);
 		} catch (err) {
 			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 			else setWarning(err.message);

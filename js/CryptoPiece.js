@@ -332,6 +332,7 @@ function CryptoPiece(config) {
 	}
 	
 	function fromJson(json) {
+		if (isString(json)) json = JSON.parse(json);
 		assertArray(json.keypairs);
 		assertTrue(json.keypairs.length > 0);
 		state.pieceNum = json.pieceNum;
