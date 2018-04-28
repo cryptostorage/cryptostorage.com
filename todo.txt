@@ -28,6 +28,7 @@ tippy jerk when editor first loaded
 compatability disclosure
 backwards compatibility
 file import incompatible pieces shows warning for developer, need to test user warnings
+export of addresses only exports single file
 
 editor:
 	bip38 support
