@@ -1588,7 +1588,6 @@ function ImportTextController(div, plugins) {
 		
 		// init state
 		setWarning("");
-		resetControls();
 		
 		// get text
 		var text = textArea.val().trim();
@@ -1626,7 +1625,7 @@ function ImportTextController(div, plugins) {
 		
 		// assign piece num if not given
 		// TODO: apply next available piece num only when viewing in editor
-		if (piece.isSplit() && !piece.getPieceNum()) piece.setPieceNum(getNextAvailablePieceNum(importedPieces));
+		//if (piece.isSplit() && !piece.getPieceNum()) piece.setPieceNum(getNextAvailablePieceNum(importedPieces));
 		
 		// accept piece into imported pieces
 		textArea.val("");
