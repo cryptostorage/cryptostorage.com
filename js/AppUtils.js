@@ -2507,5 +2507,73 @@ var AppUtils = {
 				return AppUtils.toBase(16, 58, AppUtils.toBase(64, 16, str));
 			} else throw new Error("Unsupported target base: " + tgtBase);
 		} else throw new Error("Unsupported source base: " + srcBase);
+	},
+	
+	/**
+	 * Converts pieces to a downloadable blob and name.
+	 * 
+	 * @param pieces are the pieces to convert
+	 * @param fileType specifies the file type to save (json, csv, or txt)
+	 * @param onDone(err, blob, name) is invoked when done
+	 */
+	piecesToBlob: function(pieces, fileType, onDone) {
+		
+		// validate input
+		assertArray(pieces);
+		assertTrue(pieces.length > 0);
+		assertObject(pieces[0], CryptoPiece);
+		
+		// handle single piece
+		if (pieces.length === 1) {
+			var commonPlugin = CryptoPiece.getCommonPlugin(pieces[0]);
+			var commonTicker = commonPlugin ? commonPlugin.getTicker().toLowerCase() : "mix";
+			var name = "cryptostorage_" + commonTicker + "_" + AppUtils.getTimestamp() + AppUtils.getExtension(fileType);
+			var blob = new Blob([pieces[0].toString(fileType)], {type: "text/plain;charset=utf-8"});
+			if (onDone) onDone(null, blob, name);
+		}
+		
+		// handle multiple pieces
+		else {
+			
+			// get common ticker
+			var plugin = CryptoPiece.getCommonPlugin(pieces[0]);
+			var ticker = commonPlugin ? commonPlugin.getTicker().toLowerCase() : "mix";
+			
+			// build names for pieces
+			var pieceNames = [];
+			for (var i = 0; i < pieces.length; i++) {
+				var name = "cryptostorage_" + ticker + (pieces[i].getPieceNum() ? "_piece_" + pieces[i].getPieceNum() : "");
+				pieceNames.push(getNextAvailableName(pieceNames, name));
+			}
+
+			// prepare zip
+			var zip = JSZip();
+			for (var i = 0; i < pieces.length; i++) {
+				var name = pieceNames[i];
+				zip.file(name + AppUtils.getExtension(fileType), pieces[i].toString(fileType));
+			}
+			
+			// create zip
+			zip.generateAsync({type:"blob"}).then(function(blob) {
+				onDone(null, blob, "cryptostorage_" + ticker + "_" + AppUtils.getTimestamp() + ".zip");
+			});
+			
+			/**
+			 * Gets the next available name, adding a postfix to prevent duplicates.
+			 * 
+			 * @param names is the list of existing names
+			 * @param name is the desired name to add
+			 * @returns a name which will be postfixed if necessary to prevent duplicates
+			 */
+			function getNextAvailableName(names, name) {
+				if (!arrayContains(names, name)) return name;
+				var idx = 2;
+				while (true) {
+					var postfixedName = name + "_" + idx;
+					if (!arrayContains(names, postfixedName)) return postfixedName;
+					idx++;
+				}
+			}
+		}
 	}
 }
