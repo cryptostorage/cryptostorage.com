@@ -1198,55 +1198,55 @@ input[type='checkbox'][disabled] +label {
 	position: fixed;
 	bottom: 50px;
 	right: 50px;
-	width: 350px;
+	width: 300px;
 }
 
 .editor_btn_green {
 	color: white;
-	background-color: rgb(144, 212, 66);
-	padding: 15px;
+	background-color: rgb(101, 214, 67);
+	padding: 13px;
 	font-size: 30px;
 	font-weight: bold;
 }
 
 .editor_btn_green:hover {
-	background-color: rgb(164, 232, 86);
+	background-color: rgb(121, 234, 87);
 }
 
 .editor_btn_green:active {
-	background-color: rgb(134, 202, 56);
+	background-color: rgb(81, 194, 47);
 }
 
 .editor_btn_red {
 	color: white;
-	background-color: rgb(224, 112, 82);
-	padding: 10px;
+	background-color: rgb(252, 101, 84);
+	padding: 5px;
 	font-size: 28px;
 }
 
 .editor_btn_red:hover {
-	background-color: rgb(244, 132, 102);
+	background-color: rgb(272, 121, 104);
 }
 
 .editor_btn_red:active {
-	background-color: rgb(214, 102, 72);
+	background-color: rgb(232, 91, 74);
 }
 
 .editor_btn_blue {
 	color: white;
-	background-color: rgb(66, 116, 184);
-	padding: 12px;
+	background-color: rgb(17, 118, 182);
+	padding: 5px;
 	font-size: 28px;
 	width: 100%;
-	margin-top: 8px;
+	margin-top: 5px;
 }
 
 .editor_btn_blue:hover {
-	background-color: rgb(86, 136, 204);
+	background-color: rgb(37, 138, 202);
 }
 
 .editor_btn_blue:active {
-	background-color: rgb(56, 106, 174);
+	background-color: rgb(0, 98, 162);
 }
 
 .editor_export_btn_green {
@@ -1259,27 +1259,27 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_export_btn_green:hover {
-	background-color: rgb(164, 232, 86);
+	background-color: rgb(121, 234, 87);
 }
 
 .editor_export_btn_green:active {
-	background-color: rgb(134, 202, 56);
+	background-color: rgb(81, 194, 47);
 }
 
 .editor_export_btn_red {
 	color: white;
-	background-color: rgb(224, 112, 82);
+	background-color: rgb(252, 101, 84);
 	padding: 10px;
 	font-size: 28px;
 	width: 100%;
 }
 
 .editor_export_btn_red:hover {
-	background-color: rgb(244, 132, 102);
+	background-color: rgb(272, 121, 104);
 }
 
 .editor_export_btn_red:active {
-	background-color: rgb(214, 102, 72);
+	background-color: rgb(232, 91, 74);
 }
 
 .editor_pieces_div {
