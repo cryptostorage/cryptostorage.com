@@ -235,15 +235,11 @@ function CryptoPiece(config) {
 	}
 	
 	this.toJson = function() {
-		
-		// build json
 		var json = {};
 		json.pieceNum = that.getPieceNum();
 		json.version = AppUtils.VERSION;
 		json.keypairs = [];
-		for (var i = 0; i < state.keypairs.length; i++) {
-			json.keypairs.push(state.keypairs[i].toJson());
-		}
+		for (var i = 0; i < state.keypairs.length; i++) json.keypairs.push(state.keypairs[i].toJson());
 		return json;
 	}
 	
@@ -290,7 +286,14 @@ function CryptoPiece(config) {
 	
 	this.equals = function(piece) {
 		assertObject(piece, CryptoPiece);
-		return objectsEqual(that.toJson(), piece.toJson());
+		var state2 = piece.getInternalState();
+		if (state.version !== state2.version) return false;
+		if (state.pieceNum !== state2.pieceNum) return false;
+		if (state.keypairs.length !== state2.keypairs.length) return false;
+		for (var i = 0; i < state.keypairs.length; i++) {
+			if (!state.keypairs[i].equals(state2.keypairs[i])) return false;
+		}
+		return true;
 	}
 	
 	this.getInternalState = function() {
@@ -314,12 +317,13 @@ function CryptoPiece(config) {
 	init();
 	function init() {
 		state = {};
-		if (config.keypairs) setKeypairs(config.keypairs, config.pieceNum);
+		if (config.keypairs) setKeypairs(config.keypairs);
 		else if (config.json) fromJson(config.json);
 		else if (config.splitPieces) combine(config.splitPieces);
 		else if (config.piece) fromPiece(config.piece);
 		else if (config.csv) fromCsv(config.csv);
-		else throw new Error("All arguments null");
+		else throw new Error("Config missing required fields");
+		if (isDefined(config.pieceNum)) that.setPieceNum(config.pieceNum);
 	}
 	
 	function setKeypairs(keypairs, pieceNum) {
@@ -335,12 +339,8 @@ function CryptoPiece(config) {
 		if (isString(json)) json = JSON.parse(json);
 		assertArray(json.keypairs);
 		assertTrue(json.keypairs.length > 0);
-		state.pieceNum = json.pieceNum;
-		state.version = AppUtils.VERSION;
 		var keypairs = [];
-		for (var i = 0; i < json.keypairs.length; i++) {
-			keypairs.push(new CryptoKeypair({json: json.keypairs[i]}));
-		}
+		for (var i = 0; i < json.keypairs.length; i++) keypairs.push(new CryptoKeypair({json: json.keypairs[i]}));
 		setKeypairs(keypairs);
 	}
 	
@@ -373,6 +373,10 @@ function CryptoPiece(config) {
 						keypairConfig.publicAddress = value;
 						break;
 					case CryptoKeypair.CsvHeader.SHARE_NUM:
+						if (value) {
+							value = parseInt(value, 10);
+							assertTrue(isInt(value));
+						}
 						keypairConfig.shareNum = value;
 						break;
 				}

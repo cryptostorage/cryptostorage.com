@@ -34,7 +34,7 @@
  * 				config.splitKeypairs are split keypairs to combine and initialize from
  * 				config.privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
  * 				config.publicAddress is a public address to manually set if not unencrypted (optional)
- * 				config.shareNum is the share number (optional)
+ * 				config.shareNum is the share number if otherwise undefined (optional)
  */
 function CryptoKeypair(config) {
 	
@@ -158,12 +158,18 @@ function CryptoKeypair(config) {
 	this.setShareNum = function(shareNum) {
 		if (that.isSplit()) {
 			assertNumber(shareNum);
+			assertTrue(shareNum >= 1);
+			assertTrue(shareNum <= AppUtils.MAX_SHARES);
+			assertTrue(isUndefined(state.shareNum) || state.shareNum === shareNum, "Cannot override previously assigned share num");
+			state.shareNum = shareNum;
 		} else if (that.isSplit() === false) {
 			assertNull(shareNum);
+			assertNull(state.shareNum);
 		} else if (that.isSplit() === undefined) {
 			assertUndefined(shareNum);
+			assertUndefined(state.shareNum);
 		}
-		state.shareNum = shareNum;
+		return this;
 	}
 	
 	this.removePublicAddress = function() {
@@ -183,9 +189,7 @@ function CryptoKeypair(config) {
 	}
 	
 	this.copy = function() {
-		var copied = new CryptoKeypair({keypair: that});
-		if (isUndefined(state.publicAddress)) copied.removePublicAddress();
-		return copied;
+		return new CryptoKeypair({keypair: that});
 	}
 	
 	this.toJson = function() {
@@ -222,7 +226,15 @@ function CryptoKeypair(config) {
 	
 	this.equals = function(keypair) {
 		assertObject(keypair, CryptoKeypair);
-		return objectsEqual(that.toJson(), keypair.toJson());
+		var state2 = keypair.getInternalState();
+		if (state.plugin.getTicker() !== state2.plugin.getTicker()) return false;
+		if (state.privateHex !== state2.privateHex) return false;
+		if (state.privateWif !== state2.privateWif) return false;
+		if (state.publicAddress !== state2.publicAddress) return false;
+		if (state.encryption !== state2.encryption) return false;
+		if (state.minShares !== state2.minShares) return false;
+		if (state.shareNum !== state2.shareNum) return false;
+		return true;
 	}
 	
 	this.getInternalState = function() {
@@ -235,7 +247,7 @@ function CryptoKeypair(config) {
 	function init() {
 		state = {};
 		
-		// copy from keypair
+		// direct copy internal state from keypair, no validation
 		if (config.keypair) {
 			assertUndefined(config.json);
 			assertUndefined(config.splitKeypairs);
@@ -246,7 +258,7 @@ function CryptoKeypair(config) {
 			return;
 		}
 		
-		// create from pugin
+		// create from plugin
 		if (config.plugin) {
 			assertTrue(isObject(config.plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
 			state.plugin = config.plugin;
@@ -270,7 +282,7 @@ function CryptoKeypair(config) {
 	
 	function validateState() {
 		if (!state.plugin && !state.json && !state.splitKeypairs) {
-			throw new Error("One of plugin, json, or splitKeypairs is required");
+			throw new Error("Config missing required fields");
 		}
 		
 		if (state.minShares) {
@@ -374,11 +386,6 @@ function CryptoKeypair(config) {
 			state.encryption = undefined;
 			state.minShares = decoded.minShares;
 			state.shareNum = undefined;
-			
-			// assign share num
-			assertTrue(isUndefined(config.shareNum) || config.shareNum === null || isNumber(config.shareNum));
-			if (isNumber(config.shareNum)) assertTrue(config.shareNum >= 1 && config.shareNum <= AppUtils.MAX_SHARES);
-			state.shareNum = config.shareNum;
 			return;
 		}
 		
@@ -394,14 +401,22 @@ function CryptoKeypair(config) {
 		state.privateWif = json.privateWif;
 		state.encryption = json.encryption;
 		state.minShares = json.minShares;
-		if (json.encryption === null) assertUninitialized(json.shareNum);
-		state.shareNum = json.shareNum;
 		if (state.privateHex) setPrivateKey(state.privateHex);
 		else if (state.privateWif) setPrivateKey(state.privateWif);
 		if (json.publicAddress) setPublicAddress(json.publicAddress);
+		if (json.encryption === null) assertUninitialized(json.shareNum);
+		if (json.shareNum) that.setShareNum(json.shareNum);
 	}
 	
 	function combine(splitKeypairs) {
+		
+		// verify no duplicates
+		// TODO: test performance
+		for (var i = 0; i < splitKeypairs.length - 1; i++) {
+			for (var j = i + 1; j < splitKeypairs.length; j++) {
+				assertFalse(splitKeypairs[i].equals(splitKeypairs[j]), "Cannot create keypair from duplicate shares");
+			}
+		}
 		
 		// verify keypairs and assign plugin
 		var publicAddress;

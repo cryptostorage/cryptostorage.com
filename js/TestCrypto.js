@@ -349,8 +349,7 @@ function TestCrypto() {
 			new CryptoPiece({splitPieces: invalidCombination});
 			throw new Error("fail");
 		} catch (err) {
-			if (err.message === "fail") throw new Error("Cannot create key from duplicate shares");
-			assertEquals("Pieces do not combine to create valid keypairs", err.message);
+			if (err.message === "fail") throw new Error("Cannot create piece from duplicate shares");
 		}
 		
 		// test each piece combination
@@ -451,12 +450,31 @@ function TestCrypto() {
 		// test init from split pieces
 		if (piece.isSplit() === false) {
 			var splitPieces = piece.split(3, 2);
-			for (var i = 0; i < splitPieces.length; i++) assertEquals(i + 1, splitPieces[i].getPieceNum());
-			var splitPiece = new CryptoPiece({piece: splitPieces[0]});
-			assertEquals(1, splitPiece.getPieceNum());
-			splitPiece = new CryptoPiece({keypairs: splitPieces[0].getKeypairs(), pieceNum: 5});
+			
+			// test ability to assign piece num one time if not previously assigned
+			var splitKeypair = new CryptoKeypair({plugin: splitPieces[0].getKeypairs()[0].getPlugin(), privateKey: splitPieces[0].getKeypairs()[0].getPrivateWif()});
+			var splitPiece = new CryptoPiece({keypairs: [splitKeypair]});
+			assertUndefined(splitPiece.getPieceNum());
+			splitPiece.setPieceNum(5);
 			assertEquals(5, splitPiece.getPieceNum());
-			for (var i = 0; i < splitPiece.getKeypairs(); i++) assertEquals(5, splitPiece.getKeypairs()[i].getShareNum());
+			var canSetEqual = false;
+			try {
+				splitPiece.setPieceNum(5);
+				canSetEqual = true;
+				splitPiece.setPieceNum(6);
+				fail("fail");
+			} catch (err) {
+				if (err.message === "fail") throw new Error("Should not be able to override previously set share num");
+				assertTrue(canSetEqual);
+			}
+			
+			// test init of split pieces
+			for (var i = 0; i < splitPieces.length; i++) {
+				assertEquals(i + 1, splitPieces[i].getPieceNum());
+				var splitPiece = new CryptoPiece({piece: splitPieces[i]});
+				assertEquals(i + 1, splitPiece.getPieceNum());
+				testPieceInit(splitPieces[i]);
+			}
 			piece2 = new CryptoPiece({splitPieces: splitPieces});
 			if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 			assertTrue(piece.equals(piece2));
@@ -470,17 +488,22 @@ function TestCrypto() {
 			if (err.message === "fail") throw new Error("Should not be able to set pieceNum on unencrypted keys");
 		}
 		
-		// test json conversion
+		// test init from json
 		piece2 = new CryptoPiece({json: piece.toJson()});
+		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
+		assertTrue(piece.equals(piece2, true));
+		
+		// test init from json string
+		piece2 = new CryptoPiece({json: piece.toString(AppUtils.FileType.JSON)});
 		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 		assertTrue(piece.equals(piece2));
 		
-		// test csv conversion
+		// test init from csv
 		piece2 = new CryptoPiece({csv: piece.toCsv()});
 		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 		assertTrue(piece.equals(piece2));
 		
-		// test txt conversion
+		// test init from txt
 		assertString(piece.toTxt());
 //		piece2 = new CryptoPiece({txt: piece.toTxt()});	// TODO
 //		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
