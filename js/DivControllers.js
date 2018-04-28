@@ -1455,7 +1455,7 @@ function ImportFileController(div) {
 	}
 	
 	function addControl(text, onClick) {
-		var linkDiv = $("<div class='import_control_link_div'>").appendTo(controlsDiv);
+		var linkDiv = $("<div class='import_control_link_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(controlsDiv);
 		var link = $("<div class='import_control_link'>").appendTo(linkDiv);
 		link.append(text);
 		link.click(function() { onClick(); });

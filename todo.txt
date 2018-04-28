@@ -27,6 +27,7 @@ xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b
 tippy jerk when editor first loaded
 compatability disclosure
 backwards compatibility
+file import incompatible pieces shows warning for developer, need to test user warnings
 
 editor:
 	bip38 support

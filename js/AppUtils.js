@@ -2538,10 +2538,7 @@ var AppUtils = {
 	 */
 	zipToNamedPieces: function(blob, onDone) {
 		
-		onDone(new Error("zipToNamedPieces() not implemented"));
-		return;
-		
-		// load zip asynchronously
+		// load zip
 		JSZip.loadAsync(blob).then(function(zip) {
 			
 			// collect callback functions to get pieces
@@ -2555,43 +2552,45 @@ var AppUtils = {
 				}
 			});
 			
-			// invoke callback functions to get pieces
-			async.parallel(funcs, function(err, args) {
+			// invoke callback functions to get named pieces
+			async.parallel(funcs, function(err, results) {
 				if (err) {
 					onDone(err);
 					return;
 				}
-				var pieces = [];
-				for (var i = 0; i < args.length; i++) {
-					var arg = args[i];
-					if (isArray(arg)) {
-						for (var j = 0; j < arg.length; j++) pieces.push(arg[j]);
+				var namedPieces = [];
+				for (var i = 0; i < results.length; i++) {
+					var result = results[i];
+					if (result === null) continue;
+					else if (isArray(result)) {
+						for (var j = 0; j < result.length; j++) namedPieces.push(result[j]);
 					}
-					else pieces.push(arg);
+					else namedPieces.push(result);
 				}
-				onDone(pieces);
+				onDone(null, namedPieces);
 			});
 		});
 		
 		function getPieceCallbackFunction(zipObject) {
-			return function(onPiece) {
+			return function(onDone) {
 				zipObject.async("string").then(function(str) {
-					var piece;
-					if (zipObject.name.endsWith(".json")) piece = new CryptoPiece({json: str});
-					else if (zipObject.name.endsWith(".csv")) piece = new CryptoPiece({csv: str});
-					else if (zipObject.name.endsWith(".txt")) piece = new CryptoPiece({txt: str});
-					else throw new Error("Unrecognized file type: " + zipObject.name);
-					onPiece(null, {name: zipObject.name, piece: piece});
+					try {
+						if (zipObject.name.endsWith(".json")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({json: str})});
+						else if (zipObject.name.endsWith(".csv")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({csv: str})});
+						else if (zipObject.name.endsWith(".txt")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({json: str})});
+						else throw new Error("Unrecognized file type: " + zipObject.name);
+					} catch (err) {
+						console.log(err);
+						onDone(null, null);	// simply skip this file
+					}
 				});
 			}
 		}
 		
 		function getZipCallbackFunction(zipObject) {
-			return function(callback) {
+			return function(onDone) {
 				zipObject.async("blob").then(function(blob) {
-					AppUtils.zipToPieces(blob, function(pieces) {
-						callback(null, pieces);
-					});
+					AppUtils.zipToNamedPieces(blob, onDone);
 				});
 			}
 		}
