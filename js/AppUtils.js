@@ -2505,7 +2505,11 @@ var AppUtils = {
 			var data = reader.result;
 			
 			// read zip
-			if (isZipFile(file)) AppUtils.zipToNamedPieces(data, onDone);
+			if (isZipFile(file)) AppUtils.zipToNamedPieces(data, function(err, namedPieces) {
+				if (err) onDone(err);
+				else if (!namedPieces.length) onDone(new Error("'" + file.name + "' does not contain valid pieces"));
+				else onDone(null, namedPieces);
+			});
 			
 			// read json, csv, or txt
 			else {
@@ -2519,7 +2523,7 @@ var AppUtils = {
 					onDone(null, [{name: file.name, piece: piece}]);
 				} catch (err) {
 					console.log(err);
-					onDone(new Error("Could not read pieces from '" + file.name + "'"));
+					onDone(new Error("'" + file.name + "' is not a valid piece"));
 				}
 			}
 		}

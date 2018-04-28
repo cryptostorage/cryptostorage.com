@@ -28,7 +28,6 @@ tippy jerk when editor first loaded
 compatability disclosure
 backwards compatibility
 file import incompatible pieces shows warning for developer, need to test user warnings
-no error if zip doesn't contain pieces, boolean assertion error on DivControllers.js:1550
 
 editor:
 	bip38 support
