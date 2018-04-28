@@ -3157,14 +3157,14 @@ function EditorSplitController(div, editorController) {
 		splitCheckbox = new CheckboxController($("<div>").appendTo(div), "Split Keypairs?", splitTooltip).render();
 		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(div);
 		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(div);
-		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(div);
+		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
 		var splitNumLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitNumDiv);
 		splitNumLabelTop.html("Split Into");
 		numPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitNumDiv);
 		var splitNumLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitNumDiv);
 		splitNumLabelBottom.html("Pieces");
 		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(div);
-		var splitMinDiv = $("<div class='split_input_div flex_vertical flex_justify_start'>").appendTo(div);
+		var splitMinDiv = $("<div class='split_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
 		var splitMinLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitMinDiv);
 		splitMinLabelTop.html("Require");
 		minPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitMinDiv);
