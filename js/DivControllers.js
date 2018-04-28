@@ -1517,13 +1517,6 @@ function ImportFileController(div) {
 		var editor = $("<div class='import_control_link'>").appendTo(successLinks);
 		editor.append("re-export");
 		
-		// TODO: move this to editor?
-		if (importedPieces.length > 1) {
-			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
-			viewSplit.append("view split pieces");
-			viewSplit.click(function() { UiUtils.openEditorTab("Imported Pieces", {pieces: importedPieces}); });
-		}
-		
 		// imported pieces div
 		var inlinePiecesDiv = $("<div class='import_inline_pieces_div flex_vertical flex_align_center'>").appendTo(importedStorageDiv);
 		
@@ -1546,19 +1539,26 @@ function ImportFileController(div) {
 		
 		// collect functions to read files
 		var funcs = [];
-		for (var i = 0; i < files.length; i++) {
-			funcs.push(readFileFunc(files[i]));
-		};
-		
+		for (var i = 0; i < files.length; i++) funcs.push(readFileFunc(files[i]));
 		function readFileFunc(file) {
-			return function(onDone) { readFile(file, onDone); }
+			return function(onDone) {
+				AppUtils.fileToNamedPieces(file, function(err, namedPieces) {
+					if (err) {
+						that.setWarning(err.message);
+						onDone(null, null);
+					} else {
+						assertTrue(namedPieces.length > 0);
+						onDone(null, namedPieces);
+					}
+				})
+			};
 		}
 		
-		// read files asynchronously
+		// read files
 		async.parallel(funcs, function(err, results) {
 			if (err) throw err;
 			
-			// collect named pieces from results
+			// collect named pieces from all files
 			var namedPieces = [];
 			for (var i = 0; i < results.length; i++) {
 				if (results[i]) namedPieces = namedPieces.concat(results[i]);
@@ -1567,58 +1567,6 @@ function ImportFileController(div) {
 			// add all named pieces
 			if (namedPieces.length) that.addNamedPieces(namedPieces);
 		});
-		
-		// reads the given file and calls onNamedPieces(err, namedPieces) when done
-		function readFile(file, onNamedPieces) {
-			var reader = new FileReader();
-			reader.onload = function() {
-				getNamedPiecesFromFile(file, reader.result, function(err, namedPieces) {
-					if (err) {
-						that.setWarning(err.message);
-						onNamedPieces(null, null);
-					}
-					else if (namedPieces.length === 0) {
-						if (isJsonFile(file)) that.setWarning("File '" + file.name + "' is not a valid json piece");
-						if (isCsvFile(file)) that.setWarning("File '" + file.name + "' is not a valid csv piece");
-						else if (isZipFile(file)) that.setWarning("Zip '" + file.name + "' does not contain any valid pieces");
-						else throw new Error("Unrecognized file type: " + file.type);
-					} else {
-						onNamedPieces(null, namedPieces);
-					}
-				});
-			}
-			if (isJsonFile(file) || isCsvFile(file)) reader.readAsText(file);
-			else if (isZipFile(file)) reader.readAsArrayBuffer(file);
-			else that.setWarning("File is not a json, csv, or zip file");
-		}
-		
-		function getNamedPiecesFromFile(file, data, onNamedPieces) {
-			try {
-				
-				// read non-zip files
-				if (isJsonFile(file)) piece = new CryptoPiece({json: data});
-				else if (isCsvFile(file)) piece = new CryptoPiece({csv: data});
-				else if (isTxtFile(file)) throw new Error("Txt import not implemented");
-				if (piece) {
-					var namedPiece = {name: file.name, piece: piece};
-					onNamedPieces(null, [namedPiece]);
-					return;
-				}
-				
-				// read zip file
-				else if (isZipFile(file)) throw new Error("Zip import not implemented");
-				else throw new Error("File is not recognized type (json, csv, txt, or zip)");
-			} catch (err) {
-				console.log(err);
-				onNamedPieces(new Error("Could not read valid pieces from file"));
-			}
-//			// handle zip file
-//			else if (isZipFile(file)) {
-//				AppUtils.zipToPieces(data, function(namedPieces) {
-//					onNamedPieces(null, namedPieces);
-//				});
-//			}
-		}
 	}
 	
 	function isPieceImported(name) {
@@ -1956,13 +1904,6 @@ function ImportTextController(div, plugins) {
 		startOver.click(function() { that.startOver(); });
 		var editor = $("<div class='import_control_link'>").appendTo(successLinks);
 		editor.append("re-export");
-		
-		// TODO: move this to editor?
-		if (importedPieces.length > 1) {
-			var viewSplit = $("<div class='import_control_link'>").appendTo(successLinks);
-			viewSplit.append("view split pieces");
-			viewSplit.click(function() { throw new Error("View split pieces not implemented"); });
-		}
 		
 		// imported pieces div
 		var inlinePiecesDiv = $("<div class='import_inline_pieces_div flex_vertical flex_align_center'>").appendTo(importedStorageDiv);
@@ -3448,9 +3389,8 @@ function EditorCurrencyController(div, plugins, defaultTicker) {
 	};
 	
 	this.getNumKeys = function() {
-		var num = Number(numKeysInput.val());
-		if (isInt(num)) return num;
-		return null;
+		var parsed = parseInt(numKeysInput.val(), 10);
+		return isNaN(parsed) ? null : parsed;
 	};
 	
 	this.setNumKeys = function(numKeys) {

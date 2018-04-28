@@ -998,6 +998,16 @@ function isCsvFile(file) {
 }
 
 /**
+ * Determines if the given file is a txt file.
+ * 
+ * @param file is a file
+ * @returns true if the given file is a txt file, false otherwise
+ */
+function isTxtFile(file) {
+	return file.name.endsWith(".txt") || file.type === 'text/plain';
+}
+
+/**
  * Fetches the given list of images.
  * 
  * Prerequisite: async.js.
