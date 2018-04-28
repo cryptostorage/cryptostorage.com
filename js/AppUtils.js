@@ -2519,7 +2519,7 @@ var AppUtils = {
 					onDone(null, [{name: file.name, piece: piece}]);
 				} catch (err) {
 					console.log(err);
-					onDone(new Error("Could not read pieces from file"));
+					onDone(new Error("Could not read pieces from '" + file.name + "'"));
 				}
 			}
 		}
