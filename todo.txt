@@ -4,7 +4,6 @@ view split pieces in editor
 ability to cancel import decryption, piece generation
 text parser
 print
-export of addresses only exports single file
 backwards compatibility
 direct link to editor
 action controller bottom center if not enough width

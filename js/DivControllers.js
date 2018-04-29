@@ -3879,15 +3879,17 @@ function EditorSaveController(div, pieces) {
 		
 		// transform pieces per configuration
 		var transformedPieces = [];
-		for (var i = 0; i < pieces.length; i++) {
-			if (!includePublicCheckbox.isChecked()) {
-				assertTrue(includePrivateCheckbox.isChecked());
-				transformedPieces.push(pieces[i].copy().removePublicAddresses());
-			} else if (!includePrivateCheckbox.isChecked()) {
-				assertTrue(includePublicCheckbox.isChecked());
-				transformedPieces.push(pieces[i].copy().removePrivateKeys());
-			} else {
-				transformedPieces.push(pieces[i]);
+		if (!includePrivateCheckbox.isChecked()) {
+			assertTrue(includePublicCheckbox.isChecked());
+			transformedPieces.push(pieces[0].copy().removePrivateKeys());
+		} else {
+			for (var i = 0; i < pieces.length; i++) {
+				if (!includePublicCheckbox.isChecked()) {
+					assertTrue(includePrivateCheckbox.isChecked());
+					transformedPieces.push(pieces[i].copy().removePublicAddresses());
+				} else {
+					transformedPieces.push(pieces[i]);
+				}
 			}
 		}
 		
