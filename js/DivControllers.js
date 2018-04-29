@@ -3489,6 +3489,18 @@ function EditorCurrenciesController(div, plugins) {
 		formErrorChangeListeners = [];
 		inputChangeListeners = [];
 		
+		// one of each link
+		if (AppUtils.DEV_MODE) {
+			var linksDiv = $("<div class='flex_horizontal flex_justify_end'>").appendTo(div);
+			var oneOfEachLink = $("<div class='form_link'>").appendTo(linksDiv);
+			oneOfEachLink.html("One of each");
+			oneOfEachLink.click(function() {
+				that.empty();
+				for (var i = 0; i < plugins.length; i++) that.add(plugins[i].getTicker());
+				that.validate();
+			});
+		}
+		
 		// currency inputs div
 		currencyInputsDiv = $("<div class='currency_inputs_div'>").appendTo(div);
 		
@@ -3553,8 +3565,8 @@ function EditorCurrenciesController(div, plugins) {
 		if (!currencyInputs.length) return;
 		for (var i = 0; i < currencyInputs.length; i++) currencyInputs[i].getDiv().remove();
 		currencyInputs = [];
-		if (onInputsChange) onInputsChange();
 		updateFormError();
+		invoke(inputChangeListeners);
 	};
 	
 	this.reset = function() {

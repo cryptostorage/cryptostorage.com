@@ -523,7 +523,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .form_link {
-	font-size: 18px;
+	font-size: 17px;
 	color: blue;
 	font-weight: lighter;
 }
@@ -555,14 +555,14 @@ input[type='checkbox'][disabled] +label {
 	width: 100%;
 }
 
-.currency_inputs_div:first-child {
-	border-top: 2.5px solid;
-}
-
 .currency_input_div {
 	border-style:solid;
 	border-width: 0 2.5px 2.5px 2.5px;
 	padding: 15px;
+}
+
+.currency_input_div:first-child {
+	border-top: 2.5px solid;
 }
 
 .currency_input_right_div {
@@ -1188,10 +1188,6 @@ input[type='checkbox'][disabled] +label {
 .editor_body_div {
 	padding-top: 40px;
 	width: 750px;
-}
-
-.editor_content_div, .editor_content_div * {
-	font-size: 24px;
 }
 
 .editor_floating_controls {

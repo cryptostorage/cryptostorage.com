@@ -1,5 +1,4 @@
 v0.3.0
-dev mode one of each button
 transfer tests
 view split pieces in editor
 ability to cancel import decryption, piece generation
