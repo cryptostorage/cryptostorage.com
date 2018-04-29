@@ -2492,7 +2492,9 @@ var AppUtils = {
 	},
 	
 	/**
-	 * Extracts named pieces from the given file.
+	 * Extracts named pieces from the given file (json, csv, txt, or zip).
+	 * 
+	 * Throws an error if given invalid non-zip file.  Otherwise returns whatever pieces can be extracted.
 	 * 
 	 * @param file is the file to get named pieces from
 	 * @param onDone(err, namedPieces) is invoked when extraction is done
@@ -2505,9 +2507,8 @@ var AppUtils = {
 			var data = reader.result;
 			
 			// read zip
-			if (isZipFile(file)) AppUtils.zipToNamedPieces(data, function(err, namedPieces) {
+			if (isZipFile(file)) zipToNamedPieces(data, function(err, namedPieces) {
 				if (err) onDone(err);
-				else if (!namedPieces.length) onDone(new Error(file.name + " does not contain valid pieces"));
 				else onDone(null, namedPieces);
 			});
 			
@@ -2520,8 +2521,7 @@ var AppUtils = {
 					else if (isTxtFile(file)) throw new Error("TXT not implemented");
 					else throw new Error("Unrecognized file type: " + file.name);
 				} catch (err) {
-					console.log(err);
-					onDone(new Error(file.name + " is not a valid piece"));
+					onDone(err);
 					return;
 				}
 				assertInitialized(piece);
@@ -2533,71 +2533,71 @@ var AppUtils = {
 		if (isJsonFile(file) || isCsvFile(file) || isTxtFile(file)) reader.readAsText(file);
 		else if (isZipFile(file)) reader.readAsArrayBuffer(file);
 		else onDone(new Error(file.name + " is not a json, csv, txt, or zip file"));
+		
+		/**
+		 * Extracts pieces from a zip blob.
+		 * 
+		 * @param blob is the raw zip data
+		 * @param onDone(err, namedPieces) is called when all pieces have been extracted
+		 */
+		function zipToNamedPieces(blob, onDone) {
+			
+			// load zip
+			JSZip.loadAsync(blob).then(function(zip) {
+				
+				// collect callback functions to get pieces
+				var funcs = [];
+				zip.forEach(function(path, zipObject) {
+					if (path.startsWith("_")) return;
+					if (path.endsWith(".json") || path.endsWith(".csv") || path.endsWith(".txt")) {
+						funcs.push(getPieceCallbackFunction(zipObject));
+					} else if (path.endsWith(".zip")) {
+						funcs.push(getZipCallbackFunction(zipObject));
+					}
+				});
+				
+				// invoke callback functions to get named pieces
+				async.parallel(funcs, function(err, results) {
+					if (err) {
+						onDone(err);
+						return;
+					}
+					var namedPieces = [];
+					for (var i = 0; i < results.length; i++) {
+						var result = results[i];
+						if (result === null) continue;
+						else if (isArray(result)) {
+							for (var j = 0; j < result.length; j++) namedPieces.push(result[j]);
+						}
+						else namedPieces.push(result);
+					}
+					onDone(null, namedPieces);
+				});
+			});
+			
+			function getPieceCallbackFunction(zipObject) {
+				return function(onDone) {
+					zipObject.async("string").then(function(str) {
+						try {
+							if (zipObject.name.endsWith(".json")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({json: str})});
+							else if (zipObject.name.endsWith(".csv")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({csv: str})});
+							else if (zipObject.name.endsWith(".txt")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({json: str})});
+							else throw new Error("Unrecognized file type: " + zipObject.name);
+						} catch (err) {
+							console.log(err);
+							onDone(null, null);	// simply skip this file
+						}
+					});
+				}
+			}
+			
+			function getZipCallbackFunction(zipObject) {
+				return function(onDone) {
+					zipObject.async("blob").then(function(blob) {
+						zipToNamedPieces(blob, onDone);
+					});
+				}
+			}
+		}
 	},
-	
-	/**
-	 * Extracts pieces from a zip blob.
-	 * 
-	 * @param blob is the raw zip data
-	 * @param onDone(err, namedPieces) is called when all pieces have been extracted
-	 */
-	zipToNamedPieces: function(blob, onDone) {
-		
-		// load zip
-		JSZip.loadAsync(blob).then(function(zip) {
-			
-			// collect callback functions to get pieces
-			var funcs = [];
-			zip.forEach(function(path, zipObject) {
-				if (path.startsWith("_")) return;
-				if (path.endsWith(".json") || path.endsWith(".csv") || path.endsWith(".txt")) {
-					funcs.push(getPieceCallbackFunction(zipObject));
-				} else if (path.endsWith(".zip")) {
-					funcs.push(getZipCallbackFunction(zipObject));
-				}
-			});
-			
-			// invoke callback functions to get named pieces
-			async.parallel(funcs, function(err, results) {
-				if (err) {
-					onDone(err);
-					return;
-				}
-				var namedPieces = [];
-				for (var i = 0; i < results.length; i++) {
-					var result = results[i];
-					if (result === null) continue;
-					else if (isArray(result)) {
-						for (var j = 0; j < result.length; j++) namedPieces.push(result[j]);
-					}
-					else namedPieces.push(result);
-				}
-				onDone(null, namedPieces);
-			});
-		});
-		
-		function getPieceCallbackFunction(zipObject) {
-			return function(onDone) {
-				zipObject.async("string").then(function(str) {
-					try {
-						if (zipObject.name.endsWith(".json")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({json: str})});
-						else if (zipObject.name.endsWith(".csv")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({csv: str})});
-						else if (zipObject.name.endsWith(".txt")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({json: str})});
-						else throw new Error("Unrecognized file type: " + zipObject.name);
-					} catch (err) {
-						console.log(err);
-						onDone(null, null);	// simply skip this file
-					}
-				});
-			}
-		}
-		
-		function getZipCallbackFunction(zipObject) {
-			return function(onDone) {
-				zipObject.async("blob").then(function(blob) {
-					AppUtils.zipToNamedPieces(blob, onDone);
-				});
-			}
-		}
-	}
 }

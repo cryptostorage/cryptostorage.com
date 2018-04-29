@@ -1431,11 +1431,16 @@ function ImportFileController(div) {
 		function readFileFunc(file) {
 			return function(onDone) {
 				AppUtils.fileToNamedPieces(file, function(err, namedPieces) {
-					if (err) {
-						setWarning(err.message);
-						onDone(null, null);
+					if (isZipFile(file)) {
+						if (err) throw err;
+						if (namedPieces.length === 0) setWarning(file.name + " does not contain valid pieces");
+						onDone(null, namedPieces);
 					} else {
-						assertTrue(namedPieces.length > 0);
+						if (err) {
+							setWarning(file.name + " is not a valid piece");
+						} else {
+							assertTrue(namedPieces.length === 1);
+						}
 						onDone(null, namedPieces);
 					}
 				})
@@ -1632,7 +1637,7 @@ function ImportFileController(div) {
 			onUnsplitPieceImported(importedPieces, piece);
 		} catch (err) {
 			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
-			else setWarning(err.message);
+			else setWarning("Pieces are not compatible shares");
 		}
 		
 		// done rendering

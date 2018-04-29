@@ -666,6 +666,8 @@ function TestCrypto() {
 			funcs.push(testIncompatibleShares());
 //			funcs.push(testDuplicateName());
 //			funcs.push(testUnsupportedFileType());
+//		funcs.push(testZip());
+//		funcs.push(testInvalidZip());
 			
 			// run tests async
 			async.series(funcs, function(err, results) {
@@ -749,6 +751,7 @@ function TestCrypto() {
 				fileImporter.addFiles([file1, file2], function(err) {
 					assertEquals(2, fileImporter.getNamedPieces().length);
 					assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+					onDone();
 				});
 			}
 		}
