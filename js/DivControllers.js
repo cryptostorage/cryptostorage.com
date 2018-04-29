@@ -1434,12 +1434,11 @@ function ImportFileController(div) {
 					if (isZipFile(file)) {
 						if (err) throw err;
 						if (namedPieces.length === 0) setWarning(file.name + " does not contain valid pieces");
+					} else if (isJsonFile(file) || isCsvFile(file) || isTxtFile(file)) {
+						if (err) setWarning(file.name + " is not a valid piece");
+						else assertTrue(namedPieces.length === 1);
 					} else {
-						if (err) {
-							setWarning(file.name + " is not a valid piece");
-						} else {
-							assertTrue(namedPieces.length === 1);
-						}
+						setWarning(file.name + " is not a json, csv, txt, or zip file");
 					}
 					onDone(null, namedPieces);
 				});

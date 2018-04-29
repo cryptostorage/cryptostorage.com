@@ -33,7 +33,6 @@ function TestCrypto() {
 		// test file import
 		testFileImport(plugins, function(err) {
 			if (err) throw err;
-			throw new Error("Congrats bro your file import tests pass");
 			
 			// test generate pieces
 			testGeneratePieces(plugins, function(err) {
@@ -669,9 +668,9 @@ function TestCrypto() {
 			funcs.push(testInvalidPieces());
 			funcs.push(testIncompatibleShares());
 			funcs.push(testDuplicateNames());
+			funcs.push(testUnsupportedFileTypes());
 			funcs.push(testZip());
 //		funcs.push(testInvalidZip());
-//		funcs.push(testUnsupportedFileTypes());
 			
 			// run tests async
 			async.series(funcs, function(err, results) {
@@ -858,6 +857,19 @@ function TestCrypto() {
 						assertEquals("", fileImporter.getWarning());
 						onDone();
 					});
+				});
+			}
+		}
+		
+		function testUnsupportedFileTypes() {
+			return function(onDone) {
+				fileImporter.startOver();
+				var file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo"}]}', "file1.jpg", "image/jpg");
+				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneCaD85wAWaLRggV6jqeKoYh1qeadp1WWG85Hgmgvf5Sf36"}]}', "file2.png", "image/png");
+				fileImporter.addFiles([file1, file2], function() {
+					assertEquals(0, fileImporter.getNamedPieces().length);
+					assertEquals("file2.png is not a json, csv, txt, or zip file", fileImporter.getWarning());
+					onDone();
 				});
 			}
 		}
