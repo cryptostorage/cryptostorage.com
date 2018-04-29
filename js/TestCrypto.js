@@ -501,7 +501,7 @@ function TestCrypto() {
 		// test init from json
 		piece2 = new CryptoPiece({json: piece.toJson()});
 		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
-		assertTrue(piece.equals(piece2, true));
+		assertTrue(piece.equals(piece2));
 		
 		// test init from json string
 		piece2 = new CryptoPiece({json: piece.toString(AppUtils.FileType.JSON)});
@@ -669,7 +669,7 @@ function TestCrypto() {
 			funcs.push(testInvalidPieces());
 			funcs.push(testIncompatibleShares());
 			funcs.push(testDuplicateNames());
-//		funcs.push(testZip());
+			funcs.push(testZip());
 //		funcs.push(testInvalidZip());
 //		funcs.push(testUnsupportedFileTypes());
 			
@@ -830,6 +830,49 @@ function TestCrypto() {
 					assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
 					assertEquals("Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo", fileImporter.getNamedPieces()[0].piece.getKeypairs()[0].getPrivateWif());
 					onDone();
+				});
+			}
+		}
+		
+//		function testZip() {
+//			return function(onDone) {
+//				fileImporter.startOver();
+//				var file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo"}]}', "file1.json", AppUtils.FileType.JSON);
+//				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneCaD85wAWaLRggV6jqeKoYh1qeadp1WWG85Hgmgvf5Sf36"}]}', "file1.json", AppUtils.FileType.JSON);
+//				fileImporter.addFiles([file1, file2], function() {
+//					assertEquals(1, fileImporter.getNamedPieces().length);
+//					assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
+//					assertEquals("Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo", fileImporter.getNamedPieces()[0].piece.getKeypairs()[0].getPrivateWif());
+//					throw new Error("So so close");
+//					onDone();
+//				});
+//			}
+//		}
+		
+		function testZip() {
+			return function(onDone) {
+				
+				// build piece
+				var keypairs = [];
+				for (var i = 0; i < plugins.length; i++) keypairs.push(new CryptoKeypair({plugin: plugins[i]}));
+				var piece = new CryptoPiece({keypairs: keypairs});
+				
+				// split piece
+				var splitPieces = piece.split(NUM_PIECES, MIN_PIECES);
+				
+				// convert to zip file
+				AppUtils.piecesToBlob(splitPieces, AppUtils.FileType.CSV, function(err, blob, name) {
+					assertNull(err);
+					blob.lastModifiedDate = new Date();
+			    blob.name = name;
+					
+			    // import
+			    fileImporter.startOver();
+			    fileImporter.addFiles([blob], function() {
+						assertEquals(NUM_PIECES, fileImporter.getNamedPieces().length);
+						assertEquals("", fileImporter.getWarning());
+						onDone();
+					});
 				});
 			}
 		}

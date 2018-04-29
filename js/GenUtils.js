@@ -313,7 +313,9 @@ function assertUndefined(arg, msg) {
  * @param msg is the message to throw if arg is not initialized (optional)
  */
 function assertInitialized(arg, msg) {
-	if (isUninitialized(arg)) throw new Error(msg ? msg : "Argument asserted as initialized but was " + arg);
+	if (isUninitialized(arg)) {
+		throw new Error(msg ? msg : "Argument asserted as initialized but was " + arg);
+	}
 }
 
 /**

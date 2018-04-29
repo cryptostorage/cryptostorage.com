@@ -1423,7 +1423,7 @@ function ImportFileController(div) {
 		if (decryptionController) decryptionController.cancel();
 	}
 	
-	this.addFiles = function(files, onDone) {
+	this.addFiles = function(files, onDone, isTest) {
 		
 		// collect functions to read files
 		var funcs = [];
@@ -1434,16 +1434,15 @@ function ImportFileController(div) {
 					if (isZipFile(file)) {
 						if (err) throw err;
 						if (namedPieces.length === 0) setWarning(file.name + " does not contain valid pieces");
-						onDone(null, namedPieces);
 					} else {
 						if (err) {
 							setWarning(file.name + " is not a valid piece");
 						} else {
 							assertTrue(namedPieces.length === 1);
 						}
-						onDone(null, namedPieces);
 					}
-				})
+					onDone(null, namedPieces);
+				});
 			};
 		}
 		
@@ -1576,13 +1575,13 @@ function ImportFileController(div) {
 		return false;
 	}
 	
-	function addNamedPieces(namedPieces, onDone) {
+	function addNamedPieces(namedPieces) {
 		for (var i = 0; i < namedPieces.length; i++) {
 			var namedPiece = namedPieces[i];
 			assertObject(namedPiece.piece, CryptoPiece);
 			if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
 		}
-		updatePieces(onDone);
+		updatePieces();
 	}
 	
 	function removePieces() {
@@ -1603,7 +1602,7 @@ function ImportFileController(div) {
 		throw new Error("No piece with name '" + name + "' imported");
 	}
 	
-	function updatePieces(onDone) {
+	function updatePieces() {
 		
 		// update UI
 		setWarning("");
@@ -1615,10 +1614,7 @@ function ImportFileController(div) {
 		for (var i = 0; i < importedNamedPieces.length; i++) importedPieces.push(importedNamedPieces[i].piece);
 		
 		// done if no pieces
-		if (importedPieces.length === 0) {
-			if (onDone) onDone();
-			return;
-		}
+		if (importedPieces.length === 0) return
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
@@ -1642,9 +1638,6 @@ function ImportFileController(div) {
 				setWarning("Pieces are not compatible shares");
 			}
 		}
-		
-		// done rendering
-		if (onDone) onDone();
 	}
 	
 	function renderImportedPieces(namedPieces) {

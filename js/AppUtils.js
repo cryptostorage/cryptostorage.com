@@ -2507,10 +2507,12 @@ var AppUtils = {
 			var data = reader.result;
 			
 			// read zip
-			if (isZipFile(file)) zipToNamedPieces(data, function(err, namedPieces) {
-				if (err) onDone(err);
-				else onDone(null, namedPieces);
-			});
+			if (isZipFile(file)) {
+				zipToNamedPieces(data, function(err, namedPieces) {
+					if (err) onDone(err);
+					else onDone(null, namedPieces);
+				});
+			}	
 			
 			// read json, csv, or txt
 			else {
@@ -2578,15 +2580,16 @@ var AppUtils = {
 			function getPieceCallbackFunction(zipObject) {
 				return function(onDone) {
 					zipObject.async("string").then(function(str) {
+						var piece = null;
 						try {
-							if (zipObject.name.endsWith(".json")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({json: str})});
-							else if (zipObject.name.endsWith(".csv")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({csv: str})});
-							else if (zipObject.name.endsWith(".txt")) onDone(null, {name: zipObject.name, piece: new CryptoPiece({json: str})});
+							if (zipObject.name.endsWith(".json")) piece = new CryptoPiece({json: str});
+							else if (zipObject.name.endsWith(".csv")) piece = new CryptoPiece({csv: str});
+							else if (zipObject.name.endsWith(".txt")) piece = new CryptoPiece({json: str});
 							else throw new Error("Unrecognized file type: " + zipObject.name);
 						} catch (err) {
-							console.log(err);
-							onDone(null, null);	// simply skip this file
+							console.log(err);	// simply skip this file
 						}
+						onDone(null, piece ? {name: zipObject.name, piece} : null);
 					});
 				}
 			}
