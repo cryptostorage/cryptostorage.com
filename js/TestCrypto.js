@@ -23,8 +23,8 @@ function TestCrypto() {
 		// test utils
 		testUtils();
 		
-		// test new keypairs
-		console.log("Testing keypair creation");
+		// test keypairs
+		console.log("Testing keypairs");
 		for (var i = 0; i < plugins.length; i++) {
 			testPlugin(plugins[i]);
 			testKeypairs(plugins[i]);
@@ -174,6 +174,8 @@ function TestCrypto() {
 			assertNull(keypair.getMinShares());
 			assertTrue(plugin.isAddress(keypair.getPublicAddress()));
 		}
+		
+		// TODO: test creation of keypair from hex and wif and assert equals
 		
 		// test invalid private keys
 		// TODO: CryptoKey sometimes accepts invalid PKs because of split/encryption encoding
@@ -496,6 +498,8 @@ function TestCrypto() {
 		} catch (err) {
 			if (err.message === "fail") throw new Error("Should not be able to set pieceNum on unencrypted keys");
 		}
+		
+		// TODO: test init with invalid public address
 		
 		// test init from json
 		piece2 = new CryptoPiece({json: piece.toJson()});

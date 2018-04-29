@@ -1,4 +1,6 @@
 v0.3.0
+view split pieces in editor
+
 put homepage text in index.html and dynamically hide for seo
 footer
 notice color gradient
