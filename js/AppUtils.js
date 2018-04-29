@@ -2507,7 +2507,7 @@ var AppUtils = {
 			// read zip
 			if (isZipFile(file)) AppUtils.zipToNamedPieces(data, function(err, namedPieces) {
 				if (err) onDone(err);
-				else if (!namedPieces.length) onDone(new Error("'" + file.name + "' does not contain valid pieces"));
+				else if (!namedPieces.length) onDone(new Error(file.name + " does not contain valid pieces"));
 				else onDone(null, namedPieces);
 			});
 			
@@ -2521,7 +2521,8 @@ var AppUtils = {
 					else throw new Error("Unrecognized file type: " + file.name);
 				} catch (err) {
 					console.log(err);
-					onDone(new Error("'" + file.name + "' is not a valid piece"));
+					onDone(new Error(file.name + " is not a valid piece"));
+					return;
 				}
 				assertInitialized(piece);
 				onDone(null, [{name: file.name, piece: piece}]);
@@ -2531,7 +2532,7 @@ var AppUtils = {
 		// read file
 		if (isJsonFile(file) || isCsvFile(file) || isTxtFile(file)) reader.readAsText(file);
 		else if (isZipFile(file)) reader.readAsArrayBuffer(file);
-		else onDone(new Error("File is not a json, csv, txt, or zip file"));
+		else onDone(new Error(file.name + " is not a json, csv, txt, or zip file"));
 	},
 	
 	/**

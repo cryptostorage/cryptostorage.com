@@ -659,11 +659,13 @@ function TestCrypto() {
 			
 			// get test functions
 			var funcs = [];
-			funcs.push(testValidUnencryptedJson());
-			funcs.push(testValidEncryptedJson());
-			funcs.push(testValidEncryptedCsv());
-			funcs.push(testWrongAddress());
-			funcs.push(testTwoIncompatible());
+			funcs.push(testUnencryptedJson());
+			funcs.push(testEncryptedJson());
+			funcs.push(testEncryptedCsv());
+			funcs.push(testInvalidPieces());
+			funcs.push(testIncompatibleShares());
+//			funcs.push(testDuplicateName());
+//			funcs.push(testUnsupportedFileType());
 			
 			// run tests async
 			async.series(funcs, function(err, results) {
@@ -676,7 +678,7 @@ function TestCrypto() {
 			return new File([str], name, {type: type});
 		}
 		
-		function testValidUnencryptedJson() {
+		function testUnencryptedJson() {
 			return function(onDone) {
 				fileImporter.startOver();
 				var file = getFile('{"keypairs":[{"ticker":"XMR","privateHex":"a233f87d3050d6a4d8c592e8bd617c34b832dab5e9c274a0b6d640e174190501"}]}', "file.json", AppUtils.FileType.JSON);
@@ -687,10 +689,10 @@ function TestCrypto() {
 			}
 		}
 		
-		function testValidEncryptedJson() {
+		function testEncryptedJson() {
 			return function(onDone) {
 				fileImporter.startOver();
-				var file = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"6PYUMuHUt6qtKDZ3EKdf5M5qMWnXiCrKTXJDDePAuGn2bTZ7afZnBGkpT4","address":"qzfwsjdlrvwtax9jrsfez996wg2ms2rh4sp2fsnk4k"}]}', "file.json", AppUtils.FileType.JSON);
+				var file = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"6PYUMuHUt6qtKDZ3EKdf5M5qMWnXiCrKTXJDDePAuGn2bTZ7afZnBGkpT4","publicAddress":"qzfwsjdlrvwtax9jrsfez996wg2ms2rh4sp2fsnk4k"}]}', "file.json", AppUtils.FileType.JSON);
 				fileImporter.addFiles([file], function(err) {
 					assertEquals("", fileImporter.getWarning());
 					onDone(err);
@@ -698,7 +700,7 @@ function TestCrypto() {
 			}
 		}
 		
-		function testValidEncryptedCsv() {
+		function testEncryptedCsv() {
 			return function(onDone) {
 				fileImporter.startOver();
 				var file = getFile('TICKER,PRIVATE_WIF,PUBLIC_ADDRESS\nBCH,6PYUMuHUt6qtKDZ3EKdf5M5qMWnXiCrKTXJDDePAuGn2bTZ7afZnBGkpT4,qzfwsjdlrvwtax9jrsfez996wg2ms2rh4sp2fsnk4k', "file.csv", AppUtils.FileType.CSV);
@@ -708,26 +710,45 @@ function TestCrypto() {
 				});
 			}
 		}
-		
-		function testWrongAddress() {
+
+		// TODO: test invalid json
+		function testInvalidPieces() {	
 			return function(onDone) {
 				fileImporter.startOver();
-				var file = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"Kx4vXtwwNsoAgXcdpnsDH88hZJLcfV9MDQGoMMUPFut1X8SxxWZS","address":"qzgcajsew55vwjm5e7990mc2rhnqzx5qu59t3el4lj"}]}', "file.json", AppUtils.FileType.JSON);
-				fileImporter.addFiles([file], function(err) {
-					assertEquals("Piece is invalid", fileImporter.getWarning());
-					onDone(err);
+				
+				// test invalid address
+				var file = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"Kx4vXtwwNsoAgXcdpnsDH88hZJLcfV9MDQGoMMUPFut1X8SxxWZS","publicAddress":"qzgcajsew55vwjm5e7990mc2rhnqzx5qu59t3el4lj"}]}', "file.json", AppUtils.FileType.JSON);
+				fileImporter.addFiles([file], function() {
+					assertEquals("file.json is not a valid piece", fileImporter.getWarning());
+					assertEquals(0, fileImporter.getNamedPieces().length);
+					
+					// test incorrect address
+					file = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"Kx4vXtwwNsoAgXcdpnsDH88hZJLcfV9MDQGoMMUPFut1X8SxxWZS","publicAddress":"1C4HXwb7tAF86ZwRARMBPuPo4Aa9cF6FTh"}]}', "file.json", AppUtils.FileType.JSON);
+					fileImporter.addFiles([file], function() {
+						assertEquals("file.json is not a valid piece", fileImporter.getWarning());
+						assertEquals(0, fileImporter.getNamedPieces().length);
+						
+						// test multiple invalid files
+						var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"L1M7y3uauihKeEQG1gGFk4mwakktNSL97oajEs3jnz5cV11s8xNz","publicAddress":"qzj2w0f8jlck5syrm5c86le30sfzldkcj507djaj3k"}]}', "file2.json", AppUtils.FileType.JSON);
+						fileImporter.addFiles([file, file2], function() {
+							assertEquals("file2.json is not a valid piece", fileImporter.getWarning());
+							assertEquals(0, fileImporter.getNamedPieces().length);
+							onDone();
+						});
+					});
 				});
 			}
 		}
 		
-		function testTwoIncompatible() {
+		// TODO: test same currency
+		function testIncompatibleShares() {
 			return function(onDone) {
 				fileImporter.startOver();
 				var file1 = getFile('{"keypairs":[{"ticker":"XMR","privateHex":"a233f87d3050d6a4d8c592e8bd617c34b832dab5e9c274a0b6d640e174190501"}]}', "file1.json", AppUtils.FileType.JSON);
 				var file2 = getFile('{"keypairs":[{"ticker":"BTC","privateHex":"754a95ba26a3bc80f2a6cacdb6ccf24c99adb7744d8cdb3eadb96d18743b1c6e"}]}', "file2.json", AppUtils.FileType.JSON);
 				fileImporter.addFiles([file1, file2], function(err) {
-					assertEquals("Pieces are for different cryptocurrencies", fileImporter.getWarning());
-					onDone(err);
+					assertEquals(2, fileImporter.getNamedPieces().length);
+					assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
 				});
 			}
 		}

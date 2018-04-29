@@ -1410,23 +1410,8 @@ function ImportFileController(div) {
 		return that.warningMsg;
 	}
 	
-	this.setWarning = function(str, img) {
-		that.warningMsg = str;
-		warningDiv.hide();
-		warningDiv.empty();
-		if (str) {
-			if (!img) img = $("<img src='img/caution.png'>");
-			warningDiv.append(img);
-			img.addClass("import_warning_div_icon");
-			warningDiv.append(str);
-			warningDiv.show();
-		} else {
-			warningDiv.hide();
-		}
-	}
-	
 	this.startOver = function() {
-		that.setWarning("");
+		setWarning("");
 		inputFiles.val("");
 		importedStorageDiv.hide();
 		importInputDiv.show();
@@ -1447,7 +1432,7 @@ function ImportFileController(div) {
 			return function(onDone) {
 				AppUtils.fileToNamedPieces(file, function(err, namedPieces) {
 					if (err) {
-						that.setWarning(err.message);
+						setWarning(err.message);
 						onDone(null, null);
 					} else {
 						assertTrue(namedPieces.length > 0);
@@ -1459,10 +1444,7 @@ function ImportFileController(div) {
 		
 		// read files
 		async.parallel(funcs, function(err, results) {
-			if (err) {
-				if (onDone) onDone(err);
-				return;
-			}
+			if (err) throw err;
 			
 			// collect named pieces from all files
 			var namedPieces = [];
@@ -1474,6 +1456,10 @@ function ImportFileController(div) {
 			if (namedPieces.length) addNamedPieces(namedPieces);
 			if (onDone) onDone();
 		});
+	}
+	
+	this.getNamedPieces = function() {
+		return importedNamedPieces;
 	}
 	
 	// ------------------------ PRIVATE ------------------
@@ -1490,10 +1476,25 @@ function ImportFileController(div) {
 		link.click(function() { onClick(); });
 	}
 	
+	function setWarning(str, img) {
+		that.warningMsg = str;
+		warningDiv.hide();
+		warningDiv.empty();
+		if (str) {
+			if (!img) img = $("<img src='img/caution.png'>");
+			warningDiv.append(img);
+			img.addClass("import_warning_div_icon");
+			warningDiv.append(str);
+			warningDiv.show();
+		} else {
+			warningDiv.hide();
+		}
+	}
+	
 	function onUnsplitPieceImported(importedPieces, piece) {
 		assertObject(piece, CryptoPiece);
 		resetControls();
-		that.setWarning("");
+		setWarning("");
 		
 		// encrypted piece
 		if (piece.isEncrypted()) {
@@ -1515,7 +1516,7 @@ function ImportFileController(div) {
 			});
 			
 			// register decryption controller callbacks
-			decryptionController.onWarning(function(warning) { that.setWarning(warning); });
+			decryptionController.onWarning(function(warning) { setWarning(warning); });
 			decryptionController.onDecrypted(function(piece, pieceRenderer) {
 				showInlineStorage(importedPieces, piece, pieceRenderer);
 			});
@@ -1589,7 +1590,7 @@ function ImportFileController(div) {
 		for (var i = 0; i < importedNamedPieces.length; i++) {
 			if (importedNamedPieces[i].name === name) {
 				importedNamedPieces.splice(i, 1);
-				that.setWarning("");
+				setWarning("");
 				updatePieces();
 				return;
 			}
@@ -1600,7 +1601,7 @@ function ImportFileController(div) {
 	function updatePieces(onDone) {
 		
 		// update UI
-		that.setWarning("");
+		setWarning("");
 		renderImportedPieces(importedNamedPieces);
 		resetControls();
 		
@@ -1630,23 +1631,12 @@ function ImportFileController(div) {
 			var piece = new CryptoPiece({splitPieces: importedPieces});
 			onUnsplitPieceImported(importedPieces, piece);
 		} catch (err) {
-			if (err.message.indexOf("additional piece") > -1) that.setWarning(err.message, $("<img src='img/files.png'>"));
-			else that.setWarning(err.message);
+			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
+			else setWarning(err.message);
 		}
 		
 		// done rendering
 		if (onDone) onDone();
-		
-		// TODO: unused?
-//		function keysDifferent(keys1, keys2) {
-//			if (!keys1 && keys2) return true;
-//			if (keys1 && !keys2) return true;
-//			if (keys1.length !== keys2.length) return true;
-//			for (var i = 0; i < keys1.length; i++) {
-//				if (!keys1[i].equals(keys2[i])) return true;
-//			}
-//			return false;
-//		}
 	}
 	
 	function renderImportedPieces(namedPieces) {
