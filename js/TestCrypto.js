@@ -834,21 +834,6 @@ function TestCrypto() {
 			}
 		}
 		
-//		function testZip() {
-//			return function(onDone) {
-//				fileImporter.startOver();
-//				var file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo"}]}', "file1.json", AppUtils.FileType.JSON);
-//				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneCaD85wAWaLRggV6jqeKoYh1qeadp1WWG85Hgmgvf5Sf36"}]}', "file1.json", AppUtils.FileType.JSON);
-//				fileImporter.addFiles([file1, file2], function() {
-//					assertEquals(1, fileImporter.getNamedPieces().length);
-//					assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
-//					assertEquals("Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo", fileImporter.getNamedPieces()[0].piece.getKeypairs()[0].getPrivateWif());
-//					throw new Error("So so close");
-//					onDone();
-//				});
-//			}
-//		}
-		
 		function testZip() {
 			return function(onDone) {
 				
