@@ -4,6 +4,7 @@
  * File import tests can only be run on browsers which support the File constructor.
  * 
  * TODO: test initializing piece with split keypairs with different min shares / share num
+ * TODO: test importing files without private keys
  */
 function TestCrypto() {
 	

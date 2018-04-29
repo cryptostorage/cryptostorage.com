@@ -1,49 +1,34 @@
 v0.3.0
+dev mode one of each button
+transfer tests
 view split pieces in editor
-
-put homepage text in index.html and dynamically hide for seo
+ability to cancel import decryption, piece generation
+text parser
+print
+export of addresses only exports single file
+decryption / generation announces 0% then breathes
+backwards compatibility
+direct link to editor
 footer
 notice color gradient
-interoperability disclaimer if passphrase/split checked
-precise static and dynamic dependencies
-direct link to editor
-piece incompatibilities: shareNum, currencies -> keypairs
+action controller bottom center if not enough width
+click outside dropdown only works if click within container
+interoperability disclosure
+performance tests and optimizations
+
+split lines bolder
+split validation should fail on -1
 increase test repeat
-optimize private functions for performance
+put homepage text in index.html and dynamically hide for seo
+precise static and dynamic dependencies
 update bip38 cryptojs description with pbkdf if necessary
 add support for dogecoin
 tippls
-import from txt string
-test setPieceNum
-ability to cancel import decryption, piece generation
-on decrypt decrypt progress bar should show 0%, not getting 0% onProgress()
-split validation should fail on -1
 split form error remains highlighted after split disabled
 see if there are wasteful loops in editor listeners
-able to add duplicate keys on text import: bip39 2xpTFr7i6SY1Cd7SLEcKSEU4FTeML2qcdUSLVkMg364iAjw7Wt
-xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share even though not same length as proper split share
-	auto detect length? LTC different hex sizes:
-		48adb31f61c9d82c54cde60789dfeb57ed9998074c691a847516edaae964b11c
-		67a87e6c0038dccf8092a2b3685f35c98cb9ac0b56b197055edcd1d76fc857
-"Need one additional share to recover private key" is from keypair, but imported piece contains multiple private keys
+xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share
 tippy jerk when editor first loaded
-compatability disclosure
-backwards compatibility
-file import incompatible pieces shows warning for developer, need to test user warnings
-export of addresses only exports single file, test importing file without private keys
 make progress bar its own controller
-
-editor:
-	bip38 support
-	generate disabled, cancel enabled during generation
-	save/print pop-ups
-	floating forms bottom center if not enough width
-	copied tooltip
-	dev mode one of each button
-	split lines bolder
-	tweak floating button colors
-	click outside dropdown only works if click within container
-	keypair labels arrows
 
 designer:
 passphrase confirmation
