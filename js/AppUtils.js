@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.3.0",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: false,
+	RUN_FULL_TESTS: true,
 	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
@@ -2513,18 +2513,18 @@ var AppUtils = {
 			
 			// read json, csv, or txt
 			else {
+				var piece;
 				try {
-					var piece;
 					if (isJsonFile(file)) piece = new CryptoPiece({json: data});
 					else if (isCsvFile(file)) piece = new CryptoPiece({csv: data});
 					else if (isTxtFile(file)) throw new Error("TXT not implemented");
 					else throw new Error("Unrecognized file type: " + file.name);
-					assertInitialized(piece);
-					onDone(null, [{name: file.name, piece: piece}]);
 				} catch (err) {
 					console.log(err);
 					onDone(new Error("'" + file.name + "' is not a valid piece"));
 				}
+				assertInitialized(piece);
+				onDone(null, [{name: file.name, piece: piece}]);
 			}
 		}
 		

@@ -483,5 +483,9 @@ CryptoPiece.parse = function(str, plugin) {
 	}
 	
 	// return piece
-	return new CryptoPiece({keypairs: keypairs});
+	try {
+		return new CryptoPiece({keypairs: keypairs});
+	} catch (err) {
+		return null;
+	}
 }

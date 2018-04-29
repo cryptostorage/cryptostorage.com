@@ -704,7 +704,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (!environmentFailure) UiUtils.openEditorTab(plugin.getName() + " Storage", {genConfig: getGenConfig(plugin)}); 
+			if (AppUtils.DEV_MODE || !environmentFailure) UiUtils.openEditorTab(plugin.getName() + " Storage", {genConfig: getGenConfig(plugin)}); 
 		}
 		
 		function getGenConfig(plugin) {
@@ -1380,14 +1380,14 @@ function ImportFileController(div) {
 		
 		// register browse link with hidden input
 		inputFiles = $("<input type='file' multiple accept='.json,.csv,.zip'>").appendTo(dragDropDiv);
-		inputFiles.change(function() { onFilesImported($(this).get(0).files); });
+		inputFiles.change(function() { that.addFiles($(this).get(0).files); });
 		inputFiles.hide();
 		dragDropBrowse.click(function() {
 			inputFiles.click();
 		});
 		
 		// setup drag and drop
-		setupDragAndDrop(dragDropDiv, onFilesImported);
+		setupDragAndDrop(dragDropDiv, that.addFiles);
 		
 		// imported files
 		importedPiecesDiv = $("<div class='import_imported_pieces'>").appendTo(fileInputDiv);
@@ -1425,15 +1425,6 @@ function ImportFileController(div) {
 		}
 	}
 	
-	this.addNamedPieces = function(namedPieces, onDone) {
-		for (var i = 0; i < namedPieces.length; i++) {
-			var namedPiece = namedPieces[i];
-			assertObject(namedPiece.piece, CryptoPiece);
-			if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
-		}
-		updatePieces(onDone);
-	}
-	
 	this.startOver = function() {
 		that.setWarning("");
 		inputFiles.val("");
@@ -1445,6 +1436,44 @@ function ImportFileController(div) {
 		controlsDiv.hide();
 		removePieces();
 		if (decryptionController) decryptionController.cancel();
+	}
+	
+	this.addFiles = function(files, onDone) {
+		
+		// collect functions to read files
+		var funcs = [];
+		for (var i = 0; i < files.length; i++) funcs.push(readFileFunc(files[i]));
+		function readFileFunc(file) {
+			return function(onDone) {
+				AppUtils.fileToNamedPieces(file, function(err, namedPieces) {
+					if (err) {
+						that.setWarning(err.message);
+						onDone(null, null);
+					} else {
+						assertTrue(namedPieces.length > 0);
+						onDone(null, namedPieces);
+					}
+				})
+			};
+		}
+		
+		// read files
+		async.parallel(funcs, function(err, results) {
+			if (err) {
+				if (onDone) onDone(err);
+				return;
+			}
+			
+			// collect named pieces from all files
+			var namedPieces = [];
+			for (var i = 0; i < results.length; i++) {
+				if (results[i]) namedPieces = namedPieces.concat(results[i]);
+			}
+			
+			// add all named pieces
+			if (namedPieces.length) addNamedPieces(namedPieces);
+			if (onDone) onDone();
+		});
 	}
 	
 	// ------------------------ PRIVATE ------------------
@@ -1534,46 +1563,20 @@ function ImportFileController(div) {
 		});
 	}
 	
-	// handle imported files
-	function onFilesImported(files) {
-		
-		// collect functions to read files
-		var funcs = [];
-		for (var i = 0; i < files.length; i++) funcs.push(readFileFunc(files[i]));
-		function readFileFunc(file) {
-			return function(onDone) {
-				AppUtils.fileToNamedPieces(file, function(err, namedPieces) {
-					if (err) {
-						that.setWarning(err.message);
-						onDone(null, null);
-					} else {
-						assertTrue(namedPieces.length > 0);
-						onDone(null, namedPieces);
-					}
-				})
-			};
-		}
-		
-		// read files
-		async.parallel(funcs, function(err, results) {
-			if (err) throw err;
-			
-			// collect named pieces from all files
-			var namedPieces = [];
-			for (var i = 0; i < results.length; i++) {
-				if (results[i]) namedPieces = namedPieces.concat(results[i]);
-			}
-			
-			// add all named pieces
-			if (namedPieces.length) that.addNamedPieces(namedPieces);
-		});
-	}
-	
 	function isPieceImported(name) {
 		for (var i = 0; i < importedNamedPieces.length; i++) {
 			if (importedNamedPieces[i].name === name) return true;
 		}
 		return false;
+	}
+	
+	function addNamedPieces(namedPieces, onDone) {
+		for (var i = 0; i < namedPieces.length; i++) {
+			var namedPiece = namedPieces[i];
+			assertObject(namedPiece.piece, CryptoPiece);
+			if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
+		}
+		updatePieces(onDone);
 	}
 	
 	function removePieces() {
@@ -1681,9 +1684,9 @@ function ImportFileController(div) {
 	 * Sets up a drag and drop zone.
 	 * 
 	 * @param div is the drop zone as a jquery node
-	 * @param onFilesImported(files) is called when files are dropped into the drop zone
+	 * @param onFilesAdded(files) is called when files are dropped into the drop zone
 	 */
-	function setupDragAndDrop(div, onFilesImported) {
+	function setupDragAndDrop(div, onFilesAdded) {
 		
 		// register drag and drop events
 		div.get(0).ondrop = function(event) {
@@ -1700,12 +1703,12 @@ function ImportFileController(div) {
 						files.push(dt.items[i].getAsFile());
 					}
 				}
-				onFilesImported(files);
+				onFilesAdded(files);
 			}
 			
 			// use DataTransfer interface to access file(s)
 			else {
-				onFilesImported(dt.files);
+				onFilesAdded(dt.files);
 			}
 		}
 		div.get(0).ondragenter = function(event) {

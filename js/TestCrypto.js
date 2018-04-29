@@ -1,5 +1,7 @@
 /**
  * Tests keypairs and pieces.
+ * 
+ * File import tests can only be run on browsers which support the File constructor.
  */
 function TestCrypto() {
 	
@@ -26,14 +28,19 @@ function TestCrypto() {
 			testKeypairs(plugins[i]);
 		}
 		
-		// test generate pieces
-		testGeneratePieces(plugins, function(err) {
+		// test file import
+		testFileImport(plugins, function(err) {
 			if (err) throw err;
 			
-			// test piece encryption and splitting
-			testPieceEncryption(plugins, function(err) {
+			// test generate pieces
+			testGeneratePieces(plugins, function(err) {
 				if (err) throw err;
-				onDone();
+				
+				// test piece encryption and splitting
+				testPieceEncryption(plugins, function(err) {
+					if (err) throw err;
+					onDone();
+				});
 			});
 		});
 	}
@@ -631,6 +638,98 @@ function TestCrypto() {
 				assertTrue(progressEnd);
 				onDone();
 			});
+		}
+	}
+	
+	function testFileImport(plugins, onDone) {
+		console.log("Testing file import");
+		
+		// check if browser supports File constructor
+		try {
+			new File([""], "filename.txt", {type: "text/plain"});
+		} catch (err) {
+			console.log("Skipping file import tests because browser does not support the File constructor");
+			onDone();
+			return;
+		}		
+		
+		// initialize controller
+		var fileImporter = new ImportFileController($("<div>"));
+		fileImporter.render(function() {
+			
+			// get test functions
+			var funcs = [];
+			funcs.push(testValidUnencryptedJson());
+			funcs.push(testValidEncryptedJson());
+			funcs.push(testValidEncryptedCsv());
+			funcs.push(testWrongAddress());
+			funcs.push(testTwoIncompatible());
+			
+			// run tests async
+			async.series(funcs, function(err, results) {
+				onDone(err);
+			});
+		});
+		
+		function getFile(str, name, type) {
+			assertString(str);
+			return new File([str], name, {type: type});
+		}
+		
+		function testValidUnencryptedJson() {
+			return function(onDone) {
+				fileImporter.startOver();
+				var file = getFile('{"keypairs":[{"ticker":"XMR","privateHex":"a233f87d3050d6a4d8c592e8bd617c34b832dab5e9c274a0b6d640e174190501"}]}', "file.json", AppUtils.FileType.JSON);
+				fileImporter.addFiles([file], function(err) {
+					assertEquals("", fileImporter.getWarning());
+					onDone(err);
+				});
+			}
+		}
+		
+		function testValidEncryptedJson() {
+			return function(onDone) {
+				fileImporter.startOver();
+				var file = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"6PYUMuHUt6qtKDZ3EKdf5M5qMWnXiCrKTXJDDePAuGn2bTZ7afZnBGkpT4","address":"qzfwsjdlrvwtax9jrsfez996wg2ms2rh4sp2fsnk4k"}]}', "file.json", AppUtils.FileType.JSON);
+				fileImporter.addFiles([file], function(err) {
+					assertEquals("", fileImporter.getWarning());
+					onDone(err);
+				});
+			}
+		}
+		
+		function testValidEncryptedCsv() {
+			return function(onDone) {
+				fileImporter.startOver();
+				var file = getFile('TICKER,PRIVATE_WIF,PUBLIC_ADDRESS\nBCH,6PYUMuHUt6qtKDZ3EKdf5M5qMWnXiCrKTXJDDePAuGn2bTZ7afZnBGkpT4,qzfwsjdlrvwtax9jrsfez996wg2ms2rh4sp2fsnk4k', "file.csv", AppUtils.FileType.CSV);
+				fileImporter.addFiles([file], function(err) {
+					assertEquals("", fileImporter.getWarning());
+					onDone(err);
+				});
+			}
+		}
+		
+		function testWrongAddress() {
+			return function(onDone) {
+				fileImporter.startOver();
+				var file = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"Kx4vXtwwNsoAgXcdpnsDH88hZJLcfV9MDQGoMMUPFut1X8SxxWZS","address":"qzgcajsew55vwjm5e7990mc2rhnqzx5qu59t3el4lj"}]}', "file.json", AppUtils.FileType.JSON);
+				fileImporter.addFiles([file], function(err) {
+					assertEquals("Piece is invalid", fileImporter.getWarning());
+					onDone(err);
+				});
+			}
+		}
+		
+		function testTwoIncompatible() {
+			return function(onDone) {
+				fileImporter.startOver();
+				var file1 = getFile('{"keypairs":[{"ticker":"XMR","privateHex":"a233f87d3050d6a4d8c592e8bd617c34b832dab5e9c274a0b6d640e174190501"}]}', "file1.json", AppUtils.FileType.JSON);
+				var file2 = getFile('{"keypairs":[{"ticker":"BTC","privateHex":"754a95ba26a3bc80f2a6cacdb6ccf24c99adb7744d8cdb3eadb96d18743b1c6e"}]}', "file2.json", AppUtils.FileType.JSON);
+				fileImporter.addFiles([file1, file2], function(err) {
+					assertEquals("Pieces are for different cryptocurrencies", fileImporter.getWarning());
+					onDone(err);
+				});
+			}
 		}
 	}
 }
