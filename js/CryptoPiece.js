@@ -181,22 +181,17 @@ function CryptoPiece(config) {
 	
 	this.isSplit = function() {
 		assertTrue(state.keypairs.length > 0);
-		var split = -1;
-		for (var i = 0; i < state.keypairs.length; i++) {
-			if (split === -1) split = state.keypairs[i].isSplit();
-			else if (split !== state.keypairs[i].isSplit()) throw new Error("keypair[" + i + "] has an inconsistent split state");
-		}
-		return split;
+		return state.keypairs[0].isSplit();
+	}
+	
+	this.getMinPieces = function() {
+		assertTrue(state.keypairs.length > 0);
+		return state.keypairs[0].getMinShares();
 	}
 	
 	this.getPieceNum = function() {
 		assertTrue(state.keypairs.length > 0);
-		var pieceNum = -1;
-		for (var i = 0; i < state.keypairs.length; i++) {
-			if (pieceNum === -1) pieceNum = state.keypairs[i].getShareNum();
-			else if (pieceNum !== state.keypairs[i].getShareNum()) throw new Error("keypair[" + i + "] has an inconsistent share num");
-		}
-		return pieceNum;
+		return state.keypairs[0].getShareNum();
 	}
 	
 	this.setPieceNum = function(pieceNum) {
@@ -390,13 +385,23 @@ function CryptoPiece(config) {
 	
 	function combine(splitPieces) {
 		
-		// verify consistent num keypairs
+		// verify consistent min pieces and num keypairs
+		var minPieces;
 		var numKeypairs;
 		for (var i = 0; i < splitPieces.length; i++) {
+			assertTrue(splitPieces[0].isSplit());
+			if (!minPieces) minPieces = splitPieces[i].getMinPieces();
+			else if (minPieces !== splitPieces[i].getMinPieces()) throw new Error("config.splitPieces[" + i + "].getMinPieces() has inconsistent min pieces");
 			if (!numKeypairs) numKeypairs = splitPieces[i].getKeypairs().length;
 			else if (numKeypairs !== splitPieces[i].getKeypairs().length) throw new Error("config.splitPieces[" + i + "].getKeypairs() has inconsistent number of keypairs");
 		}
 		assertTrue(numKeypairs > 0);
+		
+		// check if min pieces met
+		if (splitPieces.length < minPieces) {
+			var additional = minPieces - splitPieces.length;
+			throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
+		}
 		
 		// combine keypairs
 		var combinedKeypairs = [];

@@ -1637,7 +1637,10 @@ function ImportFileController(div) {
 			onUnsplitPieceImported(importedPieces, piece);
 		} catch (err) {
 			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
-			else setWarning("Pieces are not compatible shares");
+			else {
+				console.log(err);
+				setWarning("Pieces are not compatible shares");
+			}
 		}
 		
 		// done rendering

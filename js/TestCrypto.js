@@ -2,6 +2,8 @@
  * Tests keypairs and pieces.
  * 
  * File import tests can only be run on browsers which support the File constructor.
+ * 
+ * TODO: test initializing piece with split keypairs with different min shares / share num
  */
 function TestCrypto() {
 	
@@ -31,6 +33,7 @@ function TestCrypto() {
 		// test file import
 		testFileImport(plugins, function(err) {
 			if (err) throw err;
+			throw new Error("Congrats bro your file import tests pass");
 			
 			// test generate pieces
 			testGeneratePieces(plugins, function(err) {
@@ -662,9 +665,10 @@ function TestCrypto() {
 			funcs.push(testUnencryptedJson());
 			funcs.push(testEncryptedJson());
 			funcs.push(testEncryptedCsv());
+			funcs.push(testCompatibleShares());
 			funcs.push(testInvalidPieces());
 			funcs.push(testIncompatibleShares());
-//			funcs.push(testDuplicateName());
+			funcs.push(testDuplicateNames());
 //			funcs.push(testUnsupportedFileType());
 //		funcs.push(testZip());
 //		funcs.push(testInvalidZip());
@@ -684,9 +688,9 @@ function TestCrypto() {
 			return function(onDone) {
 				fileImporter.startOver();
 				var file = getFile('{"keypairs":[{"ticker":"XMR","privateHex":"a233f87d3050d6a4d8c592e8bd617c34b832dab5e9c274a0b6d640e174190501"}]}', "file.json", AppUtils.FileType.JSON);
-				fileImporter.addFiles([file], function(err) {
+				fileImporter.addFiles([file], function() {
 					assertEquals("", fileImporter.getWarning());
-					onDone(err);
+					onDone();
 				});
 			}
 		}
@@ -695,9 +699,9 @@ function TestCrypto() {
 			return function(onDone) {
 				fileImporter.startOver();
 				var file = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"6PYUMuHUt6qtKDZ3EKdf5M5qMWnXiCrKTXJDDePAuGn2bTZ7afZnBGkpT4","publicAddress":"qzfwsjdlrvwtax9jrsfez996wg2ms2rh4sp2fsnk4k"}]}', "file.json", AppUtils.FileType.JSON);
-				fileImporter.addFiles([file], function(err) {
+				fileImporter.addFiles([file], function() {
 					assertEquals("", fileImporter.getWarning());
-					onDone(err);
+					onDone();
 				});
 			}
 		}
@@ -706,14 +710,39 @@ function TestCrypto() {
 			return function(onDone) {
 				fileImporter.startOver();
 				var file = getFile('TICKER,PRIVATE_WIF,PUBLIC_ADDRESS\nBCH,6PYUMuHUt6qtKDZ3EKdf5M5qMWnXiCrKTXJDDePAuGn2bTZ7afZnBGkpT4,qzfwsjdlrvwtax9jrsfez996wg2ms2rh4sp2fsnk4k', "file.csv", AppUtils.FileType.CSV);
-				fileImporter.addFiles([file], function(err) {
+				fileImporter.addFiles([file], function() {
 					assertEquals("", fileImporter.getWarning());
-					onDone(err);
+					onDone();
+				});
+			}
+		}
+		
+		function testCompatibleShares() {
+			return function(onDone) {
+				
+				// add shares at same time
+				fileImporter.startOver();
+				var file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo"}]}', "file1.json", AppUtils.FileType.JSON);
+				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneCaD85wAWaLRggV6jqeKoYh1qeadp1WWG85Hgmgvf5Sf36"}]}', "file2.json", AppUtils.FileType.JSON);
+				fileImporter.addFiles([file1, file2], function() {
+					assertEquals(2, fileImporter.getNamedPieces().length);
+					assertEquals("", fileImporter.getWarning());
+					
+					// add shares one at a time
+					fileImporter.startOver();
+					fileImporter.addFiles([file1], function() {
+						assertEquals(1, fileImporter.getNamedPieces().length);
+						assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
+						fileImporter.addFiles([file2], function() {
+							assertEquals(2, fileImporter.getNamedPieces().length);
+							assertEquals("", fileImporter.getWarning());
+							onDone();
+						});
+					});
 				});
 			}
 		}
 
-		// TODO: test invalid json
 		function testInvalidPieces() {	
 			return function(onDone) {
 				fileImporter.startOver();
@@ -735,22 +764,71 @@ function TestCrypto() {
 						fileImporter.addFiles([file, file2], function() {
 							assertEquals("file2.json is not a valid piece", fileImporter.getWarning());
 							assertEquals(0, fileImporter.getNamedPieces().length);
-							onDone();
+							
+							// test invalid json
+							fileImporter.startOver();
+							file = getFile('Invalid json! {"keypairs":[{"ticker":"BTC","privateWif":"Kx4vXtwwNsoAgXcdpnsDH88hZJLcfV9MDQGoMMUPFut1X8SxxWZS","publicAddress":"qzgcajsew55vwjm5e7990mc2rhnqzx5qu59t3el4lj"}]}', "file.json", AppUtils.FileType.JSON);
+							fileImporter.addFiles([file], function() {
+								assertEquals("file.json is not a valid piece", fileImporter.getWarning());
+								assertEquals(0, fileImporter.getNamedPieces().length);
+								onDone();
+							});
 						});
 					});
 				});
 			}
 		}
 		
-		// TODO: test same currency
 		function testIncompatibleShares() {
 			return function(onDone) {
 				fileImporter.startOver();
-				var file1 = getFile('{"keypairs":[{"ticker":"XMR","privateHex":"a233f87d3050d6a4d8c592e8bd617c34b832dab5e9c274a0b6d640e174190501"}]}', "file1.json", AppUtils.FileType.JSON);
-				var file2 = getFile('{"keypairs":[{"ticker":"BTC","privateHex":"754a95ba26a3bc80f2a6cacdb6ccf24c99adb7744d8cdb3eadb96d18743b1c6e"}]}', "file2.json", AppUtils.FileType.JSON);
-				fileImporter.addFiles([file1, file2], function(err) {
+				
+				// test unsplit different currencies
+				var file1 = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"L5WpQ4Nn7P7bWMXr7LbvTWo9iYJQYTbLJPfLt1CdyS4hmsBo7xEd"}]}', "file1.json", AppUtils.FileType.JSON);
+				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"L1ncoCWShq4M5HS4csnFD6uiMZnjQTbpGjVASxowbLkSyJ8ocSkL"}]}', "file2.json", AppUtils.FileType.JSON);
+				fileImporter.addFiles([file1, file2], function() {
 					assertEquals(2, fileImporter.getNamedPieces().length);
 					assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+					
+					// test unsplit same currency
+					fileImporter.startOver();
+					file2 = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"KxL6QF8gb4aZX6Nm2udUzkeaA69HE2gsYJLpQ16N5jhRY5Tbqixf"}]}', "file2.json", AppUtils.FileType.JSON);
+					fileImporter.addFiles([file1, file2], function() {
+						assertEquals(2, fileImporter.getNamedPieces().length);
+						assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+						
+						// test split with incompatible addresses
+						fileImporter.startOver();
+						file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9G9sJN1tqPwYwN5uXug42P9KqQrNjVrUyZV61oZphPnGi","publicAddress":"qqqam8u2tdsll4n5enrnky8h5p2t6r6tdvkhvmdm53"}]}', "file1.json", AppUtils.FileType.JSON);
+						file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneDDq8GxWUgUUo2Ju3jmZvEcf5vQFXsgydBnb4uzmL2aYdt","publicAddress":"qz0g46c6lj9k2nrh6jw28sm3vw3entqfys0hxxjnqx"}]}', "file2.json", AppUtils.FileType.JSON);
+						fileImporter.addFiles([file1, file2], function() {
+							assertEquals(2, fileImporter.getNamedPieces().length);
+							assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+							
+							// test split with incompatible private shares
+							fileImporter.startOver();
+							file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne8yTZQdrxKRfanFop628APvbfqysYFfsEQhJFYhEjE7vJ5"}]}', "file1.json", AppUtils.FileType.JSON);
+							file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9jYhr4zgKrvDRvJuCe8X4w9w6vTJvbWmVDZ8ZcN1jzBNp"}]}', "file2.json", AppUtils.FileType.JSON);
+							fileImporter.addFiles([file1, file2], function() {
+								assertEquals(2, fileImporter.getNamedPieces().length);
+								assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+								onDone();
+							});
+						});
+					});
+				});
+			}
+		}
+		
+		function testDuplicateNames() {
+			return function(onDone) {
+				fileImporter.startOver();
+				var file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo"}]}', "file1.json", AppUtils.FileType.JSON);
+				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneCaD85wAWaLRggV6jqeKoYh1qeadp1WWG85Hgmgvf5Sf36"}]}', "file1.json", AppUtils.FileType.JSON);
+				fileImporter.addFiles([file1, file2], function() {
+					assertEquals(1, fileImporter.getNamedPieces().length);
+					assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
+					assertEquals("Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo", fileImporter.getNamedPieces()[0].piece.getKeypairs()[0].getPrivateWif());
 					onDone();
 				});
 			}
