@@ -6,15 +6,15 @@ ability to cancel import decryption, piece generation
 text parser
 print
 export of addresses only exports single file
-decryption / generation announces 0% then breathes
 backwards compatibility
 direct link to editor
-footer
-notice color gradient
 action controller bottom center if not enough width
 click outside dropdown only works if click within container
+footer
+notice color gradient
 interoperability disclosure
 performance tests and optimizations
+decryption / generation announces 0% then breathes
 
 split lines bolder
 split validation should fail on -1
