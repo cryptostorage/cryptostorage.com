@@ -2,6 +2,7 @@ v0.3.0
 transfer tests
 view split pieces in editor
 ability to cancel import decryption, piece generation
+remove deprecated code
 text parser
 print
 backwards compatibility
