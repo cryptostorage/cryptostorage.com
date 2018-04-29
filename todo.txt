@@ -16,6 +16,7 @@ interoperability disclosure
 performance tests and optimizations
 decryption / generation announces 0% then breathes
 
+remaining todos
 split lines bolder
 split validation should fail on -1
 increase test repeat
