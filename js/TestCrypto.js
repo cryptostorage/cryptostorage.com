@@ -669,9 +669,9 @@ function TestCrypto() {
 			funcs.push(testInvalidPieces());
 			funcs.push(testIncompatibleShares());
 			funcs.push(testDuplicateNames());
-//			funcs.push(testUnsupportedFileType());
 //		funcs.push(testZip());
 //		funcs.push(testInvalidZip());
+//		funcs.push(testUnsupportedFileTypes());
 			
 			// run tests async
 			async.series(funcs, function(err, results) {
