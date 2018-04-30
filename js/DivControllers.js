@@ -3067,6 +3067,7 @@ function EditorPassphraseController(div, editorController) {
 		
 		// register callbacks
 		passphraseCheckbox.onChecked(function() {
+			setFormError(false);
 			update();
 			invoke(usePassphraseListeners);
 			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
