@@ -2667,10 +2667,8 @@ function EditorController(div, config) {
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function setVisiblePiece(pieceNum) {
-		console.log("setVisiblePiece(" + pieceNum + ")");
-		throw new Error("Not implemented");
 		window.location.hash = "";
-		window.location.hash = "export_piece_" + (pieceNum + 1);	
+		window.location.hash = "piece_" + pieceNum;
 	}
 	
 	function updateFormError() {
@@ -2921,6 +2919,10 @@ function EditorContentController(div, editorController, config) {
 			logoHeader.hide();
 			assertTrue(pieceDivs.length > 0);
 			for (var i = 0; i < pieceDivs.length; i++) {
+				if (pieceDivs.length > 1) {
+					assertDefined(pieces[i].getPieceNum());
+					pieceDivs[i].attr("id", "piece_" + pieces[i].getPieceNum());
+				}
 				piecesDiv.append(pieceDivs[i]);
 			}
 		}
@@ -3393,7 +3395,7 @@ function EditorPaginatorController(div, editorController) {
 		if (pieceNums.length > 1) {
 			paginator = new PaginatorController($("<div>").appendTo(div), pieceNums);
 			paginator.render();
-			paginator.onClick(function(index, label) { invoke(selectionListeners, index, label); });
+			paginator.onClick(function(index, label) { invoke(clickListeners, index, label); });
 			piecesLabel = $("<div class='export_piece_selection_label'>").appendTo(div);
 			piecesLabel.html("Piece");
 			div.show();
