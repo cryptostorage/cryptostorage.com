@@ -1915,7 +1915,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .notice_warn_1 {
-	background-color: rgb(219, 231, 49);
+	background-color: rgb(182, 216, 44);
 }
 
 .notice_pass {
