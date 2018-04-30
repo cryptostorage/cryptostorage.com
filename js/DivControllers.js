@@ -2638,6 +2638,11 @@ function EditorController(div, config) {
 			genConfig.pieces = copies;
 		}
 		
+		// disable header controls TODO instead have these subscribe to onGenerate() event?
+		passphraseController.setEnabled(false);
+		splitController.setEnabled(false);
+		paginatorController.setEnabled(false);
+		
 		// generate pieces according to config
 		var pieceGenerator = new PieceGenerator(genConfig);
 		pieceGenerator.generatePieces(function(percent, label) {
@@ -3354,10 +3359,17 @@ function EditorPaginatorController(div, editorController) {
 		div.addClass("flex_vertical flex_align_center");
 		clickListeners = [];
 		updatePaginator();
-		if (paginator) setEnabled(false);
+		that.setEnabled(false);
 		editorController.onReady(function() { updatePaginator(); });
 		editorController.onSetPieces(function() { updatePaginator(); });
 		if (onDone) onDone();
+	}
+	
+	this.setEnabled = function(bool) {
+		if (!paginator) return;
+		paginator.setEnabled(bool);
+		if (bool) piecesLabel.removeClass("disabled");
+		else piecesLabel.addClass("disabled");
 	}
 	
 	/**
@@ -3367,6 +3379,8 @@ function EditorPaginatorController(div, editorController) {
 		assertFunction(listener);
 		clickListeners.push(listener);
 	}
+	
+	// --------------------------------- PRIVATE --------------------------------
 	
 	function updatePaginator() {
 		div.empty();
@@ -3381,12 +3395,6 @@ function EditorPaginatorController(div, editorController) {
 		} else {
 			div.hide();
 		}
-	}
-	
-	function setEnabled(bool) {
-		paginator.setEnabled(bool);
-		if (bool) piecesLabel.removeClass("disabled");
-		else piecesLabel.addClass("disabled");
 	}
 	
 	function getPieceNums() {
