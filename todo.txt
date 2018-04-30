@@ -2,7 +2,6 @@ v0.3.0
 tests
 ability to cancel import decryption, piece generation
 remove deprecated code
-remove hex from exports
 text parser
 print
 backwards compatibility

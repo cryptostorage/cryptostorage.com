@@ -248,9 +248,13 @@ function CryptoPiece(config) {
 	
 	this.toCsv = function() {
 		
+		// columns to exclude
+		var excludes = [CryptoKeypair.CsvHeader.PRIVATE_HEX, CryptoKeypair.CsvHeader.MIN_SHARES];
+		
 		// collect headers
 		var headers = [];
 		for (prop in CryptoKeypair.CsvHeader) {
+			if (arrayContains(excludes, prop.toString())) continue;
 			if (CryptoKeypair.CsvHeader.hasOwnProperty(prop)) {
 	    	headers.push(CryptoKeypair.CsvHeader[prop.toString()]);
 	    }

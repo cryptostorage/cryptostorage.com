@@ -196,7 +196,6 @@ function CryptoKeypair(config) {
 		return {
 			ticker: state.plugin.getTicker(),
 			publicAddress: that.getPublicAddress(),
-			privateHex: that.getPrivateHex(),
 			privateWif: that.getPrivateWif(),
 			encryption: that.getEncryptionScheme(),
 			shareNum: that.getShareNum()
