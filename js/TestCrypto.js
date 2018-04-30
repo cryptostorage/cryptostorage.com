@@ -828,13 +828,27 @@ function TestCrypto() {
 		function testDuplicateNames() {
 			return function(onDone) {
 				fileImporter.startOver();
+				
+				// add files at same time
 				var file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo"}]}', "file1.json", AppUtils.FileType.JSON);
 				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneCaD85wAWaLRggV6jqeKoYh1qeadp1WWG85Hgmgvf5Sf36"}]}', "file1.json", AppUtils.FileType.JSON);
 				fileImporter.addFiles([file1, file2], function() {
 					assertEquals(1, fileImporter.getNamedPieces().length);
 					assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
 					assertEquals("Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo", fileImporter.getNamedPieces()[0].piece.getKeypairs()[0].getPrivateWif());
-					onDone();
+					
+					// add files one at a time
+					fileImporter.startOver();
+					fileImporter.addFiles([file1], function() {
+						assertEquals(1, fileImporter.getNamedPieces().length);
+						assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
+						assertEquals("Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo", fileImporter.getNamedPieces()[0].piece.getKeypairs()[0].getPrivateWif());
+						fileImporter.addFiles([file2], function() {
+							assertEquals(1, fileImporter.getNamedPieces().length);
+							assertEquals("file1.json already imported", fileImporter.getWarning());
+							onDone();
+						});
+					});
 				});
 			}
 		}

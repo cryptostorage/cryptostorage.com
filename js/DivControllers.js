@@ -1527,7 +1527,7 @@ function ImportFileController(div) {
 		if (decryptionController) decryptionController.cancel();
 	}
 	
-	this.addFiles = function(files, onDone, isTest) {
+	this.addFiles = function(files, onDone) {
 		
 		// collect functions to read files
 		var funcs = [];
@@ -1679,12 +1679,14 @@ function ImportFileController(div) {
 	}
 	
 	function addNamedPieces(namedPieces) {
+		var numPiecesBefore = importedNamedPieces.length;
 		for (var i = 0; i < namedPieces.length; i++) {
 			var namedPiece = namedPieces[i];
 			assertObject(namedPiece.piece, CryptoPiece);
-			if (!isPieceImported(namedPiece.name)) importedNamedPieces.push(namedPiece);
+			if (isPieceImported(namedPiece.name)) setWarning(namedPiece.name + " already imported");
+			else importedNamedPieces.push(namedPiece);
 		}
-		updatePieces();
+		if (numPiecesBefore !== importedNamedPieces.length) updatePieces();
 	}
 	
 	function removePieces() {

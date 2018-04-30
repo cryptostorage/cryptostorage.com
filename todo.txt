@@ -1,7 +1,6 @@
 v0.3.0
 transfer tests
 test import text controller to fix dev warning when xmr share then unencrypted imported
-test piece already imported warning file import controller
 ability to cancel import decryption, piece generation
 remove deprecated code
 remove hex from exports
