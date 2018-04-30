@@ -2094,8 +2094,7 @@ function ImportTextController(div, plugins) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			throw new Error("View imported pieces not supported");
-			//UiUtils.openEditorTab("Imported Storage", {pieces: importedPieces});
+			UiUtils.openEditorTab("Imported Storage", {pieces: importedPieces});
 		});
 		
 		// handle unsplit piece
