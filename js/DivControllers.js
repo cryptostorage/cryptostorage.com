@@ -2387,13 +2387,14 @@ function EditorController(div, config) {
 	var that = this;
 	var passphraseController
 	var splitController;
+	var paginatorDiv
+	var paginator;
+	var paginatorLabel;
 	var contentController;
 	var importedPieces;
 	var importedPieceDivs;
 	var pieces;
 	var pieceDivs;
-	var paginator;
-	var paginatorLabel;
 	var formErrorChangeListeners;
 	var setPiecesListeners;
 	var generateProgressListeners;
@@ -2431,29 +2432,10 @@ function EditorController(div, config) {
 		splitController.render();
 		splitController.setUseSplit(false);
 		
-		// paginator controller
-		var paginatorData = getPaginatorData();
-		if (paginatorData) {
-			var paginatorDiv = $("<div class='flex_vertical flex_align_center'>").appendTo(headerDiv);
-			paginator = new PaginatorController($("<div>").appendTo(paginatorDiv), paginatorData);
-			paginator.render();
-			paginator.onClick(function(label, index) {
-				console.log("paginator.onClick(" + label + ", " + index +")");
-			});
-			paginatorLabel = $("<div class='export_piece_selection_label'>").appendTo(paginatorDiv);
-			paginatorLabel.html("Piece");
-		}
-		
-		/**
-		 * Sets the visible piece by adding/removing the hidden class.
-		 * 
-		 * @param pieceDivs are the piece divs to show/hide
-		 * @param pieceIdx is the piece number to show
-		 */
-		function setVisiblePiece(pieceDivs, pieceIdx) {
-			window.location.hash = "";
-			window.location.hash = "export_piece_" + (pieceIdx + 1);	
-		}
+		// paginator
+		paginatorDiv = $("<div class='flex_vertical flex_align_center'>").appendTo(headerDiv);
+		updatePaginator();
+		if (paginator) setPaginatorEnabled(false);
 		
 		// load body controller
 		contentController = new EditorContentController($("<div>").appendTo(div), that, config);
@@ -2461,6 +2443,9 @@ function EditorController(div, config) {
 			
 			// announce ready
 			invoke(readyListeners);
+			
+			// paginator enabled
+			if (paginator) setPaginatorEnabled(true);
 			
 			// register callbacks
 			contentController.getActionsController().onGenerate(that.generate);
@@ -2679,19 +2664,46 @@ function EditorController(div, config) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
+	function updatePaginator() {
+		paginatorDiv.empty();
+		var paginatorData = getPaginatorData();
+		console.log(paginatorData);
+		if (paginatorData) {
+			paginator = new PaginatorController($("<div>").appendTo(paginatorDiv), paginatorData);
+			paginator.render();
+			paginator.onClick(function(label, index) {
+				console.log("paginator.onClick(" + label + ", " + index +")");
+			});
+			paginatorLabel = $("<div class='export_piece_selection_label'>").appendTo(paginatorDiv);
+			paginatorLabel.html("Piece");
+		}
+	}
+	
+	function setPaginatorEnabled(bool) {
+		paginator.setEnabled(bool);
+		if (bool) paginatorLabel.removeClass("disabled");
+		else paginatorLabel.addClass("disabled");
+	}
+	
 	function getPaginatorData() {
-		if (config.genConfig) {
-			if (!isDefined(config.genConfig.numPieces) || config.genConfig.numPieces === 1) return null;
-			var pieceNums = [];
-			for (var i = 0; i < config.genConfig.numPieces; i++) pieceNums.push(i + 1);
-			return pieceNums;
-		} else if (config.pieces.length > 1) {
-			var pieceNums = [];
+		var pieceNums = [];
+		if (that.getImportedPieces() && that.getImportedPieces().length > 1) {
+			for (var i = 0; i < that.getImportedPieces().length; i++) pieceNums.push(that.getImportedPieces()[i].getPieceNum());
+		} else if (config.pieces && config.pieces.length > 1) {
 			for (var i = 0; i < config.pieces.length; i++) pieceNums.push(config.pieces[i].getPieceNum());
-			return pieceNums;
+		} else if (config.genConfig) {
+			if (!isDefined(config.genConfig.numPieces) || config.genConfig.numPieces === 1) return null;
+			for (var i = 0; i < config.genConfig.numPieces; i++) pieceNums.push(i + 1);
 		} else {
 			return null;
 		}
+		return pieceNums;
+	}
+	
+	function setVisiblePiece(pieceNum) {
+		throw new Error("Not implemented");
+		window.location.hash = "";
+		window.location.hash = "export_piece_" + (pieceNum + 1);	
 	}
 	
 	function updateFormError() {
