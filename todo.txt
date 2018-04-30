@@ -14,7 +14,6 @@ click outside dropdown only works if click within container
 footer
 interoperability disclosure
 performance tests and optimizations
-decryption / generation announces 0% then breathes
 
 remaining todos
 notice colors

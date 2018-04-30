@@ -4302,48 +4302,50 @@ function CompactPieceRenderer(div, piece) {
 		
 		// render keypairs
 		if (onProgressFn) onProgressFn(0, "Rendering keypairs");
-		async.series(renderFuncs, function(err, _keypairRenderers) {
-			assertNull(err);
-			keypairRenderers = _keypairRenderers;
-			
-			// render keypairs
-			update({
-				piece: piece,
-				keypairRenderers: keypairRenderers,
-				showLogos: true,
-				spaceBetween: false,
-				pageBreaks: false,
-				infoBack: false
-			});
-			
-			// copy keys to clipboard
-			new Clipboard(".copyable", {
-				text: function(trigger) {
-					return $(trigger).html();
-				}
-			});
-			
-			// copied tooltip
-			div.find(".copyable").each(function(i, copyable) {
-				tippy(copyable, {
-					arrow : true,
-					html : $("<div>Copied!</div>").get(0),
-					interactive : true,
-					placement : "top",
-					theme : 'translucent',
-					trigger : "click",
-					distance : 10,
-					arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
-					onShow : function() {
-						setTimeout(function() {
-							copyable._tippy.hide();
-						}, 2000)
+		setImmediate(function() {	// let browser breath
+			async.series(renderFuncs, function(err, _keypairRenderers) {
+				assertNull(err);
+				keypairRenderers = _keypairRenderers;
+				
+				// render keypairs
+				update({
+					piece: piece,
+					keypairRenderers: keypairRenderers,
+					showLogos: true,
+					spaceBetween: false,
+					pageBreaks: false,
+					infoBack: false
+				});
+				
+				// copy keys to clipboard
+				new Clipboard(".copyable", {
+					text: function(trigger) {
+						return $(trigger).html();
 					}
 				});
-			});
+				
+				// copied tooltip
+				div.find(".copyable").each(function(i, copyable) {
+					tippy(copyable, {
+						arrow : true,
+						html : $("<div>Copied!</div>").get(0),
+						interactive : true,
+						placement : "top",
+						theme : 'translucent',
+						trigger : "click",
+						distance : 10,
+						arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+						onShow : function() {
+							setTimeout(function() {
+								copyable._tippy.hide();
+							}, 2000)
+						}
+					});
+				});
 
-			// done
-			if (onDone) onDone(div);
+				// done
+				if (onDone) onDone(div);
+			});
 		});
 	}
 	

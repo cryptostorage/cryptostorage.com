@@ -83,9 +83,11 @@ function CryptoPiece(config) {
 		
 		// encrypt async
 		if (onProgress) onProgress(0, "Encrypting keypairs");
-		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
-			if (err) onDone(err);
-			else onDone(null, that);
+		setImmediate(function() {	// let browser breath
+			async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
+				if (err) onDone(err);
+				else onDone(null, that);
+			});
 		});
 		
 		function encryptFunc(keypair, scheme, passphrase) {
@@ -133,12 +135,14 @@ function CryptoPiece(config) {
 		for (var i = 0; i < state.keypairs.length; i++) funcs.push(decryptFunc(state.keypairs[i], passphrase));
 		var doneWeight = 0;
 		if (onProgress) onProgress(0, "Decrypting");
-		async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
-			if (err) onDone(err);
-			else {
-				assertEquals(doneWeight, totalWeight);
-				onDone(null, that);
-			}
+		setImmediate(function() {	// let browser breath
+			async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
+				if (err) onDone(err);
+				else {
+					assertEquals(doneWeight, totalWeight);
+					onDone(null, that);
+				}
+			});
 		});
 		
 		// decrypts one key

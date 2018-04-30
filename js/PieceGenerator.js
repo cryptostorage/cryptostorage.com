@@ -141,10 +141,12 @@ function PieceGenerator(config) {
 		
 		// generate keypairs
 		if (onProgress) onProgress(0, "Generating keypairs");
-		async.series(newKeypairFuncs, function(err, keypairs) {
-			assertNull(err);
-			onDone(null, [new CryptoPiece({keypairs: keypairs})]);
-		});
+		setImmediate(function() {	// let browser breath
+			async.series(newKeypairFuncs, function(err, keypairs) {
+				assertNull(err);
+				onDone(null, [new CryptoPiece({keypairs: keypairs})]);
+			});
+		})
 	}
 
 	function encryptIfApplicable(pieces, onProgress, onDone) {
