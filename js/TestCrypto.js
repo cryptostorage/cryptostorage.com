@@ -5,6 +5,7 @@
  * 
  * TODO: test initializing piece with split keypairs with different min shares / share num
  * TODO: test importing files without private keys
+ * TODO: more text import tests
  */
 function TestCrypto() {
 	
