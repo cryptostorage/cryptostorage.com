@@ -3018,6 +3018,7 @@ function EditorPassphraseController(div, editorController) {
 		
 		// listen for actions when editor ready
 		editorController.onReady(function() {
+			editorController.onSetPieces(update);
 			editorController.getContentController().getActionsController().onGenerate(validate);
 			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
@@ -3073,6 +3074,7 @@ function EditorPassphraseController(div, editorController) {
 	
 	this.setEnabled = function(bool) {
 		passphraseCheckbox.setEnabled(bool);
+		bip38Checkbox.setEnabled(bool);
 		if (bool && passphraseCheckbox.isChecked()) passphraseInput.removeAttr("disabled")
 		else passphraseInput.attr("disabled", "disabled");
 	}
@@ -3199,6 +3201,7 @@ function EditorSplitController(div, editorController) {
 		
 		// listen for actions when editor ready
 		editorController.onReady(function() {
+			editorController.onSetPieces(update);
 			editorController.getContentController().getActionsController().onGenerate(validate);
 			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
@@ -3384,6 +3387,8 @@ function EditorPaginatorController(div, editorController) {
 	
 	function updatePaginator() {
 		div.empty();
+		paginator = null;
+		piecesLabel = null;
 		var pieceNums = getPieceNums();
 		if (pieceNums.length > 1) {
 			paginator = new PaginatorController($("<div>").appendTo(div), pieceNums);
