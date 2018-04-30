@@ -5311,12 +5311,31 @@ function NoticeController(div, config) {
 		
 		// check if info cached
 		if (lastChecks && objectsEqual(lastChecks, info.checks)) return;
-		
+				
 		// div setup
 		div.empty();
 		div.removeClass();
 		div.addClass("notice_bar");
 		div.addClass("flex_horizontal");
+		
+		// assign notice color
+		var failCount = 0;
+		var warnCount = 0;
+		for (var i = 0; i < info.checks.length; i++) {
+			var state = info.checks[i].state;
+			if (state === "fail") failCount++;
+			else if (state === "warn") warnCount++;
+			else if (state !== "pass") throw new Error("Unrecognized environment state: " + state);
+		}
+		if (failCount > 0) div.addClass("notice_fail");
+		else if (warnCount > 0) {
+			if (warnCount >= 3) div.addClass("notice_warn_3");
+			else div.addClass("notice_warn_" + warnCount);
+		} else {
+			div.addClass("notice_pass");
+			config.showOnPass ? div.show() : div.hide();
+		}
+		
 		if (AppUtils.hasEnvironmentState("fail")) { div.addClass("notice_fail"); config.showOnFail ? div.show() : div.hide(); }
 		else if (AppUtils.hasEnvironmentState("warn")) { div.addClass("notice_warn"); config.showOnWarn ? div.show() : div.hide(); }
 		else if (config.showOnPass) { div.addClass("notice_pass"); div.show(); }

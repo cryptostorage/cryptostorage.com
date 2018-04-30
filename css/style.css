@@ -1902,12 +1902,20 @@ input[type='checkbox'][disabled] +label {
 	color: white;
 }
 
-.notice_warn {
+.notice_fail {
+	background-color: red;
+}
+
+.notice_warn_3 {
 	background-color: rgb(235, 92, 29);
 }
 
-.notice_fail {
-	background-color: red;
+.notice_warn_2 {
+	background-color: rgb(247, 185, 43);
+}
+
+.notice_warn_1 {
+	background-color: rgb(219, 231, 49);
 }
 
 .notice_pass {
