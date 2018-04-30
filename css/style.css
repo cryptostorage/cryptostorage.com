@@ -1906,15 +1906,15 @@ input[type='checkbox'][disabled] +label {
 	background-color: red;
 }
 
-.notice_warn_3 {
+.notice_warn_orange {
 	background-color: rgb(235, 92, 29);
 }
 
-.notice_warn_2 {
+.notice_warn_light_orange {
 	background-color: rgb(247, 185, 43);
 }
 
-.notice_warn_1 {
+.notice_warn_light_green {
 	background-color: rgb(182, 216, 44);
 }
 

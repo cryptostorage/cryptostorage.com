@@ -5540,27 +5540,27 @@ function NoticeController(div, config) {
 		div.addClass("flex_horizontal");
 		
 		// assign notice color
-		var failCount = 0;
-		var warnCount = 0;
-		for (var i = 0; i < info.checks.length; i++) {
-			var state = info.checks[i].state;
-			if (state === "fail") failCount++;
-			else if (state === "warn") warnCount++;
-			else if (state !== "pass") throw new Error("Unrecognized environment state: " + state);
+		if (AppUtils.hasEnvironmentState("fail")) { config.showOnFail ? div.show() : div.hide(); div.addClass("notice_fail"); }
+		else if (!AppUtils.hasEnvironmentState("warn")) { config.showOnPass ? div.show() : div.hide(); div.addClass("notice_pass"); }
+		else {			
+			config.showOnWarn ? div.show() : div.hide();
+			
+			// collect which states pass
+			var offline = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.INTERNET) === "pass";
+			var local = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.IS_LOCAL) === "pass";
+			var browserOpen = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.BROWSER) === "pass";
+			var operatingSystemOpen = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.OPERATING_SYSTEM) === "pass";
+			function getEnvironmentState(checks, code) {
+				for (var i = 0; i < checks.length; i++) {
+					if (checks[i].code === code) return checks[i].state;
+				}
+			}
+			
+			// add styling
+			if (!offline && !local) div.addClass("notice_warn_orange");
+			else if (offline && local) div.addClass(browserOpen ? "notice_warn_light_green" : "notice_warn_light_orange");
+			else div.addClass("notice_warn_light_orange");
 		}
-		if (failCount > 0) div.addClass("notice_fail");
-		else if (warnCount > 0) {
-			if (warnCount >= 3) div.addClass("notice_warn_3");
-			else div.addClass("notice_warn_" + warnCount);
-		} else {
-			div.addClass("notice_pass");
-			config.showOnPass ? div.show() : div.hide();
-		}
-		
-		if (AppUtils.hasEnvironmentState("fail")) { div.addClass("notice_fail"); config.showOnFail ? div.show() : div.hide(); }
-		else if (AppUtils.hasEnvironmentState("warn")) { div.addClass("notice_warn"); config.showOnWarn ? div.show() : div.hide(); }
-		else if (config.showOnPass) { div.addClass("notice_pass"); div.show(); }
-		else div.hide();
 		
 		// reset cache
 		lastChecks = info.checks;

@@ -2,6 +2,7 @@ v0.3.0
 transfer tests
 ability to cancel import decryption, piece generation
 remove deprecated code
+remove hex from exports
 text parser
 test import text controller to fix dev warning when xmr share then unencrypted imported
 test piece already imported warning file import controller
@@ -11,14 +12,13 @@ direct link to editor
 action controller bottom center if not enough width
 click outside dropdown only works if click within container
 footer
-notice color gradient
 interoperability disclosure
 performance tests and optimizations
 decryption / generation announces 0% then breathes
 passphrase validation error persists after unchecking passphrase
-remove hex from exports
 
 remaining todos
+notice colors
 split lines bolder
 split validation should fail on -1
 increase test repeat
