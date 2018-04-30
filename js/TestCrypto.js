@@ -27,22 +27,28 @@ function TestCrypto() {
 		// test keypairs
 		console.log("Testing keypairs");
 		for (var i = 0; i < plugins.length; i++) {
-			testPlugin(plugins[i]);
 			testKeypairs(plugins[i]);
+			testPlugin(plugins[i]);
 		}
 		
 		// test file import
 		testFileImport(plugins, function(err) {
 			if (err) throw err;
 			
-			// test generate pieces
-			testGeneratePieces(plugins, function(err) {
+			// test text import
+			testTextImport(plugins, function(err) {
 				if (err) throw err;
+				throw new Error("Text import tests pass");
 				
-				// test piece encryption and splitting
-				testPieceEncryption(plugins, function(err) {
+				// test generate pieces
+				testGeneratePieces(plugins, function(err) {
 					if (err) throw err;
-					onDone();
+					
+					// test piece encryption and splitting
+					testPieceEncryption(plugins, function(err) {
+						if (err) throw err;
+						onDone();
+					});
 				});
 			});
 		});
@@ -68,6 +74,7 @@ function TestCrypto() {
 	}
 	
 	function testUtils() {
+		console.log("Testing utils");
 		assertTrue(isString("abctesting123"));
 		assertFalse(isString(null));
 		assertFalse(isString(undefined));
@@ -904,6 +911,38 @@ function TestCrypto() {
 					assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
 					onDone();
 				});
+			}
+		}
+	}
+	
+	function testTextImport(plugins, onDone) {
+		console.log("Testing text import");
+		
+		// initialize controller
+		var textImporter = new ImportTextController($("<div>"), plugins);
+		textImporter.render(function() {
+			
+			// get test functions
+			var funcs = [];
+			funcs.push(testIncompatibleShares());
+			
+			// run tests async
+			async.series(funcs, function(err, results) {
+				onDone(err);
+			});
+		});
+		
+		function testIncompatibleShares() {
+			return function(onDone) {
+				textImporter.startOver();
+				textImporter.setSelectedCurrency("XMR");
+				textImporter.addText("Sne8L5gQB5isnKcCPfF6SA514f5PE97QJ6yA8AEoo4hLtaao");
+				assertEquals("Need 1 additional piece to recover private keys", textImporter.getWarning());
+				assertEquals(1, textImporter.getImportedPieces().length);
+				textImporter.addText("aunt useful womanly vixen vowels business obtains weekday warped doorway sniff molten coexist enigma aplomb wallets value taunts makeup opposite joyous muzzle physics pledge doorway");
+				assertEquals("Pieces are not compatible shares", textImporter.getWarning());
+				assertEquals(2, textImporter.getImportedPieces().length);
+				onDone();
 			}
 		}
 	}

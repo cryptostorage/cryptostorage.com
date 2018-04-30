@@ -1511,7 +1511,7 @@ function ImportFileController(div) {
 	}
 	
 	this.getWarning = function() {
-		return that.warningMsg;
+		return warningMsg;
 	}
 	
 	this.startOver = function() {
@@ -1584,7 +1584,7 @@ function ImportFileController(div) {
 	}
 	
 	function setWarning(str, img) {
-		that.warningMsg = str;
+		warningMsg = str;
 		warningDiv.hide();
 		warningDiv.empty();
 		if (str) {
@@ -1826,6 +1826,7 @@ inheritsFrom(ImportFileController, DivController);
  * Controller to import from text.
  * 
  * @param div is the div to render to
+ * @param plugins are plugins to support text import
  */
 function ImportTextController(div, plugins) {
 	DivController.call(this, div);
@@ -1836,6 +1837,7 @@ function ImportTextController(div, plugins) {
 	var that = this;
 	var importInputDiv;					// all import input
 	var warningDiv;
+	var warningMsg;
 	var textInputDiv;						// all text input
 	var decryptionDiv;					// decryption div
 	var cryptoSelector;
@@ -1907,18 +1909,6 @@ function ImportTextController(div, plugins) {
 		if (onDone) onDone(div);
 	}
 	
-	function resetControls() {
-		controlsDiv.empty();
-		addControl("start over", that.startOver);
-	}
-	
-	function addControl(text, onClick) {
-		var linkDiv = $("<div class='import_control_link_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(controlsDiv);
-		var link = $("<div class='import_control_link'>").appendTo(linkDiv);
-		link.append(text);
-		link.click(function() { onClick(); });
-	}
-	
 	this.startOver = function() {
 		setWarning("");
 		textArea.val("");
@@ -1934,18 +1924,93 @@ function ImportTextController(div, plugins) {
 		if (decryptionController) decryptionController.cancel();
 	}
 	
-	function getSelectedPlugin() {
-		return plugins[cryptoSelector.getSelectedIndex()];
+	this.getWarning = function() {
+		return warningMsg;
 	}
 	
-	function setSelectedCurrency(ticker) {
+	this.getImportedPieces = function() {
+		return importedPieces;
+	}
+	
+	this.setSelectedCurrency = function(ticker) {
 		for (var i = 0; i < plugins.length; i++) {
 			if (plugins[i].getTicker() === ticker) {
-				cryptoSelector.selectIndex(ticker);
+				cryptoSelector.setSelectedIndex(i);
 				return;
 			}
 		}
 		throw new Error("No plugin for ticker: " + ticker);
+	}
+	
+	this.addText = function(text) {
+		
+		// init state
+		setWarning("");
+		
+		// check for empty text
+		if (text === "") {
+			setWarning("No text entered");
+			return;
+		}
+		
+		// get piece from input text
+		var piece;
+		try {
+			piece = CryptoPiece.parse(text, getSelectedPlugin());
+		} catch (err) {
+			if (err.message.indexOf("Plugin required") !== -1) {
+				setWarning("No currency selected");
+				return;
+			}
+			throw err;
+		}
+		
+		// check if valid piece input
+		if (!piece) {
+			setWarning("Input text is not a private key or piece");
+			return;
+		}
+		
+		// check if piece can be added to imported pieces
+		var msg = getCompatibilityError(importedPieces, piece);
+		if (msg) {
+			setWarning(msg);
+			return;
+		}
+		
+		// accept piece into imported pieces
+		textArea.val("");
+		importedPieces.push(piece);
+		processPieces();
+		
+		function getCompatibilityError(pieces, piece) {
+			
+			// check if piece already added
+			for (var i = 0; i < pieces.length; i++) {
+				if (pieces[i].equals(piece)) return "Piece already imported";
+			}
+			
+			// no issues adding private key
+			return null;
+		}
+	}
+	
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function resetControls() {
+		controlsDiv.empty();
+		addControl("start over", that.startOver);
+	}
+	
+	function addControl(text, onClick) {
+		var linkDiv = $("<div class='import_control_link_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(controlsDiv);
+		var link = $("<div class='import_control_link'>").appendTo(linkDiv);
+		link.append(text);
+		link.click(function() { onClick(); });
+	}
+	
+	function getSelectedPlugin() {
+		return plugins[cryptoSelector.getSelectedIndex()];
 	}
 	
 	function onUnsplitPieceImported(importedPieces, piece) {
@@ -2023,6 +2088,7 @@ function ImportTextController(div, plugins) {
 	
 	function setWarning(str, img) {
 		warningDiv.empty();
+		warningMsg = str;
 		if (str) {
 			if (!img) img = $("<img src='img/caution.png'>");
 			warningDiv.append(img);
@@ -2054,78 +2120,7 @@ function ImportTextController(div, plugins) {
 	 * Invoked when the submit button clicked.
 	 */
 	function onSubmit() {
-		
-		// init state
-		setWarning("");
-		
-		// get text
-		var text = textArea.val().trim();
-		
-		// check for empty text
-		if (text === "") {
-			setWarning("No text entered");
-			return;
-		}
-		
-		// get piece from input text
-		var piece;
-		try {
-			piece = CryptoPiece.parse(text, getSelectedPlugin());
-		} catch (err) {
-			if (err.message.indexOf("Plugin required") !== -1) {
-				setWarning("No currency selected");
-				return;
-			}
-			throw err;
-		}
-		
-		// check if valid piece input
-		if (!piece) {
-			setWarning("Input text is not a private key or piece");
-			return;
-		}
-		
-		// check if piece can be added to imported pieces
-		var msg = getCompatibilityError(importedPieces, piece);
-		if (msg) {
-			setWarning(msg);
-			return;
-		}
-		
-		// assign piece num if not given
-		// TODO: apply next available piece num only when viewing in editor
-		//if (piece.isSplit() && !piece.getPieceNum()) piece.setPieceNum(getNextAvailablePieceNum(importedPieces));
-		
-		// accept piece into imported pieces
-		textArea.val("");
-		importedPieces.push(piece);
-		processPieces();
-		
-		function getNextAvailablePieceNum(pieces) {
-			var pieceNum = 1;
-			while (true) {
-				var found = false;
-				for (var i = 0; i < pieces.length; i++) {
-					if (pieces[i].getPieceNum() === pieceNum) {
-						found = true;
-						break;
-					} 
-				}
-				if (!found) return pieceNum;
-				pieceNum++;
-			}
-		}
-		
-		function getCompatibilityError(pieces, piece) {
-			
-			// check if piece already added
-			for (var i = 0; i < pieces.length; i++) {
-				if (pieces[i].equals(piece)) return "Piece already imported";
-			}
-			
-			// no issues adding private key
-			return null;
-		}
+		that.addText(textArea.val().trim());
 	}
 	
 	/**
@@ -2158,7 +2153,10 @@ function ImportTextController(div, plugins) {
 			onUnsplitPieceImported(importedPieces, piece);
 		} catch (err) {
 			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
-			else setWarning(err.message);
+			else {
+				console.log(err);
+				setWarning("Pieces are not compatible shares");
+			}
 		}
 	}
 	
