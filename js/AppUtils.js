@@ -2450,7 +2450,7 @@ var AppUtils = {
 		else {
 			
 			// get common ticker
-			var plugin = CryptoPiece.getCommonPlugin(pieces[0]);
+			var commonPlugin = CryptoPiece.getCommonPlugin(pieces[0]);
 			var ticker = commonPlugin ? commonPlugin.getTicker().toLowerCase() : "mix";
 			
 			// build names for pieces

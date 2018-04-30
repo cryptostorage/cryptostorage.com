@@ -13,7 +13,7 @@
 function PieceGenerator(config) {
 		
 	// init
-	PieceGenerator.validateGenerateConfig(config);
+	PieceGenerator.validateConfig(config);
 	config = Object.assign({}, config);
 	var isCancelled = false;
 
@@ -236,7 +236,7 @@ function PieceGenerator(config) {
  * 
  * @param config is the generation configuration to validate
  */
-PieceGenerator.validateGenerateConfig = function(config) {
+PieceGenerator.validateConfig = function(config) {
 	assertObject(config);
 	
 	// validate passphrase

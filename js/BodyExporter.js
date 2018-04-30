@@ -28,7 +28,7 @@
  * @param window is the window to export to
  * @param config specifies editor configuration
  * 				config.genConfig is configuration to generate keypairs
- * 				config.pieces are pre-generated pieces to display
+ * 				config.pieces are pre-generated pieces
  * 				config.pieceDivs are pre-rendered pieces to display
  * 				config.sourcePieces are source pieces that the given piece was generated from
  * 				config.showNotices specifies whether or not to show the notice bar

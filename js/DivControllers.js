@@ -65,7 +65,7 @@ var UiUtils = {
 	 * @param browserTabName is the name of the tab
 	 * @param config specifies editor configuration
 	 * 				config.genConfig is configuration to generate keypairs
-	 * 				config.pieces are pre-generated pieces to display
+	 * 				config.pieces are pre-generated pieces
 	 * 				config.pieceDivs are pre-rendered pieces to display
 	 * 				config.sourcePieces are source pieces that the given piece was generated from
 	 * 				config.showNotices specifies whether or not to show the notice bar
@@ -347,6 +347,68 @@ function DropdownController(div, ddslickConfig, defaultText) {
 	}
 }
 inheritsFrom(DropdownController, DivController);
+
+/**
+ * Controls a paginator.
+ * 
+ * @param div is the div to render to
+ * @param labels are the clickable labels in the paginator
+ * @param config is custom config for pagination.js
+ */
+function PaginatorController(div, labels, config) {
+	DivController.call(div, this);
+	
+	var uuid;
+	var paginator;
+	var clickListeners;
+	
+	this.render = function(onDone) {
+		
+		// init
+		div.empty();
+		uuid = uuidv4();
+		div.attr("id", uuid);
+		div.addClass("flex_horizontal");
+		clickListeners = [];
+		assertArray(labels);
+		assertTrue(labels.length > 0);
+		for (var i = 0; i < labels.length; i++) assertDefined(labels[i]);
+		
+		// build pagination config with defaults
+		config = Object.assign({
+			showPrevious: false,
+			showNext: false,
+			pageSize: 1,
+			dataSource: labels,
+			callback: function(data, pagination) {
+				invoke(clickListeners, data, pagination.pageNumber - 1);
+			}
+		}, config);
+		
+		// initialize paginator
+		div.pagination(config);
+		
+		// done
+		if (onDone) onDone(div);
+	}
+	
+	this.setEnabled = function(bool) {
+		assertBoolean(bool);
+		if (bool) div.pagination("enable");
+		else div.pagination("disable");
+	}
+	
+	/**
+	 * Registers a callback function that is notified when a label is clicked.
+	 * 
+	 * @param lister(label, labelIndex) is invoked when the user clicks a label
+	 */
+	this.onClick = function(listener) {
+		assertFunction(listener);
+		clickListeners.push(listener);
+	}
+}
+inheritsFrom(PaginatorController, DivController);
 
 /**
  * Controls the entire application.
@@ -709,13 +771,10 @@ function HomeController(div) {
 		
 		function getGenConfig(plugin) {
 			var config = {};
-			config.numPieces = null;
-			config.minPieces = null;
-			config.currencies = [];
-			config.currencies.push({
+			config.keypairs = [];
+			config.keypairs.push({
 				ticker: plugin.getTicker(),
-				numKeys: 1,
-				encryption: null
+				numKeypairs: 1,
 			});
 			return config;
 		}
@@ -1613,11 +1672,11 @@ function ImportFileController(div) {
 		for (var i = 0; i < importedNamedPieces.length; i++) importedPieces.push(importedNamedPieces[i].piece);
 		
 		// done if no pieces
-		if (importedPieces.length === 0) return
+		if (importedPieces.length === 0) return;
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openEditorTab("Imported Storage", {pieces: pieces});
+			UiUtils.openEditorTab("Imported Pieces", {pieces: importedPieces});
 		});
 		
 		// handle unsplit piece
@@ -2315,7 +2374,7 @@ inheritsFrom(TwoTabController, DivController);
  * @param div is the div to render to
  * @param config specifies editor configuration
  * 				config.genConfig is configuration to generate keypairs
- * 				config.pieces are pre-generated pieces to display
+ * 				config.pieces are pre-generated pieces
  * 				config.pieceDivs are pre-rendered pieces to display
  * 				config.sourcePieces are source pieces that the given piece was generated from
  * 				config.showNotices specifies whether or not to show the notice bar
@@ -2333,6 +2392,8 @@ function EditorController(div, config) {
 	var importedPieceDivs;
 	var pieces;
 	var pieceDivs;
+	var paginator;
+	var paginatorLabel;
 	var formErrorChangeListeners;
 	var setPiecesListeners;
 	var generateProgressListeners;
@@ -2369,6 +2430,30 @@ function EditorController(div, config) {
 		splitController = new EditorSplitController($("<div>").appendTo(passphraseSplitDiv), that);
 		splitController.render();
 		splitController.setUseSplit(false);
+		
+		// paginator controller
+		var paginatorData = getPaginatorData();
+		if (paginatorData) {
+			var paginatorDiv = $("<div class='flex_vertical flex_align_center'>").appendTo(headerDiv);
+			paginator = new PaginatorController($("<div>").appendTo(paginatorDiv), paginatorData);
+			paginator.render();
+			paginator.onClick(function(label, index) {
+				console.log("paginator.onClick(" + label + ", " + index +")");
+			});
+			paginatorLabel = $("<div class='export_piece_selection_label'>").appendTo(paginatorDiv);
+			paginatorLabel.html("Piece");
+		}
+		
+		/**
+		 * Sets the visible piece by adding/removing the hidden class.
+		 * 
+		 * @param pieceDivs are the piece divs to show/hide
+		 * @param pieceIdx is the piece number to show
+		 */
+		function setVisiblePiece(pieceDivs, pieceIdx) {
+			window.location.hash = "";
+			window.location.hash = "export_piece_" + (pieceIdx + 1);	
+		}
 		
 		// load body controller
 		contentController = new EditorContentController($("<div>").appendTo(div), that, config);
@@ -2478,7 +2563,10 @@ function EditorController(div, config) {
 		return importedPieceDivs;
 	}
 	
-	this.setGenerateConfig = function(config) {		
+	this.setGenerateConfig = function(config) {
+		
+		// validate config
+		PieceGenerator.validateConfig(config);
 		
 		// set passphrase
 		if (config.passphrase) passphraseController.setPassphrase(config.passphrase);
@@ -2491,7 +2579,7 @@ function EditorController(div, config) {
 		}
 		
 		// set currencies
-		contentController.getCurrenciesController().setConfig(config.currencies);
+		contentController.getCurrenciesController().setConfig(config.keypairs);
 	}
 	
 	this.getGenerateConfig = function() {
@@ -2590,6 +2678,21 @@ function EditorController(div, config) {
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
+	
+	function getPaginatorData() {
+		if (config.genConfig) {
+			if (!isDefined(config.genConfig.numPieces) || config.genConfig.numPieces === 1) return null;
+			var pieceNums = [];
+			for (var i = 0; i < config.genConfig.numPieces; i++) pieceNums.push(i + 1);
+			return pieceNums;
+		} else if (config.pieces.length > 1) {
+			var pieceNums = [];
+			for (var i = 0; i < config.pieces.length; i++) pieceNums.push(config.pieces[i].getPieceNum());
+			return pieceNums;
+		} else {
+			return null;
+		}
+	}
 	
 	function updateFormError() {
 		var formError = that.hasFormError();
@@ -3121,7 +3224,7 @@ function EditorSplitController(div, editorController) {
 			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
 			editorController.getContentController().onInputChange(update);
-			that.setEnabled(true);
+			update();
 		});
 		
 		// initial state
@@ -3180,20 +3283,24 @@ function EditorSplitController(div, editorController) {
 	
 	this.setEnabled = function(bool) {
 		splitCheckbox.setEnabled(bool);
-		update();
+		if (!bool || !that.getUseSplit()) {
+			numPiecesInput.attr("disabled", "disabled");
+			minPiecesInput.attr("disabled", "disabled");
+		} else {
+			numPiecesInput.removeAttr("disabled");
+			minPiecesInput.removeAttr("disabled");
+		}
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function update() {
 		
-		// set split inputs enabled
-		if (!splitCheckbox.isEnabled() || !that.getUseSplit()) {
-			numPiecesInput.attr("disabled", "disabled");
-			minPiecesInput.attr("disabled", "disabled");
+		// disable if pieces already split
+		if (editorController.getImportedPieces() && editorController.getImportedPieces()[0].isSplit()) {
+			that.setEnabled(false);
 		} else {
-			numPiecesInput.removeAttr("disabled");
-			minPiecesInput.removeAttr("disabled");
+			that.setEnabled(true);
 		}
 	}
 
@@ -3386,7 +3493,7 @@ function EditorCurrencyController(div, plugins, defaultTicker) {
 		return isNaN(parsed) ? null : parsed;
 	};
 	
-	this.setNumKeys = function(numKeys) {
+	this.setNumKeypairs = function(numKeys) {
 		numKeysInput.val(numKeys);
 	}
 	
@@ -3592,10 +3699,10 @@ function EditorCurrenciesController(div, plugins) {
 	 * 
 	 * @param config is an array of currencies to set for the currency inputs in the format [{ticker: "BCH", ...}, {...}]
 	 */
-	this.setConfig = function(configCurrencies) {
-		for (var i = 0; i < configCurrencies.length; i++) {
-			currencyInputs[i].setSelectedCurrency(configCurrencies[i].ticker);
-			currencyInputs[i].setNumKeys(configCurrencies[i].numKeys);
+	this.setConfig = function(configKeypairs) {
+		for (var i = 0; i < configKeypairs.length; i++) {
+			currencyInputs[i].setSelectedCurrency(configKeypairs[i].ticker);
+			currencyInputs[i].setNumKeypairs(configKeypairs[i].numKeypairs);
 		}
 	}
 	
@@ -4281,7 +4388,7 @@ CompactPieceRenderer.makeCopyable = function(pieceDivs) {
  * Relative weight to render a piece generation config.
  */
 CompactPieceRenderer.getRenderWeight = function(config) {
-	PieceGenerator.validateGenerateConfig(config);
+	PieceGenerator.validateConfig(config);
 	var numPieces = config.numPieces ? config.numPieces : 1;
 	var weight = 0;
 	
