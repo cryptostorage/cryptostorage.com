@@ -380,9 +380,7 @@ function PaginatorController(div, labels, config) {
 			showNext: false,
 			pageSize: 1,
 			dataSource: labels,
-			callback: function(data, pagination) {
-				invoke(clickListeners, data, pagination.pageNumber - 1);
-			}
+			callback: function(data, pagination) { invoke(clickListeners, pagination.pageNumber - 1, data); }
 		}, config);
 		
 		// initialize paginator
@@ -2387,9 +2385,7 @@ function EditorController(div, config) {
 	var that = this;
 	var passphraseController
 	var splitController;
-	var paginatorDiv
-	var paginator;
-	var paginatorLabel;
+	var paginatorController;
 	var contentController;
 	var importedPieces;
 	var importedPieceDivs;
@@ -2432,10 +2428,10 @@ function EditorController(div, config) {
 		splitController.render();
 		splitController.setUseSplit(false);
 		
-		// paginator
-		paginatorDiv = $("<div class='flex_vertical flex_align_center'>").appendTo(headerDiv);
-		updatePaginator();
-		if (paginator) setPaginatorEnabled(false);
+		// paginator controller
+		paginatorController = new EditorPaginatorController($("<div>").appendTo(headerDiv), that);
+		paginatorController.render();
+		paginatorController.onClick(function(index, label) { setVisiblePiece(label); });
 		
 		// load body controller
 		contentController = new EditorContentController($("<div>").appendTo(div), that, config);
@@ -2443,9 +2439,6 @@ function EditorController(div, config) {
 			
 			// announce ready
 			invoke(readyListeners);
-			
-			// paginator enabled
-			if (paginator) setPaginatorEnabled(true);
 			
 			// register callbacks
 			contentController.getActionsController().onGenerate(that.generate);
@@ -2461,6 +2454,10 @@ function EditorController(div, config) {
 		
 		// done rendering
 		if (onDone) onDone(div);
+	}
+	
+	this.getInitConfig = function() {
+		return config;
 	}
 	
 	this.onReady = function(listener) {
@@ -2632,7 +2629,7 @@ function EditorController(div, config) {
 		if (that.hasFormError()) return;
 		
 		// get generation config based on current state
-		var genConfig = that.getGenerateConfig()
+		var genConfig = that.getGenerateConfig();
 		
 		// copy pieces so originals are unchanged
 		if (genConfig.pieces) {
@@ -2641,7 +2638,7 @@ function EditorController(div, config) {
 			genConfig.pieces = copies;
 		}
 		
-		// apply config to pieces and render
+		// generate pieces according to config
 		var pieceGenerator = new PieceGenerator(genConfig);
 		pieceGenerator.generatePieces(function(percent, label) {
 			invoke(generateProgressListeners, percent, label);
@@ -2664,43 +2661,8 @@ function EditorController(div, config) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
-	function updatePaginator() {
-		paginatorDiv.empty();
-		var paginatorData = getPaginatorData();
-		console.log(paginatorData);
-		if (paginatorData) {
-			paginator = new PaginatorController($("<div>").appendTo(paginatorDiv), paginatorData);
-			paginator.render();
-			paginator.onClick(function(label, index) {
-				console.log("paginator.onClick(" + label + ", " + index +")");
-			});
-			paginatorLabel = $("<div class='export_piece_selection_label'>").appendTo(paginatorDiv);
-			paginatorLabel.html("Piece");
-		}
-	}
-	
-	function setPaginatorEnabled(bool) {
-		paginator.setEnabled(bool);
-		if (bool) paginatorLabel.removeClass("disabled");
-		else paginatorLabel.addClass("disabled");
-	}
-	
-	function getPaginatorData() {
-		var pieceNums = [];
-		if (that.getImportedPieces() && that.getImportedPieces().length > 1) {
-			for (var i = 0; i < that.getImportedPieces().length; i++) pieceNums.push(that.getImportedPieces()[i].getPieceNum());
-		} else if (config.pieces && config.pieces.length > 1) {
-			for (var i = 0; i < config.pieces.length; i++) pieceNums.push(config.pieces[i].getPieceNum());
-		} else if (config.genConfig) {
-			if (!isDefined(config.genConfig.numPieces) || config.genConfig.numPieces === 1) return null;
-			for (var i = 0; i < config.genConfig.numPieces; i++) pieceNums.push(i + 1);
-		} else {
-			return null;
-		}
-		return pieceNums;
-	}
-	
 	function setVisiblePiece(pieceNum) {
+		console.log("setVisiblePiece(" + pieceNum + ")");
 		throw new Error("Not implemented");
 		window.location.hash = "";
 		window.location.hash = "export_piece_" + (pieceNum + 1);	
@@ -3372,6 +3334,70 @@ function EditorSplitController(div, editorController) {
 	}
 }
 inheritsFrom(EditorSplitController, DivController);
+
+/**
+ * Controls the editor paginator.
+ * 
+ * @param div is the div to render to
+ * @param editorController is the top-level editor
+ */
+function EditorPaginatorController(div, editorController) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var paginator;
+	var pieceLabel;
+	var clickListeners;
+	
+	this.render = function(onDone) {
+		div.empty();
+		div.addClass("flex_vertical flex_align_center");
+		clickListeners = [];
+		updatePaginator();
+		if (onDone) onDone();
+	}
+	
+	/**
+	 * Invokes listener(index, label) when a label is clicked.
+	 */
+	this.onClick = function(listener) {
+		assertFunction(listener);
+		clickListeners.push(listener);
+	}
+	
+	function updatePaginator() {
+		div.empty();
+		var pieceNums = getPieceNums();
+		if (pieceNums.length > 1) {
+			paginator = new PaginatorController($("<div>").appendTo(div), pieceNums);
+			paginator.render();
+			paginator.onClick(function(index, label) { invoke(selectionListeners, index, label); });
+			piecesLabel = $("<div class='export_piece_selection_label'>").appendTo(div);
+			piecesLabel.html("Piece");
+		}
+	}
+	
+	function setEnabled(bool) {
+		paginator.setEnabled(bool);
+		if (bool) pieceLabel.removeClass("disabled");
+		else pieceLabel.addClass("disabled");
+	}
+	
+	function getPieceNums() {
+		var pieceNums = [];
+		var importedPieces = editorController.getImportedPieces();
+		var config = editorController.getInitConfig();
+		if (importedPieces && importedPieces.length > 1) {
+			for (var i = 0; i < importedPieces.length; i++) pieceNums.push(importedPieces[i].getPieceNum());
+		} else if (config.pieces && config.pieces.length > 1) {
+			for (var i = 0; i < config.pieces.length; i++) pieceNums.push(config.pieces[i].getPieceNum());
+		} else if (config.genConfig && isDefined(config.genConfig.numPieces) && config.genConfig.numPieces > 1) {
+			for (var i = 0; i < config.genConfig.numPieces; i++) pieceNums.push(i + 1);
+		}
+		return pieceNums;
+	}
+}
+inheritsFrom(EditorPaginatorController, DivController)
 
 /**
  * Manages a single currency input.
