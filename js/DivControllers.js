@@ -2387,10 +2387,10 @@ function EditorController(div, config) {
 	var splitController;
 	var paginatorController;
 	var contentController;
-	var importedPieces;
-	var importedPieceDivs;
-	var pieces;
-	var pieceDivs;
+	var importedPieces;			// original imported pieces
+	var importedPieceDivs;	// piece divs for original imported pieces
+	var pieces;							// current pieces
+	var pieceDivs;					// piece divs for current pieces
 	var formErrorChangeListeners;
 	var setPiecesListeners;
 	var generateProgressListeners;
@@ -3354,6 +3354,9 @@ function EditorPaginatorController(div, editorController) {
 		div.addClass("flex_vertical flex_align_center");
 		clickListeners = [];
 		updatePaginator();
+		if (paginator) setEnabled(false);
+		editorController.onReady(function() { updatePaginator(); });
+		editorController.onSetPieces(function() { updatePaginator(); });
 		if (onDone) onDone();
 	}
 	
@@ -3374,21 +3377,24 @@ function EditorPaginatorController(div, editorController) {
 			paginator.onClick(function(index, label) { invoke(selectionListeners, index, label); });
 			piecesLabel = $("<div class='export_piece_selection_label'>").appendTo(div);
 			piecesLabel.html("Piece");
+			div.show();
+		} else {
+			div.hide();
 		}
 	}
 	
 	function setEnabled(bool) {
 		paginator.setEnabled(bool);
-		if (bool) pieceLabel.removeClass("disabled");
-		else pieceLabel.addClass("disabled");
+		if (bool) piecesLabel.removeClass("disabled");
+		else piecesLabel.addClass("disabled");
 	}
 	
 	function getPieceNums() {
 		var pieceNums = [];
-		var importedPieces = editorController.getImportedPieces();
+		var currentPieces = editorController.getPieces();
 		var config = editorController.getInitConfig();
-		if (importedPieces && importedPieces.length > 1) {
-			for (var i = 0; i < importedPieces.length; i++) pieceNums.push(importedPieces[i].getPieceNum());
+		if (currentPieces && currentPieces.length > 1) {
+			for (var i = 0; i < currentPieces.length; i++) pieceNums.push(currentPieces[i].getPieceNum());
 		} else if (config.pieces && config.pieces.length > 1) {
 			for (var i = 0; i < config.pieces.length; i++) pieceNums.push(config.pieces[i].getPieceNum());
 		} else if (config.genConfig && isDefined(config.genConfig.numPieces) && config.genConfig.numPieces > 1) {
