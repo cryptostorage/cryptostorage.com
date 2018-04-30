@@ -1571,7 +1571,7 @@ function ImportFileController(div) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openEditorTab("Encrypted keys", {pieces: [piece], sourcePieces: importedPieces.length > 1 ? importedPieces : null});
+					UiUtils.openEditorTab("Encrypted keys", {pieces: [piece], sourcePieces: importedPieces});
 				});
 			});
 			
@@ -1620,7 +1620,7 @@ function ImportFileController(div) {
 		
 		// export link opens editor
 		editor.click(function() {
-			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
+			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined), sourcePieces: importedPieces});
 		});
 	}
 	
@@ -2427,6 +2427,15 @@ function EditorController(div, config) {
 		splitController = new EditorSplitController($("<div>").appendTo(passphraseSplitDiv), that);
 		splitController.render();
 		splitController.setUseSplit(false);
+		
+		// view split pieces
+		if (config.sourcePieces && config.sourcePieces.length > 1) {
+			var viewSplit = $("<div class='import_control_link'>").appendTo(headerDiv);
+			viewSplit.html("view imported pieces");
+			viewSplit.click(function() {
+				UiUtils.openEditorTab("Imported Pieces", {pieces: config.sourcePieces});
+			});
+		}
 		
 		// paginator controller
 		paginatorController = new EditorPaginatorController($("<div>").appendTo(headerDiv), that);
