@@ -60,6 +60,53 @@ var UiUtils = {
 	},
 	
 	/**
+	 * Gets a copy of the given pieces which are sorted and assigns a piece number if not given.
+	 * 
+	 * @param pieces are the pieces to copy and prepare for export
+	 */
+	getPiecesForExport: function(pieces) {
+		
+		// copy pieces
+		var copies = [];
+		for (var i = 0; i < pieces.length; i++) {
+			copies.push(pieces[i].copy());
+		}
+		
+		// assign piece numbers
+		for (var i = 0; i < copies.length; i++) {
+			if (copies[i].isSplit() && !copies[i].getPieceNum()) {
+				copies[i].setPieceNum(getNextAvailablePieceNum(copies));
+			}
+		}
+		
+		// sort
+		copies.sort(function(piece1, piece2) {
+			var num1 = piece1.getPieceNum();
+			var num2 = piece2.getPieceNum();
+			assertNumber(num1);
+			assertNumber(num2);
+			return num1 - num2;
+		});
+		
+		return(copies);
+		
+		function getNextAvailablePieceNum(pieces) {
+			var pieceNum = 1;
+			while (true) {
+				var found = false;
+				for (var i = 0; i < pieces.length; i++) {
+					if (pieces[i].getPieceNum() === pieceNum) {
+						found = true;
+						break;
+					} 
+				}
+				if (!found) return pieceNum;
+				pieceNum++;
+			}
+		}
+	},
+	
+	/**
 	 * Opens the editor in a new tab.
 	 * 
 	 * @param browserTabName is the name of the tab
@@ -1674,7 +1721,7 @@ function ImportFileController(div) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openEditorTab("Imported Pieces", {pieces: importedPieces});
+			UiUtils.openEditorTab("Imported Pieces", {pieces: UiUtils.getPiecesForExport(importedPieces)});
 		});
 		
 		// handle unsplit piece
@@ -1831,7 +1878,7 @@ function ImportTextController(div, plugins) {
 		
 		// text area
 		textArea = $("<textarea class='import_textarea'>").appendTo(textInputDiv);
-		textArea.attr("placeholder", "Enter private keys, split shares, csv, or json");
+		textArea.attr("placeholder", "Enter private keys, a split share, csv, or json");
 		
 		// submit button
 		var submit = $("<div class='import_button'>").appendTo(textInputDiv);
@@ -2094,7 +2141,7 @@ function ImportTextController(div, plugins) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openEditorTab("Imported Storage", {pieces: importedPieces});
+			UiUtils.openEditorTab("Imported Storage", {pieces: UiUtils.getPiecesForExport(importedPieces)});
 		});
 		
 		// handle unsplit piece
@@ -2432,7 +2479,7 @@ function EditorController(div, config) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(headerDiv);
 			viewSplit.html("view imported pieces");
 			viewSplit.click(function() {
-				UiUtils.openEditorTab("Imported Pieces", {pieces: config.sourcePieces});
+				UiUtils.openEditorTab("Imported Pieces", {pieces: UiUtils.getPiecesForExport(config.sourcePieces)});
 			});
 		}
 		

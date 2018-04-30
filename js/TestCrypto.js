@@ -675,6 +675,7 @@ function TestCrypto() {
 			funcs.push(testDuplicateNames());
 			funcs.push(testUnsupportedFileTypes());
 			funcs.push(testZip());
+			funcs.push(testShareThenUnencrypted());
 //		funcs.push(testInvalidZip());
 			
 			// run tests async
@@ -874,6 +875,19 @@ function TestCrypto() {
 				fileImporter.addFiles([file1, file2], function() {
 					assertEquals(0, fileImporter.getNamedPieces().length);
 					assertEquals("file2.png is not a json, csv, txt, or zip file", fileImporter.getWarning());
+					onDone();
+				});
+			}
+		}
+		
+		function testShareThenUnencrypted() {
+			return function(onDone) {
+				fileImporter.startOver();
+				var file1 = getFile('{"keypairs":[{"ticker":"XMR","privateWif":"StRy32d5vCnoDQE1S7GLviyTRaZmhgTnHL4YwjdUheBVu5ev"}]}', "file1.json", AppUtils.FileType.JSON);
+				var file2 = getFile('{"keypairs":[{"ticker":"XMR","privateWif":"scamper framed voted taken espionage dosage nomad point unnoticed oscar uneven mesh plotting huge dice luxury oilfield orphans fitting alerts goodbye unafraid daily divers dice"}]}', "file2.json", AppUtils.FileType.JSON);
+				fileImporter.addFiles([file1, file2], function() {
+					assertEquals(2, fileImporter.getNamedPieces().length);
+					assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
 					onDone();
 				});
 			}

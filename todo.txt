@@ -1,9 +1,10 @@
 v0.3.0
 transfer tests
-view split pieces in editor
 ability to cancel import decryption, piece generation
 remove deprecated code
 text parser
+test import text controller to fix dev warning when xmr share then unencrypted imported
+test piece already imported warning file import controller
 print
 backwards compatibility
 direct link to editor
@@ -15,6 +16,7 @@ interoperability disclosure
 performance tests and optimizations
 decryption / generation announces 0% then breathes
 passphrase validation error persists after unchecking passphrase
+remove hex from exports
 
 remaining todos
 split lines bolder
