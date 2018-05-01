@@ -17,6 +17,7 @@ function PieceGenerator(config) {
 	config = Object.assign({}, config);
 	var _isDestroyed = false;
 	var currentPieces;
+	var pieceRenderers;
 
 	/**
 	 * Starts generating pieces and/or piece renderers according to the config.
@@ -86,6 +87,9 @@ function PieceGenerator(config) {
 	 */
 	this.destroy = function() {
 		assertFalse(_isDestroyed, "Piece generator is already destroyed");
+		if (pieceRenderers) {
+			for (var i = 0; i < pieceRenderers.length; i++) pieceRenderers[i].destroy();
+		}
 		if (currentPieces) {
 			for (var i = 0; i < currentPieces.length; i++) currentPieces[i].destroy();
 		}
@@ -218,18 +222,18 @@ function PieceGenerator(config) {
 			
 		// collect renderers
 		var numRendered = 0;
-		var renderers = [];
+		pieceRenderers = [];
 		for (var i = 0; i < pieces.length; i++) {
-			var renderer = new config.pieceRendererClass(null, pieces[i]);
-			renderer.onProgress(function(percent, label) {
+			pieceRenderer = new config.pieceRendererClass(null, pieces[i]);
+			pieceRenderer.onProgress(function(percent, label) {
 				if (onProgress) onProgress((numRendered + percent) / pieces.length, label);
 			});
-			renderers.push(renderer);
+			pieceRenderers.push(pieceRenderer);
 		}
 		
 		// collect render callback functions
 		var renderFuncs = [];
-		for (var i = 0; i < renderers.length; i++) renderFuncs.push(renderFunction(renderers[i]));
+		for (var i = 0; i < pieceRenderers.length; i++) renderFuncs.push(renderFunction(pieceRenderers[i]));
 		function renderFunction(renderer) {
 			return function(onDone) {
 				renderer.render(function(div) {
@@ -240,10 +244,10 @@ function PieceGenerator(config) {
 		}
 		
 		// render async
-		async.series(renderFuncs, function(err, renderers) {
+		async.series(renderFuncs, function(err, pieceRenderers) {
 			assertNull(err);
-			assertEquals(pieces.length, renderers.length);
-			onDone(null, pieces, renderers);
+			assertEquals(pieces.length, pieceRenderers.length);
+			onDone(null, pieces, pieceRenderers);
 		});
 	}
 }

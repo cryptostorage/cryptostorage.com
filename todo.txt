@@ -1,5 +1,4 @@
 v0.3.0
-ability to cancel import decryption
 remove deprecated code
 text parser
 print

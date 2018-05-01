@@ -1524,7 +1524,8 @@ function ImportFileController(div) {
 		importedPiecesDiv.hide();
 		controlsDiv.hide();
 		removePieces();
-		if (decryptionController) decryptionController.cancel();
+		if (decryptionController) decryptionController.destroy();
+		decryptionController = null;
 	}
 	
 	this.addFiles = function(files, onDone) {
@@ -1921,7 +1922,8 @@ function ImportTextController(div, plugins) {
 		removePieces();
 		cryptoSelector.setEnabled(true);
 		cryptoSelector.reset();
-		if (decryptionController) decryptionController.cancel();
+		if (decryptionController) decryptionController.destroy();
+		decryptionController = null;
 	}
 	
 	this.getWarning = function() {
@@ -2207,11 +2209,13 @@ function DecryptionController(div, encryptedPiece) {
 	var passphraseInput;
 	var progressDiv;
 	var submitButton;
-	var canceller = {};
 	var onWarningFn;
 	var onDecryptedFn;
+	var pieceRenderer;
+	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
+		assertFalse(_isDestroyed, "DecryptionController is destroyed");
 		
 		// set up div
 		div.empty();
@@ -2249,14 +2253,23 @@ function DecryptionController(div, encryptedPiece) {
 	}
 	
 	this.focus = function() {
+		assertFalse(_isDestroyed, "DecryptionController is destroyed");
 		passphraseInput.focus();
 	}
 	
-	this.cancel = function() {
-		canceller.isCancelled = true;
+	this.destroy = function() {
+		assertFalse(_isDestroyed, "DecryptionController already destroyed");
+		if (pieceRenderer) pieceRenderer.destroy();
+		encryptedPiece.destroy();
+		_isDestroyed = true;
+	}
+	
+	this.isDestroyed = function() {
+		return _isDestroyed;
 	}
 	
 	this.onWarning = function(callbackFn) {
+		assertFalse(_isDestroyed, "DecryptionController is destroyed");
 		onWarningFn = callbackFn;
 	}
 	
@@ -2266,8 +2279,11 @@ function DecryptionController(div, encryptedPiece) {
 	 * @param callbackFn(decryptedPiece, pieceRenderer) is invoked when the piece is decrypted
 	 */
 	this.onDecrypted = function(callbackFn) {
+		assertFalse(_isDestroyed, "DecryptionController is destroyed");
 		onDecryptedFn = callbackFn;
 	}
+	
+	// --------------------------------- PRIVATE --------------------------------
 	
 	function init() {
 		progressDiv.hide();
@@ -2293,9 +2309,9 @@ function DecryptionController(div, encryptedPiece) {
 		}
 		
 		// compute weights for progress bar
-		var renderer = new CompactPieceRenderer(null, encryptedPiece);
+		pieceRenderer = new CompactPieceRenderer(null, encryptedPiece);
 		var decryptWeight = encryptedPiece.getDecryptWeight();
-		var renderWeight = renderer.getRenderWeight();
+		var renderWeight = pieceRenderer.getRenderWeight();
 		var totalWeight = decryptWeight + renderWeight;
 		
 		// switch content div to progress bar
@@ -2309,8 +2325,10 @@ function DecryptionController(div, encryptedPiece) {
 			
 			// decrypt piece TODO: ability to cancel decryption
 			encryptedPiece.decrypt(passphrase, function(percent, label) {
+				if (_isDestroyed) return;
 				setProgress(percent * decryptWeight / totalWeight, label);
 			}, function(err, decryptedPiece) {
+				if (_isDestroyed) return;
 				
 				// if error, switch back to input div
 				if (err) {
@@ -2320,13 +2338,13 @@ function DecryptionController(div, encryptedPiece) {
 				}
 				
 				// register renderer progress
-				renderer.onProgress(function(percent, label) {
+				pieceRenderer.onProgress(function(percent, label) {
 					setProgress((decryptWeight + percent * renderWeight) / totalWeight, "Rendering");
 				});
 				
 				// render piece
-				renderer.render(function(pieceDiv) {
-					if (onDecryptedFn) onDecryptedFn(decryptedPiece, renderer);
+				pieceRenderer.render(function(pieceDiv) {
+					if (onDecryptedFn) onDecryptedFn(decryptedPiece, pieceRenderer);
 				});
 			});
 		});
@@ -4304,8 +4322,10 @@ function CompactPieceRenderer(div, piece) {
 	
 	var keypairRenderers;
 	var onProgressFn;
+	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
+		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
 		
 		// compute weights
 		var doneWeight = 0;
@@ -4314,13 +4334,17 @@ function CompactPieceRenderer(div, piece) {
 			totalWeight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker());
 		}
 		
-		// collect functions to render keypairs
+		// collect keypair renderers and render functions
 		var renderFuncs = [];
+		keypairRenderers = [];
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			renderFuncs.push(renderFunc(new KeypairRenderer($("<div>"), piece.getKeypairs()[i], piece.getKeypairs().length > 1 ? "#" + (i + 1) : null)));
+			var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[i], piece.getKeypairs().length > 1 ? "#" + (i + 1) : null);
+			keypairRenderers.push(keypairRenderer);
+			renderFuncs.push(renderFunc(keypairRenderer));
 		}
 		function renderFunc(keypairRenderer) {
 			return function(onDone) {
+				if (_isDestroyed) return;
 				keypairRenderer.render(function(div) {
 					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
 					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
@@ -4333,8 +4357,8 @@ function CompactPieceRenderer(div, piece) {
 		if (onProgressFn) onProgressFn(0, "Rendering keypairs");
 		setImmediate(function() {	// let browser breath
 			async.series(renderFuncs, function(err, _keypairRenderers) {
+				if (_isDestroyed) return;
 				assertNull(err);
-				keypairRenderers = _keypairRenderers;
 				
 				// render keypairs
 				update({
@@ -4378,21 +4402,40 @@ function CompactPieceRenderer(div, piece) {
 		});
 	}
 	
+	/**
+	 * Destroys the renderer.  Does not destroy the underling piece.
+	 */
+	this.destroy = function() {
+		assertFalse(_isDestroyed, "CompactPieceRenderer already destroyed");
+		if (keypairRenderers) {
+			for (var i = 0; i < keypairRenderers.length; i++) keypairRenderers[i].destroy();
+		}
+		_isDestroyed = true;
+	}
+	
+	this.isDestroyed = function() {
+		return _isDestroyed;
+	}
+	
 	this.getPiece = function() {
+		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
 		return piece;
 	}
 	
 	this.onProgress = function(callbackFn) {
+		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
 		onProgressFn = callbackFn;
 	}
 	
 	this.getRenderWeight = function() {
+		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
 		var weight = 0;
 		for (var i = 0; i < piece.getKeypairs().length; i++) weight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i]);
 		return weight;
 	}
 	
 	function update(config) {
+		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
 		
 		// validate config
 		assertInitialized(config);
@@ -4565,19 +4608,13 @@ function KeypairRenderer(div, keypair, id) {
 	DivController.call(this, div);
 	
 	var that = this;
-	var isCancelled = false;
 	var keypairLeftValue;
 	var keypairRightValue;
 	var keypairCryptoLogo;
+	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
-		
-		// cancel render
-		if (isCancelled) {
-			isCancelled = false;
-			if (onDone) onDone(div);
-			return;
-		}
+		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
 		
 		// div setup
 		div.empty();
@@ -4640,7 +4677,7 @@ function KeypairRenderer(div, keypair, id) {
 		// add qr codes
 		if (decoded.leftValueCopyable) {
 			UiUtils.renderQrCode(decoded.leftValue, KeypairRenderer.QR_CONFIG, function(img) {
-				if (isCancelled) return;
+				if (_isDestroyed) return;
 				img.attr("class", "keypair_qr");
 				keypairLeftDiv.append(img);
 				addPrivateQr();
@@ -4655,7 +4692,7 @@ function KeypairRenderer(div, keypair, id) {
 		function addPrivateQr() {
 			if (decoded.rightValueCopyable) {
 				UiUtils.renderQrCode(decoded.rightValue, KeypairRenderer.QR_CONFIG, function(img) {
-					if (isCancelled) return;
+					if (_isDestroyed) return;
 					img.attr("class", "keypair_qr");
 					keypairRightDiv.append(img);
 					if (onDone) onDone(div);
@@ -4668,23 +4705,35 @@ function KeypairRenderer(div, keypair, id) {
 		}
 	}
 	
+	/**
+	 * Destroys the KeypairRenderer.  Does not destroy the underlying keypair.
+	 */
+	this.destroy = function () {
+		assertFalse(_isDestroyed, "KeypairRenderer is already destroyed");
+		_isDestroyed = true;
+	}
+	
+	this.isDestroyed = function() {
+		return _isDestroyed;
+	}
+	
 	this.getKeypair = function() {
+		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
 		return keypair;
 	}
 	
-	this.cancelRender = function() {
-		isCancelled = true;
-	}
-	
 	this.setPublicVisible = function(visible) {
+		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
 		throw new Error("Not implemented");
 	}
 	
 	this.setPrivateVisible = function(visible) {
+		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
 		throw new Error("Not implemented");
 	}
 	
 	this.setLogoVisible = function(visible) {
+		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
 		throw new Error("Not implemented");
 	}
 }
