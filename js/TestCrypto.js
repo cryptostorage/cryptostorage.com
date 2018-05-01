@@ -2,8 +2,6 @@
  * Tests keypairs and pieces.
  * 
  * File import tests can only be run on browsers which support the File constructor.
- * 
- * TODO: more text import tests
  */
 function TestCrypto() {
 	
@@ -179,23 +177,22 @@ function TestCrypto() {
 			assertFalse(keypair.isSplit());
 			assertNull(keypair.getMinShares());
 			assertTrue(plugin.isAddress(keypair.getPublicAddress()));
+			var copy = new CryptoKeypair({plugin: plugin, privateKey: keypair.getPrivateHex()});
+			assertTrue(keypair.equals(copy));
+			copy = new CryptoKeypair({plugin: plugin, privateKey: keypair.getPrivateWif()});
+			assertTrue(keypair.equals(copy));
 		}
 		
-		// TODO: test creation of keypair from hex and wif and assert equals
-		
 		// test invalid private keys
-		// TODO: CryptoKey sometimes accepts invalid PKs because of split/encryption encoding
-//		var invalids = copyArray(INVALID_PKS);
-//		invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());
-//		for (var i = 0; i < invalids.length; i++) {
-//			var invalid = invalids[i];
-//			try {
-//				new CryptoKeypair({plugin: plugin, privateKey: invalid});
-//				fail("fail");
-//			} catch (err) {
-//				if (err.message === "fail") throw new Error("Should not create " + plugin.getTicker() + " keypair from invalid input: " + invalid);
-//			}
-//		}
+		for (var i = 0; i < INVALID_PKS.length; i++) {
+			var invalid = INVALID_PKS[i];
+			try {
+				new CryptoKeypair({plugin: plugin, privateKey: invalid});
+				fail("fail");
+			} catch (err) {
+				if (err.message === "fail") throw new Error("Should not create " + plugin.getTicker() + " keypair from invalid private key: " + invalid);
+			}
+		}
 	}
 	
 	function testPieceEncryption(plugins, onDone) {
@@ -515,7 +512,13 @@ function TestCrypto() {
 			if (err.message === "fail") throw new Error("Should not be able to set pieceNum on unencrypted keys");
 		}
 		
-		// TODO: test init with invalid public address
+		// test init with invalid public address
+		try {
+			new CryptoPiece({plugin: piece.getKeypairs()[0].getPlugin(), privateKey: piece.getKeypairs[0].getPrivateWif(), publicAddress: "invalid123"});
+			throw new Error("fail");
+		} catch (err) {
+			if (err.message === "fail") throw new Error("Should not be able create piece with invalid address");
+		}
 		
 		// test init from json
 		piece2 = new CryptoPiece({json: piece.toJson()});

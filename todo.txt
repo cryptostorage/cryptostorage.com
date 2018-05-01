@@ -1,5 +1,4 @@
 v0.3.0
-tests
 ability to cancel import decryption, piece generation
 remove deprecated code
 text parser
