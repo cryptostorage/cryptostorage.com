@@ -16,6 +16,7 @@ function PieceGenerator(config) {
 	PieceGenerator.validateConfig(config);
 	config = Object.assign({}, config);
 	var isCancelled = false;
+	var _isDestroyed = false;
 
 	/**
 	 * Starts generating pieces and/or piece renderers according to the config.
@@ -75,10 +76,14 @@ function PieceGenerator(config) {
 	}
 	
 	/**
-	 * Cancels piece generation.
+	 * Destroys the piece generator and any pieces given to it or in the process of being generated.
 	 */
-	this.cancel = function() {
-		isCancelled = true;
+	this.destroy = function() {
+		_isDestroyed = true;
+	}
+	
+	this.isDestroyed = function() {
+		return _isDestroyed;
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------

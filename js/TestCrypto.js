@@ -65,7 +65,8 @@ function TestCrypto() {
 					if (err) throw err;
 					
 					// test destroy during processing
-					testDestroy(plugins, function(err) {
+					testDestroyPieceGenerator(plugins, function(err) {
+						throw new Error("Yay piece generation tests pass");
 						if (err) throw err;
 						
 						// test piece encryption and splitting
@@ -262,63 +263,67 @@ function TestCrypto() {
 			assertFalse(piece.isEncrypted());
 			assertFalse(piece.isSplit());
 			testPieceWithoutEncryption(piece);
-			
-			// encrypt piece
-			var progressStarted = false;
-			var progressComplete = false;
-			var lastPercent = 0;
-			piece.encrypt(PASSPHRASE, schemes, function(percent, label) {
-				if (percent === 0) progressStarted = true;
-				if (percent === 1) progressComplete = true;
-				assertEquals("Encrypting keypairs", label);
-				assertTrue(percent >= lastPercent);
-				lastPercent = percent;
-			}, function(err, encryptedPiece) {
-				if (err) throw err;
+			testDestroyPiece(piece, function() {
 				
-				// test state
-				assertTrue(piece === encryptedPiece);
-				assertTrue(progressStarted, "Progress was not started");
-				assertTrue(progressComplete, "Progress was not completed");
-				assertTrue(piece.isEncrypted());
-				assertFalse(piece.isSplit());
-				assertNull(piece.getPieceNum());
-				testPieceWithoutEncryption(encryptedPiece);
-				
-				// cannot encrypt encrypted piece
-				try {
-					piece.encrypt(PASSPHRASE, schemes, function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
-					fail("fail");
-				} catch (err) {
-					if (err.message === "fail") throw new Error("Cannot encrypt encrypted piece");
-				}
-				
-				// decrypt with wrong password
-				piece.decrypt("wrongPassphrase123", function(percent, label) {}, function(err, decryptedPiece) {
-					assertInitialized(err);
-					assertEquals("Incorrect passphrase", err.message);
-					assertUndefined(decryptedPiece);
+				// encrypt piece
+				var progressStarted = false;
+				var progressComplete = false;
+				var lastPercent = 0;
+				piece.encrypt(PASSPHRASE, schemes, function(percent, label) {
+					if (percent === 0) progressStarted = true;
+					if (percent === 1) progressComplete = true;
+					assertEquals("Encrypting keypairs", label);
+					assertTrue(percent >= lastPercent);
+					lastPercent = percent;
+				}, function(err, encryptedPiece) {
+					if (err) throw err;
 					
-					// decrypt piece
-					progressStarted = false;
-					progressCompleted = false;
-					piece.decrypt(PASSPHRASE, function(percent, label) {
-						if (percent === 0) progressStarted = true;
-						if (percent === 1) progressComplete = true;
-						assertEquals("Decrypting", label);
-					}, function(err, decryptedPiece) {
-						if (err) throw err;
+					// test state
+					assertTrue(piece === encryptedPiece);
+					assertTrue(progressStarted, "Progress was not started");
+					assertTrue(progressComplete, "Progress was not completed");
+					assertTrue(piece.isEncrypted());
+					assertFalse(piece.isSplit());
+					assertNull(piece.getPieceNum());
+					testPieceWithoutEncryption(encryptedPiece);
+					testDestroyPiece(encryptedPiece, function() {
 						
-						// test state
-						assertTrue(progressStarted, "Progress was not started");
-						assertTrue(progressComplete, "Progress was not completed");
-						assertTrue(piece.equals(original));
-						assertFalse(piece.isEncrypted());
-						assertFalse(piece.isSplit());
-						assertNull(piece.getPieceNum());
+						// cannot encrypt encrypted piece
+						try {
+							piece.encrypt(PASSPHRASE, schemes, function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
+							fail("fail");
+						} catch (err) {
+							if (err.message === "fail") throw new Error("Cannot encrypt encrypted piece");
+						}
 						
-						// done testing
-						onDone();
+						// decrypt with wrong password
+						piece.decrypt("wrongPassphrase123", function(percent, label) {}, function(err, decryptedPiece) {
+							assertInitialized(err);
+							assertEquals("Incorrect passphrase", err.message);
+							assertUndefined(decryptedPiece);
+							
+							// decrypt piece
+							progressStarted = false;
+							progressCompleted = false;
+							piece.decrypt(PASSPHRASE, function(percent, label) {
+								if (percent === 0) progressStarted = true;
+								if (percent === 1) progressComplete = true;
+								assertEquals("Decrypting", label);
+							}, function(err, decryptedPiece) {
+								if (err) throw err;
+								
+								// test state
+								assertTrue(progressStarted, "Progress was not started");
+								assertTrue(progressComplete, "Progress was not completed");
+								assertTrue(piece.equals(original));
+								assertFalse(piece.isEncrypted());
+								assertFalse(piece.isSplit());
+								assertNull(piece.getPieceNum());
+								
+								// done testing
+								onDone();
+							});
+						});
 					});
 				});
 			});
@@ -1063,29 +1068,100 @@ function TestCrypto() {
 //		assertTrue(copy.isEncrypted());
 //	});
 	
-	function testDestroy(plugins, onDone) {
+	function testDestroyPiece(piece, onDone) {
+		
+		// only continue if piece is known to be unsplit
+		if (piece.isSplit() !== false) {
+			onDone();
+			return;
+		}
+		
+		// don't destroy original piece
+		piece = piece.copy();
+		
+		// start encrypting or decrypting
+		if (!piece.isEncrypted()) {
+			var schemes = [];
+			for (var i = 0; i < piece.getKeypairs().length; i++) schemes.push(piece.getKeypairs()[i].getPlugin().getEncryptionSchemes()[0])
+			var isDestroyed = false;
+			piece.encrypt(PASSPHRASE, schemes, onProgress, onDone);
+		} else {
+			piece.decrypt(PASSPHRASE, onProgress, onDone);
+		}
+		
+		var isDestroyed = false; // track when destroyed
+		
+		// destroy on intermediate progress
+		function onProgress(percent, label) {
+			assertFalse(isDestroyed);
+			if (percent > 0 && percent < 1) {
+				isDestroyed = true;
+				piece.destroy();
+				assertTrue(piece.isDestroyed());
+				try {
+					piece.copy();
+					fail("fail");
+				} catch (err) {
+					if (err.message === "fail") throw new Error("Cannot use destroyed piece");
+				}
+				onDone();
+			}
+			
+			// test onDone()
+			function onDone(err, piece) {
+				if (isDestroyed) throw new Error("Should not call onDone() after being destroyed");
+				onDone();	// destroy could not be tested because never intermediate progress
+			}
+		}
+	}
+	
+	function testDestroyPieceGenerator(plugins, onDone) {
 		console.log("Testing destroy");
+		
+		// pre-generate a piece
+		var keypairs = [];
+		for (var i = 0; i < plugins.length; i++) keypairs.push(plugins[i].newKeypair());
+		var piece = new CryptoPiece({keypairs: keypairs});
 		
 		// get generation config with encryption
 		var config = {};
+		config.pieces = [piece];
 		config.passphrase = PASSPHRASE;
-		config.keypairs = [];
-		for (var i = 0; i < plugins.length; i++) {
-			config.keypairs.push({
-				ticker: plugins[i].getTicker(),
-				numKeypairs: 1,
-				encryption: plugins[i].getEncryptionSchemes()[0]
-			});
-		}
+		config.encryptionSchemes = [];
+		for (var i = 0; i < piece.getKeypairs().length; i++) config.encryptionSchemes.push(piece.getKeypairs()[i].getPlugin().getEncryptionSchemes()[0]);
 		
 		// start generating
 		var isDestroyed = false;
 		var pieceGenerator = new PieceGenerator(config);
 		pieceGenerator.generatePieces(function(percent, label) {
 			assertFalse(isDestroyed, "Progress should not be invoked after being destroyed");
+
+			// destroy when progress exceeds 25%
 			if (percent > .25) {
-				throw new Error("Time to destroy");
 				isDestroyed = true;
+				pieceGenerator.destroy();
+				assertTrue(pieceGenerator.isDestroyed());
+				assertTrue(piece.isDestroyed());
+				
+				// cannot use destroyed generator
+				try {
+					pieceGenerator.generatePieces();
+					fail("fail");
+				} catch (err) {
+					if (err.message === "fail") throw new Error("Cannot use destroyed generator");
+					assertEquals("Piece generator is destroyed", err.message);
+				}
+				
+				// cannot use destroyed piece
+				try {
+					piece.copy();
+					fail("fail");
+				} catch (err) {
+					if (err.message === "fail") throw new Error("Cannot use destroyed piece");
+					assertEquals("Piece is destroyed", err.message);
+				}
+				
+				// done
 				onDone();
 			}
 		}, function(err, pieces, pieceRenderers) {

@@ -39,6 +39,7 @@ function CryptoPiece(config) {
 	
 	var that = this;
 	var state;
+	var _isDestroyed;
 		
 	this.getKeypairs = function() {
 		return state.keypairs;
@@ -313,6 +314,14 @@ function CryptoPiece(config) {
 		var schemes = [];
 		for (var i = 0; i < state.keypairs.length; i++) schemes.push(state.keypairs[i].getEncryptionScheme());
 		return CryptoKeypair.getDecryptWeight(schemes);
+	}
+	
+	this.destroy = function() {
+		_isDestroyed = true;
+	}
+	
+	this.isDestroyed = function() {
+		return _isDestroyed;
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
