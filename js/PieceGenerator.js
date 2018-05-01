@@ -85,6 +85,7 @@ function PieceGenerator(config) {
 	 * Destroys the piece generator and any pieces given to it or in the process of being generated.
 	 */
 	this.destroy = function() {
+		assertFalse(_isDestroyed, "Piece generator is already destroyed");
 		if (currentPieces) {
 			for (var i = 0; i < currentPieces.length; i++) currentPieces[i].destroy();
 		}

@@ -97,6 +97,7 @@ function CryptoPiece(config) {
 		
 		function encryptFunc(keypair, scheme, passphrase) {
 			return function(onDone) {
+				if (_isDestroyed) return;
 				keypair.encrypt(scheme, passphrase, function(percent) {
 					if (onProgress) onProgress((doneWeight +  CryptoKeypair.getEncryptWeight(scheme) * percent) / totalWeight, "Encrypting keypairs");
 				}, function(err, keypair) {
@@ -155,6 +156,7 @@ function CryptoPiece(config) {
 		// decrypts one key
 		function decryptFunc(keypair, passphrase) {
 			return function(onDone) {
+				if (_isDestroyed) return;
 				var scheme = keypair.getEncryptionScheme();
 				keypair.decrypt(passphrase, function(percent) {
 					if (onProgress) onProgress((doneWeight + CryptoKeypair.getDecryptWeight(scheme) * percent) / totalWeight, "Decrypting");
@@ -340,6 +342,7 @@ function CryptoPiece(config) {
 	}
 	
 	this.destroy = function() {
+		assertFalse(_isDestroyed, "Piece is already destroyed");
 		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].destroy();
 		deleteProperties(state);
 		_isDestroyed = true;

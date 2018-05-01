@@ -274,6 +274,7 @@ function CryptoKeypair(config) {
 	}
 	
 	this.destroy = function() {
+		assertFalse(_isDestroyed, "Keypair is already destroyed");
 		deleteProperties(state);
 		_isDestroyed = true;
 	}

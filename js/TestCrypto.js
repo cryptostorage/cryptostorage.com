@@ -1089,32 +1089,32 @@ function TestCrypto() {
 			piece.decrypt(PASSPHRASE, onProgressCb, onDoneCb);
 		}
 		
-		// destroy on intermediate progress
+		// destroy
+		piece.destroy();
+		isDestroyed = true;
+		assertTrue(piece.isDestroyed());
+		try {
+			piece.copy();
+			fail("fail");
+		} catch (err) {
+			if (err.message === "fail") throw new Error("Cannot use destroyed piece");
+		}
+		onDone();
+		
+		// test on intermediate progress
 		function onProgressCb(percent, label) {
-			assertFalse(isDestroyed);
-			if (percent > 0 && percent < 1) {
-				isDestroyed = true;
-				piece.destroy();
-				assertTrue(piece.isDestroyed());
-				try {
-					piece.copy();
-					fail("fail");
-				} catch (err) {
-					if (err.message === "fail") throw new Error("Cannot use destroyed piece");
-				}
-				onDone();
-			}
+			assertFalse(isDestroyed, "Should not call progress after being destroyed");
 		}
 		
-		// test when done progress
+		// test on done
 		function onDoneCb(err, piece) {
-			if (isDestroyed) throw new Error("Should not call onDone() after being destroyed");
+			if (isDestroyed) throw new Error("Should not call done after being destroyed");
 			onDone();	// destroy could not be tested because never intermediate progress
 		}
 	}
 	
 	function testDestroyPieceGenerator(plugins, onDone) {
-		console.log("Testing destroy");
+		console.log("Testing destroy piece generator");
 		
 		// pre-generate a piece
 		var keypairs = [];
