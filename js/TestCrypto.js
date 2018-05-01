@@ -3,8 +3,6 @@
  * 
  * File import tests can only be run on browsers which support the File constructor.
  * 
- * TODO: test initializing piece with split keypairs with different min shares / share num
- * TODO: test importing files without private keys
  * TODO: more text import tests
  */
 function TestCrypto() {
@@ -39,7 +37,6 @@ function TestCrypto() {
 			// test text import
 			testTextImport(plugins, function(err) {
 				if (err) throw err;
-				throw new Error("Text import tests pass");
 				
 				// test generate pieces
 				testGeneratePieces(plugins, function(err) {
@@ -488,7 +485,7 @@ function TestCrypto() {
 				assertTrue(canSetEqual);
 			}
 			
-			// test init of split pieces
+			// test init from split pieces
 			for (var i = 0; i < splitPieces.length; i++) {
 				assertEquals(i + 1, splitPieces[i].getPieceNum());
 				var splitPiece = new CryptoPiece({piece: splitPieces[i]});
@@ -498,6 +495,16 @@ function TestCrypto() {
 			piece2 = new CryptoPiece({splitPieces: splitPieces});
 			if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 			assertTrue(piece.equals(piece2));
+			
+			// test init with invalid split pieces
+			var splitPieces1 = piece.split(3, 2);
+			var splitPieces2 = piece.split(5, 3);
+			try {
+				new CryptoPiece({splitPieces: [splitPieces1[0], splitPieces2[0]]});
+				fail("fail");
+			} catch (err) {
+				if (err.message === "fail") throw new Error("Cannot initialize pice from incompatible shares");
+			}
 		}
 		
 		// test init with invalid pieceNum
@@ -597,7 +604,7 @@ function TestCrypto() {
 			// config with encryption and split
 			config.passphrase = PASSPHRASE;
 			for (var i = 0; i < config.keypairs.length; i++) {
-				config.keypairs[i].encryptionScheme = AppUtils.EncryptionScheme.V0_CRYPTOJS;
+				config.keypairs[i].encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
 			}
 			config.numPieces = NUM_PIECES;
 			config.minPieces = MIN_PIECES;
@@ -684,6 +691,7 @@ function TestCrypto() {
 			funcs.push(testUnsupportedFileTypes());
 			funcs.push(testZip());
 			funcs.push(testShareThenUnencrypted());
+			funcs.push(testNoPrivateKeys());
 //		funcs.push(testInvalidZip());
 			
 			// run tests async
@@ -914,6 +922,28 @@ function TestCrypto() {
 				});
 			}
 		}
+		
+		function testNoPrivateKeys() {
+			return function(onDone) {
+				var file1 = getFile('{"keypairs":[{"ticker":"XMR","publicAddress":"49dq3hfvNua4bSrjHEa2MBEcQjMG2r2hdHRKRd8dWf6LTARrLgxoZCw4vWnvqHo47J86QYyBuQfPzSNWywq7BnRGVcQaVpU"}]}', "file1.json", AppUtils.FileType.JSON);
+				var file2 = getFile('{"keypairs":[{"ticker":"XMR","publicAddress":"46wcKVhuMTjSrxDLdiNvDtZn4Wivk7qzVSEtmGyvuNHpSFZjqno3QvyRrG1CQGtSUwYtUHtdg2mWzCpVArHdtz7G5QBbMk8"}]}', "file2.json", AppUtils.FileType.JSON);
+				
+				// test one file
+				fileImporter.startOver();
+				fileImporter.addFiles([file1], function() {
+					assertEquals(1, fileImporter.getNamedPieces().length);
+					assertEquals("", fileImporter.getWarning());
+					
+					// test two files
+					fileImporter.startOver();
+					fileImporter.addFiles([file1, file2], function() {
+						assertEquals(2, fileImporter.getNamedPieces().length);
+						assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+						onDone();
+					});
+				});
+			}
+		}
 	}
 	
 	function testTextImport(plugins, onDone) {
@@ -926,6 +956,9 @@ function TestCrypto() {
 			// get test functions
 			var funcs = [];
 			funcs.push(testIncompatibleShares());
+			funcs.push(testJsonNoPrivateKeys());
+			funcs.push(testListOfPrivateKeys());
+			funcs.push(testSplitShares());
 			
 			// run tests async
 			async.series(funcs, function(err, results) {
@@ -943,6 +976,42 @@ function TestCrypto() {
 				textImporter.addText("aunt useful womanly vixen vowels business obtains weekday warped doorway sniff molten coexist enigma aplomb wallets value taunts makeup opposite joyous muzzle physics pledge doorway");
 				assertEquals("Pieces are not compatible shares", textImporter.getWarning());
 				assertEquals(2, textImporter.getImportedPieces().length);
+				onDone();
+			}
+		}
+		
+		function testJsonNoPrivateKeys() {
+			return function(onDone) {
+				textImporter.startOver();
+				textImporter.addText('{"keypairs":[{"ticker":"XMR","publicAddress":"49dq3hfvNua4bSrjHEa2MBEcQjMG2r2hdHRKRd8dWf6LTARrLgxoZCw4vWnvqHo47J86QYyBuQfPzSNWywq7BnRGVcQaVpU"}]}');
+				assertEquals(1, textImporter.getImportedPieces().length);
+				assertEquals("", textImporter.getWarning());
+				onDone();
+			}
+		}
+		
+		function testListOfPrivateKeys() {
+			return function(onDone) {
+				textImporter.startOver();
+				textImporter.setSelectedCurrency("BTC");
+				textImporter.addText("KwnC8xcepANRQtT1VKdcp4cJQpwznWjyjkRroA7xC2DDgGQpSUFm\nL5BDzGnsVDXUQTfWeo65XHnJpExExTs8u3EjUJVQgxp4sGdqMrZe\nL4EHcLncgutBYD3AMuYnMR4Mm4ZqopxQCe3afKeBXNxa1HrZp1kH");
+				assertEquals("", textImporter.getWarning());
+				assertEquals(1, textImporter.getImportedPieces().length);
+				assertEquals(3, textImporter.getImportedPieces()[0].getKeypairs().length);
+				onDone();
+			}
+		}
+		
+		function testSplitShares() {
+			return function(onDone) {
+				textImporter.startOver();
+				textImporter.setSelectedCurrency("BTC");
+				textImporter.addText("Sne8qX2HPiBQe62QN5MvRSbABVWcTzfVJG4BbibDLrqGN4DE");
+				assertEquals("Need 1 additional piece to recover private keys", textImporter.getWarning());
+				assertEquals(1, textImporter.getImportedPieces().length);
+				textImporter.addText("SneEBeRMJRQ5K5BCd64LE6jDPHi1hWzJqBKY7pAeawuvhRJC");
+				assertEquals(2, textImporter.getImportedPieces().length);
+				assertEquals("", textImporter.getWarning());
 				onDone();
 			}
 		}

@@ -1727,7 +1727,7 @@ function ImportFileController(div) {
 		});
 		
 		// handle unsplit piece
-		if (importedPieces.length === 1 && importedPieces[0].isSplit() === false) {
+		if (importedPieces.length === 1 && !importedPieces[0].isSplit()) {
 			onUnsplitPieceImported(importedPieces, importedPieces[0]);
 			return;
 		}
@@ -2142,7 +2142,7 @@ function ImportTextController(div, plugins) {
 		});
 		
 		// handle unsplit piece
-		if (importedPieces.length === 1 && importedPieces[0].isSplit() === false) {
+		if (importedPieces.length === 1 && !importedPieces[0].isSplit()) {
 			onUnsplitPieceImported(importedPieces, importedPieces[0]);
 			return;
 		}
@@ -2657,12 +2657,12 @@ function EditorController(div, config) {
 				var keypair = config.keypairs[i];
 				if (passphraseController.getUsePassphrase()) {
 					if ((keypair.ticker === "BTC" || keypair.ticker === "BCH") && passphraseController.getBip38Checkbox().isChecked()) {
-						keypair.encryptionScheme = AppUtils.EncryptionScheme.BIP38;
+						keypair.encryption = AppUtils.EncryptionScheme.BIP38;
 					} else {
-						keypair.encryptionScheme = AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0]
+						keypair.encryption = AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0]
 					}
 				} else {
-					keypair.encryptionScheme = null;
+					keypair.encryption = null;
 				}
 			}
 		}		
@@ -4602,7 +4602,7 @@ function KeypairRenderer(div, keypair, id) {
 			if (decoded.leftValue.length > 71) {
 				keypairCrypto.css("margin-top", "-15px");
 			}
-			if (decoded.rightValue.length > 140) {
+			if (decoded.rightValue && decoded.rightValue.length > 140) {
 				keypairCrypto.css("margin-top", "-10px");
 				keypairRightLabel.css("margin-top", "-15px");
 			}

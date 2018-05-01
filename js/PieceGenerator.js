@@ -95,7 +95,7 @@ function PieceGenerator(config) {
 			for (var i = 0; i < config.keypairs.length; i++) {
 				var keypair = config.keypairs[i];
 				weights.createWeight += CryptoKeypair.getCreateWeight(keypair.ticker) * keypair.numKeypairs;
-				if (keypair.encryptionScheme) weights.encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryptionScheme) * keypair.numKeypairs;
+				if (keypair.encryption) weights.encryptWeight += CryptoKeypair.getEncryptWeight(keypair.encryption) * keypair.numKeypairs;
 			}
 		}
 		
@@ -167,7 +167,7 @@ function PieceGenerator(config) {
 			for (var i = 0; i < config.keypairs.length; i++) {
 				var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].ticker);
 				for (var j = 0; j < config.keypairs[i].numKeypairs; j++) {
-					encryptionSchemes.push(config.keypairs[i].encryptionScheme);
+					encryptionSchemes.push(config.keypairs[i].encryption);
 				}
 			}
 		}
@@ -275,7 +275,7 @@ PieceGenerator.validateConfig = function(config) {
 			assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
 			if (config.passphrase) {
 				var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].ticker);
-				assertTrue(arrayContains(plugin.getEncryptionSchemes(), config.keypairs[i].encryptionScheme));
+				assertTrue(arrayContains(plugin.getEncryptionSchemes(), config.keypairs[i].encryption));
 			}
 		}
 	}
