@@ -42,10 +42,12 @@ function CryptoPiece(config) {
 	var _isDestroyed;
 		
 	this.getKeypairs = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		return state.keypairs;
 	}
 	
 	this.hasPublicAddresses = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		var bool;
 		for (var i = 0; i < state.keypairs.length; i++) {
 			if (!state.keypairs[i].isPublicApplicable()) continue;
@@ -56,6 +58,7 @@ function CryptoPiece(config) {
 	}
 	
 	this.hasPrivateKeys = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		var bool;
 		for (var i = 0; i < state.keypairs.length; i++) {
 			if (isUndefined(bool)) bool = state.keypairs[i].hasPrivateKey();
@@ -65,6 +68,7 @@ function CryptoPiece(config) {
 	}
 	
 	this.encrypt = function(passphrase, schemes, onProgress, onDone) {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		
 		// verify input
 		assertFalse(that.isEncrypted());
@@ -109,6 +113,7 @@ function CryptoPiece(config) {
 	}
 	
 	this.isEncrypted = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		var encryption = -1;
 		for (var i = 0; i < state.keypairs.length; i++) {
 			if (encryption === -1) encryption = state.keypairs[i].isEncrypted();
@@ -118,6 +123,7 @@ function CryptoPiece(config) {
 	}
 	
 	this.decrypt = function(passphrase, onProgress, onDone) {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 
 		// validate input
 		assertTrue(that.isEncrypted());
@@ -165,6 +171,7 @@ function CryptoPiece(config) {
 	}
 	
 	this.split = function(numShares, minShares) {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		
 		// collect all split keypairs
 		var allSplitKeypairs = [];
@@ -185,42 +192,50 @@ function CryptoPiece(config) {
 	}
 	
 	this.isSplit = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		assertTrue(state.keypairs.length > 0);
 		return state.keypairs[0].isSplit();
 	}
 	
 	this.getMinPieces = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		assertTrue(state.keypairs.length > 0);
 		return state.keypairs[0].getMinShares();
 	}
 	
 	this.getPieceNum = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		assertTrue(state.keypairs.length > 0);
 		return state.keypairs[0].getShareNum();
 	}
 	
 	this.setPieceNum = function(pieceNum) {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].setShareNum(pieceNum);
 		return this;
 	}
 	
 	this.removePublicAddresses = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].removePublicAddress();
 		return this;
 	}
 	
 	this.removePrivateKeys = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].removePrivateKey();
 		return this;
 	}
 	
 	this.copy = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		var keypairCopies = [];
 		for (var i = 0; i < state.keypairs.length; i++) keypairCopies.push(state.keypairs[i].copy());
 		return new CryptoPiece({keypairs: keypairCopies});
 	}
 	
 	this.toString = function(fileType) {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		switch (fileType) {
 			case AppUtils.FileType.CSV:
 				return that.toCsv();
@@ -235,6 +250,7 @@ function CryptoPiece(config) {
 	}
 	
 	this.toJson = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		var json = {};
 		json.pieceNum = that.getPieceNum();
 		json.version = AppUtils.VERSION;
@@ -244,10 +260,12 @@ function CryptoPiece(config) {
 	}
 	
 	this.toJsonStr = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		return JSON.stringify(that.toJson());
 	}
 	
 	this.toCsv = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		
 		// columns to exclude
 		var excludes = [CryptoKeypair.CsvHeader.PRIVATE_HEX, CryptoKeypair.CsvHeader.MIN_SHARES];
@@ -279,6 +297,7 @@ function CryptoPiece(config) {
 	}
 	
 	this.toTxt = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		var str = "";
 		for (var i = 0; i < state.keypairs.length; i++) {
 			str += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\n\n";
@@ -289,6 +308,7 @@ function CryptoPiece(config) {
 	}
 	
 	this.equals = function(piece) {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		assertObject(piece, CryptoPiece);
 		var state2 = piece.getInternalState();
 		if (state.version !== state2.version) return false;
@@ -301,15 +321,18 @@ function CryptoPiece(config) {
 	}
 	
 	this.getInternalState = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		return state;
 	}
 	
 	this.getEncryptWeight = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		assertFalse(this.isEncryped(), "Cannot get encrypt weight if piece is unencrypted");
 		throw new Error("Not implemented");
 	}
 	
 	this.getDecryptWeight = function() {
+		assertFalse(_isDestroyed, "Piece is destroyed");
 		assertTrue(this.isEncrypted(), "Cannot get decrypt weight if piece is encrypted");
 		var schemes = [];
 		for (var i = 0; i < state.keypairs.length; i++) schemes.push(state.keypairs[i].getEncryptionScheme());
@@ -317,6 +340,8 @@ function CryptoPiece(config) {
 	}
 	
 	this.destroy = function() {
+		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].destroy();
+		deleteProperties(state);
 		_isDestroyed = true;
 	}
 	
@@ -328,6 +353,7 @@ function CryptoPiece(config) {
 	
 	init();
 	function init() {
+		_isDestroyed = false;
 		state = {};
 		if (config.keypairs) setKeypairs(config.keypairs);
 		else if (config.json) fromJson(config.json);

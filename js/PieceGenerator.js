@@ -15,8 +15,8 @@ function PieceGenerator(config) {
 	// init
 	PieceGenerator.validateConfig(config);
 	config = Object.assign({}, config);
-	var isCancelled = false;
 	var _isDestroyed = false;
+	var currentPieces;
 
 	/**
 	 * Starts generating pieces and/or piece renderers according to the config.
@@ -25,7 +25,7 @@ function PieceGenerator(config) {
 	 * @param onDone(err, pieces, pieceRenderers) is invoked when done
 	 */
 	this.generatePieces = function(onProgress, onDone) {
-		assertFalse(isCancelled);
+		assertFalse(_isDestroyed, "Piece generator is destroyed");
 		
 		// get weights
 		var weights = computeWeights(config);
@@ -37,34 +37,40 @@ function PieceGenerator(config) {
 		
 		// generate keypairs
 		var doneWeight = 0;
+		currentPieces = null;
 		createIfApplicable(function(percent, label) {
+			if (_isDestroyed) return;
 			if (onProgress) onProgress((doneWeight + percent * createWeight) / totalWeight, label);
 		}, function(err, pieces) {
-			if (isCancelled) return;
+			currentPieces = pieces;
+			if (_isDestroyed) return;
 			assertNull(err);
 			doneWeight += createWeight;
 			
 			// encrypt
 			encryptIfApplicable(pieces, function(percent, label) {
+				if (_isDestroyed) return;
 				if (onProgress) onProgress((doneWeight + percent * encryptWeight) / totalWeight, label);
 			}, function(err, pieces) {
-				if (isCancelled) return;
+				if (_isDestroyed) return;
 				assertNull(err);
 				doneWeight += encryptWeight;
 				
 				// split
 				splitIfApplicable(pieces, function(percent, label) {
+					if (_isDestroyed) return;
 					if (onProgress) onProgress((doneWeight + percent * splitWeight) / totalWeight, label);
 				}, function(err, pieces) {
-					if (isCancelled) return;
+					if (_isDestroyed) return;
 					assertNull(err);
 					doneWeight += splitWeight;
 					
 					// render
 					renderIfApplicable(pieces, function(percent, label) {
+						if (_isDestroyed) return;
 						if (onProgress) onProgress((doneWeight + percent * renderWeight) / totalWeight, label);
 					}, function(err, pieces, pieceRenderers) {
-						if (isCancelled) return;
+						if (_isDestroyed) return;
 						assertNull(err);
 						doneWeight += renderWeight;
 						assertEquals(doneWeight, totalWeight);
@@ -79,6 +85,9 @@ function PieceGenerator(config) {
 	 * Destroys the piece generator and any pieces given to it or in the process of being generated.
 	 */
 	this.destroy = function() {
+		if (currentPieces) {
+			for (var i = 0; i < currentPieces.length; i++) currentPieces[i].destroy();
+		}
 		_isDestroyed = true;
 	}
 	

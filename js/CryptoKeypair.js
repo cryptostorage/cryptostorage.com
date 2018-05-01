@@ -40,43 +40,57 @@ function CryptoKeypair(config) {
 	
 	var that = this;
 	var state;
+	var _isDestroyed;
 	
 	this.getPlugin = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state.plugin;
 	}
 	
 	this.isPublicApplicable = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state.plugin.hasPublicAddress();
 	}
 	
 	this.getPublicAddress = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state.publicAddress;
 	}
 	
 	this.hasPublicAddress = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return isDefined(state.publicAddress);
 	}
 	
 	this.getPrivateLabel = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state.plugin.getPrivateLabel();
 	}
 	
 	this.getPrivateHex = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state.privateHex;
 	}
 	
 	this.getPrivateWif = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state.privateWif;
 	}
 	
 	this.hasPrivateKey = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return isDefined(that.getPrivateHex());
 	}
 	
 	this.encrypt = function(scheme, passphrase, onProgress, onDone) {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		assertNull(state.encryption, "Keypair must be unencrypted to encrypt");
 		var address = that.getPublicAddress();
-		AppUtils.encryptHex(that.getPrivateHex(), scheme, passphrase, onProgress, function(err, encryptedHex) {
+		AppUtils.encryptHex(that.getPrivateHex(), scheme, passphrase, function(percent, label) {
+			if (_isDestroyed) return;
+			if (onProgress) onProgress(percent, label);
+		}, function(err, encryptedHex) {
+			if (_isDestroyed) return;
 			if (err) onDone(err);
 			else {
 				setPrivateKey(encryptedHex);
@@ -91,17 +105,24 @@ function CryptoKeypair(config) {
 	 * Returns null if unencrypted, undefined if unknown, or one of AppUtils.EncryptionScheme otherwise.
 	 */
 	this.getEncryptionScheme = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state.encryption;
 	}
 	
 	this.isEncrypted = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		if (isUndefined(that.getEncryptionScheme())) return undefined;
 		return that.getEncryptionScheme() !== null;
 	}
 	
 	this.decrypt = function(passphrase, onProgress, onDone) {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		assertInitialized(state.encryption, "Keypair must be encrypted to decrypt");
-		AppUtils.decryptHex(that.getPrivateHex(), that.getEncryptionScheme(), passphrase, onProgress, function(err, decryptedHex) {
+		AppUtils.decryptHex(that.getPrivateHex(), that.getEncryptionScheme(), passphrase, function(percent, label) {
+			if (_isDestroyed) return;
+			if (onProgress) onProgress(percent, label);
+		}, function(err, decryptedHex) {
+			if (_isDestroyed) return;
 			if (err) onDone(err);
 			else {
 				setPrivateKey(decryptedHex);
@@ -112,6 +133,7 @@ function CryptoKeypair(config) {
 	}
 	
 	this.split = function(numShares, minShares) {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		
 		// validate input
 		assertFalse(that.isSplit());
@@ -142,20 +164,24 @@ function CryptoKeypair(config) {
 	}
 	
 	this.isSplit = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		if (!that.hasPrivateKey()) return undefined;
 		assertDefined(that.getMinShares(), "Min shares is unknown despite private key being known");
 		return that.getMinShares() !== null;
 	}
 	
 	this.getMinShares = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state.minShares;
 	}
 	
 	this.getShareNum = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state.shareNum;
 	}
 	
 	this.setShareNum = function(shareNum) {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		if (that.isSplit()) {
 			assertNumber(shareNum);
 			assertTrue(shareNum >= 1);
@@ -173,12 +199,14 @@ function CryptoKeypair(config) {
 	}
 	
 	this.removePublicAddress = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		assertTrue(that.hasPrivateKey());
 		state.publicAddress = undefined;
 		return this;
 	}
 	
 	this.removePrivateKey = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		that.isPublicApplicable() ? assertDefined(that.getPublicAddress()) : assertUndefined(that.getPublicAddress());
 		state.privateHex = undefined;
 		state.privateWif = undefined;
@@ -189,10 +217,12 @@ function CryptoKeypair(config) {
 	}
 	
 	this.copy = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return new CryptoKeypair({keypair: that});
 	}
 	
 	this.toJson = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return {
 			ticker: state.plugin.getTicker(),
 			publicAddress: that.getPublicAddress(),
@@ -203,6 +233,7 @@ function CryptoKeypair(config) {
 	}
 	
 	this.getCsvValue = function(header) {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		switch(header) {
 			case CryptoKeypair.CsvHeader.TICKER:
 				return that.getPlugin().getTicker();
@@ -224,6 +255,7 @@ function CryptoKeypair(config) {
 	}
 	
 	this.equals = function(keypair) {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		assertObject(keypair, CryptoKeypair);
 		var state2 = keypair.getInternalState();
 		if (state.plugin.getTicker() !== state2.plugin.getTicker()) return false;
@@ -237,7 +269,17 @@ function CryptoKeypair(config) {
 	}
 	
 	this.getInternalState = function() {
+		assertFalse(_isDestroyed, "Keypair is destroyed");
 		return state;
+	}
+	
+	this.destroy = function() {
+		deleteProperties(state);
+		_isDestroyed = true;
+	}
+	
+	this.isDestroyed = function() {
+		return _isDestroyed;
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -245,6 +287,7 @@ function CryptoKeypair(config) {
 	init();
 	function init() {
 		state = {};
+		_isDestroyed = false;
 		
 		// direct copy internal state from keypair, no validation
 		if (config.keypair) {

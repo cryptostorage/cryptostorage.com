@@ -754,6 +754,17 @@ function copyProperties(obj) {
 }
 
 /**
+ * Deletes all properties in the given object.
+ * 
+ * @param obj is the object to delete properties from
+ */
+function deleteProperties(obj) {
+	var props = [];
+	for (var prop in obj) props.push(prop);
+	for (i = 0; i < props.length; i++) delete obj[props[i].toString()];
+}
+
+/**
  * Converts a CSV string to a 2-dimensional array of strings.
  * 
  * @param csv is the CSV string to convert

@@ -66,7 +66,6 @@ function TestCrypto() {
 					
 					// test destroy during processing
 					testDestroyPieceGenerator(plugins, function(err) {
-						throw new Error("Yay piece generation tests pass");
 						if (err) throw err;
 						
 						// test piece encryption and splitting
@@ -1080,19 +1079,18 @@ function TestCrypto() {
 		piece = piece.copy();
 		
 		// start encrypting or decrypting
+		var isDestroyed = false;
 		if (!piece.isEncrypted()) {
 			var schemes = [];
 			for (var i = 0; i < piece.getKeypairs().length; i++) schemes.push(piece.getKeypairs()[i].getPlugin().getEncryptionSchemes()[0])
 			var isDestroyed = false;
-			piece.encrypt(PASSPHRASE, schemes, onProgress, onDone);
+			piece.encrypt(PASSPHRASE, schemes, onProgressCb, onDoneCb);
 		} else {
-			piece.decrypt(PASSPHRASE, onProgress, onDone);
+			piece.decrypt(PASSPHRASE, onProgressCb, onDoneCb);
 		}
 		
-		var isDestroyed = false; // track when destroyed
-		
 		// destroy on intermediate progress
-		function onProgress(percent, label) {
+		function onProgressCb(percent, label) {
 			assertFalse(isDestroyed);
 			if (percent > 0 && percent < 1) {
 				isDestroyed = true;
@@ -1106,12 +1104,12 @@ function TestCrypto() {
 				}
 				onDone();
 			}
-			
-			// test onDone()
-			function onDone(err, piece) {
-				if (isDestroyed) throw new Error("Should not call onDone() after being destroyed");
-				onDone();	// destroy could not be tested because never intermediate progress
-			}
+		}
+		
+		// test when done progress
+		function onDoneCb(err, piece) {
+			if (isDestroyed) throw new Error("Should not call onDone() after being destroyed");
+			onDone();	// destroy could not be tested because never intermediate progress
 		}
 	}
 	
@@ -1138,10 +1136,12 @@ function TestCrypto() {
 
 			// destroy when progress exceeds 25%
 			if (percent > .25) {
-				isDestroyed = true;
+				var keypairs = piece.getKeypairs();
 				pieceGenerator.destroy();
+				isDestroyed = true;
 				assertTrue(pieceGenerator.isDestroyed());
 				assertTrue(piece.isDestroyed());
+				for (var i = 0; i < keypairs.length; i++) assertTrue(keypairs[i].isDestroyed());
 				
 				// cannot use destroyed generator
 				try {
