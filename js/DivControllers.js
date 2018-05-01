@@ -2437,8 +2437,10 @@ function EditorController(div, config) {
 	var importedPieceDivs;	// piece divs for original imported pieces
 	var pieces;							// current pieces
 	var pieceDivs;					// piece divs for current pieces
+	var pieceGenerator;			// initialized while generating
 	var formErrorChangeListeners;
 	var setPiecesListeners;
+	var generateListeners;
 	var generateProgressListeners;
 	var lastFormError;
 	var readyListeners;
@@ -2450,6 +2452,7 @@ function EditorController(div, config) {
 		div.addClass("editor_div flex_vertical flex_align_center");
 		formErrorChangeListeners = [];
 		setPiecesListeners = [];
+		generateListeners = [];
 		generateProgressListeners = [];
 		readyListeners = [];
 		
@@ -2518,6 +2521,11 @@ function EditorController(div, config) {
 	this.onReady = function(listener) {
 		assertFunction(listener);
 		readyListeners.push(listener);
+	}
+	
+	this.onGenerate = function(listener) {
+		assertFunction(listener);
+		generateListeners.push(listener);
 	}
 	
 	this.getPassphraseController = function() {
@@ -2693,13 +2701,11 @@ function EditorController(div, config) {
 			genConfig.pieces = copies;
 		}
 		
-		// disable header controls TODO instead have these subscribe to onGenerate() event?
-		passphraseController.setEnabled(false);
-		splitController.setEnabled(false);
-		paginatorController.setEnabled(false);
+		// announce generating
+		invoke(generateListeners);
 		
 		// generate pieces according to config
-		var pieceGenerator = new PieceGenerator(genConfig);
+		pieceGenerator = new PieceGenerator(genConfig);
 		pieceGenerator.generatePieces(function(percent, label) {
 			invoke(generateProgressListeners, percent, label);
 		}, function(err, pieces, pieceRenderers) {
@@ -2715,6 +2721,7 @@ function EditorController(div, config) {
 			var pieceDivs = [];
 			for (var i = 0; i < pieceRenderers.length; i++) pieceDivs.push(pieceRenderers[i].getDiv());
 			that.setPieces(pieces, pieceDivs);
+			pieceGenerator = null;
 			if (onDone) onDone();
 		});
 	}
@@ -2769,7 +2776,11 @@ function EditorController(div, config) {
 	}
 	
 	function cancel() {
-		throw new Error("Cancel not implemented");
+		if (pieceGenerator) {
+			pieceGenerator.destroy();
+			pieceGenerator = null;
+		}
+		that.setPieces(importedPieces, importedPieceDivs);
 	}
 }
 inheritsFrom(EditorController, DivController);
@@ -2959,6 +2970,7 @@ function EditorContentController(div, editorController, config) {
 	
 	function setPieces(pieces, pieceDivs) {
 		piecesDiv.empty()
+		progressDiv.hide();
 		if (currenciesController) currenciesController.getDiv().show();
 
 		// handle no pieces
@@ -2970,7 +2982,6 @@ function EditorContentController(div, editorController, config) {
 		// add pieces divs
 		else {
 			piecesDiv.show();
-			progressDiv.hide();
 			logoHeader.hide();
 			assertTrue(pieceDivs.length > 0);
 			for (var i = 0; i < pieceDivs.length; i++) {
@@ -3081,6 +3092,7 @@ function EditorPassphraseController(div, editorController) {
 			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
 			editorController.getContentController().onInputChange(update);
+			editorController.onGenerate(function() { that.setEnabled(false); });
 			update();
 		});
 		
@@ -3191,6 +3203,7 @@ function EditorPassphraseController(div, editorController) {
 	
 	function reset() {
 		passphraseCheckbox.setChecked(false);
+		bip38Checkbox.setChecked(false);
 		passphraseInput.val("");
 		validate();
 		update();
@@ -3264,6 +3277,7 @@ function EditorSplitController(div, editorController) {
 			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
 			editorController.getContentController().onInputChange(update);
+			editorController.onGenerate(function() { that.setEnabled(false); });
 			update();
 		});
 		
@@ -3423,6 +3437,7 @@ function EditorPaginatorController(div, editorController) {
 		that.setEnabled(false);
 		editorController.onReady(function() { updatePaginator(); });
 		editorController.onSetPieces(function() { updatePaginator(); });
+		editorController.onGenerate(function() { that.setEnabled(false); });
 		if (onDone) onDone();
 	}
 	
@@ -3915,6 +3930,12 @@ function EditorActionsController(div, editorController) {
 		btnReset.click(function() { invoke(resetListeners); });
 		btnReset.appendTo(div);
 		
+		// cancel button
+		btnCancel =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
+		btnCancel.append("Cancel");
+		btnCancel.click(function() { invoke(cancelListeners); });
+		btnCancel.appendTo(div);
+		
 		// save and print buttons
 		savePrintDiv = $("<div class='flex_horizontal width_100'>");
 		btnSave = $("<div class='editor_btn_blue flex_horizontal flex_justify_center user_select_none'>").appendTo(savePrintDiv);
@@ -3931,6 +3952,13 @@ function EditorActionsController(div, editorController) {
 		editorController.onFormErrorChange(update);
 		editorController.getPassphraseController().onUsePassphraseChange(update);
 		editorController.getSplitController().onUseSplitChange(update);
+		editorController.onGenerate(function() {
+			btnCancel.show();
+			btnGenerate.hide();
+			btnApply.hide();
+			btnReset.hide();
+			savePrintDiv.hide()
+		});
 		
 		// initial state
 		update();
@@ -3972,6 +4000,7 @@ function EditorActionsController(div, editorController) {
 	// ------------------------------ PRIVATE -----------------------------
 	
 	function update() {
+		btnCancel.hide();
 				
 		// handle no imported pieces
 		if (!editorController.getImportedPieces()) {

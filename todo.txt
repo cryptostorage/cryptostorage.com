@@ -1,5 +1,5 @@
 v0.3.0
-ability to cancel import decryption, piece generation
+ability to cancel import decryption
 remove deprecated code
 text parser
 print
@@ -11,6 +11,8 @@ click outside dropdown only works if click within container
 footer
 interoperability disclosure
 performance tests and optimizations
+rendering lag on import large piece
+confirmation on reset
 
 refactor tests to use async
 notice colors
