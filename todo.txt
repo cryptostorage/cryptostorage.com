@@ -1,5 +1,4 @@
 v0.3.0
-remove deprecated code
 text parser
 print
 backwards compatibility

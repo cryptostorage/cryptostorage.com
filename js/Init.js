@@ -60,10 +60,11 @@ $(document).ready(function() {
 			// load dependencies
 			LOADER.load(AppUtils.getAppDependencies(), function(err) {
 				if (err) throw err;
+				var tester = new Tests();
 				
 				// run minimum tests
 				if (AppUtils.RUN_MIN_TESTS) {
-					AppUtils.runMinimumTests(function(err) {
+					tester.runMinimumTests(function(err) {
 						if (err) throw err;
 						console.log("Minimum tests pass");
 					});
@@ -72,16 +73,10 @@ $(document).ready(function() {
 				// run full tests
 				if (AppUtils.RUN_FULL_TESTS) {
 					console.log("Running crypto test suite...")
-					new TestCrypto().run(function(err) {
+					tester.runTestSuite(function(err) {
 						if (err) throw err;
 						console.log("Crypto test suite passes");
 					});
-					
-//					console.log("Running test suite...");
-//					Tests.runTests(function(err) {
-//						if (err) throw err;
-//						console.log("Test suite passes");
-//					});
 				}
 			});
 		}
