@@ -4,6 +4,7 @@ remove deprecated code
 text parser
 print
 backwards compatibility
+quick generate
 direct link to editor
 action controller bottom center if not enough width
 click outside dropdown only works if click within container
@@ -11,7 +12,6 @@ footer
 interoperability disclosure
 performance tests and optimizations
 
-remaining todos
 notice colors
 split lines bolder
 split validation should fail on -1
@@ -26,6 +26,7 @@ see if there are wasteful loops in editor listeners
 xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share
 tippy jerk when editor first loaded
 make progress bar its own controller
+set public address of imported pieces after pieces combine
 
 designer:
 passphrase confirmation
