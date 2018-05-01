@@ -175,6 +175,15 @@ CryptoPlugin.prototype.decodeRandom = function() {
 }
 
 /**
+ * Returns a new keypair.
+ * 
+ * @param privateKey is a private key to initialize with.  Generates a random key if not given.
+ */
+CryptoPlugin.prototype.newKeypair = function(privateKey) {
+	return new CryptoKeypair({plugin: this, privateKey: privateKey});
+}
+
+/**
  * Generates a random private key in hex or wif format.
  * 
  * @returns a random private key string

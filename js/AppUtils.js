@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.3.0",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: false,
+	RUN_FULL_TESTS: true,
 	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
@@ -2259,21 +2259,23 @@ var AppUtils = {
 				// encrypted hex = salt + hex cipher text
 				var ctHex = AppUtils.toBase(64, 16, encrypted.toString());
 				var encryptedHex = salt.toString() + ctHex;
-				if (onProgress) onProgress(1);
-				if (onDone) onDone(null, encryptedHex);
 			} catch (err) {
 				onDone(err);
+				return;
 			}
+			if (onProgress) onProgress(1);
+			if (onDone) onDone(null, encryptedHex);
 		}
 		
 		function encryptHexV0(hex, scheme, passphrase, onProgress, onDone) {
 			try {
 				var encryptedB64 = CryptoJS.AES.encrypt(hex, passphrase).toString();
-				if (onProgress) onProgress(1);
-				onDone(null, AppUtils.toBase(64, 16, encryptedB64));
 			} catch (err) {
 				onDone(err);
+				return;
 			}
+			if (onProgress) onProgress(1);
+			onDone(null, AppUtils.toBase(64, 16, encryptedB64));
 		}
 		
 		function encryptHexBip38(hex, scheme, passphrase, onProgress, onDone) {

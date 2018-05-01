@@ -12,6 +12,7 @@ footer
 interoperability disclosure
 performance tests and optimizations
 
+refactor tests to use async
 notice colors
 split lines bolder
 split validation should fail on -1

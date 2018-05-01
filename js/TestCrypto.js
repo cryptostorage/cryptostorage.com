@@ -64,10 +64,15 @@ function TestCrypto() {
 				testGeneratePieces(plugins, function(err) {
 					if (err) throw err;
 					
-					// test piece encryption and splitting
-					testPieceEncryption(plugins, function(err) {
+					// test destroy during processing
+					testDestroy(plugins, function(err) {
 						if (err) throw err;
-						onDone();
+						
+						// test piece encryption and splitting
+						testPieceEncryption(plugins, function(err) {
+							if (err) throw err;
+							onDone();
+						});
 					});
 				});
 			});
@@ -1042,5 +1047,49 @@ function TestCrypto() {
 				onDone();
 			}
 		}
+	}
+	
+	// TODO: test consecutive encrypt/decrypt calls
+	// test consecutive encryption
+//	copy.encrypt(PASSPHRASE, AppUtils.EncryptionScheme.BIP38, function(progress, label) {
+//		try {
+//			copy.encrypt(PASSPHRASE, AppUtils.EncryptionScheme.BIP38);
+//			fail("fail");
+//		} catch (err) {
+//			if (err.message === "fail") throw new Error("Consecutive encryption should fail");
+//			assertEquals("Keypair is already encrypting", err.message);
+//		}
+//	}, function(err, encryptedKeypair) {
+//		assertTrue(copy.isEncrypted());
+//	});
+	
+	function testDestroy(plugins, onDone) {
+		console.log("Testing destroy");
+		
+		// get generation config with encryption
+		var config = {};
+		config.passphrase = PASSPHRASE;
+		config.keypairs = [];
+		for (var i = 0; i < plugins.length; i++) {
+			config.keypairs.push({
+				ticker: plugins[i].getTicker(),
+				numKeypairs: 1,
+				encryption: plugins[i].getEncryptionSchemes()[0]
+			});
+		}
+		
+		// start generating
+		var isDestroyed = false;
+		var pieceGenerator = new PieceGenerator(config);
+		pieceGenerator.generatePieces(function(percent, label) {
+			assertFalse(isDestroyed, "Progress should not be invoked after being destroyed");
+			if (percent > .25) {
+				throw new Error("Time to destroy");
+				isDestroyed = true;
+				onDone();
+			}
+		}, function(err, pieces, pieceRenderers) {
+			throw new Error("onDone should not be invoked after being destroyed");
+		});
 	}
 }
