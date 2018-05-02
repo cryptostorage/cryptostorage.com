@@ -1,5 +1,6 @@
 v0.3.0
 print
+something running after consecutive cancels, async.destroy()?
 backwards compatibility
 quick generate
 direct link to editor
@@ -13,7 +14,6 @@ confirmation on reset
 remove test error output
 
 remove min share encoding?
-something running after consecutive cancels, async.destroy()?
 
 refactor tests to use async
 notice colors
