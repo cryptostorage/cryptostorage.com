@@ -1207,6 +1207,7 @@ input[type='checkbox'][disabled] +label {
 
 .editor_btn_green:hover {
 	background-color: rgb(121, 234, 87);
+	cursor: pointer;
 }
 
 .editor_btn_green:active {
@@ -1222,6 +1223,7 @@ input[type='checkbox'][disabled] +label {
 
 .editor_btn_red:hover {
 	background-color: rgb(272, 121, 104);
+	cursor: pointer;
 }
 
 .editor_btn_red:active {
@@ -1239,6 +1241,7 @@ input[type='checkbox'][disabled] +label {
 
 .editor_btn_blue:hover {
 	background-color: rgb(37, 138, 202);
+	cursor: pointer;
 }
 
 .editor_btn_blue:active {
@@ -1247,7 +1250,7 @@ input[type='checkbox'][disabled] +label {
 
 .editor_export_btn_green {
 	color: white;
-	background-color: rgb(144, 212, 66);
+	background-color: rgb(101, 214, 67);
 	padding: 10px;
 	font-size: 28px;
 	font-weight: bold;
@@ -1256,6 +1259,7 @@ input[type='checkbox'][disabled] +label {
 
 .editor_export_btn_green:hover {
 	background-color: rgb(121, 234, 87);
+	cursor: pointer;
 }
 
 .editor_export_btn_green:active {
@@ -1272,6 +1276,7 @@ input[type='checkbox'][disabled] +label {
 
 .editor_export_btn_red:hover {
 	background-color: rgb(272, 121, 104);
+	cursor: pointer;
 }
 
 .editor_export_btn_red:active {

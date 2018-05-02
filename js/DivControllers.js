@@ -4107,11 +4107,11 @@ function EditorSaveController(div, pieces) {
 		
 		// cancel and save buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
-		var cancelBtn = $("<div class='editor_export_btn_red flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
+		var cancelBtn = $("<div class='editor_export_btn_red flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(buttonsDiv);
 		cancelBtn.html("Cancel");
 		cancelBtn.click(function() { if (callbackFnCancel) callbackFnCancel(); });
 		buttonsDiv.append($("<div style='width:150px;'>"));
-		saveBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
+		saveBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(buttonsDiv);
 		saveBtn.html("Save");
 		
 		// register changes
