@@ -1149,7 +1149,7 @@ var AppUtils = {
 						} catch (err) {
 							console.log(err);	// simply skip this file
 						}
-						onDone(null, piece ? {name: zipObject.name, piece} : null);
+						onDone(null, piece ? {name: zipObject.name, piece: piece} : null);
 					});
 				}
 			}
@@ -1162,5 +1162,5 @@ var AppUtils = {
 				}
 			}
 		}
-	},
+	}
 }

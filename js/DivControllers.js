@@ -4207,14 +4207,14 @@ inheritsFrom(EditorSaveController, DivController);
  * Print controller.
  * 
  * @param div is the div to render to
- * @param pieceRenderers are rendered pieces
+ * @param are pieces to print
  */
-function EditorPrintController(div, pieceRenderers) {
+function EditorPrintController(div, pieces) {
 	DivController.call(this, div);
 	
 	// validate input
-	assertArray(pieceRenderers);
-	assertTrue(pieceRenderers.length > 0);
+	assertArray(pieces);
+	assertTrue(pieces.length > 0);
 	
 	var that = this;
 	var includePublicCheckbox;
@@ -4223,6 +4223,7 @@ function EditorPrintController(div, pieceRenderers) {
 	var cryptoCashCheckbox;
 	var includeInstructionsCheckbox
 	var printBtn;
+	var pieceRenderers;	// rendered pieces ready for print
 	var callbackFnPrint;
 	var callbackFnCancel;
 	
@@ -4290,11 +4291,33 @@ function EditorPrintController(div, pieceRenderers) {
 		setPrintEnabled(false);
 		
 		// render pieces
-		throw new Error("Not implemented");
+		pieceRenderers = undefined;
+		var pieceGenerator = new PieceGenerator({
+			pieces: pieces,
+			pieceRendererClass: CompactPieceRenderer
+		});
+		pieceGenerator.generatePieces(null, function(err, _pieces, _pieceRenderers) {
+			pieceRenderers = _pieceRenderers;
+			setPrintEnabled(true);
+		});
 	}
 	
 	function print() {
-		throw new Error("Not implemented");
+		assertInitialized(pieceRenderers);
+
+		// build print div
+		var printDiv = $("<div>");
+		for (var i = 0; i < pieceRenderers.length; i++) printDiv.append(pieceRenderers[i].getDiv());
+		
+		// open window with print div
+		newWindow(printDiv, "Print Keys", "css/style.css", null, function(err, window) {
+			if (err) {
+				AppUtils.setTabError(true);
+				return;
+			}
+			window.focus();
+			window.print();
+		});
 	}
 	
 	function setPrintEnabled(bool) {
