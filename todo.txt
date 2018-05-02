@@ -15,6 +15,7 @@ remove test error output
 
 remove min share encoding?
 
+home crypto selection tab name should be "Generate Keys"
 refactor tests to use async
 notice colors
 split lines bolder
