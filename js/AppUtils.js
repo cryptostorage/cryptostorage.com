@@ -1080,7 +1080,7 @@ var AppUtils = {
 				try {
 					if (isJsonFile(file)) piece = new CryptoPiece({json: data});
 					else if (isCsvFile(file)) piece = new CryptoPiece({csv: data});
-					else if (isTxtFile(file)) throw new Error("TXT not implemented");
+					else if (isTxtFile(file)) piece = new CryptoPiece({txt: data});
 					else throw new Error("Unrecognized file type: " + file.name);
 				} catch (err) {
 					onDone(err);
@@ -1144,7 +1144,7 @@ var AppUtils = {
 						try {
 							if (zipObject.name.endsWith(".json")) piece = new CryptoPiece({json: str});
 							else if (zipObject.name.endsWith(".csv")) piece = new CryptoPiece({csv: str});
-							else if (zipObject.name.endsWith(".txt")) piece = new CryptoPiece({json: str});
+							else if (zipObject.name.endsWith(".txt")) piece = new CryptoPiece({txt: str});
 							else throw new Error("Unrecognized file type: " + zipObject.name);
 						} catch (err) {
 							console.log(err);	// simply skip this file

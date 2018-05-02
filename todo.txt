@@ -1,5 +1,4 @@
 v0.3.0
-text parser
 print
 backwards compatibility
 quick generate
@@ -11,6 +10,7 @@ interoperability disclosure
 performance tests and optimizations
 rendering lag on import large piece
 confirmation on reset
+remove test error output
 
 remove min share encoding?
 something running after consecutive cancels, async.destroy()?

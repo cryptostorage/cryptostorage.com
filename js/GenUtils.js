@@ -418,7 +418,7 @@ function assertFunction(arg, msg) {
  * @param msg is the message to throw if the argument is not the specified object
  */
 function assertObject(arg, obj, msg) {
-	assertInitialized(arg);
+	assertInitialized(arg, msg);
 	if (obj) {
 		if (!isObject(arg, obj)) throw new Error(msg ? msg : "Argument asserted as object '" + obj.name + "' but was not");
 	} else {
@@ -662,23 +662,27 @@ String.prototype.startsWith = function(searchString, position) {
  * 
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith#Polyfill
  */
-String.prototype.endsWith = function(searchStr, position) {
+String.prototype.endsWith = function(searchString, position) {
 	if (!(position < this.length)) position = this.length;	// works better than >= because it compensates for NaN
 	else position |= 0;	// round position
-	return this.substr(position - searchStr.length, searchStr.length) === searchStr;
+	return this.substr(position - searchString.length, searchString.length) === searchString;
 }
 
 /**
  * Removes the given value from the array.
+ * 
+ * @returns true if the value was found and removed, false otherwise
  */
 Array.prototype.removeVal = function(val) {
+	var found = false;
   for (var i = 0; i < this.length; i++) {
-    if (this[i] == val) {         
+    if (this[i] == val) {    
+      found = true;
       this.splice(i, 1);
       i--;
     }
   }
-  return this;
+  return found;;
 };
 
 /**
@@ -802,6 +806,16 @@ function hasWhitespace(str) {
  */
 function isWhitespace(char) {
 	return /\s/.test(char);
+}
+
+/**
+ * Indicates if the given character is a newline.
+ * 
+ * @param char is the character to test
+ * @returns true if the given character is a newline, false otherwise
+ */
+function isNewline(char) {
+	return char === '\n' || char === '\r';
 }
 
 /**

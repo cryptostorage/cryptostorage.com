@@ -433,86 +433,9 @@ function CryptoPiece(config) {
 	function fromTxt(txt) {
 		assertString(txt);
 		assertInitialized(txt);
-		
-		// process text
-		var annotatedText = new AnnotatedText(text);
-		annotateCryptos(annotatedText);
-		removeCoveredCryptos(annotatedText);
-		annotatePublicAddresses(annotatedText);
-		annotatePrivateKeys(annotatedText);
-		var piece = annotatedTextToPiece(annotatedTex);
+		var piece = CryptoPiece.parseTextPiece(txt);
+		assertObject(piece, CryptoPiece, "Could not parse piece from text");
 		fromPiece(piece);
-		
-		function annotateCryptos(annotatedText) {
-			throw new Error("Not implemented");
-		}
-		
-		function removeCoveredCryptos(annotatedText) {
-			throw new Error("Not implemented");
-		}
-		
-		/**
-		 * Encapsulates annotated text.
-		 */
-		function AnnotatedText(text) {
-			assertString(text);
-			
-			var annotations = [];
-			
-			this.addAnnotation = function(annotation) {
-				assertTrue(annotation.getStartIdx() < text.length);
-				assertTrue(annotation.getEndIdx() < text.length);
-				annotations.push(annotation);
-			}
-			
-			this.removeAnnotation = function(annotation) {
-				annotations.removeVal(annotation);
-			}
-			
-			this.getAnnotations = function() {
-				return annotations;
-			}
-		}
-		
-		/**
-		 * Encapsulates an annotation on annotated text.
-		 * 
-		 * @param annotatedText is the annotated text object to annotate
-		 * @param startIdx is the start index of the annotation
-		 * @param endIdx is the end index of the annotation
-		 * @param metadata is metadata to set for the annotation (optional)
-		 */
-		function Annotation(annotatedText, startIdx, endIdx, metadata) {
-			assertNumber(startIdx);
-			assertTrue(startIdx >= 0);
-			assertNumber(endIdx);
-			assertTrue(endIdx >= 0);
-			assertTrue(endIdx >= startIdx);
-			metadata = Object.assign({}, metadata);
-			
-			this.getCoveredText = function() {
-				return annotatedText.getText().substring(startIdx, endIdx);
-			}
-			
-			this.getAnnotatedText = function() {
-				return annotatedText;
-			}
-			
-			this.getStartIdx = function() {
-				return beginIdx;
-			}
-			
-			this.getEndIdx = function() {
-				return endIdx;
-			}
-			
-			this.getMetadata = function() {
-				return metadata;
-			}
-		}
-		
-		
-		throw new Error("fromTxt() not implemented");
 	}
 	
 	function combine(splitPieces) {
@@ -624,5 +547,257 @@ CryptoPiece.parse = function(str, plugin) {
 		return new CryptoPiece({keypairs: keypairs});
 	} catch (err) {
 		return null;
+	}
+}
+
+/**
+ * Parses a text piece.
+ * 
+ * @param txt is the text piece to parse
+ */
+CryptoPiece.parseTextPiece = function(txt) {
+	assertString(txt);
+	
+	// annotate text
+	var annotatedText = new AnnotatedText(txt.toLowerCase());
+	annotateCryptos(annotatedText, AppUtils.getCryptoPlugins());
+	removeCoveredCryptos(annotatedText);
+	annotatePublicPrivateLabels(annotatedText);
+	annotatePublicPrivateValues(annotatedText);
+	
+	// convert annotated text to piece
+	try {
+		return annotatedTextToPiece(annotatedText);
+	} catch (err) {
+		console.log(err);
+		return null;
+	}
+	
+	function annotateCryptos(annotatedText, plugins) {
+		for (var i = 0; i < plugins.length; i++) {
+			annotateInstances(annotatedText, plugins[i].getName().toLowerCase(), null, null, {plugin: plugins[i]}, true);
+		}
+	}
+	
+	function annotateInstances(annotatedText, str, startIdx, endIdx, metadata, tokensOnly) {
+		while (true) {
+			var idx = annotatedText.getText().indexOf(str, startIdx);
+			if (idx === -1 || (endIdx && idx + str.length > endIdx)) return;
+			var ann = new Annotation(annotatedText, idx, idx + str.length, metadata);
+			if (!tokensOnly || isToken(ann)) annotatedText.addAnnotation(ann);
+			startIdx = idx + 1;
+		}
+	}
+	
+	function isToken(annotation) {
+		var txt = annotation.getAnnotatedText().getText();
+		if (annotation.getStartIdx() > 0 && !isWhitespace(txt[annotation.getStartIdx() - 1])) return false;
+		if (annotation.getEndIdx() < annotation.getAnnotatedText().length - 1 && !isWhitespace(txt[annotation.getEndIdx() + 1])) return false;
+		return true;
+	}
+	
+	function removeCoveredCryptos(annotatedText) {
+		var toRemoves = [];
+		for (var i = 0; i < annotatedText.getAnnotations().length; i++) {
+			var annotation = annotatedText.getAnnotations()[i];
+			if (annotation.getCoveringAnnotations().length > 0) toRemoves.push(annotation);
+		}
+		for (var i = 0; i < toRemoves.length; i++) toRemoves[i].remove();
+	}
+	
+	function annotatePublicPrivateLabels(annotatedText) {
+		
+		// get plugin annotations
+		var pluginAnns = [];
+		for (var i = 0; i < annotatedText.getAnnotations().length; i++) {
+			var ann = annotatedText.getAnnotations()[i];
+			if (ann.getMetadata().plugin) pluginAnns.push(ann);
+		}
+		
+		// annotate public and private labels
+		for (var i = 0; i < pluginAnns.length; i++) {
+			var ann = pluginAnns[i];
+			var endIdx = (i < pluginAnns.length - 1) ? pluginAnns[i + 1].getStartIdx() : undefined;
+			annotatePublicPrivateLabelsAux(annotatedText, pluginAnns[i].getMetadata().plugin, pluginAnns[i].getStartIdx() + 1, endIdx);
+		}
+		
+		function annotatePublicPrivateLabelsAux(annotatedText, plugin, startIdx, endIdx) {
+			annotateInstances(annotatedText, "public address", startIdx, endIdx, {type: "public_label"});
+			var privateLabel = plugin.getPrivateLabel().toLowerCase();
+			annotateInstances(annotatedText, privateLabel, startIdx, endIdx, {type: "private_label"});
+		}
+	}
+	
+	function annotatePublicPrivateValues(annotatedText) {
+		
+		// collect annotated values
+		var annotatedValues = [];
+		for (var i = 0; i < annotatedText.getAnnotations().length; i++) {
+			var ann = annotatedText.getAnnotations()[i];
+			if (ann.getMetadata().type === "public_label") {
+				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);
+				if (!nextValue) continue;
+				nextValue.getMetadata().type = "public_value";
+				annotatedValues.push(nextValue);
+			} else if (ann.getMetadata().type === "private_label") {
+				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);
+				if (!nextValue) continue;
+				nextValue.getMetadata().type = "private_value";
+				annotatedValues.push(nextValue);
+			}
+		}
+		
+		// add annotations
+		for (var i = 0; i < annotatedValues.length; i++) annotatedText.addAnnotation(annotatedValues[i]);
+	}
+	
+	function getNextValueAnnotation(annotatedText, startIdx) {
+		var tokenStartIdx = -1;
+		var lastNonWhitespace = -1;
+		var whitespaceSeen = false;
+		for (var i = startIdx; i < annotatedText.getText().length; i++) {
+			if (isWhitespace(annotatedText.getText()[i])) {
+				whitespaceSeen = true;
+				if (isNewline(annotatedText.getText()[i]) && tokenStartIdx !== -1) return new Annotation(annotatedText, tokenStartIdx, lastNonWhitespace + 1);
+			} else {
+				lastNonWhitespace = i;
+				if (tokenStartIdx === -1 && whitespaceSeen) tokenStartIdx = i;
+			}
+		}
+		if (tokenStartIdx !== -1) return new Annotation(annotatedText, tokenStartIdx, annotatedText.getText().length);
+	}
+	
+	function annotatedTextToPiece(annotatedText) {
+		
+		// collect raw keypairs
+		var keypairsRaw = [];
+		for (var i = 0; i < annotatedText.getAnnotations().length; i++) {
+			var ann = annotatedText.getAnnotations()[i];
+			if (ann.getMetadata().plugin) {
+				keypairsRaw.push({plugin: ann.getMetadata().plugin});
+			} else if (ann.getMetadata().type === "public_value") {
+				assertTrue(keypairsRaw.length > 0);
+				var prev = keypairsRaw[keypairsRaw.length - 1];
+				var text = txt.substring(ann.getStartIdx(), ann.getEndIdx());
+				if (prev.publicValue) assertEquals(prev.publicValue, text);
+				else prev.publicValue = text;
+			} else if (ann.getMetadata().type === "private_value") {
+				var prev = keypairsRaw[keypairsRaw.length - 1];
+				var text = txt.substring(ann.getStartIdx(), ann.getEndIdx());
+				if (prev.privateValue) assertEquals(prev.privateValue, text);
+				else prev.privateValue = text;
+			}
+		}
+		
+		// build piece
+		var keypairs = [];
+		for (var i = 0; i < keypairsRaw.length; i++) {
+			var keypairRaw = keypairsRaw[i];
+			if (!keypairRaw.publicValue && !keypairRaw.privateValue) {	// public and private can be missing iff next keypair is same plugin
+				if (i === keypairsRaw.length - 1 || keypairRaw.plugin !== keypairsRaw[i + 1].plugin) throw new Error("Keypair does not have public or private value");
+			} else {
+				keypairs.push(new CryptoKeypair({plugin: keypairRaw.plugin, privateKey: keypairRaw.privateValue, publicAddress: keypairRaw.publicValue}));
+			}
+		}
+		return new CryptoPiece({keypairs: keypairs});
+	}
+	
+	/**
+	 * Encapsulates annotated text.
+	 */
+	function AnnotatedText(text) {
+		assertString(text);
+		
+		var annotations = [];
+		var sorted = true;
+		
+		this.getText = function() {
+			return text;
+		}
+		
+		/**
+		 * Returns annotations in sorted order.
+		 */
+		this.getAnnotations = function() {
+			if (!sorted) {
+				annotations.sort(function(ann1, ann2) {
+					if (ann1.getStartIdx() < ann2.getStartIdx()) return -1;
+					if (ann1.getStartIdx() > ann2.getStartIdx()) return 1;
+					return ann1.getEndIdx() - ann2.getEndIdx();
+				});
+				sorted = true;
+			}
+			return annotations;
+		}
+		
+		this.addAnnotation = function(annotation) {
+			assertTrue(annotation.getStartIdx() < text.length);
+			assertTrue(annotation.getEndIdx() <= text.length);
+			annotations.push(annotation);
+			sorted = false;
+		}
+		
+		this.removeAnnotation = function(annotation) {
+			var found = annotations.removeVal(annotation);
+			assertTrue(found, "Annotation was not found: " + annotation.toString());
+		}
+	}
+	
+	/**
+	 * Encapsulates an annotation on annotated text.
+	 * 
+	 * @param annotatedText is the annotated text object to annotate
+	 * @param startIdx is the start index of the annotation
+	 * @param endIdx is the end index of the annotation
+	 * @param metadata is metadata to set for the annotation (optional)
+	 */
+	function Annotation(annotatedText, startIdx, endIdx, metadata) {
+		assertNumber(startIdx);
+		assertTrue(startIdx >= 0);
+		assertNumber(endIdx);
+		assertTrue(endIdx >= 0);
+		assertTrue(endIdx >= startIdx);
+		
+		// instance variables
+		var that = this;
+		metadata = Object.assign({}, metadata);
+		
+		this.getCoveredText = function() {
+			return annotatedText.getText().substring(startIdx, endIdx);
+		}
+		
+		this.getAnnotatedText = function() {
+			return annotatedText;
+		}
+		
+		this.getStartIdx = function() {
+			return startIdx;
+		}
+		
+		this.getEndIdx = function() {
+			return endIdx;
+		}
+		
+		this.getMetadata = function() {
+			return metadata;
+		}
+		
+		this.getCoveringAnnotations = function() {
+			var anns = [];
+			for (var i = 0; i < annotatedText.getAnnotations().length; i++) {
+				var ann = annotatedText.getAnnotations()[i];
+				if (ann === that) continue;
+				if (ann.getStartIdx() <= startIdx && ann.getEndIdx() >= endIdx) anns.push(ann);
+			}
+			return anns;
+		}
+		
+		this.remove = function() {
+			annotatedText.removeAnnotation(that);
+		}
+		
+		this.toString = function() {
+			return annotatedText.getText().substring(startIdx, endIdx) + " [" + startIdx + ", " + endIdx + "]";
+		}
 	}
 }

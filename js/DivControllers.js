@@ -1483,7 +1483,7 @@ function ImportFileController(div) {
 		dragDropBrowse.append("or click to browse");
 		
 		// register browse link with hidden input
-		inputFiles = $("<input type='file' multiple accept='.json,.csv,.zip'>").appendTo(dragDropDiv);
+		inputFiles = $("<input type='file' multiple accept='.json,.csv,.txt,.zip'>").appendTo(dragDropDiv);
 		inputFiles.change(function() { that.addFiles($(this).get(0).files); });
 		inputFiles.hide();
 		dragDropBrowse.click(function() {

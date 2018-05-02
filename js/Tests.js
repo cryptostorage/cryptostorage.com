@@ -101,7 +101,7 @@ function Tests() {
 			if (err) throw err;
 			
 			// test text import
-			testTextImport(plugins, function(err) {
+			testTextImport(AppUtils.getCryptoPlugins(), function(err) {
 				if (err) throw err;
 				
 				// test generate pieces
@@ -616,6 +616,7 @@ function Tests() {
 		assertString(piece.toTxt());
 		piece2 = new CryptoPiece({txt: piece.toTxt()});
 		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
+		if (piece.getPieceNum()) piece2.setPieceNum(piece.getPieceNum());
 		assertTrue(piece.equals(piece2));
 	}
 	
