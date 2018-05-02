@@ -434,8 +434,82 @@ function CryptoPiece(config) {
 		assertString(txt);
 		assertInitialized(txt);
 		
+		// process text
+		var annotatedText = new AnnotatedText(text);
+		annotateCryptos(annotatedText);
+		removeCoveredCryptos(annotatedText);
+		annotatePublicAddresses(annotatedText);
+		annotatePrivateKeys(annotatedText);
+		var piece = annotatedTextToPiece(annotatedTex);
+		fromPiece(piece);
 		
+		function annotateCryptos(annotatedText) {
+			throw new Error("Not implemented");
+		}
 		
+		function removeCoveredCryptos(annotatedText) {
+			throw new Error("Not implemented");
+		}
+		
+		/**
+		 * Encapsulates annotated text.
+		 */
+		function AnnotatedText(text) {
+			assertString(text);
+			
+			var annotations = [];
+			
+			this.addAnnotation = function(annotation) {
+				assertTrue(annotation.getStartIdx() < text.length);
+				assertTrue(annotation.getEndIdx() < text.length);
+				annotations.push(annotation);
+			}
+			
+			this.removeAnnotation = function(annotation) {
+				annotations.removeVal(annotation);
+			}
+			
+			this.getAnnotations = function() {
+				return annotations;
+			}
+		}
+		
+		/**
+		 * Encapsulates an annotation on annotated text.
+		 * 
+		 * @param annotatedText is the annotated text object to annotate
+		 * @param startIdx is the start index of the annotation
+		 * @param endIdx is the end index of the annotation
+		 * @param metadata is metadata to set for the annotation (optional)
+		 */
+		function Annotation(annotatedText, startIdx, endIdx, metadata) {
+			assertNumber(startIdx);
+			assertTrue(startIdx >= 0);
+			assertNumber(endIdx);
+			assertTrue(endIdx >= 0);
+			assertTrue(endIdx >= startIdx);
+			metadata = Object.assign({}, metadata);
+			
+			this.getCoveredText = function() {
+				return annotatedText.getText().substring(startIdx, endIdx);
+			}
+			
+			this.getAnnotatedText = function() {
+				return annotatedText;
+			}
+			
+			this.getStartIdx = function() {
+				return beginIdx;
+			}
+			
+			this.getEndIdx = function() {
+				return endIdx;
+			}
+			
+			this.getMetadata = function() {
+				return metadata;
+			}
+		}
 		
 		
 		throw new Error("fromTxt() not implemented");
