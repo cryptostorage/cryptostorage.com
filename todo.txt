@@ -1,4 +1,6 @@
 v0.3.0
+remove min share encoding?
+something running after consecutive cancels, async.destroy()?
 text parser
 print
 backwards compatibility
