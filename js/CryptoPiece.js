@@ -363,6 +363,7 @@ function CryptoPiece(config) {
 		else if (config.splitPieces) combine(config.splitPieces);
 		else if (config.piece) fromPiece(config.piece);
 		else if (config.csv) fromCsv(config.csv);
+		else if (config.txt) fromTxt(config.txt);
 		else throw new Error("Config missing required fields");
 		if (isDefined(config.pieceNum)) that.setPieceNum(config.pieceNum);
 	}
@@ -427,6 +428,17 @@ function CryptoPiece(config) {
 		
 		// set internal keypairs
 		setKeypairs(keypairs);
+	}
+	
+	function fromTxt(txt) {
+		assertString(txt);
+		assertInitialized(txt);
+		
+		
+		
+		
+		
+		throw new Error("fromTxt() not implemented");
 	}
 	
 	function combine(splitPieces) {

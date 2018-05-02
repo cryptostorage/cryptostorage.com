@@ -1,6 +1,4 @@
 v0.3.0
-remove min share encoding?
-something running after consecutive cancels, async.destroy()?
 text parser
 print
 backwards compatibility
@@ -13,6 +11,9 @@ interoperability disclosure
 performance tests and optimizations
 rendering lag on import large piece
 confirmation on reset
+
+remove min share encoding?
+something running after consecutive cancels, async.destroy()?
 
 refactor tests to use async
 notice colors

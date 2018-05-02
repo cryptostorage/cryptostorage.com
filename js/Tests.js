@@ -614,9 +614,9 @@ function Tests() {
 		
 		// test init from txt
 		assertString(piece.toTxt());
-//		piece2 = new CryptoPiece({txt: piece.toTxt()});	// TODO
-//		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
-//		assertTrue(piece.equals(piece2));
+		piece2 = new CryptoPiece({txt: piece.toTxt()});
+		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
+		assertTrue(piece.equals(piece2));
 	}
 	
 	function testPieceRemoval(piece) {
