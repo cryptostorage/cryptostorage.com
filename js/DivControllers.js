@@ -4458,7 +4458,7 @@ function CompactPieceRenderer(div, piece, config) {
 				div.addClass("piece_div");
 				var pageDiv;
 				var tickers;
-				var pairsPerPage = config.spaceBetween ? 6 : 7;
+				var pairsPerPage = config.cryptoCash ? 6 : 7;
 				for (var i = 0; i < piece.getKeypairs().length; i++) {
 					
 					// add new page
@@ -4469,7 +4469,7 @@ function CompactPieceRenderer(div, piece, config) {
 							div.append($("<div>"));
 							tickers = [];
 							for (var j = 0; j < pairsPerPage; j++) tickers.push(piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
-							if (config.spaceBetween && config.infoBack) div.append(getSweepInstructionsPage(tickers));
+							if (config.cryptoCash && config.infoBack) div.append(getSweepInstructionsPage(tickers));
 						}
 						
 						// add new page
@@ -4477,7 +4477,7 @@ function CompactPieceRenderer(div, piece, config) {
 						if (piece.getPieceNum() || config.showLogos) {
 							var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 							headerDiv.append($("<div class='piece_page_header_left'>"));
-							if (!config.spaceBetween && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+							if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
 							var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
 							if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
 						}
@@ -4485,11 +4485,11 @@ function CompactPieceRenderer(div, piece, config) {
 					
 					// add keypair to page
 					pageDiv.append(keypairRenderers[i].getDiv());
-					if (config.spaceBetween) keypairRenderers[i].getDiv().addClass("keypair_div_spaced");
+					if (config.cryptoCash) keypairRenderers[i].getDiv().addClass("keypair_div_spaced");
 				}
 				
 				// add final page of sweep instructions
-				if (config.infoBack && config.spaceBetween) {
+				if (config.infoBack && config.cryptoCash) {
 					var numPairsLastPage = piece.getKeypairs().length % pairsPerPage;
 					if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
 					tickers = [];
