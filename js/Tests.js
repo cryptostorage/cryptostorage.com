@@ -31,7 +31,7 @@ function Tests() {
 	
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_KEYS = 1;							// number of keys to test per plugin without encryption throughout tests
-	var REPEAT_KEYS_ENCRYPTION = 1;		// number of keys to test per plugin with encryption throughout tests
+	var REPEAT_KEYS_ENCRYPTION = 0;		// number of keys to test per plugin with encryption throughout tests
 	var TEST_MAX_SHARES = false;			// computationally intensive
 	var NUM_PIECES = 3;
 	var MIN_PIECES = 2;
@@ -1234,11 +1234,76 @@ function Tests() {
 					assertEquals("Piece is destroyed", err.message);
 				}
 				
-				// done
-				onDone();
+				// test destroying repeatedly to ensure no runaway threads
+				testRepeatDestroy(function() {
+					onDone();
+				})
 			}
 		}, function(err, pieces, pieceRenderers) {
 			throw new Error("onDone should not be invoked after being destroyed");
 		});
+		
+		function testRepeatDestroy(onDone) {
+			
+			// collect test functions
+			var funcs = [];
+			var repeatDestroy = 5;
+			for (var i = 0; i < repeatDestroy; i++) {
+				funcs.push(function(onDone) { testDestroyImmediate(); onDone(); });
+				funcs.push(function(onDone) { testDestroyDuring("Generating", getGenConfig(plugins, 1000, false), onDone); });
+				funcs.push(function(onDone) { testDestroyDuring("Rendering", getGenConfig(plugins, 1, false), onDone); });
+				funcs.push(function(onDone) { testDestroyDuring("Encrypting", getGenConfig(plugins, 1, true), onDone); });
+			}
+			
+			// execute in series
+			async.series(funcs, function(err) {
+				if (err) throw err;
+				onDone(err);
+			})
+		}
+		
+		function testDestroyImmediate() {
+			var pieceGenerator = new PieceGenerator(getGenConfig(plugins, 1, false));
+			pieceGenerator.generatePieces();
+			pieceGenerator.destroy();
+		}
+		
+		function testDestroyDuring(progressSubstring, genConfig) {
+			var isDestroyed = false;
+			var progressSeen = false;
+			var progressSeenPercent;
+			var pieceGenerator = new PieceGenerator(genConfig);
+			pieceGenerator.generatePieces(function(percent, label) {
+				if (isDestroyed) throw new Error("Should not invoke onProgress() after generator destroyed");
+				if (strContains(label, progressSubstring)) {
+					if (progressSeen && percent > progressSeenPercent) {
+						pieceGenerator.destroy();
+						isDestroyed = true;
+						onDone();
+						return;
+					}
+					progressSeen = true;
+					progressSeenPercent = percent;
+				}
+			}, function(err, pieces, pieceRenderers) {
+				assertTrue(isDestroyed, "Generator should have been destroyed for progress substring " + progressLabelSubstring);
+				throw new Error("Should not invoke onDone() after generator destroyed")
+			});
+		}
+		
+		function getGenConfig(plugins, numKeypairs, useEncryption) {
+			var config = {};
+			config.keypairs = [];
+			if (useEncryption) config.passphrase = PASSPHRASE;
+			for (var i = 0; i < plugins.length; i++) {
+				config.keypairs.push({
+					ticker: plugins[i].getTicker(),
+					numKeypairs: numKeypairs,
+					encryption: useEncryption ? plugins[i].getEncryptionSchemes()[0] : undefined
+				});
+			}
+			config.pieceRendererClass = CompactPieceRenderer;
+			return config;
+		}
 	}
 }
