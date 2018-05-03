@@ -1,5 +1,4 @@
 v0.3.0
-print
 backwards compatibility
 quick generate
 direct link to editor
@@ -14,6 +13,7 @@ unrecognized private key with single character errors on BTC and DASH
 cross browser testing
 
 remove min share encoding?
+print selector compact | cryptocash | community design, etc
 text import says please select currency on unrecognized text import
 print tab values shouldn't be underlined because cannot click
 home crypto selection tab name should be "Generate Keys"

@@ -4394,9 +4394,6 @@ function CompactPieceRenderer(div, piece, config) {
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
 	
-	console.log("Rendering with config");
-	console.log(config);
-	
 	// config default and validation
 	config = Object.assign({
 		showPublic: true,
@@ -4431,7 +4428,8 @@ function CompactPieceRenderer(div, piece, config) {
 		var renderFuncs = [];
 		keypairRenderers = [];
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[i], config, piece.getKeypairs().length > 1 ? "#" + (i + 1) : null);
+			if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (i + 1);
+			var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[i], config);
 			keypairRenderers.push(keypairRenderer);
 			renderFuncs.push(renderFunc(keypairRenderer));
 		}
@@ -4672,9 +4670,9 @@ CompactPieceRenderer.getRenderWeight = function(config) {
  * 				config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
- * @param id is an id to render with the keypair (optional)
+ * 				config.keypairNum is a number identifier to render with the keypair (optional)
  */
-function KeypairRenderer(div, keypair, config, id) {
+function KeypairRenderer(div, keypair, config) {
 	DivController.call(this, div);
 	
 	// default config
@@ -4697,22 +4695,18 @@ function KeypairRenderer(div, keypair, config, id) {
 		div.empty();
 		div.addClass("keypair_div flex_horizontal");
 		
-		// TODO
-		assertTrue(config.showPublic, "Hiding public not implemented");
-		assertTrue(config.showPrivate, "Hiding private not implemented");
-		
 		// left, center, right divs
 		var keypairLeftDiv = $("<div class='keypair_left_div flex_horizontal flex_align_start flex_justify_center'>").appendTo(div);
 		var keypairCenterDiv = $("<div class='keypair_center_div flex_vertical'>").appendTo(div);
 		var keypairRightDiv = $("<div class='keypair_right_div flex_horizontal flex_align_end flex_justify_center'>").appendTo(div);
 		
 		// decode keypair for rendering
-		var decoded = KeypairRenderer.decodeKeypair(keypair);
+		var decoded = KeypairRenderer.decodeKeypair(keypair, config);
 		
 		// keypair id
 		var idDiv = $("<div class='keypair_center_id'>").appendTo(keypairCenterDiv);
 		if (decoded.leftLabel) idDiv.css("position", "absolute");
-		if (id) idDiv.html(id);
+		if (config.keypairNum) idDiv.html(config.keypairNum);
 		
 		// left label and value
 		if (decoded.leftLabel) {
@@ -4837,7 +4831,6 @@ KeypairRenderer.QR_CONFIG = {
  * 
  * @param keypair is the keypair to decode
  * @param config is custom configuration
- * 				config.keypairId is the id if the keypair
  * @returns a decoded object with fields which inform rendering
  * 					decoded.leftLabel is the upper left label
  * 					decoded.leftValue is the upper left value
@@ -4847,35 +4840,33 @@ KeypairRenderer.QR_CONFIG = {
  * 					decoded.rightLabel is the lower right label
  * 					decoded.rightValue is the lower right value
  * 					decoded.rightValueCopyable indicates if the right value is copyable and should be QR
- * 					decoded.keypairId is the keypair identifier to render
  */
 KeypairRenderer.decodeKeypair = function(keypair, config) {
 	
 	// default render config
-	var defaultConfig = {
-		includePublic: true,
-		includePrivate: true,	
-		showLogo: true
-	};
-	config = Object.assign(defaultConfig, config);
+	config = Object.assign({
+		showPublic: true,
+		showPrivate: true,	
+		showLogos: true
+	}, config);
 	
 	// decode
 	var decoded = {};
-	decoded.cryptoLogo = config.showLogo ? keypair.getPlugin().getLogo() : null;
+	decoded.cryptoLogo = config.showLogos ? keypair.getPlugin().getLogo() : null;
 	decoded.cryptoLabel = keypair.getPlugin().getName();
-	decoded.keypairId = config.keypairId;
 	
 	// initialize left values
 	if (keypair.isPublicApplicable()) {
 		decoded.leftLabel = "\u25C4 Public Address";
-		if (keypair.getPublicAddress()) {
+		if (keypair.getPublicAddress() && config.showPublic) {
 			decoded.leftValueCopyable = true;
 			decoded.leftValue = keypair.getPublicAddress();
 		} else {
 			decoded.leftValueCopyable = false;
-			if (keypair.isSplit()) decoded.leftValue = "Combine shares to view";
-			else if (keypair.isEncrypted()) decoded.leftValue = "Decrypt to view";
-			else throw new Error("Public address should be known");
+			if (keypair.isSplit()) decoded.leftValue = "(combine shares to view)";
+			else if (keypair.isEncrypted()) decoded.leftValue = "(decrypt to view)";
+			else if (!config.showPublic) decoded.leftValue = "(not shown)";
+			else throw new Error("Unknown public address value");
 		}
 	} else {
 		decoded.leftLabel = null;
@@ -4885,8 +4876,8 @@ KeypairRenderer.decodeKeypair = function(keypair, config) {
 	
 	// initialize right values
 	decoded.rightLabel = keypair.getPlugin().getPrivateLabel();
-	decoded.rightLabel += " " + (config.includePrivate ? keypair.isSplit() ? "(split)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
-	decoded.rightValue = keypair.getPrivateWif();
+	decoded.rightLabel += " " + (config.showPrivate ? keypair.isSplit() ? "(split)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
+	decoded.rightValue = keypair.getPrivateWif() && config.showPrivate ? keypair.getPrivateWif() : "(not shown)";
 	decoded.rightValueCopyable = isInitialized(keypair.getPrivateWif());
 	return decoded;
 }
