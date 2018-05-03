@@ -382,9 +382,7 @@ function Tests() {
 	// tests piece splitting, initialization, and conversion
 	function testPieceWithoutEncryption(piece) {
 		assertObject(piece, CryptoPiece);
-		if (piece.isSplit() === false) {
-			testPieceSplit(piece);
-		}
+		if (piece.isSplit() === false) testPieceSplit(piece);
 		testPieceState(piece);
 		testPieceInit(piece);
 		testPieceRemoval(piece);
