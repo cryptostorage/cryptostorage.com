@@ -1,5 +1,4 @@
 v0.3.0
-something running after consecutive cancels, async.destroy()?
 print
 backwards compatibility
 quick generate

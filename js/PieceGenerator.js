@@ -151,6 +151,7 @@ function PieceGenerator(config) {
 		var numCreated = 0;
 		function newKeypairFunc(plugin) {
 			return function(onDone) {
+				if (_isDestroyed) return;
 				var keypair = new CryptoKeypair({plugin: plugin});
 				numCreated++;
 				if (onProgress) onProgress(numCreated / newKeypairFuncs.length, "Generating keypairs");
