@@ -2801,7 +2801,7 @@ function EditorController(div, config) {
 	
 	function cancel() {
 		if (pieceGenerator) {
-			pieceGenerator.destroy();
+			pieceGenerator.destroy(true);
 			pieceGenerator = null;
 		}
 		that.setPieces(importedPieces, importedPieceDivs);
@@ -4099,9 +4099,9 @@ function EditorSaveController(div, pieces) {
 		// checkboxes
 		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(div);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save public addresses").render();
-		includePublicCheckbox.setChecked(true);
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
-		includePrivateCheckbox.setChecked(true);
+		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
+		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
 		
 		// save as selector
 		var selectorOptions = ["Save as JSON", "Save as CSV", "Save as TXT"];
@@ -4146,8 +4146,8 @@ function EditorSaveController(div, pieces) {
 	function update(onDone) {
 		
 		// toggle include checkboxes
-		includePrivateCheckbox.setEnabled(includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(includePrivateCheckbox.isChecked());
+		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
 		
 		// disable save button
 		setSaveEnabled(false);
@@ -4230,6 +4230,7 @@ function EditorPrintController(div, pieces) {
 	var includeInstructionsCheckbox
 	var printBtn;
 	var pieceRenderers;	// rendered pieces ready for print
+	var pieceGenerator;
 	var callbackFnPrint;
 	var callbackFnCancel;
 	
@@ -4254,8 +4255,8 @@ function EditorPrintController(div, pieces) {
 		}
 		
 		// initial state
-		includePublicCheckbox.setChecked(true);
-		includePrivateCheckbox.setChecked(true);
+		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
+		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
 		includeLogosCheckbox.setChecked(true);
 		if (cryptoCashApplies()) includeInstructionsCheckbox.setChecked(true);
 		
@@ -4263,7 +4264,10 @@ function EditorPrintController(div, pieces) {
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
 		var cancelBtn = $("<div class='editor_export_btn_red flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
 		cancelBtn.html("Cancel");
-		cancelBtn.click(function() { if (callbackFnCancel) callbackFnCancel(); });
+		cancelBtn.click(function() {
+			if (pieceGenerator) pieceGenerator.destroy();
+			if (callbackFnCancel) callbackFnCancel();
+		});
 		buttonsDiv.append($("<div style='width:150px;'>"));
 		printBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
 		printBtn.html("Print");
@@ -4297,26 +4301,26 @@ function EditorPrintController(div, pieces) {
 	
 	function update(onDone) {
 		
-		// TODO: include public/private only available if applicable
-				
-		// toggle checkboxes
-		includePrivateCheckbox.setEnabled(includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(includePrivateCheckbox.isChecked());
-		if (cryptoCashApplies() && includePrivateCheckbox.isChecked()) {
-			cryptoCashCheckbox.show()
-			includeInstructionsCheckbox.setVisible(cryptoCashCheckbox.isChecked());
-		} else {
-			cryptoCashCheckbox.hide();
-			includeInstructionsCheckbox.hide()
+		// update checkboxes
+		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+		if (cryptoCashApplies()) {
+			if (includePrivateCheckbox.isChecked()) {
+				cryptoCashCheckbox.show();
+				includeInstructionsCheckbox.setVisible(cryptoCashCheckbox.isChecked());
+			} else {
+				cryptoCashCheckbox.hide();
+				includeInstructionsCheckbox.hide()
+			}
 		}
 		
 		// disable print button
 		setPrintEnabled(false);
 		
 		// render pieces
-		// TODO: cancel last generator if applicable
 		pieceRenderers = undefined;
-		var pieceGenerator = new PieceGenerator({
+		if (pieceGenerator) pieceGenerator.destroy();
+		pieceGenerator = new PieceGenerator({
 			pieces: pieces,
 			pieceRendererClass: CompactPieceRenderer,
 			pieceRendererConfig: getPieceRendererConfig()

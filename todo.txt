@@ -1,16 +1,17 @@
 v0.3.0
-backwards compatibility
-quick generate
+rendering lag on import large piece
+print preview
 direct link to editor
 action controller bottom center if not enough width
+browser testing
+quick generate
+backwards compatibility
 click outside dropdown only works if click within container
 footer
 interoperability disclosure
 performance tests and optimizations
-rendering lag on import large piece
 confirmation on reset
 unrecognized private key with single character errors on BTC and DASH
-cross browser testing
 
 remove min share encoding?
 print selector compact | cryptocash | community design, etc

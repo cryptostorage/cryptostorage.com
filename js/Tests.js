@@ -1208,7 +1208,7 @@ function Tests() {
 			// destroy when progress exceeds 25%
 			if (percent > .25) {
 				var keypairs = piece.getKeypairs();
-				pieceGenerator.destroy();
+				pieceGenerator.destroy(true);
 				isDestroyed = true;
 				assertTrue(pieceGenerator.isDestroyed());
 				assertTrue(piece.isDestroyed());
@@ -1263,7 +1263,7 @@ function Tests() {
 		function testDestroyImmediate() {
 			var pieceGenerator = new PieceGenerator(getGenConfig(plugins, 1, false));
 			pieceGenerator.generatePieces();
-			pieceGenerator.destroy();
+			pieceGenerator.destroy(true);
 		}
 		
 		function testDestroyDuring(progressSubstring, genConfig) {
@@ -1275,7 +1275,7 @@ function Tests() {
 				if (isDestroyed) throw new Error("Should not invoke onProgress() after generator destroyed");
 				if (strContains(label, progressSubstring)) {
 					if (progressSeen && percent > progressSeenPercent) {
-						pieceGenerator.destroy();
+						pieceGenerator.destroy(true);
 						isDestroyed = true;
 						onDone();
 						return;
