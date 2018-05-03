@@ -11,10 +11,10 @@ performance tests and optimizations
 rendering lag on import large piece
 confirmation on reset
 unrecognized private key with single character errors on BTC and DASH
-
+cross browser testing
 
 remove min share encoding?
-
+text import says please select currency on unrecognized text import
 print tab values shouldn't be underlined because cannot click
 home crypto selection tab name should be "Generate Keys"
 notice colors

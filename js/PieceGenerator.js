@@ -9,6 +9,7 @@
  * 				config.pieces are existing pieces to start with instead of generating new keypairs
  *				config.encryptionSchemes are encryption schemes to encrypt existing pieces if passphrase is set
  * 				config.pieceRendererClass specifies a class to render pieces, skips rendering if not given
+ * 				config.pieceRendererConfig is render configuration
  */
 function PieceGenerator(config) {
 		
@@ -225,7 +226,7 @@ function PieceGenerator(config) {
 		var numRendered = 0;
 		pieceRenderers = [];
 		for (var i = 0; i < pieces.length; i++) {
-			pieceRenderer = new config.pieceRendererClass(null, pieces[i]);
+			pieceRenderer = new config.pieceRendererClass(null, pieces[i], config.pieceRendererConfig);
 			pieceRenderer.onProgress(function(percent, label) {
 				if (onProgress) onProgress((numRendered + percent) / pieces.length, label);
 			});

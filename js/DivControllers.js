@@ -192,9 +192,11 @@ function DivController(div) {
 	this.div = div;
 }
 DivController.prototype.getDiv = function() { return this.div; }
-DivController.prototype.render = function(onDone) { }	// callback called with rendered div
-DivController.prototype.onShow = function() { }
-DivController.prototype.onHide = function() { }
+DivController.prototype.render = function(onDone) { throw new Error("Subclass must implement"); }
+DivController.prototype.show = function() { this.div.show(); }
+DivController.prototype.hide = function() { this.div.hide(); }
+DivController.prototype.setVisible = function(bool) { assertBoolean(bool); bool ? this.div.show() : this.div.hide(); }
+DivController.prototype.isVisible = function() { return this.div.is(":visible"); }
 
 /**
  * Controls a single checkbox.
@@ -284,7 +286,7 @@ function CheckboxController(div, label, tooltip) {
 		return !isInitialized(checkbox.attr("disabled"));
 	}
 }
-inheritsFrom(EditorActionsController, DivController);
+inheritsFrom(CheckboxController, DivController);
 
 /**
  * Controls a dropdown selector.
@@ -4246,13 +4248,16 @@ function EditorPrintController(div, pieces) {
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show public addresses").render();
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show private keys").render();
 		includeLogosCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show currency logos").render();
-		cryptoCashCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "CryptoCash").render();
-		includeInstructionsCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Print Instructions (Two Sided)").render();
+		if (cryptoCashApplies()) {
+			cryptoCashCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "CryptoCash").render();
+			includeInstructionsCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Print Instructions (Two Sided)").render();
+		}
 		
 		// initial state
 		includePublicCheckbox.setChecked(true);
 		includePrivateCheckbox.setChecked(true);
 		includeLogosCheckbox.setChecked(true);
+		if (cryptoCashApplies()) includeInstructionsCheckbox.setChecked(true);
 		
 		// cancel and print buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
@@ -4266,6 +4271,11 @@ function EditorPrintController(div, pieces) {
 		// register changes
 		includePublicCheckbox.onChecked(function() { update(); });
 		includePrivateCheckbox.onChecked(function() { update(); });
+		includeLogosCheckbox.onChecked(function() { update(); });
+		if (cryptoCashApplies()) {
+			cryptoCashCheckbox.onChecked(function() { update(); });
+			includeInstructionsCheckbox.onChecked(function() { update(); });
+		}
 		
 		// initialize
 		update();
@@ -4287,23 +4297,53 @@ function EditorPrintController(div, pieces) {
 	
 	function update(onDone) {
 		
-		// toggle include checkboxes
+		// TODO: include public/private only available if applicable
+				
+		// toggle checkboxes
 		includePrivateCheckbox.setEnabled(includePublicCheckbox.isChecked());
 		includePublicCheckbox.setEnabled(includePrivateCheckbox.isChecked());
+		if (cryptoCashApplies() && includePrivateCheckbox.isChecked()) {
+			cryptoCashCheckbox.show()
+			includeInstructionsCheckbox.setVisible(cryptoCashCheckbox.isChecked());
+		} else {
+			cryptoCashCheckbox.hide();
+			includeInstructionsCheckbox.hide()
+		}
 		
 		// disable print button
 		setPrintEnabled(false);
 		
 		// render pieces
+		// TODO: cancel last generator if applicable
 		pieceRenderers = undefined;
 		var pieceGenerator = new PieceGenerator({
 			pieces: pieces,
-			pieceRendererClass: CompactPieceRenderer
+			pieceRendererClass: CompactPieceRenderer,
+			pieceRendererConfig: getPieceRendererConfig()
 		});
 		pieceGenerator.generatePieces(null, function(err, _pieces, _pieceRenderers) {
+			assertNull(err);
 			pieceRenderers = _pieceRenderers;
 			setPrintEnabled(true);
+			if (onDone) onDone();
 		});
+	}
+	
+	function getPieceRendererConfig() {
+		return {
+			showPublic: includePublicCheckbox.isChecked(),
+			showPrivate: includePrivateCheckbox.isChecked(),
+			showLogos: includeLogosCheckbox.isChecked(),
+			cryptoCash: cryptoCashCheckbox && cryptoCashCheckbox.isVisible() ? cryptoCashCheckbox.isChecked() : false,
+			infoBack: includeInstructionsCheckbox ? includeInstructionsCheckbox.isChecked() : false,
+			pageBreaks: true
+		}
+	}
+	
+	function cryptoCashApplies() {
+		if (pieces.length !== 1) return false;
+		if (pieces[0].isEncrypted() !== false) return false;
+		return true;
 	}
 	
 	function print() {
@@ -4339,13 +4379,39 @@ inheritsFrom(EditorPrintController, DivController);
 /**
  * Renders a piece with compact keypairs.
  * 
+ * @param config specifies render configuration
+ *  			config.showLogos specifies if crypto logos should be shown
+ * 				config.showPublic specifies if public addresses should be shown
+ * 				config.showPrivate specifies if private keys should be shown
+ * 				config.cryptoCash specifies to space 6 keypairs per page with no cryptostorage logo
+ * 				config.infoBack specifies if double-sided sweep instructions should be included for crypto cash
+ * 				config.pageBreaks specifies if piece should be rendered as pages
  * @param div is the div to render to
  * @param piece is the piece to render
  */
-function CompactPieceRenderer(div, piece) {
+function CompactPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
+	
+	console.log("Rendering with config");
+	console.log(config);
+	
+	// config default and validation
+	config = Object.assign({
+		showPublic: true,
+		showPrivate: true,
+		showLogos: true,
+		cryptoCash: false,
+		infoBack: false,
+		pageBreaks: false
+	}, config);
+	if (!config.showPublic) assertTrue(config.showPrivate);
+	if (!config.showPrivate) assertTrue(config.showPublic);
+	if (config.infoBack) {
+		assertFalse(piece.isSplit());
+		assertTrue(config.pageBreaks);
+	}
 	
 	var keypairRenderers;
 	var onProgressFn;
@@ -4365,7 +4431,7 @@ function CompactPieceRenderer(div, piece) {
 		var renderFuncs = [];
 		keypairRenderers = [];
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[i], piece.getKeypairs().length > 1 ? "#" + (i + 1) : null);
+			var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[i], config, piece.getKeypairs().length > 1 ? "#" + (i + 1) : null);
 			keypairRenderers.push(keypairRenderer);
 			renderFuncs.push(renderFunc(keypairRenderer));
 		}
@@ -4387,15 +4453,49 @@ function CompactPieceRenderer(div, piece) {
 				if (_isDestroyed) return;
 				assertNull(err);
 				
-				// render keypairs
-				update({
-					piece: piece,
-					keypairRenderers: keypairRenderers,
-					showLogos: true,
-					spaceBetween: false,
-					pageBreaks: false,
-					infoBack: false
-				});
+				// build pages
+				div.empty();
+				div.addClass("piece_div");
+				var pageDiv;
+				var tickers;
+				var pairsPerPage = config.spaceBetween ? 6 : 7;
+				for (var i = 0; i < piece.getKeypairs().length; i++) {
+					
+					// add new page
+					if ((!config.pageBreaks && i === 0) || (config.pageBreaks && i % pairsPerPage === 0)) {
+						
+						// add sweep instructions
+						if (config.infoBack && i > 0) {
+							div.append($("<div>"));
+							tickers = [];
+							for (var j = 0; j < pairsPerPage; j++) tickers.push(piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
+							if (config.spaceBetween && config.infoBack) div.append(getSweepInstructionsPage(tickers));
+						}
+						
+						// add new page
+						pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+						if (piece.getPieceNum() || config.showLogos) {
+							var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
+							headerDiv.append($("<div class='piece_page_header_left'>"));
+							if (!config.spaceBetween && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+							var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
+							if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
+						}
+					}
+					
+					// add keypair to page
+					pageDiv.append(keypairRenderers[i].getDiv());
+					if (config.spaceBetween) keypairRenderers[i].getDiv().addClass("keypair_div_spaced");
+				}
+				
+				// add final page of sweep instructions
+				if (config.infoBack && config.spaceBetween) {
+					var numPairsLastPage = piece.getKeypairs().length % pairsPerPage;
+					if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
+					tickers = [];
+					for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.getKeypairs()[piece.getKeypairs().length - (numPairsLastPage - i)].getPlugin().getTicker());
+					div.append(getSweepInstructionsPage(tickers));
+				}
 				
 				// copy keys to clipboard
 				new Clipboard(".copyable", {
@@ -4459,67 +4559,6 @@ function CompactPieceRenderer(div, piece) {
 		var weight = 0;
 		for (var i = 0; i < piece.getKeypairs().length; i++) weight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i]);
 		return weight;
-	}
-	
-	function update(config) {
-		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
-		
-		// validate config
-		assertInitialized(config);
-		if (config.infoBack) {
-			assertFalse(config.piece.isSplit());
-			assertTrue(config.pageBreaks);
-			assertTrue(config.spaceBetween);
-		}
-		
-		// div setup
-		div.empty();
-		div.addClass("piece_div");
-		
-		// compute pairs per page
-		var pairsPerPage = config.spaceBetween ? 6 : 7;
-
-		// setup pages and collect functions to render keys
-		var pageDiv;
-		var funcs = [];
-		var tickers;
-		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			
-			// add new page
-			if ((!config.pageBreaks && i === 0) || (config.pageBreaks && i % pairsPerPage === 0)) {
-				
-				// add cryptocash instructions
-				if (config.infoBack && i > 0) {
-					div.append($("<div>"));
-					tickers = [];
-					for (var j = 0; j < pairsPerPage; j++) tickers.push(config.piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
-					if (config.spaceBetween && config.infoBack) div.append(getSweepInstructionsPage(tickers));
-				}
-				
-				// add new page
-				pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-				if (piece.getPieceNum() || config.showLogos) {
-					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
-					headerDiv.append($("<div class='piece_page_header_left'>"));
-					if (config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
-					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-					if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
-				}
-			}
-			
-			// add keypair to page
-			pageDiv.append(config.keypairRenderers[i].getDiv());
-			if (config.spaceBetween) config.keypairRenderers[i].getDiv().addClass("keypair_div_spaced");
-		}
-		
-		// add final page of sweep instructions
-		if (config.infoBack && config.spaceBetween) {
-			var numPairsLastPage = piece.getKeypairs().length % pairsPerPage;
-			if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
-			tickers = [];
-			for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.getKeypairs()[piece.getKeypairs().length - (numPairsLastPage - i)].getPlugin().getTicker());
-			div.append(getSweepInstructionsPage(tickers));
-		}
 	}
 	
 	/**
@@ -4629,10 +4668,21 @@ CompactPieceRenderer.getRenderWeight = function(config) {
  * 
  * @param div is the div to render to
  * @param keypair is the keypair to render
+ * @param config specifies render configuration
+ * 				config.showLogos specifies if crypto logos should be shown
+ * 				config.showPublic specifies if public addresses should be shown
+ * 				config.showPrivate specifies if private keys should be shown
  * @param id is an id to render with the keypair (optional)
  */
-function KeypairRenderer(div, keypair, id) {
+function KeypairRenderer(div, keypair, config, id) {
 	DivController.call(this, div);
+	
+	// default config
+	config = Object.assign({
+		showLogos: true,
+		showPublic: true,
+		showPrivate: true
+	}, config);
 	
 	var that = this;
 	var keypairLeftValue;
@@ -4646,6 +4696,10 @@ function KeypairRenderer(div, keypair, id) {
 		// div setup
 		div.empty();
 		div.addClass("keypair_div flex_horizontal");
+		
+		// TODO
+		assertTrue(config.showPublic, "Hiding public not implemented");
+		assertTrue(config.showPrivate, "Hiding private not implemented");
 		
 		// left, center, right divs
 		var keypairLeftDiv = $("<div class='keypair_left_div flex_horizontal flex_align_start flex_justify_center'>").appendTo(div);
@@ -4672,7 +4726,7 @@ function KeypairRenderer(div, keypair, id) {
 		
 		// crypto logo and label
 		var keypairCrypto = $("<div class='keypair_crypto flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairCenterDiv);
-		if (decoded.cryptoLogo) {
+		if (config.showLogos && decoded.cryptoLogo) {
 			decoded.cryptoLogo.attr("width", "100%");
 			decoded.cryptoLogo.attr("height", "100%");
 			keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
@@ -4747,21 +4801,6 @@ function KeypairRenderer(div, keypair, id) {
 	this.getKeypair = function() {
 		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
 		return keypair;
-	}
-	
-	this.setPublicVisible = function(visible) {
-		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
-		throw new Error("Not implemented");
-	}
-	
-	this.setPrivateVisible = function(visible) {
-		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
-		throw new Error("Not implemented");
-	}
-	
-	this.setLogoVisible = function(visible) {
-		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
-		throw new Error("Not implemented");
 	}
 }
 inheritsFrom(KeypairRenderer, DivController);
