@@ -1,13 +1,14 @@
 v0.3.0
-rendering lag on import large piece
 print preview
 direct link to editor
+rendering lag on import large piece
 action controller bottom center if not enough width
 browser testing
 quick generate
 backwards compatibility
 click outside dropdown only works if click within container
 footer
+regenerate / reapply buttons
 interoperability disclosure
 performance tests and optimizations
 confirmation on reset
