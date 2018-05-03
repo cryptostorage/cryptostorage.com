@@ -1435,9 +1435,11 @@ inheritsFrom(ImportController, DivController);
  * Controller to import from file.
  * 
  * @param div is the div to render to
+ * @param printErrors specifies if errors should be printed to the console on invalid input (default true)
  */
-function ImportFileController(div) {
+function ImportFileController(div, printErrors) {
 	DivController.call(this, div);
+	printErrors = isDefined(printErrors) ? printErrors : true;
 	
 	var that = this;
 	var importInputDiv;						// all import input
@@ -1740,7 +1742,7 @@ function ImportFileController(div) {
 		} catch (err) {
 			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 			else {
-				console.log(err);
+				if (printErrors) console.log(err);
 				setWarning("Pieces are not compatible shares");
 			}
 		}
@@ -1828,10 +1830,12 @@ inheritsFrom(ImportFileController, DivController);
  * 
  * @param div is the div to render to
  * @param plugins are plugins to support text import
+ * @param printErrors specifies if errors should be printed to the console on invalid input (default true)
  */
-function ImportTextController(div, plugins) {
+function ImportTextController(div, plugins, printErrors) {
 	DivController.call(this, div);
 	assertTrue(plugins.length > 0);
+	printErrors = isDefined(printErrors) ? printErrors : true;
 	
 	var MAX_PIECE_LENGTH = 58;	// max length of piece strings to render
 	
@@ -2156,7 +2160,7 @@ function ImportTextController(div, plugins) {
 		} catch (err) {
 			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 			else {
-				console.log(err);
+				if (printErrors) console.log(err);
 				setWarning("Pieces are not compatible shares");
 			}
 		}

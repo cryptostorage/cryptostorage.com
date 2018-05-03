@@ -1,6 +1,6 @@
 v0.3.0
-print
 something running after consecutive cancels, async.destroy()?
+print
 backwards compatibility
 quick generate
 direct link to editor
@@ -11,7 +11,8 @@ interoperability disclosure
 performance tests and optimizations
 rendering lag on import large piece
 confirmation on reset
-remove test error output
+unrecognized private key with single character errors on BTC and DASH
+
 
 remove min share encoding?
 
@@ -21,7 +22,6 @@ refactor tests to use async
 notice colors
 split lines bolder
 split validation should fail on -1
-increase test repeat
 put homepage text in index.html and dynamically hide for seo
 precise static and dynamic dependencies
 update bip38 cryptojs description with pbkdf if necessary

@@ -598,7 +598,7 @@ function BIP39Plugin() {
 		var wordlist = WORDLISTS[language];
 		var shamir39 = new Shamir39();
 		if (!mnemonic) mnemonic = new Mnemonic(language);
-		var decoded = {};
+		var decoded = {publicAddress: null};
 		
 		// unencrypted wif
 		if (mnemonic.check(str)) {
@@ -621,7 +621,7 @@ function BIP39Plugin() {
 	}
 	
 	this.isAddress = function(str) {
-		return isUndefined(str);
+		return str === null;
 	}
 }
 inheritsFrom(BIP39Plugin, CryptoPlugin);

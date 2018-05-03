@@ -50,7 +50,6 @@ function CryptoPiece(config) {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		var bool;
 		for (var i = 0; i < state.keypairs.length; i++) {
-			if (!state.keypairs[i].isPublicApplicable()) continue;
 			if (isUndefined(bool)) bool = state.keypairs[i].hasPublicAddress();
 			else if (bool !== state.keypairs[i].hasPublicAddress()) throw new Error("Inconsistent hasPublicAddress() on keypair[" + i + "]");
 		}
@@ -303,8 +302,12 @@ function CryptoPiece(config) {
 		var str = "";
 		for (var i = 0; i < state.keypairs.length; i++) {
 			str += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\n\n";
-			if (state.keypairs[i].getPublicAddress()) str += "Public Address:\n" + state.keypairs[i].getPublicAddress() + "\n\n";
-			if (state.keypairs[i].getPrivateWif()) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPieceNum() ? "(split)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\n" + state.keypairs[i].getPrivateWif() + "\n\n";
+			var publicAddress = state.keypairs[i].getPublicAddress();
+			if (isDefined(publicAddress)) {
+				if (!state.keypairs[i].getPlugin().hasPublicAddress()) publicAddress = "Not applicable";
+				str += "Public Address:\n" + publicAddress + "\n\n";
+			}
+			if (isDefined(state.keypairs[i].getPrivateWif())) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPieceNum() ? "(split)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\n" + state.keypairs[i].getPrivateWif() + "\n\n";
 		}
 		return str.trim();
 	}
@@ -559,19 +562,13 @@ CryptoPiece.parseTextPiece = function(txt) {
 	assertString(txt);
 	
 	// annotate text
-	var annotatedText = new AnnotatedText(txt.toLowerCase());
-	annotateCryptos(annotatedText, AppUtils.getCryptoPlugins());
-	removeCoveredCryptos(annotatedText);
-	annotatePublicPrivateLabels(annotatedText);
-	annotatePublicPrivateValues(annotatedText);
-	
-	// convert annotated text to piece
-	try {
-		return annotatedTextToPiece(annotatedText);
-	} catch (err) {
-		console.log(err);
-		return null;
-	}
+	var annotatedText = new AnnotatedText(txt.toLowerCase());			// going to be annotating text with metadata
+	annotateCryptos(annotatedText, AppUtils.getCryptoPlugins());	// identify all crypo instances by name
+	annotatedText.removeSubsumedAnnotations();										// remove any that are covered by a larger annotation
+	annotatePublicPrivateLabels(annotatedText);										// identify all labels for public/private values
+	annotatePublicPrivateValues(annotatedText);										// identify all private values
+	annotatedText.removeSubsumedAnnotations();										// remove any that are covered by a larger annotation
+	return annotatedTextToPiece(annotatedText);										// convert the annotated text to a crypo piece
 	
 	function annotateCryptos(annotatedText, plugins) {
 		for (var i = 0; i < plugins.length; i++) {
@@ -592,17 +589,8 @@ CryptoPiece.parseTextPiece = function(txt) {
 	function isToken(annotation) {
 		var txt = annotation.getAnnotatedText().getText();
 		if (annotation.getStartIdx() > 0 && !isWhitespace(txt[annotation.getStartIdx() - 1])) return false;
-		if (annotation.getEndIdx() < annotation.getAnnotatedText().length - 1 && !isWhitespace(txt[annotation.getEndIdx() + 1])) return false;
+		if (annotation.getEndIdx() < txt.length && !isWhitespace(txt[annotation.getEndIdx()])) return false;
 		return true;
-	}
-	
-	function removeCoveredCryptos(annotatedText) {
-		var toRemoves = [];
-		for (var i = 0; i < annotatedText.getAnnotations().length; i++) {
-			var annotation = annotatedText.getAnnotations()[i];
-			if (annotation.getCoveringAnnotations().length > 0) toRemoves.push(annotation);
-		}
-		for (var i = 0; i < toRemoves.length; i++) toRemoves[i].remove();
 	}
 	
 	function annotatePublicPrivateLabels(annotatedText) {
@@ -635,12 +623,12 @@ CryptoPiece.parseTextPiece = function(txt) {
 		for (var i = 0; i < annotatedText.getAnnotations().length; i++) {
 			var ann = annotatedText.getAnnotations()[i];
 			if (ann.getMetadata().type === "public_label") {
-				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);
+				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);	// TODO: look for ':' for end index
 				if (!nextValue) continue;
 				nextValue.getMetadata().type = "public_value";
 				annotatedValues.push(nextValue);
 			} else if (ann.getMetadata().type === "private_label") {
-				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);
+				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);	// TODO: look for ':' for end index
 				if (!nextValue) continue;
 				nextValue.getMetadata().type = "private_value";
 				annotatedValues.push(nextValue);
@@ -678,14 +666,15 @@ CryptoPiece.parseTextPiece = function(txt) {
 			} else if (ann.getMetadata().type === "public_value") {
 				assertTrue(keypairsRaw.length > 0);
 				var prev = keypairsRaw[keypairsRaw.length - 1];
-				var text = txt.substring(ann.getStartIdx(), ann.getEndIdx());
-				if (prev.publicValue) assertEquals(prev.publicValue, text);
-				else prev.publicValue = text;
+				var value = txt.substring(ann.getStartIdx(), ann.getEndIdx());
+				if (value === "Not applicable") value = null;
+				if (isDefined(prev.publicValue)) assertEquals(prev.publicValue, value);
+				else prev.publicValue = value;
 			} else if (ann.getMetadata().type === "private_value") {
 				var prev = keypairsRaw[keypairsRaw.length - 1];
-				var text = txt.substring(ann.getStartIdx(), ann.getEndIdx());
-				if (prev.privateValue) assertEquals(prev.privateValue, text);
-				else prev.privateValue = text;
+				var value = txt.substring(ann.getStartIdx(), ann.getEndIdx());
+				if (isDefined(prev.privateValue)) assertEquals(prev.privateValue, value);
+				else prev.privateValue = value;
 			}
 		}
 		
@@ -693,7 +682,7 @@ CryptoPiece.parseTextPiece = function(txt) {
 		var keypairs = [];
 		for (var i = 0; i < keypairsRaw.length; i++) {
 			var keypairRaw = keypairsRaw[i];
-			if (!keypairRaw.publicValue && !keypairRaw.privateValue) {	// public and private can be missing iff next keypair is same plugin
+			if (!isDefined(keypairRaw.publicValue) && !isDefined(keypairRaw.privateValue)) {	// public and private can be missing iff next keypair is same plugin
 				if (i === keypairsRaw.length - 1 || keypairRaw.plugin !== keypairsRaw[i + 1].plugin) throw new Error("Keypair does not have public or private value");
 			} else {
 				keypairs.push(new CryptoKeypair({plugin: keypairRaw.plugin, privateKey: keypairRaw.privateValue, publicAddress: keypairRaw.publicValue}));
@@ -741,6 +730,15 @@ CryptoPiece.parseTextPiece = function(txt) {
 			var found = annotations.removeVal(annotation);
 			assertTrue(found, "Annotation was not found: " + annotation.toString());
 		}
+		
+		this.removeSubsumedAnnotations = function() {
+			var toRemoves = [];
+			for (var i = 0; i < annotations.length; i++) {
+				var ann = annotations[i];
+				if (ann.getSubsumingAnnotations().length > 0) toRemoves.push(ann);
+			}
+			for (var i = 0; i < toRemoves.length; i++) toRemoves[i].remove();
+		}
 	}
 	
 	/**
@@ -782,12 +780,29 @@ CryptoPiece.parseTextPiece = function(txt) {
 			return metadata;
 		}
 		
-		this.getCoveringAnnotations = function() {
+		this.sameSpan = function(ann) {
+			throw new Error("Not implemented");
+		}
+		
+		this.overlaps = function(ann) {
+			throw new Error("Not implemented");
+		}
+		
+		this.subsumes = function(ann) {
+			return that.getStartIdx() <= ann.getStartIdx() && that.getEndIdx() > ann.getEndIdx() ||
+						 that.getStartIdx() < ann.getStartIdx() && that.getEndIdx() >= ann.getEndIdx();
+		}
+		
+		this.subsumedBy = function(ann) {
+			return ann.subsumes(that);
+		}
+		
+		this.getSubsumingAnnotations = function() {
 			var anns = [];
 			for (var i = 0; i < annotatedText.getAnnotations().length; i++) {
 				var ann = annotatedText.getAnnotations()[i];
 				if (ann === that) continue;
-				if (ann.getStartIdx() <= startIdx && ann.getEndIdx() >= endIdx) anns.push(ann);
+				if (ann.subsumes(that)) anns.push(ann);
 			}
 			return anns;
 		}

@@ -30,10 +30,13 @@
 function Tests() {
 	
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
-	var REPEAT_LONG = 10;
-	var REPEAT_SHORT = 2;
+	var NUM_KEYS = 1								// number of keys per plugin to test without encryption
+	var NUM_KEYS_ENCRYPTION = 1;		// number of keys per plugin to test with encryption
+	var TEST_MAX_SHARES = false;		// computationally intensive
 	var NUM_PIECES = 3;
 	var MIN_PIECES = 2;
+	
+	// list of invalid private keys to test per plugin
 	var INVALID_PKS = [" ", "ab", "abctesting123", "abc testing 123", 12345, "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "7ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a", "3b20836520fe2e8eef1fd3f898fd97b5a3bcb6702fae72e3ca1ba8fb6e1ddd75b12f74dc6422606d1750e40"];
 	
 	/**
@@ -86,33 +89,24 @@ function Tests() {
 	this.runTestSuite = function(onDone) {
 		var plugins = getTestPlugins();
 		
-		// test utils
 		testUtils();
 		
-		// test keypairs
-		console.log("Testing keypairs");
-		for (var i = 0; i < plugins.length; i++) {
-			testKeypairs(plugins[i]);
-			testPlugin(plugins[i]);
-		}
+		testPlugins(plugins);
 		
-		// test file import
+		testPieceAllPlugins(plugins);
+		
 		testFileImport(plugins, function(err) {
 			if (err) throw err;
 			
-			// test text import
 			testTextImport(AppUtils.getCryptoPlugins(), function(err) {
 				if (err) throw err;
 				
-				// test generate pieces
 				testGeneratePieces(plugins, function(err) {
 					if (err) throw err;
 					
-					// test destroy during processing
 					testDestroyPieceGenerator(plugins, function(err) {
 						if (err) throw err;
 						
-						// test piece encryption and splitting
 						testPieceEncryption(plugins, function(err) {
 							if (err) throw err;
 							onDone();
@@ -199,64 +193,53 @@ function Tests() {
 		}
 	}
 	
-	function testPlugin(plugin) {
-		assertInitialized(plugin.getName());
-		assertInitialized(plugin.getTicker());
-		assertInitialized(plugin.getLogo());
-		
-		// test invalid addresses
-		assertFalse(plugin.isAddress("invalidAddress123"));
-		assertFalse(plugin.isAddress(null));
-		plugin.hasPublicAddress() ? assertFalse(plugin.isAddress(undefined)) : assertTrue(plugin.isAddress(undefined));
-		assertFalse(plugin.isAddress([]));
-		
-		// test decode invalid private keys
-		var invalids = copyArray(INVALID_PKS);
-		invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());
-		for (var i = 0; i < invalids.length; i++) {
-			var invalid = invalids[i];
-			if (isString(invalid)) {
-				assertNull(plugin.decode(invalid));	
-			} else {
-				try {
-					plugin.decode(invalid);
-					fail("fail");
-				} catch (err) {
-					if (err.message === "fail") throw new Error(plugin.getTicker() + " should throw exception if decoding non-string");
+	function testPlugins(plugins) {
+		console.log("Testing plugins");
+		for (var i = 0; i < plugins.length; i++) {
+			var plugin = plugins[i];
+			assertInitialized(plugin.getName());
+			assertInitialized(plugin.getTicker());
+			assertInitialized(plugin.getLogo());
+			
+			// test invalid addresses
+			assertFalse(plugin.isAddress("invalidAddress123"));
+			assertFalse(plugin.isAddress(null));
+			plugin.hasPublicAddress() ? assertFalse(plugin.isAddress(undefined)) : assertTrue(plugin.isAddress(undefined));
+			assertFalse(plugin.isAddress([]));
+			
+			// test decode invalid private keys
+			var invalids = copyArray(INVALID_PKS);
+			invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());
+			for (var i = 0; i < invalids.length; i++) {
+				var invalid = invalids[i];
+				if (isString(invalid)) {
+					assertNull(plugin.decode(invalid));	
+				} else {
+					try {
+						plugin.decode(invalid);
+						fail("fail");
+					} catch (err) {
+						if (err.message === "fail") throw new Error(plugin.getTicker() + " should throw exception if decoding non-string");
+					}
 				}
 			}
-		}
-		
-		// verify shamirs is initialized with 7 bits
-		if (plugin.getTicker() === "BTC") {
-			var keypair = new CryptoKeypair({plugin: plugin});
-			var shares = secrets.share(keypair.getPrivateHex(), NUM_PIECES, MIN_PIECES);
-			for (var i = 0; i < shares.length; i++)  {
-				var b58 = AppUtils.toBase(16, 58, shares[i]);
-				assertTrue(b58.startsWith("3X") || b58.startsWith("3Y"));
+			
+			// verify shamirs is initialized with 7 bits
+			if (plugin.getTicker() === "BTC") {
+				var keypair = new CryptoKeypair({plugin: plugin});
+				var shares = secrets.share(keypair.getPrivateHex(), NUM_PIECES, MIN_PIECES);
+				for (var i = 0; i < shares.length; i++)  {
+					var b58 = AppUtils.toBase(16, 58, shares[i]);
+					assertTrue(b58.startsWith("3X") || b58.startsWith("3Y"));
+				}
 			}
 		}
 	}
 	
-	function testKeypairs(plugin) {
+	function testPieceAllPlugins(plugins) {
+		console.log("Testing piece with all plugins");
 		
-		// create new keypairs
-		for (var i = 0; i < REPEAT_LONG; i++) {
-			var keypair = new CryptoKeypair({plugin: plugin});
-			assertInitialized(keypair.getPrivateHex());
-			assertInitialized(keypair.getPrivateWif());
-			assertFalse(keypair.isEncrypted());
-			assertNull(keypair.getEncryptionScheme());
-			assertFalse(keypair.isSplit());
-			assertNull(keypair.getMinShares());
-			assertTrue(plugin.isAddress(keypair.getPublicAddress()));
-			var copy = new CryptoKeypair({plugin: plugin, privateKey: keypair.getPrivateHex()});
-			assertTrue(keypair.equals(copy));
-			copy = new CryptoKeypair({plugin: plugin, privateKey: keypair.getPrivateWif()});
-			assertTrue(keypair.equals(copy));
-		}
-		
-		// test invalid private keys
+		// test init keypairs with invalid private keys
 		for (var i = 0; i < INVALID_PKS.length; i++) {
 			var invalid = INVALID_PKS[i];
 			try {
@@ -266,9 +249,40 @@ function Tests() {
 				if (err.message === "fail") throw new Error("Should not create " + plugin.getTicker() + " keypair from invalid private key: " + invalid);
 			}
 		}
+		
+		// create and test keypairs
+		var keypairs = [];
+		for (var i = 0; i < plugins.length; i++) {
+			var plugin = plugins[i];
+			for (var j = 0; j < NUM_KEYS; j++) {
+				var keypair = new CryptoKeypair({plugin: plugin});
+				assertInitialized(keypair.getPrivateHex());
+				assertInitialized(keypair.getPrivateWif());
+				assertFalse(keypair.isEncrypted());
+				assertNull(keypair.getEncryptionScheme());
+				assertFalse(keypair.isSplit());
+				assertNull(keypair.getMinShares());
+				assertTrue(plugin.isAddress(keypair.getPublicAddress()));
+				var copy = new CryptoKeypair({plugin: plugin, privateKey: keypair.getPrivateHex()});
+				assertTrue(keypair.equals(copy));
+				copy = new CryptoKeypair({plugin: plugin, privateKey: keypair.getPrivateWif()});
+				assertTrue(keypair.equals(copy));
+				keypairs.push(keypair);
+			}
+		}
+		
+		// create and test piece
+		var piece = new CryptoPiece({keypairs: keypairs});
+		testPieceWithoutEncryption(piece);
 	}
 	
 	function testPieceEncryption(plugins, onDone) {
+		
+		// skip if intensive operations disabled
+		if (NUM_KEYS_ENCRYPTION === 0) {
+			onDone();
+			return;
+		}
 		
 		// collect test functions
 		var testFuncs = [];
@@ -294,8 +308,10 @@ function Tests() {
 			var keypairs = [];
 			var schemes = [];
 			for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
-				keypairs.push(new CryptoKeypair({plugin: plugin}));
-				schemes.push(plugin.getEncryptionSchemes()[i]);
+				for (var j = 0; j < NUM_KEYS_ENCRYPTION; j++) {
+					keypairs.push(new CryptoKeypair({plugin: plugin}));
+					schemes.push(plugin.getEncryptionSchemes()[i]);
+				}
 			}
 			
 			// create piece from keypairs
@@ -376,7 +392,9 @@ function Tests() {
 	// tests piece splitting, initialization, and conversion
 	function testPieceWithoutEncryption(piece) {
 		assertObject(piece, CryptoPiece);
-		if (piece.isSplit() === false) testPieceSplit(piece);
+		if (piece.isSplit() === false) {
+			testPieceSplit(piece);
+		}
 		testPieceState(piece);
 		testPieceInit(piece);
 		testPieceRemoval(piece);
@@ -385,7 +403,7 @@ function Tests() {
 	function testPieceSplit(unsplitPiece) {
 		assertObject(unsplitPiece, CryptoPiece);
 		assertFalse(unsplitPiece.isSplit());
-		
+				
 		// copy original for later testing
 		var original = unsplitPiece.copy();
 		assertTrue(original.equals(unsplitPiece));
@@ -422,7 +440,7 @@ function Tests() {
 		} catch (err) {
 			if (err.message === "fail") throw new Error("Cannot split split piece");
 		}
-		
+				
 		// test that single pieces cannot create key
 		for (var i = 0; i < splitPieces.length; i++) {
 			try {
@@ -432,7 +450,7 @@ function Tests() {
 				if (err.message === "fail") throw new Error("Cannot combine single split piece");
 			}
 		}
-		
+				
 		// test combining duplicate shares
 		var invalidCombination = [];
 		for (var i = 0; i < MIN_PIECES; i++) invalidCombination.push(splitPieces[0]);
@@ -442,7 +460,7 @@ function Tests() {
 		} catch (err) {
 			if (err.message === "fail") throw new Error("Cannot create piece from duplicate shares");
 		}
-		
+				
 		// test each piece combination
 		var combinations = getCombinations(splitPieces, MIN_PIECES);
 		for (var i = 0; i < combinations.length; i++) {
@@ -451,17 +469,28 @@ function Tests() {
 			if (!original.hasPublicAddresses()) combined.removePublicAddresses();
 			assertTrue(original.equals(combined));
 		}
-		
+				
 		// combine all pieces
 		var combined = new CryptoPiece({splitPieces: splitPieces});
 		if (!original.hasPublicAddresses()) combined.removePublicAddresses();
 		assertTrue(original.equals(combined));
+				
+		// test split with more than max shares
+		try {
+			combined.split(AppUtils.MAX_SHARES + 1, AppUtils.MAX_SHARES - 10);
+			fail("fail");
+		} catch (err) {
+			if (err.message === "fail") throw new Error("Cannot split piece with more than MAX_SHARES");
+			assertEquals("Cannot split into more than " + AppUtils.MAX_SHARES + " shares", err.message);
+		}
 		
 		// test split with max shares
-		splitPieces = combined.split(AppUtils.MAX_SHARES, AppUtils.MAX_SHARES - 10);
-		var combined = new CryptoPiece({splitPieces: splitPieces});
-		if (!original.hasPublicAddresses()) combined.removePublicAddresses();
-		assertTrue(original.equals(combined));
+		if (TEST_MAX_SHARES) {
+			splitPieces = combined.split(AppUtils.MAX_SHARES, AppUtils.MAX_SHARES - 10);
+			var combined = new CryptoPiece({splitPieces: splitPieces});
+			if (!original.hasPublicAddresses()) combined.removePublicAddresses();
+			assertTrue(original.equals(combined));
+		}
 	}
 	
 	function testPieceState(piece) {
@@ -482,8 +511,11 @@ function Tests() {
 			assertNumber(keypair.getMinShares());
 			assertTrue(keypair.getMinShares() >= 2);
 			assertTrue(keypair.getMinShares() <= AppUtils.MAX_SHARES);
-			if (keypair.isPublicApplicable()) assertTrue(keypair.getPublicAddress() === undefined || isInitialized(keypair.getPublicAddress()));
-			else assertUndefined(keypair.getPublicAddress());
+			if (keypair.hasPublicAddress()) {
+				keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
+			} else {
+				assertUndefined(keypair.getPublicAddress());
+			}
 		}
 		
 		// test encrypted keypair
@@ -491,8 +523,11 @@ function Tests() {
 			assertFalse(keypair.isSplit());
 			assertNull(keypair.getMinShares());
 			assertNull(keypair.getShareNum());
-			if (keypair.isPublicApplicable()) assertTrue(keypair.getPublicAddress() === undefined || isInitialized(keypair.getPublicAddress()));
-			else assertUndefined(keypair.getPublicAddress());
+			if (keypair.hasPublicAddress()) {
+				keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
+			} else {
+				assertUndefined(keypair.getPublicAddress());
+			}
 		}
 		
 		// test unencrypted keypair
@@ -503,7 +538,11 @@ function Tests() {
 			assertNull(keypair.getEncryptionScheme());
 			assertFalse(keypair.isSplit());
 			assertNull(keypair.getMinShares());
-			if (!keypair.isPublicApplicable()) assertUndefined(keypair.getPublicAddress());
+			if (keypair.hasPublicAddress()) {
+				keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
+			} else {
+				assertUndefined(keypair.getPublicAddress());
+			}
 		}
 		
 		// test keypair without private keys
@@ -514,7 +553,7 @@ function Tests() {
 			assertUndefined(keypair.getEncryptionScheme());
 			assertUndefined(keypair.isSplit());
 			assertUndefined(keypair.getMinShares());
-			keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertUndefined(keypair.getPublicAddress());
+			keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
 		}
 		
 		// invalid state
@@ -653,7 +692,7 @@ function Tests() {
 		modified.removePrivateKeys();
 		for (var i = 0; i < modified.getKeypairs().length; i++) {
 			var keypair = modified.getKeypairs()[i];
-			keypair.isPublicApplicable() ? assertDefined(keypair.getPublicAddress()) : assertUndefined(keypair.getPublicAddress());
+			keypair.isPublicApplicable() ? assertDefined(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
 			assertFalse(keypair.hasPrivateKey());
 			assertUndefined(keypair.isEncrypted());
 			assertUndefined(keypair.getMinShares());
@@ -672,7 +711,7 @@ function Tests() {
 		for (var i = 0; i < plugins.length; i++) {
 			config.keypairs.push({
 				ticker: plugins[i].getTicker(),
-				numKeypairs: 1
+				numKeypairs: NUM_KEYS
 			});
 		}
 		config.pieceRendererClass = CompactPieceRenderer;
@@ -727,18 +766,17 @@ function Tests() {
 				}
 			}, function (err, pieces, pieceRenderers) {
 				assertNull(err);
-				if (config.numPieces) {
-					assertEquals(config.numPieces, pieces.length);
-					assertEquals(config.numPieces, pieceRenderers.length);
-				} else {
-					assertEquals(1, pieces.length);
-					assertEquals(1, pieceRenderers.length);
-				}
-				assertEquals(plugins.length, pieces[0].getKeypairs().length);
-				for (var i = 0; i < pieceRenderers.length; i++) assertInitialized(pieceRenderers[i].getDiv());
 				assertTrue(progressStart);
 				assertTrue(progressMiddle);
 				assertTrue(progressEnd);
+				assertEquals(pieces.length, pieceRenderers.length);
+				if (config.numPieces) assertEquals(config.numPieces, pieces.length);
+				else assertEquals(1, pieces.length);
+				assertEquals(plugins.length * NUM_KEYS, pieces[0].getKeypairs().length);
+				for (var i = 0; i < pieces.length; i++) {
+					testPieceWithoutEncryption(pieces[i]);
+					assertInitialized(pieceRenderers[i].getDiv());
+				}
 				onDone();
 			});
 		}
@@ -757,7 +795,7 @@ function Tests() {
 		}		
 		
 		// initialize controller
-		var fileImporter = new ImportFileController($("<div>"));
+		var fileImporter = new ImportFileController($("<div>"), false);
 		fileImporter.render(function() {
 			
 			// get test functions
@@ -1031,7 +1069,7 @@ function Tests() {
 		console.log("Testing text import");
 		
 		// initialize controller
-		var textImporter = new ImportTextController($("<div>"), plugins);
+		var textImporter = new ImportTextController($("<div>"), plugins, false);
 		textImporter.render(function() {
 			
 			// get test functions
