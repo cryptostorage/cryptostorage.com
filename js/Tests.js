@@ -30,9 +30,9 @@
 function Tests() {
 	
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
-	var NUM_KEYS = 1								// number of keys per plugin to test without encryption
-	var NUM_KEYS_ENCRYPTION = 1;		// number of keys per plugin to test with encryption
-	var TEST_MAX_SHARES = false;		// computationally intensive
+	var REPEAT_KEYS = 1								// number of keys to repeat per plugin without encryption
+	var REPEAT_KEYS_ENCRYPTION = 1;		// number of keys to repeat per plugin with encryption
+	var TEST_MAX_SHARES = false;			// computationally intensive
 	var NUM_PIECES = 3;
 	var MIN_PIECES = 2;
 	
@@ -89,31 +89,21 @@ function Tests() {
 	this.runTestSuite = function(onDone) {
 		var plugins = getTestPlugins();
 		
-		testUtils();
+		// collect test functions
+		var funcs = [];
+		funcs.push(function(onDone) { testUtils(); onDone(); });
+		funcs.push(function(onDone) { testPlugins(plugins); onDone(); });
+		funcs.push(function(onDone) { testPieceAllPlugins(plugins); onDone(); });
+		funcs.push(function(onDone) { testFileImport(plugins, onDone); });
+		funcs.push(function(onDone) { testTextImport(AppUtils.getCryptoPlugins(), onDone); });
+		funcs.push(function(onDone) { testGeneratePieces(plugins, onDone); });
+		funcs.push(function(onDone) { testDestroyPieceGenerator(plugins, onDone); });
+		funcs.push(function(onDone) { testPieceEncryption(plugins, onDone); });
 		
-		testPlugins(plugins);
-		
-		testPieceAllPlugins(plugins);
-		
-		testFileImport(plugins, function(err) {
+		// execute in series
+		async.series(funcs, function(err) {
 			if (err) throw err;
-			
-			testTextImport(AppUtils.getCryptoPlugins(), function(err) {
-				if (err) throw err;
-				
-				testGeneratePieces(plugins, function(err) {
-					if (err) throw err;
-					
-					testDestroyPieceGenerator(plugins, function(err) {
-						if (err) throw err;
-						
-						testPieceEncryption(plugins, function(err) {
-							if (err) throw err;
-							onDone();
-						});
-					});
-				});
-			});
+			if (onDone) onDone();
 		});
 	}
 	
@@ -254,7 +244,7 @@ function Tests() {
 		var keypairs = [];
 		for (var i = 0; i < plugins.length; i++) {
 			var plugin = plugins[i];
-			for (var j = 0; j < NUM_KEYS; j++) {
+			for (var j = 0; j < REPEAT_KEYS; j++) {
 				var keypair = new CryptoKeypair({plugin: plugin});
 				assertInitialized(keypair.getPrivateHex());
 				assertInitialized(keypair.getPrivateWif());
@@ -279,7 +269,7 @@ function Tests() {
 	function testPieceEncryption(plugins, onDone) {
 		
 		// skip if intensive operations disabled
-		if (NUM_KEYS_ENCRYPTION === 0) {
+		if (REPEAT_KEYS_ENCRYPTION === 0) {
 			onDone();
 			return;
 		}
@@ -308,7 +298,7 @@ function Tests() {
 			var keypairs = [];
 			var schemes = [];
 			for (var i = 0; i < plugin.getEncryptionSchemes().length; i++) {
-				for (var j = 0; j < NUM_KEYS_ENCRYPTION; j++) {
+				for (var j = 0; j < REPEAT_KEYS_ENCRYPTION; j++) {
 					keypairs.push(new CryptoKeypair({plugin: plugin}));
 					schemes.push(plugin.getEncryptionSchemes()[i]);
 				}
@@ -711,7 +701,7 @@ function Tests() {
 		for (var i = 0; i < plugins.length; i++) {
 			config.keypairs.push({
 				ticker: plugins[i].getTicker(),
-				numKeypairs: NUM_KEYS
+				numKeypairs: REPEAT_KEYS
 			});
 		}
 		config.pieceRendererClass = CompactPieceRenderer;
@@ -772,7 +762,7 @@ function Tests() {
 				assertEquals(pieces.length, pieceRenderers.length);
 				if (config.numPieces) assertEquals(config.numPieces, pieces.length);
 				else assertEquals(1, pieces.length);
-				assertEquals(plugins.length * NUM_KEYS, pieces[0].getKeypairs().length);
+				assertEquals(plugins.length * REPEAT_KEYS, pieces[0].getKeypairs().length);
 				for (var i = 0; i < pieces.length; i++) {
 					testPieceWithoutEncryption(pieces[i]);
 					assertInitialized(pieceRenderers[i].getDiv());

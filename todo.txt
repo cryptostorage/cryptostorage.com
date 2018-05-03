@@ -18,7 +18,6 @@ remove min share encoding?
 
 print tab values shouldn't be underlined because cannot click
 home crypto selection tab name should be "Generate Keys"
-refactor tests to use async
 notice colors
 split lines bolder
 split validation should fail on -1
