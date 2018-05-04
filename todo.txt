@@ -8,7 +8,6 @@ footer
 regenerate / reapply buttons
 interoperability disclosure
 performance tests and optimizations
-confirmation on reset
 unrecognized private key with single character errors on BTC and DASH
 browser testing
 print selector compact | cryptocash | community design, etc
@@ -26,6 +25,7 @@ tippy jerk when editor first loaded
 make progress bar its own controller
 set public address of imported pieces after pieces combine
 notice colors
+confirmation on destroy or close generated storage
 
 add support for dogecoin
 tippls
