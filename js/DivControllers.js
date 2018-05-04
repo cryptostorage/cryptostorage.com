@@ -3933,13 +3933,10 @@ function EditorActionsController(div, editorController) {
 		
 		// generate button
 		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
-		btnGenerate.append("Generate");
 		btnGenerate.appendTo(div);
 		
 		// apply button
 		btnApply = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
-		btnApply.append("Apply");
-		btnApply.click(function() { invoke(applyListeners); });
 		btnApply.appendTo(div);
 		
 		// reset button
@@ -4023,6 +4020,7 @@ function EditorActionsController(div, editorController) {
 		// handle no imported pieces
 		if (!editorController.getImportedPieces()) {
 			btnApply.hide();
+			btnGenerate.html(editorController.getPieces() ? "Regenerate" : "Generate");
 			btnGenerate.show();
 			btnGenerate.unbind("click");
 			btnReset.show();
@@ -4037,9 +4035,19 @@ function EditorActionsController(div, editorController) {
 		// handle imported pieces
 		else {
 			btnGenerate.hide();
+			
+			// apply and reset shown if passphrase or split checked
 			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getSplitController().getUseSplit()) {
+				btnApply.html(editorController.getPieces() === editorController.getImportedPieces() ? "Apply" : "Reapply");
 				btnApply.show()
+				btnApply.unbind("click");
 				btnReset.show();
+				if (editorController.hasFormError()) {
+					btnApply.addClass("btn_disabled");
+				} else {
+					btnApply.removeClass("btn_disabled");
+					btnApply.click(function() { invoke(applyListeners); });
+				}
 			} else {
 				btnApply.hide();
 				if (editorController.getPieces()[0] !== editorController.getImportedPieces()[0]) {

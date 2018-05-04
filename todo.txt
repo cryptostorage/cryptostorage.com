@@ -5,7 +5,6 @@ quick generate
 backwards compatibility
 remove min share encoding?
 footer
-regenerate / reapply buttons
 interoperability disclosure
 performance tests and optimizations
 unrecognized private key with single character errors on BTC and DASH
@@ -25,7 +24,7 @@ tippy jerk when editor first loaded
 make progress bar its own controller
 set public address of imported pieces after pieces combine
 notice colors
-confirmation on destroy or close generated storage
+confirmation on destroy generated storage
 
 add support for dogecoin
 tippls
