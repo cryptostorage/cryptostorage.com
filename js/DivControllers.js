@@ -4421,83 +4421,67 @@ function CompactPieceRenderer(div, piece, config) {
 	this.render = function(onDone) {
 		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
 		
+		// div setup
+		div.empty();
+		div.addClass("piece_div");
+		
+		// build pages and collect functions to render keypairs
+		var pageDiv;
+		var tickers;
+		var pairsPerPage = config.cryptoCash ? 6 : 7;
+		var renderFuncs = [];
+		for (var i = 0; i < piece.getKeypairs().length; i++) {
+			
+			// add new page
+			if ((!config.pageBreaks && i === 0) || (config.pageBreaks && i % pairsPerPage === 0)) {
+				
+				// add sweep instructions
+				if (config.infoBack && i > 0) {
+					div.append($("<div>"));
+					tickers = [];
+					for (var j = 0; j < pairsPerPage; j++) tickers.push(piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
+					if (config.cryptoCash && config.infoBack) div.append(getSweepInstructionsPage(tickers));
+				}
+				
+				// add new page
+				pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+				if (piece.getPieceNum() || config.showLogos) {
+					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
+					headerDiv.append($("<div class='piece_page_header_left'>"));
+					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
+					if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
+				}
+			}
+			
+			// collect functions to render keypairs
+			var placeholderDiv = $("<div class='keypair_div'>").appendTo(pageDiv);
+			if (config.cryptoCash) placeholderDiv.addClass("keypair_div_spaced");
+			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
+		}
+		
+		// add final page of sweep instructions
+		if (config.infoBack && config.cryptoCash) {
+			var numPairsLastPage = piece.getKeypairs().length % pairsPerPage;
+			if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
+			tickers = [];
+			for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.getKeypairs()[piece.getKeypairs().length - (numPairsLastPage - i)].getPlugin().getTicker());
+			div.append(getSweepInstructionsPage(tickers));
+		}
+		
 		// compute weights
 		var doneWeight = 0;
 		var totalWeight  = 0;
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
 			totalWeight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker());
 		}
-		
-		// collect keypair renderers and render functions
-		var renderFuncs = [];
-		keypairRenderers = [];
-		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (i + 1);
-			var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[i], config);
-			keypairRenderers.push(keypairRenderer);
-			renderFuncs.push(renderFunc(keypairRenderer));
-		}
-		function renderFunc(keypairRenderer) {
-			return function(onDone) {
-				if (_isDestroyed) return;
-				keypairRenderer.render(function(div) {
-					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
-					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
-					onDone(null, keypairRenderer);
-				});
-			}
-		}
-		
+
 		// render keypairs
 		if (onProgressFn) onProgressFn(0, "Rendering keypairs");
 		setImmediate(function() {	// let browser breath
 			async.series(renderFuncs, function(err, _keypairRenderers) {
 				if (_isDestroyed) return;
 				assertNull(err);
-				
-				// build pages
-				div.empty();
-				div.addClass("piece_div");
-				var pageDiv;
-				var tickers;
-				var pairsPerPage = config.cryptoCash ? 6 : 7;
-				for (var i = 0; i < piece.getKeypairs().length; i++) {
-					
-					// add new page
-					if ((!config.pageBreaks && i === 0) || (config.pageBreaks && i % pairsPerPage === 0)) {
-						
-						// add sweep instructions
-						if (config.infoBack && i > 0) {
-							div.append($("<div>"));
-							tickers = [];
-							for (var j = 0; j < pairsPerPage; j++) tickers.push(piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
-							if (config.cryptoCash && config.infoBack) div.append(getSweepInstructionsPage(tickers));
-						}
-						
-						// add new page
-						pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-						if (piece.getPieceNum() || config.showLogos) {
-							var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
-							headerDiv.append($("<div class='piece_page_header_left'>"));
-							if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
-							var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-							if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
-						}
-					}
-					
-					// add keypair to page
-					pageDiv.append(keypairRenderers[i].getDiv());
-					if (config.cryptoCash) keypairRenderers[i].getDiv().addClass("keypair_div_spaced");
-				}
-				
-				// add final page of sweep instructions
-				if (config.infoBack && config.cryptoCash) {
-					var numPairsLastPage = piece.getKeypairs().length % pairsPerPage;
-					if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
-					tickers = [];
-					for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.getKeypairs()[piece.getKeypairs().length - (numPairsLastPage - i)].getPlugin().getTicker());
-					div.append(getSweepInstructionsPage(tickers));
-				}
 				
 				// copy keys to clipboard
 				new Clipboard(".copyable", {
@@ -4529,6 +4513,21 @@ function CompactPieceRenderer(div, piece, config) {
 				if (onDone) onDone(div);
 			});
 		});
+		
+		// callback function to render keypair
+		function renderFunc(placeholderDiv, piece, index, config) {
+			return function(onDone) {
+				if (_isDestroyed) return;
+				if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (index + 1);
+				var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
+				keypairRenderer.render(function(div) {
+					placeholderDiv.replaceWith(div);
+					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
+					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
+					onDone(null, keypairRenderer);
+				});
+			}
+		}
 	}
 	
 	/**
@@ -4678,6 +4677,7 @@ CompactPieceRenderer.getRenderWeight = function(config) {
  */
 function KeypairRenderer(div, keypair, config) {
 	DivController.call(this, div);
+	assertObject(keypair, CryptoKeypair);
 	
 	// default config
 	config = Object.assign({

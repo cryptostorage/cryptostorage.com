@@ -1,7 +1,6 @@
 v0.3.0
 print preview
 direct link to editor
-rendering lag on import large piece
 action controller bottom center if not enough width
 browser testing
 quick generate
