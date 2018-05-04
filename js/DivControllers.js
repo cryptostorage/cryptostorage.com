@@ -813,7 +813,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (AppUtils.DEV_MODE || !environmentFailure) UiUtils.openEditorTab(plugin.getName() + " Storage", {genConfig: getGenConfig(plugin)}); 
+			if (AppUtils.DEV_MODE || !environmentFailure) UiUtils.openEditorTab("Generate Keypairs", {genConfig: getGenConfig(plugin)}); 
 		}
 		
 		function getGenConfig(plugin) {

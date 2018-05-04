@@ -3,6 +3,7 @@ print preview
 direct link to editor
 quick generate
 backwards compatibility
+remove min share encoding?
 footer
 regenerate / reapply buttons
 interoperability disclosure
@@ -10,26 +11,23 @@ performance tests and optimizations
 confirmation on reset
 unrecognized private key with single character errors on BTC and DASH
 browser testing
-
-remove min share encoding?
 print selector compact | cryptocash | community design, etc
 text import says please select currency on unrecognized text import
 print tab values shouldn't be underlined because cannot click
-home crypto selection tab name should be "Generate Keys"
-notice colors
 split lines bolder
 split validation should fail on -1
 put homepage text in index.html and dynamically hide for seo
 precise static and dynamic dependencies
 update bip38 cryptojs description with pbkdf if necessary
-add support for dogecoin
-tippls
 split form error remains highlighted after split disabled
 see if there are wasteful loops in editor listeners
 xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share
 tippy jerk when editor first loaded
 make progress bar its own controller
 set public address of imported pieces after pieces combine
+
+add support for dogecoin
+tippls
 
 designer:
 passphrase confirmation
