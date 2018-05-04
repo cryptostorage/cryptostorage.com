@@ -4175,10 +4175,9 @@ function EditorSaveController(div, pieces) {
 	function save() {
 		assertInitialized(saveBlob);
 		assertInitialized(saveName);
-		if (includePrivateCheckbox.isChecked() || confirm("Funds CANNOT be recovered from the saved file because the private keys are not included.\n\nContinue?")) {
-			saveAs(saveBlob, saveName);
-			if (callbackFnSave) callbackFnSave();
-		}
+		if (!includePrivateCheckbox.isChecked() && !confirm("Funds CANNOT be recovered from the saved file because the private keys are not included.\n\nContinue?")) return;
+		saveAs(saveBlob, saveName);
+		if (callbackFnSave) callbackFnSave();
 	}
 	
 	function getSelectedFileType() {
@@ -4346,13 +4345,16 @@ function EditorPrintController(div, pieces) {
 	
 	function print() {
 		assertInitialized(pieceRenderers);
+		
+		// confirm printing without private keys
+		if (!includePrivateCheckbox.isChecked() && !confirm("Funds CANNOT be recovered from the printed file because the private keys are not included.\n\nContinue?")) return;
 
 		// build print div
 		var printDiv = $("<div>");
 		for (var i = 0; i < pieceRenderers.length; i++) printDiv.append(pieceRenderers[i].getDiv());
 		
 		// open window with print div
-		newWindow(printDiv, "Print Keys", "css/style.css", null, function(err, window) {
+		newWindow(printDiv, "Print Keypairs", "css/style.css", null, function(err, window) {
 			if (err) {
 				AppUtils.setTabError(true);
 				return;
@@ -4876,7 +4878,7 @@ KeypairRenderer.decodeKeypair = function(keypair, config) {
 	decoded.rightLabel = keypair.getPlugin().getPrivateLabel();
 	decoded.rightLabel += " " + (config.showPrivate ? keypair.isSplit() ? "(split)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
 	decoded.rightValue = keypair.getPrivateWif() && config.showPrivate ? keypair.getPrivateWif() : "(not shown)";
-	decoded.rightValueCopyable = isInitialized(keypair.getPrivateWif());
+	decoded.rightValueCopyable = isDefined(keypair.getPrivateWif()) && config.showPrivate;
 	return decoded;
 }
 
