@@ -616,7 +616,7 @@ input[type='checkbox'][disabled] +label {
 
 .add_currency_div {
 	text-align: center;
-	margin: 20px;
+	margin: 20px 20px 0 20px;
 }
 
 .add_currency_span {
@@ -1190,17 +1190,18 @@ input[type='checkbox'][disabled] +label {
 	width: 750px;
 }
 
-.editor_floating_controls {
+.editor_controls {
 	position: fixed;
-	bottom: 50px;
-	right: 50px;
-	width: 300px;
+	bottom: 0px;
+	right: 0px;
+	width: 400px;
+	padding: 40px;
 }
 
 .editor_btn_green {
 	color: white;
 	background-color: rgb(101, 214, 67);
-	padding: 13px;
+	padding: 18px;
 	font-size: 30px;
 	font-weight: bold;
 }
@@ -1217,7 +1218,7 @@ input[type='checkbox'][disabled] +label {
 .editor_btn_red {
 	color: white;
 	background-color: rgb(252, 101, 84);
-	padding: 5px;
+	padding: 9px;
 	font-size: 28px;
 }
 
@@ -1233,7 +1234,7 @@ input[type='checkbox'][disabled] +label {
 .editor_btn_blue {
 	color: white;
 	background-color: rgb(17, 118, 182);
-	padding: 5px;
+	padding: 9px;
 	font-size: 28px;
 	width: 100%;
 	margin-top: 5px;
@@ -2131,4 +2132,10 @@ input[type='checkbox'][disabled] +label {
 .ddslick_disabler {
 	z-index: 10;
 	height: 100%;
+}
+
+@media screen and (max-device-width: 667px) { 
+	.editor_controls {
+		position: static;
+	}
 }

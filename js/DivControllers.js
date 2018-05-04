@@ -3929,7 +3929,7 @@ function EditorActionsController(div, editorController) {
 		
 		// init
 		div.empty();
-		div.addClass("editor_floating_controls");
+		div.addClass("editor_controls");
 		generateListeners = [];
 		applyListeners = [];
 		resetListeners = [];
