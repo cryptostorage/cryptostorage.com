@@ -9,7 +9,6 @@ interoperability disclosure
 performance tests and optimizations
 unrecognized private key with single character errors on BTC and DASH
 browser testing
-print selector compact | cryptocash | community design, etc
 text import says please select currency on unrecognized text import
 print tab values shouldn't be underlined because cannot click
 split lines bolder
@@ -17,7 +16,6 @@ split validation should fail on -1
 put homepage text in index.html and dynamically hide for seo
 precise static and dynamic dependencies
 update bip38 cryptojs description with pbkdf if necessary
-split form error remains highlighted after split disabled
 see if there are wasteful loops in editor listeners
 xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share
 tippy jerk when editor first loaded
@@ -28,6 +26,7 @@ confirmation on destroy generated storage
 
 add support for dogecoin
 tippls
+print selector compact | cryptocash | community design, etc
 
 designer:
 passphrase confirmation

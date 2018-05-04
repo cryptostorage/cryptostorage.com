@@ -3103,7 +3103,6 @@ function EditorPassphraseController(div, editorController) {
 		// register callbacks
 		passphraseCheckbox.onChecked(function() {
 			setFormError(false);
-			update();
 			invoke(usePassphraseListeners);
 			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
 		});
@@ -3203,19 +3202,21 @@ function EditorPassphraseController(div, editorController) {
 			that.setBip38Visible(bip38Visible);
 		}
 		
-		// handle error
-		if (hasError) {
-			passphraseInput.addClass("form_input_error_div");
-			passphraseInput.focus();
-			setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
-		} else {
+		// remove form errors
+		if (!hasError) {
 			passphraseInput.removeClass("form_input_error_div");
 			passphraseInput.get(0)._tippy.hide();
 		}
 	}
 	
 	function validate() {
-		setFormError(that.getUsePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH);
+		var err = that.getUsePassphrase() && that.getPassphrase().length < AppUtils.MIN_PASSPHRASE_LENGTH;
+		if (err) {
+			passphraseInput.addClass("form_input_error_div");
+			passphraseInput.focus();
+			setImmediate(function() { passphraseInput.get(0)._tippy.show(); });	// initial click causes tooltip to hide, so wait momentarily
+		}
+		setFormError(err);
 	}
 	
 	function setFormError(_hasError) {
@@ -3285,9 +3286,9 @@ function EditorSplitController(div, editorController) {
 		
 		// register inputs
 		splitCheckbox.onChecked(function() {
-			if (splitCheckbox.isChecked()) numPiecesInput.focus();
-			update();
+			setFormError(false);
 			invoke(useSplitListeners);
+			if (splitCheckbox.isChecked()) numPiecesInput.focus();
 		});
 		numPiecesInput.on("input", function(e) { validate(true); });
 		numPiecesInput.on("focusout", function(e) { validate(false); });
@@ -3380,6 +3381,12 @@ function EditorSplitController(div, editorController) {
 		} else {
 			that.setEnabled(true);
 		}
+		
+		// remove form errors
+		if (!hasError) {
+			numPiecesInput.removeClass("form_input_error_div");
+			minPiecesInput.removeClass("form_input_error_div");
+		}
 	}
 
 	function reset() {
@@ -3390,9 +3397,15 @@ function EditorSplitController(div, editorController) {
 		update();
 	}
 	
+	function setFormError(_hasError) {
+		var change = hasError !== _hasError;
+		hasError = _hasError;
+		update();
+		if (change) invoke(formErrorChangeListeners, hasError);
+	}
+	
 	function validate(lenientBlankAndRange) {
-		var lastError = hasError;
-		hasError = false;
+		var err = false;
 		if (that.getUseSplit()) {
 			
 			// validate num pieces
@@ -3401,12 +3414,12 @@ function EditorSplitController(div, editorController) {
 				if (!numPiecesInput.val() || isInt(numPieces)) {
 					numPiecesInput.removeClass("form_input_error_div");
 				} else {
-					hasError = true;
+					err = true;
 					numPiecesInput.addClass("form_input_error_div");
 				}
 			} else {
 				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
-					hasError = true;
+					err = true;
 					numPiecesInput.addClass("form_input_error_div");
 				} else {
 					numPiecesInput.removeClass("form_input_error_div");
@@ -3419,22 +3432,19 @@ function EditorSplitController(div, editorController) {
 				if (!minPiecesInput.val() || isInt(minPieces)) {
 					minPiecesInput.removeClass("form_input_error_div");
 				} else {
-					hasError = true;
+					err = true;
 					minPiecesInput.addClass("form_input_error_div");
 				}
 			} else {
 				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!hasError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
-					hasError = true;
+					err = true;
 					minPiecesInput.addClass("form_input_error_div");
 				} else {
 					minPiecesInput.removeClass("form_input_error_div");
 				}
 			}
-		} else {
-			numPiecesInput.removeClass("form_input_error_div");
-			minPiecesInput.removeClass("form_input_error_div");
 		}
-		if (hasError !== lastError) invoke(formErrorChangeListeners, hasError);
+		setFormError(err);
 	}
 }
 inheritsFrom(EditorSplitController, DivController);
