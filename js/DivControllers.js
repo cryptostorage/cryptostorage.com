@@ -4517,6 +4517,7 @@ function CompactPieceRenderer(div, piece, config) {
 				if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (index + 1);
 				var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
+					if (config.cryptoCash) div.addClass("keypair_div_spaced");
 					placeholderDiv.replaceWith(div);
 					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
 					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
