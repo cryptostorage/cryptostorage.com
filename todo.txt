@@ -21,8 +21,8 @@ xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b
 tippy jerk when editor first loaded
 make progress bar its own controller
 set public address of imported pieces after pieces combine
-notice colors
 confirmation on destroy generated storage
+styling polish (notice colors, export controls, etc)
 
 add support for dogecoin
 tippls
