@@ -1,16 +1,15 @@
 v0.3.0
 print preview
 direct link to editor
-browser testing
 quick generate
 backwards compatibility
-click outside dropdown only works if click within container
 footer
 regenerate / reapply buttons
 interoperability disclosure
 performance tests and optimizations
 confirmation on reset
 unrecognized private key with single character errors on BTC and DASH
+browser testing
 
 remove min share encoding?
 print selector compact | cryptocash | community design, etc

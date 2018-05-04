@@ -3788,12 +3788,6 @@ function EditorCurrenciesController(div, plugins) {
 		currencyInput.onCurrencyChange(function() { invoke(inputChangeListeners); });
 		currencyInput.onDelete(function() { remove(currencyInput); });
 		currencyInput.onFormErrorChange(updateFormError);
-		
-//		onInputsChange, function() {
-//			remove(currencyInput);
-//		}, function(hasError) {
-//			updateFormError();
-//		});
 		currencyInput.getDiv().appendTo(currencyInputsDiv);
 		currencyInputs.push(currencyInput);
 		currencyInputs[0].setTrashEnabled(currencyInputs.length !== 1);
