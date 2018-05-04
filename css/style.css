@@ -1289,12 +1289,12 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_popup_div {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	right: 0;
+	height: 100%;
+    width: 100%;
     left: 0;
+    top: 0;
     overflow: hidden;
+    position: fixed;
     background-color: rgba(0, 0, 0, .5);
 }
 
