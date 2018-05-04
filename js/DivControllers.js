@@ -119,9 +119,6 @@ var UiUtils = {
 	 */
 	openEditorTab: function(browserTabName, config) {
 		
-		// deep copy config
-		config = Object.assign({}, config);
-		
 		// open tab
 		newWindow(null, browserTabName, AppUtils.getInitialExportDependencies(), getInternalStyleSheetText(), function(err, window) {
 			
@@ -132,8 +129,28 @@ var UiUtils = {
 			}
 			
 			// initialize tab
+			config = Object.assign({}, config);
 			config.environmentInfo = AppUtils.getCachedEnvironment();
 		  window.exportToBody(window, config);
+			window.focus();
+		});
+	},
+	
+	openGenerateTab: function(config) {
+		
+		// open tab
+		newWindowPath("./generate.html", function(err, window) {
+			
+			// check for error
+			if (err) {
+				AppUtils.setTabError(true);
+				return;
+			}
+			
+			// initialize window
+			config = Object.assign({}, config);
+			config.environmentInfo = AppUtils.getCachedEnvironment();
+			window.exportToBody(window, config);
 			window.focus();
 		});
 	},
@@ -213,7 +230,7 @@ function CheckboxController(div, label, tooltip) {
 	var infoImg;
 	
 	this.render = function(onDone) {
-		
+
 		// div setup
 		div.empty();
 		div.addClass("flex_horizontal flex_align_center");
@@ -628,7 +645,7 @@ function AppController(div) {
 	}
 	
 	function onSelectGenerate() {
-		UiUtils.openEditorTab("Export Storage", {confirmExit: true});
+		UiUtils.openGenerateTab({confirmExit: true});
 	}
 	
 	function onSelectImport() {
@@ -813,7 +830,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (AppUtils.DEV_MODE || !environmentFailure) UiUtils.openEditorTab("Generate Keypairs", {genConfig: getGenConfig(plugin)}); 
+			if (AppUtils.DEV_MODE || !environmentFailure) UiUtils.openGenerateTab({genConfig: getGenConfig(plugin)}); 
 		}
 		
 		function getGenConfig(plugin) {

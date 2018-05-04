@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<title>Generate Keypairs</title>
+		<meta name="Description" content="Generate keypairs for major cryptocurrencies in your browser with passphrase protection and compartmentalization.  100% open source and client-side.">
+		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+		<meta name="viewport" content="user-scalable=no"/>
+		<meta property="og:title" content="Generate Keypairs">
+		<meta property="og:description" content="Generate keypairs for major cryptocurrencies in your browser with passphrase protection and compartmentalization.  100% open source and client-side.">
+		<meta property="og:image" content="https://cryptostorage.com/img/cryptostorage_social.png">
+		<meta property="og:url" content="https://cryptostorage.com/generate.html">
+		<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="/favicon.ico" type="image/x-icon">
+		<link rel="stylesheet" type="text/css" href="css/style.css"/>
+		<script src="lib/jquery-3.2.1.js"></script>
+		<script src="lib/loadjs.js"></script>
+		<script src="lib/async.js"></script>
+		<script src="lib/tippy.all.js"></script>
+		<script src="js/BodyExporter.js"></script>
+		<script src="js/GenUtils.js"></script>
+		<script src="js/DependencyLoader.js"></script>
+		<script src="js/DivControllers.js"></script>
+		<script src="js/AppUtils.js"></script>
+		<script src="js/CryptoPlugins.js"></script>
+		
+		<!-- Initialize -->
+		<script type="text/javascript">
+		
+			// welcome :)
+			console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
+			
+ 			// initialize window
+ 			if (window.opener !== "cryptostorage") {
+ 				LOADER.load(AppUtils.getInitialExportDependencies(), function(err) {
+ 					if (err) throw err;
+ 			 		window.exportToBody(window, {environmentInfo: AppUtils.getCachedEnvironment()});
+ 				});
+ 			}
+ 			
+/* 	 		// run tests
+			if (AppUtils.RUN_MIN_TESTS || AppUtils.RUN_FULL_TESTS) {
+				
+				// load dependencies
+				LOADER.load(AppUtils.getAppDependencies(), function(err) {
+					if (err) throw err;
+					var tester = new Tests();
+					
+					// run minimum tests
+					if (AppUtils.RUN_MIN_TESTS) {
+						tester.runMinimumTests(function(err) {
+							if (err) throw err;
+							console.log("Minimum tests pass");
+						});
+					}
+					
+					// run full tests
+					if (AppUtils.RUN_FULL_TESTS) {
+						console.log("Running crypto test suite...")
+						tester.runTestSuite(function(err) {
+							if (err) throw err;
+							console.log("Crypto test suite passes");
+						});
+					}
+				});
+			} */
+			
+     	</script> 
+	</head>
+	<body class='app_body'>
+		<!-- Application content -->
+	</body>
+</html>

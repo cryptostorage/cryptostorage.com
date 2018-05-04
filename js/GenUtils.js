@@ -939,6 +939,26 @@ function newWindow(div, title, dependencyPaths, internalCss, onLoad) {
 	}
 }
 
+function newWindowPath(path, onLoad) {
+	var onLoadCalled = false;
+	var w = window.open(path);
+	if (!isInitialized(w) || !isInitialized(w.document)) {
+		onLoadOnce(new Error("Could not get window reference"));
+		return;
+	}
+	w.opener = "cryptostorage";
+	w.addEventListener('load', function() {
+		onLoadOnce(null, w);
+	});
+	
+	// prevents onLoad() from being called multiple times
+	function onLoadOnce(err, window) {
+		if (onLoadCalled) return;
+		onLoadCalled = true;
+		if (onLoad) onLoad(err, window);
+	}
+}
+
 /**
  * Converts the given image to a base64 encoded data url.
  * 
