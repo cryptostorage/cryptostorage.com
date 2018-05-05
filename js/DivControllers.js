@@ -120,9 +120,7 @@ var UiUtils = {
 	openEditorDynamic: function(browserTabName, config) {
 		
 		// open tab
-		console.log("Opening dynamic...");
 		newWindow(null, browserTabName, AppUtils.getInitialExportDependencies(), getInternalStyleSheetText(), function(err, window) {
-			console.log("Dynamic callback!");
 			
 			// check for error
 			if (err) {
@@ -140,61 +138,16 @@ var UiUtils = {
 	
 	/**
 	 * Opens the editor as a static html window.
-	 * 
-	 * @param config specifies editor configuration
-	 * 				config.genConfig is configuration to generate keypairs
-	 * 				config.pieces are pre-generated pieces
-	 * 				config.pieceDivs are pre-rendered pieces to display
-	 * 				config.sourcePieces are source pieces that the given piece was generated from
-	 * 				config.showNotices specifies whether or not to show the notice bar
+
+	 * @param tickers is a csv of tickers to initially generate
 	 */
-	openEditorStatic: function(config) {
-		
-		// open window
-		console.log("Opening static...");
-		openGenerateWindow(function(err, window) {
-			console.log("Static opened!!!");
-					
-			// check for error
-			if (err) {
-				AppUtils.setTabError(true);
-				return;
-			}
-			
-			// initialize editor
-			config = Object.assign({}, config);
-			config.environmentInfo = AppUtils.getCachedEnvironment();
-			console.log("Launch through app");
-			window.initEditor(window, config);
-			window.focus();
-		});
-		
-		function openGenerateWindow(onLoad) {
-			var onLoadCalled = false;
-			var w = window.open("generate.html");
-			w.onload = function() { onLoadOnce(null, w); }
-			w.document.onload = function() { onLoadOnce(null, w); }
-			//$(w.document).ready(function() { onLoadOnce(null, w); });
-			setTimeout(function() {
-				onLoadOnce(null, w);
-			}, 3000);
-			if (!isInitialized(w) || !isInitialized(w.document)) {
-				onLoadOnce(new Error("Could not get window reference"));
-				return;
-			}
-			w.addEventListener('load', function() { onLoadOnce(null, w); });
-			if (w.loaded) onLoadOnce(null, w);
-			//w.opener = null;
-			w.internalLaunch = true;
-			
-			// prevents onLoad() from being called multiple times
-			function onLoadOnce(err, window) {
-				console.log("Static onLoadOnce...");
-				if (onLoadCalled) return;
-				onLoadCalled = true;
-				if (onLoad) onLoad(err, window);
-			}
+	openEditorStatic: function(tickers) {
+		var tickerParam = "";
+		if (tickers) {
+			tickers = listify(tickers);
+			if (tickers.length) tickerParam = "?ticker=" + tickers.join(",").toLowerCase()
 		}
+		window.open("generate.html" + tickerParam);
 	},
 	
 	// UI constants
@@ -687,7 +640,7 @@ function AppController(div) {
 	}
 	
 	function onSelectGenerate() {
-		UiUtils.openEditorStatic({confirmExit: true});
+		UiUtils.openEditorStatic();
 	}
 	
 	function onSelectImport() {
@@ -872,17 +825,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (AppUtils.DEV_MODE || !environmentFailure) UiUtils.openEditorStatic({genConfig: getGenConfig(plugin)}); 
-		}
-		
-		function getGenConfig(plugin) {
-			var config = {};
-			config.keypairs = [];
-			config.keypairs.push({
-				ticker: plugin.getTicker(),
-				numKeypairs: 1,
-			});
-			return config;
+			if (AppUtils.DEV_MODE || !environmentFailure) UiUtils.openEditorStatic(plugin.getTicker()); 
 		}
 	}
 	
@@ -3590,8 +3533,9 @@ inheritsFrom(EditorPaginatorController, DivController)
  * @param div is the div to render to
  * @param plugins are crypto plugins to select from
  * @param defaultTicker is the ticker of the initial selected currency
+ * @param defaultNumKeys is the number of keys in the initial selected currency
  */
-function EditorCurrencyController(div, plugins, defaultTicker) {
+function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 	DivController.call(this, div);
 	
 	assertInitialized(div);
@@ -3637,8 +3581,7 @@ function EditorCurrencyController(div, plugins, defaultTicker) {
 		
 		// create pull down
 		selector = $("<div id='currency_selector_" + id + "'>").appendTo(div);
-		that.setSelectedCurrency(null);	// initializes selector
-		if (defaultTicker) that.setSelectedCurrency(defaultTicker);
+		that.setSelectedCurrency(null);
 		
 		// create right div
 		var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
@@ -3650,6 +3593,10 @@ function EditorCurrencyController(div, plugins, defaultTicker) {
 		trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
 		trashDiv.click(function() { invoke(deleteListeners); });
 		trashImg = $("<img class='trash_img' src='img/trash.png'>").appendTo(trashDiv);
+		
+		// set default state
+		if (defaultTicker) that.setSelectedCurrency(defaultTicker);
+		if (defaultNumKeys) that.setNumKeys(defaultNumKeys);
 		
 		// done
 		if (onDone) onDone(div);
@@ -3716,7 +3663,8 @@ function EditorCurrencyController(div, plugins, defaultTicker) {
 		return isNaN(parsed) ? null : parsed;
 	};
 	
-	this.setNumKeypairs = function(numKeys) {
+	this.setNumKeys = function(numKeys) {
+		assertNumber(numKeys);
 		numKeysInput.val(numKeys);
 	}
 	
@@ -3851,8 +3799,8 @@ function EditorCurrenciesController(div, plugins) {
 		return currencyInputs;
 	};
 	
-	this.add = function(ticker) {
-		var currencyInput = new EditorCurrencyController($("<div>"), plugins, ticker)
+	this.add = function(ticker, numKepairs) {
+		var currencyInput = new EditorCurrencyController($("<div>"), plugins, ticker, numKepairs)
 		currencyInput.render();
 		currencyInput.onCurrencyChange(function() { invoke(inputChangeListeners); });
 		currencyInput.onDelete(function() { remove(currencyInput); });
@@ -3914,12 +3862,14 @@ function EditorCurrenciesController(div, plugins) {
 	/**
 	 * Sets the configuration.
 	 * 
-	 * @param config is an array of currencies to set for the currency inputs in the format [{ticker: "BCH", ...}, {...}]
+	 * @param config is an array of currencies to set for the currency inputs in the format [{ticker: "BCH", numKeypairs: 2}, {...}]
 	 */
 	this.setConfig = function(configKeypairs) {
+		assertArray(configKeypairs);
+		assertTrue(configKeypairs.length > 0);
+		that.empty();
 		for (var i = 0; i < configKeypairs.length; i++) {
-			currencyInputs[i].setSelectedCurrency(configKeypairs[i].ticker);
-			currencyInputs[i].setNumKeypairs(configKeypairs[i].numKeypairs);
+			that.add(configKeypairs[i].ticker, configKeypairs[i].numKeypairs);
 		}
 	}
 	

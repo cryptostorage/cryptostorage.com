@@ -298,11 +298,12 @@ var AppUtils = {
 	 * Returns the crypto plugin with the given ticker symbol.
 	 */
 	getCryptoPlugin: function(ticker) {
-		assertInitialized(ticker);
+		assertString(ticker);
+		ticker = ticker.trim().toLowerCase();
 		var plugins = AppUtils.getCryptoPlugins();
 		for (var i = 0; i < plugins.length; i++) {
 			var plugin = plugins[i];
-			if (plugin.getTicker() === ticker) return plugin;
+			if (plugin.getTicker().toLowerCase() === ticker) return plugin;
 		}
 		throw new Error("No plugin found for crypto '" + ticker + "'");
 	},

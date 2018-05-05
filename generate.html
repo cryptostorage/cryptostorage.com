@@ -28,22 +28,63 @@
 		
 			// welcome :)
 			console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
-						
-  			// initialize window
-  			$(document).ready(function() {
-  				console.log("Generate.html ready!");
-  				window.loaded = true;
-  	 			if (!window.internalLaunch || window.opener !== null) {
-  	 				console.log("Launching directly");
-  	 				LOADER.load(AppUtils.getInitialExportDependencies(), function(err) {
-  	 					if (err) throw err;
-  	 			 		window.initEditor(window, {environmentInfo: AppUtils.getCachedEnvironment()});
-  	 				});
-  	 			} else {
-  	 				console.log("Not launching directly");
-  	 			}
-  			});
-  			
+				
+			// load initial editor dependencies
+			LOADER.load(AppUtils.getInitialExportDependencies(), function(err) {
+				if (err) throw err;
+				
+				// initialize editor with config
+				var config = {};
+				config.environmentInfo = AppUtils.getCachedEnvironment();
+				config.genConfig = getGenConfig();
+				window.initEditor(window, config);
+			});
+			
+			/**
+			 * Translates url parameters into a generation config for the editor
+			 *
+			 * @returns a generation config if valid one given, null if invalid or not given
+			 */
+			function getGenConfig() {
+				 
+				// get tickers
+				var tickerParamValue = getParameterByName("ticker");
+				if (!tickerParamValue) return null;
+				var tickers = tickerParamValue.split(",");
+				
+				// trim and validate tickers
+				var tickersValid = true;
+				for (var i = 0; i < tickers.length; i++) {
+					tickers[i] = tickers[i].trim();
+					try { AppUtils.getCryptoPlugin(tickers[i]); }
+					catch (err) { return null; }
+				}
+				if (!tickers.length) return null;
+				
+				// translate tickers to generation config
+				var genConfig = {keypairs: []};
+				var seriesStartIdx = 0;
+				for (var i = 0; i < tickers.length; i++) {
+					
+					// start new ticker series
+					if (tickers[i] !== tickers[seriesStartIdx]) {
+						genConfig.keypairs.push({
+							ticker: tickers[seriesStartIdx],
+							numKeypairs: i - seriesStartIdx
+						});
+						seriesStartIdx = i;
+					}
+					
+					// handle last element
+					if (i === tickers.length - 1) {
+						genConfig.keypairs.push({
+							ticker: tickers[seriesStartIdx],
+							numKeypairs: i - seriesStartIdx + 1
+						});
+					}
+				}
+				return genConfig;
+			}
  			
 /* 	 		// run tests
 			if (AppUtils.RUN_MIN_TESTS || AppUtils.RUN_FULL_TESTS) {
