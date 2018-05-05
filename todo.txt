@@ -1,6 +1,5 @@
 v0.3.0
 print preview
-direct link to editor
 quick generate
 backwards compatibility
 remove min share encoding?

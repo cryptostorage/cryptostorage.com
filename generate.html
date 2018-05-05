@@ -85,34 +85,6 @@
 				}
 				return genConfig;
 			}
- 			
-/* 	 		// run tests
-			if (AppUtils.RUN_MIN_TESTS || AppUtils.RUN_FULL_TESTS) {
-				
-				// load dependencies
-				LOADER.load(AppUtils.getAppDependencies(), function(err) {
-					if (err) throw err;
-					var tester = new Tests();
-					
-					// run minimum tests
-					if (AppUtils.RUN_MIN_TESTS) {
-						tester.runMinimumTests(function(err) {
-							if (err) throw err;
-							console.log("Minimum tests pass");
-						});
-					}
-					
-					// run full tests
-					if (AppUtils.RUN_FULL_TESTS) {
-						console.log("Running crypto test suite...")
-						tester.runTestSuite(function(err) {
-							if (err) throw err;
-							console.log("Crypto test suite passes");
-						});
-					}
-				});
-			} */
-			
      	</script> 
 	</head>
 	<body class='app_body'>
