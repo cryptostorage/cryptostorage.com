@@ -30,16 +30,20 @@
 			console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
 						
   			// initialize window
-  			window.loaded = true;
- 			if (!window.internalLaunch || window.opener !== null) {
- 				console.log("Launching directly");
- 				LOADER.load(AppUtils.getInitialExportDependencies(), function(err) {
- 					if (err) throw err;
- 			 		window.initEditor(window, {environmentInfo: AppUtils.getCachedEnvironment()});
- 				});
- 			} else {
- 				console.log("Not launching directly");
- 			}
+  			$(document).ready(function() {
+  				console.log("Generate.html ready!");
+  				window.loaded = true;
+  	 			if (!window.internalLaunch || window.opener !== null) {
+  	 				console.log("Launching directly");
+  	 				LOADER.load(AppUtils.getInitialExportDependencies(), function(err) {
+  	 					if (err) throw err;
+  	 			 		window.initEditor(window, {environmentInfo: AppUtils.getCachedEnvironment()});
+  	 				});
+  	 			} else {
+  	 				console.log("Not launching directly");
+  	 			}
+  			});
+  			
  			
 /* 	 		// run tests
 			if (AppUtils.RUN_MIN_TESTS || AppUtils.RUN_FULL_TESTS) {

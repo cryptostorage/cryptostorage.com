@@ -120,7 +120,9 @@ var UiUtils = {
 	openEditorDynamic: function(browserTabName, config) {
 		
 		// open tab
+		console.log("Opening dynamic...");
 		newWindow(null, browserTabName, AppUtils.getInitialExportDependencies(), getInternalStyleSheetText(), function(err, window) {
+			console.log("Dynamic callback!");
 			
 			// check for error
 			if (err) {
@@ -149,10 +151,9 @@ var UiUtils = {
 	openEditorStatic: function(config) {
 		
 		// open window
-		console.log("opening window...");
+		console.log("Opening static...");
 		openGenerateWindow(function(err, window) {
-			
-			console.log("window opened!");
+			console.log("Static opened!!!");
 					
 			// check for error
 			if (err) {
@@ -171,18 +172,24 @@ var UiUtils = {
 		function openGenerateWindow(onLoad) {
 			var onLoadCalled = false;
 			var w = window.open("generate.html");
+			w.onload = function() { onLoadOnce(null, w); }
+			w.document.onload = function() { onLoadOnce(null, w); }
+			//$(w.document).ready(function() { onLoadOnce(null, w); });
+			setTimeout(function() {
+				onLoadOnce(null, w);
+			}, 3000);
 			if (!isInitialized(w) || !isInitialized(w.document)) {
 				onLoadOnce(new Error("Could not get window reference"));
 				return;
 			}
-			w.opener = null;
-			w.internalLaunch = true;
 			w.addEventListener('load', function() { onLoadOnce(null, w); });
-			w.onload = function() { onLoadOnce(null, w); }
 			if (w.loaded) onLoadOnce(null, w);
+			//w.opener = null;
+			w.internalLaunch = true;
 			
 			// prevents onLoad() from being called multiple times
 			function onLoadOnce(err, window) {
+				console.log("Static onLoadOnce...");
 				if (onLoadCalled) return;
 				onLoadCalled = true;
 				if (onLoad) onLoad(err, window);
