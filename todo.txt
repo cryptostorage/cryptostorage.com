@@ -3,6 +3,7 @@ print preview
 quick generate
 backwards compatibility
 remove min share encoding?
+mobile print extra padding
 footer
 interoperability disclosure
 performance tests and optimizations
