@@ -16,7 +16,7 @@
 		<script src="lib/loadjs.js"></script>
 		<script src="lib/async.js"></script>
 		<script src="lib/tippy.all.js"></script>
-		<script src="js/BodyExporter.js"></script>
+		<script src="js/InitEditor.js"></script>
 		<script src="js/GenUtils.js"></script>
 		<script src="js/DependencyLoader.js"></script>
 		<script src="js/DivControllers.js"></script>
@@ -28,13 +28,17 @@
 		
 			// welcome :)
 			console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
-			
- 			// initialize window
- 			if (window.opener !== "cryptostorage") {
+						
+  			// initialize window
+  			window.loaded = true;
+ 			if (!window.internalLaunch || window.opener !== null) {
+ 				console.log("Launching directly");
  				LOADER.load(AppUtils.getInitialExportDependencies(), function(err) {
  					if (err) throw err;
- 			 		window.exportToBody(window, {environmentInfo: AppUtils.getCachedEnvironment()});
+ 			 		window.initEditor(window, {environmentInfo: AppUtils.getCachedEnvironment()});
  				});
+ 			} else {
+ 				console.log("Not launching directly");
  			}
  			
 /* 	 		// run tests

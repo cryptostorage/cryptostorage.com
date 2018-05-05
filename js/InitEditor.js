@@ -25,7 +25,7 @@
 /**
  * Renders an editor to the given window's body.
  * 
- * @param window is the window to export to
+ * @param window is the window to initialize the editor with
  * @param config specifies editor configuration
  * 				config.genConfig is configuration to generate keypairs
  * 				config.pieces are pre-generated pieces
@@ -34,7 +34,7 @@
  * 				config.showNotices specifies whether or not to show the notice bar
  *  			config.environmentInfo is initial environment to display
  */
-window.exportToBody = function(window, config) {
+window.initEditor = function(window, config) {
 
 	// detect any uncaught errors
 	window.onerror = function(err) {

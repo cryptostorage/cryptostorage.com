@@ -107,7 +107,7 @@ var UiUtils = {
 	},
 	
 	/**
-	 * Opens the editor in a new tab.
+	 * Opens the editor as a dynamically generated window.
 	 * 
 	 * @param browserTabName is the name of the tab
 	 * @param config specifies editor configuration
@@ -117,7 +117,7 @@ var UiUtils = {
 	 * 				config.sourcePieces are source pieces that the given piece was generated from
 	 * 				config.showNotices specifies whether or not to show the notice bar
 	 */
-	openEditorTab: function(browserTabName, config) {
+	openEditorDynamic: function(browserTabName, config) {
 		
 		// open tab
 		newWindow(null, browserTabName, AppUtils.getInitialExportDependencies(), getInternalStyleSheetText(), function(err, window) {
@@ -131,28 +131,63 @@ var UiUtils = {
 			// initialize tab
 			config = Object.assign({}, config);
 			config.environmentInfo = AppUtils.getCachedEnvironment();
-		  window.exportToBody(window, config);
+		  window.initEditor(window, config);
 			window.focus();
 		});
 	},
 	
-	openGenerateTab: function(config) {
+	/**
+	 * Opens the editor as a static html window.
+	 * 
+	 * @param config specifies editor configuration
+	 * 				config.genConfig is configuration to generate keypairs
+	 * 				config.pieces are pre-generated pieces
+	 * 				config.pieceDivs are pre-rendered pieces to display
+	 * 				config.sourcePieces are source pieces that the given piece was generated from
+	 * 				config.showNotices specifies whether or not to show the notice bar
+	 */
+	openEditorStatic: function(config) {
 		
-		// open tab
-		newWindowPath("./generate.html", function(err, window) {
+		// open window
+		console.log("opening window...");
+		openGenerateWindow(function(err, window) {
 			
+			console.log("window opened!");
+					
 			// check for error
 			if (err) {
 				AppUtils.setTabError(true);
 				return;
 			}
 			
-			// initialize window
+			// initialize editor
 			config = Object.assign({}, config);
 			config.environmentInfo = AppUtils.getCachedEnvironment();
-			window.exportToBody(window, config);
+			console.log("Launch through app");
+			window.initEditor(window, config);
 			window.focus();
 		});
+		
+		function openGenerateWindow(onLoad) {
+			var onLoadCalled = false;
+			var w = window.open("generate.html");
+			if (!isInitialized(w) || !isInitialized(w.document)) {
+				onLoadOnce(new Error("Could not get window reference"));
+				return;
+			}
+			w.opener = null;
+			w.internalLaunch = true;
+			w.addEventListener('load', function() { onLoadOnce(null, w); });
+			w.onload = function() { onLoadOnce(null, w); }
+			if (w.loaded) onLoadOnce(null, w);
+			
+			// prevents onLoad() from being called multiple times
+			function onLoadOnce(err, window) {
+				if (onLoadCalled) return;
+				onLoadCalled = true;
+				if (onLoad) onLoad(err, window);
+			}
+		}
 	},
 	
 	// UI constants
@@ -645,7 +680,7 @@ function AppController(div) {
 	}
 	
 	function onSelectGenerate() {
-		UiUtils.openGenerateTab({confirmExit: true});
+		UiUtils.openEditorStatic({confirmExit: true});
 	}
 	
 	function onSelectImport() {
@@ -830,7 +865,7 @@ function HomeController(div) {
 		});
 		
 		function onCurrencyClicked(plugin) {
-			if (AppUtils.DEV_MODE || !environmentFailure) UiUtils.openGenerateTab({genConfig: getGenConfig(plugin)}); 
+			if (AppUtils.DEV_MODE || !environmentFailure) UiUtils.openEditorStatic({genConfig: getGenConfig(plugin)}); 
 		}
 		
 		function getGenConfig(plugin) {
@@ -1640,7 +1675,7 @@ function ImportFileController(div, printErrors) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openEditorTab("Encrypted keys", {pieces: [piece], sourcePieces: importedPieces});
+					UiUtils.openEditorDynamic("Encrypted keys", {pieces: [piece], sourcePieces: importedPieces});
 				});
 			});
 			
@@ -1689,7 +1724,7 @@ function ImportFileController(div, printErrors) {
 		
 		// export link opens editor
 		editor.click(function() {
-			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined), sourcePieces: importedPieces});
+			UiUtils.openEditorDynamic("Imported Piece", {pieces: (piece ? [piece] : undefined), pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined), sourcePieces: importedPieces});
 		});
 	}
 	
@@ -1745,7 +1780,7 @@ function ImportFileController(div, printErrors) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openEditorTab("Imported Pieces", {pieces: UiUtils.getPiecesForExport(importedPieces)});
+			UiUtils.openEditorDynamic("Imported Pieces", {pieces: UiUtils.getPiecesForExport(importedPieces)});
 		});
 		
 		// handle unsplit piece
@@ -2058,7 +2093,7 @@ function ImportTextController(div, plugins, printErrors) {
 				
 				// add control to view encrypted keys
 				addControl("view encrypted keys", function() {
-					UiUtils.openEditorTab("Encrypted keys", {pieces: [piece], sourcePieces: importedPieces.length > 1 ? importedPieces : null});
+					UiUtils.openEditorDynamic("Encrypted keys", {pieces: [piece], sourcePieces: importedPieces.length > 1 ? importedPieces : null});
 				});
 			});
 			
@@ -2107,7 +2142,7 @@ function ImportTextController(div, plugins, printErrors) {
 		
 		// export link opens editor
 		editor.click(function() {
-			UiUtils.openEditorTab("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
+			UiUtils.openEditorDynamic("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
 		});
 	}
 	
@@ -2163,7 +2198,7 @@ function ImportTextController(div, plugins, printErrors) {
 		
 		// add control to view pieces
 		addControl("view imported pieces", function() {
-			UiUtils.openEditorTab("Imported Storage", {pieces: UiUtils.getPiecesForExport(importedPieces)});
+			UiUtils.openEditorDynamic("Imported Storage", {pieces: UiUtils.getPiecesForExport(importedPieces)});
 		});
 		
 		// handle unsplit piece
@@ -2523,7 +2558,7 @@ function EditorController(div, config) {
 			var viewSplit = $("<div class='import_control_link'>").appendTo(headerDiv);
 			viewSplit.html("view imported pieces");
 			viewSplit.click(function() {
-				UiUtils.openEditorTab("Imported Pieces", {pieces: UiUtils.getPiecesForExport(config.sourcePieces)});
+				UiUtils.openEditorDynamic("Imported Pieces", {pieces: UiUtils.getPiecesForExport(config.sourcePieces)});
 			});
 		}
 		
