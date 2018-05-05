@@ -933,7 +933,6 @@ function newWindow(div, title, dependencyPaths, internalCss, onLoad) {
 	
 	// prevents onLoad() from being called multiple times
 	function onLoadOnce(err, window) {
-		console.log("Dynamic onLoadOnce...");
 		if (onLoadCalled) return;
 		onLoadCalled = true;
 		if (onLoad) onLoad(err, window);
