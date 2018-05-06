@@ -492,7 +492,7 @@ function RipplePlugin() {
 		
 		// unencrypted wif
 		if (str.length === 29 && isBase58(str)) {
-			decoded.privateHex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			decoded.privateHex = AppUtils.toBase(58, 16, str);
 			decoded.privateWif = str;
 			decoded.publicAddress = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(str).publicKey);
 			decoded.encryption = null;
@@ -502,7 +502,7 @@ function RipplePlugin() {
 		// unencrypted hex
 		if (str.length === 44 && isHex(str)) {
 			decoded.privateHex = str;
-			decoded.privateWif = Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
+			decoded.privateWif = AppUtils.toBase(16, 58, str);
 			decoded.publicAddress = ripple_key_pairs.deriveAddress(ripple_key_pairs.deriveKeypair(decoded.privateWif).publicKey);			
 			decoded.encryption = null;
 			return decoded;

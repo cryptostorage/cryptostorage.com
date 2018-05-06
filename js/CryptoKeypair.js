@@ -154,7 +154,7 @@ function CryptoKeypair(config) {
 		
 		// encode shares with minimum threshold
 		for (var i = 0; i < shares.length; i++) {
-			shares[i] = encodeWifShare(shares[i], minShares);
+			shares[i] = encodeHexShare(shares[i], minShares);
 		}
 		
 		// create keypairs
@@ -174,9 +174,7 @@ function CryptoKeypair(config) {
 	
 	this.isSplit = function() {
 		assertFalse(_isDestroyed, "Keypair is destroyed");
-		if (!that.hasPrivateKey()) return undefined;
-		assertDefined(that.getMinShares(), "Min shares is unknown despite private key being known");
-		return that.getMinShares() !== null;
+		return state.isSplit;
 	}
 	
 	this.getMinShares = function() {
@@ -220,6 +218,7 @@ function CryptoKeypair(config) {
 		state.privateHex = undefined;
 		state.privateWif = undefined;
 		state.encryption = undefined;
+		state.isSplit = undefined;
 		state.minShares = undefined;
 		state.shareNum = undefined;
 		return this;
@@ -236,7 +235,10 @@ function CryptoKeypair(config) {
 			ticker: state.plugin.getTicker(),
 			publicAddress: that.getPublicAddress(),
 			privateWif: that.getPrivateWif(),
+			privateHex: that.getPrivateHex(),
 			encryption: that.getEncryptionScheme(),
+			isSplit: that.isSplit(),
+			minShares: that.getMinShares(),
 			shareNum: that.getShareNum()
 		};
 	}
@@ -272,6 +274,7 @@ function CryptoKeypair(config) {
 		if (state.privateWif !== state2.privateWif) return false;
 		if (state.publicAddress !== state2.publicAddress) return false;
 		if (state.encryption !== state2.encryption) return false;
+		if (state.isSplit !== state2.isSplit) return false;
 		if (state.minShares !== state2.minShares) return false;
 		if (state.shareNum !== state2.shareNum) return false;
 		return true;
@@ -312,6 +315,9 @@ function CryptoKeypair(config) {
 		
 		// create from plugin
 		if (config.plugin) {
+			assertUndefined(config.keypair);
+			assertUndefined(config.splitKeypairs);
+			assertUndefined(config.json);
 			assertTrue(isObject(config.plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
 			state.plugin = config.plugin;
 			if (isDefined(config.privateKey)) setPrivateKey(config.privateKey);
@@ -320,10 +326,20 @@ function CryptoKeypair(config) {
 		}
 		
 		// create from json
-		else if (config.json) fromJson(config.json);
+		else if (config.json) {
+			assertUndefined(config.keypair);
+			assertUndefined(config.plugin);
+			assertUndefined(config.splitKeypairs);
+			fromJson(config.json);
+		}
 		
 		// create from splitKeypairs
-		else if (config.splitKeypairs) combine(config.splitKeypairs);
+		else if (config.splitKeypairs) {
+			assertUndefined(config.keypair);
+			assertUndefined(config.plugin);
+			assertUndefined(config.json);
+			combine(config.splitKeypairs);
+		}
 		
 		// set share num
 		if (isDefined(config.shareNum)) that.setShareNum(config.shareNum);
@@ -337,12 +353,29 @@ function CryptoKeypair(config) {
 			throw new Error("Config missing required fields");
 		}
 		
+		if (state.isSplit === true) {
+			assertInitialized(state.privateHex);
+			assertInitialized(state.privateWif);
+		} else if (state.isSplit === false) {
+			assertInitialized(state.privateHex);
+			assertInitialized(state.privateWif);
+			assertNull(state.minShares);
+			assertNull(state.shareNum);
+		} else if (state.isSplit ===  undefined) {
+			assertUndefined(state.privateHex);
+			assertUndefined(state.privateHex);
+			assertUndefined(state.minShares);
+			assertUndefined(state.shareNum);
+		}
+		
 		if (state.minShares) {
+			assertTrue(state.isSplit);
 			assertNumber(state.minShares);
 			assertTrue(state.minShares >= 2 && state.minShares <= AppUtils.MAX_SHARES);
 		}
 		
 		if (state.shareNum) {
+			assertTrue(state.isSplit);
 			assertNumber(state.shareNum);
 			assertTrue(state.shareNum >= 1 && state.shareNum <= AppUtils.MAX_SHARES);
 		}
@@ -365,27 +398,29 @@ function CryptoKeypair(config) {
 		// private key known
 		if (that.hasPrivateKey()) {
 			
-			// min shares is known or not applicable
-			assertDefined(state.minShares);
+			// split state is known or not applicable
+			assertDefined(state.isSplit);
 			
 			// if not split then encryption is known
-			if (state.minShares === null) assertDefined(state.encryption);
+			if (state.isSplit === false) assertDefined(state.encryption);
 			
 			// unencrypted
 			if (state.encryption === null) {
 				state.plugin.hasPublicAddress() ? assertInitialized(state.publicAddress) : assertNull(state.publicAddress);
+				assertFalse(state.isSplit);
 				assertNull(state.minShares);
 				assertNull(state.shareNum);
 			}
 			
 			// split
-			if (state.encryption === undefined || state.minShares || state.numShares) {
+			if (state.encryption === undefined || state.isSplit) {
 				assertUndefined(state.encryption);
-				assertNumber(state.minShares);
+				assertNotNull(state.minShares);	// either undefined or share number
 			}
 			
 			// encrypted
 			if (isInitialized(state.encryption)) {
+				assertFalse(state.isSplit);
 				assertNull(state.minShares);
 				assertNull(state.shareNum);
 			}
@@ -395,6 +430,7 @@ function CryptoKeypair(config) {
 		if (!that.hasPrivateKey()) {
 			assertUndefined(state.privateHex);
 			assertUndefined(state.privateWif);
+			assertUndefined(state.isSplit);
 			assertUndefined(state.minShares);
 			assertUndefined(state.shareNum);
 			assertUndefined(state.encryption);
@@ -413,6 +449,7 @@ function CryptoKeypair(config) {
 			state.privateWif = decoded.privateWif;
 			state.publicAddress = decoded.publicAddress;
 			state.encryption = decoded.encryption;
+			state.isSplit = false;
 			state.minShares = null;
 			state.shareNum = null;
 			return;
@@ -425,18 +462,20 @@ function CryptoKeypair(config) {
 			state.privateWif = decoded.privateWif;
 			state.publicAddress = state.plugin.hasPublicAddress() ? undefined : null;
 			state.encryption = decoded.encryption;
+			state.isSplit = false;
 			state.minShares = null;
 			state.shareNum = null;
 			return;
 		}
 		
-		// split share with cryptostorage conventions
+		// split share
 		decoded = decodeShare(privateKey);
 		if (decoded) {
 			state.privateHex = decoded.privateHex.toLowerCase();
 			state.privateWif = decoded.privateWif;
 			state.publicAddress = state.plugin.hasPublicAddress() ? undefined : null;
 			state.encryption = undefined;
+			state.isSplit = true;
 			state.minShares = decoded.minShares;
 			state.shareNum = undefined;
 			return;
@@ -453,6 +492,7 @@ function CryptoKeypair(config) {
 		state.privateHex = json.privateHex;
 		state.privateWif = json.privateWif;
 		state.encryption = json.encryption;
+		state.isSplit = json.isSplit;
 		state.minShares = json.minShares;
 		if (isDefined(state.privateHex)) setPrivateKey(state.privateHex);
 		else if (isDefined(state.privateWif)) setPrivateKey(state.privateWif);
@@ -477,7 +517,7 @@ function CryptoKeypair(config) {
 		var shamirHexes = [];
 		for (var i = 0; i < splitKeypairs.length; i++) {
 			var decodedShare = decodeShare(splitKeypairs[i].getPrivateWif());
-			assertInitialized(decodedShare);
+			assertInitialized(decodedShare, "Could not decode share: " + splitKeypairs[i].getPrivateWif());
 			if (!minShares) minShares = decodedShare.minShares;
 			else if (minShares !== decodedShare.minShares) throw new Error("splitKeypairs[" + i + "] has inconsistent min shares");
 			shamirHexes.push(decodedShare.shamirHex);
@@ -491,9 +531,11 @@ function CryptoKeypair(config) {
 		}
 		
 		// ensure sufficient shares provided
-		if (splitKeypairs.length < minShares) {
+		if (isNumber(minShares) && splitKeypairs.length < minShares) {
 			var additional = minShares - splitKeypairs.length;
 			throw new Error("Need " + additional + " additional " + (additional === 1 ? "share" : "shares") + " to recover private key");
+		} else if (splitKeypairs.length < 2) {
+			throw new Error("Need additional shares to recover private key");
 		}
 		
 		// try to combine shares to create private key and public address, which might be invalid or incompatible
@@ -502,8 +544,12 @@ function CryptoKeypair(config) {
 			setPrivateKey(privateHex);
 			if (isDefined(publicAddress)) setPublicAddress(publicAddress);
 		} catch (err) {
-			throw new Error("Pieces do not combine to create valid keypairs");
+			throw new Error("Need additional shares to recover private key");
 		}
+		
+		// pieces must combine to create an unsplit piece with known encryption
+    assertFalse(that.isSplit(), "Pieces are not compatible shares");
+    assertBoolean(that.isEncrypted(), "Pieces are not compatible shares");
 	}
 	
 	function setPublicAddress(address) {
@@ -581,64 +627,91 @@ function CryptoKeypair(config) {
 	 * 
 	 * @param share is the share hex to encode
 	 * @param minShares is the minimum threshold to combine shares
-	 * @returns wif encoded share
+	 * @returns encoded hex share
 	 */
-	function encodeWifShare(share, minShares) {
+	function encodeHexShare(share, minShares) {
 		assertTrue(isHex(share));
 		assertTrue(isNumber(minShares) && minShares <= AppUtils.MAX_SHARES);
-		return encodeShareV1(share, minShares);
+		return encodeShareV0(share, minShares);
 		
-		function encodeShareV0(share, minShares) {
+		function encodeShareV0(share) {
+			return padLeft(share, 2);
+		}
+		
+		function encodeShareV1(share, minShares) {
 			try {
-				return minShares + 'c' + Bitcoin.Base58.encode(ninja.wallets.splitwallet.hexToBytes(share));
+				return minShares + 'c' + AppUtils.toBase(16, 58, padLeft(share, 2));
 			} catch (err) {
 				return null;
 			}
 		}
 		
-		function encodeShareV1(share, minShares) {
-			var hex = padLeft(AppUtils.SPLIT_V1_VERSION.toString(16), 2) + padLeft(minShares.toString(16), 2) + padLeft(share, 2);
-			return Bitcoin.Base58.encode(Crypto.util.hexToBytes(hex));
-			
-			// Pads a string `str` with zeros on the left so that its length is a multiple of `bits` (credit: bitaddress.org)
-			function padLeft(str, bits){
-				bits = bits || config.bits
-				var missing = str.length % bits;
-				return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
-			}
+		function encodeShareV2(share, minShares) {
+			return padLeft(CryptoKeypair.SPLIT_V2_VERSION.toString(16), 2) + padLeft(minShares.toString(16), 2) + padLeft(share, 2);
+		}
+		
+		// Pads a string `str` with zeros on the left so that its length is a multiple of `bits` (credit: bitaddress.org)
+		function padLeft(str, bits){
+			bits = bits || config.bits
+			var missing = str.length % bits;
+			return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
 		}
 	}
 	
 	/**
-	 * Decodes the given encoded share.
+	 * Provides a decoding of the given share which is assumed to be a correctly encoded share.
 	 * 
 	 * @param share is the encoded wif or hex share to decode
-	 * @returns Object with privateHex, privateWif, shamirHex, and minShares initialized
+	 * @returns Object with privateHex, privateWif, shamirHex, and minShares initialized as known
 	 */
-	function decodeShare(encodedShare) {
-		if (!isString(encodedShare)) return null;
+	function decodeShare(share) {
+		if (!isString(share)) return null;
 		var decoded;
-		if ((decoded = decodeShareHexV0(encodedShare))) return decoded;
-		if ((decoded = decodeShareWifV0(encodedShare))) return decoded;
-		if ((decoded = decodeShareHexV1(encodedShare))) return decoded;
-		if ((decoded = decodeShareWifV1(encodedShare))) return decoded;
+		if ((decoded = decodeShareHexV1(share))) return decoded;	// 2c prefix for 2 minimum shares + hex
+		if ((decoded = decodeShareWifV1(share))) return decoded;
+		if ((decoded = decodeShareHexV2(share))) return decoded;	// min shares encoded in hex and b58
+		if ((decoded = decodeShareWifV2(share))) return decoded;
+		if ((decoded = decodeShareHexV0(share))) return decoded;	// no min shares encoding
+		if ((decoded = decodeShareWifV0(share))) return decoded;
 		return null;
 		
-		function decodeShareHexV0(encodedShare) {
-			if (!isHex(encodedShare)) return null;
-			return decodeShareWifV0(AppUtils.toBase(16, 58, encodedShare));
+		function decodeShareHexV0(share) {
+			if (!isHex(share)) return null;
+			assertTrue(share.length > 10);
+			return {
+				shamirHex: ninja.wallets.splitwallet.stripLeadZeros(share),
+				privateHex: share,
+				privateWif: AppUtils.toBase(16, 58, share)
+			};
 		}
 		
-		function decodeShareWifV0(encodedShare) {
+		function decodeShareWifV0(share) {
+			if (!isBase58(share)) return null;
+			assertTrue(share.length > 10);
+			if (share.length < 32) return null;
+			var hex = AppUtils.toBase(58, 16, share);
+			return {
+				shamirHex: ninja.wallets.splitwallet.stripLeadZeros(hex),
+				privateHex: hex,
+				privateWif: share
+			}
+		}
+		
+		function decodeShareHexV1(share) {
+			if (!isHex(share)) return null;
+			return decodeShareWifV1(AppUtils.toBase(16, 58, share));
+		}
+		
+		function decodeShareWifV1(share) {
 			try {
-				if (encodedShare.length < 34) return null;
+				if (share.length < 34) return null;
 				var decoded = {};
-				decoded.minShares = getMinPiecesV0(encodedShare);
+				decoded.minShares = getMinPiecesV1(share);
 				if (!decoded.minShares) return null;
-				var wif = encodedShare.substring(encodedShare.indexOf('c') + 1);
+				var wif = share.substring(share.indexOf('c') + 1);
 				if (!isBase58(wif)) return null;
-				decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(Crypto.util.bytesToHex(Bitcoin.Base58.decode(wif)));
-				decoded.privateWif = encodedShare;
+				decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(AppUtils.toBase(58, 16, wif));
+				decoded.privateWif = share;
 				decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
 				return decoded;
 			} catch (err) {
@@ -653,7 +726,7 @@ function CryptoKeypair(config) {
 			 * @param splitPiece is a string which may be prefixed with 'XXXc...'
 			 * @return the minimum pieces to reconstitute if prefixed, null otherwise
 			 */
-			function getMinPiecesV0(splitPiece) {
+			function getMinPiecesV1(splitPiece) {
 				var idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
 				if (idx <= 0) return null;
 				var minShares = Number(splitPiece.substring(0, idx));	// parse preceding numbers to int
@@ -662,23 +735,23 @@ function CryptoKeypair(config) {
 			}
 		}
 		
-		function decodeShareHexV1(encodedShare) {
-			if (!isHex(encodedShare)) return null;
-			return decodeShareWifV1(AppUtils.toBase(16, 58, encodedShare));
+		function decodeShareHexV2(share) {
+			if (!isHex(share)) return null;
+			return decodeShareWifV2(AppUtils.toBase(16, 58, share));
 		}
 		
-		function decodeShareWifV1(encodedShare) {
-			if (encodedShare.length < 33) return null;
-			if (!isBase58(encodedShare)) return null;
-			var hex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(encodedShare));
+		function decodeShareWifV2(share) {
+			if (share.length < 33) return null;
+			if (!isBase58(share)) return null;
+			var hex = AppUtils.toBase(58, 16, share);
 			if (hex.length % 2 !== 0) return null;
 			var version = parseInt(hex.substring(0, 2), 16);
-			if (version !== AppUtils.SPLIT_V1_VERSION) return null;
+			if (version !== CryptoKeypair.SPLIT_V2_VERSION) return null;
 			var decoded = {};
 			decoded.minShares = parseInt(hex.substring(2, 4), 16);
 			if (!isNumber(decoded.minShares) || decoded.minShares < 2 || decoded.minShares > AppUtils.MAX_SHARES) return null;
 			decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
-			decoded.privateWif = encodedShare;
+			decoded.privateWif = share;
 			decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
 			return decoded;
 		}
@@ -725,6 +798,7 @@ CryptoKeypair.getDecryptWeight = function(schemes) {
 	}
 }
 
+// CSV headers
 CryptoKeypair.CsvHeader = {
 		TICKER: "TICKER",
 		PRIVATE_HEX: "PRIVATE_HEX",
@@ -734,3 +808,6 @@ CryptoKeypair.CsvHeader = {
 		MIN_SHARES: "MIN_SHARES",
 		SHARE_NUM: "SHARE_NUM"
 }
+
+// split 2 encoded version
+CryptoKeypair.SPLIT_V2_VERSION = 1;

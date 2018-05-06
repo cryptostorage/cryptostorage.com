@@ -1744,7 +1744,7 @@ function ImportFileController(div, printErrors) {
 			var piece = new CryptoPiece({splitPieces: importedPieces});
 			onUnsplitPieceImported(importedPieces, piece);
 		} catch (err) {
-			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
+			if (err.message.indexOf("additional") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 			else {
 				if (printErrors) console.log(err);
 				setWarning("Pieces are not compatible shares");
@@ -2162,7 +2162,7 @@ function ImportTextController(div, plugins, printErrors) {
 			var piece = new CryptoPiece({splitPieces: importedPieces});
 			onUnsplitPieceImported(importedPieces, piece);
 		} catch (err) {
-			if (err.message.indexOf("additional piece") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
+			if (err.message.indexOf("additional") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 			else {
 				if (printErrors) console.log(err);
 				setWarning("Pieces are not compatible shares");

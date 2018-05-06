@@ -456,9 +456,11 @@ function CryptoPiece(config) {
 		assertTrue(numKeypairs > 0);
 		
 		// check if min pieces met
-		if (splitPieces.length < minPieces) {
+		if (isNumber(minPieces) && splitPieces.length < minPieces) {
 			var additional = minPieces - splitPieces.length;
 			throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
+		} else if (splitPieces.length < 2) {
+			throw new Error("Need additional shares to recover private key");
 		}
 		
 		// combine keypairs
@@ -466,7 +468,12 @@ function CryptoPiece(config) {
 		for (var i = 0; i < numKeypairs; i++) {
 			var splitKeypairs = [];
 			for (var j = 0; j < splitPieces.length; j++) splitKeypairs.push(splitPieces[j].getKeypairs()[i]);
-			combinedKeypairs.push(new CryptoKeypair({splitKeypairs: splitKeypairs}));
+			try {
+				combinedKeypairs.push(new CryptoKeypair({splitKeypairs: splitKeypairs}));
+			} catch (err) {
+				if (err.message.indexOf("additional") > -1) throw new Error("Need additional pieces to recover private keys");
+				else throw err;
+			}
 		}
 		
 		// set keypairs to combined keypairs

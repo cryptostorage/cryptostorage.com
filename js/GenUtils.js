@@ -711,7 +711,7 @@ function getCombinations(arr, combinationSize) {
 		// build combination from array
 		var combination = [];
 		for (var indexCombinationIdx = 0; indexCombinationIdx < indexCombination.length; indexCombinationIdx++) {
-			combination.push(arr[indexCombinationIdx]);
+			combination.push(arr[indexCombination[indexCombinationIdx]]);
 		}
 		
 		// add to combinations

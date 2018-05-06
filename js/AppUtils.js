@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.3.0",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: false,
+	RUN_FULL_TESTS: true,
 	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
@@ -61,7 +61,6 @@ var AppUtils = {
 	NA: "Not applicable",							// "not applicable" constant
 	MAX_SHARES: 127,									// maximum number of split shares
 	MAX_KEYPAIRS: 1000,								// limit max keypairs to prevent inadequately tested scenarios
-	SPLIT_V1_VERSION: 1,							// split encoding config version
 	
 	// encryption v1 constants
 	ENCRYPTION_V1_PBKDF_ITER: 10000,
