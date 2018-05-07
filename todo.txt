@@ -1,6 +1,4 @@
 v0.3.0
-test that unsufficient shares cannot create valid keypair
-remove min share encoding?
 print preview
 quick generate
 backwards compatibility
