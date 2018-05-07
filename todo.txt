@@ -1,12 +1,13 @@
 v0.3.0
+performance tests and optimizations
 print preview
 quick generate
 backwards compatibility
 mobile print extra padding
+see if there are wasteful loops in editor listeners
+confirmation on destroy generated storage
 footer
 interoperability disclosure
-performance tests and optimizations
-unrecognized private key with single character errors on BTC and DASH
 browser testing
 text import says please select currency on unrecognized text import
 print tab values shouldn't be underlined because cannot click
@@ -15,12 +16,9 @@ split validation should fail on -1
 put homepage text in index.html and dynamically hide for seo
 precise static and dynamic dependencies
 update bip38 cryptojs description with pbkdf if necessary
-see if there are wasteful loops in editor listeners
-xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share
 tippy jerk when editor first loaded
 make progress bar its own controller
 set public address of imported pieces after pieces combine
-confirmation on destroy generated storage
 styling polish (notice colors, export controls, etc)
 
 add support for dogecoin
@@ -42,6 +40,7 @@ split piece selector is part of header, but is not config.  Worth moving?
 crypto-cash faq and slider point
 
 low priority:
+xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share
 view balance qr code on cryptocash
 different print layouts
 blue link against red notice is hard to read
