@@ -1,8 +1,8 @@
 v0.3.0
 performance tests and optimizations
+backwards compatibility
 print preview
 quick generate
-backwards compatibility
 mobile print extra padding
 see if there are wasteful loops in editor listeners
 confirmation on destroy generated storage
