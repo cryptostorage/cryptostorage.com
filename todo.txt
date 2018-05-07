@@ -1,5 +1,4 @@
 v0.3.0
-1p0 valid input on num keys
 performance tests and optimizations
 print preview
 quick generate

@@ -3250,6 +3250,8 @@ function EditorSplitController(div, editorController) {
 	var that = this;
 	var splitCheckbox;
 	var splitInput;
+	var numPiecesInput;
+	var minPiecesInput;
 	var hasError;
 	var formErrorChangeListeners;
 	var useSplitListeners;
@@ -3659,8 +3661,8 @@ function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 	};
 	
 	this.getNumKeys = function() {
-		var parsed = parseInt(numKeysInput.val(), 10);
-		return isNaN(parsed) ? null : parsed;
+		var numKeys = Number(numKeysInput.val());
+		return isInt(numKeys) ? numKeys : null;
 	};
 	
 	this.setNumKeys = function(numKeys) {
@@ -3719,7 +3721,7 @@ function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 		// validate num keys
 		else {
 			var numKeys = that.getNumKeys();
-			if (isInt(numKeys) && numKeys >= 1) {
+			if (numKeys && numKeys >= 1) {
 				numKeysInput.removeClass("form_input_error_div");
 				numKeysError = false;
 			} else {
