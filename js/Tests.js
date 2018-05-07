@@ -26,14 +26,12 @@
  * Encapsulates application tests.
  * 
  * File import tests can only be run on browsers which support the File constructor.
- * 
- * TODO: test share encoding versions
  */
 function Tests() {
 	
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_KEYS = 1;							// number of keys to test per plugin without encryption throughout tests
-	var REPEAT_KEYS_ENCRYPTION = 0;		// number of keys to test per plugin with encryption throughout tests
+	var REPEAT_KEYS_ENCRYPTION = 1;		// number of keys to test per plugin with encryption throughout tests
 	var TEST_MAX_SHARES = false;			// computationally intensive
 	var NUM_PIECES = 3;
 	var MIN_PIECES = 2;
@@ -164,8 +162,8 @@ function Tests() {
 		assertTrue(isHex("fcc256cbc5a180831956fba7b9b7de5f521037c39980921ebe6dbd822f791007"));
 		var keypair = new CryptoKeypair({plugin: getTestPlugins()[0]});
 		testBaseConversion(keypair.getPrivateHex(), 16);
-		//testBaseConversion("70111bc5b6071ba913ed6af099852620cac02c4437ac8e7f1", 16);	// TODO: assert failure since hex.length % 2 !== 0
 		testBaseConversion("070115462b1f10cd83733218cd5f720ae66891aa2d1cad4eb9", 16);
+		testBaseConversion("0142e0bd5032652e3d01248cede2afe96a0f372cd85a3005de5d308a45cce598c797d22b3082789ba5d1ab", 16);
 		function testBaseConversion(str, base) {
 			assertNumber(base);
 			
@@ -430,27 +428,17 @@ function Tests() {
 			if (err.message === "fail") throw new Error("Cannot split split piece");
 		}
 		
-//		// test combining insufficient shares
-//		for (var combinationSize = 1; combinationSize < MIN_PIECES; i++) {
-//			var combinations = getCombinations(splitPieces, combinationSize);
-//			for (var i = 0; i < combinations.length; i++) {
-//				var combination = combinations[i];
-//				try {
-//					var combined = new CryptoPiece({splitPieces: combination});
-//				} catch (err) {
-//					if (err.message === "fail") throw new Error("Should not be able to create piece with insufficient shares");
-//					else throw err;
-//				}
-//			}
-//		}
-		
-		// test that single pieces cannot create key
-		for (var i = 0; i < splitPieces.length; i++) {
-			try {
-				new CryptoPiece({splitPieces: [splitPieces[i]]})
-				throw new Error("fail");
-			} catch (err) {
-				if (err.message === "fail") throw new Error("Cannot combine single split piece");
+		// test combining insufficient shares
+		for (var combinationSize = 1; combinationSize < MIN_PIECES; combinationSize++) {
+			var combinations = getCombinations(splitPieces, combinationSize);
+			for (var i = 0; i < combinations.length; i++) {
+				var combination = combinations[i];
+				try {
+					var combined = new CryptoPiece({splitPieces: combination});
+					fail("fail");
+				} catch (err) {
+					if (err.message === "fail") throw new Error("Should not be able to create piece with insufficient shares");
+				}
 			}
 		}
 				
@@ -958,7 +946,7 @@ function Tests() {
 							file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9jYhr4zgKrvDRvJuCe8X4w9w6vTJvbWmVDZ8ZcN1jzBNp"}]}', "file2.json", AppUtils.FileType.JSON);
 							fileImporter.addFiles([file1, file2], function() {
 								assertEquals(2, fileImporter.getNamedPieces().length);
-								assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+								assertEquals("Need additional pieces to recover private keys", fileImporter.getWarning());
 								onDone();
 							});
 						});

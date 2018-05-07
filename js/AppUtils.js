@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.3.0",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: true,
+	RUN_FULL_TESTS: false,
 	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
@@ -963,6 +963,7 @@ var AppUtils = {
 		assertNumber(tgtBase);
 		assertInitialized(str);
 		if (srcBase === 16) {
+			assertTrue(str.length % 2 === 0, "Cannot convert non-even length hex since it cannot be converted back");
 			if (tgtBase === 58) {
 				return Bitcoin.Base58.encode(Crypto.util.hexToBytes(str));
 			} else if (tgtBase === 64) {

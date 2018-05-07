@@ -151,14 +151,14 @@ function BitcoinPlugin() {
 		
 		// bip38 wif
 		if (ninja.privateKey.isBIP38Format(str)) {
-			decoded.privateHex = Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+			decoded.privateHex = AppUtils.toBase(58, 16, str);
 			decoded.privateWif = str;
 			decoded.encryption = AppUtils.EncryptionScheme.BIP38;
 			return decoded;
 		}
 		
 		// bip38 hex
-		if (str.length > 80 && str.length < 90 && isHex(str)) return that.decode(AppUtils.toBase(16, 58, str));			
+		if (str.length > 80 && str.length < 90 && str.length % 2 === 0 && isHex(str)) return that.decode(AppUtils.toBase(16, 58, str));			
 		
 		// otherwise cannot decode
 		return null;

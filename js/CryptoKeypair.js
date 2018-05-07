@@ -677,6 +677,7 @@ function CryptoKeypair(config) {
 		
 		function decodeShareHexV0(share) {
 			if (!isHex(share)) return null;
+			if (share.length % 2 !== 0) return null;
 			assertTrue(share.length > 10);
 			return {
 				shamirHex: ninja.wallets.splitwallet.stripLeadZeros(share),
@@ -699,6 +700,7 @@ function CryptoKeypair(config) {
 		
 		function decodeShareHexV1(share) {
 			if (!isHex(share)) return null;
+			if (share.length % 2 !== 0) return null;
 			return decodeShareWifV1(AppUtils.toBase(16, 58, share));
 		}
 		
@@ -737,6 +739,7 @@ function CryptoKeypair(config) {
 		
 		function decodeShareHexV2(share) {
 			if (!isHex(share)) return null;
+			if (share.length % 2 !== 0) return null;
 			return decodeShareWifV2(AppUtils.toBase(16, 58, share));
 		}
 		
