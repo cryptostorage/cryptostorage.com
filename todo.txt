@@ -1,4 +1,5 @@
 v0.3.0
+1p0 valid input on num keys
 performance tests and optimizations
 print preview
 quick generate
@@ -20,6 +21,7 @@ tippy jerk when editor first loaded
 make progress bar its own controller
 set public address of imported pieces after pieces combine
 styling polish (notice colors, export controls, etc)
+num keypairs exceed max error
 
 add support for dogecoin
 tippls
