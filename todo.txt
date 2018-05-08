@@ -1,7 +1,4 @@
 v0.3.0
-piece div margin bottoms vs print
-preview width smaller than 750
-remove old styling
 print preview
 quick generate
 ultra compact view
@@ -18,7 +15,6 @@ num keypairs exceed max error
 notice colors
 export control layout
 split lines bolder
-mobile print extra padding
 tippy jerk when editor first loaded
 update bip38 cryptojs description with pbkdf if necessary
 print tab values shouldn't be underlined because cannot click

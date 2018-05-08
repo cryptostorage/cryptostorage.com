@@ -1428,7 +1428,12 @@ input[type='checkbox'][disabled] +label {
 }
 
 @media print {
-
+	.piece_div {
+		margin-bottom: 0;
+	}
+	.piece_page_div {
+		margin-bottom: 0;
+	}
 }
 
 .cryptocash_instructions {
