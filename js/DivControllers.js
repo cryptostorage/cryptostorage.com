@@ -2905,13 +2905,13 @@ function EditorContentController(div, editorController, config) {
 				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
 				
 				// progress bar
-				progressDiv = $("<div class='export_progress_div'>").appendTo(bodyDiv);
+				progressDiv = $("<div class='editor_progress_div'>").appendTo(bodyDiv);
 				progressDiv.hide();
 				progressBar = UiUtils.getProgressBar(progressDiv);
-				progressLabel = $("<div class='export_progress_label'>").appendTo(progressDiv);
+				progressLabel = $("<div class='editor_progress_label'>").appendTo(progressDiv);
 				
 				// pieces div
-				piecesDiv = $("<div class='export_pieces_div flex_vertical'>").appendTo(bodyDiv);
+				piecesDiv = $("<div class='editor_pieces_div flex_vertical'>").appendTo(bodyDiv);
 				piecesDiv.hide();
 				
 				// currency inputs controller
@@ -3537,7 +3537,7 @@ function EditorPaginatorController(div, editorController) {
 			paginator = new PaginatorController($("<div>").appendTo(div), pieceNums);
 			paginator.render();
 			paginator.onClick(function(index, label) { invoke(clickListeners, index, label); });
-			piecesLabel = $("<div class='export_piece_selection_label'>").appendTo(div);
+			piecesLabel = $("<div class='editor_piece_selection_label'>").appendTo(div);
 			piecesLabel.html("Piece");
 			div.show();
 		} else {

@@ -508,49 +508,6 @@ input[type='checkbox'][disabled] +label {
 	margin-top: 20px;
 }
 
-.form_links_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-ms-flex-pack: end;
-	-webkit-justify-content: flex-end;
-	justify-content: flex-end;
-	margin-bottom: 5px;
-}
-
-.form_link {
-	font-size: 17px;
-	color: blue;
-	font-weight: lighter;
-}
-
-.form_link:hover {
-	cursor: pointer;
-	text-decoration:underline;
-}
-
-.form_start_over {
-	font-size: 20px;
-	color: blue;
-	font-weight: lighter;
-	width: 100%;
-	text-align: center;
-	margin-top: 10px;
-}
-
-.form_start_over:hover {
-	cursor: pointer;
-	text-decoration:underline;
-}
-
-.form_section_div {
-	margin-bottom: 20px;
-}
-
 .currency_inputs_div {
 	width: 100%;
 }
@@ -628,90 +585,21 @@ input[type='checkbox'][disabled] +label {
 	text-decoration:underline;
 }
 
-.passphrase_input_div {
-	margin: 20px 20px 0px 20px;
+.form_link {
+	font-size: 17px;
+	color: blue;
+	font-weight: lighter;
 }
 
-.passphrase_warn_div {
-	color: red;
-	width: 100%;
-	text-align: center;
-	margin-bottom: 10px;
-}
-
-.passphrase_input {
-	width: 100%;
-	border: 2.5px solid;
-	padding: 5px;
-	margin: 3px 0 3px 0px;
-}
-
-.passphrase_config_div {
-	width: 100%;
-	padding: 7px 0px 7px 0px;
-}
-
-.bip38_checkbox_div {
-}
-
-.show_passphrase_checkbox_div {
-	margin-left: auto;
-}
-
-.form_generate_div {
-	width: 100%;
-}
-
-.dark_green_btn {
-	height: 70px;
-	min-width: 225px;
-	padding: 20px;
-	background-color: rgb(76, 213, 67);
-	color: white;
-	font-size:24px;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-
-.dark_green_btn:hover {
+.form_link:hover {
 	cursor: pointer;
-	background-color: rgb(66, 233, 55);
-}
-
-.dark_green_btn:active {
-	background-color: rgb(68, 183, 61);
-}
-
-.dark_green_btn_disabled {
-	color: black;
-	background-color: grey;
-}
-
-.dark_green_btn_disabled:hover {
-	background-color: grey;
-	cursor: auto;
-}
-
-.dark_green_btn_disabled:active {
-	background-color: grey;
+	text-decoration:underline;
 }
 
 .form_input_error_div {
 	border-color: red !important;
     outline: none;
     box-shadow: 0 0 10px red;
-}
-
-.red_warning {
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
-	font-weight: bold;
-	color: #ff3333;
-	padding: 20px;
-	text-align: center;
 }
 
 .title {
@@ -1354,128 +1242,24 @@ input[type='checkbox'][disabled] +label {
 	z-index: 1;
 }
 
-.export_div {
-	align-items: center;
-	min-width: 775px;
-	-webkit-text-size-adjust: 100%;
-	background-color: white;
-}
-
-.export_header {
-	align-items: center;
-	background-color: rgb(17, 119, 184);
-	width: 100%;
-	margin-top: -2px;	/* fix mobile safari border showing */
-}
-
-.export_controls {
-	padding: 12px;
-	margin-top: 2px;	/* fix mobile safari border showing */
-	padding: 20px;
-	max-width: 875px;
-}
-
-.export_buttons {
-	margin-top: 0px;
-	align-items: stretch;
-	height: 53px;
-	line-height: 50px;
-}
-
-.export_button {
-	background-color: white;
-	color: black;
-	margin: 0 10px 0 10px;
-	padding: 0px 20px 0px 20px;
-	border: 2.5px solid black;
-	font-size: 28px;
-	font-weight: bold;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	white-space: nowrap;
-}
-
-.export_button:hover {
-	cursor: pointer;
-	background-color: #EBEDEF;
-}
-
-.export_button:active {
-	background-color: #ABB2B9;
-}
-
-.export_button_disabled {
-	background-color: white;
-	color: grey;
-	margin: 0 10px 0 10px;
-	padding: 0px 20px 0px 20px;
-	border: 2.5px solid black;
-	font-size: 28px;
-	font-weight: bold;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-
-.export_checkboxes {
-	margin-top: 15px;
-	flex-wrap: wrap;
-}
-
-.export_checkbox_span {
-	white-space: nowrap;
-	margin-left: 15px;
-}
-
-.export_checkbox_span:first-child {
-	margin-left: 0px;
-}
-
-.export_checkbox {
-	width: 25px;
-	height: 25px;
-	margin-right: 1px;
-}
-
-.export_checkbox_label {
-	color: white;
-	font-size: 24px;
-	white-space: nowrap;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-}
-
-#paginator {
-	margin-top: 15px;
-}
-
-.export_piece_selection_label {
+.editor_piece_selection_label {
 	margin-top: 5px;
 	color: white;
 }
 
-.export_progress_div {
+.editor_progress_div {
 	margin-top:100px;
 	width: 800px;
 	height: 50px;
 }
 
-.export_progress_label {
+.editor_progress_label {
 	width: 100%;
 	text-align: center;
 	font-size: 20px;
 }
 
-.export_content_div {
-	width: 100%;
-}
-
-.export_pieces_div {
+.editor_pieces_div {
 	background-color: white;
 	padding: 0 0 40px 0;
 }
@@ -1534,162 +1318,6 @@ input[type='checkbox'][disabled] +label {
 	text-align: right;
 	font-weight: bold;
 	font-size: 24px;
-}
-
-/* DEPRECATED */
-
-.key_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	height: 128px;
-	box-sizing: border-box;
-	padding: 7px 7px 7px 7px;
-	border: 2px solid;
-	border-color: green;
-	border-bottom: none;
-}
-
-.key_div:last-child {
-	border-bottom: 2px solid green;
-}
-
-.key_div_spaced {
-	border-bottom: 2px solid;
-	border-color: green;
-	margin-bottom: 34px;
-}
-
-.key_div_spaced:last-child {
-	margin-bottom: 0px;
-}
-
-.key_div_qr {
-	width: 90px;
-	height: 90px;
-}
-
-.key_div_qr_omitted {
-	width: 90px;
-	height: 90px;
-	border: solid thin;
-}
-
-.key_div_qr_omitted_img {
-	width: 75px;
-	height: 75px;
-}
-
-.key_div_left {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	align-items: flex-start;
-	-ms-flex-align: flex-start;
-	-webkit-align-items: flex-start;
-	-webkit-justify-content: center;
-	-ms-flex-pack: center;
-	justify-content: center;
-	width:90px;
-}
-
-.key_div_center {
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-flex-direction: column;
-	-moz-flex-direction: column;
-	-ms-flex-direction: column;
-	flex-direction: column;
-	margin: 0 7px 0 7px;
-	position: relative;
-}
-
-.key_div_center_id {
-	font-size: 13px;
-	left: 0;
-	right: 0;
-	text-align: center;
-}
-
-.key_div_left_label {
-	font-weight: bold;
-	font-size: 14px;
-}
-
-.key_div_left_value {
-	padding-right: 5px;
-	font-size: 13px;
-	font-family: monospace;
-	word-break: break-all;
-	z-index: 1000;
-}
-
-.key_div_currency {
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center;
-	-ms-flex-pack: center;
-	justify-content: center;
-}
-
-.key_div_currency_logo {
-	width: 29px;
-	height: 29px;
-	margin-right: 5px;
-}
-
-.key_div_currency_label {
-	font-weight: bold;
-	font-size: 15px
-}
-
-.key_div_right_label {
-	font-weight: bold;
-	font-size: 14px;
-	text-align: right;
-	margin-top: -20px;
-}
-
-.key_div_right_value {
-	margin-left: 5px;
-	font-size: 13px;
-	text-align: right;
-	font-family: monospace;
-	line-height: 14px;
-}
-
-.key_div_right {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: flex-end;
-	-ms-flex-align: end;
-	align-items: flex-end;
-	-webkit-justify-content: center;
-	-ms-flex-pack: center;
-	justify-content: center;
-}
-
-/* NEW KEYPAIR */
-
-.compact_piece_div {
-	width: 750px;
 }
 
 .keypair_div {
@@ -2037,92 +1665,6 @@ input[type='checkbox'][disabled] +label {
 .sample_key_pair_img {
 	width: 100%;
 }
-
-.beta_warning {
-	background-color: orange;
-	padding: 5px 10px 5px 10px;
-	border-radius: 10px;
-	border:2px solid;
-	margin-top: 20px;
-	width: unset;
-}
-
-.beta_warning * {
-	font-size:18px;
-}
-
-.beta_icon {
-	width: 30px;
-	height: 30px;
-	margin-right: 3px;
-}
-
-.interoperability_disclaimer {
-	width: unset;
-	font-size: 22px;
-	margin-bottom: 15px;
-}
-
-.interoperability_disclaimer * {
-	font-size:16px;
-}
-
-.interoperability_caution {
-	width: 20px;
-	height: 20px;
-}
-
-/* --- Export more dropdown from W3 --- */
-
-.dropdown {
-    height: 100%;
-    float: right;
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f1f1f1;
-    min-width: 160px;
-    overflow: auto;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    right: 0;
-    z-index: 1;
-}
-
-.dropdown_export_button:first-child {
-	border-top: 2.5px solid black;
-}
-
-.dropdown_export_button {
-	padding: 0px 10px 0px 10px;
-	border-style: solid;
-    border-width: 0px 2.5px 2.5px 2.5px;
-    font-weight: normal;
-    font-size: 23px;
-    margin: 0;
-    text-decoration: none;
-    display: block;
-}
-
-.dropbtn {
-	height: 100%;
-	padding: 0px 10px 0px 10px;
-	margin: 0 10px 0 10px;
-}
-
-.export_more_img {
-	width:40px;
-	margin: -5px 0px 0px 4px;
-}
-
-.export_more_img_disabled {
-	opacity: .5;
-}
-
-.show {display:block;}
 
 .btn_disabled {
 	color: black;

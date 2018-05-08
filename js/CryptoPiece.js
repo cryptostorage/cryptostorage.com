@@ -400,6 +400,7 @@ function CryptoPiece(config) {
 			if (keypair.address) {
 				keypair.publicAddress = keypair.address;
 				delete keypair.address;
+				if (keypair.publicAddress === AppUtils.NA) keypair.publicAddress = null;
 			}
 		}
 		
@@ -442,6 +443,7 @@ function CryptoPiece(config) {
 				var value = csvArr[row][col];
 				if (value === "") value = undefined;
 				if (value === "null") value = null;
+				if (value === AppUtils.NA) value = null;
 				switch (csvArr[0][col]) {
 					case CryptoKeypair.CsvHeader.TICKER:
 						keypairConfig.plugin = AppUtils.getCryptoPlugin(value);

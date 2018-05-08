@@ -1314,6 +1314,7 @@ function Tests() {
 	}
 	
 	function testBackwardsCompatibility(onDone) {
+		console.log("Testing backwards compatibility")
 		
 		// 0.0.1 unencrypted which had 1.0 as version
 		var json = {"version":"1.0","keys":[{"ticker":"BCH","address":"qzzyasm98rlzp49xy9ckyw5hpm62ha8p3slncram4x","wif":"Kzc8vfQ45ymDvoeLBSnZsHJC9f5FgWx5JUFKqK8PU9ew8MnPq2Gn","encryption":null}]};
@@ -1337,6 +1338,12 @@ function Tests() {
 		json = {"pieceNum":1,"version":"0.1.0","keys":[{"ticker":"XMR","address":"45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm","wif":"2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez","encryption":"CryptoJS"}]};
 		piece1 = new CryptoPiece({json: json});
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", shareNum: 1, publicAddress: "45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm", privateKey: "2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.1.6 json bip39
+		json = {"pieceNum":2,"version":"0.1.6","keys":[{"ticker":"BIP39","address":"Not applicable","wif":"2FDYwUaFBJhM4HFd2aG7uJWJ1kT6QLnN47AirWQRGH4wCYe4qQ2Uvr4Q1GMt4kELu3FfLM5YHoNS1f2KPL4c3n3B6vbNxVQC4VGM8xC5LEbXbkGzJwidXnEwZVwVHEMAAQ9Gp1k","encryption":"V1_CRYPTOJS"}]};
+		piece1 = new CryptoPiece({json: json});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", shareNum: 2, privateKey: "2FDYwUaFBJhM4HFd2aG7uJWJ1kT6QLnN47AirWQRGH4wCYe4qQ2Uvr4Q1GMt4kELu3FfLM5YHoNS1f2KPL4c3n3B6vbNxVQC4VGM8xC5LEbXbkGzJwidXnEwZVwVHEMAAQ9Gp1k"})]});
 		assertTrue(piece1.equals(piece2));
 		
 		// 0.2.3 json unencrypted
@@ -1385,6 +1392,12 @@ function Tests() {
 		csv = "TICKER,ADDRESS,PIECE_NUM\nXMR,475DC8KdSQgTEq5CbGeZvFhGX7f4qMYdC1eABNY2Vu3xTFEBnHfqfA3EYyyirXsy6a8MiBsjMWYVAfyhHM3UoFHMUN3giDG,1";
 		piece1 = new CryptoPiece({csv: csv});
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", publicAddress: "475DC8KdSQgTEq5CbGeZvFhGX7f4qMYdC1eABNY2Vu3xTFEBnHfqfA3EYyyirXsy6a8MiBsjMWYVAfyhHM3UoFHMUN3giDG"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.2.3 csv bip39
+		csv = "TICKER,ADDRESS,WIF,ENCRYPTION\nBIP39,Not applicable,tomato domain essence fat velvet robot bring index slab daughter artist cover book image disease divert used paddle hire put index spare busy clap,NULL";
+		piece1 = new CryptoPiece({csv: csv});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", privateKey: "tomato domain essence fat velvet robot bring index slab daughter artist cover book image disease divert used paddle hire put index spare busy clap"})]});
 		assertTrue(piece1.equals(piece2));
 		
 		// done testing compatibility
