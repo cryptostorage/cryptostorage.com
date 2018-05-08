@@ -40,9 +40,6 @@
 				window.initEditor(window, config);
 			});
 			
-			// init synchronous environment info
-			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
-			
 			/**
 			 * Translates url parameters into a generation config for the editor
 			 *
@@ -51,7 +48,7 @@
 			function getGenConfig() {
 				 
 				// get tickers
-				var tickerParamValue = getParameterByName("ticker");
+				var tickerParamValue = getParameterByName(AppUtils.TICKERS_PARAM);
 				if (!tickerParamValue) return null;
 				var tickers = tickerParamValue.split(",");
 				

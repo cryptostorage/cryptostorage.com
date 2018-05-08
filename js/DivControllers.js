@@ -2855,7 +2855,7 @@ function EditorContentController(div, editorController, config) {
 			if (config.showNotices) {
 				
 				// poll environment info on loop
-				AppUtils.pollEnvironment(AppUtils.getCachedEnvironment());
+				AppUtils.pollEnvironment(AppUtils.getCachedEnvironment() ? AppUtils.getCachedEnvironment() : AppUtils.getEnvironmentSync());
 				
 				// notice div
 				var noticeDivContainer = $("<div class='notice_container'>").appendTo(div);

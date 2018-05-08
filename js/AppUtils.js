@@ -61,6 +61,7 @@ var AppUtils = {
 	NA: "Not applicable",							// "not applicable" constant
 	MAX_SHARES: 127,									// maximum number of split shares
 	MAX_KEYPAIRS: 1000,								// limit max keypairs to prevent inadequately tested scenarios
+	TICKERS_PARAM: "tickers",					// generate.html?tickers=xmr
 	
 	// encryption v1 constants
 	ENCRYPTION_V1_PBKDF_ITER: 10000,
