@@ -1192,10 +1192,9 @@ input[type='checkbox'][disabled] +label {
 
 .editor_controls {
 	position: fixed;
-	bottom: 0px;
-	right: 0px;
-	width: 400px;
-	padding: 40px;
+	bottom: 40px;
+	right: 40px;
+	width: 320px;
 }
 
 .editor_btn_green {
