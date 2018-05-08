@@ -1,22 +1,23 @@
 v0.3.0
 print preview
 quick generate
-mobile print extra padding
 confirmation on destroy generated storage
 footer
 interoperability disclosure
 browser testing
-print tab values shouldn't be underlined because cannot click
-split lines bolder
 split validation should fail on -1
 put homepage text in index.html and dynamically hide for seo
 precise static and dynamic dependencies
-update bip38 cryptojs description with pbkdf if necessary
-tippy jerk when editor first loaded
 make progress bar its own controller
 set public address of imported pieces after pieces combine
-styling polish (notice colors, export controls, etc)
 num keypairs exceed max error
+notice colors
+export control layout
+split lines bolder
+mobile print extra padding
+tippy jerk when editor first loaded
+update bip38 cryptojs description with pbkdf if necessary
+print tab values shouldn't be underlined because cannot click
 
 print selector compact | cryptocash | community design, etc
 performance tests and optimizations
