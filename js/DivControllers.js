@@ -145,7 +145,7 @@ var UiUtils = {
 		var tickerParam = "";
 		if (tickers) {
 			tickers = listify(tickers);
-			if (tickers.length) tickerParam = "?ticker=" + tickers.join(",").toLowerCase()
+			if (tickers.length) tickerParam = "?" + AppUtils.TICKERS_PARAM + "=" + tickers.join(",").toLowerCase()
 		}
 		window.open("generate.html" + tickerParam);
 	},
