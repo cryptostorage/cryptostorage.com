@@ -382,6 +382,27 @@ function CryptoPiece(config) {
 	
 	function fromJson(json) {
 		if (isString(json)) json = JSON.parse(json);
+		json = Object.assign({}, json);
+		
+		// upgrade piece for backwards compatibility
+		if (json.keys) {
+			json.keypairs = json.keys;
+			delete json.keys;
+		}
+		for (var i = 0; i < json.keypairs.length; i++) {
+			var keypair = json.keypairs[i];
+			if (keypair.wif) {
+				keypair.privateWif = keypair.wif;
+				delete keypair.wif;
+				keypair.shareNum = json.pieceNum;
+			}
+			if (!keypair.privateWif) delete keypair.shareNum;	// no share num if not split
+			if (keypair.address) {
+				keypair.publicAddress = keypair.address;
+				delete keypair.address;
+			}
+		}
+		
 		assertArray(json.keypairs);
 		assertTrue(json.keypairs.length > 0);
 		var keypairs = [];
@@ -397,6 +418,21 @@ function CryptoPiece(config) {
 		var csvArr = csvToArr(csv);
 		assertTrue(csvArr.length > 0);
 		assertTrue(csvArr[0].length > 0);
+		
+		// upgrade headers for backwards compatibility
+		for (var col = 0; col < csvArr[0].length; col++) {
+			switch (csvArr[0][col].toLowerCase()) {
+			case "address":
+				csvArr[0][col] = CryptoKeypair.CsvHeader.PUBLIC_ADDRESS;
+				break;
+			case "wif":
+				csvArr[0][col] = CryptoKeypair.CsvHeader.PRIVATE_WIF;
+				break;
+			case "piece_num":
+				csvArr[0][col] = CryptoKeypair.CsvHeader.SHARE_NUM;
+				break;
+			}
+		}
 		
 		// build keypairs
 		var keypairs = [];
@@ -426,6 +462,7 @@ function CryptoPiece(config) {
 						break;
 				}
 			}
+			if (!keypairConfig.privateKey) delete keypairConfig.shareNum;	// no share num if no private key
 			keypairs.push(new CryptoKeypair(keypairConfig));
 		}
 		

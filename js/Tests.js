@@ -94,6 +94,7 @@ function Tests() {
 		funcs.push(function(onDone) { testUtils(); onDone(); });
 		funcs.push(function(onDone) { testPlugins(plugins); onDone(); });
 		funcs.push(function(onDone) { testPieceAllPlugins(plugins); onDone(); });
+		funcs.push(function(onDone) { testBackwardsCompatibility(onDone); });
 		funcs.push(function(onDone) { testFileImport(plugins, onDone); });
 		funcs.push(function(onDone) { testTextImport(AppUtils.getCryptoPlugins(), onDone); });
 		funcs.push(function(onDone) { testGeneratePieces(plugins, onDone); });
@@ -1310,5 +1311,83 @@ function Tests() {
 			config.pieceRendererClass = CompactPieceRenderer;
 			return config;
 		}
+	}
+	
+	function testBackwardsCompatibility(onDone) {
+		
+		// 0.0.1 unencrypted which had 1.0 as version
+		var json = {"version":"1.0","keys":[{"ticker":"BCH","address":"qzzyasm98rlzp49xy9ckyw5hpm62ha8p3slncram4x","wif":"Kzc8vfQ45ymDvoeLBSnZsHJC9f5FgWx5JUFKqK8PU9ew8MnPq2Gn","encryption":null}]};
+		var piece1 = new CryptoPiece({json: json});
+		var piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BCH", publicAddress: "qzzyasm98rlzp49xy9ckyw5hpm62ha8p3slncram4x", privateKey: "Kzc8vfQ45ymDvoeLBSnZsHJC9f5FgWx5JUFKqK8PU9ew8MnPq2Gn"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.1.0 unencrypted
+		var json = {"version":"0.1.0","keys":[{"ticker":"BCH","address":"qzzyasm98rlzp49xy9ckyw5hpm62ha8p3slncram4x","wif":"Kzc8vfQ45ymDvoeLBSnZsHJC9f5FgWx5JUFKqK8PU9ew8MnPq2Gn","encryption":null}]};
+		piece1 = new CryptoPiece({json: json});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BCH", publicAddress: "qzzyasm98rlzp49xy9ckyw5hpm62ha8p3slncram4x", privateKey: "Kzc8vfQ45ymDvoeLBSnZsHJC9f5FgWx5JUFKqK8PU9ew8MnPq2Gn"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.1.0 json encrypted
+		json = {"version":"0.1.0","keys":[{"ticker":"XMR","address":"4ArXGi8gnxZA7Y9j1nK8ZmbspwCFcWLxyYeZkAnyCsYZ38c8FbyVvNfe3dAcp9Bk9P8Fa9fVp1gzz6v3B84rFW3SK9J7KPi","wif":"U2FsdGVkX19mwVwGQhm8jrqGIroOYfA4ckFDgBRhgGaQEE/uRpFXwFJlwwZ4DAGTTXTaAMEW6KSSzdsrjB7GE41U5L+Na5uuMK9wweoaoGH6j5rVTkRvToHYka4hAr9F","encryption":"CryptoJS"}]};
+		piece1 = new CryptoPiece({json: json});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", publicAddress: "4ArXGi8gnxZA7Y9j1nK8ZmbspwCFcWLxyYeZkAnyCsYZ38c8FbyVvNfe3dAcp9Bk9P8Fa9fVp1gzz6v3B84rFW3SK9J7KPi", privateKey: "U2FsdGVkX19mwVwGQhm8jrqGIroOYfA4ckFDgBRhgGaQEE/uRpFXwFJlwwZ4DAGTTXTaAMEW6KSSzdsrjB7GE41U5L+Na5uuMK9wweoaoGH6j5rVTkRvToHYka4hAr9F"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.1.0 json encrypted and split
+		json = {"pieceNum":1,"version":"0.1.0","keys":[{"ticker":"XMR","address":"45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm","wif":"2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez","encryption":"CryptoJS"}]};
+		piece1 = new CryptoPiece({json: json});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", shareNum: 1, publicAddress: "45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm", privateKey: "2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.2.3 json unencrypted
+		json = {"version":"0.2.3","keys":[{"ticker":"LTC","address":"LSo2GTgwyhuaMAPh9PcuC7ANivTEW9pHpB","wif":"T6JEJvLyyy2EeCzH4daNJ2g32U7EPqRftY5dgAvf22t5YotF3s4J","encryption":null}]};
+		piece1 = new CryptoPiece({json: json});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "LTC", publicAddress: "LSo2GTgwyhuaMAPh9PcuC7ANivTEW9pHpB", privateKey: "T6JEJvLyyy2EeCzH4daNJ2g32U7EPqRftY5dgAvf22t5YotF3s4J"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.2.3 json encrypted
+		json = {"version":"0.2.3","keys":[{"ticker":"XMR","address":"49J6bLmRd5nUxMquQkBpDkTuPFgJ3dva8LcpWYnBWpMjCRN7u4KXGczNBenRfc7fHQcSpUPNHPXviXcf6cz5aB5621xrcTd","wif":"6ihMiRRf7NgYhVpHyAAFuoZd17Jf5SNwbUxVD9qg2FuZfbKmsKu4i5ErfZfRPttgksuhArNhG6ajRs5f64o2aviEGZFhJ7PpADFitjNq9ukzWpR5JLmyJVXBGCYTBYGo2T5","encryption":"V1_CRYPTOJS"}]};
+		piece1 = new CryptoPiece({json: json});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", publicAddress: "49J6bLmRd5nUxMquQkBpDkTuPFgJ3dva8LcpWYnBWpMjCRN7u4KXGczNBenRfc7fHQcSpUPNHPXviXcf6cz5aB5621xrcTd", privateKey: "6ihMiRRf7NgYhVpHyAAFuoZd17Jf5SNwbUxVD9qg2FuZfbKmsKu4i5ErfZfRPttgksuhArNhG6ajRs5f64o2aviEGZFhJ7PpADFitjNq9ukzWpR5JLmyJVXBGCYTBYGo2T5"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.2.3 json encrypted and split
+		json = {"pieceNum":1,"version":"0.2.3","keys":[{"ticker":"BTC","address":"19LbxpV9eMtSppiVhxibHDfPJYCLY7YFJZ","wif":"3Gz5MbtY98FdKoFYLF1QcXvGszwPnBtUsvKRpNfEzhvDma3noDETGqYJRXFL4oCRemJyHDoSmmnUPvLSawKFJvEER2Q7ixbsr6BtYZdXr4kDWnLy8NiYhMEHKcD86oskjzpD1MWz"}]};
+		piece1 = new CryptoPiece({json: json}); 
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BTC", shareNum: 1, publicAddress: "19LbxpV9eMtSppiVhxibHDfPJYCLY7YFJZ", privateKey: "3Gz5MbtY98FdKoFYLF1QcXvGszwPnBtUsvKRpNfEzhvDma3noDETGqYJRXFL4oCRemJyHDoSmmnUPvLSawKFJvEER2Q7ixbsr6BtYZdXr4kDWnLy8NiYhMEHKcD86oskjzpD1MWz"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.2.3 json no private key and split
+		json = {"pieceNum":1,"version":"0.2.3","keys":[{"ticker":"BTC","address":"1AiWGJRuCkt1WP3N1B3Yo73t5kgNP3J17Q"}]}
+		piece1 = new CryptoPiece({json: json}); 
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BTC", publicAddress: "1AiWGJRuCkt1WP3N1B3Yo73t5kgNP3J17Q"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.2.3 csv unencrypted
+		var csv = "TICKER,ADDRESS,WIF,ENCRYPTION\nBCH,qr0ye8lqf9qwfhs28nsqu4xvsnx374ps3c5x4fje6m,KwhdDnzSuYQgjTyrdBmBDrM9ehJ9NzvnwdWiYFkjyk35AwzpeSKs,NULL";
+		piece1 = new CryptoPiece({csv: csv});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BCH", publicAddress: "qr0ye8lqf9qwfhs28nsqu4xvsnx374ps3c5x4fje6m", privateKey: "KwhdDnzSuYQgjTyrdBmBDrM9ehJ9NzvnwdWiYFkjyk35AwzpeSKs"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.2.3 csv encrypted
+		csv = "TICKER,ADDRESS,WIF,ENCRYPTION\nXMR,48zYRRTqfVpEKW2JFh4vbpbm2NsYEhwcJBwhaZGDkctyho5kpSbdx4SDFfNZLZxySgDaSrzuxNmtZ5VvVDDVLDXmBvNFQK5,9FqGDi3vAQV6nCobhuKyFr8FDormZ4dzt5mSX2GgYA1q8nQVniRQ4KrBfVXrLbzf1LUwgqVRnFzmhFWx5yZaarrHwM4ucczJGJwPPYNLoTZZUXGKGdvEPwEkDE2eu9ExBok,V1_CRYPTOJS";
+		piece1 = new CryptoPiece({csv: csv});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", publicAddress: "48zYRRTqfVpEKW2JFh4vbpbm2NsYEhwcJBwhaZGDkctyho5kpSbdx4SDFfNZLZxySgDaSrzuxNmtZ5VvVDDVLDXmBvNFQK5", privateKey: "9FqGDi3vAQV6nCobhuKyFr8FDormZ4dzt5mSX2GgYA1q8nQVniRQ4KrBfVXrLbzf1LUwgqVRnFzmhFWx5yZaarrHwM4ucczJGJwPPYNLoTZZUXGKGdvEPwEkDE2eu9ExBok"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.2.3 csv split
+		csv = "TICKER,ADDRESS,WIF,PIECE_NUM\nXMR,49NR7bLTrAtPgVYtx8F1MUe3PZFiYC8sKFGB8VfuBK44KhUXrEoDtQkP77KgdirP4BDGSRJSinoUD5MzdyqaDzc9JYw4Zpw,Sne9BnjFn4fgGA3UFLpDGn6o5r9Eo9T7p11mJYX2Gdw2mMCs,1";
+		piece1 = new CryptoPiece({csv: csv});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", shareNum: 1, publicAddress: "49NR7bLTrAtPgVYtx8F1MUe3PZFiYC8sKFGB8VfuBK44KhUXrEoDtQkP77KgdirP4BDGSRJSinoUD5MzdyqaDzc9JYw4Zpw", privateKey: "Sne9BnjFn4fgGA3UFLpDGn6o5r9Eo9T7p11mJYX2Gdw2mMCs"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// 0.2.3 csv no private keys split
+		csv = "TICKER,ADDRESS,PIECE_NUM\nXMR,475DC8KdSQgTEq5CbGeZvFhGX7f4qMYdC1eABNY2Vu3xTFEBnHfqfA3EYyyirXsy6a8MiBsjMWYVAfyhHM3UoFHMUN3giDG,1";
+		piece1 = new CryptoPiece({csv: csv});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", publicAddress: "475DC8KdSQgTEq5CbGeZvFhGX7f4qMYdC1eABNY2Vu3xTFEBnHfqfA3EYyyirXsy6a8MiBsjMWYVAfyhHM3UoFHMUN3giDG"})]});
+		assertTrue(piece1.equals(piece2));
+		
+		// done testing compatibility
+		onDone();
 	}
 }

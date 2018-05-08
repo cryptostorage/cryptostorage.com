@@ -1,5 +1,4 @@
 v0.3.0
-backwards compatibility
 print preview
 quick generate
 mobile print extra padding

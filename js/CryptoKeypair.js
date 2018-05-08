@@ -29,7 +29,7 @@
  * 
  * @param config is initialization configuration
  * 				config.keypair is a keypair to copy from
- * 				config.plugin is the crypto plugin
+ * 				config.plugin is the crypto plugin or string ticker
  * 				config.json is exportable json to initialize from
  * 				config.splitKeypairs are split keypairs to combine and initialize from
  * 				config.privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
@@ -58,8 +58,9 @@ function CryptoKeypair(config) {
 		assertUndefined(config.keypair);
 		assertUndefined(config.splitKeypairs);
 		assertUndefined(config.json);
-		assertTrue(isObject(config.plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
-		this._state.plugin = config.plugin;
+		var plugin = isString(config.plugin) ? AppUtils.getCryptoPlugin(config.plugin) : config.plugin;
+		assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
+		this._state.plugin = plugin;
 		if (isDefined(config.privateKey)) this._setPrivateKey(config.privateKey);
 		else if (isUndefined(config.publicAddress)) this._setPrivateKey(config.plugin.randomPrivateKey());
 		if (isDefined(config.publicAddress)) this._setPublicAddress(config.publicAddress);
@@ -473,8 +474,9 @@ CryptoKeypair.prototype._setPrivateKey = function(privateKey) {
 	throw new Error("Unrecognized " + this._state.plugin.getTicker() + " private key: " + privateKey);
 }
 
-// TODO: support old and new format
 CryptoKeypair.prototype._fromJson = function(json) {
+	if (isString(json)) json = JSON.parse(json);
+	json = Object.assign({}, json);	
 	assertInitialized(json.ticker);
 	this._state.plugin = AppUtils.getCryptoPlugin(json.ticker);
 	this._state.privateHex = json.privateHex;
