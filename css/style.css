@@ -84,18 +84,7 @@ body {
 }
 
 .app_body {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-flex-direction: column;
-	-moz-flex-direction: column;
-	-ms-flex-direction: column;
-	flex-direction: column;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	min-width: 971px;
+	min-width: 946px;
 	-webkit-text-size-adjust: 100%;
 	background-color: rgb(235, 242, 254);
 }
@@ -1187,8 +1176,6 @@ input[type='checkbox'][disabled] +label {
 
 .editor_export_div {
 	background-color: white;
-	min-width: 700px;
-	max-width: 980px;
 	z-index: 1;
 	flex-shrink: 0;
 }
@@ -1707,5 +1694,6 @@ input[type='checkbox'][disabled] +label {
 @media screen and (max-device-width: 667px) { 
 	.editor_controls {
 		position: static;
+		padding: 40px;
 	}
 }
