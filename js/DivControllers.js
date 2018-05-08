@@ -4531,7 +4531,7 @@ function CompactPieceRenderer(div, piece, config) {
 				
 				// add new page
 				pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-				if (piece.getPieceNum() || config.showLogos) {
+				if (piece.getPieceNum() || (!config.cryptoCash && config.showLogos)) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
 					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
@@ -4741,71 +4741,22 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
 	
-	// config default and validation
-	config = Object.assign({
-		showPublic: true,
-		showPrivate: true,
-		showLogos: true,
-		cryptoCash: false,
-		infoBack: false,
-		pageBreaks: false
-	}, config);
-	if (!config.showPublic) assertTrue(config.showPrivate);
-	if (!config.showPrivate) assertTrue(config.showPublic);
-	if (config.infoBack) {
-		assertFalse(piece.isSplit());
-		assertTrue(config.pageBreaks);
-	}
-	
-	var keypairRenderers;
 	var onProgressFn;
+	var pieceRenderer;
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
 		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
 		
-		// div setup
-		div.empty();
-		div.addClass("piece_div");
+		// get preview piece
+		var previewPiece = piece;
 		
-		// header
-		if (piece.getPieceNum() || config.showLogos) {
-			var headerDiv = $("<div class='piece_page_header_div'>").appendTo(div);
-			headerDiv.append($("<div class='piece_page_header_left'>"));
-			if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
-			var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-			if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
-		}
-		
-		// render keypairs
-		var renderFuncs = [];
-		var numKeypairs = config.cryptoCash ? 1 : Math.min(piece.getKeypairs().length, 2);
-		for (var i = 0; i < numKeypairs; i++) renderFuncs.push(renderFunc($("<div>").appendTo(div), piece, i, config));
-		async.series(renderFuncs, function(err, keypairRenderers) {
-			assertNull(err);
-			
-			// add sweep instructions
-			if (config.cryptoCash && config.infoBack) {
-				div.append(UiUtils.getSweepInstructionsDiv(piece.getKeypairs()[0].getPlugin().getTicker()));
-			}
-			
-			// done rendering
-			if (onDone) onDone(div);
+		// render preview piece
+		pieceRenderer = new CompactPieceRenderer(div, previewPiece, config);
+		pieceRenderer.onProgress(onProgressFn);
+		pieceRenderer.render(function(div) {
+			if (onDone) onDone();
 		});
-		
-		// callback function to render keypair
-		function renderFunc(placeholderDiv, piece, index, config) {
-			return function(onDone) {
-				if (_isDestroyed) return;
-				if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (index + 1);
-				var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
-				keypairRenderer.render(function(div) {
-					if (config.cryptoCash) div.addClass("keypair_div_spaced");
-					placeholderDiv.replaceWith(div);
-					onDone(null, keypairRenderer);
-				});
-			}
-		}
 	}
 	
 	this.onProgress = function(callbackFn) {
@@ -4818,9 +4769,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	 */
 	this.destroy = function() {
 		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer already destroyed");
-		if (keypairRenderers) {
-			for (var i = 0; i < keypairRenderers.length; i++) keypairRenderers[i].destroy();
-		}
+		if (pieceRenderer) pieceRenderer.destroy();
 		_isDestroyed = true;
 	}
 	

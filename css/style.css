@@ -1709,6 +1709,10 @@ input[type='checkbox'][disabled] +label {
 	margin-bottom: 34px;
 }
 
+.keypair_div_spaced:last-child {
+	margin-bottom: 0;
+}
+
 .keypair_qr {
 	width: 90px;
 	height: 90px;
