@@ -4332,6 +4332,10 @@ function EditorPrintController(div, pieces) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
+	function setRenderProgress(percent, label) {
+		printLoadDiv.show();
+	}
+	
 	function update(onDone) {
 		
 		// update checkboxes
@@ -4371,9 +4375,9 @@ function EditorPrintController(div, pieces) {
 			pieceRendererClass: CompactPieceRenderer,
 			pieceRendererConfig: getPieceRendererConfig()
 		});
-		pieceGenerator.generatePieces(null, function(err, _pieces, _pieceRenderers) {
+		pieceGenerator.generatePieces(setRenderProgress, function(err, _pieces, _pieceRenderers) {
 			assertNull(err);
-			printPreviewDiv.empty();
+			printPreviewDiv.children().replaceWith(printLoadDiv);
 			printPreviewDiv.append(piecePreviewRenderer.getDiv());
 			printLoadDiv.hide();
 			pieceRenderers = _pieceRenderers;
