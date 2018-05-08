@@ -4285,7 +4285,6 @@ function EditorPrintController(div, pieces) {
 	var printBtn;
 	var previewDiv;					// panel for print preview
 	var previewLoadDiv;			// covers print preview panel while loading
-	var previewRenderer;		// rendered preview ready for display
 	var previewGenerator;		// generates preview
 	var pieceRenderers;			// rendered pieces ready for print
 	var pieceGenerator;			// generates rendered pieces
@@ -4389,7 +4388,6 @@ function EditorPrintController(div, pieces) {
 		setPrintEnabled(false);
 		
 		// render peview
-		previewRenderer = undefined;
 		if (previewGenerator) previewGenerator.destroy();
 		previewGenerator = new PieceGenerator({
 			pieces: pieces,
@@ -4398,7 +4396,7 @@ function EditorPrintController(div, pieces) {
 		});
 		previewGenerator.generatePieces(null, function(err, _pieces, _previewRenderers) {
 			assertNull(err);
-			previewRenderer = _previewRenderers[0];
+			assertEquals(1, _previewRenderers.length);
 			
 			// render pieces
 			pieceRenderers = undefined;
@@ -4411,7 +4409,7 @@ function EditorPrintController(div, pieces) {
 			pieceGenerator.generatePieces(setRenderProgress, function(err, _pieces, _pieceRenderers) {
 				assertNull(err);
 				previewDiv.children().replaceWith(previewLoadDiv);
-				previewDiv.append(previewRenderer.getDiv());
+				previewDiv.append(_previewRenderers[0].getDiv());
 				previewLoadDiv.hide();
 				pieceRenderers = _pieceRenderers;
 				setPrintEnabled(true);

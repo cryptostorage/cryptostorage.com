@@ -1,4 +1,6 @@
 v0.3.0
+preview width smaller than 750
+remove old styling
 print preview
 quick generate
 ultra compact view
