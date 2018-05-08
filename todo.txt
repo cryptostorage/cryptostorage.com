@@ -1,15 +1,12 @@
 v0.3.0
-performance tests and optimizations
 backwards compatibility
 print preview
 quick generate
 mobile print extra padding
-see if there are wasteful loops in editor listeners
 confirmation on destroy generated storage
 footer
 interoperability disclosure
 browser testing
-text import says please select currency on unrecognized text import
 print tab values shouldn't be underlined because cannot click
 split lines bolder
 split validation should fail on -1
@@ -22,9 +19,12 @@ set public address of imported pieces after pieces combine
 styling polish (notice colors, export controls, etc)
 num keypairs exceed max error
 
+print selector compact | cryptocash | community design, etc
+performance tests and optimizations
+see if there are wasteful loops in editor listeners
+text import says please select currency on unrecognized text import
 add support for dogecoin
 tippls
-print selector compact | cryptocash | community design, etc
 
 designer:
 passphrase confirmation
