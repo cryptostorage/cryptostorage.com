@@ -4151,8 +4151,11 @@ function EditorSaveController(div, pieces) {
 		var header = $("<div class='editor_export_header'>").appendTo(div);
 		header.append("Save");
 		
+		// body
+		var body = $("<div class='editor_export_body'>").appendTo(div);
+		
 		// checkboxes
-		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(div);
+		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save public addresses").render();
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
 		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
@@ -4162,12 +4165,12 @@ function EditorSaveController(div, pieces) {
 		var selectorOptions = ["Save as JSON", "Save as CSV", "Save as TXT"];
 		var ddslickData = [];
 		for (var i = 0; i < selectorOptions.length; i++) ddslickData.push({text: selectorOptions[i]});
-		var saveSelectorDiv = $("<div>").appendTo(div);
+		var saveSelectorDiv = $("<div>").appendTo(body);
 		var ddslickConfig = {data: ddslickData};
 		saveAsDropdown = new DropdownController(saveSelectorDiv, ddslickConfig).render();
 		
 		// cancel and save buttons
-		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
+		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(body);
 		var cancelBtn = $("<div class='editor_export_btn_red flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(buttonsDiv);
 		cancelBtn.html("Cancel");
 		cancelBtn.click(function() { if (callbackFnCancel) callbackFnCancel(); });
