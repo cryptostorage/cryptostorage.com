@@ -1,6 +1,7 @@
 v0.3.0
 print preview
 quick generate
+ultra compact view
 confirmation on destroy generated storage
 footer
 interoperability disclosure
