@@ -1190,6 +1190,7 @@ input[type='checkbox'][disabled] +label {
 	min-width: 700px;
 	max-width: 980px;
 	z-index: 1;
+	flex-shrink: 0;
 }
 
 .editor_export_header {
@@ -1227,7 +1228,6 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_print_preview {
-	width: 100%;
 	min-height: 200px;
 	position: relative;
 }
@@ -1265,6 +1265,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .piece_div {
+	min-width: 750px;
 	width: 750px;
 	margin-bottom: 50px;
 }
