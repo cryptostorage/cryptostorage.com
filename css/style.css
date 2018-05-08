@@ -1304,32 +1304,34 @@ input[type='checkbox'][disabled] +label {
 	z-index: 1;
 }
 
-.editor_export_div > div {
-	padding: 40px 80px 0px 80px;
-}
-
-.editor_export_div > div:first-child {
-	padding: 20px 20px 20px 20px;
-}
-
-.editor_export_div > div:last-child {
-	padding-bottom: 40px;
-}
-
 .editor_export_header {
 	width: 100%;
+	padding: 20px;
 	color: white;
 	font-size: 28px;
 	background-color: rgb(17, 119, 184);
 }
 
+
+.editor_export_body {
+	padding: 20px 60px 30px 60px;
+}
+
+.editor_export_body > div {
+	margin-bottom: 30px;
+}
+
+.editor_export_body > div:last-child {
+	margin-bottom: 0px;
+}
+
 .editor_export_checkboxes {
 	flex-wrap: wrap;
-	padding: 20px 68px 0px 68px !important;
+	max-width: 750px;
 }
 
 .editor_export_checkboxes > div {
-	margin: 20px 12px 0px 12px;
+	margin: 10px 12px 0px 12px;
 }
 
 .editor_export_checkbox * {
@@ -1488,7 +1490,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .piece_page_div {
-	margin-bottom: 50px;
+	margin-bottom: 30px;
 	page-break-inside: avoid;
 	page-break-after: always;
 }

@@ -4302,8 +4302,11 @@ function EditorPrintController(div, pieces) {
 		var header = $("<div class='editor_export_header'>").appendTo(div);
 		header.append("Print");
 		
+		// body
+		var body = $("<div class='editor_export_body'>").appendTo(div);
+		
 		// checkboxes
-		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(div);
+		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show public addresses").render();
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show private keys").render();
 		includeLogosCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show logos").render();
@@ -4313,7 +4316,7 @@ function EditorPrintController(div, pieces) {
 		}
 		
 		// print preview
-		previewDiv = $("<div class='editor_print_preview flex_horizontal flex_align_center flex_justify_center'>").appendTo(div);
+		previewDiv = $("<div class='editor_print_preview flex_horizontal flex_align_center flex_justify_center'>").appendTo(body);
 		previewLoadDiv = $("<div class='editor_print_load flex_horizontal flex_align_center flex_justify_center'>").appendTo(previewDiv);
 		previewLoadDiv.append("<img src='img/loading.gif' class='loading'>");
 		
@@ -4324,7 +4327,7 @@ function EditorPrintController(div, pieces) {
 		if (cryptoCashApplies()) includeInstructionsCheckbox.setChecked(true);
 		
 		// cancel and print buttons
-		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(div);
+		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(body);
 		var cancelBtn = $("<div class='editor_export_btn_red flex_horizontal flex_align_center flex_justify_center'>").appendTo(buttonsDiv);
 		cancelBtn.html("Cancel");
 		cancelBtn.click(function() {
@@ -4373,11 +4376,12 @@ function EditorPrintController(div, pieces) {
 		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
 		if (cryptoCashApplies()) {
 			if (includePrivateCheckbox.isChecked()) {
-				cryptoCashCheckbox.show();
-				includeInstructionsCheckbox.setVisible(cryptoCashCheckbox.isChecked());
+				cryptoCashCheckbox.setEnabled(true);
+				includeInstructionsCheckbox.setEnabled(cryptoCashCheckbox.isChecked());
 			} else {
-				cryptoCashCheckbox.hide();
-				includeInstructionsCheckbox.hide()
+				cryptoCashCheckbox.setChecked(false);
+				cryptoCashCheckbox.setEnabled(false);
+				includeInstructionsCheckbox.setEnabled(false);
 			}
 		}
 		
@@ -4749,7 +4753,10 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
 		
 		// get preview piece
-		var previewPiece = piece;
+		var numKeypairs = config.cryptoCash ? 1 : Math.min(2, piece.getKeypairs().length);
+		var previewKeypairs = [];
+		for (var i = 0; i < numKeypairs; i++) previewKeypairs.push(piece.getKeypairs()[i]);
+		var previewPiece = new CryptoPiece({keypairs: previewKeypairs});
 		
 		// render preview piece
 		pieceRenderer = new CompactPieceRenderer(div, previewPiece, config);
