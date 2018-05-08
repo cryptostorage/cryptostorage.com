@@ -2814,6 +2814,8 @@ inheritsFrom(EditorController, DivController);
 /**
  * Controls the editor content panel.
  * 
+ * TODO: rename this to EditorBodyController
+ * 
  * @param div is the div to render to
  * @param editorController is the governing editor controller
  * @param config specifies rendering config

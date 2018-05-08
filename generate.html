@@ -40,6 +40,9 @@
 				window.initEditor(window, config);
 			});
 			
+			// init synchronous environment info
+			AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
+			
 			/**
 			 * Translates url parameters into a generation config for the editor
 			 *
