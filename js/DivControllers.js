@@ -4387,10 +4387,10 @@ function EditorPrintController(div, pieces) {
 		// disable print button
 		setPrintEnabled(false);
 		
-		// render peview
+		// render preview
 		if (previewGenerator) previewGenerator.destroy();
 		previewGenerator = new PieceGenerator({
-			pieces: pieces,
+			pieces: [pieces[0]],
 			pieceRendererClass: CompactPiecePreviewRenderer,
 			pieceRendererConfig: getPieceRendererConfig()
 		});
