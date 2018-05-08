@@ -4253,8 +4253,12 @@ function EditorPrintController(div, pieces) {
 	var cryptoCashCheckbox;
 	var includeInstructionsCheckbox
 	var printBtn;
-	var pieceRenderers;	// rendered pieces ready for print
-	var pieceGenerator;
+	var printPreviewDiv;				// panel for print preview
+	var printLoadDiv;						// covers print preview panel while loading
+	var piecePreviewRenderer;		// rendered preview ready for display
+	var piecePreviewGenerator;	// generates preview
+	var pieceRenderers;					// rendered pieces ready for print
+	var pieceGenerator;					// generates rendered pieces
 	var callbackFnPrint;
 	var callbackFnCancel;
 	
@@ -4277,6 +4281,11 @@ function EditorPrintController(div, pieces) {
 			cryptoCashCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "CryptoCash").render();
 			includeInstructionsCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Print Instructions (Two Sided)").render();
 		}
+		
+		// print preview
+		printPreviewDiv = $("<div class='editor_print_preview'>").appendTo(div);
+		printLoadDiv = $("<div class='editor_print_load flex_horizontal flex_align_center flex_justify_center'>").appendTo(printPreviewDiv);
+		printLoadDiv.append("<img src='img/loading.gif' class='loading'>");
 		
 		// initial state
 		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
@@ -4341,6 +4350,19 @@ function EditorPrintController(div, pieces) {
 		// disable print button
 		setPrintEnabled(false);
 		
+		// render peview
+		piecePreviewRenderer = undefined;
+		if (piecePreviewGenerator) piecePreviewGenerator.destroy();
+		piecePreviewGenerator = new PieceGenerator({
+			pieces: pieces,
+			pieceRendererClass: CompactPiecePreviewRenderer,
+			pieceRendererConfig: getPieceRendererConfig()
+		});
+		piecePreviewGenerator.generatePieces(null, function(err, _pieces, _piecePreviewRenderers) {
+			assertNull(err);
+			piecePreviewRenderer = _piecePreviewRenderers[0];
+		});
+		
 		// render pieces
 		pieceRenderers = undefined;
 		if (pieceGenerator) pieceGenerator.destroy();
@@ -4351,6 +4373,9 @@ function EditorPrintController(div, pieces) {
 		});
 		pieceGenerator.generatePieces(null, function(err, _pieces, _pieceRenderers) {
 			assertNull(err);
+			printPreviewDiv.empty();
+			printPreviewDiv.append(piecePreviewRenderer.getDiv());
+			printLoadDiv.hide();
 			pieceRenderers = _pieceRenderers;
 			setPrintEnabled(true);
 			if (onDone) onDone();
@@ -4690,6 +4715,190 @@ CompactPieceRenderer.getRenderWeight = function(config) {
 		}
 	}
 	return weight;
+}
+
+/**
+ * Renders a preview of what CompactPieceRenderer will render.
+
+ * @param div is the div to render to
+ * @param piece is the piece to render
+ * @param config specifies render configuration
+ *  			config.showLogos specifies if crypto logos should be shown
+ * 				config.showPublic specifies if public addresses should be shown
+ * 				config.showPrivate specifies if private keys should be shown
+ * 				config.cryptoCash specifies to space 6 keypairs per page with no cryptostorage logo
+ * 				config.infoBack specifies if double-sided sweep instructions should be included for crypto cash
+ */
+function CompactPiecePreviewRenderer(div, piece, config) {
+	if (!div) div = $("<div>");
+	DivController.call(this, div);
+	assertObject(piece, CryptoPiece);
+	
+	// config default and validation
+	config = Object.assign({
+		showPublic: true,
+		showPrivate: true,
+		showLogos: true,
+		cryptoCash: false,
+		infoBack: false,
+		pageBreaks: false
+	}, config);
+	if (!config.showPublic) assertTrue(config.showPrivate);
+	if (!config.showPrivate) assertTrue(config.showPublic);
+	if (config.infoBack) {
+		assertFalse(piece.isSplit());
+		assertTrue(config.pageBreaks);
+	}
+	
+	var keypairRenderers;
+	var onProgressFn;
+	var _isDestroyed = false;
+	
+	this.render = function(onDone) {
+		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
+		
+		// div setup
+		div.empty();
+		div.addClass("piece_div");
+		
+		// TODO: implement
+		div.append("Ok ready to get this show on the road");
+		onDone(div);
+		return;
+		
+		// build pages and collect functions to render keypairs
+		var pageDiv;
+		var tickers;
+		var pairsPerPage = config.cryptoCash ? 6 : 7;
+		var renderFuncs = [];
+		for (var i = 0; i < piece.getKeypairs().length; i++) {
+			
+			// add new page
+			if ((!config.pageBreaks && i === 0) || (config.pageBreaks && i % pairsPerPage === 0)) {
+				
+				// add sweep instructions
+				if (config.infoBack && i > 0) {
+					div.append($("<div>"));
+					tickers = [];
+					for (var j = 0; j < pairsPerPage; j++) tickers.push(piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
+					if (config.cryptoCash && config.infoBack) div.append(getSweepInstructionsPage(tickers));
+				}
+				
+				// add new page
+				pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+				if (piece.getPieceNum() || config.showLogos) {
+					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
+					headerDiv.append($("<div class='piece_page_header_left'>"));
+					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
+					if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
+				}
+			}
+			
+			// collect functions to render keypairs
+			var placeholderDiv = $("<div class='keypair_div'>").appendTo(pageDiv);
+			if (config.cryptoCash) placeholderDiv.addClass("keypair_div_spaced");
+			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
+		}
+		
+		// add final page of sweep instructions
+		if (config.infoBack && config.cryptoCash) {
+			var numPairsLastPage = piece.getKeypairs().length % pairsPerPage;
+			if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
+			tickers = [];
+			for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.getKeypairs()[piece.getKeypairs().length - (numPairsLastPage - i)].getPlugin().getTicker());
+			div.append(getSweepInstructionsPage(tickers));
+		}
+		
+		// compute weights
+		var doneWeight = 0;
+		var totalWeight  = 0;
+		for (var i = 0; i < piece.getKeypairs().length; i++) {
+			totalWeight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker());
+		}
+
+		// render keypairs
+		if (onProgressFn) onProgressFn(0, "Rendering keypairs");
+		setImmediate(function() {	// let browser breath
+			async.series(renderFuncs, function(err, _keypairRenderers) {
+				if (_isDestroyed) return;
+				assertNull(err);
+				
+				// copy keys to clipboard
+				new Clipboard(".copyable", {
+					text: function(trigger) {
+						return $(trigger).html();
+					}
+				});
+				
+				// copied tooltip
+				div.find(".copyable").each(function(i, copyable) {
+					tippy(copyable, {
+						arrow : true,
+						html : $("<div>Copied!</div>").get(0),
+						interactive : true,
+						placement : "top",
+						theme : 'translucent',
+						trigger : "click",
+						distance : 10,
+						arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+						onShow : function() {
+							setTimeout(function() {
+								copyable._tippy.hide();
+							}, 2000)
+						}
+					});
+				});
+
+				// done
+				if (onDone) onDone(div);
+			});
+		});
+		
+		// callback function to render keypair
+		function renderFunc(placeholderDiv, piece, index, config) {
+			return function(onDone) {
+				if (_isDestroyed) return;
+				if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (index + 1);
+				var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
+				keypairRenderer.render(function(div) {
+					if (config.cryptoCash) div.addClass("keypair_div_spaced");
+					placeholderDiv.replaceWith(div);
+					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
+					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
+					onDone(null, keypairRenderer);
+				});
+			}
+		}
+	}
+	
+	this.onProgress = function(callbackFn) {
+		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
+		onProgressFn = callbackFn;
+	}
+	
+	/**
+	 * Destroys the renderer.  Does not destroy the underling piece.
+	 */
+	this.destroy = function() {
+		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer already destroyed");
+		if (keypairRenderers) {
+			for (var i = 0; i < keypairRenderers.length; i++) keypairRenderers[i].destroy();
+		}
+		_isDestroyed = true;
+	}
+	
+	this.isDestroyed = function() {
+		return _isDestroyed;
+	}
+}
+inheritsFrom(CompactPiecePreviewRenderer, DivController);
+
+/**
+ * Register preview generation weight.
+ */
+CompactPiecePreviewRenderer.getRenderWeight = function(config) {
+	return 1;
 }
 
 /**
@@ -5238,7 +5447,7 @@ function LoadController(renderer, config) {
 			$(loadingImg).addClass("loading");
 			
 			// wrap renderer's div
-			renderer.getDiv().wrap("<div class='flex_vertical flex_align_center'>");	// wrap div with loading
+			renderer.getDiv().wrap("<div class='loading_div flex_vertical flex_align_center'>");	// wrap div with loading
 			wrapper = renderer.getDiv().parent();
 			wrapper.prepend(loadingImg);
 			if (config && config.enableScroll) wrapper.css("margin-bottom", "1200px");
