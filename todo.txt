@@ -1,4 +1,5 @@
 v0.3.0
+argument asserted as initialized exception on mobile; need stack trace
 don't zoom in on focus in generate.html
 ultra compact view
 sample overlay on print preview
