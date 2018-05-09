@@ -1,7 +1,8 @@
 v0.3.0
+save dropdown causes scrollbar
 make generate.html load faster
-quick generate
 ultra compact view
+quick generate
 confirmation on destroy generated storage
 footer
 interoperability disclosure
