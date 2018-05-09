@@ -3,25 +3,25 @@ save dropdown causes scrollbar
 ultra compact view
 show password
 interoperability disclosure
-make generate.html load faster
-quick generate
 confirmation on destroy generated storage
 footer
 browser testing
 split validation should fail on -1
 put homepage text in index.html and dynamically hide for seo
 precise static and dynamic dependencies
-make progress bar its own controller
-set public address of imported pieces after pieces combine
 num keypairs exceed max error
+print tab values shouldn't be underlined because cannot click
+performance tests and optimizations
+
+make generate.html load faster
+quick generate
+make progress bar its own controller
 notice colors
 export control layout
 split lines bolder
 tippy jerk when editor first loaded
 update bip38 cryptojs description with pbkdf if necessary
-print tab values shouldn't be underlined because cannot click
 print selector compact | cryptocash | community design, etc
-performance tests and optimizations
 see if there are wasteful loops in editor listeners
 text import says please select currency on unrecognized text import
 add support for dogecoin
