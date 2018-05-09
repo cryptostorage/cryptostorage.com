@@ -83,6 +83,15 @@ body {
 	user-select: none;
 }
 
+.overlay_div {
+	height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    position: fixed;
+    background-color: rgba(0, 0, 0, .5);
+}
+
 .app_body {
 	min-width: 946px;
 	-webkit-text-size-adjust: 100%;
@@ -1162,15 +1171,6 @@ input[type='checkbox'][disabled] +label {
 
 .editor_pieces_div {
 	width: 750px;
-}
-
-.editor_popup_div {
-	height: 100%;
-    width: 100%;
-    left: 0;
-    top: 0;
-    position: fixed;
-    background-color: rgba(0, 0, 0, .5);
 }
 
 .editor_export_div {

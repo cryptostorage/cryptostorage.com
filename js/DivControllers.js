@@ -241,6 +241,44 @@ DivController.prototype.setVisible = function(bool) { assertBoolean(bool); bool 
 DivController.prototype.isVisible = function() { return this.div.is(":visible"); }
 
 /**
+ * Displays a div as a poup.
+ * 
+ * @param div is the div to render a popup on top of
+ * @param popupDiv is the popup div to display as a popup
+ */
+function PopupController(div, popupDiv) {
+	DivController.call(this, div);
+	
+	var that = this;
+	var overlayDiv;
+	var originalOverflow;
+	
+	this.render = function(onDone) {
+		
+		// prevent background scrolling
+		var originalOverflow = div.css("overflow");
+		div.css("overflow", "hidden");
+		
+		// full screen overlay
+		overlayDiv = $("<div class='overlay_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(div);
+		overlayDiv.append(popupDiv);
+		overlayDiv.click(function(e) {
+			if (e.target !== this) return;
+			that.close();
+		});
+		
+		// done rendering
+		if (onDone) onDone();
+	}
+	
+	this.close = function() {
+		div.css("overflow", originalOverflow);
+		overlayDiv.remove();
+	}
+}
+inheritsFrom(PopupController, DivController);
+
+/**
  * Controls a single checkbox.
  * 
  * @param div is the div to render to
@@ -2796,47 +2834,21 @@ function EditorController(div, config) {
 	}
 	
 	function save() {
-		
-		// fullscreen div
-		div.css("overflow", "hidden");
-		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
-		popupDiv.click(function(e) {
-			if (e.target !== this) return;
-			closePopup();
-		});
-		
-		// save controller
-		var saveController = new EditorSaveController($("<div>").appendTo(popupDiv), pieces);
-		saveController.onSave(function() { closePopup(); });
-		saveController.onCancel(function() { closePopup() })
+		var saveController = new EditorSaveController($("<div>"), pieces);
+		var popupController = new PopupController(div, saveController.getDiv());
+		saveController.onSave(popupController.close);
+		saveController.onCancel(popupController.close);
 		saveController.render();
-		
-		function closePopup() {
-			div.css("overflow", "auto");
-			popupDiv.detach();
-		}
+		popupController.render();
 	}
 		
 	function print() {
-		
-		// fullscreen div
-		div.css("overflow", "hidden");
-		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
-		popupDiv.click(function(e) {
-			if (e.target !== this) return;
-			closePopup();
-		});
-		
-		// print controller
-		var printController = new EditorPrintController($("<div>").appendTo(popupDiv), pieces);
-		printController.onPrint(function() { closePopup(); });
-		printController.onCancel(function() { closePopup(); });
+		var printController = new EditorPrintController($("<div>"), pieces);
+		var popupController = new PopupController(div, printController.getDiv());
+		printController.onPrint(popupController.close);
+		printController.onCancel(popupController.close);
 		printController.render();
-		
-		function closePopup() {
-			div.css("overflow", "auto");
-			popupDiv.detach();
-		}
+		popupController.render();
 	}
 	
 	function reset() {
@@ -5265,7 +5277,13 @@ function NoticeController(div, config) {
 					}
 					break;
 				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
-					if (check.state === "fail") div.append("Unexpected error: " + info.runtimeError.message + "<br>" + info.runtimeError.stack);
+					if (check.state === "fail") {
+						var msg = "Unexpected error: ";
+						if (info.runtimeError.message) msg += info.runtimeError.message;
+						else msg += info.runtimeError.toString();
+						if (info.runtimeError.stack) msg += "<br>" + info.runtimeError.stack;
+						div.append(msg);
+					}
 					break;
 				case AppUtils.EnvironmentCode.INTERNET:
 					if (check.state === "pass") div.append("No internet connection");
