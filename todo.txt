@@ -1,6 +1,7 @@
 v0.3.0
-coyping not working well on mobile
+don't zoom in on focus in generate.html
 ultra compact view
+sample overlay on print preview
 show password
 interoperability disclosure
 confirmation on destroy generated storage
