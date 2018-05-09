@@ -1,5 +1,4 @@
 v0.3.0
-print preview
 make generate.html load faster
 quick generate
 ultra compact view
@@ -24,6 +23,7 @@ performance tests and optimizations
 see if there are wasteful loops in editor listeners
 text import says please select currency on unrecognized text import
 add support for dogecoin
+mobile safari background scrolls while popups open
 tippls
 
 designer:
