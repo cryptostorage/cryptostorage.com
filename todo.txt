@@ -1,5 +1,4 @@
 v0.3.0
-save dropdown causes scrollbar
 ultra compact view
 show password
 interoperability disclosure
