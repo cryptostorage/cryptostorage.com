@@ -1179,7 +1179,7 @@ input[type='checkbox'][disabled] +label {
 	max-height: 100%;
 }
 
-.editor_export_body_div {
+.editor_export_print_div {
 	overflow-y: auto;
 }
 
