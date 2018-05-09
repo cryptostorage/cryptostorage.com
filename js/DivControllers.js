@@ -3122,6 +3122,8 @@ function EditorPassphraseController(div, editorController) {
 	var that = this;
 	var passphraseCheckbox;
 	var passphraseInput;
+	var passphraseEyeDiv;
+	var passphraseVisible;
 	var bip38Div;
 	var bip38Checkbox;
 	var hasError;
@@ -3143,9 +3145,13 @@ function EditorPassphraseController(div, editorController) {
 		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?");
 		passphraseCheckbox.render();
 		
-		// passphrase input
+		// column for passphrase inputs
 		var passphraseInputVertical = $("<div class='editor_passphrase_vertical flex_vertical flex_justify_center'>").appendTo(div);
-		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseInputVertical);
+		
+		// passphrase input
+		var passphraseInputDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(passphraseInputVertical);
+		passphraseInput = $("<input type='password' class='editor_passphrase_input'>").appendTo(passphraseInputDiv);
+		passphraseEyeDiv = $("<div class='editor_passphrase_eye_div flex_horizontal flex_align_center'>").appendTo(passphraseInputDiv);
 		
 		// bip38 checkbox
 		bip38Div = $("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical);
@@ -3178,7 +3184,7 @@ function EditorPassphraseController(div, editorController) {
 			// render disclaimer and set focus
 			if (passphraseCheckbox.isChecked()) {				
 				if (firstChecked) {
-					//firstChecked = false;
+					firstChecked = false;
 					var disclaimerPopup = new PopupController(editorController.getDiv(), getPassphraseDisclaimerDiv(function() {
 						disclaimerPopup.close();
 					}), false);
@@ -3189,6 +3195,8 @@ function EditorPassphraseController(div, editorController) {
 				} else {
 					passphraseInput.focus();
 				}
+			} else {
+				that.setPassphraseVisible(false);
 			}
 		});
 		passphraseInput.on("input", function(e) { setFormError(false); });
@@ -3234,6 +3242,19 @@ function EditorPassphraseController(div, editorController) {
 		passphraseCheckbox.setChecked(checked);
 	}
 	
+	this.setPassphraseVisible = function(bool) {
+		passphraseVisible = bool;
+		var visibleImg = passphraseVisible ? $("<img src='img/visible.png'>") : $("<img src='img/visible_false.png'>");
+		visibleImg.addClass("editor_passphrase_eye_img");
+		if (passphraseEyeDiv.children().length > 0) passphraseEyeDiv.children().replaceWith(visibleImg);
+		else passphraseEyeDiv.append(visibleImg);
+		passphraseInput.attr("type", passphraseVisible ? "text" : "password");
+	}
+	
+	this.isPassphraseVisible = function() {
+		return passphraseVisible;
+	}
+	
 	this.getPassphrase = function() {
 		return passphraseInput.val();
 	}
@@ -3253,8 +3274,15 @@ function EditorPassphraseController(div, editorController) {
 	this.setEnabled = function(bool) {
 		passphraseCheckbox.setEnabled(bool);
 		bip38Checkbox.setEnabled(bool);
-		if (bool && passphraseCheckbox.isChecked()) passphraseInput.removeAttr("disabled")
-		else passphraseInput.attr("disabled", "disabled");
+		passphraseEyeDiv.unbind("click");
+		if (bool && passphraseCheckbox.isChecked()) {
+			passphraseInput.removeAttr("disabled");
+			passphraseEyeDiv.removeClass("editor_passphrase_eye_div_disabled");
+			passphraseEyeDiv.click(function() { that.setPassphraseVisible(!that.isPassphraseVisible()); });
+		} else {
+			passphraseInput.attr("disabled", "disabled");
+			passphraseEyeDiv.addClass("editor_passphrase_eye_div_disabled");
+		}
 	}
 	
 	// --------------------------------- PRIVATE --------------------------------
@@ -3315,6 +3343,7 @@ function EditorPassphraseController(div, editorController) {
 		passphraseCheckbox.setChecked(false);
 		bip38Checkbox.setChecked(false);
 		passphraseInput.val("");
+		that.setPassphraseVisible(false);
 		validate();
 		update();
 	}
@@ -3326,7 +3355,7 @@ function EditorPassphraseController(div, editorController) {
 		headerTitle.append("<img src='img/caution_solid.png' style='width:40px; height: 40px; margin-right: 10px;'>");
 		headerTitle.append("Passphrase Encryption");
 		var bodyDiv = $("<div class='editor_popup_body flex_vertical flex_align_center'>").appendTo(div);		
-		bodyDiv.append($("<div style='font-size:20px; font-weight:bold; color:red; margin-bottom:25px; text-align:center;'>Funds cannot be recovered without the passphrase.  Do not lose it.</div>"));
+		bodyDiv.append($("<div style='font-size:20px; font-weight:bold; color:red; margin-bottom:25px; text-align:center;'>Do not lose the passphrase.  Funds cannot be recovered without it.</div>"));
 		var interoperableDiv = $("<div style='font-size:20px; margin-bottom: 25px; text-align:center'>Passphrase encryption may not be interoperable with other tools.&nbsp;&nbsp;</div>").appendTo(bodyDiv);
 		var learnMoreLink = $("<a style='font-size:20px;' target='_blank' href='index.html#faq_interoperable'>Read more</a>").appendTo(div);
 		interoperableDiv.append(learnMoreLink);

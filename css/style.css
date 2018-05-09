@@ -1012,6 +1012,27 @@ input[type='checkbox'][disabled] +label {
 	margin-top: 8px;
 }
 
+.editor_passphrase_eye_div {
+	margin-left: 5px;
+}
+
+.editor_passphrase_eye_div:hover {
+	cursor: pointer;
+}
+
+.editor_passphrase_eye_div_disabled {
+	opacity: 0.5;
+}
+
+.editor_passphrase_eye_div_disabled:hover {
+	cursor: auto;
+}
+
+.editor_passphrase_eye_img {
+	width: 35px;
+	height: 35px;
+}
+
 .editor_passphrase_warn_div {
 	max-width: 675px;
 }
