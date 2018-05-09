@@ -1,5 +1,4 @@
 v0.3.0
-don't zoom in on focus in generate.html
 ultra compact view
 sample overlay on print preview
 show password
