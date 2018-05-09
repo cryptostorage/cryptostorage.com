@@ -1,11 +1,12 @@
 v0.3.0
 save dropdown causes scrollbar
-make generate.html load faster
 ultra compact view
+show password
+interoperability disclosure
+make generate.html load faster
 quick generate
 confirmation on destroy generated storage
 footer
-interoperability disclosure
 browser testing
 split validation should fail on -1
 put homepage text in index.html and dynamically hide for seo
