@@ -1012,6 +1012,10 @@ input[type='checkbox'][disabled] +label {
 	margin-top: 8px;
 }
 
+.editor_passphrase_warn_div {
+	max-width: 675px;
+}
+
 .split_input_div {
 	margin: 20px 20px 0px 20px;
 }
@@ -1173,17 +1177,13 @@ input[type='checkbox'][disabled] +label {
 	width: 750px;
 }
 
-.editor_export_div {
+.editor_popup_div {
 	background-color: white;
 	z-index: 1;
 	max-height: 100%;
 }
 
-.editor_export_print_div {
-	overflow-y: auto;
-}
-
-.editor_export_header {
+.editor_popup_header {
 	width: 100%;
 	padding: 20px;
 	color: white;
@@ -1191,16 +1191,21 @@ input[type='checkbox'][disabled] +label {
 	background-color: rgb(17, 119, 184);
 }
 
-.editor_export_body {
-	padding: 20px 50px 30px 50px;
+.editor_popup_body {
+	padding: 25px 50px 25px 50px;
+	background-color: white;
 }
 
-.editor_export_body > div {
+.editor_popup_body > div {
 	margin-bottom: 30px;
 }
 
-.editor_export_body > div:last-child {
+.editor_popup_body > div:last-child {
 	margin-bottom: 0px;
+}
+
+.editor_print_div {
+	overflow-y: auto;
 }
 
 .editor_export_checkboxes {

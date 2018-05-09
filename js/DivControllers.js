@@ -245,18 +245,22 @@ DivController.prototype.isVisible = function() { return this.div.is(":visible");
  * 
  * @param div is the div to render a popup on top of
  * @param popupDiv is the popup div to display as a popup
+ * @param closeOnExternalClick specifies if popup should close on external click (default true)
  */
-function PopupController(div, popupDiv) {
+function PopupController(div, popupDiv, closeOnExternalClick) {
 	DivController.call(this, div);
 	
+	closeOnExternalClick = isDefined(closeOnExternalClick) ? closeOnExternalClick : true;
 	var that = this;
 	var overlayDiv;
 	var originalOverflow;
+	var closeListeners = [];
 	
 	this.render = function(onDone) {
 		
 		// prevent background scrolling
-		var originalOverflow = div.css("overflow");
+		originalOverflow = div.css("overflow");
+		if (!originalOverflow) originalOverflow = "auto";
 		div.css("overflow", "hidden");
 		
 		// full screen overlay
@@ -264,16 +268,22 @@ function PopupController(div, popupDiv) {
 		overlayDiv.append(popupDiv);
 		overlayDiv.click(function(e) {
 			if (e.target !== this) return;
-			that.close();
+			if (closeOnExternalClick) that.close();
 		});
 		
 		// done rendering
 		if (onDone) onDone();
 	}
 	
+	this.onClose = function(listener) {
+		assertFunction(listener);
+		closeListeners.push(listener);
+	}
+	
 	this.close = function() {
 		div.css("overflow", originalOverflow);
 		overlayDiv.remove();
+		invoke(closeListeners);
 	}
 }
 inheritsFrom(PopupController, DivController);
@@ -3117,6 +3127,7 @@ function EditorPassphraseController(div, editorController) {
 	var hasError;
 	var formErrorChangeListeners;
 	var usePassphraseListeners;
+	var firstChecked;
 
 	this.render = function(onDone) {
 		
@@ -3128,6 +3139,7 @@ function EditorPassphraseController(div, editorController) {
 		usePassphraseListeners = [];
 		
 		// passphrase checkbox
+		firstChecked = true;
 		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?");
 		passphraseCheckbox.render();
 		
@@ -3162,7 +3174,22 @@ function EditorPassphraseController(div, editorController) {
 		passphraseCheckbox.onChecked(function() {
 			setFormError(false);
 			invoke(usePassphraseListeners);
-			if (passphraseCheckbox.isChecked()) passphraseInput.focus();
+			
+			// render disclaimer and set focus
+			if (passphraseCheckbox.isChecked()) {				
+				if (firstChecked) {
+					//firstChecked = false;
+					var disclaimerPopup = new PopupController(editorController.getDiv(), getPassphraseDisclaimerDiv(function() {
+						disclaimerPopup.close();
+					}), false);
+					disclaimerPopup.render();
+					disclaimerPopup.onClose(function() {
+						if (passphraseCheckbox.isChecked()) passphraseInput.focus();
+					});
+				} else {
+					passphraseInput.focus();
+				}
+			}
 		});
 		passphraseInput.on("input", function(e) { setFormError(false); });
 		
@@ -3290,6 +3317,23 @@ function EditorPassphraseController(div, editorController) {
 		passphraseInput.val("");
 		validate();
 		update();
+	}
+	
+	function getPassphraseDisclaimerDiv(onAgree) {
+		var div = $("<div class='editor_popup_div editor_passphrase_warn_div flex_vertical flex_align_center'>");
+		var headerDiv = $("<div class='editor_popup_header flex_horizontal flex_align_center'>").appendTo(div);
+		var headerTitle = $("<div class='flex_horizontal flex_align_center'>").appendTo(headerDiv);
+		headerTitle.append("<img src='img/caution_solid.png' style='width:40px; height: 40px; margin-right: 10px;'>");
+		headerTitle.append("Passphrase Encryption");
+		var bodyDiv = $("<div class='editor_popup_body flex_vertical flex_align_center'>").appendTo(div);		
+		bodyDiv.append($("<div style='font-size:20px; font-weight:bold; color:red; margin-bottom:25px; text-align:center;'>Funds cannot be recovered without the passphrase.  Do not lose it.</div>"));
+		var interoperableDiv = $("<div style='font-size:20px; margin-bottom: 25px; text-align:center'>Passphrase encryption may not be interoperable with other tools.&nbsp;&nbsp;</div>").appendTo(bodyDiv);
+		var learnMoreLink = $("<a style='font-size:20px;' target='_blank' href='index.html#faq_interoperable'>Read more</a>").appendTo(div);
+		interoperableDiv.append(learnMoreLink);
+		var okButton = $("<div style='font-size:22px;' class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center'>").appendTo(bodyDiv);
+		okButton.append("Okay, I understand the risk");
+		okButton.click(onAgree);
+		return div;
 	}
 }
 inheritsFrom(EditorPassphraseController, DivController);
@@ -4169,14 +4213,14 @@ function EditorSaveController(div, pieces) {
 		
 		// div setup
 		div.empty();
-		div.addClass("editor_export_div flex_vertical flex_align_center")
+		div.addClass("editor_popup_div flex_vertical flex_align_center")
 		
 		// header
-		var header = $("<div class='editor_export_header'>").appendTo(div);
+		var header = $("<div class='editor_popup_header'>").appendTo(div);
 		header.append("Save");
 		
 		// body
-		var body = $("<div class='editor_export_body'>").appendTo(div);
+		var body = $("<div class='editor_popup_body'>").appendTo(div);
 		
 		// checkboxes
 		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
@@ -4322,14 +4366,14 @@ function EditorPrintController(div, pieces) {
 		
 		// div setup
 		div.empty();
-		div.addClass("editor_export_div editor_export_print_div flex_vertical flex_align_center")
+		div.addClass("editor_popup_div editor_print_div flex_vertical flex_align_center")
 		
 		// header
-		var header = $("<div class='editor_export_header'>").appendTo(div);
+		var header = $("<div class='editor_popup_header'>").appendTo(div);
 		header.append("Print");
 		
 		// body
-		var body = $("<div class='editor_export_body'>").appendTo(div);
+		var body = $("<div class='editor_popup_body'>").appendTo(div);
 		
 		// checkboxes
 		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
