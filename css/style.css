@@ -1177,6 +1177,9 @@ input[type='checkbox'][disabled] +label {
 	background-color: white;
 	z-index: 1;
 	max-height: 100%;
+}
+
+.editor_export_body_div {
 	overflow-y: auto;
 }
 
