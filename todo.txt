@@ -14,6 +14,7 @@ precise static and dynamic dependencies
 num keypairs exceed max error
 print tab values shouldn't be underlined because cannot click
 performance tests and optimizations
+only import controller loads dependencies, home does not
 
 make generate.html load faster
 quick generate

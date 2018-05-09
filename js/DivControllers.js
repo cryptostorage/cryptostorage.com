@@ -5265,7 +5265,7 @@ function NoticeController(div, config) {
 					}
 					break;
 				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
-					if (check.state === "fail") div.append("Unexpected error: " + info.runtimeError);
+					if (check.state === "fail") div.append("Unexpected error: " + info.runtimeError.message + "<br>" + info.runtimeError.stack);
 					break;
 				case AppUtils.EnvironmentCode.INTERNET:
 					if (check.state === "pass") div.append("No internet connection");
