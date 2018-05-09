@@ -4298,7 +4298,7 @@ function EditorPrintController(div, pieces) {
 		
 		// div setup
 		div.empty();
-		div.addClass("editor_export_div flex_vertical flex_align_items_center")
+		div.addClass("editor_export_div flex_vertical flex_align_center")
 		
 		// header
 		var header = $("<div class='editor_export_header'>").appendTo(div);
