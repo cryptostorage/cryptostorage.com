@@ -2798,33 +2798,45 @@ function EditorController(div, config) {
 	function save() {
 		
 		// fullscreen div
+		div.css("overflow", "hidden");
 		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
 		popupDiv.click(function(e) {
 			if (e.target !== this) return;
-			popupDiv.detach();
+			closePopup();
 		});
 		
 		// save controller
 		var saveController = new EditorSaveController($("<div>").appendTo(popupDiv), pieces);
-		saveController.onSave(function() { popupDiv.detach(); });
-		saveController.onCancel(function() { popupDiv.detach(); })
+		saveController.onSave(function() { closePopup(); });
+		saveController.onCancel(function() { closePopup() })
 		saveController.render();
+		
+		function closePopup() {
+			div.css("overflow", "auto");
+			popupDiv.detach();
+		}
 	}
 		
 	function print() {
 		
 		// fullscreen div
+		div.css("overflow", "hidden");
 		var popupDiv = $("<div class='editor_popup_div flex_horizontal flex_align_center flex_justify_center'>").appendTo($("body"));
 		popupDiv.click(function(e) {
 			if (e.target !== this) return;
-			popupDiv.detach();
+			closePopup();
 		});
 		
 		// print controller
 		var printController = new EditorPrintController($("<div>").appendTo(popupDiv), pieces);
-		printController.onPrint(function() { popupDiv.detach(); });
-		printController.onCancel(function() { popupDiv.detach(); });
+		printController.onPrint(function() { closePopup(); });
+		printController.onCancel(function() { closePopup(); });
 		printController.render();
+		
+		function closePopup() {
+			div.css("overflow", "auto");
+			popupDiv.detach();
+		}
 	}
 	
 	function reset() {
