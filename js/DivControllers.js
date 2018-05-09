@@ -241,16 +241,24 @@ DivController.prototype.setVisible = function(bool) { assertBoolean(bool); bool 
 DivController.prototype.isVisible = function() { return this.div.is(":visible"); }
 
 /**
- * Displays a div as a poup.
+ * Displays an overlay atop a div.
  * 
- * @param div is the div to render a popup on top of
- * @param popupDiv is the popup div to display as a popup
- * @param closeOnExternalClick specifies if popup should close on external click (default true)
+ * @param div is the div to overlay
+ * @param config specifies overlay configuraiton
+ * 				config.contentDiv is centered on the overlay to achieve a popup if given
+ *				config.backgroundColor specifies the opacity of the overlay div
+ *				config.closeOnExternalClick specifies if the overlay should be closed on external click (default true)
  */
-function PopupController(div, popupDiv, closeOnExternalClick) {
+function OverlayController(div, config) {
 	DivController.call(this, div);
 	
-	closeOnExternalClick = isDefined(closeOnExternalClick) ? closeOnExternalClick : true;
+	// default config
+	config = Object.assign({
+		backgroundColor: "rgba(0, 0, 0, 0.5)",
+		closeOnClick: true
+	}, config);
+	
+	// instance variables
 	var that = this;
 	var overlayDiv;
 	var originalOverflow;
@@ -265,10 +273,11 @@ function PopupController(div, popupDiv, closeOnExternalClick) {
 		
 		// full screen overlay
 		overlayDiv = $("<div class='overlay_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(div);
-		overlayDiv.append(popupDiv);
+		overlayDiv.css("background-color", config.backgroundColor);
+		if (config.contentDiv) overlayDiv.append(config.contentDiv);
 		overlayDiv.click(function(e) {
 			if (e.target !== this) return;
-			if (closeOnExternalClick) that.close();
+			if (config.closeOnExternalClick) that.close();
 		});
 		
 		// done rendering
@@ -286,7 +295,7 @@ function PopupController(div, popupDiv, closeOnExternalClick) {
 		invoke(closeListeners);
 	}
 }
-inheritsFrom(PopupController, DivController);
+inheritsFrom(OverlayController, DivController);
 
 /**
  * Controls a single checkbox.
@@ -2845,7 +2854,7 @@ function EditorController(div, config) {
 	
 	function save() {
 		var saveController = new EditorSaveController($("<div>"), pieces);
-		var popupController = new PopupController(div, saveController.getDiv());
+		var popupController = new OverlayController(div, {contentDiv: saveController.getDiv()});
 		saveController.onSave(popupController.close);
 		saveController.onCancel(popupController.close);
 		saveController.render();
@@ -2854,7 +2863,7 @@ function EditorController(div, config) {
 		
 	function print() {
 		var printController = new EditorPrintController($("<div>"), pieces);
-		var popupController = new PopupController(div, printController.getDiv());
+		var popupController = new OverlayController(div, {contentDiv: printController.getDiv()});
 		printController.onPrint(popupController.close);
 		printController.onCancel(popupController.close);
 		printController.render();
@@ -3185,9 +3194,8 @@ function EditorPassphraseController(div, editorController) {
 			if (passphraseCheckbox.isChecked()) {				
 				if (firstChecked) {
 					firstChecked = false;
-					var disclaimerPopup = new PopupController(editorController.getDiv(), getPassphraseDisclaimerDiv(function() {
-						disclaimerPopup.close();
-					}), false);
+					var disclaimerDiv = getPassphraseDisclaimerDiv(function() { disclaimerPopup.close(); });
+					var disclaimerPopup = new OverlayController(editorController.getDiv(), {contentDiv: disclaimerDiv});
 					disclaimerPopup.render();
 					disclaimerPopup.onClose(function() {
 						if (passphraseCheckbox.isChecked()) passphraseInput.focus();
@@ -3355,9 +3363,9 @@ function EditorPassphraseController(div, editorController) {
 		headerTitle.append("<img src='img/caution_solid.png' style='width:40px; height: 40px; margin-right: 10px;'>");
 		headerTitle.append("Passphrase Encryption");
 		var bodyDiv = $("<div class='editor_popup_body flex_vertical flex_align_center'>").appendTo(div);		
-		bodyDiv.append($("<div style='font-size:20px; font-weight:bold; color:red; margin-bottom:25px; text-align:center;'>Do not lose the passphrase.  Funds cannot be recovered without it.</div>"));
-		var interoperableDiv = $("<div style='font-size:20px; margin-bottom: 25px; text-align:center'>Passphrase encryption may not be interoperable with other tools.&nbsp;&nbsp;</div>").appendTo(bodyDiv);
-		var learnMoreLink = $("<a style='font-size:20px;' target='_blank' href='index.html#faq_interoperable'>Read more</a>").appendTo(div);
+		bodyDiv.append($("<div style='font-size:20px; font-weight:bold; color:red; margin-bottom:25px; text-align:center;'>Do not lose your passphrase or your funds will be lost.</div>"));
+		var interoperableDiv = $("<div style='font-size:20px; margin-bottom: 25px; text-align:center'>Passphrase encrypted keys may not be interoperable with other tools.&nbsp;&nbsp;</div>").appendTo(bodyDiv);
+		var learnMoreLink = $("<a style='font-size:20px;' target='_blank' href='index.html#faq_interoperable'>Learn more</a>").appendTo(div);
 		interoperableDiv.append(learnMoreLink);
 		var okButton = $("<div style='font-size:22px;' class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center'>").appendTo(bodyDiv);
 		okButton.append("Okay, I understand the risk");
