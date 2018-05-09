@@ -18,7 +18,6 @@ split lines bolder
 tippy jerk when editor first loaded
 update bip38 cryptojs description with pbkdf if necessary
 print tab values shouldn't be underlined because cannot click
-
 print selector compact | cryptocash | community design, etc
 performance tests and optimizations
 see if there are wasteful loops in editor listeners
