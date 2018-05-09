@@ -1,5 +1,6 @@
 v0.3.0
 print preview
+make generate.html load faster
 quick generate
 ultra compact view
 confirmation on destroy generated storage
