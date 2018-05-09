@@ -1,5 +1,4 @@
 v0.3.0
-argument asserted as initialized exception on mobile; need stack trace
 don't zoom in on focus in generate.html
 ultra compact view
 sample overlay on print preview
@@ -15,8 +14,8 @@ num keypairs exceed max error
 print tab values shouldn't be underlined because cannot click
 performance tests and optimizations
 only import controller loads dependencies, home does not
-
 make generate.html load faster
+
 quick generate
 make progress bar its own controller
 notice colors
