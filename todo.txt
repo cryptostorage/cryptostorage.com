@@ -2,7 +2,6 @@ v0.3.0
 ultra compact view
 sample overlay on print preview
 show password
-interoperability disclosure
 confirmation on destroy generated storage
 footer
 browser testing
