@@ -7,11 +7,12 @@ precise static and dynamic dependencies
 num keypairs exceed max error
 only import controller loads dependencies, home does not
 make generate.html load faster
-update faq_interoperable to only refer to encryption
 put homepage text in index.html and dynamically hide for seo
 performance tests and optimizations
 browser testing
 
+update faq_interoperable to only refer to encryption
+update home sample page
 progress layout
 piece and view imported pieces layout
 split and passphrase inputs don't disable while generating on chrome
