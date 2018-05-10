@@ -4,7 +4,6 @@ precise static and dynamic dependencies
 make generate.html load faster
 ultra compact view
 footer
-sample and public addresses persisting in print preview with large piece
 num keypairs exceed max error
 performance tests and optimizations
 

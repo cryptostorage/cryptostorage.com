@@ -1262,7 +1262,7 @@ input[type='checkbox'][disabled] +label {
 	width: 100%;
 	height: 100%;
 	background-color: white;
-	z-index: 1;
+	z-index: 2;
 }
 
 .editor_print_sample_overlay {
