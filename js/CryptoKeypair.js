@@ -275,37 +275,40 @@ CryptoKeypair.prototype.setShareNum = function(shareNum) {
 
 CryptoKeypair.prototype.toJson = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
+	function isExcluded(field) { return arrayContains(CryptoKeypair.EXCLUDE_FIELDS, field); }
 	return {
-		ticker: this.getPlugin().getTicker(),
-		publicAddress: this.getPublicAddress(),
-		privateWif: this.getPrivateWif(),
-		privateHex: this.getPrivateHex(),
-		encryption: this.getEncryptionScheme(),
-		isSplit: this.isSplit(),
-		minShares: this.getMinShares(),
-		shareNum: this.getShareNum()
+		ticker: isExcluded(CryptoKeypair.Field.TICKER) ? undefined : this.getPlugin().getTicker(),
+		publicAddress: isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS) ? undefined : this.getPublicAddress(),
+		privateWif: isExcluded(CryptoKeypair.Field.PRIVATE_WIF) ? undefined : this.getPrivateWif(),
+		privateHex: isExcluded(CryptoKeypair.Field.PRIVATE_HEX) ? undefined : this.getPrivateHex(),
+		encryption: isExcluded(CryptoKeypair.Field.ENCRYPTION) ? undefined : this.getEncryptionScheme(),
+		isSplit: isExcluded(CryptoKeypair.Field.IS_SPLIT) ? undefined : this.isSplit(),
+		minShares: isExcluded(CryptoKeypair.Field.MIN_SHARES) ? undefined : this.getMinShares(),
+		shareNum: isExcluded(CryptoKeypair.Field.SHARE_NUM) ? undefined : this.getShareNum(),
 	}
 }
 
-CryptoKeypair.prototype.getCsvValue = function(header) {
+CryptoKeypair.prototype.getFieldValue = function(field) {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	switch(header) {
-		case CryptoKeypair.CsvHeader.TICKER:
+	switch(field) {
+		case CryptoKeypair.Field.TICKER:
 			return this.getPlugin().getTicker();
-		case CryptoKeypair.CsvHeader.PRIVATE_WIF:
+		case CryptoKeypair.Field.PRIVATE_WIF:
 			return this.getPrivateWif();
-		case CryptoKeypair.CsvHeader.PRIVATE_HEX:
+		case CryptoKeypair.Field.PRIVATE_HEX:
 			return this.getPrivateHex();
-		case CryptoKeypair.CsvHeader.PUBLIC_ADDRESS:
+		case CryptoKeypair.Field.PUBLIC_ADDRESS:
 			return this.getPublicAddress();
-		case CryptoKeypair.CsvHeader.ENCRYPTION:
+		case CryptoKeypair.Field.ENCRYPTION:
 			return this.getEncryptionScheme();
-		case CryptoKeypair.CsvHeader.MIN_SHARES:
+		case CryptoKeypair.Field.IS_SPLIT:
+			return this.isSplit();
+		case CryptoKeypair.Field.MIN_SHARES:
 			return this.getMinShares();
-		case CryptoKeypair.CsvHeader.SHARE_NUM:
+		case CryptoKeypair.Field.SHARE_NUM:
 			return this.getShareNum();
 		default:
-			throw new Error("Unrecognized CSV header: " + header);
+			throw new Error("Unrecognized keypair field: " + field);
 	}
 }
 
@@ -792,16 +795,24 @@ CryptoKeypair.getDecryptWeight = function(schemes) {
 	}
 }
 
-// CSV headers
-CryptoKeypair.CsvHeader = {
-		TICKER: "TICKER",
-		PRIVATE_HEX: "PRIVATE_HEX",
-		PRIVATE_WIF: "PRIVATE_WIF",
-		PUBLIC_ADDRESS: "PUBLIC_ADDRESS",
-		ENCRYPTION: "ENCRYPTION",
-		MIN_SHARES: "MIN_SHARES",
-		SHARE_NUM: "SHARE_NUM"
+// enumerates keypair fields and maps to human readable strings
+CryptoKeypair.Field = {
+		TICKER: "Ticker",
+		PRIVATE_HEX: "Private Hex",
+		PRIVATE_WIF: "Private WIF",
+		PUBLIC_ADDRESS: "Public Address",
+		ENCRYPTION: "Encryption",
+		IS_SPLIT: "Is Split",
+		MIN_SHARES: "Minimum Shares",
+		SHARE_NUM: "Share Number"
 }
+
+// hardcoded fields to exclude from json and csv export
+CryptoKeypair.EXCLUDE_FIELDS = [
+	CryptoKeypair.Field.PRIVATE_HEX,
+	CryptoKeypair.Field.MIN_SHARES,
+	CryptoKeypair.Field.IS_SPLIT
+];
 
 // split v2 encoded version
 CryptoKeypair.SPLIT_V2_VERSION = 1;

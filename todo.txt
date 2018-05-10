@@ -1,5 +1,4 @@
 v0.3.0
-human readable csv headers
 ultra compact view
 quick generate
 footer
@@ -23,7 +22,7 @@ export control layout
 split lines bolder
 tippy jerk when editor first loaded
 update bip38 cryptojs description with pbkdf if necessary
-print selector compact | cryptocash | community design, etc
+print selector compact | cryptocash | community design, et
 see if there are wasteful loops in editor listeners
 text import says please select currency on unrecognized text import
 add support for dogecoin

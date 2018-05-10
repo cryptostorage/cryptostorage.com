@@ -268,15 +268,12 @@ function CryptoPiece(config) {
 	this.toCsv = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		
-		// columns to exclude
-		var excludes = [CryptoKeypair.CsvHeader.PRIVATE_HEX, CryptoKeypair.CsvHeader.MIN_SHARES];
-		
 		// collect headers
 		var headers = [];
-		for (prop in CryptoKeypair.CsvHeader) {
-			if (arrayContains(excludes, prop.toString())) continue;
-			if (CryptoKeypair.CsvHeader.hasOwnProperty(prop)) {
-	    	headers.push(CryptoKeypair.CsvHeader[prop.toString()]);
+		for (prop in CryptoKeypair.Field) {
+			if (arrayContains(CryptoKeypair.EXCLUDE_FIELDS, CryptoKeypair.Field[prop.toString()])) continue;	// skip if excluded
+			if (CryptoKeypair.Field.hasOwnProperty(prop)) {
+	    	headers.push(CryptoKeypair.Field[prop.toString()]);
 	    }
 		}
 		
@@ -285,7 +282,7 @@ function CryptoPiece(config) {
 		for (i = 0; i < state.keypairs.length; i++) {
 			var keypairValues = [];
 			for (var j = 0; j < headers.length; j++) {
-				var value = state.keypairs[i].getCsvValue(headers[j]);
+				var value = state.keypairs[i].getFieldValue(headers[j]);
 				if (value === null) value = "null";
 				if (value === undefined) value = "";
 				keypairValues.push(value);
@@ -424,13 +421,13 @@ function CryptoPiece(config) {
 		for (var col = 0; col < csvArr[0].length; col++) {
 			switch (csvArr[0][col].toLowerCase()) {
 			case "address":
-				csvArr[0][col] = CryptoKeypair.CsvHeader.PUBLIC_ADDRESS;
+				csvArr[0][col] = CryptoKeypair.Field.PUBLIC_ADDRESS;
 				break;
 			case "wif":
-				csvArr[0][col] = CryptoKeypair.CsvHeader.PRIVATE_WIF;
+				csvArr[0][col] = CryptoKeypair.Field.PRIVATE_WIF;
 				break;
 			case "piece_num":
-				csvArr[0][col] = CryptoKeypair.CsvHeader.SHARE_NUM;
+				csvArr[0][col] = CryptoKeypair.Field.SHARE_NUM;
 				break;
 			}
 		}
@@ -444,18 +441,18 @@ function CryptoPiece(config) {
 				if (value === "") value = undefined;
 				if (value === "null") value = null;
 				if (value === AppUtils.NA) value = null;
-				switch (csvArr[0][col]) {
-					case CryptoKeypair.CsvHeader.TICKER:
+				switch (csvArr[0][col].toLowerCase()) {
+					case CryptoKeypair.Field.TICKER.toLowerCase():
 						keypairConfig.plugin = AppUtils.getCryptoPlugin(value);
 						break;
-					case CryptoKeypair.CsvHeader.PRIVATE_WIF:
-					case CryptoKeypair.CsvHeader.PRIVATE_HEX:
+					case CryptoKeypair.Field.PRIVATE_WIF.toLowerCase():
+					case CryptoKeypair.Field.PRIVATE_HEX.toLowerCase():
 						keypairConfig.privateKey = value;
 						break;
-					case CryptoKeypair.CsvHeader.PUBLIC_ADDRESS:
+					case CryptoKeypair.Field.PUBLIC_ADDRESS.toLowerCase():
 						keypairConfig.publicAddress = value;
 						break;
-					case CryptoKeypair.CsvHeader.SHARE_NUM:
+					case CryptoKeypair.Field.SHARE_NUM.toLowerCase():
 						if (value) {
 							value = parseInt(value, 10);
 							assertTrue(isInt(value));
