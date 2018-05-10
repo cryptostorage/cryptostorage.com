@@ -1,15 +1,14 @@
 v0.3.0
-ultra compact view
 quick generate
-footer
-precise static and dynamic dependencies
-num keypairs exceed max error
 only import controller loads dependencies, home does not
+precise static and dynamic dependencies
 make generate.html load faster
-put homepage text in index.html and dynamically hide for seo
+ultra compact view
+footer
+num keypairs exceed max error
 performance tests and optimizations
-browser testing
 
+put homepage text in index.html and dynamically hide for seo
 update faq_interoperable to only refer to encryption
 update home sample page
 progress layout
@@ -27,6 +26,9 @@ see if there are wasteful loops in editor listeners
 text import says please select currency on unrecognized text import
 add support for dogecoin
 mobile safari background scrolls while popups open
+browser testing
+release
+
 tippls
 
 designer:
