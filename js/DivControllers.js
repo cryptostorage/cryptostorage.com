@@ -2680,7 +2680,7 @@ function EditorController(div, config) {
 			
 			// confirm exit if keypairs generated
 			window.addEventListener("beforeunload", function (e) {
-				if (!that.newPiecesGenerated()) return;
+				if (AppUtils.DEV_MODE || !that.newPiecesGenerated()) return;
 				var confirmationMsg = "Discard generated keypairs and close?";
 				(e || window.event).returnValue = confirmationMsg;	// Gecko + IE
 				return confirmationMsg;   
@@ -2873,7 +2873,7 @@ function EditorController(div, config) {
 		if (that.hasFormError()) return;
 		
 		// confirm discard
-		if (that.newPiecesGenerated() && !confirm("Discard and regenerate the keypairs?")) return;
+		if (!AppUtils.DEV_MODE && that.newPiecesGenerated() && !confirm("Discard and regenerate the keypairs?")) return;
 		
 		// get generation config based on current state
 		var genConfig = that.getGenerateConfig();
@@ -2942,7 +2942,7 @@ function EditorController(div, config) {
 	}
 	
 	function reset() {
-		if (!that.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
+		if (AppUtils.DEV_MODE || !that.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
 			that.setCurrentPieces(importedPieces, importedPieceDivs);
 		}
 	}
