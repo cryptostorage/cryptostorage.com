@@ -2884,14 +2884,21 @@ function EditorController(div, config) {
 			genConfig.pieces = copies;
 		}
 		
+		// generator and progress callback
+		pieceGenerator = new PieceGenerator(genConfig);
+		console.log(pieceGenerator.getWeights());
+		var progressFunc = null;
+		if (pieceGenerator.getWeights().totalWeight > 300) {	// only announce progress if weight exceeds threshold
+			progressFunc = function(percent, label) {
+				invoke(generateProgressListeners, percent, label);
+			}
+		}
+		
 		// announce generating
 		invoke(generateListeners);
 		
-		// generate pieces according to config
-		pieceGenerator = new PieceGenerator(genConfig);
-		pieceGenerator.generatePieces(function(percent, label) {
-			invoke(generateProgressListeners, percent, label);
-		}, function(err, pieces, pieceRenderers) {
+		// generate pieces
+		pieceGenerator.generatePieces(progressFunc, function(err, pieces, pieceRenderers) {
 			
 			// validate
 			assertNull(err);

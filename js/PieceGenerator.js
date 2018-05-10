@@ -16,7 +16,9 @@ function PieceGenerator(config) {
 	// init
 	PieceGenerator.validateConfig(config);
 	config = Object.assign({}, config);
+	var that = this;
 	var _isDestroyed = false;
+	var weights;
 	var currentPieces;
 	var pieceRenderers;
 
@@ -30,7 +32,7 @@ function PieceGenerator(config) {
 		assertFalse(_isDestroyed, "Piece generator is destroyed");
 		
 		// get weights
-		var weights = computeWeights(config);
+		var weights = that.getWeights();
 		var createWeight = weights.createWeight;
 		var encryptWeight = weights.encryptWeight
 		var splitWeight = weights.splitWeight;
@@ -83,30 +85,9 @@ function PieceGenerator(config) {
 		});
 	}
 	
-	/**
-	 * Destroys the piece generator and any pieces given to it or in the process of being generated.
-	 * 
-	 * @param destroyPieces specifies if this generator's pieces should be destroyed
-	 */
-	this.destroy = function(destroyPieces) {
-		assertFalse(_isDestroyed, "Piece generator is already destroyed");
-		if (pieceRenderers) {
-			for (var i = 0; i < pieceRenderers.length; i++) pieceRenderers[i].destroy();
-		}
-		if (currentPieces && destroyPieces) {
-			for (var i = 0; i < currentPieces.length; i++) currentPieces[i].destroy();
-		}
-		_isDestroyed = true;
-	}
-	
-	this.isDestroyed = function() {
-		return _isDestroyed;
-	}
-	
-	// --------------------------------- PRIVATE --------------------------------
-	
-	function computeWeights() {
-		var weights = {};
+	this.getWeights = function() {
+		if (weights) return weights;	// use cache
+		weights = {};
 		weights.createWeight = 0;
 		weights.encryptWeight = 0;
 		weights.splitWeight = 0;
@@ -132,6 +113,28 @@ function PieceGenerator(config) {
 		weights.totalWeight = weights.createWeight + weights.encryptWeight + weights.splitWeight + weights.renderWeight;
 		return weights;
 	}
+	
+	/**
+	 * Destroys the piece generator and any pieces given to it or in the process of being generated.
+	 * 
+	 * @param destroyPieces specifies if this generator's pieces should be destroyed
+	 */
+	this.destroy = function(destroyPieces) {
+		assertFalse(_isDestroyed, "Piece generator is already destroyed");
+		if (pieceRenderers) {
+			for (var i = 0; i < pieceRenderers.length; i++) pieceRenderers[i].destroy();
+		}
+		if (currentPieces && destroyPieces) {
+			for (var i = 0; i < currentPieces.length; i++) currentPieces[i].destroy();
+		}
+		_isDestroyed = true;
+	}
+	
+	this.isDestroyed = function() {
+		return _isDestroyed;
+	}
+	
+	// --------------------------------- PRIVATE --------------------------------
 	
 	function createIfApplicable(onProgress, onDone) {
 		

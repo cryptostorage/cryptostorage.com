@@ -1113,6 +1113,7 @@ input[type='checkbox'][disabled] +label {
 	bottom: 40px;
 	right: 40px;
 	width: 320px;
+	z-index: 1
 }
 
 .editor_btn_green {
