@@ -1,4 +1,5 @@
 v0.3.0
+human readable csv headers
 ultra compact view
 quick generate
 footer
@@ -11,9 +12,8 @@ put homepage text in index.html and dynamically hide for seo
 performance tests and optimizations
 browser testing
 
-longer copied tooltip
-progress label overlapping cancel button
-human readable csv headers
+progress layout
+piece and view imported pieces layout
 split and passphrase inputs don't disable while generating on chrome
 little more margin at bottom of editor, especially mobile
 make progress bar its own controller
