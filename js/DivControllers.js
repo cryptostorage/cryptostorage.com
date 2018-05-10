@@ -3611,36 +3611,36 @@ function EditorSplitController(div, editorController) {
 			// validate num pieces
 			var numPieces = Number(numPiecesInput.val());
 			if (lenientBlankAndRange) {
-				if (!numPiecesInput.val() || isInt(numPieces)) {
+				if (!numPiecesInput.val() || (isInt(numPieces) && numPieces >= 0)) {
 					numPiecesInput.removeClass("form_input_error_div");
 				} else {
 					err = true;
 					numPiecesInput.addClass("form_input_error_div");
 				}
 			} else {
-				if (!numPiecesInput.val() || !isInt(numPieces) || numPieces < 2 || numPieces > AppUtils.MAX_SHARES) {
+				if (numPiecesInput.val() && isInt(numPieces) && numPieces >= 2 && numPieces <= AppUtils.MAX_SHARES) {
+					numPiecesInput.removeClass("form_input_error_div");
+				} else {
 					err = true;
 					numPiecesInput.addClass("form_input_error_div");
-				} else {
-					numPiecesInput.removeClass("form_input_error_div");
 				}
 			}
 			
 			// validate min pieces
 			var minPieces = Number(minPiecesInput.val());
 			if (lenientBlankAndRange) {
-				if (!minPiecesInput.val() || isInt(minPieces)) {
+				if (!minPiecesInput.val() || (isInt(minPieces) && minPieces >= 0)) {
 					minPiecesInput.removeClass("form_input_error_div");
 				} else {
 					err = true;
 					minPiecesInput.addClass("form_input_error_div");
 				}
 			} else {
-				if (!minPiecesInput.val() || !isInt(minPieces) || minPieces < 2 || (!hasError && minPieces > numPieces) || minPieces > AppUtils.MAX_SHARES) {
+				if (minPiecesInput.val() && isInt(minPieces) && minPieces >= 2 && minPieces <= AppUtils.MAX_SHARES && (err || minPieces <= numPieces)) {
+					minPiecesInput.removeClass("form_input_error_div");
+				} else {
 					err = true;
 					minPiecesInput.addClass("form_input_error_div");
-				} else {
-					minPiecesInput.removeClass("form_input_error_div");
 				}
 			}
 		}
