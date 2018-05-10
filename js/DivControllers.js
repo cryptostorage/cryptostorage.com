@@ -225,6 +225,41 @@ var UiUtils = {
 			img[0].src = url;
 		});
 	},
+	
+	/**
+	 * Makes all divs within the given div and with class 'copyable' copyable (clipboard and tooltip).
+	 * 
+	 * @param div is the div to find copyable classes within
+	 */
+	makeCopyable: function(div) {
+		
+		// copy to clipboard
+		// TODO: target scope
+		new Clipboard(".copyable", {
+			text: function(trigger) {
+				return $(trigger).html();
+			}
+		});
+		
+		// add tooltips
+		div.find(".copyable").each(function(i, copyable) {
+			tippy(copyable, {
+				arrow : true,
+				html : $("<div>Copied!</div>").get(0),
+				interactive : true,
+				placement : "top",
+				theme : 'translucent',
+				trigger : "click",
+				distance : 10,
+				arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+				onShow : function() {
+					setTimeout(function() {
+						copyable._tippy.hide();
+					}, 3000)
+				}
+			});
+		});
+	}
 }
 
 /**
@@ -1376,30 +1411,7 @@ function DonateController(div, appController) {
 					pageDiv.append(donationsDiv);
 					
 					// make addresses copyable
-					new Clipboard(".copyable", {
-						text: function(trigger) {
-							return $(trigger).html();
-						}
-					});
-					
-					// copied tooltips
-					div.find(".copyable").each(function(i, copyable) {
-						tippy(copyable, {
-							arrow : true,
-							html : $("<div>Copied!</div>").get(0),
-							interactive : true,
-							placement : "top",
-							theme : 'translucent',
-							trigger : "click",
-							distance : 5,
-							arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
-							onShow : function() {
-								setTimeout(function() {
-									copyable._tippy.hide();
-								}, 3000)
-							}
-						});
-					});
+					UiUtils.makeCopyable(div);
 					
 					// done rendering
 					if (onDone) onDone(div);
@@ -4740,31 +4752,8 @@ function CompactPieceRenderer(div, piece, config) {
 				if (_isDestroyed) return;
 				assertNull(err);
 				
-				// copy keys to clipboard
-				new Clipboard(".copyable", {
-					text: function(trigger) {
-						return $(trigger).html();
-					}
-				});
-				
-				// copied tooltip
-				div.find(".copyable").each(function(i, copyable) {
-					tippy(copyable, {
-						arrow : true,
-						html : $("<div>Copied!</div>").get(0),
-						interactive : true,
-						placement : "top",
-						theme : 'translucent',
-						trigger : "click",
-						distance : 10,
-						arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
-						onShow : function() {
-							setTimeout(function() {
-								copyable._tippy.hide();
-							}, 2000)
-						}
-					});
-				});
+				// make keypairs copyable
+				UiUtils.makeCopyable(div);
 
 				// done
 				if (onDone) onDone(div);
@@ -4840,34 +4829,8 @@ inheritsFrom(CompactPieceRenderer, DivController);
  */
 CompactPieceRenderer.makeCopyable = function(pieceDivs) {
 	pieceDivs = listify(pieceDivs);
-	
-	// copy keys to clipboard
-	new Clipboard(".copyable", {
-		text: function(trigger) {
-			return $(trigger).html();
-		}
-	});
-	
-	// copied tooltips
 	for (var i = 0; i < pieceDivs.length; i++) {
-		var pieceDiv = pieceDivs[i];
-		pieceDiv.find(".copyable").each(function(i, copyable) {
-			tippy(copyable, {
-				arrow : true,
-				html : $("<div>Copied!</div>").get(0),
-				interactive : true,
-				placement : "top",
-				theme : 'translucent',
-				trigger : "click",
-				distance : 10,
-				arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
-				onShow : function() {
-					setTimeout(function() {
-						copyable._tippy.hide();
-					}, 2000)
-				}
-			});
-		});
+		UiUtils.makeCopyable(pieceDivs);
 	}
 }
 
