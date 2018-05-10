@@ -276,8 +276,8 @@ function OverlayController(div, config) {
 		overlayDiv = $("<div class='overlay_div flex_horizontal flex_align_center flex_justify_center'>");
 		if (config.fullScreen) overlayDiv.css("position", "fixed");
 		else div.css("position", "relative");
-		overlayDiv.appendTo(div);
 		overlayDiv.css("background-color", config.backgroundColor);
+		overlayDiv.appendTo(div);
 		if (config.contentDiv) overlayDiv.append(config.contentDiv);
 		overlayDiv.click(function(e) {
 			if (e.target !== this) return;
