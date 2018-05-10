@@ -18,6 +18,7 @@ longer copied tooltip
 progress label overlapping cancel button
 human readable csv headers
 split and passphrase inputs don't disable while generating on chrome
+little more margin at bottom of editor, especially mobile
 make progress bar its own controller
 notice colors
 export control layout

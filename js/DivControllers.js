@@ -2710,7 +2710,7 @@ function EditorController(div, config) {
 		generateProgressListeners.push(listener);
 	}
 	
-	this.setPieces = function(_pieces, _pieceDivs) {
+	this.setCurrentPieces = function(_pieces, _pieceDivs) {
 		
 		// set and notify null pieces
 		if (_pieces === undefined && _pieceDivs === undefined) {
@@ -2745,7 +2745,7 @@ function EditorController(div, config) {
 		setPiecesListeners.push(listener);
 	}
 	
-	this.getPieces = function() {
+	this.getCurrentPieces = function() {
 		return pieces;
 	}
 	
@@ -2873,7 +2873,7 @@ function EditorController(div, config) {
 			// set pieces and divs
 			var pieceDivs = [];
 			for (var i = 0; i < pieceRenderers.length; i++) pieceDivs.push(pieceRenderers[i].getDiv());
-			that.setPieces(pieces, pieceDivs);
+			that.setCurrentPieces(pieces, pieceDivs);
 			pieceGenerator = null;
 			if (onDone) onDone();
 		});
@@ -2911,7 +2911,7 @@ function EditorController(div, config) {
 	}
 	
 	function reset() {
-		that.setPieces(importedPieces, importedPieceDivs);
+		that.setCurrentPieces(importedPieces, importedPieceDivs);
 	}
 	
 	function cancel() {
@@ -2919,7 +2919,7 @@ function EditorController(div, config) {
 			pieceGenerator.destroy(true);
 			pieceGenerator = null;
 		}
-		that.setPieces(importedPieces, importedPieceDivs);
+		that.setCurrentPieces(importedPieces, importedPieceDivs);
 	}
 }
 inheritsFrom(EditorController, DivController);
@@ -3032,7 +3032,7 @@ function EditorContentController(div, editorController, config) {
 					// add pre-existing piece divs
 					if (config.pieceDivs) {
 						CompactPieceRenderer.makeCopyable(config.pieceDivs);
-						editorController.setPieces(config.pieces, config.pieceDivs);
+						editorController.setCurrentPieces(config.pieces, config.pieceDivs);
 					}
 					
 					// render piece divs
@@ -3048,7 +3048,7 @@ function EditorContentController(div, editorController, config) {
 						}
 						
 						// set pieces and divs
-						editorController.setPieces(config.pieces, pieceDivs);
+						editorController.setCurrentPieces(config.pieces, pieceDivs);
 						
 						// start rendering pieces but don't wait
 						var renderFuncs = [];
@@ -3694,7 +3694,7 @@ function EditorPaginatorController(div, editorController) {
 	
 	function getPieceNums() {
 		var pieceNums = [];
-		var currentPieces = editorController.getPieces();
+		var currentPieces = editorController.getCurrentPieces();
 		var config = editorController.getInitConfig();
 		if (currentPieces && currentPieces.length > 1) {
 			for (var i = 0; i < currentPieces.length; i++) pieceNums.push(currentPieces[i].getPieceNum());
@@ -4220,7 +4220,7 @@ function EditorActionsController(div, editorController) {
 		// handle no imported pieces
 		if (!editorController.getImportedPieces()) {
 			btnApply.hide();
-			btnGenerate.html(editorController.getPieces() ? "Regenerate" : "Generate");
+			btnGenerate.html(editorController.getCurrentPieces() ? "Regenerate" : "Generate");
 			btnGenerate.show();
 			btnGenerate.unbind("click");
 			btnReset.show();
@@ -4238,7 +4238,7 @@ function EditorActionsController(div, editorController) {
 			
 			// apply and reset shown if passphrase or split checked
 			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getSplitController().getUseSplit()) {
-				btnApply.html(editorController.getPieces() === editorController.getImportedPieces() ? "Apply" : "Reapply");
+				btnApply.html(editorController.getCurrentPieces() === editorController.getImportedPieces() ? "Apply" : "Reapply");
 				btnApply.show()
 				btnApply.unbind("click");
 				btnReset.show();
@@ -4250,7 +4250,7 @@ function EditorActionsController(div, editorController) {
 				}
 			} else {
 				btnApply.hide();
-				if (editorController.getPieces()[0] !== editorController.getImportedPieces()[0]) {
+				if (editorController.getCurrentPieces()[0] !== editorController.getImportedPieces()[0]) {
 					btnReset.show();
 				} else {
 					btnReset.hide();
@@ -4259,7 +4259,7 @@ function EditorActionsController(div, editorController) {
 		}
 		
 		// update save print buttons
-		editorController.getPieces() ? savePrintDiv.show() : savePrintDiv.hide();
+		editorController.getCurrentPieces() ? savePrintDiv.show() : savePrintDiv.hide();
 	}
 }
 inheritsFrom(EditorActionsController, DivController);
