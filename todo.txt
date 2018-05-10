@@ -2,6 +2,7 @@ v0.3.0
 ultra compact view
 confirmation on destroy generated storage
 split validation should fail on -1, min fails if num is blank
+quick generate
 footer
 browser testing
 precise static and dynamic dependencies
@@ -14,7 +15,6 @@ update faq_interoperable to only refer to encryption
 put homepage text in index.html and dynamically hide for seo
 
 split and passphrase inputs don't disable while generating on chrome
-quick generate
 make progress bar its own controller
 notice colors
 export control layout
