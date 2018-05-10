@@ -4542,7 +4542,7 @@ function EditorPrintController(div, pieces) {
 		previewGenerator = new PieceGenerator({
 			pieces: [pieces[0]],
 			pieceRendererClass: CompactPiecePreviewRenderer,
-			pieceRendererConfig: getPieceRendererConfig()
+			pieceRendererConfig: getPieceRendererConfig(true)
 		});
 		previewGenerator.generatePieces(null, function(err, _pieces, _previewRenderers) {
 			assertNull(err);
@@ -4573,14 +4573,14 @@ function EditorPrintController(div, pieces) {
 		});
 	}
 	
-	function getPieceRendererConfig() {
+	function getPieceRendererConfig(isPreview) {
 		return {
 			showPublic: includePublicCheckbox.isChecked(),
 			showPrivate: includePrivateCheckbox.isChecked(),
 			showLogos: includeLogosCheckbox.isChecked(),
 			cryptoCash: cryptoCashCheckbox && cryptoCashCheckbox.isVisible() ? cryptoCashCheckbox.isChecked() : false,
 			infoBack: includeInstructionsCheckbox ? includeInstructionsCheckbox.isChecked() : false,
-			pageBreaks: true
+			pageBreaks: isPreview ? false : true
 		}
 	}
 	
@@ -4652,10 +4652,7 @@ function CompactPieceRenderer(div, piece, config) {
 	}, config);
 	if (!config.showPublic) assertTrue(config.showPrivate);
 	if (!config.showPrivate) assertTrue(config.showPublic);
-	if (config.infoBack) {
-		assertFalse(piece.isSplit());
-		assertTrue(config.pageBreaks);
-	}
+	if (config.infoBack) assertFalse(piece.isSplit());
 	
 	var keypairRenderers;
 	var onProgressFn;
@@ -4683,7 +4680,10 @@ function CompactPieceRenderer(div, piece, config) {
 					div.append($("<div>"));
 					tickers = [];
 					for (var j = 0; j < pairsPerPage; j++) tickers.push(piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
-					if (config.cryptoCash && config.infoBack) div.append(getSweepInstructionsPage(tickers));
+					if (config.cryptoCash && config.infoBack) {
+						pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+						pageDiv.append(getSweepInstructions(tickers));
+					}
 				}
 				
 				// add new page
@@ -4703,13 +4703,14 @@ function CompactPieceRenderer(div, piece, config) {
 			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
 		}
 		
-		// add final page of sweep instructions
+		// add final sweep instructions
 		if (config.infoBack && config.cryptoCash) {
 			var numPairsLastPage = piece.getKeypairs().length % pairsPerPage;
 			if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
 			tickers = [];
 			for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.getKeypairs()[piece.getKeypairs().length - (numPairsLastPage - i)].getPlugin().getTicker());
-			div.append(getSweepInstructionsPage(tickers));
+			if (config.pageBreaks) pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+			pageDiv.append(getSweepInstructions(tickers));
 		}
 		
 		// compute weights
@@ -4809,14 +4810,14 @@ function CompactPieceRenderer(div, piece, config) {
 	/**
 	 * Render sweep instructions.
 	 * 
-	 * @param tickers is an array of tickers to render instructions for
+	 * @param tickers is an array of tickers to get instructions for
 	 */
-	function getSweepInstructionsPage(tickers) {
+	function getSweepInstructions(tickers) {
 		assertArray(tickers);
 		assertTrue(tickers.length > 0);
-		var pageDiv = $("<div class='piece_page_div'>");
-		for (var i = 0; i < tickers.length; i++) pageDiv.append(UiUtils.getSweepInstructionsDiv(tickers[i]));
-		return pageDiv;
+		var instructionDivs = [];
+		for (var i = 0; i < tickers.length; i++) instructionDivs.push(UiUtils.getSweepInstructionsDiv(tickers[i]));
+		return instructionDivs;
 	}
 }
 inheritsFrom(CompactPieceRenderer, DivController);
