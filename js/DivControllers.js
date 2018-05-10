@@ -2596,6 +2596,7 @@ function EditorController(div, config) {
 	DivController.call(this, div);
 	
 	// global variables
+	var QUICK_GENERATE_MAX = 350;	// generation is 'quick' up to this weight to avoid flickering
 	var that = this;
 	var passphraseController
 	var splitController;
@@ -2884,21 +2885,17 @@ function EditorController(div, config) {
 			genConfig.pieces = copies;
 		}
 		
-		// generator and progress callback
+		// create generator and determine if generation is quick
 		pieceGenerator = new PieceGenerator(genConfig);
-		console.log(pieceGenerator.getWeights());
-		var progressFunc = null;
-		if (pieceGenerator.getWeights().totalWeight > 300) {	// only announce progress if weight exceeds threshold
-			progressFunc = function(percent, label) {
-				invoke(generateProgressListeners, percent, label);
-			}
-		}
+		var isQuick = pieceGenerator.getWeights().totalWeight <= QUICK_GENERATE_MAX;
 		
 		// announce generating
-		invoke(generateListeners);
+		invoke(generateListeners, isQuick);
 		
 		// generate pieces
-		pieceGenerator.generatePieces(progressFunc, function(err, pieces, pieceRenderers) {
+		pieceGenerator.generatePieces(function(percent, label) {
+			if (!isQuick) invoke(generateProgressListeners, percent, label);	// don't announce if quick
+		}, function(err, pieces, pieceRenderers) {
 			
 			// validate
 			assertNull(err);
@@ -3296,7 +3293,9 @@ function EditorPassphraseController(div, editorController) {
 			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
 			editorController.getContentController().onInputChange(update);
-			editorController.onGenerate(function() { setEnabled(false); });
+			editorController.onGenerate(function(isQuick) {
+				if (!isQuick) setEnabled(false);
+			});
 			update();
 		});
 		
@@ -3524,13 +3523,15 @@ function EditorSplitController(div, editorController) {
 			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
 			editorController.getContentController().onInputChange(update);
-			editorController.onGenerate(function() { that.setEnabled(false); });
+			editorController.onGenerate(function(isQuick) {
+				if (!isQuick) setEnabled(false);
+			});
 			update();
 		});
 		
 		// initial state
 		reset();
-		that.setEnabled(false);
+		setEnabled(false);
 		
 		// done
 		if (onDone) onDone(div);
@@ -3582,7 +3583,9 @@ function EditorSplitController(div, editorController) {
 		minPiecesInout.val(minPieces);
 	}
 	
-	this.setEnabled = function(bool) {
+	// -------------------------------- PRIVATE ---------------------------------
+	
+	function setEnabled(bool) {
 		splitCheckbox.setEnabled(bool);
 		if (!bool || !that.getUseSplit()) {
 			numPiecesInput.attr("disabled", "disabled");
@@ -3593,15 +3596,13 @@ function EditorSplitController(div, editorController) {
 		}
 	}
 	
-	// -------------------------------- PRIVATE ---------------------------------
-	
 	function update() {
 		
 		// disable if pieces already split
 		if (editorController.getImportedPieces() && editorController.getImportedPieces()[0].isSplit()) {
-			that.setEnabled(false);
+			setEnabled(false);
 		} else {
-			that.setEnabled(true);
+			setEnabled(true);
 		}
 		
 		// remove form errors
@@ -4206,7 +4207,8 @@ function EditorActionsController(div, editorController) {
 		editorController.onFormErrorChange(update);
 		editorController.getPassphraseController().onUsePassphraseChange(update);
 		editorController.getSplitController().onUseSplitChange(update);
-		editorController.onGenerate(function() {
+		editorController.onGenerate(function(isQuick) {
+			if (isQuick) return;
 			btnCancel.show();
 			btnGenerate.hide();
 			btnApply.hide();
@@ -4779,6 +4781,7 @@ function CompactPieceRenderer(div, piece, config) {
 				if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (index + 1);
 				var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
+					if (_isDestroyed) return;
 					if (config.cryptoCash) div.addClass("keypair_div_spaced");
 					placeholderDiv.replaceWith(div);
 					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
