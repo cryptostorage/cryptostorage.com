@@ -3359,7 +3359,6 @@ function EditorPassphraseController(div, editorController) {
 	
 	function setEnabled(bool) {
 		assertBoolean(bool);
-		console.log("setEnabled(" + bool + ")");
 		passphraseCheckbox.setEnabled(bool);
 		bip38Checkbox.setEnabled(bool);
 		passphraseEyeDiv.unbind("click");
