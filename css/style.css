@@ -1269,11 +1269,11 @@ input[type='checkbox'][disabled] +label {
 	font-weight: 800;
 	color: rgb(146, 146, 146);
 	opacity: 0.42;
- 	-webkit-transform: rotate(-20deg);
-    -moz-transform: rotate(-20deg);
-    -o-transform: rotate(-20eg);
-    -ms-transform: rotate(-20deg);
-    transform: rotate(-15deg);
+ 	-webkit-transform: rotate(-18deg);
+    -moz-transform: rotate(-18deg);
+    -o-transform: rotate(-18eg);
+    -ms-transform: rotate(-18deg);
+    transform: rotate(-18deg);
 }
 
 .editor_piece_selection_label {
@@ -1366,21 +1366,21 @@ input[type='checkbox'][disabled] +label {
 	padding: 7px 7px 7px 7px;
 	border: 2px solid;
 	border-color: green;
-	border-bottom: none;
+	border-top: none;
 }
 
-.keypair_div:last-child {
-	border-bottom: 2px solid green;
+.keypair_div:first-child {
+	border-top: 2px solid green;
 }
 
 .keypair_div_spaced {
-	border-bottom: 2px solid;
+	border-top: 2px solid;
 	border-color: green;
-	margin-bottom: 34px;
+	margin-top: 34px;
 }
 
-.keypair_div_spaced:last-child {
-	margin-bottom: 0;
+.keypair_div_spaced:first-child {
+	margin-top: 0;
 }
 
 .keypair_qr {

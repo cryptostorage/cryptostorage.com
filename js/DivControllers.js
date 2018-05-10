@@ -4661,7 +4661,7 @@ function CompactPieceRenderer(div, piece, config) {
 		div.addClass("piece_div");
 		
 		// build pages and collect functions to render keypairs
-		var pageDiv;
+		var keypairsDiv;
 		var tickers;
 		var pairsPerPage = config.cryptoCash ? 6 : 7;
 		var renderFuncs = [];
@@ -4676,13 +4676,14 @@ function CompactPieceRenderer(div, piece, config) {
 					tickers = [];
 					for (var j = 0; j < pairsPerPage; j++) tickers.push(piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
 					if (config.cryptoCash && config.infoBack) {
-						pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-						pageDiv.append(getSweepInstructions(tickers));
+						var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+						keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
+						keypairsDiv.append(getSweepInstructions(tickers));
 					}
 				}
 				
 				// add new page
-				pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+				var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
 				if (piece.getPieceNum() || (!config.cryptoCash && config.showLogos)) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
@@ -4690,10 +4691,11 @@ function CompactPieceRenderer(div, piece, config) {
 					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
 					if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
 				}
+				keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
 			}
 			
 			// collect functions to render keypairs
-			var placeholderDiv = $("<div class='keypair_div'>").appendTo(pageDiv);
+			var placeholderDiv = $("<div class='keypair_div'>").appendTo(keypairsDiv);
 			if (config.cryptoCash) placeholderDiv.addClass("keypair_div_spaced");
 			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
 		}
@@ -4704,8 +4706,11 @@ function CompactPieceRenderer(div, piece, config) {
 			if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
 			tickers = [];
 			for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.getKeypairs()[piece.getKeypairs().length - (numPairsLastPage - i)].getPlugin().getTicker());
-			if (config.pageBreaks) pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-			pageDiv.append(getSweepInstructions(tickers));
+			if (config.pageBreaks) {
+				var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+				keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
+			}
+			keypairsDiv.append(getSweepInstructions(tickers));
 		}
 		
 		// compute weights
@@ -4914,6 +4919,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 			
 			// add sample overlay
 			var sampleDiv = $("<div class='editor_print_sample_overlay user_select_none'>SAMPLE</div>");
+			console.log(div.children().first().children().eq(config.showLogos && !config.cryptoCash ? 1 : 0));
 			//new OverlayController(_previewRenderers[0].getDiv().children().first().children().eq(1), {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render();
 			new OverlayController(div.children().first().children().eq(config.showLogos && !config.cryptoCash ? 1 : 0), {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
 				if (onDone) onDone();
