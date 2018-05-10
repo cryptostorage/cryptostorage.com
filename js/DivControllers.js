@@ -233,7 +233,7 @@ var UiUtils = {
 	 */
 	makeCopyable: function(div) {
 		
-		// find copyable divs
+		// find copyable divs as NodeList
 		var copyables = div.get(0).querySelectorAll(".copyable");
 		
 		// copy to clipboard on click
@@ -244,8 +244,7 @@ var UiUtils = {
 		});
 		
 		// add styling and tooltips
-		for(var i = 0; i < copyables.length; ++i) {
-			var copyable = copyables[i];
+		copyables.forEach(function(copyable, i) {
 			$(copyable).addClass("copyable_init");
 			tippy(copyable, {
 				arrow : true,
@@ -259,10 +258,10 @@ var UiUtils = {
 				onShow : function() {
 					setTimeout(function() {
 						copyable._tippy.hide();
-					}, 3000)
+					}, 2500)
 				}
 			});
-		}
+		});
 	}
 }
 

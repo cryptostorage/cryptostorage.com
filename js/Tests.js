@@ -604,8 +604,13 @@ function Tests() {
 			if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 			assertTrue(piece.equals(piece2));
 			
-			// test init with invalid split pieces
-			// TODO: this test fails without min share encoding
+			/**
+			 * Tests init with shares with different minimum thresholds.
+			 * 
+			 * This test is commented out because shares from different keys can appear
+			 * valid, so this test is invalid without knowing share threshold which was
+			 * removed by default in v0.3.0.
+			 */
 //			var splitPieces1 = piece.split(3, 2);
 //			var splitPieces2 = piece.split(5, 3);
 //			try {
