@@ -1,6 +1,5 @@
 v0.3.0
 ultra compact view
-sample overlay on print preview
 confirmation on destroy generated storage
 split validation should fail on -1, min fails if num is blank
 footer

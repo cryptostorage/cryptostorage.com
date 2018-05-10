@@ -1264,8 +1264,8 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_print_sample_overlay {
-	font-size: 75px;
-	font-weight: 800;
+	font-size: 70px;
+	font-weight: 700;
 	color: rgb(146, 146, 146);
 	opacity: 0.42;
  	-webkit-transform: rotate(-18deg);

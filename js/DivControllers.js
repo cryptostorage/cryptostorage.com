@@ -3410,7 +3410,7 @@ function EditorPassphraseController(div, editorController) {
 		var learnMoreLink = $("<a style='font-size:20px;' target='_blank' href='index.html#faq_interoperable'>Learn more</a>").appendTo(div);
 		interoperableDiv.append(learnMoreLink);
 		var okButton = $("<div style='font-size:22px;' class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(bodyDiv);
-		okButton.append("Okay, I understand the risk");
+		okButton.append("I understand the risk");
 		okButton.click(onAgree);
 		return div;
 	}
@@ -4919,9 +4919,8 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 			
 			// add sample overlay
 			var sampleDiv = $("<div class='editor_print_sample_overlay user_select_none'>SAMPLE</div>");
-			console.log(div.children().first().children().eq(config.showLogos && !config.cryptoCash ? 1 : 0));
-			//new OverlayController(_previewRenderers[0].getDiv().children().first().children().eq(1), {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render();
-			new OverlayController(div.children().first().children().eq(config.showLogos && !config.cryptoCash ? 1 : 0), {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
+			var keypairsDiv = div.children().first().children().eq(config.showLogos && !config.cryptoCash || piece.isSplit() ? 1 : 0);
+			new OverlayController(keypairsDiv, {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
 				if (onDone) onDone();
 			});
 		});
