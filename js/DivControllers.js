@@ -4561,11 +4561,6 @@ function EditorPrintController(div, pieces) {
 				previewDiv.children().replaceWith(previewLoadDiv);
 				previewDiv.append(_previewRenderers[0].getDiv());
 				previewLoadDiv.hide();
-				
-				// add sample overlay
-				//var sampleDiv = $("<div class='editor_print_sample_overlay user_select_none'>SAMPLE</div>");
-				//new OverlayController(_previewRenderers[0].getDiv().children().first().children().eq(1), {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render();
-				//new OverlayController(previewDiv, {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render();
 				pieceRenderers = _pieceRenderers;
 				setPrintEnabled(true);
 				if (onDone) onDone();
@@ -4916,7 +4911,13 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 		pieceRenderer = new CompactPieceRenderer(div, previewPiece, config);
 		pieceRenderer.onProgress(onProgressFn);
 		pieceRenderer.render(function(div) {
-			if (onDone) onDone();
+			
+			// add sample overlay
+			var sampleDiv = $("<div class='editor_print_sample_overlay user_select_none'>SAMPLE</div>");
+			//new OverlayController(_previewRenderers[0].getDiv().children().first().children().eq(1), {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render();
+			new OverlayController(div, {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
+				if (onDone) onDone();
+			});
 		});
 	}
 	
