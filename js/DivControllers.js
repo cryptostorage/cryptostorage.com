@@ -1396,7 +1396,7 @@ function DonateController(div, appController) {
 							onShow : function() {
 								setTimeout(function() {
 									copyable._tippy.hide();
-								}, 2000)
+								}, 3000)
 							}
 						});
 					});

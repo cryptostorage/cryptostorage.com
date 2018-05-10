@@ -1,16 +1,16 @@
 v0.3.0
+print tab values shouldn't be underlined because cannot click
 ultra compact view
 quick generate
 footer
-browser testing
 precise static and dynamic dependencies
 num keypairs exceed max error
-print tab values shouldn't be underlined because cannot click
-performance tests and optimizations
 only import controller loads dependencies, home does not
 make generate.html load faster
 update faq_interoperable to only refer to encryption
 put homepage text in index.html and dynamically hide for seo
+performance tests and optimizations
+browser testing
 
 longer copied tooltip
 progress label overlapping cancel button
