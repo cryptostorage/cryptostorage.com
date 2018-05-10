@@ -904,7 +904,7 @@ function buildHtmlDocument(div, title, dependencyPaths, internalCss) {
 		}
 	}
 	str += "</head><body>";
-	if (div) str += div.html();
+	if (div) str += $("<div>").append(div.clone()).html();
 	str += "</body></html>";
 	return str;
 }

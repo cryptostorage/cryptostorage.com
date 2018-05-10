@@ -2994,7 +2994,7 @@ function EditorContentController(div, editorController, config) {
 				progressLabel = $("<div class='editor_progress_label'>").appendTo(progressDiv);
 				
 				// pieces div
-				piecesDiv = $("<div class='editor_pieces_div flex_vertical'>").appendTo(bodyDiv);
+				piecesDiv = $("<div class='pieces_div flex_vertical'>").appendTo(bodyDiv);
 				piecesDiv.hide();
 				
 				// currency inputs controller
@@ -3008,7 +3008,7 @@ function EditorContentController(div, editorController, config) {
 				}
 				
 				// actions controller
-				actionsController = new EditorActionsController($("<div>").appendTo(bodyDiv), editorController);
+				actionsController = new EditorActionsController($("<div>").appendTo(div), editorController);
 				actionsController.render();
 				
 				// register callbacks
@@ -4592,11 +4592,11 @@ function EditorPrintController(div, pieces) {
 		if (!includePrivateCheckbox.isChecked() && !confirm("Funds CANNOT be recovered from the printed file because the private keys are not included.\n\nContinue?")) return;
 
 		// build print div
-		var printDiv = $("<div>");
-		for (var i = 0; i < pieceRenderers.length; i++) printDiv.append(pieceRenderers[i].getDiv());
+		var piecesDiv = $("<div class='pieces_div'>");
+		for (var i = 0; i < pieceRenderers.length; i++) piecesDiv.append(pieceRenderers[i].getDiv());
 		
-		// open window with print div
-		newWindow(printDiv, "Print Keypairs", "css/style.css", null, function(err, window) {
+		// open window with pieces
+		newWindow(piecesDiv, "Print Keypairs", "css/style.css", null, function(err, window) {
 			if (err) {
 				AppUtils.setTabError(true);
 				return;
@@ -4915,7 +4915,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 			// add sample overlay
 			var sampleDiv = $("<div class='editor_print_sample_overlay user_select_none'>SAMPLE</div>");
 			//new OverlayController(_previewRenderers[0].getDiv().children().first().children().eq(1), {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render();
-			new OverlayController(div, {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
+			new OverlayController(div.children().first().children().eq(config.showLogos && !config.cryptoCash ? 1 : 0), {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
 				if (onDone) onDone();
 			});
 		});

@@ -1097,8 +1097,15 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_body_div {
-	padding-top: 40px;
 	width: 750px;
+}
+
+.editor_body_div > div {
+	margin-top: 40px;
+}
+
+.editor_body_div > div:last-child {
+	margin-bottom: 40px;
 }
 
 .editor_controls {
@@ -1194,10 +1201,6 @@ input[type='checkbox'][disabled] +label {
 	background-color: rgb(232, 91, 74);
 }
 
-.editor_pieces_div {
-	width: 750px;
-}
-
 .editor_popup_div {
 	background-color: white;
 	z-index: 1;
@@ -1290,29 +1293,34 @@ input[type='checkbox'][disabled] +label {
 	font-size: 20px;
 }
 
-.editor_pieces_div {
+.pieces_div {
 	background-color: white;
-	padding: 0 0 40px 0;
+}
+
+.pieces_div > .piece_div {
+	margin-bottom: 50px;
+}
+
+.pieces_div > .piece_div:last-child {
+	margin-bottom: 0px;
+}
+
+.pieces_div > .piece_div > .piece_page_div {
+	margin-bottom: 30px;
+}
+
+.pieces_div > .piece_div > .piece_page_div:last-child {
+	margin-bottom: 0px;
 }
 
 .piece_div {
 	min-width: 750px;
 	width: 750px;
-	margin-bottom: 50px;
-}
-
-.piece_div:last-child {
-	margin-bottom: 0px;
 }
 
 .piece_page_div {
-	margin-bottom: 30px;
 	page-break-inside: avoid;
 	page-break-after: always;
-}
-
-.piece_page_div:last-child {
-	margin-bottom: 0px;
 }
 
 .piece_page_header_div {
@@ -1392,7 +1400,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .keypair_left_div {
-	width:90px;
+	width: 90px;
 }
 
 .keypair_left_label {
@@ -1456,15 +1464,6 @@ input[type='checkbox'][disabled] +label {
 	text-align: right;
 	font-family: monospace;
 	line-height: 14px;
-}
-
-@media print {
-	.piece_div {
-		margin-bottom: 0;
-	}
-	.piece_page_div {
-		margin-bottom: 0;
-	}
 }
 
 .cryptocash_instructions {
@@ -1741,6 +1740,18 @@ input[type='checkbox'][disabled] +label {
 	}
 	.editor_controls {
 		position: static;
-		padding: 40px 0 40px 0px;
+		padding: 0 0 40px 0px;
+	}
+}
+
+@media print {
+	.pieces_div {
+		margin: 0 !important;
+	}
+	.piece_div {
+		margin: 0 !important;
+	}
+	.piece_page_div {
+		margin: 0 !important;
 	}
 }
