@@ -1103,7 +1103,7 @@ function FaqController(div) {
 						generateKeysList.append("<li><p>Optionally split your keys for maximum security.</p></li>");
 						generateList.append("<li><p>Save the generated keys to a flash drive or printed paper for safe keeping.  Geographic redundancy is <i>highly recommended</i> so if one location is lost due to fire, flood, theft, etc, there are backup copies at other locations.</p>" +
 							"<p>The keys can be imported at any time by relaunching this tool in a secure environment.</p>" +
-								"<p><span style='color:red'>Do not lose the generated keys or the password or all funds will be lost.</span></p></li>");
+							"<p><span style='color:red'>Do not lose the generated keys or the password or all funds will be lost.</span></p></li>");
 						return answerDiv;
 					}
 				},{
@@ -2996,7 +2996,7 @@ function EditorContentController(div, editorController, config) {
 		formErrorChangeListeners = [];
 		inputChangeListeners = [];
 		
-		// load dependencies TODO: load correct dependencies
+		// load dependencies
 		LOADER.load(AppUtils.getDynamicExportDependencies(), function(err) {
 			if (err) throw err;
 			

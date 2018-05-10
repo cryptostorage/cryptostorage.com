@@ -26,19 +26,16 @@
 		<!-- Initialize -->
 		<script type="text/javascript">
 		
+		$(document).ready(function() {
+			
 			// welcome :)
 			console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
-				
-			// load initial editor dependencies
-			LOADER.load(AppUtils.getInitialExportDependencies(), function(err) {
-				if (err) throw err;
-				
-				// initialize editor with config
-				var config = {};
-				config.environmentInfo = AppUtils.getCachedEnvironment();
-				config.genConfig = getGenConfig();
-				window.initEditor(window, config);
-			});
+			
+			// initialize editor with config
+			var config = {};
+			config.environmentInfo = AppUtils.getCachedEnvironment();
+			config.genConfig = getGenConfig();
+			window.initEditor(window, config);
 			
 			/**
 			 * Translates url parameters into a generation config for the editor
@@ -85,6 +82,7 @@
 				}
 				return genConfig;
 			}
+		});	
      	</script> 
 	</head>
 	<body>
