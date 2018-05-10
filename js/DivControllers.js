@@ -246,29 +246,37 @@ DivController.prototype.isVisible = function() { return this.div.is(":visible");
  * @param div is the div to overlay
  * @param config specifies overlay configuraiton
  * 				config.contentDiv is centered on the overlay to achieve a popup if given
+ * 				config.fullScreen specifies if the overlay is full screen (default false)
  *				config.backgroundColor specifies the opacity of the overlay div
  *				config.hideOnExternalClick specifies if the overlay should be hidden on external click (default false)
  */
 function OverlayController(div, config) {
 	DivController.call(this, div);
+	assertDefined(div);
 	
 	// default config
 	config = Object.assign({
+		fullScreen: false,
 		backgroundColor: "rgba(0, 0, 0, 0.5)",
 		hideOnExternalClick: false
+		
 	}, config);
 	
 	// instance variables
 	var that = this;
 	var overlayDiv;
 	var originalOverflow = div.css("overflow") ? div.css("overflow") : "auto";
+	var originalPosition = div.css("position") ? div.css("position") : "static";
 	var hideListeners = [];
 	var showListeners = [];
 	
 	this.render = function(onDone) {
 		
 		// full div overlay
-		overlayDiv = $("<div class='overlay_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(div);
+		overlayDiv = $("<div class='overlay_div flex_horizontal flex_align_center flex_justify_center'>");
+		if (config.fullScreen) overlayDiv.css("position", "fixed");
+		else div.css("position", "relative");
+		overlayDiv.appendTo(div);
 		overlayDiv.css("background-color", config.backgroundColor);
 		if (config.contentDiv) overlayDiv.append(config.contentDiv);
 		overlayDiv.click(function(e) {
@@ -295,6 +303,7 @@ function OverlayController(div, config) {
 	
 	this.hide = function() {
 		div.css("overflow", originalOverflow);
+		div.css("position", originalPosition);
 		overlayDiv.hide();
 		invoke(hideListeners);
 	}
@@ -308,6 +317,7 @@ function OverlayController(div, config) {
 	this.destroy = function() {
 		if (overlayDiv) overlayDiv.remove();
 		div.css("overflow", originalOverflow);
+		div.css("position", originalPosition);
 	}
 }
 inheritsFrom(OverlayController, DivController);
@@ -2869,7 +2879,7 @@ function EditorController(div, config) {
 	
 	function save() {
 		var saveController = new EditorSaveController($("<div>"), pieces);
-		var popupController = new OverlayController(div, {contentDiv: saveController.getDiv(), hideOnExternalClick: true});
+		var popupController = new OverlayController(div, {contentDiv: saveController.getDiv(), fullScreen: true, hideOnExternalClick: true});
 		saveController.onSave(popupController.destroy);
 		saveController.onCancel(popupController.destroy);
 		saveController.render();
@@ -2878,7 +2888,7 @@ function EditorController(div, config) {
 		
 	function print() {
 		var printController = new EditorPrintController($("<div>"), pieces);
-		var popupController = new OverlayController(div, {contentDiv: printController.getDiv(), hideOnExternalClick: true});
+		var popupController = new OverlayController(div, {contentDiv: printController.getDiv(), fullScreen: true, hideOnExternalClick: true});
 		printController.onPrint(popupController.destroy);
 		printController.onCancel(popupController.destroy);
 		printController.render();
@@ -3210,7 +3220,7 @@ function EditorPassphraseController(div, editorController) {
 				if (firstChecked) {
 					firstChecked = false;
 					var disclaimerDiv = getPassphraseDisclaimerDiv(function() { disclaimerPopup.hide(); });
-					var disclaimerPopup = new OverlayController(editorController.getDiv(), {contentDiv: disclaimerDiv});
+					var disclaimerPopup = new OverlayController(editorController.getDiv(), {contentDiv: disclaimerDiv, fullScreen: true});
 					disclaimerPopup.render();
 					disclaimerPopup.onHide(function() {
 						if (passphraseCheckbox.isChecked()) passphraseInput.focus();
@@ -3379,8 +3389,8 @@ function EditorPassphraseController(div, editorController) {
 		headerTitle.append("<img src='img/caution_solid.png' style='width:40px; height: 40px; margin-right: 10px;'>");
 		headerTitle.append("Passphrase Encryption");
 		var bodyDiv = $("<div class='editor_popup_body flex_vertical flex_align_center'>").appendTo(div);		
-		bodyDiv.append($("<div style='font-size:20px; font-weight:bold; color:red; margin-bottom:25px; text-align:center;'>Do not lose your passphrase or your funds will be lost.</div>"));
-		var interoperableDiv = $("<div style='font-size:20px; margin-bottom: 25px; text-align:center'>Passphrase encrypted keys may not be interoperable with other tools.&nbsp;&nbsp;</div>").appendTo(bodyDiv);
+		bodyDiv.append($("<div style='font-size:20px; font-weight:bold; color:red; text-align:center;'>Do not lose your passphrase or your funds will be lost.</div>"));
+		var interoperableDiv = $("<div style='font-size:20px; text-align:center'>Passphrase encrypted keys may not be interoperable with other tools.&nbsp;&nbsp;</div>").appendTo(bodyDiv);
 		var learnMoreLink = $("<a style='font-size:20px;' target='_blank' href='index.html#faq_interoperable'>Learn more</a>").appendTo(div);
 		interoperableDiv.append(learnMoreLink);
 		var okButton = $("<div style='font-size:22px;' class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(bodyDiv);
@@ -4535,6 +4545,11 @@ function EditorPrintController(div, pieces) {
 				previewDiv.children().replaceWith(previewLoadDiv);
 				previewDiv.append(_previewRenderers[0].getDiv());
 				previewLoadDiv.hide();
+				
+				// add sample overlay
+				//var sampleDiv = $("<div class='editor_print_sample_overlay user_select_none'>SAMPLE</div>");
+				//new OverlayController(_previewRenderers[0].getDiv().children().first().children().eq(1), {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render();
+				//new OverlayController(previewDiv, {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render();
 				pieceRenderers = _pieceRenderers;
 				setPrintEnabled(true);
 				if (onDone) onDone();
