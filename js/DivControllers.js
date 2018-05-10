@@ -2587,9 +2587,9 @@ function EditorController(div, config) {
 	var paginatorController;
 	var contentController;
 	var importedPieces;			// original imported pieces
-	var importedPieceDivs;	// piece divs for original imported pieces
-	var pieces;							// current pieces
-	var pieceDivs;					// piece divs for current pieces
+	var importedPieceDivs;	// piece divs for original imported currentPieces
+	var currentPieces;			// current pieces
+	var currentPieceDivs;		// piece divs for current pieces
 	var pieceGenerator;			// initialized while generating
 	var formErrorChangeListeners;
 	var setPiecesListeners;
@@ -2661,6 +2661,14 @@ function EditorController(div, config) {
 			passphraseController.onFormErrorChange(updateFormError);
 			splitController.onFormErrorChange(updateFormError);
 			contentController.onFormErrorChange(updateFormError);
+			
+			// confirm exit if keypairs generated
+			window.addEventListener("beforeunload", function (e) {
+				if (!that.newPiecesGenerated()) return;
+				var confirmationMsg = "Discard generated keypairs and close?";
+				(e || window.event).returnValue = confirmationMsg;	// Gecko + IE
+				return confirmationMsg;   
+			});
 		});
 		
 		// done rendering
@@ -2734,23 +2742,23 @@ function EditorController(div, config) {
 		// set and notify
 		setAndNotify();
 		function setAndNotify() {
-			pieces = _pieces;
-			pieceDivs = _pieceDivs;
-			invoke(setPiecesListeners, pieces, pieceDivs);
+			currentPieces = _pieces;
+			currentPieceDivs = _pieceDivs;
+			invoke(setPiecesListeners, currentPieces, currentPieceDivs);
 		}
 	}
 	
-	this.onSetPieces = function(listener) {
+	this.onSetCurrentPieces = function(listener) {
 		assertFunction(listener);
 		setPiecesListeners.push(listener);
 	}
 	
 	this.getCurrentPieces = function() {
-		return pieces;
+		return currentPieces;
 	}
 	
-	this.getPieceDivs = function() {
-		return pieceDivs;
+	this.getCurrentPieceDivs = function() {
+		return currentPieceDivs;
 	}
 	
 	this.getImportedPieces = function() {
@@ -2759,6 +2767,10 @@ function EditorController(div, config) {
 	
 	this.getImportedPieceDivs = function() {
 		return importedPieceDivs;
+	}
+	
+	this.newPiecesGenerated = function() {
+		return !equals(this.getCurrentPieces(), this.getImportedPieces());
 	}
 	
 	this.setGenerateConfig = function(config) {
@@ -2844,6 +2856,9 @@ function EditorController(div, config) {
 		// validate no errors
 		if (that.hasFormError()) return;
 		
+		// confirm discard
+		if (that.newPiecesGenerated() && !confirm("Discard and regenerate the keypairs?")) return;
+		
 		// get generation config based on current state
 		var genConfig = that.getGenerateConfig();
 		
@@ -2893,7 +2908,7 @@ function EditorController(div, config) {
 	}
 	
 	function save() {
-		var saveController = new EditorSaveController($("<div>"), pieces);
+		var saveController = new EditorSaveController($("<div>"), currentPieces);
 		var popupController = new OverlayController(div, {contentDiv: saveController.getDiv(), fullScreen: true, hideOnExternalClick: true});
 		saveController.onSave(popupController.destroy);
 		saveController.onCancel(popupController.destroy);
@@ -2902,7 +2917,7 @@ function EditorController(div, config) {
 	}
 		
 	function print() {
-		var printController = new EditorPrintController($("<div>"), pieces);
+		var printController = new EditorPrintController($("<div>"), currentPieces);
 		var popupController = new OverlayController(div, {contentDiv: printController.getDiv(), fullScreen: true, hideOnExternalClick: true});
 		printController.onPrint(popupController.destroy);
 		printController.onCancel(popupController.destroy);
@@ -2911,7 +2926,9 @@ function EditorController(div, config) {
 	}
 	
 	function reset() {
-		that.setCurrentPieces(importedPieces, importedPieceDivs);
+		if (!that.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
+			that.setCurrentPieces(importedPieces, importedPieceDivs);
+		}
 	}
 	
 	function cancel() {
@@ -3012,7 +3029,7 @@ function EditorContentController(div, editorController, config) {
 				actionsController.render();
 				
 				// register callbacks
-				editorController.onSetPieces(setPieces);
+				editorController.onSetCurrentPieces(setCurrentPieces);
 				editorController.onGenerateProgress(setGenerateProgress);
 				
 				// listen for actions when editor ready
@@ -3109,7 +3126,7 @@ function EditorContentController(div, editorController, config) {
 		if (currenciesController) currenciesController.reset();
 	}
 	
-	function setPieces(pieces, pieceDivs) {
+	function setCurrentPieces(pieces, pieceDivs) {
 		piecesDiv.empty()
 		progressDiv.hide();
 		if (currenciesController) currenciesController.getDiv().show();
@@ -3252,7 +3269,7 @@ function EditorPassphraseController(div, editorController) {
 		
 		// listen for actions when editor ready
 		editorController.onReady(function() {
-			editorController.onSetPieces(update);
+			editorController.onSetCurrentPieces(update);
 			editorController.getContentController().getActionsController().onGenerate(validate);
 			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
@@ -3480,7 +3497,7 @@ function EditorSplitController(div, editorController) {
 		
 		// listen for actions when editor ready
 		editorController.onReady(function() {
-			editorController.onSetPieces(update);
+			editorController.onSetCurrentPieces(update);
 			editorController.getContentController().getActionsController().onGenerate(validate);
 			editorController.getContentController().getActionsController().onApply(validate);
 			editorController.getContentController().getActionsController().onReset(reset);
@@ -3653,7 +3670,7 @@ function EditorPaginatorController(div, editorController) {
 		updatePaginator();
 		that.setEnabled(false);
 		editorController.onReady(function() { updatePaginator(); });
-		editorController.onSetPieces(function() { updatePaginator(); });
+		editorController.onSetCurrentPieces(function() { updatePaginator(); });
 		editorController.onGenerate(function() { that.setEnabled(false); });
 		if (onDone) onDone();
 	}
@@ -4163,7 +4180,7 @@ function EditorActionsController(div, editorController) {
 		savePrintDiv.appendTo(div);
 		
 		// register callbacks
-		editorController.onSetPieces(update);
+		editorController.onSetCurrentPieces(update);
 		editorController.onFormErrorChange(update);
 		editorController.getPassphraseController().onUsePassphraseChange(update);
 		editorController.getSplitController().onUseSplitChange(update);
@@ -4238,7 +4255,7 @@ function EditorActionsController(div, editorController) {
 			
 			// apply and reset shown if passphrase or split checked
 			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getSplitController().getUseSplit()) {
-				btnApply.html(editorController.getCurrentPieces() === editorController.getImportedPieces() ? "Apply" : "Reapply");
+				btnApply.html(!editorController.newPiecesGenerated() ? "Apply" : "Reapply");
 				btnApply.show()
 				btnApply.unbind("click");
 				btnReset.show();
@@ -4250,11 +4267,7 @@ function EditorActionsController(div, editorController) {
 				}
 			} else {
 				btnApply.hide();
-				if (editorController.getCurrentPieces()[0] !== editorController.getImportedPieces()[0]) {
-					btnReset.show();
-				} else {
-					btnReset.hide();
-				}
+				editorController.newPiecesGenerated() ? btnReset.show() : btnReset.hide();
 			}
 		}
 		
