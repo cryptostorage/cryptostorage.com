@@ -233,16 +233,20 @@ var UiUtils = {
 	 */
 	makeCopyable: function(div) {
 		
-		// copy to clipboard
-		// TODO: target scope
-		new Clipboard(".copyable", {
+		// find copyable divs
+		var copyables = div.get(0).querySelectorAll(".copyable");
+		
+		// copy to clipboard on click
+		new Clipboard(copyables, {
 			text: function(trigger) {
 				return $(trigger).html();
 			}
 		});
 		
-		// add tooltips
-		div.find(".copyable").each(function(i, copyable) {
+		// add styling and tooltips
+		for(var i = 0; i < copyables.length; ++i) {
+			var copyable = copyables[i];
+			$(copyable).addClass("copyable_init");
 			tippy(copyable, {
 				arrow : true,
 				html : $("<div>Copied!</div>").get(0),
@@ -258,7 +262,7 @@ var UiUtils = {
 					}, 3000)
 				}
 			});
-		});
+		}
 	}
 }
 
@@ -3060,7 +3064,7 @@ function EditorContentController(div, editorController, config) {
 					
 					// add pre-existing piece divs
 					if (config.pieceDivs) {
-						CompactPieceRenderer.makeCopyable(config.pieceDivs);
+						CompactPieceRenderer.makeCopyable(config.pieceDivs);	// copy is lost when transferred across tabs
 						editorController.setCurrentPieces(config.pieces, config.pieceDivs);
 					}
 					
@@ -4567,7 +4571,7 @@ function EditorPrintController(div, pieces) {
 		previewGenerator = new PieceGenerator({
 			pieces: [pieces[0]],
 			pieceRendererClass: CompactPiecePreviewRenderer,
-			pieceRendererConfig: getPieceRendererConfig(true)
+			pieceRendererConfig: getPrintRenderConfig(true)
 		});
 		previewGenerator.generatePieces(null, function(err, _pieces, _previewRenderers) {
 			assertNull(err);
@@ -4579,7 +4583,7 @@ function EditorPrintController(div, pieces) {
 			pieceGenerator = new PieceGenerator({
 				pieces: pieces,
 				pieceRendererClass: CompactPieceRenderer,
-				pieceRendererConfig: getPieceRendererConfig()
+				pieceRendererConfig: getPrintRenderConfig()
 			});
 			pieceGenerator.generatePieces(setRenderProgress, function(err, _pieces, _pieceRenderers) {
 				assertNull(err);
@@ -4593,14 +4597,15 @@ function EditorPrintController(div, pieces) {
 		});
 	}
 	
-	function getPieceRendererConfig(isPreview) {
+	function getPrintRenderConfig(isPreview) {
 		return {
 			showPublic: includePublicCheckbox.isChecked(),
 			showPrivate: includePrivateCheckbox.isChecked(),
 			showLogos: includeLogosCheckbox.isChecked(),
 			cryptoCash: cryptoCashCheckbox && cryptoCashCheckbox.isVisible() ? cryptoCashCheckbox.isChecked() : false,
 			infoBack: includeInstructionsCheckbox ? includeInstructionsCheckbox.isChecked() : false,
-			pageBreaks: isPreview ? false : true
+			pageBreaks: isPreview ? false : true,
+			copyable: false
 		}
 	}
 	
@@ -4668,7 +4673,8 @@ function CompactPieceRenderer(div, piece, config) {
 		showLogos: true,
 		cryptoCash: false,
 		infoBack: false,
-		pageBreaks: false
+		pageBreaks: false,
+		copyable: true
 	}, config);
 	if (!config.showPublic) assertTrue(config.showPrivate);
 	if (!config.showPrivate) assertTrue(config.showPublic);
@@ -4753,7 +4759,7 @@ function CompactPieceRenderer(div, piece, config) {
 				assertNull(err);
 				
 				// make keypairs copyable
-				UiUtils.makeCopyable(div);
+				if (config.copyable) UiUtils.makeCopyable(div);
 
 				// done
 				if (onDone) onDone(div);
@@ -4830,7 +4836,7 @@ inheritsFrom(CompactPieceRenderer, DivController);
 CompactPieceRenderer.makeCopyable = function(pieceDivs) {
 	pieceDivs = listify(pieceDivs);
 	for (var i = 0; i < pieceDivs.length; i++) {
-		UiUtils.makeCopyable(pieceDivs);
+		UiUtils.makeCopyable(pieceDivs[i]);
 	}
 }
 
