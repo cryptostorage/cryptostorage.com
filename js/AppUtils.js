@@ -105,6 +105,7 @@ var AppUtils = {
 	
 	// ------------------------- APPLICATION DEPENDENCIES -----------------------
 	
+	// returns inital homepage dependencies
 	getHomeDependencies: function() {
 		var dependencies = [
 			"lib/slick.js",
@@ -133,6 +134,36 @@ var AppUtils = {
 		return dependencies;
 	},
 	
+	// returns faq dependencies
+	getFaqDependencies: function() {
+		return [
+			"lib/setImmediate.js",
+			"img/key_pair.png",
+			"img/notice_bar_pass.png"
+		];
+	},
+	
+	// returns donation dependencies
+	getDonateDependencies: function() {
+		return [
+			"lib/qrcode.js",
+			"lib/clipboard.js",
+			"img/loading.gif",
+			"img/bitpay.png",
+			"img/ethereumjs.png",
+		];
+	},
+	
+	// returns app dependencies excluding import and editor
+	getAppDependencies: function() {
+		var dependencies = ["js/Tests.js"];
+		dependencies = dependencies.concat(AppUtils.getHomeDependencies());
+		dependencies = dependencies.concat(AppUtils.getFaqDependencies());
+		dependencies = dependencies.concat(AppUtils.getDonateDependencies());
+		return dependencies;
+	},
+	
+	// returns dependencies for notice bar
 	getNoticeDependencies: function() {
 		return [
 			"lib/setImmediate.js",
@@ -150,6 +181,7 @@ var AppUtils = {
 		];
 	},
 	
+	// returns all crypto dependencies
 	getCryptoDependencies: function() {
 		var dependencies = [];
 		dependencies.push("lib/crypto-js.js");
@@ -162,7 +194,8 @@ var AppUtils = {
 		return dependencies;
 	},
 	
-	getInitialExportDependencies: function() {
+	// returns dependencies to initialize editor with loading wheel
+	getInitialEditorDependencies: function() {
 		return [
 			"lib/jquery-3.2.1.js",
 			"lib/async.js",
@@ -180,7 +213,8 @@ var AppUtils = {
 		];
 	},
 
-	getDynamicExportDependencies: function() {
+	// returns dependencies for import and export so both will work when offline after either is accessed
+	getImportExportDependencies: function() {
 		var dependencies = [
 			"css/pagination.css",
 			"lib/pagination.js",
@@ -200,69 +234,28 @@ var AppUtils = {
 			"lib/setImmediate.js",
 			"img/cryptostorage_export.png",
 			"img/restricted.png",
-			"img/refresh.png"
-		];
-		
-		// add dependencies
-		dependencies = dependencies.concat(AppUtils.getCryptoDependencies());
-		dependencies = dependencies.concat(AppUtils.getNoticeDependencies());
-		
-		// return unique array
-		return toUniqueArray(dependencies);
-	},
-	
-	// return all faq dependencies
-	getFaqDependencies: function() {
-		return [
-			"lib/setImmediate.js",
-			"img/key_pair.png",
-			"img/notice_bar_pass.png"
-		];
-	},
-	
-	// returns all app dependencies after inital homescreen is loaded
-	getAppDependencies: function() {
-
-		// app dependencies
-		var dependencies = [
-			"lib/setImmediate.js",
-			"css/pagination.css",
-			"lib/pagination.js",
-			"lib/qrcode.js",
-			"lib/jszip.js",
-			"lib/FileSaver.js",
-			"lib/crypto-js.js",
-			"lib/progressbar.js",
-			"lib/bitaddress.js",
-			"lib/clipboard.js",
-			"js/CryptoKeypair.js",
-			"js/CryptoPiece.js",
-			"js/PieceGenerator.js",
-			"js/Tests.js",
-			"js/InitEditor.js",
-			"lib/jquery.ddslick.js",
-			"img/loading.gif",
-			"img/information.png",
+			"img/caution_solid.png",
 			"img/trash.png",
+			"img/visible.png",
+			"img/visible_false.png",
+			"img/information_white.png",
 			"img/caution_solid.png",
 			"img/qr_code.png",
 			"img/split_lines_2.png",
 			"img/split_lines_3.png",
+			
+			// import images
 			"img/file.png",
 			"img/files.png",
 			"img/caution.png",
 			"img/checkmark.png",
 			"img/drag_and_drop.png",
-			"img/bitpay.png",
-			"img/ethereumjs.png",
-			"img/share.png",
-			"img/information_white.png"
+			"img/trash.png",
 		];
 		
 		// add dependencies
 		dependencies = dependencies.concat(AppUtils.getCryptoDependencies());
 		dependencies = dependencies.concat(AppUtils.getNoticeDependencies());
-		dependencies = dependencies.concat(AppUtils.getDynamicExportDependencies());
 		
 		// return unique array
 		return toUniqueArray(dependencies);

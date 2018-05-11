@@ -1,5 +1,4 @@
 v0.3.0
-only import controller loads dependencies, home does not
 ultra compact view
 footer
 num keypairs exceed max error

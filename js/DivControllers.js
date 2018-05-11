@@ -159,7 +159,7 @@ var UiUtils = {
 	openEditorDynamic: function(browserTabName, config) {
 		
 		// open tab
-		newWindow(null, browserTabName, AppUtils.getInitialExportDependencies(), getInternalStyleSheetText(), function(err, window) {
+		newWindow(null, browserTabName, AppUtils.getInitialEditorDependencies(), getInternalStyleSheetText(), function(err, window) {
 			
 			// check for error
 			if (err) {
@@ -733,18 +733,17 @@ function AppController(div) {
 		// navigate to first page
 		navigate(window.location.hash, function() {
 			
+			// done initializing application
+			if (onDone) onDone();
+			
 			// load notice dependencies and start polling
 			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
 				if (err) throw err;
 				AppUtils.pollEnvironment(AppUtils.getEnvironmentSync());
 				
-				// load all dependencies in the background
-				var dependencies = toUniqueArray(AppUtils.getHomeDependencies().concat(AppUtils.getAppDependencies()).concat(AppUtils.getFaqDependencies()));
-				LOADER.load(dependencies, function(err) {
+				// load remaining app dependencies in the background
+				LOADER.load(AppUtils.getAppDependencies(), function(err) {
 					if (err) throw err;
-					
-					// done initializing application
-					if (onDone) onDone();
 				});
 			});
 		});
@@ -1537,7 +1536,7 @@ function ImportController(div) {
 	this.render = function(onDone) {
 		
 		// load dependencies
-		LOADER.load(AppUtils.getAppDependencies(), function(err) {
+		LOADER.load(AppUtils.getImportExportDependencies(), function(err) {
 			if (err) throw err;
 			
 			// div setup
@@ -1792,7 +1791,7 @@ function ImportFileController(div, printErrors) {
 		
 		// import success message
 		var successDiv = $("<div class='import_success_div flex_vertical flex_align_center'>").appendTo(importedStorageDiv);
-		var successTitle = $("<div class='import_success_title flex_horizontal'>").appendTo(successDiv);
+		var successTitle = $("<div class='import_success_title flex_horizontal flex_align_center'>").appendTo(successDiv);
 		successTitle.append($("<img class='import_success_checkmark' src='img/checkmark.png'>"));
 		successTitle.append("Imported Successfully");
 		var successLinks = $("<div class='import_success_links flex_horizontal flex_align_center flex_justify_center'>").appendTo(successDiv);
@@ -2997,7 +2996,7 @@ function EditorContentController(div, editorController, config) {
 		inputChangeListeners = [];
 		
 		// load dependencies
-		LOADER.load(AppUtils.getDynamicExportDependencies(), function(err) {
+		LOADER.load(AppUtils.getImportExportDependencies(), function(err) {
 			if (err) throw err;
 			
 			// notices
