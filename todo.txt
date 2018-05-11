@@ -1,30 +1,34 @@
 v0.3.0
 ultra compact view
-footer
+see if there are wasteful loops in editor listeners
 performance tests
 
-put homepage text in index.html and dynamically hide for seo
-update faq_interoperable to only refer to encryption
-update home sample page
-piece and view imported pieces layout
+footer
+white background with grey border when passphrase / split disabled
 split and passphrase inputs don't disable while generating on chrome
+piece selection and view imported pieces layout
 little more margin at bottom of editor, especially mobile
-notice colors
-export control layout
 split lines bolder
-tippy jerk when editor first loaded
+update home sample page
+notice colors
+
+update faq_interoperable to only refer to encryption
 update bip38 cryptojs description with pbkdf if necessary
-print selector compact | cryptocash | community design, et
-see if there are wasteful loops in editor listeners
+put homepage text in index.html and dynamically hide for seo
+impor
+
+browser testing
+release
+
+document cold storage setup options in faq
+community paper wallet designs
+print selector compact | cryptocash | community design, etc
 text import says please select currency on unrecognized text import
 add support for dogecoin
 mobile safari background scrolls while popups open
 dynamic sample angle
-fail gracefully if import dependencies fail to load
-browser testing
-release
-
 tippls
+fail gracefully if import dependencies fail to load
 
 designer:
 passphrase confirmation
