@@ -298,7 +298,7 @@ PieceGenerator.validateConfig = function(config) {
 			assertInitialized(config.keypairs[i].ticker);
 			assertNumber(config.keypairs[i].numKeypairs);
 			assertTrue(config.keypairs[i].numKeypairs > 0);
-			assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
+			//assertTrue(config.keypairs[i].numKeypairs <= AppUtils.MAX_KEYPAIRS);
 			if (config.passphrase) {
 				var plugin = AppUtils.getCryptoPlugin(config.keypairs[i].ticker);
 				assertTrue(arrayContains(plugin.getEncryptionSchemes(), config.keypairs[i].encryption));

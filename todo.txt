@@ -1,8 +1,7 @@
 v0.3.0
 ultra compact view
 footer
-num keypairs exceed max error
-performance tests and optimizations
+performance tests
 
 put homepage text in index.html and dynamically hide for seo
 update faq_interoperable to only refer to encryption

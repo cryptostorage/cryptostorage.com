@@ -60,7 +60,7 @@ var AppUtils = {
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
 	MAX_SHARES: 127,									// maximum number of split shares
-	MAX_KEYPAIRS: 1000,								// limit max keypairs to prevent inadequately tested scenarios
+	//MAX_KEYPAIRS: 1000,							// limit max keypairs per currency selection
 	TICKERS_PARAM: "tickers",					// generate.html?tickers=xmr
 	
 	// encryption v1 constants
