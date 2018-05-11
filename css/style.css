@@ -1283,7 +1283,11 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_progress_div {
-	margin-top:100px;
+	margin-bottom: 40px;
+}
+
+.editor_progress_bar_div {
+	margin: 100px 0 10px 0;
 	width: 750px;
 	height: 50px;
 }
@@ -1291,7 +1295,7 @@ input[type='checkbox'][disabled] +label {
 .editor_progress_label {
 	width: 100%;
 	text-align: center;
-	font-size: 20px;
+	font-size: 22px;
 }
 
 .pieces_div {
@@ -1742,7 +1746,7 @@ input[type='checkbox'][disabled] +label {
 	}
 	.editor_controls {
 		position: static;
-		padding: 0 0 40px 0px;
+		margin: 0 0 40px 0px;
 	}
 }
 

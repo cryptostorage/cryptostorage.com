@@ -39,8 +39,6 @@ var UiUtils = {
 	/**
 	 * Renders a progress bar to the given div.
 	 * 
-	 * TODO: make this its own controller
-	 * 
 	 * @param div is the div to render to
 	 * @returns a progress bar instance
 	 */
@@ -3023,9 +3021,9 @@ function EditorContentController(div, editorController, config) {
 				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
 				
 				// progress bar
-				progressDiv = $("<div class='editor_progress_div'>").appendTo(bodyDiv);
+				progressDiv = $("<div class='editor_progress_div flex_vertical flex_align_center'>").appendTo(bodyDiv);
 				progressDiv.hide();
-				progressBar = UiUtils.getProgressBar(progressDiv);
+				progressBar = UiUtils.getProgressBar($("<div class='editor_progress_bar_div'>").appendTo(progressDiv));
 				progressLabel = $("<div class='editor_progress_label'>").appendTo(progressDiv);
 				
 				// pieces div

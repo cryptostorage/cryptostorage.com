@@ -7,11 +7,9 @@ performance tests and optimizations
 put homepage text in index.html and dynamically hide for seo
 update faq_interoperable to only refer to encryption
 update home sample page
-progress layout
 piece and view imported pieces layout
 split and passphrase inputs don't disable while generating on chrome
 little more margin at bottom of editor, especially mobile
-make progress bar its own controller
 notice colors
 export control layout
 split lines bolder
@@ -23,6 +21,7 @@ text import says please select currency on unrecognized text import
 add support for dogecoin
 mobile safari background scrolls while popups open
 dynamic sample angle
+fail gracefully if import dependencies fail to load
 browser testing
 release
 
