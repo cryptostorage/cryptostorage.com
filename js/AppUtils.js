@@ -63,6 +63,12 @@ var AppUtils = {
 	//MAX_KEYPAIRS: 1000,							// limit max keypairs per currency selection
 	TICKERS_PARAM: "tickers",					// generate.html?tickers=xmr
 	
+	// urls
+	GITHUB_URL: "https://github.com/cryptostorage/cryptostorage.com",
+	GITHUB_DOWNLOAD_URL: "https://github.com/cryptostorage/cryptostorage.com/archive/master.zip",
+	GITHUB_ISSUES_URL: "https://github.com/cryptostorage/cryptostorage.com/issues",
+	REDDIT_URL: "https://www.reddit.com/r/cryptostorage/",
+	
 	// encryption v1 constants
 	ENCRYPTION_V1_PBKDF_ITER: 10000,
 	ENCRYPTION_V1_KEY_SIZE: 256,
@@ -146,8 +152,9 @@ var AppUtils = {
 	// returns donation dependencies
 	getDonateDependencies: function() {
 		return [
-			"lib/qrcode.js",
+			"lib/tippy.all.js",
 			"lib/clipboard.js",
+			"lib/qrcode.js",
 			"img/loading.gif",
 			"img/bitpay.png",
 			"img/ethereumjs.png",

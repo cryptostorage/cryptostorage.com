@@ -959,19 +959,52 @@ function HomeController(div) {
 			var licenseDiv = $("<div class='flex_horizontal'>").appendTo(pageDiv);
 			var mitImg = $().appendTo(licenseDiv);
 			licenseDiv.append("<a target='_blank' href='./LICENSE.txt'><img src='img/mit.png' class='license_img'></a>");
-			licenseDiv.append("<a target='_blank' href='https://github.com/cryptostorage/cryptostorage.com'><img src='img/github.png' class='license_img'></a>");
-			licenseDiv.append("<a target='_blank' href='https://reddit.com/r/cryptostorage'><img src='img/reddit.png' class='license_img'></a>");
+			licenseDiv.append("<a target='_blank' href='" + AppUtils.GITHUB_URL + "'><img src='img/github.png' class='license_img'></a>");
+			licenseDiv.append("<a target='_blank' href='" + AppUtils.REDDIT_URL + "'><img src='img/reddit.png' class='license_img'></a>");
 			pageDiv.append("<div style='height: 20px;'>");
-			var downloadBtn = $("<a class='light_green_btn' href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>").appendTo(pageDiv);
+			var downloadBtn = $("<a class='light_green_btn' href='" + AppUtils.GITHUB_DOWNLOAD_URL + "'>").appendTo(pageDiv);
 			downloadBtn.append("Download Now (zip)");
 			
-			// footer
-			var footerDiv = $("<div class='home_footer_div flex_horizontal'>").appendTo(div);
-			footerDiv.append($("<div class='home_footer_version flex_horizontal'></div>"));
-			var descriptionDiv = $("<div class='home_footer_description flex_vertical flex_justify_center'>").appendTo(footerDiv);
-			descriptionDiv.append("<div><a href='./LICENSE.txt'>MIT licensed.</a></div>JavaScript copyrights included in the source. No warranty.");
-			var versionDiv = $("<div class='home_footer_version flex_horizontal flex_align_center flex_justify_end'>").appendTo(footerDiv);
-			versionDiv.append("<a href='./versions.txt' target='_blank'>version " + AppUtils.VERSION + AppUtils.VERSION_POSTFIX + "</a>");
+			// footer div
+			var footerDiv = $("<div class='footer flex_vertical flex_align_center'>").appendTo(div);
+			var footerTopicsDiv = $("<div class='flex_horizontal flex_justify_space_between width_100'>").appendTo(footerDiv);
+			
+			// footer topics
+			var footerTopicGenerate = $("<div class='footer_topic_div flex_vertical'>");
+			$("<a target='_blank' href='generate.html' class='footer_topic'>Generate Keypairs</a>").appendTo(footerTopicGenerate);
+			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=btc' class='footer_subtopic'>Bitcoin</a>").appendTo(footerTopicGenerate);
+			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=bch' class='footer_subtopic'>Bitcoin Cash</a>").appendTo(footerTopicGenerate);
+			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=eth' class='footer_subtopic'>Ethereum</a>").appendTo(footerTopicGenerate);
+			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=ltc' class='footer_subtopic'>Litecoin</a>").appendTo(footerTopicGenerate);
+			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=xmr' class='footer_subtopic'>Monero</a>").appendTo(footerTopicGenerate);
+			var footerTopicGitHub = $("<div class='footer_topic_div flex_vertical'>");
+			$("<a target='_blank' href='" + AppUtils.GITHUB_URL + "' class='footer_topic'>GitHub</a>").appendTo(footerTopicGitHub);
+			var footerTopicDownload = $("<div class='footer_topic_div flex_vertical'>");
+			$("<a target='_blank' href='" + AppUtils.GITHUB_DOWNLOAD_URL + "' class='footer_topic'>Download Now</a>").appendTo(footerTopicDownload);
+			var footerTopicReleaseNotes = $("<div class='footer_topic_div'>");
+			$("<a target='_blank' href='versions.txt' class='footer_topic flex_vertical'>Release Notes</a>").appendTo(footerTopicReleaseNotes);
+			var footerTopicDonate = $("<div class='footer_topic_div flex_vertical'>");
+			$("<a href='#donate' class='footer_topic'>Donate</a>").appendTo(footerTopicDonate);
+			var footerTopicFaq = $("<div class='footer_topic_div flex_vertical'>");
+			$("<a href='#faq' class='footer_topic'>FAQ</a>").appendTo(footerTopicFaq);
+			var footerTopicIssueTracker = $("<div class='footer_topic_div flex_vertical'>");
+			$("<a target='_blank' href='" + AppUtils.GITHUB_ISSUES_URL + "' class='footer_topic'>Issue Tracker</a>").appendTo(footerTopicIssueTracker);
+			
+			// footer columns
+			var footerCol1 = $("<div class='flex_vertical flex_1'>").appendTo(footerTopicsDiv);
+			footerCol1.append(footerTopicGenerate);
+			var footerCol2 = $("<div class='flex_vertical flex_1'>").appendTo(footerTopicsDiv);
+			footerCol2.append(footerTopicGitHub);
+			footerCol2.append(footerTopicDownload);
+			footerCol2.append(footerTopicReleaseNotes);
+			var footerCol3 = $("<div class='flex_vertical flex_1'>").appendTo(footerTopicsDiv);
+			footerCol3.append(footerTopicFaq);
+			footerCol3.append(footerTopicDonate);
+			footerCol3.append(footerTopicIssueTracker);
+			
+			// footer license
+			var footerLicenseDiv = $("<div class='footer_license'>").appendTo(footerDiv);
+			footerLicenseDiv.append("<a href='./LICENSE.txt' class='footer_license'>MIT licensed</a>");
 			
 			// done rendering
 			if (onDone) onDone(div);

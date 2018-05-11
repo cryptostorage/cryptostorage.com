@@ -1,7 +1,10 @@
 v0.3.0
+update encryption v2 constants
+hash tags don't go to top of page from footer
 ultra compact view
 see if there are wasteful loops in editor listeners
 performance tests
+add support for dogecoin1
 
 footer
 white background with grey border when passphrase / split disabled
@@ -24,11 +27,11 @@ document cold storage setup options in faq
 community paper wallet designs
 print selector compact | cryptocash | community design, etc
 text import says please select currency on unrecognized text import
-add support for dogecoin
 mobile safari background scrolls while popups open
 dynamic sample angle
 tippls
 fail gracefully if import dependencies fail to load
+show preview then render print in background with progress indicator in print button
 
 designer:
 passphrase confirmation
