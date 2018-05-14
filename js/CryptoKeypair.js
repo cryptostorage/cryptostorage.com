@@ -599,8 +599,8 @@ CryptoKeypair.decodeEncryptedKey = function(str) {
 		// determine if encrypted hex V1
 		if (!isHex(str)) return null;
 		if (str.length - 32 < 1 || str.length % 32 !== 0) return null;
-		var version = parseInt(str.substring(0, AppUtils.ENCRYPTION_V1_VERSION.toString(16).length), 16);
-		if (version !== AppUtils.ENCRYPTION_V1_VERSION) return null;
+		var version = parseInt(str.substring(0, AppUtils.ENCRYPTION_V2_VERSION.toString(16).length), 16);
+		if (version !== AppUtils.ENCRYPTION_V2_VERSION) return null;
 		
 		// decode
 		var decoded = {};

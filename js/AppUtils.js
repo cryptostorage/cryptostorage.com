@@ -70,10 +70,10 @@ var AppUtils = {
 	REDDIT_URL: "https://www.reddit.com/r/cryptostorage/",
 	
 	// encryption v1 constants
-	ENCRYPTION_V1_PBKDF_ITER: 10000,
-	ENCRYPTION_V1_KEY_SIZE: 256,
-	ENCRYPTION_V1_BLOCK_SIZE: 16,
-	ENCRYPTION_V1_VERSION: 1,
+	ENCRYPTION_V2_PBKDF_ITER: 10000,
+	ENCRYPTION_V2_KEY_SIZE: 256,
+	ENCRYPTION_V2_BLOCK_SIZE: 16,
+	ENCRYPTION_V2_VERSION: 1,
 
 	/**
 	 * Mock environment checks.
@@ -795,15 +795,15 @@ var AppUtils = {
 			try {
 				
 				// create random salt and replace first two characters with version
-				var salt = CryptoJS.lib.WordArray.random(AppUtils.ENCRYPTION_V1_BLOCK_SIZE);
-				var hexVersion = AppUtils.ENCRYPTION_V1_VERSION.toString(16);
+				var salt = CryptoJS.lib.WordArray.random(AppUtils.ENCRYPTION_V2_BLOCK_SIZE);
+				var hexVersion = AppUtils.ENCRYPTION_V2_VERSION.toString(16);
 				salt = hexVersion + salt.toString().substring(hexVersion.length);
 				salt = CryptoJS.enc.Hex.parse(salt);
 				
 				// strengthen passphrase with passphrase key
 				var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-		      keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
-		      iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
+		      keySize: AppUtils.ENCRYPTION_V2_KEY_SIZE / 32,
+		      iterations: AppUtils.ENCRYPTION_V2_PBKDF_ITER,
 		      hasher: CryptoJS.algo.SHA512
 		    });
 				
@@ -891,13 +891,13 @@ var AppUtils = {
 		function decryptHexV1(hex, passphrase, onProgress, onDone) {
 			
 			// assert correct version
-			assertEquals(AppUtils.ENCRYPTION_V1_VERSION, parseInt(hex.substring(0, AppUtils.ENCRYPTION_V1_VERSION.toString(16).length), 16));
+			assertEquals(AppUtils.ENCRYPTION_V2_VERSION, parseInt(hex.substring(0, AppUtils.ENCRYPTION_V2_VERSION.toString(16).length), 16));
 				
 			// get passphrase key
 			var salt = CryptoJS.enc.Hex.parse(hex.substr(0, 32));
 		  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
-		  	keySize: AppUtils.ENCRYPTION_V1_KEY_SIZE / 32,
-		  	iterations: AppUtils.ENCRYPTION_V1_PBKDF_ITER,
+		  	keySize: AppUtils.ENCRYPTION_V2_KEY_SIZE / 32,
+		  	iterations: AppUtils.ENCRYPTION_V2_PBKDF_ITER,
 		  	hasher: CryptoJS.algo.SHA512
 		  });
 		  
