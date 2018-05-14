@@ -6,7 +6,6 @@ see if there are wasteful loops in editor listeners
 performance tests
 add support for dogecoin1
 
-footer
 white background with grey border when passphrase / split disabled
 split and passphrase inputs don't disable while generating on chrome
 piece selection and view imported pieces layout

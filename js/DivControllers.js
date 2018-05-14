@@ -2626,7 +2626,7 @@ function EditorController(div, config) {
 	DivController.call(this, div);
 	
 	// global variables
-	var QUICK_GENERATE_MAX = 350;	// generation is 'quick' up to this weight to avoid flickering
+	var QUICK_GENERATE_MAX = 300;	// generation is 'quick' up to this weight to avoid flickering
 	var that = this;
 	var passphraseController
 	var splitController;
