@@ -58,7 +58,7 @@ $(document).ready(function() {
 		if (AppUtils.RUN_MIN_TESTS || AppUtils.RUN_FULL_TESTS) {
 			
 			// load dependencies
-			LOADER.load(AppUtils.getAppDependencies(), function(err) {
+			LOADER.load(AppUtils.getImportExportDependencies(), function(err) {
 				if (err) throw err;
 				var tester = new Tests();
 				

@@ -189,7 +189,7 @@ var AppUtils = {
 	},
 	
 	// returns all crypto dependencies
-	getCryptoDependencies: function() {
+	getPluginDependencies: function() {
 		var dependencies = [];
 		dependencies.push("lib/crypto-js.js");
 		dependencies.push("lib/bitcoinjs.js");
@@ -261,7 +261,7 @@ var AppUtils = {
 		];
 		
 		// add dependencies
-		dependencies = dependencies.concat(AppUtils.getCryptoDependencies());
+		dependencies = dependencies.concat(AppUtils.getPluginDependencies());
 		dependencies = dependencies.concat(AppUtils.getNoticeDependencies());
 		
 		// return unique array
