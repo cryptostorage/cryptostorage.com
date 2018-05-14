@@ -665,6 +665,7 @@ function AppController(div) {
 		else if (hash === "#donate") that.showDonate(onDone);
 		else if (hash === "#import") that.showImport(onDone);
 		else that.showHome(onDone);
+		$('html,body').scrollTop(0);
 	}
 	
 	this.render = function(onDone) {
