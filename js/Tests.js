@@ -112,18 +112,20 @@ function Tests() {
 	
 	function getTestPlugins() {
 		var plugins = [];
-		plugins.push(new BitcoinPlugin());
+		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+//		plugins.push(AppUtils.getCryptoPlugin("LTC"));
+//		plugins.push(new BitcoinPlugin());
 //		plugins.push(new BitcoinCashPlugin());
-		plugins.push(new EthereumPlugin());
-		plugins.push(new MoneroPlugin());
-		plugins.push(new DashPlugin());
-		plugins.push(new LitecoinPlugin());
-		plugins.push(new ZcashPlugin());
-		plugins.push(new RipplePlugin());
-		plugins.push(new StellarPlugin());
-		plugins.push(new WavesPlugin());
-		plugins.push(new NeoPlugin());
-		plugins.push(new BIP39Plugin());
+//		plugins.push(new EthereumPlugin());
+//		plugins.push(new MoneroPlugin());
+//		plugins.push(new DashPlugin());
+//		plugins.push(new LitecoinPlugin());
+//		plugins.push(new ZcashPlugin());
+//		plugins.push(new RipplePlugin());
+//		plugins.push(new StellarPlugin());
+//		plugins.push(new WavesPlugin());
+//		plugins.push(new NeoPlugin());
+//		plugins.push(new BIP39Plugin());
 		return plugins;
 	}
 	

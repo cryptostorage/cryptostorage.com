@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.3.0",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: false,
+	RUN_FULL_TESTS: true,
 	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
@@ -192,7 +192,7 @@ var AppUtils = {
 	getPluginDependencies: function() {
 		var dependencies = [];
 		dependencies.push("lib/crypto-js.js");
-		dependencies.push("lib/bitcoinjs.js");
+		dependencies.push("lib/bitcoinjs-3.3.2.js");
 		var plugins = AppUtils.getCryptoPlugins();
 		for (var i = 0; i < plugins.length; i++) {
 			dependencies = dependencies.concat(plugins[i].getDependencies());
@@ -274,22 +274,24 @@ var AppUtils = {
 	getCryptoPlugins: function() {
 		if (!AppUtils.plugins) {
 			AppUtils.plugins = [];
+			AppUtils.plugins.push(new HdPlugin("BTC"));
+			//AppUtils.plugins.push(new HdPlugin("LTC"));
 			AppUtils.plugins.push(new BitcoinCashPlugin());
-			AppUtils.plugins.push(new EthereumPlugin());
+//			AppUtils.plugins.push(new EthereumPlugin());
 			AppUtils.plugins.push(new MoneroPlugin());
-			AppUtils.plugins.push(new BitcoinPlugin());
+//			AppUtils.plugins.push(new BitcoinPlugin());
 			AppUtils.plugins.push(new LitecoinPlugin());
-			AppUtils.plugins.push(new NeoPlugin());
-			AppUtils.plugins.push(new DashPlugin());
-			AppUtils.plugins.push(new ZcashPlugin());
-			AppUtils.plugins.push(new WavesPlugin());
-			AppUtils.plugins.push(new StellarPlugin());
-			AppUtils.plugins.push(new RipplePlugin());
-			AppUtils.plugins.push(new EthereumClassicPlugin());
-			AppUtils.plugins.push(new OmiseGoPlugin());
-			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
+//			AppUtils.plugins.push(new NeoPlugin());
+//			AppUtils.plugins.push(new DashPlugin());
+//			AppUtils.plugins.push(new ZcashPlugin());
+//			AppUtils.plugins.push(new WavesPlugin());
+//			AppUtils.plugins.push(new StellarPlugin());
+//			AppUtils.plugins.push(new RipplePlugin());
+//			AppUtils.plugins.push(new EthereumClassicPlugin());
+//			AppUtils.plugins.push(new OmiseGoPlugin());
+//			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
 			AppUtils.plugins.push(new BIP39Plugin());
-			AppUtils.plugins.push(new UbiqPlugin());
+//			AppUtils.plugins.push(new UbiqPlugin());
 		}
 		return AppUtils.plugins;
 	},

@@ -733,3 +733,132 @@ function NeoPlugin() {
 	}
 }
 inheritsFrom(NeoPlugin, CryptoPlugin);
+
+/**
+ * Plugin that generates keys using BIP32, BIP39, and BIP44.
+ * 
+ * @param ticker identifies the network
+ */
+function HdPlugin(ticker) {
+	
+	this.getName = function() { return HdPlugins[ticker].name; }
+	this.getTicker = function() { return ticker };
+	this.getLogoPath = function() { return HdPlugins[ticker].logoPath; }
+	this.getDependencies = function() { return ["lib/bitcoinjs-3.3.2.js", "lib/bip39.js"]; }
+	this.getDonationAddress = function() { HdPlugins[ticker].donationAddress }
+	
+	var mnemonic;
+	var language = "english";
+	var network;
+	
+	this.randomPrivateKey = function() {
+		
+		// get network
+		if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
+		console.log(network);
+		
+		// get bip44 derivation path
+		var derivationPath = "m/44'/" + HdPlugins[ticker].bip44Index + "'/0'/0";
+		console.log(derivationPath);
+		
+		// generate bip39 seed
+		if (!mnemonic) mnemonic = new Mnemonic(language);
+		var phrase = mnemonic.generate(256);
+		var seed = mnemonic.toSeed(phrase);
+		console.log(seed);
+		
+		// derive bip32 root key
+		var bip32RootKey = bitcoinjs.bitcoin.HDNode.fromSeedHex(seed, network);
+		console.log(bip32RootKey);
+		
+		// bip32 extended key
+		var bip32ExtendedKey = getBip32ExtendedKey(bip32RootKey, derivationPath);
+		console.log(bip32ExtendedKey);
+		
+		// key of first index
+		var key = bip32ExtendedKey.deriveHardened(0);
+		
+		// return wif
+		return key.keyPair.toWIF(network);
+	}
+	
+	this.decode = function(str) {
+		assertString(str);
+		assertInitialized(str);
+		var decoded = {};
+		
+		// get network
+		if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
+		
+		// wif
+		try {
+			var keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
+			console.log(keypair);
+			//console.log(bs58check.decode(str).toString('hex'));
+			
+			decoded.privateWif = str;
+			decoded.privateHex = AppUtils.toBase(58, 16, str);
+			decoded.publicAddress = keypair.getAddress().toString();
+			decoded.encryption = null;
+			console.log(decoded);
+			return decoded;
+		} catch (err) {
+			throw err;
+		}
+		
+		// unrecognized hex or wif
+		return null;
+	}
+	
+	this.isAddress = function(str) {
+		throw new Error("isAddress() Not implemented");
+	}
+	
+	/**
+	 * Credit: https://github.com/iancoleman/bip39
+	 * 
+	 * MIT license.
+	 */
+	function getBip32ExtendedKey(bip32RootKey, path) {
+		var extendedKey = bip32RootKey;
+    var pathBits = path.split("/");
+    for (var i=0; i<pathBits.length; i++) {
+      var bit = pathBits[i];
+      var index = parseInt(bit);
+      if (isNaN(index)) {
+          continue;
+      }
+      var hardened = bit[bit.length-1] == "'";
+      var isPriv = !(extendedKey.isNeutered());
+      var invalidDerivationPath = hardened && !isPriv;
+      if (invalidDerivationPath) {
+          extendedKey = null;
+      }
+      else if (hardened) {
+          extendedKey = extendedKey.deriveHardened(index);
+      }
+      else {
+          extendedKey = extendedKey.derive(index);
+      }
+    }
+    return extendedKey;
+	}
+}
+inheritsFrom(HdPlugin, CryptoPlugin);
+
+var HdPlugins = {
+		"BTC": {
+			name: "Bitcoin",
+			logoPath: "img/bitcoin.png",
+			donationAddress: "AbcTest",
+			bitcoinjs_network: "bitcoin",
+			bip44Index: 0
+		},
+		"LTC": {
+			name: "Litecoin",
+			logoPath: "img/litecoin.png",
+			donationAddress: "AbcTest",
+			bitcoinjs_network: "litecoin",
+			bip44Index: 2
+		}
+};
