@@ -39,8 +39,10 @@ function DependencyLoader() {
 	 * 
 	 * @param paths is one or more paths to load as a string or string[]
 	 * @param onDone(err) is invoked when the paths are loaded or fail
+	 * @param maxThreads specifies the maximum number of parallel fetch requests (default 10)
 	 */
-	this.load = function(paths, onDone) {
+	this.load = function(paths, onDone, maxThreads) {
+		maxThreads = maxThreads || 10;
 		
 		// listify paths
 		if (!isArray(paths)) {
@@ -78,7 +80,7 @@ function DependencyLoader() {
 		// executes functions to fetch scripts and images
 		function loadAsync() {
 			var funcs = [getScriptsFunc(scriptsToLoad), getImagesFunc(imagesToLoad)];
-			async.parallel(funcs, function(err, result) {
+			async.parallelLimit(funcs, maxThreads, function(err, result) {
 				if (onDone) onDone(err);
 			});
 		}
