@@ -732,9 +732,6 @@ function AppController(div) {
 		// navigate to first page
 		navigate(window.location.hash, function() {
 			
-			// done initializing application
-			if (onDone) onDone();
-			
 			// load notice dependencies and start polling
 			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
 				if (err) throw err;
@@ -743,6 +740,9 @@ function AppController(div) {
 				// load remaining app dependencies in the background
 				LOADER.load(AppUtils.getAppDependencies(), function(err) {
 					if (err) throw err;
+					
+					// done initializing application
+					if (onDone) onDone();
 				});
 			});
 		});
