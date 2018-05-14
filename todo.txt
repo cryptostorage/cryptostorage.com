@@ -1,7 +1,6 @@
 v0.3.0
+add support for dogecoin, zcoin, etc
 ultra compact view
-performance tests
-add support for dogecoin1
 
 white background with grey border when passphrase / split disabled
 split and passphrase inputs don't disable while generating on chrome
@@ -14,8 +13,6 @@ notice colors
 update faq_interoperable to only refer to encryption
 update bip38 cryptojs description with pbkdf if necessary
 put homepage text in index.html and dynamically hide for seo
-impor
-
 browser testing
 release
 
