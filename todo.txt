@@ -1,6 +1,5 @@
 v0.3.0
 ultra compact view
-see if there are wasteful loops in editor listeners
 performance tests
 add support for dogecoin1
 
