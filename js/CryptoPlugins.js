@@ -585,9 +585,6 @@ function BitcoinJsPlugin(ticker) {
 		assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
 		
 		// return randomly generated wif
-		//console.log(network);
-		//console.log(bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: true}));
-		
 		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: true}).toWIF();
 	}
 	
@@ -629,6 +626,7 @@ function BitcoinJsPlugin(ticker) {
 			decoded.encryption = null;
 			return decoded;
 		} catch (err) {
+			console.log(err);
 			return null;	// unrecognized private key
 		}
 	}
@@ -638,6 +636,7 @@ function BitcoinJsPlugin(ticker) {
 			bitcoinjs.bitcoin.address.fromBase58Check(str);
 			return true;
 		} catch (err) {
+			console.log(err);
 			return false;
 		}
 	}

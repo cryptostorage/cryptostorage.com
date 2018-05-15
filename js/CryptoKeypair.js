@@ -355,7 +355,7 @@ CryptoKeypair.prototype._validateState = function() {
 		assertNull(this._state.shareNum);
 	} else if (this._state.isSplit ===  undefined) {
 		assertUndefined(this._state.privateHex);
-		assertUndefined(this._state.privateHex);
+		assertUndefined(this._state.privateWif);
 		assertUndefined(this._state.minShares);
 		assertUndefined(this._state.shareNum);
 	}
@@ -373,10 +373,10 @@ CryptoKeypair.prototype._validateState = function() {
 	}
 	
 	// hex and wif must both be initialized or undefined
-	if (isInitialized(this._state.privateHex)) {
+	if (isInitialized(this._state.privateHex) || isInitialized(this._state.privateWif)) {
+		assertInitialized(this._state.privateHex);
 		assertInitialized(this._state.privateWif);
-	}
-	else {
+	} else {
 		assertUndefined(this._state.privateHex);
 		assertUndefined(this._state.privateWif);
 	}
