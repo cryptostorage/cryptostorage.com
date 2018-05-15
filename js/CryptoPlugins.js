@@ -757,27 +757,8 @@ function HdPlugin(ticker) {
 		// get network
 		if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
 		
-		// get bip44 derivation path
-		var derivationPath = "m/44'/" + HdPlugins[ticker].bip44Index + "'/0'/0";
-		
-		// generate bip39 seed
-		if (!mnemonic) mnemonic = new Mnemonic(language);
-		var phrase = mnemonic.generate(256);
-		var seed = mnemonic.toSeed(phrase);
-		
-		// derive bip32 root key
-		var bip32RootKey = bitcoinjs.bitcoin.HDNode.fromSeedHex(seed, network);
-		
-		// bip32 extended key
-		var bip32ExtendedKey = getBip32ExtendedKey(bip32RootKey, derivationPath);
-		
-		// key of first index
-		var key = bip32ExtendedKey.deriveHardened(0);
-		
-		// TODO: no need to go through bip39 seed
-		
-		// return wif
-		return key.keyPair.toWIF(network);
+		// return randomly generated wif
+		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network}).toWIF();
 	}
 	
 	this.decode = function(str) {
@@ -790,7 +771,7 @@ function HdPlugin(ticker) {
 		// initialize keypair
 		var keypair;
 		try {
-			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromHEX(str, network, true);
+			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromHex(str, network, true);
 			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
 		} catch (err) {
 			return null;
@@ -799,7 +780,7 @@ function HdPlugin(ticker) {
 		// decode
 		var decoded = {};
 		decoded.privateWif = keypair.toWIF();
-		decoded.privateHex = keypair.toHEX();
+		decoded.privateHex = keypair.toHex();
 		decoded.publicAddress = keypair.getAddress().toString();
 		decoded.encryption = null;
 		return decoded;
