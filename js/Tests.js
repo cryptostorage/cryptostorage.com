@@ -31,7 +31,7 @@ function Tests() {
 	
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_KEYS = 1;							// number of keys to test per plugin without encryption throughout tests
-	var REPEAT_KEYS_ENCRYPTION = 1;		// number of keys to test per plugin with encryption throughout tests
+	var REPEAT_KEYS_ENCRYPTION = 0;		// number of keys to test per plugin with encryption throughout tests
 	var TEST_MAX_SHARES = false;			// computationally intensive
 	var NUM_PIECES = 3;
 	var MIN_PIECES = 2;
@@ -115,19 +115,19 @@ function Tests() {
 		
 		
 		var plugins = [];
-//		plugins.push(AppUtils.getCryptoPlugin("BCH"));
-//		plugins.push(AppUtils.getCryptoPlugin("ETC"));
-//		plugins.push(AppUtils.getCryptoPlugin("XMR"));
+		plugins.push(AppUtils.getCryptoPlugin("BCH"));
+		plugins.push(AppUtils.getCryptoPlugin("ETC"));
+		plugins.push(AppUtils.getCryptoPlugin("XMR"));
 		plugins.push(AppUtils.getCryptoPlugin("BTC"));
 		plugins.push(AppUtils.getCryptoPlugin("LTC"));
-//		plugins.push(AppUtils.getCryptoPlugin("NEO"));
+		plugins.push(AppUtils.getCryptoPlugin("NEO"));
 		plugins.push(AppUtils.getCryptoPlugin("DSH"));
-//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+		plugins.push(AppUtils.getCryptoPlugin("BTC"));
 //		plugins.push(AppUtils.getCryptoPlugin("ZEC"));
-//		plugins.push(AppUtils.getCryptoPlugin("WAVES"));
-//		plugins.push(AppUtils.getCryptoPlugin("XLM"));
-//		plugins.push(AppUtils.getCryptoPlugin("XRP"));
-//		plugins.push(AppUtils.getCryptoPlugin("BIP39"));
+		plugins.push(AppUtils.getCryptoPlugin("WAVES"));
+		plugins.push(AppUtils.getCryptoPlugin("XLM"));
+		plugins.push(AppUtils.getCryptoPlugin("XRP"));
+		plugins.push(AppUtils.getCryptoPlugin("BIP39"));
 
 		
 //		plugins.push(new BitcoinPlugin());
