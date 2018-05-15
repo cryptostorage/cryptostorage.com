@@ -746,6 +746,7 @@ function HdPlugin(ticker) {
 	this.getLogoPath = function() { return HdPlugins[ticker].logoPath; }
 	this.getDependencies = function() { return ["lib/bitcoinjs-3.3.2.js", "lib/bip39.js"]; }
 	this.getDonationAddress = function() { HdPlugins[ticker].donationAddress }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
 	
 	var mnemonic;
 	var language = "english";
