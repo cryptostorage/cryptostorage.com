@@ -758,7 +758,7 @@ function HdPlugin(ticker) {
 		if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
 		
 		// return randomly generated wif
-		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network}).toWIF();
+		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: true}).toWIF();
 	}
 	
 	this.decode = function(str) {
