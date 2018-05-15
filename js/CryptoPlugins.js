@@ -741,16 +741,17 @@ inheritsFrom(NeoPlugin, CryptoPlugin);
  */
 function HdPlugin(ticker) {
 	
-	this.getName = function() { return HdPlugins[ticker].name; }
-	this.getTicker = function() { return ticker };
-	this.getLogoPath = function() { return HdPlugins[ticker].logoPath; }
-	this.getDependencies = function() { return ["lib/bitcoinjs-3.3.2.js", "lib/bip39.js"]; }
-	this.getDonationAddress = function() { HdPlugins[ticker].donationAddress }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
-	
+	var that = this;
 	var mnemonic;
 	var language = "english";
 	var network;
+	
+	this.getName = function() { return HdPlugins[ticker].name; }
+	this.getTicker = function() { return ticker };
+	this.getLogoPath = function() { return HdPlugins[ticker].logoPath; }
+	this.getDependencies = function() { return ["lib/bitcoinjs-3.3.2.js", "lib/bitcoinjs-bip38-2.0.2.js"]; }
+	this.getDonationAddress = function() { HdPlugins[ticker].donationAddress }
+	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
 	
 	this.randomPrivateKey = function() {
 		
@@ -764,26 +765,36 @@ function HdPlugin(ticker) {
 	this.decode = function(str) {
 		assertString(str);
 		assertInitialized(str);
+		var decoded = {};
 		
-		// get network
-		if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
-		
-		// initialize keypair
-		var keypair;
-		try {
-			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromHex(str, network, true);
-			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
-		} catch (err) {
-			return null;
+		// bip38 wif
+		if (AppUtils.isBIP38Format(str)) {
+			decoded.privateWif = str;
+			decoded.privateHex = AppUtils.toBase(58, 16, str);
+			decoded.publicAddress = undefined;
+			decoded.encryption = AppUtils.EncryptionScheme.BIP38;
+			return decoded;
 		}
 		
-		// decode
-		var decoded = {};
-		decoded.privateWif = keypair.toWIF();
-		decoded.privateHex = keypair.toHex();
-		decoded.publicAddress = keypair.getAddress().toString();
-		decoded.encryption = null;
-		return decoded;
+		// bip38 hex
+		if (str.length > 80 && str.length < 90 && str.length % 2 === 0 && isHex(str)) {
+			return that.decode(AppUtils.toBase(16, 58, str));
+		}
+		
+		// unencrypted
+		var keypair;
+		try {
+			if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
+			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromHex(str, network, true);
+			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
+			decoded.privateWif = keypair.toWIF();
+			decoded.privateHex = keypair.toHex();
+			decoded.publicAddress = keypair.getAddress().toString();
+			decoded.encryption = null;
+			return decoded;
+		} catch (err) {
+			return null;	// unrecognized private key
+		}
 	}
 	
 	this.isAddress = function(str) {
