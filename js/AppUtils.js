@@ -274,32 +274,22 @@ var AppUtils = {
 	getCryptoPlugins: function() {
 		if (!AppUtils.plugins) {
 			AppUtils.plugins = [];
-			
-//			// add BitcoinJS plugins
-//			for (prop in BitcoinJsPlugins) {
-//				if (BitcoinJsPlugins.hasOwnProperty(prop)) {
-//					AppUtils.plugins.push(new BitcoinJsPlugin(prop.toString()));
-//				}
-//			}
-			
+			AppUtils.plugins.push(new BitcoinCashPlugin());
+			AppUtils.plugins.push(new EthereumPlugin());
+			AppUtils.plugins.push(new MoneroPlugin());
 			AppUtils.plugins.push(new BitcoinJsPlugin("BTC"));
 			AppUtils.plugins.push(new BitcoinJsPlugin("LTC"));
+			AppUtils.plugins.push(new NeoPlugin());
 			AppUtils.plugins.push(new BitcoinJsPlugin("DSH"));
-			AppUtils.plugins.push(new BitcoinCashPlugin());
-//			AppUtils.plugins.push(new EthereumPlugin());
-			AppUtils.plugins.push(new MoneroPlugin());
-//			AppUtils.plugins.push(new BitcoinPlugin());
-//			AppUtils.plugins.push(new NeoPlugin());
-//			AppUtils.plugins.push(new DashPlugin());
-//			AppUtils.plugins.push(new ZcashPlugin());
-//			AppUtils.plugins.push(new WavesPlugin());
-//			AppUtils.plugins.push(new StellarPlugin());
-//			AppUtils.plugins.push(new RipplePlugin());
-//			AppUtils.plugins.push(new EthereumClassicPlugin());
-//			AppUtils.plugins.push(new OmiseGoPlugin());
-//			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
+			AppUtils.plugins.push(new BitcoinJsPlugin("ZEC"));
+			AppUtils.plugins.push(new WavesPlugin());
+			AppUtils.plugins.push(new StellarPlugin());
+			AppUtils.plugins.push(new RipplePlugin());
+			AppUtils.plugins.push(new EthereumClassicPlugin());
+			AppUtils.plugins.push(new OmiseGoPlugin());
+			AppUtils.plugins.push(new BasicAttentionTokenPlugin());
 			AppUtils.plugins.push(new BIP39Plugin());
-//			AppUtils.plugins.push(new UbiqPlugin());
+			AppUtils.plugins.push(new UbiqPlugin());
 		}
 		return AppUtils.plugins;
 	},

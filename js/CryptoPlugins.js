@@ -118,74 +118,15 @@ CryptoPlugin.prototype.hasPublicAddress = function() { return true; };
 CryptoPlugin.prototype.isAddress = function(str) { throw new Error("Subclass must implement"); }
 
 /**
- * Bitcoin plugin.
- */
-function BitcoinPlugin() {
-	var that = this;
-	this.getName = function() { return "Bitcoin"; }
-	this.getTicker = function() { return "BTC" };
-	this.getLogoPath = function() { return "img/bitcoin.png"; }
-	this.getDependencies = function() { return ["lib/bitaddress.js"]; }
-	this.getDonationAddress = function() { return "1ArmuyQfgM1Sd3tN1A242FzPhbePfCjbmE"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
-	
-	this.randomPrivateKey = function() {
-		return new Bitcoin.ECKey().setCompressed(true).getBitcoinHexFormat();
-	}
-	
-	this.decode = function(str) {
-		assertString(str);
-		assertInitialized(str);
-		var decoded = {};
-		
-		// unencrypted
-		if (ninja.privateKey.isPrivateKey(str)) {
-			var key = new Bitcoin.ECKey(str);
-			key.setCompressed(true);
-			decoded.publicAddress = key.getBitcoinAddress();
-			decoded.privateHex = key.getBitcoinHexFormat();
-			decoded.privateWif = key.getBitcoinWalletImportFormat();
-			decoded.encryption = null;
-			return decoded;
-		}
-		
-		// bip38 wif
-		if (ninja.privateKey.isBIP38Format(str)) {
-			decoded.privateHex = AppUtils.toBase(58, 16, str);
-			decoded.privateWif = str;
-			decoded.encryption = AppUtils.EncryptionScheme.BIP38;
-			return decoded;
-		}
-		
-		// bip38 hex
-		if (str.length > 80 && str.length < 90 && str.length % 2 === 0 && isHex(str)) return that.decode(AppUtils.toBase(16, 58, str));			
-		
-		// otherwise cannot decode
-		return null;
-	}
-	
-	this.isAddress = function(str) {
-		try {
-			Bitcoin.Address.decodeString(str);
-			return true;
-		} catch (err) {
-			return false;
-		}
-	}
-}
-inheritsFrom(BitcoinPlugin, CryptoPlugin);
-
-/**
  * Bitcoin Cash plugin.
  */
 function BitcoinCashPlugin() {
-	var bitcoinPlugin = new BitcoinPlugin();
+	var bitcoinPlugin = new BitcoinJsPlugin("BTC");
 	this.getName = function() { return "Bitcoin Cash"; }
 	this.getTicker = function() { return "BCH" };
 	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
-	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/bchaddrjs-0.1.4.js"]; }
+	this.getDependencies = function() { return ["lib/bchaddrjs-0.1.4.js"]; }
 	this.getDonationAddress = function() { return "qqcsh20ltcnxxw2wqd3m7j8j8qeh46qwuv5s93987x"; }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
 	
 	this.randomPrivateKey = function() {
 		return bitcoinPlugin.randomPrivateKey();
@@ -218,7 +159,7 @@ function EthereumPlugin() {
 	this.getName = function() { return "Ethereum"; }
 	this.getTicker = function() { return "ETH" };
 	this.getLogoPath = function() { return "img/ethereum.png"; }
-	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/keythereum.js", "lib/ethereumjs-util.js"]; }
+	this.getDependencies = function() { return ["lib/keythereum.js", "lib/ethereumjs-util.js"]; }
 	this.getDonationAddress = function() { return "0x8074da70E22a58A9E4a5DCeCf968Ea499D60e470"; }
 	
 	this.randomPrivateKey = function() {
@@ -298,84 +239,6 @@ function UbiqPlugin() {
 inheritsFrom(UbiqPlugin, EthereumPlugin);
 
 /**
- * Litecoin plugin.
- */
-function LitecoinPlugin() {
-	this.getName = function() { return "Litecoin"; }
-	this.getTicker = function() { return "LTC" };
-	this.getLogoPath = function() { return "img/litecoin.png"; }
-	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/litecore.js"]; }
-	this.getDonationAddress = function() { return "LSRx2UwU5rjKGcmUXx8KDNTNXMBV1PudHB"; }
-	
-	this.randomPrivateKey = function() {
-		return new litecore.PrivateKey().toString();
-	}
-	
-	this.decode = function(str) {
-		assertString(str);
-		assertInitialized(str);
-		
-		// unencrypted
-		if (str.length >= 52 && litecore.PrivateKey.isValid(str)) {	// litecore says 'ab' is valid?
-			var decoded = {};
-			var key = new litecore.PrivateKey(str);
-			decoded.privateHex = key.toString();
-			decoded.privateWif = key.toWIF();
-			decoded.publicAddress = key.toAddress().toString();
-			decoded.encryption = null;
-			return decoded;
-		}
-		
-		// otherwise key is not recognized
-		return null;
-	}
-	
-	this.isAddress = function(str) {
-		return litecore.Address.isValid(str);
-	}
-}
-inheritsFrom(LitecoinPlugin, CryptoPlugin);
-
-/**
- * Dash plugin.
- */
-function DashPlugin() {
-	this.getName = function() { return "Dash"; }
-	this.getTicker = function() { return "DASH" };
-	this.getLogoPath = function() { return "img/dash.png"; }
-	this.getDependencies = function() { return ["lib/crypto-js.js", "lib/bitaddress.js", "lib/dashcore.js"]; }
-	this.getDonationAddress = function() { return "XoK6AmEGxAh2WKMh2hkVycnkEdmi8zDaQR"; }
-	
-	this.randomPrivateKey = function() {
-		return new dashcore.PrivateKey().toString();
-	}
-	
-	this.decode = function(str) {
-		assertString(str);
-		assertInitialized(str);
-		
-		// unencrypted
-		if (str.length >= 52 && dashcore.PrivateKey.isValid(str)) {	// dashcore says 'ab' is valid?
-			var decoded = {};
-			var key = new dashcore.PrivateKey(str);
-			decoded.privateHex = key.toString();
-			decoded.privateWif = key.toWIF();
-			decoded.publicAddress = key.toAddress().toString();
-			decoded.encryption = null;
-			return decoded;
-		}
-		
-		// otherwise key is not recognized
-		return null;
-	}
-	
-	this.isAddress = function(str) {
-		return dashcore.Address.isValid(str);
-	}
-}
-inheritsFrom(DashPlugin, CryptoPlugin);
-
-/**
  * Monero plugin.
  */
 function MoneroPlugin() {
@@ -431,45 +294,6 @@ function MoneroPlugin() {
 	}
 }
 inheritsFrom(MoneroPlugin, CryptoPlugin);
-
-/**
- * Zcash plugin.
- */
-function ZcashPlugin() {
-	this.getName = function() { return "Zcash"; }
-	this.getTicker = function() { return "ZEC" };
-	this.getLogoPath = function() { return "img/zcash.png"; }
-	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/zcashcore.js"]; }
-	this.getDonationAddress = function() { return "t1g1AQ8Q8yWbkBntunJaKADJ38YjxsDuJ3H"; }
-	
-	this.randomPrivateKey = function() {
-		return new zcashcore.PrivateKey().toString();
-	}
-	
-	this.decode = function(str) {
-		assertString(str);
-		assertInitialized(str);
-		
-		// unencrypted
-		if (str.length >= 52 && zcashcore.PrivateKey.isValid(str)) {	// zcashcore says 'ab' is valid?
-			var decoded = {};
-			var key = new zcashcore.PrivateKey(str);
-			decoded.privateHex = key.toString();
-			decoded.privateWif = key.toWIF();
-			decoded.publicAddress = key.toAddress().toString();
-			decoded.encryption = null;
-			return decoded;
-		}
-		
-		// otherwise key is not recognized
-		return null;
-	}
-	
-	this.isAddress = function(str) {
-		return zcashcore.Address.isValid(str);
-	}
-}
-inheritsFrom(ZcashPlugin, CryptoPlugin);
 
 /**
  * Ripple plugin.
@@ -761,6 +585,9 @@ function BitcoinJsPlugin(ticker) {
 		assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
 		
 		// return randomly generated wif
+		//console.log(network);
+		//console.log(bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: true}));
+		
 		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: true}).toWIF();
 	}
 	
@@ -786,10 +613,16 @@ function BitcoinJsPlugin(ticker) {
 		// unencrypted
 		var keypair;
 		try {
+			
+			// get bitcoinjs network extension
 			if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
 			assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
+			
+			// get keypair from hex or wif
 			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, network, true);
 			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
+			
+			// decode
 			decoded.privateWif = keypair.toWIF();
 			decoded.privateHex = keypair.toUncheckedHex();
 			decoded.publicAddress = keypair.getAddress().toString();
@@ -818,19 +651,25 @@ var BitcoinJsPlugins = {
 		"BTC": {
 			name: "Bitcoin",
 			logoPath: "img/bitcoin.png",
-			donationAddress: "AbcTest",
+			donationAddress: "1ArmuyQfgM1Sd3tN1A242FzPhbePfCjbmE",
 			bitcoinjs_network: "bitcoin",
 		},
 		"LTC": {
 			name: "Litecoin",
 			logoPath: "img/litecoin.png",
-			donationAddress: "AbcTest",
+			donationAddress: "LSRx2UwU5rjKGcmUXx8KDNTNXMBV1PudHB",
 			bitcoinjs_network: "litecoin",
 		},
 		"DSH": {
 			name: "Dash",
 			logoPath: "img/dash.png",
-			donationAddress: "AbcTest",
+			donationAddress: "XoK6AmEGxAh2WKMh2hkVycnkEdmi8zDaQR",
 			bitcoinjs_network: "dash",
+		},
+		"ZEC": {
+			name: "Zcash",
+			logoPath: "img/zcash.png",
+			donationAddress: "t1g1AQ8Q8yWbkBntunJaKADJ38YjxsDuJ3H",
+			bitcoinjs_network: "zcash",
 		}
 };

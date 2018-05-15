@@ -111,10 +111,25 @@ function Tests() {
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function getTestPlugins() {
+		//return AppUtils.getCryptoPlugins();
+		
+		
 		var plugins = [];
-//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
-//		plugins.push(AppUtils.getCryptoPlugin("LTC"));
+//		plugins.push(AppUtils.getCryptoPlugin("BCH"));
+//		plugins.push(AppUtils.getCryptoPlugin("ETC"));
+//		plugins.push(AppUtils.getCryptoPlugin("XMR"));
+		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+		plugins.push(AppUtils.getCryptoPlugin("LTC"));
+//		plugins.push(AppUtils.getCryptoPlugin("NEO"));
 		plugins.push(AppUtils.getCryptoPlugin("DSH"));
+//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+//		plugins.push(AppUtils.getCryptoPlugin("ZEC"));
+//		plugins.push(AppUtils.getCryptoPlugin("WAVES"));
+//		plugins.push(AppUtils.getCryptoPlugin("XLM"));
+//		plugins.push(AppUtils.getCryptoPlugin("XRP"));
+//		plugins.push(AppUtils.getCryptoPlugin("BIP39"));
+
+		
 //		plugins.push(new BitcoinPlugin());
 //		plugins.push(new BitcoinCashPlugin());
 //		plugins.push(new EthereumPlugin());
@@ -187,7 +202,6 @@ function Tests() {
 	}
 	
 	function testPlugins(plugins) {
-		console.log("Testing plugins");
 		for (var i = 0; i < plugins.length; i++) {
 			var plugin = plugins[i];
 			assertInitialized(plugin.getName());
@@ -196,15 +210,15 @@ function Tests() {
 			
 			// test invalid addresses
 			assertFalse(plugin.isAddress("invalidAddress123"));
-			assertFalse(plugin.isAddress(null));
-			plugin.hasPublicAddress() ? assertFalse(plugin.isAddress(undefined)) : assertTrue(plugin.isAddress(undefined));
+			assertFalse(plugin.isAddress(undefined));
+			plugin.hasPublicAddress() ? assertFalse(plugin.isAddress(null)) : assertTrue(plugin.isAddress(null));
 			assertFalse(plugin.isAddress([]));
-			
+
 			// test decode invalid private keys
 			var invalids = copyArray(INVALID_PKS);
 			invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());
-			for (var i = 0; i < invalids.length; i++) {
-				var invalid = invalids[i];
+			for (var j = 0; j < invalids.length; j++) {
+				var invalid = invalids[j];
 				if (isString(invalid)) {
 					assertNull(plugin.decode(invalid));	
 				} else {
@@ -216,13 +230,13 @@ function Tests() {
 					}
 				}
 			}
-			
+
 			// verify shamirs is initialized with 7 bits
 			if (plugin.getTicker() === "BTC") {
 				var keypair = new CryptoKeypair({plugin: plugin});
 				var shares = secrets.share(keypair.getPrivateHex(), NUM_PIECES, MIN_PIECES);
-				for (var i = 0; i < shares.length; i++)  {
-					var b58 = AppUtils.toBase(16, 58, shares[i]);
+				for (var j = 0; j < shares.length; j++)  {
+					var b58 = AppUtils.toBase(16, 58, shares[j]);
 					assertTrue(b58.startsWith("3X") || b58.startsWith("3Y"));
 				}
 			}
