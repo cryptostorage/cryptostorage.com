@@ -860,25 +860,14 @@ var AppUtils = {
 		
 		function encryptHexBip38(hex, passphrase, onProgress, onDone) {
 			try {
-				console.log("Encrypting BIP38");
-				keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(hex);
-				var encrypted = bitcoinjs.bip38.encrypt(keypair.d.toBuffer(), true, passphrase, function(progress) {
+				var keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(hex);
+				var decoded = bitcoinjs.wif.decode(keypair.toWIF());
+				bitcoinjs.bip38.encryptAsync(decoded.privateKey, true, passphrase, function(progress) {
 					if (onProgress) onProgress(progress.percent / 100);
+				}, null, function(err, encryptedWif) {
+					if (err) onDone(err);
+					else onDone(null, AppUtils.toBase(58, 16, encryptedWif));
 				});
-				console.log(encrypted);
-				onDone(null, AppUtils.toBase(58, 16, encrypted));	// TODO: async
-				
-				
-//				var key = new Bitcoin.ECKey(hex);
-//				key.setCompressed(true);
-//				var wif = key.getBitcoinWalletImportFormat();
-//				var decoded = bitcoinjs.decode(wif);
-//				bitcoinjs.encrypt(decoded.privateKey, true, passphrase, function(progress) {
-//					if (onProgress) onProgress(progress.percent / 100);
-//				}, null, function(err, encryptedWif) {
-//					if (err) onDone(err);
-//					else onDone(null, AppUtils.toBase(58, 16, encryptedWif));
-//				});
 			} catch (err) {
 				onDone(err);
 			}
@@ -965,38 +954,17 @@ var AppUtils = {
 		}
 		
 		function decryptHexBip38(hex, passphrase, onProgress, onDone) {
-			
-			// convert hex to b58
-			var b58 = AppUtils.toBase(16, 58, hex);
-			
-			try {
-				
-				// decrypt
-				console.log("Decrypting...");
-				var decrypted = bitcoinjs.bip38.decrypt(b58, passphrase, function(progress) {
-					if (onProgress) onProgress(progress.percent / 100);
-				});
-				var decryptedWif = bitcoinjs.wif.encode(0x80, decrypted.privateKey, decrypted.compressed);	// network and compressed not used
-				var decryptedHex = bitcoinjs.bitcoin.ECPair.fromWIF(decryptedWif).toUncheckedHex();
-				onDone(null, decryptedHex);
-			} catch (err) {
-				console.log(err);
-				onDone(new Error("Incorrect passphrase"));
-				return;
-			}
-			
-//			bitcoinjs.decrypt(AppUtils.toBase(16, 58, hex), passphrase, function(progress) {
-//				if (onProgress) onProgress(progress.percent / 100);
-//			}, null, function(err, decryptedKey) {
-//				if (err) onDone(new Error("Incorrect passphrase"));
-//				else {
-//					var decryptedB58 = bitcoinjs.encode(0x80, decryptedKey.privateKey, true);
-//					key = new Bitcoin.ECKey(decryptedB58);
-//					key.setCompressed(true);
-//					if (onProgress) onProgress(1);
-//					onDone(null, key.getBitcoinHexFormat());
-//				}
-//			});
+			bitcoinjs.bip38.decryptAsync(AppUtils.toBase(16, 58, hex), passphrase, function(progress) {
+				if (onProgress) onProgress(progress.percent / 100);
+			}, null, function(err, decryptedKey) {
+				if (err) onDone(new Error("Incorrect passphrase"));
+				else {
+					var decryptedWif = bitcoinjs.wif.encode(0x80, decryptedKey.privateKey, true);	// network and compressed not used
+					var decryptedHex = bitcoinjs.bitcoin.ECPair.fromWIF(decryptedWif).toUncheckedHex();
+					if (onProgress) onProgress(1);
+					onDone(null, decryptedHex);
+				}
+			});
 		}
 	},
 	
