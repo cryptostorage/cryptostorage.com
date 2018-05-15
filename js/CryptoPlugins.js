@@ -794,36 +794,6 @@ function HdPlugin(ticker) {
 			return false;
 		}
 	}
-	
-	/**
-	 * Credit: https://github.com/iancoleman/bip39
-	 * 
-	 * MIT license.
-	 */
-	function getBip32ExtendedKey(bip32RootKey, path) {
-		var extendedKey = bip32RootKey;
-    var pathBits = path.split("/");
-    for (var i=0; i<pathBits.length; i++) {
-      var bit = pathBits[i];
-      var index = parseInt(bit);
-      if (isNaN(index)) {
-          continue;
-      }
-      var hardened = bit[bit.length-1] == "'";
-      var isPriv = !(extendedKey.isNeutered());
-      var invalidDerivationPath = hardened && !isPriv;
-      if (invalidDerivationPath) {
-          extendedKey = null;
-      }
-      else if (hardened) {
-          extendedKey = extendedKey.deriveHardened(index);
-      }
-      else {
-          extendedKey = extendedKey.derive(index);
-      }
-    }
-    return extendedKey;
-	}
 }
 inheritsFrom(HdPlugin, CryptoPlugin);
 
