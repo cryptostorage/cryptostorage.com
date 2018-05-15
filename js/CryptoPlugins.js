@@ -755,28 +755,25 @@ function HdPlugin(ticker) {
 		
 		// get network
 		if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
-		console.log(network);
 		
 		// get bip44 derivation path
 		var derivationPath = "m/44'/" + HdPlugins[ticker].bip44Index + "'/0'/0";
-		console.log(derivationPath);
 		
 		// generate bip39 seed
 		if (!mnemonic) mnemonic = new Mnemonic(language);
 		var phrase = mnemonic.generate(256);
 		var seed = mnemonic.toSeed(phrase);
-		console.log(seed);
 		
 		// derive bip32 root key
 		var bip32RootKey = bitcoinjs.bitcoin.HDNode.fromSeedHex(seed, network);
-		console.log(bip32RootKey);
 		
 		// bip32 extended key
 		var bip32ExtendedKey = getBip32ExtendedKey(bip32RootKey, derivationPath);
-		console.log(bip32ExtendedKey);
 		
 		// key of first index
 		var key = bip32ExtendedKey.deriveHardened(0);
+		
+		// TODO: no need to go through bip39 seed
 		
 		// return wif
 		return key.keyPair.toWIF(network);
@@ -785,33 +782,35 @@ function HdPlugin(ticker) {
 	this.decode = function(str) {
 		assertString(str);
 		assertInitialized(str);
-		var decoded = {};
 		
 		// get network
 		if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
 		
-		// wif
+		// initialize keypair
+		var keypair;
 		try {
-			var keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
-			console.log(keypair);
-			//console.log(bs58check.decode(str).toString('hex'));
-			
-			decoded.privateWif = str;
-			decoded.privateHex = AppUtils.toBase(58, 16, str);
-			decoded.publicAddress = keypair.getAddress().toString();
-			decoded.encryption = null;
-			console.log(decoded);
-			return decoded;
+			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromHEX(str, network, true);
+			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
 		} catch (err) {
-			throw err;
+			return null;
 		}
 		
-		// unrecognized hex or wif
-		return null;
+		// decode
+		var decoded = {};
+		decoded.privateWif = keypair.toWIF();
+		decoded.privateHex = keypair.toHEX();
+		decoded.publicAddress = keypair.getAddress().toString();
+		decoded.encryption = null;
+		return decoded;
 	}
 	
 	this.isAddress = function(str) {
-		throw new Error("isAddress() Not implemented");
+		try {
+			bitcoinjs.bitcoin.address.fromBase58Check(str);
+			return true;
+		} catch (err) {
+			return false;
+		}
 	}
 	
 	/**
