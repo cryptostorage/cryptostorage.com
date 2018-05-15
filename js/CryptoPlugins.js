@@ -749,7 +749,7 @@ function BitcoinJsPlugin(ticker) {
 	this.getName = function() { return BitcoinJsPlugins[ticker].name; }
 	this.getTicker = function() { return ticker };
 	this.getLogoPath = function() { return BitcoinJsPlugins[ticker].logoPath; }
-	this.getDependencies = function() { return ["lib/bitcoinjs-3.3.2.js", "lib/bitcoinjs-bip38-2.0.2.js"]; }
+	this.getDependencies = function() { return ["lib/bitcoinjs-3.3.2.js"]; }
 	this.getDonationAddress = function() { return BitcoinJsPlugins[ticker].donationAddress }
 	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
 	
@@ -785,10 +785,10 @@ function BitcoinJsPlugin(ticker) {
 		var keypair;
 		try {
 			if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
-			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromHex(str, network, true);
+			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, network, true);
 			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
 			decoded.privateWif = keypair.toWIF();
-			decoded.privateHex = keypair.toHex();
+			decoded.privateHex = keypair.toUncheckedHex();
 			decoded.publicAddress = keypair.getAddress().toString();
 			decoded.encryption = null;
 			return decoded;

@@ -861,8 +861,8 @@ var AppUtils = {
 		function encryptHexBip38(hex, passphrase, onProgress, onDone) {
 			try {
 				console.log("Encrypting BIP38");
-				keypair = bitcoinjs.bitcoin.ECPair.fromHex(hex);
-				var encrypted = bitcoinjsBip38.encrypt(keypair.d.toBuffer(), true, passphrase, function(progress) {
+				keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(hex);
+				var encrypted = bitcoinjs.bip38.encrypt(keypair.d.toBuffer(), true, passphrase, function(progress) {
 					if (onProgress) onProgress(progress.percent / 100);
 				});
 				console.log(encrypted);
@@ -973,14 +973,12 @@ var AppUtils = {
 				
 				// decrypt
 				console.log("Decrypting...");
-				var decrypted = bitcoinjsBip38.decrypt(b58, passphrase, function(progress) {
+				var decrypted = bitcoinjs.bip38.decrypt(b58, passphrase, function(progress) {
 					if (onProgress) onProgress(progress.percent / 100);
 				});
-				console.log(decrypted);
-				
-				// return decrypted hex from keypair
-				var keypair = new bitcoinjs.bitcoin.ECPair.fromPrivateKeyByteArray(decrypted.privateKey, null, decrypted.compressed);
-				onDone(null, keypair.toHex());
+				var decryptedWif = bitcoinjs.wif.encode(0x80, decrypted.privateKey, decrypted.compressed);	// network and compressed not used
+				var decryptedHex = bitcoinjs.bitcoin.ECPair.fromWIF(decryptedWif).toUncheckedHex();
+				onDone(null, decryptedHex);
 			} catch (err) {
 				console.log(err);
 				onDone(new Error("Incorrect passphrase"));
