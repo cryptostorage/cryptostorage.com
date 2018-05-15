@@ -735,28 +735,28 @@ function NeoPlugin() {
 inheritsFrom(NeoPlugin, CryptoPlugin);
 
 /**
- * Plugin that generates keys using BIP32, BIP39, and BIP44.
+ * Plugin that generates keypairs using BitcoinJS and pluggable networks (LTC, DASH, DOGE, etc).
  * 
- * @param ticker identifies the network
+ * @param ticker identifies the network to generate keypairs for
  */
-function HdPlugin(ticker) {
+function BitcoinJsPlugin(ticker) {
 	
 	var that = this;
-	var mnemonic;
 	var language = "english";
+	var mnemonic;
 	var network;
 	
-	this.getName = function() { return HdPlugins[ticker].name; }
+	this.getName = function() { return BitcoinJsPlugins[ticker].name; }
 	this.getTicker = function() { return ticker };
-	this.getLogoPath = function() { return HdPlugins[ticker].logoPath; }
+	this.getLogoPath = function() { return BitcoinJsPlugins[ticker].logoPath; }
 	this.getDependencies = function() { return ["lib/bitcoinjs-3.3.2.js", "lib/bitcoinjs-bip38-2.0.2.js"]; }
-	this.getDonationAddress = function() { HdPlugins[ticker].donationAddress }
+	this.getDonationAddress = function() { return BitcoinJsPlugins[ticker].donationAddress }
 	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
 	
 	this.randomPrivateKey = function() {
 		
 		// get network
-		if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
+		if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
 		
 		// return randomly generated wif
 		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: true}).toWIF();
@@ -784,7 +784,7 @@ function HdPlugin(ticker) {
 		// unencrypted
 		var keypair;
 		try {
-			if (!network) network = bitcoinjs.bitcoin.networks[HdPlugins[ticker].bitcoinjs_network];
+			if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
 			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromHex(str, network, true);
 			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
 			decoded.privateWif = keypair.toWIF();
@@ -806,9 +806,12 @@ function HdPlugin(ticker) {
 		}
 	}
 }
-inheritsFrom(HdPlugin, CryptoPlugin);
+inheritsFrom(BitcoinJsPlugin, CryptoPlugin);
 
-var HdPlugins = {
+/**
+ * Enumerates plugins using CryptoJS and pluggable networks.
+ */
+var BitcoinJsPlugins = {
 		"BTC": {
 			name: "Bitcoin",
 			logoPath: "img/bitcoin.png",

@@ -274,8 +274,16 @@ var AppUtils = {
 	getCryptoPlugins: function() {
 		if (!AppUtils.plugins) {
 			AppUtils.plugins = [];
-			AppUtils.plugins.push(new HdPlugin("BTC"));
-			AppUtils.plugins.push(new HdPlugin("LTC"));
+			
+//			// add BitcoinJS plugins
+//			for (prop in BitcoinJsPlugins) {
+//				if (BitcoinJsPlugins.hasOwnProperty(prop)) {
+//					AppUtils.plugins.push(new BitcoinJsPlugin(prop.toString()));
+//				}
+//			}
+			
+			AppUtils.plugins.push(new BitcoinJsPlugin("BTC"));
+			AppUtils.plugins.push(new BitcoinJsPlugin("LTC"));
 			AppUtils.plugins.push(new BitcoinCashPlugin());
 //			AppUtils.plugins.push(new EthereumPlugin());
 			AppUtils.plugins.push(new MoneroPlugin());
@@ -968,6 +976,7 @@ var AppUtils = {
 				var decrypted = bitcoinjsBip38.decrypt(b58, passphrase, function(progress) {
 					if (onProgress) onProgress(progress.percent / 100);
 				});
+				console.log(decrypted);
 				
 				// return decrypted hex from keypair
 				var keypair = new bitcoinjs.bitcoin.ECPair.fromPrivateKeyByteArray(decrypted.privateKey, null, decrypted.compressed);
