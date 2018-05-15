@@ -740,6 +740,7 @@ inheritsFrom(NeoPlugin, CryptoPlugin);
  * @param ticker identifies the network to generate keypairs for
  */
 function BitcoinJsPlugin(ticker) {
+	assertDefined(BitcoinJsPlugins[ticker], "BitcoinJsPlugin[" + ticker + "] not defined");
 	
 	var that = this;
 	var language = "english";
@@ -757,6 +758,7 @@ function BitcoinJsPlugin(ticker) {
 		
 		// get network
 		if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
+		assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
 		
 		// return randomly generated wif
 		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: true}).toWIF();
@@ -785,6 +787,7 @@ function BitcoinJsPlugin(ticker) {
 		var keypair;
 		try {
 			if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
+			assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
 			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, network, true);
 			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
 			decoded.privateWif = keypair.toWIF();
@@ -817,13 +820,17 @@ var BitcoinJsPlugins = {
 			logoPath: "img/bitcoin.png",
 			donationAddress: "AbcTest",
 			bitcoinjs_network: "bitcoin",
-			bip44Index: 0
 		},
 		"LTC": {
 			name: "Litecoin",
 			logoPath: "img/litecoin.png",
 			donationAddress: "AbcTest",
 			bitcoinjs_network: "litecoin",
-			bip44Index: 2
+		},
+		"DSH": {
+			name: "Dash",
+			logoPath: "img/dash.png",
+			donationAddress: "AbcTest",
+			bitcoinjs_network: "dash",
 		}
 };

@@ -284,6 +284,7 @@ var AppUtils = {
 			
 			AppUtils.plugins.push(new BitcoinJsPlugin("BTC"));
 			AppUtils.plugins.push(new BitcoinJsPlugin("LTC"));
+			AppUtils.plugins.push(new BitcoinJsPlugin("DSH"));
 			AppUtils.plugins.push(new BitcoinCashPlugin());
 //			AppUtils.plugins.push(new EthereumPlugin());
 			AppUtils.plugins.push(new MoneroPlugin());

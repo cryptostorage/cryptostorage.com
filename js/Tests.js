@@ -112,8 +112,9 @@ function Tests() {
 	
 	function getTestPlugins() {
 		var plugins = [];
-		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
 //		plugins.push(AppUtils.getCryptoPlugin("LTC"));
+		plugins.push(AppUtils.getCryptoPlugin("DSH"));
 //		plugins.push(new BitcoinPlugin());
 //		plugins.push(new BitcoinCashPlugin());
 //		plugins.push(new EthereumPlugin());
