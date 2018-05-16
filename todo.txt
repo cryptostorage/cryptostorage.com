@@ -1,5 +1,4 @@
 v0.3.0
-remove path from bitcoinjs
 bip 32/39/44 address derivation with bip38
 
 cryptocash no instructions should display two instances
