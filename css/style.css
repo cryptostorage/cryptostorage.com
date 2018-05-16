@@ -987,7 +987,7 @@ input[type='checkbox'][disabled] +label {
 .editor_header {
 	background-color: rgb(17, 119, 184);
 	width: 100%;
-	padding: 10px;
+	padding: 5px 25px 25px 25px;
 }
 
 .editor_header, .editor_header * {
@@ -1004,7 +1004,11 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_passphrase_split > div {
-	margin: 10px 20px 10px 20px;
+	margin: 20px 20px 0px 20px;
+}
+
+.editor_control_link {
+	margin-top: 20px;
 }
 
 .editor_passphrase_div {
@@ -1051,10 +1055,6 @@ input[type='checkbox'][disabled] +label {
 	max-width: 675px;
 }
 
-.split_input_div {
-	margin: 20px 20px 0px 20px;
-}
-
 .split_warn_div {
 	width: 100%;
 	text-align: center;
@@ -1074,7 +1074,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .split_input_div {
-	margin: 7px;
+	margin: 0 5px 0 5px;
 }
 
 .split_input {

@@ -2,7 +2,6 @@ v0.3.0
 ultra compact view
 plugins proper inheritance
 
-piece selection and view imported pieces layout
 little more margin at bottom of editor, especially mobile
 split lines bolder
 update home sample page
@@ -13,6 +12,7 @@ put homepage text in index.html and dynamically hide for seo
 images huge before css applied in print tab
 don't change passphrase controller until agreement accepted
 better bip38 description
+actions controller should center if width goes below point
 
 browser testing
 release

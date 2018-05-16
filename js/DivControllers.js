@@ -2679,7 +2679,7 @@ function EditorController(div, config) {
 		
 		// view split pieces
 		if (config.sourcePieces && config.sourcePieces.length > 1) {
-			var viewSplit = $("<div class='import_control_link'>").appendTo(headerDiv);
+			var viewSplit = $("<div class='editor_control_link import_control_link'>").appendTo(headerDiv);
 			viewSplit.html("view imported pieces");
 			viewSplit.click(function() {
 				UiUtils.openEditorDynamic("Imported Pieces", {pieces: UiUtils.getPiecesForExport(config.sourcePieces)});
@@ -3726,7 +3726,7 @@ function EditorPaginatorController(div, editorController) {
 	
 	this.render = function(onDone) {
 		div.empty();
-		div.addClass("flex_vertical flex_align_center");
+		div.addClass("editor_control_link flex_vertical flex_align_center");
 		clickListeners = [];
 		updatePaginator();
 		that.setEnabled(false);
