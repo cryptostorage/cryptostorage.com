@@ -118,41 +118,6 @@ CryptoPlugin.prototype.hasPublicAddress = function() { return true; };
 CryptoPlugin.prototype.isAddress = function(str) { throw new Error("Subclass must implement"); }
 
 /**
- * Bitcoin Cash plugin.
- */
-function BitcoinCashPlugin() {
-	var bitcoinPlugin = new BitcoinJsPlugin("BTC");
-	this.getName = function() { return "Bitcoin Cash"; }
-	this.getTicker = function() { return "BCH" };
-	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
-	this.getDependencies = function() { return ["lib/bchaddrjs-0.1.4.js"]; }
-	this.getDonationAddress = function() { return "qqcsh20ltcnxxw2wqd3m7j8j8qeh46qwuv5s93987x"; }
-	
-	this.randomPrivateKey = function() {
-		return bitcoinPlugin.randomPrivateKey();
-	}
-	
-	this.decode = function(str) {
-		var decoded = bitcoinPlugin.decode(str);
-		if (!decoded) return null;
-		if (!decoded.publicAddress) return decoded;
-		var cashAddr =  bchaddr.toCashAddress(decoded.publicAddress);
-		decoded.publicAddress = cashAddr.substring(cashAddr.indexOf(':') + 1);
-		return decoded;
-	}
-	
-	this.isAddress = function(str) {
-		if (bitcoinPlugin.isAddress(str)) return true;
-		try {
-			return bchaddr.isCashAddress(str);
-		} catch (err) {
-			return false;
-		}
-	}
-}
-inheritsFrom(BitcoinCashPlugin, CryptoPlugin);
-
-/**
  * Ethereum plugin.
  */
 function EthereumPlugin() {
@@ -564,6 +529,7 @@ inheritsFrom(NeoPlugin, CryptoPlugin);
  * @param ticker identifies the network to generate keypairs for
  */
 function BitcoinJsPlugin(ticker) {
+	CryptoPlugin.call(this);
 	assertDefined(BitcoinJsPlugins[ticker], "BitcoinJsPlugin[" + ticker + "] not defined");
 	
 	var that = this;
@@ -682,3 +648,39 @@ var BitcoinJsPlugins = {
 			bitcoinjs_network: "zcoin",
 		}
 };
+
+/**
+ * Bitcoin Cash plugin.
+ */
+function BitcoinCashPlugin() {
+	BitcoinJsPlugin.call(this, "BTC");
+	var bitcoinPlugin = new BitcoinJsPlugin("BTC");
+	this.getName = function() { return "Bitcoin Cash"; }
+	this.getTicker = function() { return "BCH" };
+	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
+	this.getDependencies = function() { return ["lib/bchaddrjs-0.1.4.js"]; }
+	this.getDonationAddress = function() { return "qqcsh20ltcnxxw2wqd3m7j8j8qeh46qwuv5s93987x"; }
+	
+	this.randomPrivateKey = function() {
+		return bitcoinPlugin.randomPrivateKey();
+	}
+	
+	this.decode = function(str) {
+		var decoded = bitcoinPlugin.decode(str);
+		if (!decoded) return null;
+		if (!decoded.publicAddress) return decoded;
+		var cashAddr =  bchaddr.toCashAddress(decoded.publicAddress);
+		decoded.publicAddress = cashAddr.substring(cashAddr.indexOf(':') + 1);
+		return decoded;
+	}
+	
+	this.isAddress = function(str) {
+		if (bitcoinPlugin.isAddress(str)) return true;
+		try {
+			return bchaddr.isCashAddress(str);
+		} catch (err) {
+			return false;
+		}
+	}
+}
+inheritsFrom(BitcoinCashPlugin, BitcoinJsPlugin);

@@ -2876,7 +2876,7 @@ function EditorController(div, config) {
 			for (var i = 0; i < config.keypairs.length; i++) {
 				var keypair = config.keypairs[i];
 				if (passphraseController.getUsePassphrase()) {
-					if ((keypair.ticker === "BTC" || keypair.ticker === "BCH") && passphraseController.getBip38Checkbox().isChecked()) {
+					if (passphraseController.getBip38Checkbox().isChecked() && arrayContains(AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes(), AppUtils.EncryptionScheme.BIP38)) {
 						keypair.encryption = AppUtils.EncryptionScheme.BIP38;
 					} else {
 						keypair.encryption = AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes()[0]
@@ -3271,9 +3271,9 @@ function EditorPassphraseController(div, editorController) {
 		
 		// bip38 checkbox
 		bip38Div = $("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical);
-		var bip38Tooltip = "<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to encrypt Bitcoin private keys with a passphrase.<br><br>" +
+		var bip38Tooltip = "<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to securely encrypt private keys with a passphrase.<br><br>" +
 											 "BIP38 requires significantly more time and energy to encrypt/decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default encryption scheme), which makes it more secure against brute-force attacks.";
-		bip38Checkbox = new CheckboxController(bip38Div, "Use BIP38 for BTC & BCH", bip38Tooltip);
+		bip38Checkbox = new CheckboxController(bip38Div, "Use BIP38 when supported", bip38Tooltip);
 		bip38Checkbox.render();
 		bip38Div.hide();
 		
@@ -3413,7 +3413,14 @@ function EditorPassphraseController(div, editorController) {
 				
 				// else look for bip38 in crypto inputs
 				else if (that.getUsePassphrase()) {
-					bip38Visible = editorController.getContentController().getCurrenciesController().hasCurrenciesSelected(["BTC", "BCH"]);
+					var currencyInputs = editorController.getContentController().getCurrenciesController().getCurrencyInputs();
+					for (var i = 0; i < currencyInputs.length; i++) {
+						if (!currencyInputs[i].getSelectedPlugin()) continue;
+						if (arrayContains(currencyInputs[i].getSelectedPlugin().getEncryptionSchemes(), AppUtils.EncryptionScheme.BIP38)) {
+							bip38Visible = true;
+							break;
+						}
+					}
 				}
 			}
 			that.setBip38Visible(bip38Visible);
