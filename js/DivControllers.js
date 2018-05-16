@@ -3008,6 +3008,7 @@ function EditorContentController(div, editorController, config) {
 	var hasError;
 	var formErrorChangeListeners;
 	var inputChangeListeners;
+	var bodyDiv;
 	var progressDiv;
 	var progressBar;
 	var progressLabel;
@@ -3048,7 +3049,7 @@ function EditorContentController(div, editorController, config) {
 			function renderAux() {
 				
 				// editor body div
-				var bodyDiv = $("<div class='editor_body_div flex_vertical flex_align_center'>").appendTo(div);
+				bodyDiv = $("<div class='editor_body_div flex_vertical flex_align_center'>").appendTo(div);
 				
 				// cryptostorage logo
 				logoHeader = $("<div class='piece_page_header_div'>").appendTo(bodyDiv);
@@ -3075,10 +3076,12 @@ function EditorContentController(div, editorController, config) {
 				}
 				
 				// actions controller
-				actionsController = new EditorActionsController($("<div>").appendTo(div), editorController);
+				actionsController = new EditorActionsController($("<div>"), editorController);
 				actionsController.render();
+				placeActionsController();
 				
 				// register callbacks
+				$(window).resize(placeActionsController);
 				editorController.onSetCurrentPieces(setCurrentPieces);
 				editorController.onGenerateProgress(setGenerateProgress);
 				
@@ -3222,6 +3225,16 @@ function EditorContentController(div, editorController, config) {
 	
 	function validate() {
 		if (currenciesController) currenciesController.validate();
+	}
+	
+	function placeActionsController() {
+		if ($(window).width() < 1500) {
+			actionsController.getDiv().appendTo(bodyDiv);
+			actionsController.getDiv().removeClass("editor_controls_fixed");
+		} else {
+			actionsController.getDiv().appendTo(div);
+			actionsController.getDiv().addClass("editor_controls_fixed");
+		}
 	}
 }
 inheritsFrom(EditorContentController, DivController);

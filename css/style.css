@@ -1008,7 +1008,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_control_link {
-	margin-top: 20px;
+	margin-top: 15px;
 }
 
 .editor_passphrase_div {
@@ -1119,15 +1119,18 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_body_div > div:last-child {
-	margin-bottom: 40px;
+	margin-bottom: 70px;
 }
 
 .editor_controls {
+	width: 320px;
+	z-index: 1;
+}
+
+.editor_controls_fixed {
 	position: fixed;
 	bottom: 40px;
 	right: 40px;
-	width: 320px;
-	z-index: 1
 }
 
 .editor_btn_green {
@@ -1757,10 +1760,6 @@ input[type='checkbox'][disabled] +label {
 @media screen and (max-device-width: 667px) {
 	.editor_div {
 		max-width: 900px;
-	}
-	.editor_controls {
-		position: static;
-		margin: 0 0 40px 0px;
 	}
 }
 
