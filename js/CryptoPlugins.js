@@ -626,7 +626,6 @@ function BitcoinJsPlugin(ticker) {
 			decoded.encryption = null;
 			return decoded;
 		} catch (err) {
-			console.log(err);
 			return null;	// unrecognized private key
 		}
 	}
@@ -636,7 +635,6 @@ function BitcoinJsPlugin(ticker) {
 			bitcoinjs.bitcoin.address.fromBase58Check(str);
 			return true;
 		} catch (err) {
-			console.log(err);
 			return false;
 		}
 	}

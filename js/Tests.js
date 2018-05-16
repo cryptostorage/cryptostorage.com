@@ -111,37 +111,20 @@ function Tests() {
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function getTestPlugins() {
-		//return AppUtils.getCryptoPlugins();
-		
-		
 		var plugins = [];
-//		plugins.push(AppUtils.getCryptoPlugin("BCH"));
-//		plugins.push(AppUtils.getCryptoPlugin("ETC"));
-//		plugins.push(AppUtils.getCryptoPlugin("XMR"));
-//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
-//		plugins.push(AppUtils.getCryptoPlugin("LTC"));
-//		plugins.push(AppUtils.getCryptoPlugin("NEO"));
-//		plugins.push(AppUtils.getCryptoPlugin("DSH"));
-//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+		plugins.push(AppUtils.getCryptoPlugin("BCH"));
+		plugins.push(AppUtils.getCryptoPlugin("ETC"));
+		plugins.push(AppUtils.getCryptoPlugin("XMR"));
+		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+		plugins.push(AppUtils.getCryptoPlugin("LTC"));
+		plugins.push(AppUtils.getCryptoPlugin("NEO"));
+		plugins.push(AppUtils.getCryptoPlugin("DSH"));
+		plugins.push(AppUtils.getCryptoPlugin("BTC"));
 		plugins.push(AppUtils.getCryptoPlugin("ZEC"));
-//		plugins.push(AppUtils.getCryptoPlugin("WAVES"));
-//		plugins.push(AppUtils.getCryptoPlugin("XLM"));
-//		plugins.push(AppUtils.getCryptoPlugin("XRP"));
-//		plugins.push(AppUtils.getCryptoPlugin("BIP39"));
-
-		
-//		plugins.push(new BitcoinPlugin());
-//		plugins.push(new BitcoinCashPlugin());
-//		plugins.push(new EthereumPlugin());
-//		plugins.push(new MoneroPlugin());
-//		plugins.push(new DashPlugin());
-//		plugins.push(new LitecoinPlugin());
-//		plugins.push(new ZcashPlugin());
-//		plugins.push(new RipplePlugin());
-//		plugins.push(new StellarPlugin());
-//		plugins.push(new WavesPlugin());
-//		plugins.push(new NeoPlugin());
-//		plugins.push(new BIP39Plugin());
+		plugins.push(AppUtils.getCryptoPlugin("WAVES"));
+		plugins.push(AppUtils.getCryptoPlugin("XLM"));
+		plugins.push(AppUtils.getCryptoPlugin("XRP"));
+		plugins.push(AppUtils.getCryptoPlugin("BIP39"));
 		return plugins;
 	}
 	
