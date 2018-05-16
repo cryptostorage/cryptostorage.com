@@ -3,6 +3,7 @@ remove path from bitcoinjs
 bip 32/39/44 address derivation with bip38
 
 cryptocash no instructions should display two instances
+download notice images as part of import/export dependencies
 ultra compact view
 white background with grey border when passphrase / split disabled
 split and passphrase inputs don't disable while generating on chrome
@@ -14,6 +15,7 @@ notice colors
 update faq_interoperable to only refer to encryption
 update bip38 cryptojs description with pbkdf if necessary
 put homepage text in index.html and dynamically hide for seo
+images huge before css applied in print tab
 
 browser testing
 release
