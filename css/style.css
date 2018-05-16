@@ -442,6 +442,11 @@ input[type='checkbox']:not([disabled]) +label {
   	cursor: pointer;
 }
 
+input[type='text'][disabled], input[type='password'][disabled], input[type='tel'][disabled]  {
+	background-color: white;
+	border-color: grey;
+}
+
 input[type='checkbox'][disabled] +label {
   	opacity: 0.5;
 }

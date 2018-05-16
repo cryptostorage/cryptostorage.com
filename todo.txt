@@ -2,7 +2,6 @@ v0.3.0
 ultra compact view
 plugins proper inheritance
 
-white background with grey border when passphrase / split disabled
 split and passphrase inputs don't disable while generating on chrome
 piece selection and view imported pieces layout
 little more margin at bottom of editor, especially mobile
