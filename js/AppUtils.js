@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.3.0",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: true,
+	RUN_FULL_TESTS: false,
 	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
@@ -279,8 +279,10 @@ var AppUtils = {
 			AppUtils.plugins.push(new MoneroPlugin());
 			AppUtils.plugins.push(new BitcoinJsPlugin("BTC"));
 			AppUtils.plugins.push(new BitcoinJsPlugin("LTC"));
+			AppUtils.plugins.push(new BitcoinJsPlugin("DOGE"));
 			AppUtils.plugins.push(new NeoPlugin());
 			AppUtils.plugins.push(new BitcoinJsPlugin("DSH"));
+			AppUtils.plugins.push(new BitcoinJsPlugin("XZC"));
 			AppUtils.plugins.push(new BitcoinJsPlugin("ZEC"));
 			AppUtils.plugins.push(new WavesPlugin());
 			AppUtils.plugins.push(new StellarPlugin());
