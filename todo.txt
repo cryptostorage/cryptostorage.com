@@ -1,5 +1,7 @@
 v0.3.0
 ultra compact view
+plugins proper inheritance
+
 white background with grey border when passphrase / split disabled
 split and passphrase inputs don't disable while generating on chrome
 piece selection and view imported pieces layout
@@ -12,7 +14,7 @@ update bip38 cryptojs description with pbkdf if necessary
 put homepage text in index.html and dynamically hide for seo
 images huge before css applied in print tab
 don't change passphrase controller until agreement accepted
-plugins proper inheritance
+better bip38 description
 
 browser testing
 release
