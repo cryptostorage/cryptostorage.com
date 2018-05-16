@@ -25,7 +25,6 @@ print selector compact | cryptocash | community design, etc
 text import says please select currency on unrecognized text import
 mobile safari background scrolls while popups open
 dynamic sample angle
-tippls
 fail gracefully if import dependencies fail to load
 show preview then render print in background with progress indicator in print button
 
