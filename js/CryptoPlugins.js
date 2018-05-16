@@ -582,7 +582,7 @@ function BitcoinJsPlugin(ticker) {
 			assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
 			
 			// get keypair from hex or wif
-			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, network, true);
+			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, network, true);	// TODO: hex may or may not be compressed
 			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
 			
 			// decode
