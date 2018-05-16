@@ -880,7 +880,7 @@ inheritsFrom(IntroController, DivController);
  */
 function HomeController(div) {
 	DivController.call(this, div);
-	var moreLink = true;
+	var moreLink = false;
 	this.render = function(onDone) {
 		
 		// load home dependencies
