@@ -2,6 +2,7 @@ v0.3.0
 remove path from bitcoinjs
 bip 32/39/44 address derivation with bip38
 
+cryptocash no instructions should display two instances
 ultra compact view
 white background with grey border when passphrase / split disabled
 split and passphrase inputs don't disable while generating on chrome
