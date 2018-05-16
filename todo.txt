@@ -1,4 +1,5 @@
 v0.3.0
+does bip38 not have network checksum?
 ultra compact view
 
 update faq_interoperable to only refer to encryption
