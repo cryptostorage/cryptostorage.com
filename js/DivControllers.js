@@ -3228,7 +3228,7 @@ function EditorContentController(div, editorController, config) {
 	}
 	
 	function placeActionsController() {
-		if ($(window).width() < 1500) {
+		if ($(window).width() < 1450) {
 			actionsController.getDiv().appendTo(bodyDiv);
 			actionsController.getDiv().removeClass("editor_controls_fixed");
 		} else {
