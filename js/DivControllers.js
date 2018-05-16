@@ -4936,7 +4936,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
 		
 		// get preview piece
-		var numKeypairs = config.cryptoCash ? 1 : Math.min(2, piece.getKeypairs().length);
+		var numKeypairs = config.cryptoCash ? (config.infoBack ? 1 : 2) : Math.min(2, piece.getKeypairs().length);
 		var previewKeypairs = [];
 		for (var i = 0; i < numKeypairs; i++) previewKeypairs.push(piece.getKeypairs()[i]);
 		var previewPiece = new CryptoPiece({keypairs: previewKeypairs});

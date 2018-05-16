@@ -1,6 +1,4 @@
 v0.3.0
-cryptocash no instructions should display two instances
-download notice images as part of import/export dependencies
 ultra compact view
 white background with grey border when passphrase / split disabled
 split and passphrase inputs don't disable while generating on chrome
