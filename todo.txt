@@ -1,15 +1,16 @@
 v0.3.0
 does bip38 not have network checksum?
+reset resets passphrase / others even if user clicks cancel
+don't change passphrase controller until agreement accepted
 ultra compact view
+
+update home sample page
+split lines bolder
+notice colors
 
 update faq_interoperable to only refer to encryption
 better bip38 description
 update bip38 cryptojs description with pbkdf if necessary
-
-update home sample page
-split lines bolder
-don't change passphrase controller until agreement accepted
-notice colors
 put homepage text in index.html and dynamically hide for seo
 release notes
 
