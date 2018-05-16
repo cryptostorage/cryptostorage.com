@@ -2,20 +2,24 @@ v0.3.0
 ultra compact view
 plugins proper inheritance
 
-split lines bolder
 update home sample page
-notice colors
-update faq_interoperable to only refer to encryption
-update bip38 cryptojs description with pbkdf if necessary
-put homepage text in index.html and dynamically hide for seo
+split lines bolder
+
 images huge before css applied in print tab
 don't change passphrase controller until agreement accepted
-better bip38 description
+notice colors
 
+put homepage text in index.html and dynamically hide for seo
+update faq_interoperable to only refer to encryption
+better bip38 description
+update bip38 cryptojs description with pbkdf if necessary
+document cold storage setup options in faq
+
+exhaustive tests
+address testing
 browser testing
 release
 
-document cold storage setup options in faq
 community paper wallet designs
 print selector compact | cryptocash | community design, etc
 text import says please select currency on unrecognized text import
