@@ -3492,7 +3492,7 @@ function EditorPassphraseController(div, editorController) {
 		var headerDiv = $("<div class='editor_popup_header flex_horizontal flex_align_center'>").appendTo(div);
 		var headerTitle = $("<div class='flex_horizontal flex_align_center'>").appendTo(headerDiv);
 		headerTitle.append("<img src='img/caution_solid.png' style='width:40px; height: 40px; margin-right: 10px;'>");
-		headerTitle.append("Passphrase Encryption");
+		headerTitle.append("Caution");
 		var bodyDiv = $("<div class='editor_popup_body flex_vertical flex_align_center'>").appendTo(div);		
 		bodyDiv.append($("<div style='font-size:20px; font-weight:bold; color:red; text-align:center;'>Do not lose your passphrase or your funds will be lost.</div>"));
 		var interoperableDiv = $("<div style='font-size:20px; text-align:center'>Encrypted keys may not be interoperable with other tools.&nbsp;&nbsp;</div>").appendTo(bodyDiv);
