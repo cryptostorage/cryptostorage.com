@@ -31,7 +31,7 @@ function Tests() {
 	
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_KEYS = 1;							// number of keys to test per plugin without encryption throughout tests
-	var REPEAT_KEYS_ENCRYPTION = 0;		// number of keys to test per plugin with encryption throughout tests
+	var REPEAT_KEYS_ENCRYPTION = 1;		// number of keys to test per plugin with encryption throughout tests
 	var TEST_MAX_SHARES = false;			// computationally intensive
 	var NUM_PIECES = 3;
 	var MIN_PIECES = 2;
