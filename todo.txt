@@ -1,5 +1,13 @@
 v0.3.0
-does bip38 not have network checksum?
+why are bip38s generated from ian and i's not importable into other dogecoin tools
+import uncompressed then encrypt, address is uncompressed but bip38 is compressed
+
+iancoleman pr to fix address with bip38 enabled
+bitcoinjs pr toUncheckedHex(), fromUncheckedHex()
+bitcoinjs pr fixes for zcash
+bip39 pr fix zcash limit
+bitcoinjs/bip38 and /scryptsy pr to enable async, reference fork
+
 reset resets passphrase / others even if user clicks cancel
 don't change passphrase controller until agreement accepted
 ultra compact view
