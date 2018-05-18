@@ -149,17 +149,39 @@ CryptoKeypair.prototype.removePrivateKey = function() {
 }
 
 CryptoKeypair.prototype.encrypt = function(scheme, passphrase, onProgress, onDone) {
-	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	assertNull(this._state.encryption, "Keypair must be unencrypted to encrypt");
+	
+	// validate input
+	assertFalse(this.isDestroyed(), "Keypair is destroyed");
+	assertNull(this.getEncryptionScheme(), "Keypair must be unencrypted to encrypt");
+	assertInitialized(scheme, "Scheme is not initialized");
+	assertInitialized(passphrase, "Passphrase is not initialized");
+	assertInitialized(onDone, "onDone is not initialized");
+	
+	// get encryption function
+	var encryptFunc;
+	switch (scheme) {
+		case AppUtils.EncryptionScheme.V0_CRYPTOJS:
+			encryptFunc = this._encryptCryptoJsV0.bind(this);
+			break;
+		case AppUtils.EncryptionScheme.V1_CRYPTOJS:
+			encryptFunc = this._encryptCryptoJsV1.bind(this);
+			break;
+		case AppUtils.EncryptionScheme.BIP38:
+			encryptFunc = this._encryptBip38.bind(this);
+			break;
+		default: throw new Error("Unsupported encryption scheme: " + scheme);
+	}
+	
+	// encrypt
 	var that = this;
-	var address = this.getPublicAddress();
-	AppUtils.encryptHex(this.getPrivateHex(), scheme, passphrase, function(percent, label) {
+	encryptFunc(passphrase, function(percent, label) {
 		if (that._isDestroyed) return;
 		if (onProgress) onProgress(percent, label);
 	}, function(err, encryptedHex) {
 		if (that._isDestroyed) return;
 		if (err) onDone(err);
 		else {
+			var address = that.getPublicAddress();
 			that._setPrivateKey(encryptedHex);
 			that._setPublicAddress(address);
 			that._validateState();
@@ -183,10 +205,31 @@ CryptoKeypair.prototype.isEncrypted = function() {
 }
 
 CryptoKeypair.prototype.decrypt = function(passphrase, onProgress, onDone) {
-	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	assertInitialized(this._state.encryption, "Keypair must be encrypted to decrypt");
+	
+	// validate input
+	assertFalse(this.isDestroyed(), "Keypair is destroyed");
+	assertInitialized(this.getEncryptionScheme(), "Keypair must be encrypted to decrypt");
+	assertInitialized(passphrase, "Passphrase is not initialized");
+	assertInitialized(onDone, "onDone is not initialized");
+	
+	// get decryption function
+	var decryptFunc;
+	switch (this.getEncryptionScheme()) {
+		case AppUtils.EncryptionScheme.V0_CRYPTOJS:
+			decryptFunc = this._decryptCryptoJsV0.bind(this);
+			break;
+		case AppUtils.EncryptionScheme.V1_CRYPTOJS:
+			decryptFunc = this._decryptCryptoJsV1.bind(this);
+			break;
+		case AppUtils.EncryptionScheme.BIP38:
+			decryptFunc = this._decryptBip38.bind(this);
+			break;
+		default: throw new Error("Unsupported encryption scheme: " + scheme);
+	}
+	
+	// decrypt
 	var that = this;
-	AppUtils.decryptHex(this.getPrivateHex(), this.getEncryptionScheme(), passphrase, function(percent, label) {
+	decryptFunc(passphrase, function(percent, label) {
 		if (that._isDestroyed) return;
 		if (onProgress) onProgress(percent, label);
 	}, function(err, decryptedHex) {
@@ -551,6 +594,134 @@ CryptoKeypair.prototype._setPublicAddress = function(address) {
 	if (this.getEncryptionScheme() === null) throw new Error("Cannot set public address of unencrypted keypair");
 	assertTrue(this._state.plugin.isAddress(address), "Invalid address: " + address);
 	this._state.publicAddress = address;
+}
+
+CryptoKeypair.prototype._encryptCryptoJsV0 = function(passphrase, onProgress, onDone) {
+	var hex = this.getPrivateHex();
+	try {
+		var encryptedB64 = CryptoJS.AES.encrypt(hex, passphrase).toString();
+	} catch (err) {
+		onDone(err);
+		return;
+	}
+	if (onProgress) onProgress(1);
+	onDone(null, AppUtils.toBase(64, 16, encryptedB64));
+}
+
+CryptoKeypair.prototype._decryptCryptoJsV0 = function(passphrase, onProgress, onDone) {
+	var hex = this.getPrivateHex();
+	var decryptedHex;
+	try {
+		decryptedHex = CryptoJS.AES.decrypt(AppUtils.toBase(16, 64, hex), passphrase).toString(CryptoJS.enc.Utf8);
+	} catch (err) { }
+	if (!decryptedHex) onDone(new Error("Incorrect passphrase"));
+	else {
+		if (onProgress) onProgress(1);
+		onDone(null, decryptedHex);
+	}
+}
+
+CryptoKeypair.prototype._encryptCryptoJsV1 = function(passphrase, onProgress, onDone) {
+	var hex = this.getPrivateHex();
+	try {
+		
+		// create random salt and replace first two characters with version
+		var salt = CryptoJS.lib.WordArray.random(AppUtils.ENCRYPTION_V2_BLOCK_SIZE);
+		var hexVersion = AppUtils.ENCRYPTION_V2_VERSION.toString(16);
+		salt = hexVersion + salt.toString().substring(hexVersion.length);
+		salt = CryptoJS.enc.Hex.parse(salt);
+		
+		// strengthen passphrase with passphrase key
+		var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+      keySize: AppUtils.ENCRYPTION_V2_KEY_SIZE / 32,
+      iterations: AppUtils.ENCRYPTION_V2_PBKDF_ITER,
+      hasher: CryptoJS.algo.SHA512
+    });
+		
+		// encrypt
+		var iv = salt;
+		var encrypted = CryptoJS.AES.encrypt(hex, passphraseKey, { 
+	    iv: iv, 
+	    padding: CryptoJS.pad.Pkcs7,
+	    mode: CryptoJS.mode.CBC
+	  });
+		
+		// encrypted hex = salt + hex cipher text
+		var ctHex = AppUtils.toBase(64, 16, encrypted.toString());
+		var encryptedHex = salt.toString() + ctHex;
+	} catch (err) {
+		onDone(err);
+		return;
+	}
+	if (onProgress) onProgress(1);
+	if (onDone) onDone(null, encryptedHex);
+}
+
+CryptoKeypair.prototype._decryptCryptoJsV1 = function(passphrase, onProgress, onDone) {
+	var hex = this.getPrivateHex();
+	
+	// assert correct version
+	assertEquals(AppUtils.ENCRYPTION_V2_VERSION, parseInt(hex.substring(0, AppUtils.ENCRYPTION_V2_VERSION.toString(16).length), 16));
+		
+	// get passphrase key
+	var salt = CryptoJS.enc.Hex.parse(hex.substr(0, 32));
+  var passphraseKey = CryptoJS.PBKDF2(passphrase, salt, {
+  	keySize: AppUtils.ENCRYPTION_V2_KEY_SIZE / 32,
+  	iterations: AppUtils.ENCRYPTION_V2_PBKDF_ITER,
+  	hasher: CryptoJS.algo.SHA512
+  });
+  
+  // decrypt
+  var iv = salt;
+  var ctHex = hex.substring(32);
+  var ctB64 = CryptoJS.enc.Hex.parse(ctHex).toString(CryptoJS.enc.Base64);
+  var decryptedHex;
+  try {
+  	var decrypted = CryptoJS.AES.decrypt(ctB64, passphraseKey, {
+	  	iv: iv, 
+	    padding: CryptoJS.pad.Pkcs7,
+	    mode: CryptoJS.mode.CBC
+	  });
+  	decryptedHex = decrypted.toString(CryptoJS.enc.Utf8);
+  	assertInitialized(decryptedHex);
+  } catch (err) {
+  	onDone(new Error("Incorrect passphrase"));
+  	return;
+  }
+  if (onProgress) onProgress(1)
+	onDone(null, decryptedHex);
+}
+
+CryptoKeypair.prototype._encryptBip38 = function(passphrase, onProgress, onDone) {
+	var hex = this.getPrivateHex();
+	try {
+		var keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(hex);
+		var decoded = bitcoinjs.wif.decode(keypair.toWIF());	// network and compression not used
+		assertEquals(decoded.privateKey, keypair.d.toBuffer());
+		bitcoinjs.bip38.encryptAsync(decoded.privateKey, BitcoinJsPlugin.COMPRESSED_KEYPAIRS, passphrase, function(progress) {	// TODO: compression depends on original wif
+			if (onProgress) onProgress(progress.percent / 100);
+		}, null, function(err, encryptedWif) {
+			if (err) onDone(err);
+			else onDone(null, AppUtils.toBase(58, 16, encryptedWif));
+		});
+	} catch (err) {
+		onDone(err);
+	}
+}
+
+CryptoKeypair.prototype._decryptBip38 = function(passphrase, onProgress, onDone) {
+	var hex = this.getPrivateHex();
+	bitcoinjs.bip38.decryptAsync(AppUtils.toBase(16, 58, hex), passphrase, function(progress) {
+		if (onProgress) onProgress(progress.percent / 100);
+	}, null, function(err, decryptedKey) {
+		if (err) onDone(new Error("Incorrect passphrase"));
+		else {
+			var decryptedWif = bitcoinjs.wif.encode(0x80, decryptedKey.privateKey, true);	// network and compressed not used
+			var decryptedHex = bitcoinjs.bitcoin.ECPair.fromWIF(decryptedWif).toUncheckedHex();
+			if (onProgress) onProgress(1);
+			onDone(null, decryptedHex);
+		}
+	});
 }
 
 // --------------------------------- STATIC -----------------------------------
