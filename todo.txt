@@ -1,5 +1,4 @@
 v0.3.0
-import uncompressed bip38 gets decrypted as compressed keypair because decryption becomes unchecked hex
 disable bip38 for alts
 
 iancoleman pr to fix address with bip38 enabled

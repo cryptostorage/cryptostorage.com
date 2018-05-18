@@ -544,6 +544,11 @@ function BitcoinJsPlugin(ticker) {
 	this.getDonationAddress = function() { return BitcoinJsPlugins[ticker].donationAddress }
 	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
 	
+	this.getNetwork = function() {
+		if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
+		return network;
+	}
+	
 	this.randomPrivateKey = function() {
 		
 		// get network

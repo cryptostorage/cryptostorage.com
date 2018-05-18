@@ -111,12 +111,12 @@ function Tests() {
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function getTestPlugins() {
-		return AppUtils.getCryptoPlugins();
+//		return AppUtils.getCryptoPlugins();
 		var plugins = [];
 //		plugins.push(AppUtils.getCryptoPlugin("BCH"));
 //		plugins.push(AppUtils.getCryptoPlugin("ETC"));
 //		plugins.push(AppUtils.getCryptoPlugin("XMR"));
-//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+		plugins.push(AppUtils.getCryptoPlugin("BTC"));
 //		plugins.push(AppUtils.getCryptoPlugin("LTC"));
 //		plugins.push(AppUtils.getCryptoPlugin("DOGE"));
 //		plugins.push(AppUtils.getCryptoPlugin("NEO"));
@@ -241,14 +241,22 @@ function Tests() {
 				assertTrue(b58.startsWith("3X") || b58.startsWith("3Y"));
 			}
 			
-			// decrypt bip38 from bitaddress
-			var keypair = new CryptoKeypair({plugin: plugin, privateKey: "6PnVwcNhzgTCq3ac2UYNYEpKLzKTTajZuTFD8dTiQSRcD9Brz81xwNw8eN"});
-			var piece = new CryptoPiece({keypairs: [keypair]});
-			piece.decrypt("abctesting123", function(percent, label) {
+			// import uncompressed keypair
+			keypair = new CryptoKeypair({plugin: plugin, privateKey: "5HyajPXtXY46WEQheAtqL6VmQPW22iKuzUZdAfycQqFtxQPran2"});
+			assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
+			
+			// encrypt uncompressed from bitaddress
+			keypair.encrypt(AppUtils.EncryptionScheme.BIP38, "abctesting123", null, function(err, encryptedKeypair) {
+				assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
+				assertEquals("6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL", keypair.getPrivateWif());
 				
-			}, function(err, decryptedPiece) {
-				assertNull(err);
-				onDone();
+				// decrypt uncompressed from bitaddress
+				keypair = new CryptoKeypair({plugin: plugin, privateKey: "6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL"});
+				keypair.decrypt("abctesting123", null, function(err, decryptedKeypair) {
+					assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
+					assertEquals("5HyajPXtXY46WEQheAtqL6VmQPW22iKuzUZdAfycQqFtxQPran2", keypair.getPrivateWif());
+					onDone();
+				});
 			});
 		}
 		

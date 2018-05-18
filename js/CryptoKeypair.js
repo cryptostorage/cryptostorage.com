@@ -177,12 +177,12 @@ CryptoKeypair.prototype.encrypt = function(scheme, passphrase, onProgress, onDon
 	encryptFunc(passphrase, function(percent, label) {
 		if (that._isDestroyed) return;
 		if (onProgress) onProgress(percent, label);
-	}, function(err, encryptedHex) {
+	}, function(err, encryptedKey) {
 		if (that._isDestroyed) return;
 		if (err) onDone(err);
 		else {
 			var address = that.getPublicAddress();
-			that._setPrivateKey(encryptedHex);
+			that._setPrivateKey(encryptedKey);
 			that._setPublicAddress(address);
 			that._validateState();
 			onDone(null, that);
@@ -232,12 +232,12 @@ CryptoKeypair.prototype.decrypt = function(passphrase, onProgress, onDone) {
 	decryptFunc(passphrase, function(percent, label) {
 		if (that._isDestroyed) return;
 		if (onProgress) onProgress(percent, label);
-	}, function(err, decryptedHex) {
+	}, function(err, decryptedKey) {
 		if (that._isDestroyed) return;
 		if (err) onDone(err);
 		else {
 			try {
-				that._setPrivateKey(decryptedHex);
+				that._setPrivateKey(decryptedKey);
 			} catch (err) {
 				console.log("Error setting private key after decryption!!!");
 				console.log(that.toJson());
@@ -699,7 +699,7 @@ CryptoKeypair.prototype._encryptBip38 = function(passphrase, onProgress, onDone)
 			if (onProgress) onProgress(progress.percent / 100);
 		}, null, function(err, encryptedWif) {
 			if (err) onDone(err);
-			else onDone(null, AppUtils.toBase(58, 16, encryptedWif));
+			else onDone(null, encryptedWif);
 		});
 	} catch (err) {
 		onDone(err);
@@ -707,15 +707,15 @@ CryptoKeypair.prototype._encryptBip38 = function(passphrase, onProgress, onDone)
 }
 
 CryptoKeypair.prototype._decryptBip38 = function(passphrase, onProgress, onDone) {
+	var that = this;
 	bitcoinjs.bip38.decryptAsync(this.getPrivateWif(), passphrase, function(progress) {
 		if (onProgress) onProgress(progress.percent / 100);
 	}, null, function(err, decryptedKey) {
 		if (err) onDone(new Error("Incorrect passphrase"));
 		else {
-			var decryptedWif = bitcoinjs.wif.encode(0x80, decryptedKey.privateKey, true);	// network and compressed not used
-			var decryptedHex = bitcoinjs.bitcoin.ECPair.fromWIF(decryptedWif).toUncheckedHex();
+			var decryptedWif = bitcoinjs.wif.encode(that._state.plugin.getNetwork().wif, decryptedKey.privateKey, decryptedKey.compressed);
 			if (onProgress) onProgress(1);
-			onDone(null, decryptedHex);
+			onDone(null, decryptedWif);
 		}
 	});
 }
