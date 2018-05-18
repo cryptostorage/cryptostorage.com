@@ -1,11 +1,14 @@
 v0.3.0
-ultra compact view
-print selector compact | cryptocash | community design, etc
+"discard and create new keypairs?"
+csv text import view encrypted keys blank right margin
 
 update faq_interoperable to only refer to encryption
 better bip38 description
 update bip38 cryptojs description with pbkdf if necessary
 release notes
+
+ultra compact view
+print selector compact | cryptocash | community design, etc
 
 notice colors
 put homepage text in index.html and dynamically hide for seo
