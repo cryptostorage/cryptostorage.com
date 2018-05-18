@@ -1,9 +1,4 @@
 v0.3.0
-
-bitcoinjs pr toUncheckedHex(), fromUncheckedHex()
-bitcoinjs pr fixes for zcash
-bitcoinjs/bip38 and /scryptsy pr to enable async, reference fork
-
 ultra compact view
 
 update home sample page
