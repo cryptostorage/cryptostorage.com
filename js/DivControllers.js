@@ -406,7 +406,7 @@ function CheckboxController(div, label, tooltip) {
 		}
 		
 		// register checkbox listener
-		checkbox.click(function() { invoke(checkedListeners); });
+		checkbox.click(function(e) { invoke(checkedListeners, e); });
 		
 		// done
 		if (onDone) onDone(div);
@@ -3304,29 +3304,24 @@ function EditorPassphraseController(div, editorController) {
 		});
 		
 		// register callbacks
-		passphraseCheckbox.onChecked(function() {
-			setFormError(false);
-			invoke(usePassphraseListeners);
-			
-			// render disclaimer and set focus
-			if (passphraseCheckbox.isChecked()) {				
-				if (!riskAccepted) {
-					var disclaimerDiv = getPassphraseDisclaimerDiv(function() { riskAccepted = true; disclaimerPopup.hide(); });
-					var disclaimerPopup = new OverlayController(editorController.getDiv(), {contentDiv: disclaimerDiv, fullScreen: true, hideOnExternalClick: true});
-					disclaimerPopup.render();
-					disclaimerPopup.onHide(function() {
-						if (!riskAccepted) that.setUsePassphrase(false);
-						if (passphraseCheckbox.isChecked()) passphraseInput.focus();
-						disclaimerPopup.destroy();
-					});
-				} else {
-					passphraseInput.focus();
-				}
+		passphraseInput.on("input", function(e) { setFormError(false); });
+		passphraseCheckbox.onChecked(function(e) {
+			if (passphraseCheckbox.isChecked() && !riskAccepted) {
+				e.preventDefault();
+				var disclaimerDiv = getPassphraseDisclaimerDiv(function() { riskAccepted = true; disclaimerPopup.hide(); });
+				var disclaimerPopup = new OverlayController(editorController.getDiv(), {contentDiv: disclaimerDiv, fullScreen: true, hideOnExternalClick: true});
+				disclaimerPopup.render();
+				disclaimerPopup.onHide(function() {
+					that.setUsePassphrase(riskAccepted);
+					if (passphraseCheckbox.isChecked()) passphraseInput.focus();
+					disclaimerPopup.destroy();
+				});
 			} else {
-				that.setPassphraseVisible(false);
+				passphraseCheckbox.isChecked() ? passphraseInput.focus() : that.setPassphraseVisible(false);
+				setFormError(false);
+				invoke(usePassphraseListeners);
 			}
 		});
-		passphraseInput.on("input", function(e) { setFormError(false); });
 		
 		// listen for actions when editor ready
 		editorController.onReady(function() {

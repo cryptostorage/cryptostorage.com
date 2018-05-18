@@ -7,7 +7,6 @@ bitcoinjs pr fixes for zcash
 bip39 pr fix zcash limit
 bitcoinjs/bip38 and /scryptsy pr to enable async, reference fork
 
-don't change passphrase controller until agreement accepted
 ultra compact view
 private keypair should say "Private WIF"
 
