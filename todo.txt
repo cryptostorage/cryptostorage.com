@@ -1,9 +1,7 @@
 v0.3.0
 
-iancoleman pr to fix address with bip38 enabled
 bitcoinjs pr toUncheckedHex(), fromUncheckedHex()
 bitcoinjs pr fixes for zcash
-bip39 pr fix zcash limit
 bitcoinjs/bip38 and /scryptsy pr to enable async, reference fork
 
 ultra compact view
