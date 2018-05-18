@@ -854,8 +854,9 @@ var AppUtils = {
 		function encryptHexBip38(hex, passphrase, onProgress, onDone) {
 			try {
 				var keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(hex);
-				var decoded = bitcoinjs.wif.decode(keypair.toWIF());
-				bitcoinjs.bip38.encryptAsync(decoded.privateKey, true, passphrase, function(progress) {
+				var decoded = bitcoinjs.wif.decode(keypair.toWIF());	// network and compression not used
+				assertEquals(decoded.privateKey, keypair.d.toBuffer());
+				bitcoinjs.bip38.encryptAsync(decoded.privateKey, BitcoinJsPlugin.COMPRESSED_KEYPAIRS, passphrase, function(progress) {
 					if (onProgress) onProgress(progress.percent / 100);
 				}, null, function(err, encryptedWif) {
 					if (err) onDone(err);

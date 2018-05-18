@@ -551,7 +551,7 @@ function BitcoinJsPlugin(ticker) {
 		assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
 		
 		// return randomly generated wif
-		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: true}).toWIF();
+		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: BitcoinJsPlugin.COMPRESSED_KEYPAIRS}).toWIF();
 	}
 	
 	this.decode = function(str) {
@@ -582,7 +582,7 @@ function BitcoinJsPlugin(ticker) {
 			assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
 			
 			// get keypair from hex or wif
-			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, network, true);	// TODO: hex may or may not be compressed
+			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, network, BitcoinJsPlugin.COMPRESSED_KEYPAIRS);
 			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
 			
 			// decode
@@ -606,6 +606,11 @@ function BitcoinJsPlugin(ticker) {
 	}
 }
 inheritsFrom(BitcoinJsPlugin, CryptoPlugin);
+
+/**
+ * Specifies if keypairs generated with the BitcoinJS plugin should be compressed or not including bip38.
+ */
+BitcoinJsPlugin.COMPRESSED_KEYPAIRS = false;
 
 /**
  * Enumerates plugins using CryptoJS and pluggable networks.
