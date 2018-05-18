@@ -2976,9 +2976,7 @@ function EditorController(div, config) {
 	}
 	
 	function reset() {
-		if (AppUtils.DEV_MODE || !that.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
-			that.setCurrentPieces(importedPieces, importedPieceDivs);
-		}
+		that.setCurrentPieces(importedPieces, importedPieceDivs);
 	}
 	
 	function cancel() {
@@ -4233,8 +4231,12 @@ function EditorActionsController(div, editorController) {
 		// reset button
 		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
 		btnReset.append("Reset");
-		btnReset.click(function() { invoke(resetListeners); });
 		btnReset.appendTo(div);
+		btnReset.click(function() {
+			if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
+				invoke(resetListeners);
+			}
+		});
 		
 		// cancel button
 		btnCancel =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
