@@ -693,12 +693,9 @@ CryptoKeypair.prototype._decryptCryptoJsV1 = function(passphrase, onProgress, on
 }
 
 CryptoKeypair.prototype._encryptBip38 = function(passphrase, onProgress, onDone) {
-	var hex = this.getPrivateHex();
 	try {
-		var keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(hex);
-		var decoded = bitcoinjs.wif.decode(keypair.toWIF());	// network and compression not used
-		assertEquals(decoded.privateKey, keypair.d.toBuffer());
-		bitcoinjs.bip38.encryptAsync(decoded.privateKey, BitcoinJsPlugin.COMPRESSED_KEYPAIRS, passphrase, function(progress) {	// TODO: compression depends on original wif
+		var decoded = bitcoinjs.wif.decode(this.getPrivateWif());
+		bitcoinjs.bip38.encryptAsync(decoded.privateKey, decoded.compressed, passphrase, function(progress) {
 			if (onProgress) onProgress(progress.percent / 100);
 		}, null, function(err, encryptedWif) {
 			if (err) onDone(err);
@@ -710,8 +707,7 @@ CryptoKeypair.prototype._encryptBip38 = function(passphrase, onProgress, onDone)
 }
 
 CryptoKeypair.prototype._decryptBip38 = function(passphrase, onProgress, onDone) {
-	var hex = this.getPrivateHex();
-	bitcoinjs.bip38.decryptAsync(AppUtils.toBase(16, 58, hex), passphrase, function(progress) {
+	bitcoinjs.bip38.decryptAsync(this.getPrivateWif(), passphrase, function(progress) {
 		if (onProgress) onProgress(progress.percent / 100);
 	}, null, function(err, decryptedKey) {
 		if (err) onDone(new Error("Incorrect passphrase"));

@@ -610,7 +610,7 @@ inheritsFrom(BitcoinJsPlugin, CryptoPlugin);
 /**
  * Specifies if keypairs generated with the BitcoinJS plugin should be compressed or not including bip38.
  */
-BitcoinJsPlugin.COMPRESSED_KEYPAIRS = false;
+BitcoinJsPlugin.COMPRESSED_KEYPAIRS = true;
 
 /**
  * Enumerates plugins using CryptoJS and pluggable networks.
