@@ -3284,7 +3284,7 @@ function EditorPassphraseController(div, editorController) {
 		bip38Div = $("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical);
 		var bip38Tooltip = "<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to securely encrypt private keys with a passphrase.<br><br>" +
 											 "BIP38 requires significantly more time and energy to encrypt/decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default encryption scheme), which makes it more secure against brute-force attacks.";
-		bip38Checkbox = new CheckboxController(bip38Div, "Use BIP38 when supported", bip38Tooltip);
+		bip38Checkbox = new CheckboxController(bip38Div, "Use BIP38 for BTC & BCH", bip38Tooltip);
 		bip38Checkbox.render();
 		bip38Div.hide();
 		

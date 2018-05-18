@@ -1,5 +1,4 @@
 v0.3.0
-disable bip38 for alts
 
 iancoleman pr to fix address with bip38 enabled
 bitcoinjs pr toUncheckedHex(), fromUncheckedHex()

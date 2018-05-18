@@ -111,12 +111,12 @@ function Tests() {
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function getTestPlugins() {
-//		return AppUtils.getCryptoPlugins();
-		var plugins = [];
+		return AppUtils.getCryptoPlugins();
+//		var plugins = [];
 //		plugins.push(AppUtils.getCryptoPlugin("BCH"));
 //		plugins.push(AppUtils.getCryptoPlugin("ETC"));
 //		plugins.push(AppUtils.getCryptoPlugin("XMR"));
-		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
 //		plugins.push(AppUtils.getCryptoPlugin("LTC"));
 //		plugins.push(AppUtils.getCryptoPlugin("DOGE"));
 //		plugins.push(AppUtils.getCryptoPlugin("NEO"));
@@ -131,7 +131,7 @@ function Tests() {
 //		plugins.push(AppUtils.getCryptoPlugin("BAT"));
 //		plugins.push(AppUtils.getCryptoPlugin("BIP39"));
 //		plugins.push(AppUtils.getCryptoPlugin("UBIQ"));
-		return plugins;
+//		return plugins;
 	}
 	
 	function testUtils() {

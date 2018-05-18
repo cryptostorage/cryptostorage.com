@@ -542,21 +542,20 @@ function BitcoinJsPlugin(ticker) {
 	this.getLogoPath = function() { return BitcoinJsPlugins[ticker].logoPath; }
 	this.getDependencies = function() { return ["lib/bitcoinjs-3.3.2.js"]; }
 	this.getDonationAddress = function() { return BitcoinJsPlugins[ticker].donationAddress }
-	this.getEncryptionSchemes = function() { return [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]; }
+	
+	// initialize encryption schemes
+	if (BitcoinJsPlugins[ticker].encryptionSchemes) {
+		this.getEncryptionSchemes = function() { return BitcoinJsPlugins[ticker].encryptionSchemes; }
+	}
 	
 	this.getNetwork = function() {
-		if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
+		if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjsNetwork];
+		assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjsNetwork + "] not defined");
 		return network;
 	}
 	
 	this.randomPrivateKey = function() {
-		
-		// get network
-		if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
-		assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
-		
-		// return randomly generated wif
-		return bitcoinjs.bitcoin.ECPair.makeRandom({network: network, compressed: BitcoinJsPlugin.COMPRESSED_KEYPAIRS}).toWIF();
+		return bitcoinjs.bitcoin.ECPair.makeRandom({network: this.getNetwork(), compressed: BitcoinJsPlugin.COMPRESSED_KEYPAIRS}).toWIF();
 	}
 	
 	this.decode = function(str) {
@@ -582,13 +581,9 @@ function BitcoinJsPlugin(ticker) {
 		var keypair;
 		try {
 			
-			// get bitcoinjs network extension
-			if (!network) network = bitcoinjs.bitcoin.networks[BitcoinJsPlugins[ticker].bitcoinjs_network];
-			assertDefined(network, "bitcoinjs.bitcoin.networks[" + BitcoinJsPlugins[ticker].bitcoinjs_network + "] not defined");
-			
 			// get keypair from hex or wif
-			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, network, BitcoinJsPlugin.COMPRESSED_KEYPAIRS);
-			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, network);
+			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, this.getNetwork(), BitcoinJsPlugin.COMPRESSED_KEYPAIRS);
+			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, this.getNetwork());
 			
 			// decode
 			decoded.privateWif = keypair.toWIF();
@@ -613,7 +608,7 @@ function BitcoinJsPlugin(ticker) {
 inheritsFrom(BitcoinJsPlugin, CryptoPlugin);
 
 /**
- * Specifies if keypairs generated with the BitcoinJS plugin should be compressed or not including bip38.
+ * Specifies if keypairs generated with the BitcoinJS plugin should be compressed or not including BIP38.
  */
 BitcoinJsPlugin.COMPRESSED_KEYPAIRS = true;
 
@@ -625,37 +620,38 @@ var BitcoinJsPlugins = {
 			name: "Bitcoin",
 			logoPath: "img/bitcoin.png",
 			donationAddress: "1ArmuyQfgM1Sd3tN1A242FzPhbePfCjbmE",
-			bitcoinjs_network: "bitcoin",
+			bitcoinjsNetwork: "bitcoin",
+			encryptionSchemes: [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]
 		},
 		"LTC": {
 			name: "Litecoin",
 			logoPath: "img/litecoin.png",
 			donationAddress: "LSRx2UwU5rjKGcmUXx8KDNTNXMBV1PudHB",
-			bitcoinjs_network: "litecoin",
+			bitcoinjsNetwork: "litecoin",
 		},
 		"DSH": {
 			name: "Dash",
 			logoPath: "img/dash.png",
 			donationAddress: "XoK6AmEGxAh2WKMh2hkVycnkEdmi8zDaQR",
-			bitcoinjs_network: "dash",
+			bitcoinjsNetwork: "dash",
 		},
 		"ZEC": {
 			name: "Zcash",
 			logoPath: "img/zcash.png",
 			donationAddress: "t1g1AQ8Q8yWbkBntunJaKADJ38YjxsDuJ3H",
-			bitcoinjs_network: "zcash",
+			bitcoinjsNetwork: "zcash",
 		},
 		"DOGE": {
 			name: "Dogecoin",
 			logoPath: "img/dogecoin.png",
 			donationAddress: "todo",
-			bitcoinjs_network: "dogecoin",
+			bitcoinjsNetwork: "dogecoin",
 		},
 		"XZC": {
 			name: "Zcoin",
 			logoPath: "img/zcoin.png",
 			donationAddress: "todo",
-			bitcoinjs_network: "zcoin",
+			bitcoinjsNetwork: "zcoin",
 		}
 };
 
