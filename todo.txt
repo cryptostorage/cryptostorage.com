@@ -8,7 +8,6 @@ bip39 pr fix zcash limit
 bitcoinjs/bip38 and /scryptsy pr to enable async, reference fork
 
 ultra compact view
-private keypair should say "Private WIF"
 
 update home sample page
 split lines bolder
