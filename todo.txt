@@ -1,7 +1,6 @@
 v0.3.0
 ultra compact view
 
-update home sample page
 split lines bolder
 notice colors
 

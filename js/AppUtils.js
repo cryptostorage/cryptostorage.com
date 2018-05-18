@@ -125,7 +125,7 @@ var AppUtils = {
 			"img/checklist.png",
 			"img/passphrase_input.png",
 			"img/split_input.png",
-			"img/print_example.png",
+			"img/print_sample.png",
 			"img/notice_bars.png",
 			"img/key.png",
 			"img/mit.png",
