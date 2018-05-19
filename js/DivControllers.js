@@ -1210,7 +1210,7 @@ function FaqController(div) {
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>All unencrypted keys generated with CryptoStorage will work with other wallet software and vice versa.</p>" +
-								"<p>However, there is currently no standardized way of encrypting or splitting cryptocurrency keys that works across all key types.  As a result, CryptoStorage uses its own conventions to encrypt and split keys which will not work with other tools unless they use the same conventions.  <b>A copy of this tool should be saved to recover keys in the future if using encryption or splitting.</b></p>");
+								"<p>However, there is currently no standardized way of encrypting cryptocurrency keypairs with a passphrase.  As a result, CryptoStorage uses its own conventions which will not work with other tools unless they use the same conventions.  <b>A copy of this tool should be saved to recover keys in the future if using passphrase encryption.</b></p>");
 						return answerDiv;
 					}
 				}, {
@@ -3288,8 +3288,8 @@ function EditorPassphraseController(div, editorController) {
 		
 		// bip38 checkbox
 		bip38Div = $("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical);
-		var bip38Tooltip = "<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a method to securely encrypt private keys with a passphrase.<br><br>" +
-											 "BIP38 requires significantly more time and energy to encrypt/decrypt private keys than <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> (the default encryption scheme), which makes it more secure against brute-force attacks.";
+		var bip38Tooltip = "<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a standard for encrypting cryptocurrency keypairs which is designed to be resilient against brute-force passphrase cracking.<br><br>" +
+		 									 "BIP38 requires significantly more time and energy to encrypt and decrypt private keys than the default, <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a>, which uses PBKDF2, 10000 iterations, and SHA512.";
 		bip38Checkbox = new CheckboxController(bip38Div, "Use BIP38 for BTC & BCH", bip38Tooltip);
 		bip38Checkbox.render();
 		bip38Div.hide();
