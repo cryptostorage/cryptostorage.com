@@ -13,6 +13,7 @@ address testing
 browser testing
 release
 
+wait momentarily to let internet connect to avoid notice flicker
 plugins proper inheritance
 community paper wallet designs
 text import says please select currency on unrecognized text import
