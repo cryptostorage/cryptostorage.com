@@ -5084,6 +5084,7 @@ inheritsFrom(LoadController, DivController);
  * 				config.cryptoCash specifies to space 6 keypairs per page with no cryptostorage logo
  * 				config.infoBack specifies if double-sided sweep instructions should be included for crypto cash
  * 				config.pageBreaks specifies if piece should be rendered as pages
+ *  			config.copyable specifies if the public/private values should be copyable
  * @param div is the div to render to
  * @param piece is the piece to render
  */
@@ -5211,7 +5212,7 @@ function StandardPieceRenderer(div, piece, config) {
 	}
 	
 	/**
-	 * Destroys the renderer.  Does not destroy the underling piece.
+	 * Destroys the renderer.  Does not destroy the underlying piece.
 	 */
 	this.destroy = function() {
 		assertFalse(_isDestroyed, "StandardPieceRenderer already destroyed");
@@ -5341,7 +5342,7 @@ function StandardPiecePreviewRenderer(div, piece, config) {
 	}
 	
 	/**
-	 * Destroys the renderer.  Does not destroy the underling piece.
+	 * Destroys the renderer.  Does not destroy the underlying piece.
 	 */
 	this.destroy = function() {
 		assertFalse(_isDestroyed, "StandardPiecePreviewRenderer already destroyed");
@@ -5591,9 +5592,8 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
  *  			config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
- * 				config.cryptoCash specifies to space 6 keypairs per page with no cryptostorage logo
- * 				config.infoBack specifies if double-sided sweep instructions should be included for crypto cash
  * 				config.pageBreaks specifies if piece should be rendered as pages
+ * 				config.copyable specifies if the public/private values should be copyable
  * @param div is the div to render to
  * @param piece is the piece to render
  */
@@ -5604,17 +5604,13 @@ function CompactPieceRenderer(div, piece, config) {
 	
 	// config default and validation
 	config = Object.assign({
-		showPublic: true,
+		showPublic: false,
 		showPrivate: true,
 		showLogos: true,
-		cryptoCash: false,
-		infoBack: false,
 		pageBreaks: false,
 		copyable: true
 	}, config);
-	if (!config.showPublic) assertTrue(config.showPrivate);
-	if (!config.showPrivate) assertTrue(config.showPublic);
-	if (config.infoBack) assertFalse(piece.isSplit());
+	assertTrue((config.showPrivate && !config.showPublic) || (!config.showPrivate && config.showPublic));
 	
 	var keypairRenderers;
 	var onProgressFn;
@@ -5630,28 +5626,16 @@ function CompactPieceRenderer(div, piece, config) {
 		// build pages and collect functions to render keypairs
 		var keypairsDiv;
 		var tickers;
-		var pairsPerPage = config.cryptoCash ? 6 : 7;
+		var pairsPerPage = 12;
 		var renderFuncs = [];
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
 			
 			// add new page
 			if ((!config.pageBreaks && i === 0) || (config.pageBreaks && i % pairsPerPage === 0)) {
 				
-				// add sweep instructions
-				if (config.infoBack && i > 0) {
-					div.append($("<div>"));
-					tickers = [];
-					for (var j = 0; j < pairsPerPage; j++) tickers.push(piece.getKeypairs()[i - (pairsPerPage - j)].getPlugin().getTicker());
-					if (config.cryptoCash && config.infoBack) {
-						var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-						keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
-						keypairsDiv.append(getSweepInstructions(tickers));
-					}
-				}
-				
 				// add new page
 				var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-				if (piece.getPieceNum() || (!config.cryptoCash && config.showLogos)) {
+				if (piece.getPieceNum() || config.showLogos) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
 					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
@@ -5662,22 +5646,8 @@ function CompactPieceRenderer(div, piece, config) {
 			}
 			
 			// collect functions to render keypairs
-			var placeholderDiv = $("<div class='keypair_div'>").appendTo(keypairsDiv);
-			if (config.cryptoCash) placeholderDiv.addClass("keypair_div_spaced");
+			var placeholderDiv = $("<div class='compact_keypair_div'>").appendTo(keypairsDiv);	// TODO: two to a row
 			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
-		}
-		
-		// add final sweep instructions
-		if (config.infoBack && config.cryptoCash) {
-			var numPairsLastPage = piece.getKeypairs().length % pairsPerPage;
-			if (!numPairsLastPage) numPairsLastPage = pairsPerPage;
-			tickers = [];
-			for (var i = 0; i < numPairsLastPage; i++) tickers.push(piece.getKeypairs()[piece.getKeypairs().length - (numPairsLastPage - i)].getPlugin().getTicker());
-			if (config.pageBreaks) {
-				var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-				keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
-			}
-			keypairsDiv.append(getSweepInstructions(tickers));
 		}
 		
 		// compute weights
@@ -5710,7 +5680,6 @@ function CompactPieceRenderer(div, piece, config) {
 				var keypairRenderer = new CompactKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
-					if (config.cryptoCash) div.addClass("keypair_div_spaced");
 					placeholderDiv.replaceWith(div);
 					doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
 					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
@@ -5721,7 +5690,7 @@ function CompactPieceRenderer(div, piece, config) {
 	}
 	
 	/**
-	 * Destroys the renderer.  Does not destroy the underling piece.
+	 * Destroys the renderer.  Does not destroy the underlying piece.
 	 */
 	this.destroy = function() {
 		assertFalse(_isDestroyed, "CompactPieceRenderer already destroyed");
@@ -5750,19 +5719,6 @@ function CompactPieceRenderer(div, piece, config) {
 		var weight = 0;
 		for (var i = 0; i < piece.getKeypairs().length; i++) weight += CompactKeypairRenderer.getRenderWeight(piece.getKeypairs()[i]);
 		return weight;
-	}
-	
-	/**
-	 * Render sweep instructions.
-	 * 
-	 * @param tickers is an array of tickers to get instructions for
-	 */
-	function getSweepInstructions(tickers) {
-		assertArray(tickers);
-		assertTrue(tickers.length > 0);
-		var instructionDivs = [];
-		for (var i = 0; i < tickers.length; i++) instructionDivs.push(UiUtils.getSweepInstructionsDiv(tickers[i]));
-		return instructionDivs;
 	}
 }
 inheritsFrom(CompactPieceRenderer, DivController);
@@ -5810,8 +5766,6 @@ CompactPieceRenderer.getRenderWeight = function(config) {
  *  			config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
- * 				config.cryptoCash specifies to space 6 keypairs per page with no cryptostorage logo
- * 				config.infoBack specifies if double-sided sweep instructions should be included for crypto cash
  */
 function CompactPiecePreviewRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
@@ -5824,6 +5778,8 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	
 	this.render = function(onDone) {
 		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
+		
+		throw new Error("Not implemented");
 		
 		// get preview piece
 		var numKeypairs = config.cryptoCash ? (config.infoBack ? 1 : 2) : Math.min(2, piece.getKeypairs().length);
@@ -5851,7 +5807,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	}
 	
 	/**
-	 * Destroys the renderer.  Does not destroy the underling piece.
+	 * Destroys the renderer.  Does not destroy the underlying piece.
 	 */
 	this.destroy = function() {
 		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer already destroyed");
@@ -5873,7 +5829,7 @@ CompactPiecePreviewRenderer.getRenderWeight = function(config) {
 }
 
 /**
- * Renders a single keypair.
+ * Renders a single compact keypair.
  * 
  * @param div is the div to render to
  * @param keypair is the keypair to render
@@ -5895,9 +5851,6 @@ function CompactKeypairRenderer(div, keypair, config) {
 	}, config);
 	
 	var that = this;
-	var keypairLeftValue;
-	var keypairRightValue;
-	var keypairCryptoLogo;
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
@@ -5905,91 +5858,11 @@ function CompactKeypairRenderer(div, keypair, config) {
 		
 		// div setup
 		div.empty();
-		div.addClass("keypair_div flex_horizontal");
+		div.addClass("compact_keypair_div flex_vertical");
 		
-		// left, center, right divs
-		var keypairLeftDiv = $("<div class='keypair_left_div flex_horizontal flex_align_start flex_justify_center'>").appendTo(div);
-		var keypairCenterDiv = $("<div class='keypair_center_div flex_vertical'>").appendTo(div);
-		var keypairRightDiv = $("<div class='keypair_right_div flex_horizontal flex_align_end flex_justify_center'>").appendTo(div);
+		div.append("super compact");
 		
-		// decode keypair for rendering
-		var decoded = CompactKeypairRenderer.decodeKeypair(keypair, config);
-		
-		// keypair id
-		var idDiv = $("<div class='keypair_center_id'>").appendTo(keypairCenterDiv);
-		if (decoded.leftLabel) idDiv.css("position", "absolute");
-		if (config.keypairNum) idDiv.html(config.keypairNum);
-		
-		// left label and value
-		if (decoded.leftLabel) {
-			var keypairLeftLabel = $("<div class='keypair_left_label'>").appendTo(keypairCenterDiv);
-			keypairLeftLabel.html(decoded.leftLabel);
-			keypairLeftValue = $("<div class='keypair_left_value'>").appendTo(keypairCenterDiv);
-			if (!hasWhitespace(decoded.leftValue)) keypairLeftValue.css("word-break", "break-all");
-			keypairLeftValue.html(decoded.leftValue);
-			if (decoded.leftValueCopyable) keypairLeftValue.addClass("copyable");
-		}
-		
-		// crypto logo and label
-		var keypairCrypto = $("<div class='keypair_crypto flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairCenterDiv);
-		if (config.showLogos && decoded.cryptoLogo) {
-			decoded.cryptoLogo.attr("width", "100%");
-			decoded.cryptoLogo.attr("height", "100%");
-			keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
-			keypairCryptoLogo.append(decoded.cryptoLogo);
-		}
-		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(keypairCrypto);
-		keypairCryptoLabel.html(decoded.cryptoLabel);
-		
-		// right label and value
-		var keypairRightLabel = $("<div class='keypair_right_label'>").appendTo(keypairCenterDiv);
-		keypairRightLabel.html(decoded.rightLabel);
-		keypairRightValue = $("<div class='keypair_right_value'>").appendTo(keypairCenterDiv);
-		if (!decoded.leftLabel) keypairRightValue.css("margin-left", "-90px");
-		if (!hasWhitespace(decoded.rightValue)) keypairRightValue.css("word-break", "break-all");
-		keypairRightValue.html(decoded.rightValue);
-		if (decoded.rightValueCopyable) keypairRightValue.addClass("copyable");
-		
-		// collapse spacing for long keys
-		if (decoded.leftLabel) {
-			if (decoded.leftValue.length > 71) {
-				keypairCrypto.css("margin-top", "-15px");
-			}
-			if (decoded.rightValue && decoded.rightValue.length > 140) {
-				keypairCrypto.css("margin-top", "-10px");
-				keypairRightLabel.css("margin-top", "-15px");
-			}
-		}
-		
-		// add qr codes
-		if (decoded.leftValueCopyable) {
-			UiUtils.renderQrCode(decoded.leftValue, CompactKeypairRenderer.QR_CONFIG, function(img) {
-				if (_isDestroyed) return;
-				img.attr("class", "keypair_qr");
-				keypairLeftDiv.append(img);
-				addPrivateQr();
-			});
-		} else {
-			if (decoded.leftLabel) {
-				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairLeftDiv);
-				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
-			}
-			addPrivateQr();
-		}
-		function addPrivateQr() {
-			if (decoded.rightValueCopyable) {
-				UiUtils.renderQrCode(decoded.rightValue, CompactKeypairRenderer.QR_CONFIG, function(img) {
-					if (_isDestroyed) return;
-					img.attr("class", "keypair_qr");
-					keypairRightDiv.append(img);
-					if (onDone) onDone(div);
-				});
-			} else {
-				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairRightDiv);
-				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
-				if (onDone) onDone(div);
-			}
-		}
+		onDone(div);
 	}
 	
 	/**
@@ -6019,13 +5892,7 @@ inheritsFrom(CompactKeypairRenderer, DivController);
  */
 CompactKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
 	assertInitialized(tickerOrKeypair);
-	if (isString(tickerOrKeypair)) {
-		var plugin = AppUtils.getCryptoPlugin(tickerOrKeypair);
-		return 10 * (plugin.hasPublicAddress() ? 2 : 1);
-	} else {
-		assertObject(tickerOrKeypair, CryptoKeypair);
-		return (tickerOrKeypair.hasPublicAddress() ? 10 : 0) + (tickerOrKeypair.hasPrivateKey() ? 10 : 0); 
-	}
+	return 10;
 }
 
 /**
@@ -6054,6 +5921,8 @@ CompactKeypairRenderer.QR_CONFIG = {
  * 					decoded.rightValueCopyable indicates if the right value is copyable and should be QR
  */
 CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
+	
+	throw new Error("Not implemented");
 	
 	// default render config
 	config = Object.assign({
