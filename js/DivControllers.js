@@ -4712,6 +4712,369 @@ function EditorPrintController(div, pieces) {
 inheritsFrom(EditorPrintController, DivController);
 
 /**
+ * Controls the notices div.
+ * 
+ * @param div is the div to render to
+ * @param config is the configuration:
+ * 	{
+ * 		showOnPass: bool,	// show if everything passes
+ * 		showOnFail: bool,	// show if there are any failures
+ * 		showOnWarn: bool,	// show if there are any warnings
+ * 	}
+ */
+function NoticeController(div, config) {
+	DivController.call(this, div);
+	
+	var lastChecks;
+	var tippies;
+	
+	this.render = function(onDone) {
+		
+		// merge configs
+		config = Object.assign({}, getDefaultConfig(), config);
+		
+		// listen for environment
+		var first = true;
+		AppUtils.addEnvironmentListener(function(info) {
+			setEnvironmentInfo(info);
+			
+			// done rendering
+			if (first) {
+				first = false;
+				setImmediate(function() {	// fix issue where notice bar doesn't render full width
+					if (onDone) onDone(div);
+				});
+			}
+		});
+	}
+	
+	function getDefaultConfig() {
+		return {
+			showOnFail: true,
+			showOnWarn: true,
+			showOnPass: true
+		};
+	}
+	
+	function setEnvironmentInfo(info) {
+		
+		// check if info cached
+		if (lastChecks && objectsEqual(lastChecks, info.checks)) return;
+				
+		// div setup
+		div.empty();
+		div.removeClass();
+		div.addClass("notice_bar");
+		div.addClass("flex_horizontal");
+		
+		// assign notice color
+		if (AppUtils.hasEnvironmentState("fail")) { config.showOnFail ? div.show() : div.hide(); div.addClass("notice_fail"); }
+		else if (!AppUtils.hasEnvironmentState("warn")) { config.showOnPass ? div.show() : div.hide(); div.addClass("notice_pass"); }
+		else {			
+			config.showOnWarn ? div.show() : div.hide();
+			
+			// collect which states pass
+			var offline = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.INTERNET) === "pass";
+			var local = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.IS_LOCAL) === "pass";
+			var browserOpen = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.BROWSER) === "pass";
+			var operatingSystemOpen = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.OPERATING_SYSTEM) === "pass";
+			function getEnvironmentState(checks, code) {
+				for (var i = 0; i < checks.length; i++) {
+					if (checks[i].code === code) return checks[i].state;
+				}
+			}
+			
+			// add styling
+			if (!offline && !local) div.addClass("notice_warn_orange");
+			else if (offline && local) div.addClass(browserOpen ? "notice_warn_light_green" : "notice_warn_light_orange");
+			else div.addClass("notice_warn_light_orange");
+		}
+		
+		// reset cache
+		lastChecks = info.checks;
+		
+		// track tippy divs to fix bug where more than one becomes visible
+		if (tippies) for (var i = 0; i < tippies.length; i++) tippies[i].get(0)._tippy.hide();
+		tippies = [];
+		
+		// compute width of icon divs based on max number of icons
+		var numNoticesLeft = 0;
+		var numNoticesRight = 0;
+		for (var i = 0; i < info.checks.length; i++) {
+			if (info.checks[i].state === "pass") numNoticesRight++;
+			else numNoticesLeft++;
+		}
+		var maxNotices = Math.max(numNoticesLeft, numNoticesRight);
+		var width = maxNotices * (40 + 16);	// icon width + padding
+		
+		// build notice
+		div.empty();
+		renderLeft($("<div>").appendTo(div), info);
+		renderCenter($("<div>").appendTo(div), info);
+		renderRight($("<div>").appendTo(div), info);
+		
+		// render notice left
+		function renderLeft(div, info) {
+			div.addClass("notice_bar_left flex_horizontal flex_align_center flex_justify_start");
+			div.css("min-width", width);
+			div.css("max-width", width);
+			for (var i = 0; i < info.checks.length; i++) {
+				if (info.checks[i].state === "pass") continue;
+				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
+			}
+		}
+		
+		// render notice center
+		function renderCenter(div, info) {
+			div.addClass("notice_bar_center flex_horizontal flex_align_center flex_justify_center");
+			renderCheckDescription(div, info, getFirstNonPassCheck(info));
+		}
+		
+		// render notice right
+		function renderRight(div, info) {
+			div.addClass("notice_bar_right flex_horizontal flex_align_center flex_justify_end");
+			div.css("min-width", width);
+			div.css("max-width", width);
+			for (var i = 0; i < info.checks.length; i++) {
+				if (info.checks[i].state !== "pass") continue;
+				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
+			}
+		}
+		
+		// gets the first non-pass check
+		function getFirstNonPassCheck(info) {
+			for (var i = 0; i < info.checks.length; i++) {
+				if (info.checks[i].state !== "pass") return info.checks[i];
+			}
+			return null;
+		}
+		
+		// render single check icon
+		function renderNoticeIcon(div, info, check) {
+			tippies.push(div);
+			
+			div.addClass("flex_vertical notice_icon_div");
+			div.append(getIcon(check));
+			div.append(getStateIcon(check.state));
+			
+			// tooltip
+			var description = $("<div>");
+			renderCheckDescription(description, info, check);
+			tippy(div.get(0), {
+				arrow: true,
+				html: description.get(0),
+				interactive: true,
+				placement: 'bottom',
+				theme: 'translucent',
+				trigger: "mouseenter",
+				multiple: 'false',
+				distance: 20,
+				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
+				maxWidth: UiUtils.NOTICE_TOOLTIP_MAX_WIDTH,
+				onShow: function() {
+					for (var i = 0; i < tippies.length; i++) {
+						if (tippies[i] !== div) tippies[i].get(0)._tippy.hide();	// manually hide other tippy divs
+					}
+				}
+			});
+			
+			// gets the check icon
+			function getIcon(check) {
+				
+				// interpret environment code and state
+				switch (check.code) {
+					case AppUtils.EnvironmentCode.RUNTIME_ERROR:
+						return $("<img class='notice_icon' src='img/skull.png'>");
+					case AppUtils.EnvironmentCode.INTERNET:
+						return $("<img class='notice_icon' src='img/internet.png'>");
+					case AppUtils.EnvironmentCode.IS_LOCAL:
+						return $("<img class='notice_icon' src='img/download.png'>");
+					case AppUtils.EnvironmentCode.BROWSER:
+						return getBrowserIcon(info);
+					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
+						return getOperatingSystemIcon(info);
+					default:
+						throw new Error("Unrecognized environment code: " + check.code);
+				}
+			}
+			
+			function getBrowserIcon(info) {
+				var name = info.browser.name;
+				if (strContains(name, "Firefox")) return $("<img class='notice_icon' src='img/firefox.png'>");
+				else if (strContains(name, "Chrome")) return $("<img class='notice_icon' src='img/chrome.png'>");
+				else if (strContains(name, "Chromium")) return $("<img class='notice_icon' src='img/chrome.png'>");
+				else if (strContains(name, "Safari")) return $("<img class='notice_icon' src='img/safari.png'>");
+				else if (strContains(name, "IE") || strContains(name, "Internet Explorer")) return $("<img class='notice_icon' style='width:35px; height:35px;' src='img/internet_explorer.png'>");
+				else return $("<img class='notice_icon' src='img/browser.png'>");
+			}
+			
+			function getOperatingSystemIcon(info) {
+				var name = info.os.name;
+				if (arrayContains(OperatingSystems.LINUX, name)) return $("<img class='notice_icon' src='img/linux.png'>");
+				else if (arrayContains(OperatingSystems.OSX, name)) return $("<img class='notice_icon' src='img/osx.png'>");
+				else if (strContains(name, "iOS")) return $("<img class='notice_icon' src='img/ios.png'>");
+				else if (arrayContains(OperatingSystems.WINDOWS, name)) return $("<img class='notice_icon' src='img/windows.png'>");
+				else if (strContains(name, "Android")) return $("<img class='notice_icon' src='img/android.png'>");
+				return $("<img class='notice_icon' src='img/computer.png'>");
+			}
+			
+			function getStateIcon(state) {
+				if (state === "pass") return $("<img class='notice_state_icon' src='img/circle_checkmark.png'>");
+				if (state === "fail") return $("<img class='notice_state_icon' src='img/circle_exclamation.png'>");
+				if (state === "warn") return $("<img class='notice_state_icon' src='img/circle_exclamation.png'>");
+				throw new Error("Unrecognized state: " + state);
+			}
+		}
+		
+		// render single check description
+		function renderCheckDescription(div, info, check) {
+			
+			// all checks pass
+			if (!check) {
+				var content = $("<div>").appendTo(div);
+				content.append("<div class='notice_bar_center_major flex_horizontal'>All security checks pass</div>");
+				return;
+			}
+			
+			// interpret environment code and state
+			switch (check.code) {
+				case AppUtils.EnvironmentCode.BROWSER:
+					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
+					else {
+						var content = $("<div>").appendTo(div);
+						if (check.state === "fail") content.append("<div class='notice_bar_center_major'>Browser is not supported (" + info.browser.name + " " + info.browser.version + ")</div>");
+						else content.append("<div class='notice_bar_center_major'>Browser is not open source (" + info.browser.name + ")</div>");
+						content.append("<div class='notice_bar_center_minor'>Recommended browsers: " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + "</div>");
+					}
+					break;
+				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
+					if (check.state === "fail") {
+						var msg = "Unexpected error: ";
+						if (info.runtimeError.message) msg += info.runtimeError.message;
+						else msg += info.runtimeError.toString();
+						if (info.runtimeError.stack) msg += "<br>" + info.runtimeError.stack;
+						div.append(msg);
+					}
+					break;
+				case AppUtils.EnvironmentCode.INTERNET:
+					if (check.state === "pass") div.append("No internet connection");
+					else if (check.state === "warn") {
+						var content = $("<div>").appendTo(div);
+						content.append("<div class='notice_bar_center_major'>Internet connection is active</div>");
+						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for better security</div>");
+					} else if (check.state === "fail") {
+						var content = $("<div>").appendTo(div);
+						content.append("<div class='notice_bar_center_major'>Connect to the internet</div>");
+						content.append("<div class='notice_bar_center_minor'>Internet is required because this tool is not running locally.  <a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
+					}
+					break;
+				case AppUtils.EnvironmentCode.IS_LOCAL:
+					if (check.state === "pass") div.append("<div class='notice_bar_center_major'>Tool is running locally</div>");
+					else {
+						var content = $("<div>").appendTo(div);
+						content.append("<div class='notice_bar_center_major'>Tool is not running locally</div>");
+						content.append("<div class='notice_bar_center_minor'><a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
+					}
+					break;
+				case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
+					if (check.state === "pass") div.append("Operating system is open source (" + info.os.name + ")");
+					else {
+						var content = $("<div>").appendTo(div);
+						content.append("<div class='notice_bar_center_major'>Operating system is not open source (" + info.os.name + ")</div>");
+						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
+					}
+					break;
+				case AppUtils.EnvironmentCode.DEV_MODE:
+					if (check.state === "warn") div.append("Tool is under development and should not be trusted with sigificant amounts");
+					break;
+				default:
+					throw new Error("Unrecognized environment code: " + check.code);
+			}
+		}
+	}
+}
+inheritsFrom(NoticeController, DivController);
+
+/**
+ * Invokes the renderer and presents a loading wheel until it's done.
+ * 
+ * Requires that the div be hidden while rendering.
+ * 
+ * Works by wrapping the renderer's div with the loader's div until done.
+ * 
+ * Call getDiv() to get the best representation of current state (wrapper or renderer's div).
+ * 
+ * @param renderer renders the content to a div which is hidden by a loading wheel until done
+ * @param config allows load rendering customization
+ * 				config.enableScroll	specifies if the scroll bar should show during loading (UI tweak)
+ */
+function LoadController(renderer, config) {
+	DivController.call(this, renderer.getDiv());
+	var isLoading = false;
+	var wrapper;
+	
+	/**
+	 * Renders the loader.
+	 * 
+	 * @param onRenderDone(div) is invoked when the renderer's div is rendered
+	 * @param onLoaderDone(div) is invoked when load wheel is rendered
+	 */
+	this.render = function(onRenderDone, onLoaderDone) {
+		
+		// ignore if loading
+		if (isLoading) {
+			if (onLoaderDone) onLoaderDone(wrapper);
+			return;
+		}
+		
+		// check if already rendered
+		if (renderer.getDiv().children().length) {
+			if (onLoaderDone) onLoaderDone(renderer.getDiv());
+			if (onRenderDone) onRenderDone(renderer.getDiv());
+			return;
+		}
+		
+		// load loading gif
+		isLoading = true;
+		var loadingImg = new Image();
+		loadingImg.onload = function() {
+			$(loadingImg).addClass("loading");
+			
+			// wrap renderer's div
+			renderer.getDiv().wrap("<div class='loading_div flex_vertical flex_align_center'>");	// wrap div with loading
+			wrapper = renderer.getDiv().parent();
+			wrapper.prepend(loadingImg);
+			if (config && config.enableScroll) wrapper.css("margin-bottom", "1200px");
+			
+			// load is done
+			if (onLoaderDone) onLoaderDone(wrapper);
+			
+			// don't show div while rendering
+			renderer.getDiv().hide();
+				
+			// render content
+			renderer.render(function() {
+				wrapper.replaceWith(renderer.getDiv());
+				wrapper = null;
+				isLoading = false;
+				renderer.getDiv().show();
+				if (onRenderDone) onRenderDone(renderer.getDiv());
+			});
+		};
+		loadingImg.src = "img/loading.gif";
+	}
+	
+	this.getDiv = function() {
+		return wrapper ? wrapper : renderer.getDiv();
+	}
+	
+	this.getRenderer = function() {
+		return renderer;
+	}
+}
+inheritsFrom(LoadController, DivController);
+
+/**
  * Renders a piece with standard keypairs.
  * 
  * @param config specifies render configuration
@@ -5220,366 +5583,3 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 	decoded.rightValueCopyable = isDefined(keypair.getPrivateWif()) && config.showPrivate;
 	return decoded;
 }
-
-/**
- * Controls the notices div.
- * 
- * @param div is the div to render to
- * @param config is the configuration:
- * 	{
- * 		showOnPass: bool,	// show if everything passes
- * 		showOnFail: bool,	// show if there are any failures
- * 		showOnWarn: bool,	// show if there are any warnings
- * 	}
- */
-function NoticeController(div, config) {
-	DivController.call(this, div);
-	
-	var lastChecks;
-	var tippies;
-	
-	this.render = function(onDone) {
-		
-		// merge configs
-		config = Object.assign({}, getDefaultConfig(), config);
-		
-		// listen for environment
-		var first = true;
-		AppUtils.addEnvironmentListener(function(info) {
-			setEnvironmentInfo(info);
-			
-			// done rendering
-			if (first) {
-				first = false;
-				setImmediate(function() {	// fix issue where notice bar doesn't render full width
-					if (onDone) onDone(div);
-				});
-			}
-		});
-	}
-	
-	function getDefaultConfig() {
-		return {
-			showOnFail: true,
-			showOnWarn: true,
-			showOnPass: true
-		};
-	}
-	
-	function setEnvironmentInfo(info) {
-		
-		// check if info cached
-		if (lastChecks && objectsEqual(lastChecks, info.checks)) return;
-				
-		// div setup
-		div.empty();
-		div.removeClass();
-		div.addClass("notice_bar");
-		div.addClass("flex_horizontal");
-		
-		// assign notice color
-		if (AppUtils.hasEnvironmentState("fail")) { config.showOnFail ? div.show() : div.hide(); div.addClass("notice_fail"); }
-		else if (!AppUtils.hasEnvironmentState("warn")) { config.showOnPass ? div.show() : div.hide(); div.addClass("notice_pass"); }
-		else {			
-			config.showOnWarn ? div.show() : div.hide();
-			
-			// collect which states pass
-			var offline = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.INTERNET) === "pass";
-			var local = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.IS_LOCAL) === "pass";
-			var browserOpen = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.BROWSER) === "pass";
-			var operatingSystemOpen = getEnvironmentState(info.checks, AppUtils.EnvironmentCode.OPERATING_SYSTEM) === "pass";
-			function getEnvironmentState(checks, code) {
-				for (var i = 0; i < checks.length; i++) {
-					if (checks[i].code === code) return checks[i].state;
-				}
-			}
-			
-			// add styling
-			if (!offline && !local) div.addClass("notice_warn_orange");
-			else if (offline && local) div.addClass(browserOpen ? "notice_warn_light_green" : "notice_warn_light_orange");
-			else div.addClass("notice_warn_light_orange");
-		}
-		
-		// reset cache
-		lastChecks = info.checks;
-		
-		// track tippy divs to fix bug where more than one becomes visible
-		if (tippies) for (var i = 0; i < tippies.length; i++) tippies[i].get(0)._tippy.hide();
-		tippies = [];
-		
-		// compute width of icon divs based on max number of icons
-		var numNoticesLeft = 0;
-		var numNoticesRight = 0;
-		for (var i = 0; i < info.checks.length; i++) {
-			if (info.checks[i].state === "pass") numNoticesRight++;
-			else numNoticesLeft++;
-		}
-		var maxNotices = Math.max(numNoticesLeft, numNoticesRight);
-		var width = maxNotices * (40 + 16);	// icon width + padding
-		
-		// build notice
-		div.empty();
-		renderLeft($("<div>").appendTo(div), info);
-		renderCenter($("<div>").appendTo(div), info);
-		renderRight($("<div>").appendTo(div), info);
-		
-		// render notice left
-		function renderLeft(div, info) {
-			div.addClass("notice_bar_left flex_horizontal flex_align_center flex_justify_start");
-			div.css("min-width", width);
-			div.css("max-width", width);
-			for (var i = 0; i < info.checks.length; i++) {
-				if (info.checks[i].state === "pass") continue;
-				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
-			}
-		}
-		
-		// render notice center
-		function renderCenter(div, info) {
-			div.addClass("notice_bar_center flex_horizontal flex_align_center flex_justify_center");
-			renderCheckDescription(div, info, getFirstNonPassCheck(info));
-		}
-		
-		// render notice right
-		function renderRight(div, info) {
-			div.addClass("notice_bar_right flex_horizontal flex_align_center flex_justify_end");
-			div.css("min-width", width);
-			div.css("max-width", width);
-			for (var i = 0; i < info.checks.length; i++) {
-				if (info.checks[i].state !== "pass") continue;
-				renderNoticeIcon($("<div>").appendTo(div), info, info.checks[i]);
-			}
-		}
-		
-		// gets the first non-pass check
-		function getFirstNonPassCheck(info) {
-			for (var i = 0; i < info.checks.length; i++) {
-				if (info.checks[i].state !== "pass") return info.checks[i];
-			}
-			return null;
-		}
-		
-		// render single check icon
-		function renderNoticeIcon(div, info, check) {
-			tippies.push(div);
-			
-			div.addClass("flex_vertical notice_icon_div");
-			div.append(getIcon(check));
-			div.append(getStateIcon(check.state));
-			
-			// tooltip
-			var description = $("<div>");
-			renderCheckDescription(description, info, check);
-			tippy(div.get(0), {
-				arrow: true,
-				html: description.get(0),
-				interactive: true,
-				placement: 'bottom',
-				theme: 'translucent',
-				trigger: "mouseenter",
-				multiple: 'false',
-				distance: 20,
-				arrowTransform: 'scaleX(1.25) scaleY(2.5) translateY(2px)',
-				maxWidth: UiUtils.NOTICE_TOOLTIP_MAX_WIDTH,
-				onShow: function() {
-					for (var i = 0; i < tippies.length; i++) {
-						if (tippies[i] !== div) tippies[i].get(0)._tippy.hide();	// manually hide other tippy divs
-					}
-				}
-			});
-			
-			// gets the check icon
-			function getIcon(check) {
-				
-				// interpret environment code and state
-				switch (check.code) {
-					case AppUtils.EnvironmentCode.RUNTIME_ERROR:
-						return $("<img class='notice_icon' src='img/skull.png'>");
-					case AppUtils.EnvironmentCode.INTERNET:
-						return $("<img class='notice_icon' src='img/internet.png'>");
-					case AppUtils.EnvironmentCode.IS_LOCAL:
-						return $("<img class='notice_icon' src='img/download.png'>");
-					case AppUtils.EnvironmentCode.BROWSER:
-						return getBrowserIcon(info);
-					case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
-						return getOperatingSystemIcon(info);
-					default:
-						throw new Error("Unrecognized environment code: " + check.code);
-				}
-			}
-			
-			function getBrowserIcon(info) {
-				var name = info.browser.name;
-				if (strContains(name, "Firefox")) return $("<img class='notice_icon' src='img/firefox.png'>");
-				else if (strContains(name, "Chrome")) return $("<img class='notice_icon' src='img/chrome.png'>");
-				else if (strContains(name, "Chromium")) return $("<img class='notice_icon' src='img/chrome.png'>");
-				else if (strContains(name, "Safari")) return $("<img class='notice_icon' src='img/safari.png'>");
-				else if (strContains(name, "IE") || strContains(name, "Internet Explorer")) return $("<img class='notice_icon' style='width:35px; height:35px;' src='img/internet_explorer.png'>");
-				else return $("<img class='notice_icon' src='img/browser.png'>");
-			}
-			
-			function getOperatingSystemIcon(info) {
-				var name = info.os.name;
-				if (arrayContains(OperatingSystems.LINUX, name)) return $("<img class='notice_icon' src='img/linux.png'>");
-				else if (arrayContains(OperatingSystems.OSX, name)) return $("<img class='notice_icon' src='img/osx.png'>");
-				else if (strContains(name, "iOS")) return $("<img class='notice_icon' src='img/ios.png'>");
-				else if (arrayContains(OperatingSystems.WINDOWS, name)) return $("<img class='notice_icon' src='img/windows.png'>");
-				else if (strContains(name, "Android")) return $("<img class='notice_icon' src='img/android.png'>");
-				return $("<img class='notice_icon' src='img/computer.png'>");
-			}
-			
-			function getStateIcon(state) {
-				if (state === "pass") return $("<img class='notice_state_icon' src='img/circle_checkmark.png'>");
-				if (state === "fail") return $("<img class='notice_state_icon' src='img/circle_exclamation.png'>");
-				if (state === "warn") return $("<img class='notice_state_icon' src='img/circle_exclamation.png'>");
-				throw new Error("Unrecognized state: " + state);
-			}
-		}
-		
-		// render single check description
-		function renderCheckDescription(div, info, check) {
-			
-			// all checks pass
-			if (!check) {
-				var content = $("<div>").appendTo(div);
-				content.append("<div class='notice_bar_center_major flex_horizontal'>All security checks pass</div>");
-				return;
-			}
-			
-			// interpret environment code and state
-			switch (check.code) {
-				case AppUtils.EnvironmentCode.BROWSER:
-					if (check.state === "pass") div.append("Browser is open source (" + info.browser.name + ")");
-					else {
-						var content = $("<div>").appendTo(div);
-						if (check.state === "fail") content.append("<div class='notice_bar_center_major'>Browser is not supported (" + info.browser.name + " " + info.browser.version + ")</div>");
-						else content.append("<div class='notice_bar_center_major'>Browser is not open source (" + info.browser.name + ")</div>");
-						content.append("<div class='notice_bar_center_minor'>Recommended browsers: " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + "</div>");
-					}
-					break;
-				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
-					if (check.state === "fail") {
-						var msg = "Unexpected error: ";
-						if (info.runtimeError.message) msg += info.runtimeError.message;
-						else msg += info.runtimeError.toString();
-						if (info.runtimeError.stack) msg += "<br>" + info.runtimeError.stack;
-						div.append(msg);
-					}
-					break;
-				case AppUtils.EnvironmentCode.INTERNET:
-					if (check.state === "pass") div.append("No internet connection");
-					else if (check.state === "warn") {
-						var content = $("<div>").appendTo(div);
-						content.append("<div class='notice_bar_center_major'>Internet connection is active</div>");
-						content.append("<div class='notice_bar_center_minor'>Disconnect from the internet for better security</div>");
-					} else if (check.state === "fail") {
-						var content = $("<div>").appendTo(div);
-						content.append("<div class='notice_bar_center_major'>Connect to the internet</div>");
-						content.append("<div class='notice_bar_center_minor'>Internet is required because this tool is not running locally.  <a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
-					}
-					break;
-				case AppUtils.EnvironmentCode.IS_LOCAL:
-					if (check.state === "pass") div.append("<div class='notice_bar_center_major'>Tool is running locally</div>");
-					else {
-						var content = $("<div>").appendTo(div);
-						content.append("<div class='notice_bar_center_major'>Tool is not running locally</div>");
-						content.append("<div class='notice_bar_center_minor'><a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download from GitHub</a></div>");
-					}
-					break;
-				case AppUtils.EnvironmentCode.OPERATING_SYSTEM:
-					if (check.state === "pass") div.append("Operating system is open source (" + info.os.name + ")");
-					else {
-						var content = $("<div>").appendTo(div);
-						content.append("<div class='notice_bar_center_major'>Operating system is not open source (" + info.os.name + ")</div>");
-						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
-					}
-					break;
-				case AppUtils.EnvironmentCode.DEV_MODE:
-					if (check.state === "warn") div.append("Tool is under development and should not be trusted with sigificant amounts");
-					break;
-				default:
-					throw new Error("Unrecognized environment code: " + check.code);
-			}
-		}
-	}
-}
-inheritsFrom(NoticeController, DivController);
-
-/**
- * Invokes the renderer and presents a loading wheel until it's done.
- * 
- * Requires that the div be hidden while rendering.
- * 
- * Works by wrapping the renderer's div with the loader's div until done.
- * 
- * Call getDiv() to get the best representation of current state (wrapper or renderer's div).
- * 
- * @param renderer renders the content to a div which is hidden by a loading wheel until done
- * @param config allows load rendering customization
- * 				config.enableScroll	specifies if the scroll bar should show during loading (UI tweak)
- */
-function LoadController(renderer, config) {
-	DivController.call(this, renderer.getDiv());
-	var isLoading = false;
-	var wrapper;
-	
-	/**
-	 * Renders the loader.
-	 * 
-	 * @param onRenderDone(div) is invoked when the renderer's div is rendered
-	 * @param onLoaderDone(div) is invoked when load wheel is rendered
-	 */
-	this.render = function(onRenderDone, onLoaderDone) {
-		
-		// ignore if loading
-		if (isLoading) {
-			if (onLoaderDone) onLoaderDone(wrapper);
-			return;
-		}
-		
-		// check if already rendered
-		if (renderer.getDiv().children().length) {
-			if (onLoaderDone) onLoaderDone(renderer.getDiv());
-			if (onRenderDone) onRenderDone(renderer.getDiv());
-			return;
-		}
-		
-		// load loading gif
-		isLoading = true;
-		var loadingImg = new Image();
-		loadingImg.onload = function() {
-			$(loadingImg).addClass("loading");
-			
-			// wrap renderer's div
-			renderer.getDiv().wrap("<div class='loading_div flex_vertical flex_align_center'>");	// wrap div with loading
-			wrapper = renderer.getDiv().parent();
-			wrapper.prepend(loadingImg);
-			if (config && config.enableScroll) wrapper.css("margin-bottom", "1200px");
-			
-			// load is done
-			if (onLoaderDone) onLoaderDone(wrapper);
-			
-			// don't show div while rendering
-			renderer.getDiv().hide();
-				
-			// render content
-			renderer.render(function() {
-				wrapper.replaceWith(renderer.getDiv());
-				wrapper = null;
-				isLoading = false;
-				renderer.getDiv().show();
-				if (onRenderDone) onRenderDone(renderer.getDiv());
-			});
-		};
-		loadingImg.src = "img/loading.gif";
-	}
-	
-	this.getDiv = function() {
-		return wrapper ? wrapper : renderer.getDiv();
-	}
-	
-	this.getRenderer = function() {
-		return renderer;
-	}
-}
-inheritsFrom(LoadController, DivController);
