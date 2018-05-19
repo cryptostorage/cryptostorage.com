@@ -1210,7 +1210,8 @@ function FaqController(div) {
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						answerDiv.append("<p>All unencrypted keys generated with CryptoStorage will work with other wallet software and vice versa.</p>" +
-								"<p>However, there is currently no standardized way of encrypting cryptocurrency keypairs with a passphrase.  As a result, CryptoStorage uses its own conventions which will not work with other tools unless they use the same conventions.  <b>A copy of this tool should be saved to recover keys in the future if using passphrase encryption.</b></p>");
+								"<p>However, there is currently no standardized way of encrypting cryptocurrency keypairs with a passphrase except for <a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a>.  When BIP38 is not supported, CryptoStorage uses a specific encryption configuration (<a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> with PBDKF2, 10000 iterations, SHA512, and an embedded verison for future extensibility) which will not work with other tools unless they use the same configuration.<br><br>" +
+								"<b>A copy of this tool should be saved to recover keys in the future if using passphrase encryption.</b></p>");
 						return answerDiv;
 					}
 				}, {
