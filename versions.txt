@@ -84,10 +84,12 @@ cryptostorage-v0.2.3-beta
 
 05/25/2018
 cryptostorage-v0.3.0-beta
-- New editor design
-- Ability to import BIP39 seeds and re-export with encryption and/or splitting
-- Ability to import from text
+- New editor design!
 - Added support for Dogecoin and Zcoin
+- Import BIP39 seeds and other private keys and re-export with encryption and/or splitting
+- Import from text
 - Refactored codebase to be more object-oriented
+- Minimum threshold no longer encoded in split shares
 - Switched from individual dependencies to BitcoinJS with extensible network configurations
+- Improved test suite to be more thorough
 - More thorough test suite
