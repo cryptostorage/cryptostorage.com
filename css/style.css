@@ -1527,6 +1527,27 @@ input[type='checkbox'][disabled] +label {
 	width: 175px;
 }
 
+.compact_keypairs_row {
+
+}
+
+.compact_keypairs_row:last-child > .compact_keypair_div {
+	border-bottom: 2px solid green;
+}
+
+.compact_keypair_div {
+	width: 375px;
+	padding: 7px;
+	box-sizing: border-box;
+	border: 2px solid green;
+	border-right: none;
+	border-bottom: none;
+}
+
+.compact_keypair_div:last-child {
+	border-right: 2px solid green;
+}
+
 .hidden {
 	display: none;
 }

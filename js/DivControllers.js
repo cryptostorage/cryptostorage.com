@@ -5388,7 +5388,6 @@ function StandardKeypairRenderer(div, keypair, config) {
 	var that = this;
 	var keypairLeftValue;
 	var keypairRightValue;
-	var keypairCryptoLogo;
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
@@ -5426,7 +5425,7 @@ function StandardKeypairRenderer(div, keypair, config) {
 		if (config.showLogos && decoded.cryptoLogo) {
 			decoded.cryptoLogo.attr("width", "100%");
 			decoded.cryptoLogo.attr("height", "100%");
-			keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
+			var keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
 			keypairCryptoLogo.append(decoded.cryptoLogo);
 		}
 		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(keypairCrypto);
@@ -5625,6 +5624,7 @@ function CompactPieceRenderer(div, piece, config) {
 		
 		// build pages and collect functions to render keypairs
 		var keypairsDiv;
+		var keypairsRow;
 		var tickers;
 		var pairsPerPage = 12;
 		var renderFuncs = [];
@@ -5645,8 +5645,13 @@ function CompactPieceRenderer(div, piece, config) {
 				keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
 			}
 			
+			// add new row
+			if (i === 0 || i % 2 === 0) {
+				keypairsRow = $("<div class='compact_keypairs_row flex_horizontal'>").appendTo(keypairsDiv);
+			}
+			
 			// collect functions to render keypairs
-			var placeholderDiv = $("<div class='compact_keypair_div'>").appendTo(keypairsDiv);	// TODO: two to a row
+			var placeholderDiv = $("<div class='compact_keypair_div'>").appendTo(keypairsRow);
 			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
 		}
 		
@@ -5858,10 +5863,26 @@ function CompactKeypairRenderer(div, keypair, config) {
 		
 		// div setup
 		div.empty();
-		div.addClass("compact_keypair_div flex_vertical");
+		div.addClass("compact_keypair_div flex_vertical flex_align_center flex_justify_center");
 		
-		div.append("super compact");
+		// decode keypair for rendering
+		var decoded = CompactKeypairRenderer.decodeKeypair(keypair, config);
+		console.log(decoded);
 		
+		// crypto logo and label
+		var logoLabel = $("<div class='keypair_crypto flex_horizontal flex_align_center flex_justify_center'>").appendTo(div);
+		if (config.showLogos && decoded.cryptoLogo) {
+			decoded.cryptoLogo.attr("width", "100%");
+			decoded.cryptoLogo.attr("height", "100%");
+			var keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(logoLabel);
+			keypairCryptoLogo.append(decoded.cryptoLogo);
+		}
+		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(logoLabel);
+		keypairCryptoLabel.html(decoded.valueLabel);
+		
+		div.append("Super compact");
+		
+		// done rendering
 		onDone(div);
 	}
 	
@@ -5911,54 +5932,36 @@ CompactKeypairRenderer.QR_CONFIG = {
  * @param keypair is the keypair to decode
  * @param config is custom configuration
  * @returns a decoded object with fields which inform rendering
- * 					decoded.leftLabel is the upper left label
- * 					decoded.leftValue is the upper left value
- * 					decoded.leftValueCopyable indicates if the left value is copyable and should be QR
+ * 					decoded.value is the keypair value
+ *  				decoded.valueLabel is the value label
+ * 					decoded.valueCopyable indicates if the value is copyable and should be QR
  * 					decoded.cryptoLogo is the center logo to render
- * 					decoded.cryptoLabel is the center label to render
- * 					decoded.rightLabel is the lower right label
- * 					decoded.rightValue is the lower right value
- * 					decoded.rightValueCopyable indicates if the right value is copyable and should be QR
  */
 CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
 	
-	throw new Error("Not implemented");
-	
 	// default render config
 	config = Object.assign({
-		showPublic: true,
+		showPublic: false,
 		showPrivate: true,	
 		showLogos: true
 	}, config);
+	assertTrue((!config.showPublic && config.showPrivate) || (config.showPublic && !config.showPrivate));
 	
 	// decode
 	var decoded = {};
 	decoded.cryptoLogo = config.showLogos ? keypair.getPlugin().getLogo() : null;
-	decoded.cryptoLabel = keypair.getPlugin().getName();
-	
-	// initialize left values
-	if (keypair.isPublicApplicable()) {
-		decoded.leftLabel = "\u25C4 Public Address";
-		if (keypair.getPublicAddress() && config.showPublic) {
-			decoded.leftValueCopyable = true;
-			decoded.leftValue = keypair.getPublicAddress();
+	decoded.valueLabel = keypair.getPlugin().getName() + (keypair.isSplit() ? " (split)" : (keypair.isEncrypted() ? " (encrypted)" : " (unencrypted)"));
+	if (config.showPublic) {
+		if (keypair.isPublicApplicable()) {
+			decoded.value = keypair.getPublicAddress();
+			decoded.valueCopyable = true;
 		} else {
-			decoded.leftValueCopyable = false;
-			if (keypair.isSplit()) decoded.leftValue = "(combine shares to view)";
-			else if (keypair.isEncrypted()) decoded.leftValue = "(decrypt to view)";
-			else if (!config.showPublic) decoded.leftValue = "(not shown)";
-			else throw new Error("Unknown public address value");
+			decoded.value = "Not applicable";
+			decoded.valueCopyable = false;
 		}
 	} else {
-		decoded.leftLabel = null;
-		decoded.leftValue = null;
-		decoded.leftValueCopyable = false;
+		decoded.value = keypair.getPrivateWif();
+		decoded.valueCopyable = true;
 	}
-	
-	// initialize right values
-	decoded.rightLabel = keypair.getPlugin().getPrivateLabel();
-	decoded.rightLabel += " " + (config.showPrivate ? keypair.isSplit() ? "(split)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
-	decoded.rightValue = keypair.getPrivateWif() && config.showPrivate ? keypair.getPrivateWif() : "(not shown)";
-	decoded.rightValueCopyable = isDefined(keypair.getPrivateWif()) && config.showPrivate;
 	return decoded;
 }
