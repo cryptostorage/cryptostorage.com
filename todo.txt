@@ -1,8 +1,7 @@
 v0.3.0
-release notes
-
 ultra compact view
 print selector compact | cryptocash | community design, etc
+release notes
 
 notice colors
 put homepage text in index.html and dynamically hide for seo

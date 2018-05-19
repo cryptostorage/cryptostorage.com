@@ -81,3 +81,13 @@ cryptostorage-v0.2.2-beta
 cryptostorage-v0.2.3-beta
 - Introducing crypto-cash.  A convenient format to print and tip people IRL :)
 - To generate crypto-cash, generate unencrypted storage and check the crypto-cash checkbox in the export tab
+
+05/25/2018
+cryptostorage-v0.3.0-beta
+- New editor design
+- Ability to import BIP39 seeds and re-export with encryption and/or splitting
+- Ability to import from text
+- Added support for Dogecoin and Zcoin
+- Refactored codebase to be more object-oriented
+- Switched from individual dependencies to BitcoinJS with extensible network configurations
+- More thorough test suite
