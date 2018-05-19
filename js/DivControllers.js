@@ -1848,7 +1848,7 @@ function ImportFileController(div, printErrors) {
 		if (pieceRenderer) {
 			pieceRenderer.getDiv().appendTo(inlinePiecesDiv);
 		} else {
-			pieceRenderer = new CompactPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
+			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
 			pieceRenderer.render();
 		}
 		
@@ -2266,7 +2266,7 @@ function ImportTextController(div, plugins, printErrors) {
 		if (pieceRenderer) {
 			pieceRenderer.getDiv().appendTo(inlinePiecesDiv);
 		} else {
-			pieceRenderer = new CompactPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
+			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
 			pieceRenderer.render();
 		}
 		
@@ -2497,7 +2497,7 @@ function DecryptionController(div, encryptedPiece) {
 		}
 		
 		// compute weights for progress bar
-		pieceRenderer = new CompactPieceRenderer(null, encryptedPiece);
+		pieceRenderer = new StandardPieceRenderer(null, encryptedPiece);
 		var decryptWeight = encryptedPiece.getDecryptWeight();
 		var renderWeight = pieceRenderer.getRenderWeight();
 		var totalWeight = decryptWeight + renderWeight;
@@ -2901,7 +2901,7 @@ function EditorController(div, config) {
 		}
 		
 		// set piece renderer class
-		config.pieceRendererClass = CompactPieceRenderer;
+		config.pieceRendererClass = StandardPieceRenderer;
 		return config;
 	}
 	
@@ -3106,7 +3106,7 @@ function EditorContentController(div, editorController, config) {
 					
 					// add pre-existing piece divs
 					if (config.pieceDivs) {
-						CompactPieceRenderer.makeCopyable(config.pieceDivs);	// copy is lost when transferred across tabs
+						StandardPieceRenderer.makeCopyable(config.pieceDivs);	// copy is lost when transferred across tabs
 						editorController.setCurrentPieces(config.pieces, config.pieceDivs);
 					}
 					
@@ -3119,7 +3119,7 @@ function EditorContentController(div, editorController, config) {
 						for (var i = 0; i < config.pieces.length; i++) {
 							var pieceDiv = $("<div>");
 							pieceDivs.push(pieceDiv);
-							pieceRenderers.push(new CompactPieceRenderer(pieceDiv, config.pieces[i]));
+							pieceRenderers.push(new StandardPieceRenderer(pieceDiv, config.pieces[i]));
 						}
 						
 						// set pieces and divs
@@ -4633,7 +4633,7 @@ function EditorPrintController(div, pieces) {
 		if (previewGenerator) previewGenerator.destroy();
 		previewGenerator = new PieceGenerator({
 			pieces: [pieces[0]],
-			pieceRendererClass: CompactPiecePreviewRenderer,
+			pieceRendererClass: StandardPiecePreviewRenderer,
 			pieceRendererConfig: getPrintRenderConfig(true)
 		});
 		previewGenerator.generatePieces(null, function(err, _pieces, _previewRenderers) {
@@ -4645,7 +4645,7 @@ function EditorPrintController(div, pieces) {
 			if (pieceGenerator) pieceGenerator.destroy();
 			pieceGenerator = new PieceGenerator({
 				pieces: pieces,
-				pieceRendererClass: CompactPieceRenderer,
+				pieceRendererClass: StandardPieceRenderer,
 				pieceRendererConfig: getPrintRenderConfig()
 			});
 			pieceGenerator.generatePieces(setRenderProgress, function(err, _pieces, _pieceRenderers) {
@@ -4712,7 +4712,7 @@ function EditorPrintController(div, pieces) {
 inheritsFrom(EditorPrintController, DivController);
 
 /**
- * Renders a piece with compact keypairs.
+ * Renders a piece with standard keypairs.
  * 
  * @param config specifies render configuration
  *  			config.showLogos specifies if crypto logos should be shown
@@ -4724,7 +4724,7 @@ inheritsFrom(EditorPrintController, DivController);
  * @param div is the div to render to
  * @param piece is the piece to render
  */
-function CompactPieceRenderer(div, piece, config) {
+function StandardPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
@@ -4748,7 +4748,7 @@ function CompactPieceRenderer(div, piece, config) {
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
-		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
+		assertFalse(_isDestroyed, "StandardPieceRenderer is destroyed");
 		
 		// div setup
 		div.empty();
@@ -4851,7 +4851,7 @@ function CompactPieceRenderer(div, piece, config) {
 	 * Destroys the renderer.  Does not destroy the underling piece.
 	 */
 	this.destroy = function() {
-		assertFalse(_isDestroyed, "CompactPieceRenderer already destroyed");
+		assertFalse(_isDestroyed, "StandardPieceRenderer already destroyed");
 		if (keypairRenderers) {
 			for (var i = 0; i < keypairRenderers.length; i++) keypairRenderers[i].destroy();
 		}
@@ -4863,17 +4863,17 @@ function CompactPieceRenderer(div, piece, config) {
 	}
 	
 	this.getPiece = function() {
-		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
+		assertFalse(_isDestroyed, "StandardPieceRenderer is destroyed");
 		return piece;
 	}
 	
 	this.onProgress = function(callbackFn) {
-		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
+		assertFalse(_isDestroyed, "StandardPieceRenderer is destroyed");
 		onProgressFn = callbackFn;
 	}
 	
 	this.getRenderWeight = function() {
-		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
+		assertFalse(_isDestroyed, "StandardPieceRenderer is destroyed");
 		var weight = 0;
 		for (var i = 0; i < piece.getKeypairs().length; i++) weight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i]);
 		return weight;
@@ -4892,12 +4892,12 @@ function CompactPieceRenderer(div, piece, config) {
 		return instructionDivs;
 	}
 }
-inheritsFrom(CompactPieceRenderer, DivController);
+inheritsFrom(StandardPieceRenderer, DivController);
 
 /**
  * Makes the given divs copyable assuming it is a rendered piece(s).
  */
-CompactPieceRenderer.makeCopyable = function(pieceDivs) {
+StandardPieceRenderer.makeCopyable = function(pieceDivs) {
 	pieceDivs = listify(pieceDivs);
 	for (var i = 0; i < pieceDivs.length; i++) {
 		UiUtils.makeCopyable(pieceDivs[i]);
@@ -4907,7 +4907,7 @@ CompactPieceRenderer.makeCopyable = function(pieceDivs) {
 /**
  * Relative weight to render a piece generation config.
  */
-CompactPieceRenderer.getRenderWeight = function(config) {
+StandardPieceRenderer.getRenderWeight = function(config) {
 	PieceGenerator.validateConfig(config);
 	var numPieces = config.numPieces ? config.numPieces : 1;
 	var weight = 0;
@@ -4929,7 +4929,7 @@ CompactPieceRenderer.getRenderWeight = function(config) {
 }
 
 /**
- * Renders a preview of what CompactPieceRenderer will render.
+ * Renders a preview of what StandardPieceRenderer will render.
 
  * @param div is the div to render to
  * @param piece is the piece to render
@@ -4940,7 +4940,7 @@ CompactPieceRenderer.getRenderWeight = function(config) {
  * 				config.cryptoCash specifies to space 6 keypairs per page with no cryptostorage logo
  * 				config.infoBack specifies if double-sided sweep instructions should be included for crypto cash
  */
-function CompactPiecePreviewRenderer(div, piece, config) {
+function StandardPiecePreviewRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
@@ -4950,7 +4950,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
-		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
+		assertFalse(_isDestroyed, "StandardPiecePreviewRenderer is destroyed");
 		
 		// get preview piece
 		var numKeypairs = config.cryptoCash ? (config.infoBack ? 1 : 2) : Math.min(2, piece.getKeypairs().length);
@@ -4959,7 +4959,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 		var previewPiece = new CryptoPiece({keypairs: previewKeypairs});
 		
 		// render preview piece
-		pieceRenderer = new CompactPieceRenderer(div, previewPiece, config);
+		pieceRenderer = new StandardPieceRenderer(div, previewPiece, config);
 		pieceRenderer.onProgress(onProgressFn);
 		pieceRenderer.render(function(div) {
 			
@@ -4973,7 +4973,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	}
 	
 	this.onProgress = function(callbackFn) {
-		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
+		assertFalse(_isDestroyed, "StandardPiecePreviewRenderer is destroyed");
 		onProgressFn = callbackFn;
 	}
 	
@@ -4981,7 +4981,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	 * Destroys the renderer.  Does not destroy the underling piece.
 	 */
 	this.destroy = function() {
-		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer already destroyed");
+		assertFalse(_isDestroyed, "StandardPiecePreviewRenderer already destroyed");
 		if (pieceRenderer) pieceRenderer.destroy();
 		_isDestroyed = true;
 	}
@@ -4990,12 +4990,12 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 		return _isDestroyed;
 	}
 }
-inheritsFrom(CompactPiecePreviewRenderer, DivController);
+inheritsFrom(StandardPiecePreviewRenderer, DivController);
 
 /**
  * Register preview generation weight.
  */
-CompactPiecePreviewRenderer.getRenderWeight = function(config) {
+StandardPiecePreviewRenderer.getRenderWeight = function(config) {
 	return 1;
 }
 

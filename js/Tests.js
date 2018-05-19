@@ -753,7 +753,7 @@ function Tests() {
 				numKeypairs: REPEAT_KEYS
 			});
 		}
-		config.pieceRendererClass = CompactPieceRenderer;
+		config.pieceRendererClass = StandardPieceRenderer;
 		testGenerateConfig(config, function(err) {
 			if (err) {
 				onDone(err);
@@ -1351,7 +1351,7 @@ function Tests() {
 					encryption: useEncryption ? plugins[i].getEncryptionSchemes()[0] : undefined
 				});
 			}
-			config.pieceRendererClass = CompactPieceRenderer;
+			config.pieceRendererClass = StandardPieceRenderer;
 			return config;
 		}
 	}
