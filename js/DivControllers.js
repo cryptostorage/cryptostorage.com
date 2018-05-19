@@ -2904,7 +2904,7 @@ function EditorController(div, config) {
 		if (that.hasFormError()) return;
 		
 		// confirm discard
-		if (!AppUtils.DEV_MODE && that.newPiecesGenerated() && !confirm("Discard and regenerate the keypairs?")) return;
+		if (!AppUtils.DEV_MODE && that.newPiecesGenerated() && !confirm("Discard and create new keypairs?")) return;
 		
 		// get generation config based on current state
 		var genConfig = that.getGenerateConfig();

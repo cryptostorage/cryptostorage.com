@@ -1,5 +1,4 @@
 v0.3.0
-"discard and create new keypairs?"
 csv text import view encrypted keys blank right margin
 
 update faq_interoperable to only refer to encryption
