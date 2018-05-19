@@ -4689,7 +4689,7 @@ function EditorPrintController(div, pieces) {
 		for (var i = 0; i < pieceRenderers.length; i++) piecesDiv.append(pieceRenderers[i].getDiv());
 		
 		// open window with pieces
-		newWindow({div: piecesDiv, title: "Print Keypairs", dependencyPaths: "css/styles.css"}, function(err, window) {
+		newWindow({div: piecesDiv, title: "Print Keypairs", dependencyPaths: "css/style.css"}, function(err, window) {
 			if (err) {
 				AppUtils.setTabError(true);
 				return;
