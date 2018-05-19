@@ -1,6 +1,4 @@
 v0.3.0
-csv text import view encrypted keys blank right margin
-
 update faq_interoperable to only refer to encryption
 better bip38 description
 update bip38 cryptojs description with pbkdf if necessary

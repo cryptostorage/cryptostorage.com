@@ -882,19 +882,42 @@ function getInternalStyleSheetText() {
 }
 
 /**
- * Builds an HTML document with the given div in the body.
+ * Manually builds an HTML document string.
  * 
- * @param div is the div to embed within the document's body (optional)
- * @param title is the title of the tab (optional)
- * @param dependencyPaths are js, css, or img to import (optional)
- * @param internalCss are css rules to embed within the document's style (optional)
+ * @param content specifies optional document content
+ * 				content.div is a pre-existing div to stringify and add to the body
+ * 				content.title is the title of the new tab
+ * 				content.dependencyPaths specifies paths to js, css, or img paths
+ * 				content.internalCss is css to embed in the html document
+ * 				content.metas are meta elements with keys/values to include
  * @returns str is the document string
  */
-function buildHtmlDocument(div, title, dependencyPaths, internalCss) {
+function buildHtmlDocument(content) {
 	var str = "<!DOCTYPE HTML>";
-	str += "<html><head>" + (title ? "<title>" + title + "</title>" : "") + (internalCss ? "<style>" + internalCss + "</style>" : "");
-	if (dependencyPaths) {
-		dependencyPaths = listify(dependencyPaths);
+	str += "<html><head>";
+	
+	// add metas
+	if (content.metas) {
+		var metas = listify(content.metas);
+		for (var i = 0; i < metas.length; i++) {
+			var meta = metas[i];
+			var elem = document.createElement("meta");
+			for (var prop in meta) {
+				if (meta.hasOwnProperty(prop)) {
+					elem.setAttribute(prop.toString(), meta[prop.toString()]);
+				}
+			}
+			str += elem.outerHTML;
+		}
+	}
+	
+	// add title and internal css
+	str += content.title ? "<title>" + content.title + "</title>" : "";
+	str += content.internalCss ? "<style>" + content.internalCss + "</style>" : "";
+	
+	// add dependency paths
+	if (content.dependencyPaths) {
+		var dependencyPaths = listify(content.dependencyPaths);
 		for (var i = 0; i < dependencyPaths.length; i++) {
 			var dependencyPath = dependencyPaths[i];
 			if (dependencyPath.endsWith(".js")) str += "<script src='" + dependencyPath + "'></script>";
@@ -904,7 +927,7 @@ function buildHtmlDocument(div, title, dependencyPaths, internalCss) {
 		}
 	}
 	str += "</head><body>";
-	if (div) str += $("<div>").append(div.clone()).html();
+	if (content.div) str += $("<div>").append(content.div.clone()).html();	// add cloned div as string
 	str += "</body></html>";
 	return str;
 }
@@ -912,13 +935,15 @@ function buildHtmlDocument(div, title, dependencyPaths, internalCss) {
 /**
  * Opens the given div in a new window.
  * 
- * @param div is the jquery div to render to (optional)
- * @param title is the title of the new tab (optional)
- * @param dependencyPaths are js, css, or img paths to import (optional)
- * @param internalCss is css to embed in the html document (optional)
+ * @param content specifies optional window content
+ * 				content.div is a pre-existing div to stringify and add to the body
+ * 				content.title is the title of the new tab
+ * 				content.dependencyPaths specifies paths to js, css, or img paths
+ * 				content.internalCss is css to embed in the html document
+ * 				content.metas are meta elements with keys/values to include
  * @param onLoad(err, window) is invoked with a reference to the window when available
  */
-function newWindow(div, title, dependencyPaths, internalCss, onLoad) {
+function newWindow(content, onLoad) {
 	var onLoadCalled = false;
 	var w = window.open();
 	if (!isInitialized(w) || !isInitialized(w.document)) {
@@ -926,7 +951,7 @@ function newWindow(div, title, dependencyPaths, internalCss, onLoad) {
 		return;
 	}
 	w.opener = null;
-	w.document.write(buildHtmlDocument(div, title, dependencyPaths, internalCss));
+	w.document.write(buildHtmlDocument(content));
 	w.addEventListener('load', function() {
 		onLoadOnce(null, w);
 	});

@@ -156,8 +156,14 @@ var UiUtils = {
 	 */
 	openEditorDynamic: function(browserTabName, config) {
 		
-		// open tab
-		newWindow(null, browserTabName, AppUtils.getInitialEditorDependencies(), getInternalStyleSheetText(), function(err, window) {
+		// open window
+		var content = {
+		  title: browserTabName,
+		  dependencyPaths: AppUtils.getInitialEditorDependencies(),
+		  internalCss: getInternalStyleSheetText(),
+		  metas: {name: "viewport", content: "width=900px, user-scalable=no"},
+		}
+		newWindow(content, function(err, window) {
 			
 			// check for error
 			if (err) {
@@ -4682,7 +4688,7 @@ function EditorPrintController(div, pieces) {
 		for (var i = 0; i < pieceRenderers.length; i++) piecesDiv.append(pieceRenderers[i].getDiv());
 		
 		// open window with pieces
-		newWindow(piecesDiv, "Print Keypairs", "css/style.css", null, function(err, window) {
+		newWindow({div: piecesDiv, title: "Print Keypairs", dependencyPaths: "css/styles.css"}, function(err, window) {
 			if (err) {
 				AppUtils.setTabError(true);
 				return;
