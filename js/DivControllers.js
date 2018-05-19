@@ -4811,7 +4811,7 @@ function StandardPieceRenderer(div, piece, config) {
 		var doneWeight = 0;
 		var totalWeight  = 0;
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			totalWeight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker());
+			totalWeight += StandardKeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker());
 		}
 
 		// render keypairs
@@ -4834,12 +4834,12 @@ function StandardPieceRenderer(div, piece, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
 				if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (index + 1);
-				var keypairRenderer = new KeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
+				var keypairRenderer = new StandardKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
 					if (config.cryptoCash) div.addClass("keypair_div_spaced");
 					placeholderDiv.replaceWith(div);
-					doneWeight += KeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
+					doneWeight += StandardKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
 					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
 					onDone(null, keypairRenderer);
 				});
@@ -4875,7 +4875,7 @@ function StandardPieceRenderer(div, piece, config) {
 	this.getRenderWeight = function() {
 		assertFalse(_isDestroyed, "StandardPieceRenderer is destroyed");
 		var weight = 0;
-		for (var i = 0; i < piece.getKeypairs().length; i++) weight += KeypairRenderer.getRenderWeight(piece.getKeypairs()[i]);
+		for (var i = 0; i < piece.getKeypairs().length; i++) weight += StandardKeypairRenderer.getRenderWeight(piece.getKeypairs()[i]);
 		return weight;
 	}
 	
@@ -4915,14 +4915,14 @@ StandardPieceRenderer.getRenderWeight = function(config) {
 	// compute weight from pre-existing pieces
 	if (config.pieces) {
 		for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
-			weight += (KeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker()) * numPieces);
+			weight += (StandardKeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker()) * numPieces);
 		}
 	}
 	
 	// compute weight from keypair generation config
 	else {
 		for (var i = 0; i < config.keypairs.length; i++) {
-			weight += config.keypairs[i].numKeypairs * KeypairRenderer.getRenderWeight(config.keypairs[i].ticker) * numPieces;
+			weight += config.keypairs[i].numKeypairs * StandardKeypairRenderer.getRenderWeight(config.keypairs[i].ticker) * numPieces;
 		}
 	}
 	return weight;
@@ -5010,7 +5010,7 @@ StandardPiecePreviewRenderer.getRenderWeight = function(config) {
  * 				config.showPrivate specifies if private keys should be shown
  * 				config.keypairNum is a number identifier to render with the keypair (optional)
  */
-function KeypairRenderer(div, keypair, config) {
+function StandardKeypairRenderer(div, keypair, config) {
 	DivController.call(this, div);
 	assertObject(keypair, CryptoKeypair);
 	
@@ -5028,7 +5028,7 @@ function KeypairRenderer(div, keypair, config) {
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
-		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
+		assertFalse(_isDestroyed, "StandardKeypairRenderer is destroyed");
 		
 		// div setup
 		div.empty();
@@ -5040,7 +5040,7 @@ function KeypairRenderer(div, keypair, config) {
 		var keypairRightDiv = $("<div class='keypair_right_div flex_horizontal flex_align_end flex_justify_center'>").appendTo(div);
 		
 		// decode keypair for rendering
-		var decoded = KeypairRenderer.decodeKeypair(keypair, config);
+		var decoded = StandardKeypairRenderer.decodeKeypair(keypair, config);
 		
 		// keypair id
 		var idDiv = $("<div class='keypair_center_id'>").appendTo(keypairCenterDiv);
@@ -5090,7 +5090,7 @@ function KeypairRenderer(div, keypair, config) {
 		
 		// add qr codes
 		if (decoded.leftValueCopyable) {
-			UiUtils.renderQrCode(decoded.leftValue, KeypairRenderer.QR_CONFIG, function(img) {
+			UiUtils.renderQrCode(decoded.leftValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
 				if (_isDestroyed) return;
 				img.attr("class", "keypair_qr");
 				keypairLeftDiv.append(img);
@@ -5105,7 +5105,7 @@ function KeypairRenderer(div, keypair, config) {
 		}
 		function addPrivateQr() {
 			if (decoded.rightValueCopyable) {
-				UiUtils.renderQrCode(decoded.rightValue, KeypairRenderer.QR_CONFIG, function(img) {
+				UiUtils.renderQrCode(decoded.rightValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
 					if (_isDestroyed) return;
 					img.attr("class", "keypair_qr");
 					keypairRightDiv.append(img);
@@ -5120,10 +5120,10 @@ function KeypairRenderer(div, keypair, config) {
 	}
 	
 	/**
-	 * Destroys the KeypairRenderer.  Does not destroy the underlying keypair.
+	 * Destroys the StandardKeypairRenderer.  Does not destroy the underlying keypair.
 	 */
 	this.destroy = function () {
-		assertFalse(_isDestroyed, "KeypairRenderer is already destroyed");
+		assertFalse(_isDestroyed, "StandardKeypairRenderer is already destroyed");
 		_isDestroyed = true;
 	}
 	
@@ -5132,11 +5132,11 @@ function KeypairRenderer(div, keypair, config) {
 	}
 	
 	this.getKeypair = function() {
-		assertFalse(_isDestroyed, "KeypairRenderer is destroyed");
+		assertFalse(_isDestroyed, "StandardKeypairRenderer is destroyed");
 		return keypair;
 	}
 }
-inheritsFrom(KeypairRenderer, DivController);
+inheritsFrom(StandardKeypairRenderer, DivController);
 
 /**
  * Returns the weight to render the given ticker or keypair.
@@ -5144,7 +5144,7 @@ inheritsFrom(KeypairRenderer, DivController);
  * @param tickerOrKeypair can be a ticker or initialized keypair
  * @returns the relative weight to render the keypair
  */
-KeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
+StandardKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
 	assertInitialized(tickerOrKeypair);
 	if (isString(tickerOrKeypair)) {
 		var plugin = AppUtils.getCryptoPlugin(tickerOrKeypair);
@@ -5158,7 +5158,7 @@ KeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
 /**
  * Default keypair QR config.
  */
-KeypairRenderer.QR_CONFIG = {
+StandardKeypairRenderer.QR_CONFIG = {
 		size: 90,
 		version: null,
 		errorCorrectionLevel: 'H',
@@ -5180,7 +5180,7 @@ KeypairRenderer.QR_CONFIG = {
  * 					decoded.rightValue is the lower right value
  * 					decoded.rightValueCopyable indicates if the right value is copyable and should be QR
  */
-KeypairRenderer.decodeKeypair = function(keypair, config) {
+StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 	
 	// default render config
 	config = Object.assign({
