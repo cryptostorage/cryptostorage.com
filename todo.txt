@@ -5,6 +5,7 @@ release notes
 
 notice colors
 put homepage text in index.html and dynamically hide for seo
+remove old code
 exhaustive tests
 address testing
 browser testing
