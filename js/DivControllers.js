@@ -5880,10 +5880,22 @@ function CompactKeypairRenderer(div, keypair, config) {
 		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(logoLabel);
 		keypairCryptoLabel.html(decoded.valueLabel);
 		
-		div.append("Super compact");
+		// keypair value
+		var valueQrDiv = $("<div class='flex_horizontal flex_align_center flex_justify_center'>").appendTo(div);
+		var valueDiv = $("<div class='keypair_left_value'>").appendTo(valueQrDiv);
+		valueDiv.append(decoded.value);
 		
-		// done rendering
-		onDone(div);
+		// QR code
+		if (decoded.valueCopyable) {
+			UiUtils.renderQrCode(decoded.value, CompactKeypairRenderer.QR_CONFIG, function(img) {
+				if (_isDestroyed) return;
+				img.attr("class", "keypair_qr");
+				valueQrDiv.append(img);
+				
+				// done rendering
+				if (onDone) onDone(div);
+			});
+		}
 	}
 	
 	/**

@@ -1531,8 +1531,8 @@ input[type='checkbox'][disabled] +label {
 
 }
 
-.compact_keypairs_row:last-child > .compact_keypair_div {
-	border-bottom: 2px solid green;
+.compact_keypairs_row:first-child > .compact_keypair_div {
+	border-top: 2px solid green;
 }
 
 .compact_keypair_div {
@@ -1540,8 +1540,8 @@ input[type='checkbox'][disabled] +label {
 	padding: 7px;
 	box-sizing: border-box;
 	border: 2px solid green;
+	border-top: none;
 	border-right: none;
-	border-bottom: none;
 }
 
 .compact_keypair_div:last-child {
