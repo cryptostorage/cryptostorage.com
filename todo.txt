@@ -2,6 +2,7 @@ v0.3.0
 donation page
 faq text more spread out
 notice colors
+test adblocker
 
 ultra compact view
 print selector compact | cryptocash | community design, etc
