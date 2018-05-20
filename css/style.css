@@ -1282,7 +1282,7 @@ input[type='checkbox'][disabled] +label {
 	z-index: 2;
 }
 
-.editor_print_sample_overlay {
+.editor_print_preview_overlay {
 	font-size: 70px;
 	font-weight: 700;
 	color: rgb(146, 146, 146);

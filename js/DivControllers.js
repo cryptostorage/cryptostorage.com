@@ -5330,10 +5330,10 @@ function StandardPiecePreviewRenderer(div, piece, config) {
 		pieceRenderer.onProgress(onProgressFn);
 		pieceRenderer.render(function(div) {
 			
-			// add sample overlay
-			var sampleDiv = $("<div class='editor_print_sample_overlay user_select_none'>SAMPLE</div>");
+			// add preview overlay
+			var previewDiv = $("<div class='editor_print_preview_overlay user_select_none'>PREVIEW</div>");
 			var keypairsDiv = div.children().first().children().eq(config.showLogos && !config.cryptoCash || piece.isSplit() ? 1 : 0);
-			new OverlayController(keypairsDiv, {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
+			new OverlayController(keypairsDiv, {contentDiv: previewDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
 				if (onDone) onDone();
 			});
 		});
