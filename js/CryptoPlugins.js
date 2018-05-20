@@ -644,13 +644,13 @@ var BitcoinJsPlugins = {
 		"DOGE": {
 			name: "Dogecoin",
 			logoPath: "img/dogecoin.png",
-			donationAddress: "todo",
+			donationAddress: "D782E2y8gseyBxyuTGumSN8fry2eqFNBdE",
 			bitcoinjsNetwork: "dogecoin",
 		},
 		"XZC": {
 			name: "Zcoin",
 			logoPath: "img/zcoin.png",
-			donationAddress: "todo",
+			donationAddress: "YAW9C6VxPhjT8P2sfuEKV2ZZjhG8FXSwHX785EBWhFb9M1u9RtZc",
 			bitcoinjsNetwork: "zcoin",
 		}
 };
