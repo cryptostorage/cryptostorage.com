@@ -248,7 +248,8 @@ var UiUtils = {
 		});
 		
 		// add styling and tooltips
-		copyables.forEach(function(copyable, i) {
+		for (var i = 0; i < copyables.length; i++) {
+			var copyable = copyables[i];
 			$(copyable).addClass("copyable_init");
 			tippy(copyable, {
 				arrow : true,
@@ -265,7 +266,7 @@ var UiUtils = {
 					}, 2500)
 				}
 			});
-		});
+		}
 	}
 }
 
@@ -2906,7 +2907,7 @@ function EditorController(div, config) {
 		}
 		
 		// set piece renderer class
-		config.pieceRendererClass = CompactPieceRenderer;
+		config.pieceRendererClass = StandardPieceRenderer;
 		return config;
 	}
 	
