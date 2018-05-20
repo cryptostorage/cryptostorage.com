@@ -496,7 +496,7 @@ input[type='checkbox'][disabled] +label {
 
 .answer, .answer * {
 	font-size: 18px;
-	line-height: 25px;
+	line-height: 28px;
 }
 
 .answer {
