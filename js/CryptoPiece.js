@@ -298,13 +298,13 @@ function CryptoPiece(config) {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		var str = "";
 		for (var i = 0; i < state.keypairs.length; i++) {
-			str += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\n\n";
+			str += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\r\n\r\n";
 			var publicAddress = state.keypairs[i].getPublicAddress();
 			if (isDefined(publicAddress)) {
 				if (!state.keypairs[i].getPlugin().hasPublicAddress()) publicAddress = "Not applicable";
-				str += "Public Address:\n" + publicAddress + "\n\n";
+				str += "Public Address:\r\n" + publicAddress + "\r\n\r\n";
 			}
-			if (isDefined(state.keypairs[i].getPrivateWif())) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPieceNum() ? "(split)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\n" + state.keypairs[i].getPrivateWif() + "\n\n";
+			if (isDefined(state.keypairs[i].getPrivateWif())) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPieceNum() ? "(split)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
 		}
 		return str.trim();
 	}
