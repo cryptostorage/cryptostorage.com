@@ -4638,10 +4638,26 @@ function EditorPrintController(div, pieces) {
 		// disable print button
 		setPrintEnabled(false);
 		
+		// transform pieces per configuration
+		var transformedPieces = [];
+		if (!includePrivateCheckbox.isChecked()) {
+			assertTrue(includePublicCheckbox.isChecked());
+			transformedPieces.push(pieces[0].copy().removePrivateKeys());
+		} else {
+			for (var i = 0; i < pieces.length; i++) {
+				if (!includePublicCheckbox.isChecked()) {
+					assertTrue(includePrivateCheckbox.isChecked());
+					transformedPieces.push(pieces[i].copy().removePublicAddresses());
+				} else {
+					transformedPieces.push(pieces[i]);
+				}
+			}
+		}
+		
 		// render preview
 		if (previewGenerator) previewGenerator.destroy();
 		previewGenerator = new PieceGenerator({
-			pieces: [pieces[0]],
+			pieces: [transformedPieces[0]],
 			pieceRendererClass: StandardPiecePreviewRenderer,
 			pieceRendererConfig: getPrintRenderConfig(true)
 		});
@@ -4653,7 +4669,7 @@ function EditorPrintController(div, pieces) {
 			pieceRenderers = undefined;
 			if (pieceGenerator) pieceGenerator.destroy();
 			pieceGenerator = new PieceGenerator({
-				pieces: pieces,
+				pieces: transformedPieces,
 				pieceRendererClass: StandardPieceRenderer,
 				pieceRendererConfig: getPrintRenderConfig()
 			});
