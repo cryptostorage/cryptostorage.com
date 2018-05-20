@@ -3276,7 +3276,10 @@ function EditorPassphraseController(div, editorController) {
 		
 		// passphrase checkbox
 		riskAccepted = false;
-		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?");
+		var passphraseTooltipTxt = "Encrypts your keypairs with a passphrase.<br><br>" +
+															 "The passphrase must be at least 7 characters long.<br><br>" +
+															 "Encrypts with <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> with PBKDF2, 10000 iterations, and SHA512 by default.";
+		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?", passphraseTooltipTxt);
 		passphraseCheckbox.render();
 		
 		// column for passphrase inputs
@@ -3290,7 +3293,7 @@ function EditorPassphraseController(div, editorController) {
 		// bip38 checkbox
 		bip38Div = $("<div class='editor_bip38_div'>").appendTo(passphraseInputVertical);
 		var bip38Tooltip = "<a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is a standard for encrypting cryptocurrency keypairs which is designed to be resilient against brute-force passphrase cracking.<br><br>" +
-		 									 "BIP38 requires significantly more time and energy to encrypt and decrypt private keys than the default, <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a>, which uses PBKDF2, 10000 iterations, and SHA512.";
+		 									 "BIP38 requires significantly more time and energy to encrypt and decrypt private keys than the default, <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a>.";
 		bip38Checkbox = new CheckboxController(bip38Div, "Use BIP38 for BTC & BCH", bip38Tooltip);
 		bip38Checkbox.render();
 		bip38Div.hide();
