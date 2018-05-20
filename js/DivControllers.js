@@ -2906,7 +2906,7 @@ function EditorController(div, config) {
 		}
 		
 		// set piece renderer class
-		config.pieceRendererClass = CompactPieceRenderer;
+		config.pieceRendererClass = StandardPieceRenderer;
 		return config;
 	}
 	
@@ -5205,7 +5205,8 @@ function StandardPieceRenderer(div, piece, config) {
 		function renderFunc(placeholderDiv, piece, index, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
-				if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (index + 1);
+				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = "#" + (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
+				console.log(config.keypairId);
 				var keypairRenderer = new StandardKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
@@ -5380,7 +5381,7 @@ StandardPiecePreviewRenderer.getRenderWeight = function(config) {
  * 				config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
- * 				config.keypairNum is a number identifier to render with the keypair (optional)
+ * 				config.keypairId is an identifier to render with the keypair (optional)
  */
 function StandardKeypairRenderer(div, keypair, config) {
 	DivController.call(this, div);
@@ -5416,7 +5417,7 @@ function StandardKeypairRenderer(div, keypair, config) {
 		// keypair id
 		var idDiv = $("<div class='keypair_center_id'>").appendTo(keypairCenterDiv);
 		if (decoded.leftLabel) idDiv.css("position", "absolute");
-		if (config.keypairNum) idDiv.html(config.keypairNum);
+		if (config.keypairId) idDiv.html(config.keypairId);
 		
 		// left label and value
 		if (decoded.leftLabel) {
@@ -5689,7 +5690,7 @@ function CompactPieceRenderer(div, piece, config) {
 		function renderFunc(placeholderDiv, piece, index, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
-				if (piece.getKeypairs().length > 1) config.keypairNum = "#" + (index + 1);
+				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = "#" + (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
 				var keypairRenderer = new CompactKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
@@ -5850,7 +5851,7 @@ CompactPiecePreviewRenderer.getRenderWeight = function(config) {
  * 				config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
- * 				config.keypairNum is a number identifier to render with the keypair (optional)
+ * 				config.keypairId is an identifier to render with the keypair (optional)
  */
 function CompactKeypairRenderer(div, keypair, config) {
 	DivController.call(this, div);
