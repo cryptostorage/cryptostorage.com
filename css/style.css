@@ -1446,8 +1446,11 @@ input[type='checkbox'][disabled] +label {
 	position: relative;
 }
 
-.keypair_center_id {
+.keypair_id {
 	font-size: 13px;
+}
+
+.keypair_center_id {
 	left: 0;
 	right: 0;
 	text-align: center;
@@ -1546,6 +1549,21 @@ input[type='checkbox'][disabled] +label {
 
 .compact_keypair_div:last-child {
 	border-right: 2px solid green;
+}
+
+.compact_keypair_header {
+	margin-bottom: 5px;
+}
+
+.compact_keypair_value {
+	padding-right: 5px;
+	font-size: 13px;
+	font-family: monospace;
+}
+
+.compact_keypair_id {
+	position: absolute;
+	right: 0;
 }
 
 .hidden {

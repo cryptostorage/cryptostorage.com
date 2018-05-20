@@ -2906,7 +2906,7 @@ function EditorController(div, config) {
 		}
 		
 		// set piece renderer class
-		config.pieceRendererClass = StandardPieceRenderer;
+		config.pieceRendererClass = CompactPieceRenderer;
 		return config;
 	}
 	
@@ -5415,7 +5415,7 @@ function StandardKeypairRenderer(div, keypair, config) {
 		var decoded = StandardKeypairRenderer.decodeKeypair(keypair, config);
 		
 		// keypair id
-		var idDiv = $("<div class='keypair_center_id'>").appendTo(keypairCenterDiv);
+		var idDiv = $("<div class='keypair_id keypair_center_id'>").appendTo(keypairCenterDiv);
 		if (decoded.leftLabel) idDiv.css("position", "absolute");
 		if (config.keypairId) idDiv.html(config.keypairId);
 		
@@ -5851,6 +5851,7 @@ CompactPiecePreviewRenderer.getRenderWeight = function(config) {
  * 				config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
+ * 				config.qrLeft specifies if the qr code should be on the left side (default true)
  * 				config.keypairId is an identifier to render with the keypair (optional)
  */
 function CompactKeypairRenderer(div, keypair, config) {
@@ -5861,7 +5862,8 @@ function CompactKeypairRenderer(div, keypair, config) {
 	config = Object.assign({
 		showLogos: true,
 		showPublic: true,
-		showPrivate: true
+		showPrivate: true,
+		qrLeft: true
 	}, config);
 	
 	var that = this;
@@ -5876,10 +5878,12 @@ function CompactKeypairRenderer(div, keypair, config) {
 		
 		// decode keypair for rendering
 		var decoded = CompactKeypairRenderer.decodeKeypair(keypair, config);
-		console.log(decoded);
+		
+		// keypair header
+		var header = $("<div style='position:relative;' class='compact_keypair_header flex_horizontal flex_align_center width_100'>").appendTo(div);
 		
 		// crypto logo and label
-		var logoLabel = $("<div class='keypair_crypto flex_horizontal flex_align_center flex_justify_center'>").appendTo(div);
+		var logoLabel = $("<div class='keypair_crypto flex_horizontal flex_align_center flex_justify_center'>").appendTo(header);
 		if (config.showLogos && decoded.cryptoLogo) {
 			decoded.cryptoLogo.attr("width", "100%");
 			decoded.cryptoLogo.attr("height", "100%");
@@ -5889,9 +5893,21 @@ function CompactKeypairRenderer(div, keypair, config) {
 		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(logoLabel);
 		keypairCryptoLabel.html(decoded.valueLabel);
 		
+		// keypair id
+		if (config.keypairId) {
+			var idDiv = $("<div class='keypair_id compact_keypair_id'>").appendTo(header);
+			idDiv.html(config.keypairId);
+		}
+		
+		// render QR left
+		if (config.qrLeft) {
+			// TODO
+		}
+		
 		// keypair value
-		var valueQrDiv = $("<div class='flex_horizontal flex_align_center flex_justify_center'>").appendTo(div);
-		var valueDiv = $("<div class='keypair_left_value'>").appendTo(valueQrDiv);
+		var valueQrDiv = $("<div class='flex_horizontal flex_align_center flex_justify_center width_100'>").appendTo(div);
+		var valueDiv = $("<div class='compact_keypair_value width_100'>").appendTo(valueQrDiv);
+		if (!hasWhitespace(decoded.value)) valueDiv.css("word-break", "break-all");
 		valueDiv.append(decoded.value);
 		
 		// QR code
