@@ -443,8 +443,8 @@ input[type='checkbox']:not([disabled]) +label {
 }
 
 input[type='text'][disabled], input[type='password'][disabled], input[type='tel'][disabled]  {
-	background-color: white;
-	border-color: grey;
+	background-color: rgb(218, 218, 218);
+	border-color: black;
 }
 
 input[type='checkbox'][disabled] +label {
