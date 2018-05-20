@@ -5905,7 +5905,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		
 		// render QR left
 		if (config.qrLeft) {
-			// TODO
+			// TODO left align and handle non-copyable
 		}
 		
 		// keypair value
