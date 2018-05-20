@@ -5664,6 +5664,9 @@ function CompactPieceRenderer(div, piece, config) {
 			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
 		}
 		
+		// add blank placeholder if uneven number of keypairs
+		if (i % 2 !== 0) $("<div style='border-bottom:none; border-right:none;' class='compact_keypair_div'>").appendTo(keypairsRow);
+		
 		// compute weights
 		var doneWeight = 0;
 		var totalWeight  = 0;
@@ -5861,17 +5864,18 @@ function CompactKeypairRenderer(div, keypair, config) {
 	// default config
 	config = Object.assign({
 		showLogos: true,
-		showPublic: true,
+		showPublic: false,
 		showPrivate: true,
 		qrLeft: true
 	}, config);
+	assertTrue((config.showPrivate && !config.showPublic) || (!config.showPrivate && config.showPublic));
 	
 	var that = this;
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
 		assertFalse(_isDestroyed, "CompactKeypairRenderer is destroyed");
-		
+			
 		// div setup
 		div.empty();
 		div.addClass("compact_keypair_div flex_vertical flex_align_center flex_justify_center");
