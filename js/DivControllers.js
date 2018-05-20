@@ -5665,7 +5665,7 @@ function CompactPieceRenderer(div, piece, config) {
 		}
 		
 		// add blank placeholder if uneven number of keypairs
-		if (i % 2 !== 0) $("<div style='border-bottom:none; border-right:none;' class='compact_keypair_div'>").appendTo(keypairsRow);
+		if (i % 2 !== 0) $("<div style='border-top:none; border-right:none; border-bottom:none;' class='compact_keypair_div'>").appendTo(keypairsRow);
 		
 		// compute weights
 		var doneWeight = 0;
