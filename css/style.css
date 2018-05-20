@@ -1406,13 +1406,13 @@ input[type='checkbox'][disabled] +label {
 }
 
 .keypair_qr {
-	width: 90px;
-	height: 90px;
+	width: 87px;
+	height: 87px;
 }
 
 .keypair_qr_omitted_div {
-	width: 90px;
-	height: 90px;
+	width: 87px;
+	height: 87px;
 	border: solid thin;
 }
 
@@ -1422,7 +1422,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .keypair_left_div {
-	width: 90px;
+	width: 87px;
 }
 
 .keypair_left_label {

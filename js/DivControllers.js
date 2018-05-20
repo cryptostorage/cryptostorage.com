@@ -5445,7 +5445,7 @@ function StandardKeypairRenderer(div, keypair, config) {
 		var keypairRightLabel = $("<div class='keypair_right_label'>").appendTo(keypairCenterDiv);
 		keypairRightLabel.html(decoded.rightLabel);
 		keypairRightValue = $("<div class='keypair_right_value'>").appendTo(keypairCenterDiv);
-		if (!decoded.leftLabel) keypairRightValue.css("margin-left", "-90px");
+		if (!decoded.leftLabel) keypairRightValue.css("margin-left", "-87px");
 		if (!hasWhitespace(decoded.rightValue)) keypairRightValue.css("word-break", "break-all");
 		keypairRightValue.html(decoded.rightValue);
 		if (decoded.rightValueCopyable) keypairRightValue.addClass("copyable");
@@ -5532,7 +5532,7 @@ StandardKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
  * Default keypair QR config.
  */
 StandardKeypairRenderer.QR_CONFIG = {
-		size: 90,
+		size: 87,
 		version: null,
 		errorCorrectionLevel: 'H',
 		scale: 4,
@@ -5962,7 +5962,7 @@ CompactKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
  * Default keypair QR config.
  */
 CompactKeypairRenderer.QR_CONFIG = {
-		size: 90,
+		size: 87,
 		version: null,
 		errorCorrectionLevel: 'H',
 		scale: 4,
