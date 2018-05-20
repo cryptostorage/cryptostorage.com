@@ -3,7 +3,6 @@ print public addresses only with pieces doesn't make sense, should just be one p
 show full preview in print preview, not first two keypairs
 text export newlines not appearing on windows
 #2.3 for piece 2 keypair 3
-donation page
 faq text more spread out
 notice colors
 test adblocker

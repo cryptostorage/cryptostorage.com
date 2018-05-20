@@ -1438,6 +1438,11 @@ function DonateController(div, appController) {
 					currencyPlugin: AppUtils.getCryptoPlugin("XMR") 
 				});
 				credits.push({
+					title: "BitcoinJS",
+					subtitle: $("<a target='_blank' href='https://github.com/bitcoinjs'>https://github.com/bitcoinjs</a>"),
+					image: $("<img src='img/bitcoinjs.png'>")
+				});
+				credits.push({
 					title: "BitPay",
 					subtitle: $("<a target='_blank' href='https://bitpay.com'>www.bitpay.com</a>"),
 					image: $("<img src='img/bitpay.png'>")
