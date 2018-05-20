@@ -281,7 +281,7 @@ var AppUtils = {
 			AppUtils.plugins.push(new BitcoinJsPlugin("LTC"));
 			AppUtils.plugins.push(new BitcoinJsPlugin("DOGE"));
 			AppUtils.plugins.push(new NeoPlugin());
-			AppUtils.plugins.push(new BitcoinJsPlugin("DSH"));
+			AppUtils.plugins.push(new BitcoinJsPlugin("DASH"));
 			AppUtils.plugins.push(new BitcoinJsPlugin("XZC"));
 			AppUtils.plugins.push(new BitcoinJsPlugin("ZEC"));
 			AppUtils.plugins.push(new WavesPlugin());

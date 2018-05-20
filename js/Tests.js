@@ -120,7 +120,7 @@ function Tests() {
 //		plugins.push(AppUtils.getCryptoPlugin("LTC"));
 //		plugins.push(AppUtils.getCryptoPlugin("DOGE"));
 //		plugins.push(AppUtils.getCryptoPlugin("NEO"));
-//		plugins.push(AppUtils.getCryptoPlugin("DSH"));
+//		plugins.push(AppUtils.getCryptoPlugin("DASH"));
 //		plugins.push(AppUtils.getCryptoPlugin("XZC"));
 //		plugins.push(AppUtils.getCryptoPlugin("ZEC"));
 //		plugins.push(AppUtils.getCryptoPlugin("WAVES"));
@@ -253,6 +253,7 @@ function Tests() {
 				// decrypt uncompressed from bitaddress
 				keypair = new CryptoKeypair({plugin: plugin, privateKey: "6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL"});
 				keypair.decrypt("abctesting123", null, function(err, decryptedKeypair) {
+					assertNull(err);
 					assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
 					assertEquals("5HyajPXtXY46WEQheAtqL6VmQPW22iKuzUZdAfycQqFtxQPran2", keypair.getPrivateWif());
 					onDone();

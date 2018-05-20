@@ -629,7 +629,7 @@ var BitcoinJsPlugins = {
 			donationAddress: "LSRx2UwU5rjKGcmUXx8KDNTNXMBV1PudHB",
 			bitcoinjsNetwork: "litecoin",
 		},
-		"DSH": {
+		"DASH": {
 			name: "Dash",
 			logoPath: "img/dash.png",
 			donationAddress: "XoK6AmEGxAh2WKMh2hkVycnkEdmi8zDaQR",
