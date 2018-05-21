@@ -2278,7 +2278,8 @@ function ImportTextController(div, plugins, printErrors) {
 		
 		// export link opens editor
 		editor.click(function() {
-			UiUtils.openEditorDynamic("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
+			UiUtils.openEditorDynamic("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: undefined});	// TODO: set this back
+			//UiUtils.openEditorDynamic("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
 		});
 	}
 	
@@ -2907,7 +2908,7 @@ function EditorController(div, config) {
 		}
 		
 		// set piece renderer class
-		config.pieceRendererClass = StandardPieceRenderer;
+		config.pieceRendererClass = CompactPieceRenderer;
 		return config;
 	}
 	
@@ -3112,7 +3113,7 @@ function EditorContentController(div, editorController, config) {
 					
 					// add pre-existing piece divs
 					if (config.pieceDivs) {
-						StandardPieceRenderer.makeCopyable(config.pieceDivs);	// copy is lost when transferred across tabs
+						StandardPieceRenderer.makeCopyable(config.pieceDivs);	// copy is lost when transferred across tabs	// TODO: not StandardPieceRenderer
 						editorController.setCurrentPieces(config.pieces, config.pieceDivs);
 					}
 					
@@ -3125,7 +3126,7 @@ function EditorContentController(div, editorController, config) {
 						for (var i = 0; i < config.pieces.length; i++) {
 							var pieceDiv = $("<div>");
 							pieceDivs.push(pieceDiv);
-							pieceRenderers.push(new StandardPieceRenderer(pieceDiv, config.pieces[i]));
+							pieceRenderers.push(new CompactPieceRenderer(pieceDiv, config.pieces[i]));
 						}
 						
 						// set pieces and divs
@@ -5223,7 +5224,6 @@ function StandardPieceRenderer(div, piece, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
 				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = "#" + (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
-				console.log(config.keypairId);
 				var keypairRenderer = new StandardKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
@@ -5678,6 +5678,7 @@ function CompactPieceRenderer(div, piece, config) {
 			
 			// collect functions to render keypairs
 			var placeholderDiv = $("<div class='compact_keypair_div'>").appendTo(keypairsRow);
+			config.qrLeft = i % 2 === 0;
 			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
 		}
 		
@@ -5708,6 +5709,7 @@ function CompactPieceRenderer(div, piece, config) {
 		
 		// callback function to render keypair
 		function renderFunc(placeholderDiv, piece, index, config) {
+			config = Object.assign({}, config);
 			return function(onDone) {
 				if (_isDestroyed) return;
 				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = "#" + (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
@@ -5871,7 +5873,7 @@ CompactPiecePreviewRenderer.getRenderWeight = function(config) {
  * 				config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
- * 				config.qrLeft specifies if the qr code should be on the left side (default true)
+ * 				config.qrLeft specifies if the qr code is on the left side else right side (default true)
  * 				config.keypairId is an identifier to render with the keypair (optional)
  */
 function CompactKeypairRenderer(div, keypair, config) {
@@ -5895,48 +5897,53 @@ function CompactKeypairRenderer(div, keypair, config) {
 			
 		// div setup
 		div.empty();
-		div.addClass("compact_keypair_div flex_vertical flex_align_center flex_justify_center");
+		div.addClass("compact_keypair_div flex_horizontal flex_align_center width_100");
 		
 		// decode keypair for rendering
 		var decoded = CompactKeypairRenderer.decodeKeypair(keypair, config);
 		
-		// keypair header
-		var header = $("<div style='position:relative;' class='compact_keypair_header flex_horizontal flex_align_center width_100'>").appendTo(div);
-		
-		// crypto logo and label
-		var logoLabel = $("<div class='keypair_crypto flex_horizontal flex_align_center flex_justify_center'>").appendTo(header);
+		// keypair title includes logo, name, and id
+		var title = $("<div class='compact_keypair_title flex_horizontal flex_align_center flex_justify_center width_100'>");
+		var keypairCryptoLabel = $("<div class='keypair_crypto_label flex_horizontal flex_align_center flex_justify_center'>").appendTo(title);
+		keypairCryptoLabel.html(decoded.valueLabel);
+		keypairCryptoLabel.css("text-align", "center");
+		config.qrLeft ? keypairCryptoLabel.css("padding-right", "7px") : keypairCryptoLabel.css("margin-left", "auto");
 		if (config.showLogos && decoded.cryptoLogo) {
 			decoded.cryptoLogo.attr("width", "100%");
 			decoded.cryptoLogo.attr("height", "100%");
-			var keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(logoLabel);
+			var keypairCryptoLogo = $("<div class='keypair_crypto_logo'>");
 			keypairCryptoLogo.append(decoded.cryptoLogo);
+			if (config.qrLeft) {
+				 keypairCryptoLogo.prependTo(keypairCryptoLabel)
+			} else {
+				keypairCryptoLogo.appendTo(keypairCryptoLabel);
+				keypairCryptoLogo.css("margin-left", "5px");
+				keypairCryptoLogo.css("margin-left", "5px");
+			}
 		}
-		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(logoLabel);
-		keypairCryptoLabel.html(decoded.valueLabel);
 		
 		// keypair id
 		if (config.keypairId) {
-			var idDiv = $("<div class='keypair_id compact_keypair_id'>").appendTo(header);
+			var idDiv = $("<div class='keypair_id compact_keypair_id'>").appendTo(div);
 			idDiv.html(config.keypairId);
+			config.qrLeft ? idDiv.css("right", "7px") : idDiv.css("left", "7px");
 		}
 		
-		// render QR left
-		if (config.qrLeft) {
-			// TODO left align and handle non-copyable
-		}
-		
-		// keypair value
-		var valueQrDiv = $("<div class='flex_horizontal flex_align_center flex_justify_center width_100'>").appendTo(div);
-		var valueDiv = $("<div class='compact_keypair_value width_100'>").appendTo(valueQrDiv);
+		// keypair content
+		var contentDiv = $("<div class='flex_vertical width_100'>").appendTo(div);
+		contentDiv.addClass(config.qrLeft ? "flex_align_start" : "flex_align_end");
+		var valueDiv = $("<div class='compact_keypair_value width_100'>").appendTo(contentDiv);
 		if (!hasWhitespace(decoded.value)) valueDiv.css("word-break", "break-all");
 		valueDiv.append(decoded.value);
+		
+		contentDiv.prepend(title);
 		
 		// QR code
 		if (decoded.valueCopyable) {
 			UiUtils.renderQrCode(decoded.value, CompactKeypairRenderer.QR_CONFIG, function(img) {
 				if (_isDestroyed) return;
 				img.attr("class", "keypair_qr");
-				valueQrDiv.append(img);
+				config.qrLeft ? div.prepend(img) : div.append(img);	
 				
 				// done rendering
 				if (onDone) onDone(div);

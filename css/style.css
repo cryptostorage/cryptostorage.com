@@ -1385,7 +1385,7 @@ input[type='checkbox'][disabled] +label {
 .keypair_div {
 	height: 128px;
 	box-sizing: border-box;
-	padding: 7px 7px 7px 7px;
+	padding: 7px;
 	border: 2px solid;
 	border-color: green;
 	border-top: none;
@@ -1545,25 +1545,34 @@ input[type='checkbox'][disabled] +label {
 	border: 2px solid green;
 	border-top: none;
 	border-right: none;
+	position: relative;
 }
 
 .compact_keypair_div:last-child {
 	border-right: 2px solid green;
 }
 
-.compact_keypair_header {
+.compact_keypair_title {
 	margin-bottom: 5px;
 }
 
+.compact_keypair_div > .keypair_qr:first-child {
+	margin-right: 7px;
+}
+
+.compact_keypair_div > .keypair_qr:last-child {
+	margin-left: 7px;
+}
+
 .compact_keypair_value {
-	padding-right: 5px;
 	font-size: 13px;
 	font-family: monospace;
+	text-align: center;
 }
 
 .compact_keypair_id {
 	position: absolute;
-	right: 0;
+	top: 7px;
 }
 
 .hidden {
