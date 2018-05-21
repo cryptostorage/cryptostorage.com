@@ -1557,6 +1557,14 @@ input[type='checkbox'][disabled] +label {
 	margin-bottom: 5px;
 }
 
+.compact_keypair_div * .compact_keypair_title > div {
+	margin-right: 5px;
+}
+
+.compact_keypair_div * .compact_keypair_title > div:last-child {
+	margin-right: 0;
+}
+
 .compact_keypair_div > .keypair_qr:first-child {
 	margin-right: 7px;
 }

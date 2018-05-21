@@ -5223,7 +5223,7 @@ function StandardPieceRenderer(div, piece, config) {
 		function renderFunc(placeholderDiv, piece, index, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
-				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = "#" + (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
+				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
 				var keypairRenderer = new StandardKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
@@ -5712,7 +5712,7 @@ function CompactPieceRenderer(div, piece, config) {
 			config = Object.assign({}, config);
 			return function(onDone) {
 				if (_isDestroyed) return;
-				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = "#" + (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
+				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
 				var keypairRenderer = new CompactKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
@@ -5902,8 +5902,19 @@ function CompactKeypairRenderer(div, keypair, config) {
 		// decode keypair for rendering
 		var decoded = CompactKeypairRenderer.decodeKeypair(keypair, config);
 		
+		// keypair id
+		var id;
+		if (config.keypairId) {
+			id = $("<div class='keypair_id'>");
+			id.html(config.keypairId)
+			id.css("position", "absolute");
+			id.css("top", "5px");
+			config.qrLeft ? id.css("right", "5px") : id.css("left", "5px");
+		}
+		div.append(id);
+		
 		// keypair title includes logo, name, and id
-		var title = $("<div class='compact_keypair_title flex_horizontal flex_align_center width_100'>");
+		var title = $("<div class='compact_keypair_title flex_horizontal flex_align_center'>");		
 		
 		// keypair label
 		var label = $("<div class='keypair_label flex_1'>");
@@ -5916,22 +5927,13 @@ function CompactKeypairRenderer(div, keypair, config) {
 			decoded.cryptoLogo.attr("height", "100%");
 			logo = $("<div class='keypair_logo'>");
 			logo.append(decoded.cryptoLogo);
-		}
-		
-		// keypair id
-		var id;
-		if (config.keypairId) {
-			id = $("<div class='keypair_id'>");
-			id.html(config.keypairId)
-		}
+		}		
 		
 		// place title elements
 		if (config.qrLeft) {
 			title.append(logo);
 			title.append(label);
-			title.append(id);
 		} else {
-			title.append(id);
 			title.append(label);
 			title.append(logo);
 		}
