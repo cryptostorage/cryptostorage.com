@@ -1541,7 +1541,7 @@ input[type='checkbox'][disabled] +label {
 
 .compact_keypair_div {
 	width: 375px;
-	padding: 7px;
+	padding: 6px;
 	box-sizing: border-box;
 	border: 2px solid green;
 	border-top: none;
@@ -1570,11 +1570,11 @@ input[type='checkbox'][disabled] +label {
 }
 
 .compact_keypair_div > .keypair_qr:first-child {
-	margin-right: 7px;
+	margin-right: 6px;
 }
 
 .compact_keypair_div > .keypair_qr:last-child {
-	margin-left: 7px;
+	margin-left: 6px;
 }
 
 .compact_keypair_value {

@@ -5933,7 +5933,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		title.append(logo);
 		title.append(label);
 		
-		// apply counterbalance to center label and protect id
+		// apply margin to prevent overlap with id
 		config.qrLeft ? title.css("margin-right", "15px") : title.css("margin-left", "15px");
 		
 		// content includes title and keypair value
