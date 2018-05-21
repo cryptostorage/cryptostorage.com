@@ -5933,9 +5933,6 @@ function CompactKeypairRenderer(div, keypair, config) {
 		title.append(logo);
 		title.append(label);
 		
-		// apply margin to prevent overlap with id
-		config.qrLeft ? title.css("margin-right", "15px") : title.css("margin-left", "15px");
-		
 		// content includes title and keypair value
 		var content = $("<div class='flex_vertical flex_align_center width_100'>").appendTo(div);
 		content.append(title);
