@@ -1553,6 +1553,10 @@ input[type='checkbox'][disabled] +label {
 	border-right: 2px solid green;
 }
 
+.compact_keypair_id {
+	font-size: 12px;
+}
+
 .compact_keypair_title {
 	margin-bottom: 5px;
 }

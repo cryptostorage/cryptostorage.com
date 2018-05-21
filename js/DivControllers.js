@@ -5905,7 +5905,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		// keypair id
 		var id;
 		if (config.keypairId) {
-			id = $("<div class='keypair_id'>");
+			id = $("<div class='compact_keypair_id'>");
 			id.html(config.keypairId)
 			id.css("position", "absolute");
 			id.css("top", "5px");
@@ -5914,7 +5914,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		div.append(id);
 		
 		// keypair title includes logo, name, and id
-		var title = $("<div class='compact_keypair_title flex_horizontal flex_align_center'>");		
+		var title = $("<div class='compact_keypair_title flex_horizontal flex_align_center'>");
 		
 		// keypair label
 		var label = $("<div class='keypair_label flex_1'>");
@@ -5927,16 +5927,14 @@ function CompactKeypairRenderer(div, keypair, config) {
 			decoded.cryptoLogo.attr("height", "100%");
 			logo = $("<div class='keypair_logo'>");
 			logo.append(decoded.cryptoLogo);
-		}		
+		}
 		
 		// place title elements
-		if (config.qrLeft) {
-			title.append(logo);
-			title.append(label);
-		} else {
-			title.append(label);
-			title.append(logo);
-		}
+		title.append(logo);
+		title.append(label);
+		
+		// apply counterbalance to center label and protect id
+		config.qrLeft ? title.css("margin-right", "15px") : title.css("margin-left", "15px");
 		
 		// content includes title and keypair value
 		var content = $("<div class='flex_vertical flex_align_center width_100'>").appendTo(div);
