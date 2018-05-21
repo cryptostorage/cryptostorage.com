@@ -5447,14 +5447,14 @@ function StandardKeypairRenderer(div, keypair, config) {
 		}
 		
 		// crypto logo and label
-		var keypairCrypto = $("<div class='keypair_crypto flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairCenterDiv);
+		var keypairCrypto = $("<div class='keypair_title flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairCenterDiv);
 		if (config.showLogos && decoded.cryptoLogo) {
 			decoded.cryptoLogo.attr("width", "100%");
 			decoded.cryptoLogo.attr("height", "100%");
-			var keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
+			var keypairCryptoLogo = $("<div class='keypair_logo'>").appendTo(keypairCrypto);
 			keypairCryptoLogo.append(decoded.cryptoLogo);
 		}
-		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(keypairCrypto);
+		var keypairCryptoLabel = $("<div class='keypair_label'>").appendTo(keypairCrypto);
 		keypairCryptoLabel.html(decoded.cryptoLabel);
 		
 		// right label and value
@@ -5895,7 +5895,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 	this.render = function(onDone) {
 		assertFalse(_isDestroyed, "CompactKeypairRenderer is destroyed");
 			
-		// div setup
+		// keypair div setup
 		div.empty();
 		div.addClass("compact_keypair_div flex_horizontal flex_align_center width_100");
 		
@@ -5903,42 +5903,47 @@ function CompactKeypairRenderer(div, keypair, config) {
 		var decoded = CompactKeypairRenderer.decodeKeypair(keypair, config);
 		
 		// keypair title includes logo, name, and id
-		var title = $("<div class='compact_keypair_title flex_horizontal flex_align_center flex_justify_center width_100'>");
-		var keypairCryptoLabel = $("<div class='keypair_crypto_label flex_horizontal flex_align_center flex_justify_center'>").appendTo(title);
-		keypairCryptoLabel.html(decoded.valueLabel);
-		keypairCryptoLabel.css("text-align", "center");
-		config.qrLeft ? keypairCryptoLabel.css("padding-right", "7px") : keypairCryptoLabel.css("margin-left", "auto");
-		if (config.showLogos && decoded.cryptoLogo) {
+		var title = $("<div class='compact_keypair_title flex_horizontal flex_align_center width_100'>");
+		
+		// keypair label
+		var label = $("<div class='keypair_label flex_1'>");
+		label.append(decoded.valueLabel);
+		
+		// keypair logo
+		var logo;
+		if (decoded.cryptoLogo && config.showLogos) {
 			decoded.cryptoLogo.attr("width", "100%");
 			decoded.cryptoLogo.attr("height", "100%");
-			var keypairCryptoLogo = $("<div class='keypair_crypto_logo'>");
-			keypairCryptoLogo.append(decoded.cryptoLogo);
-			if (config.qrLeft) {
-				 keypairCryptoLogo.prependTo(keypairCryptoLabel)
-			} else {
-				keypairCryptoLogo.appendTo(keypairCryptoLabel);
-				keypairCryptoLogo.css("margin-left", "5px");
-				keypairCryptoLogo.css("margin-left", "5px");
-			}
+			logo = $("<div class='keypair_logo'>");
+			logo.append(decoded.cryptoLogo);
 		}
 		
 		// keypair id
+		var id;
 		if (config.keypairId) {
-			var idDiv = $("<div class='keypair_id compact_keypair_id'>").appendTo(div);
-			idDiv.html(config.keypairId);
-			config.qrLeft ? idDiv.css("right", "7px") : idDiv.css("left", "7px");
+			id = $("<div class='keypair_id'>");
+			id.html(config.keypairId)
 		}
 		
-		// keypair content
-		var contentDiv = $("<div class='flex_vertical width_100'>").appendTo(div);
-		contentDiv.addClass(config.qrLeft ? "flex_align_start" : "flex_align_end");
-		var valueDiv = $("<div class='compact_keypair_value width_100'>").appendTo(contentDiv);
+		// place title elements
+		if (config.qrLeft) {
+			title.append(logo);
+			title.append(label);
+			title.append(id);
+		} else {
+			title.append(id);
+			title.append(label);
+			title.append(logo);
+		}
+		
+		// content includes title and keypair value
+		var content = $("<div class='flex_vertical flex_align_center width_100'>").appendTo(div);
+		content.append(title);
+		var valueDiv = $("<div class='compact_keypair_value width_100'>").appendTo(content);
 		if (!hasWhitespace(decoded.value)) valueDiv.css("word-break", "break-all");
 		valueDiv.append(decoded.value);
 		
-		contentDiv.prepend(title);
-		
-		// QR code
+		// qr code
 		if (decoded.valueCopyable) {
 			UiUtils.renderQrCode(decoded.value, CompactKeypairRenderer.QR_CONFIG, function(img) {
 				if (_isDestroyed) return;

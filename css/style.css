@@ -1456,21 +1456,22 @@ input[type='checkbox'][disabled] +label {
 	text-align: center;
 }
 
-.keypair_crypto {
+.keypair_title {
 	-webkit-flex: 1;
 	-ms-flex: 1;
 	flex: 1;
 }
 
-.keypair_crypto_logo {
+.keypair_logo {
 	width: 29px;
 	height: 29px;
 	margin-right: 5px;
 }
 
-.keypair_crypto_label {
+.keypair_label {
 	font-weight: bold;
-	font-size: 15px
+	font-size: 15px;
+	text-align: center;
 }
 
 .keypair_right_div {
@@ -1568,11 +1569,6 @@ input[type='checkbox'][disabled] +label {
 	font-size: 13px;
 	font-family: monospace;
 	text-align: center;
-}
-
-.compact_keypair_id {
-	position: absolute;
-	top: 7px;
 }
 
 .hidden {
