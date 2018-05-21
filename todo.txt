@@ -2,6 +2,8 @@ v0.3.0
 even longer xmr seed; needs to float around qr
 ultra compact view
 print selector compact | cryptocash | community design, etc
+no error message on reddit app when tab should open
+stacktrace should be visible in editor if unexpected error
 
 put homepage text in index.html and dynamically hide for seo
 test adblocker
