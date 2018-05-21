@@ -1559,7 +1559,7 @@ input[type='checkbox'][disabled] +label {
 
 .compact_keypair_title {
 	margin-bottom: 5px;
-	max-width: 215px;
+	max-width: 220px;
 }
 
 .compact_keypair_div * .compact_keypair_title > div {
