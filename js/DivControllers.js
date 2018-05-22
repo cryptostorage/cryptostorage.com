@@ -2313,8 +2313,7 @@ function ImportTextController(div, plugins, printErrors) {
 		
 		// export link opens editor
 		editor.click(function() {
-			UiUtils.openEditorDynamic("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: undefined});	// TODO: set this back
-			//UiUtils.openEditorDynamic("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
+			UiUtils.openEditorDynamic("Imported Piece", {pieces: (piece ? [piece] : undefined), sourcePieces: importedPieces, pieceDivs: (pieceRenderer ? [pieceRenderer.getDiv()] : undefined)});
 		});
 	}
 	
@@ -2943,7 +2942,7 @@ function EditorController(div, config) {
 		}
 		
 		// set piece renderer class
-		config.pieceRendererClass = CompactPieceRenderer;
+		config.pieceRendererClass = StandardPieceRenderer;
 		return config;
 	}
 	
@@ -5440,6 +5439,7 @@ function StandardPiecePreviewRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
+	assertTrue(piece.getKeypairs().length >= 1);
 	
 	var onProgressFn;
 	var pieceRenderer;
