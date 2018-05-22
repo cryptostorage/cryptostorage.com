@@ -1,4 +1,5 @@
 v0.3.0
+InputLabelController.onChecked() only fires if changed
 make sure no wasteful loops on print updates
 not showing logos on compact removes preview overlay
 even longer xmr seed; needs to float around qr
