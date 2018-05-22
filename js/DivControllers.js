@@ -167,7 +167,7 @@ var UiUtils = {
 			
 			// check for error
 			if (err) {
-				AppUtils.setTabError(true);
+				AppUtils.setOpenWindowError(true);
 				return;
 			}
 			
@@ -190,7 +190,14 @@ var UiUtils = {
 			tickers = listify(tickers);
 			if (tickers.length) tickerParam = "?" + AppUtils.TICKERS_PARAM + "=" + tickers.join(",").toLowerCase()
 		}
-		window.open("generate.html" + tickerParam);
+		
+		// open window and check for errors
+		if (window) {
+			var w = window.open("generate.html" + tickerParam);
+			if (!w) AppUtils.setOpenWindowError(true);
+		} else {
+			AppUtils.setOpenWindowError(true);
+		}
 	},
 	
 	// default QR configuration
@@ -4822,7 +4829,7 @@ function EditorPrintController(div, pieces) {
 		// open window with pieces
 		newWindow({div: piecesDiv, title: "Print Keypairs", dependencyPaths: "css/style.css"}, function(err, window) {
 			if (err) {
-				AppUtils.setTabError(true);
+				AppUtils.setOpenWindowError(true);
 				return;
 			}
 			window.focus();

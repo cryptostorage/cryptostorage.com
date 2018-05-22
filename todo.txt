@@ -1,11 +1,9 @@
 v0.3.0
-no error message on reddit app when tab should open
+fix zcash in bitcoinjs? or switch back to old plugin
+ensure time before offline update not up to MAX_TIME * 2
 standard layout needs to float around long xmr seed
 compact layout center title
 put homepage text in index.html and dynamically hide for seo
-fix zcash in bitcoinjs? or switch back to old plugin
-ensure time before offline update not up to MAX_TIME * 2
-
 test adblocker
 todos in code
 remove old code
@@ -14,6 +12,7 @@ address testing
 browser testing
 release
 
+reddit mobile app generate.html save silently fails
 notice colors
 wait momentarily to let internet connect to avoid notice flicker
 plugins proper inheritance

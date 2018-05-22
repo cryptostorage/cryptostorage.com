@@ -739,7 +739,7 @@ var AppUtils = {
 	/**
 	 * Sets an error if a new tab cannot be opened.
 	 */
-	setTabError: function(bool) {
+	setOpenWindowError: function(bool) {
 		if (!AppUtils.environment) AppUtils.environment = {};
 		AppUtils.TAB_ERROR = bool;
 		AppUtils.environment.tabError = bool;
