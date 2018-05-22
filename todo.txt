@@ -1,9 +1,6 @@
 v0.3.0
-make sure no wasteful loops on print updates
-not showing logos on compact removes preview overlay
-even longer xmr seed; needs to float around qr
-ultra compact view
-print selector compact | cryptocash | community design, etc
+standard layout needs to float around long xmr seed
+compact layout center title
 no error message on reddit app when tab should open
 stacktrace should be visible in editor if unexpected error
 
