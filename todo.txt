@@ -1,5 +1,6 @@
 v0.3.0
-format stacktrace a little nicer
+why is notice bar getting called twice
+
 bug print > cryptocash > info back with only one keypair
 no error message on reddit app when tab should open
 standard layout needs to float around long xmr seed

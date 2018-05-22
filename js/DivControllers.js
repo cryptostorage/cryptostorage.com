@@ -5080,11 +5080,25 @@ function NoticeController(div, config) {
 					break;
 				case AppUtils.EnvironmentCode.RUNTIME_ERROR:
 					if (check.state === "fail") {
-						var msg = "Unexpected error: ";
-						if (info.runtimeError.message) msg += info.runtimeError.message;
-						else msg += info.runtimeError.toString();
-						if (info.runtimeError.stack) msg += "<br>" + info.runtimeError.stack;
-						div.append(msg);
+						var errDiv = $("<div>");
+						
+						// title
+						var msg = "An unexpected error occurred";
+						if (!info.runtimeError.message) msg += ": " + info.runtimeError.toString();	// no additional stacktrace
+						errDiv.append(msg);
+
+						// stack trace
+						if (info.runtimeError.stack) {
+							
+							// submit an issue
+							var submitIssue = $("<div style='margin:3px 0 5px 0; font-size:18px;'><a style='font-size:18px; color:yellow;' target='_blank' href='" + AppUtils.GITHUB_ISSUES_URL + "'>Submit an issue with the text below/a></div>").appendTo(errDiv);
+							
+							// add stacktrace
+							var stacktrace = $("<div class='notice_stacktrace'>").appendTo(errDiv);
+							var stacktraceTxt = info.runtimeError.message + "<br>" + info.runtimeError.stack.replace(/\n/g, "<br/>");
+							stacktrace.append(stacktraceTxt);
+						}
+						div.append(errDiv);
 					}
 					break;
 				case AppUtils.EnvironmentCode.INTERNET:

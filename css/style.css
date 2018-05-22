@@ -1603,6 +1603,13 @@ input[type='checkbox'][disabled] +label {
 	background-color: red;
 }
 
+.notice_stacktrace {
+	font-family: monospace;
+	font-size: 12px;
+	text-align: left;
+	line-height: 15px;
+}
+
 .notice_warn_orange {
 	background-color: rgb(235, 92, 29);
 }

@@ -33,7 +33,7 @@ $(document).ready(function() {
 	// catch unexpected errors
 	window.onerror = function(message, source, lineno, colno, error) {
 		AppUtils.setRuntimeError(error ? error : message);
-		throw error;
+		throw error ? error : message;
 	};
 
 	// assign window.crypto (supports IE11)
