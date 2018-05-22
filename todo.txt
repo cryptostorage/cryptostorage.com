@@ -1,5 +1,4 @@
 v0.3.0
-InputLabelController.onChecked() only fires if changed
 make sure no wasteful loops on print updates
 not showing logos on compact removes preview overlay
 even longer xmr seed; needs to float around qr
@@ -29,6 +28,7 @@ show preview then render print in background with progress indicator in print bu
 document cold storage setup options in faq
 within bitaddress, why is encrypted bip38 not recreated from encrypting unencrypted wif? not my tool
 why are bip38s generated from ian and i's not importable into other dogecoin tools, why is output of bpw not importable in CS but is for others?
+InputLabelController.onChecked() only fires if changed
 
 designer:
 passphrase confirmation
