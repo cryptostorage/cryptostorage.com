@@ -35,12 +35,12 @@
  *  			config.environmentInfo is initial environment to display
  */
 window.initEditor = function(window, config) {
-
-	// detect any uncaught errors
-	window.onerror = function(err) {
-		AppUtils.setRuntimeError(err);
-		throw err;
-	}
+	
+	// catch unexpected errors
+	window.onerror = function(message, source, lineno, colno, error) {
+		AppUtils.setRuntimeError(error ? error : message);
+		throw error;
+	};
 	
 	// set initial environment info
 	if (config.environmentInfo) AppUtils.setCachedEnvironment(config.environmentInfo);

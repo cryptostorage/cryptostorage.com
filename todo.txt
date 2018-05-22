@@ -1,7 +1,7 @@
 v0.3.0
-bug print > compact > public > cryptocash > info back, nondeterministic?
+format stacktrace a little nicer
+bug print > cryptocash > info back with only one keypair
 no error message on reddit app when tab should open
-stacktrace should be visible in editor if unexpected error
 standard layout needs to float around long xmr seed
 compact layout center title
 put homepage text in index.html and dynamically hide for seo
