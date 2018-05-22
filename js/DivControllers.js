@@ -383,7 +383,8 @@ function InputLabelController(div, type, label, tooltip, name) {
 	var that = this;
 	var input;
 	var infoImg;
-	var clickListeners = [];
+	var lastChecked;
+	var checkedListeners = [];
 	var enabledListeners = [];
 	
 	this.render = function(onDone) {
@@ -419,7 +420,7 @@ function InputLabelController(div, type, label, tooltip, name) {
 		}
 		
 		// register click listener
-		input.click(function(e) { invoke(clickListeners, e); });
+		input.click(function(e) { invoke(checkedListeners, e); });
 		
 		// done
 		if (onDone) onDone(div);
@@ -432,14 +433,14 @@ function InputLabelController(div, type, label, tooltip, name) {
 	
 	this.onChecked = function(listener) {
 		assertFunction(listener);
-		clickListeners.push(listener);
+		checkedListeners.push(listener);
 	}
 	
 	this.setChecked = function(bool) {
 		assertBoolean(bool);
 		if (bool === that.isChecked()) return;
 		input.prop("checked", bool);
-		invoke(clickListeners);
+		invoke(checkedListeners);
 	}
 	
 	this.isChecked = function() {
@@ -4738,6 +4739,8 @@ function EditorPrintController(div, pieces) {
 				}
 			}
 		}
+		
+		console.log("Rendering print");
 		
 		// render preview
 		if (previewGenerator) previewGenerator.destroy();
