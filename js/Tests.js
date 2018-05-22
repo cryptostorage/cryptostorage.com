@@ -247,6 +247,7 @@ function Tests() {
 			
 			// encrypt uncompressed from bitaddress
 			keypair.encrypt(AppUtils.EncryptionScheme.BIP38, "abctesting123", null, function(err, encryptedKeypair) {
+				assertNull(err);
 				assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
 				assertEquals("6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL", keypair.getPrivateWif());
 				
