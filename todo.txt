@@ -1,6 +1,7 @@
 v0.3.0
 fix zcash in bitcoinjs? or switch back to old plugin
 ensure time before offline update not up to MAX_TIME * 2
+preview overlay upper left?
 standard layout needs to float around long xmr seed
 compact layout center title
 put homepage text in index.html and dynamically hide for seo
