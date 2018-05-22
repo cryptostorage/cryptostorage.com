@@ -1,4 +1,5 @@
 v0.3.0
+bug print > compact > public > cryptocash > info back, nondeterministic?
 no error message on reddit app when tab should open
 stacktrace should be visible in editor if unexpected error
 standard layout needs to float around long xmr seed

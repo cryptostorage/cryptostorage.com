@@ -1257,14 +1257,11 @@ input[type='checkbox'][disabled] +label {
 .editor_export_checkboxes {
 	flex-wrap: wrap;
 	max-width: 750px;
+	margin-top: 15px !important;
 }
 
 .editor_export_checkboxes > div {
-	margin: 0 12px 0px 12px;
-}
-
-.editor_export_checkboxes > div:last-child {
-	margin-top: 10px;
+	margin: 10px 12px 0px 12px;
 }
 
 .editor_export_input * {
