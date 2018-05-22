@@ -4812,7 +4812,11 @@ function EditorPrintController(div, pieces) {
 		assertInitialized(pieceRenderers);
 		
 		// confirm printing without private keys
-		if (!includePrivateCheckbox.isChecked() && !confirm("Funds CANNOT be recovered from the printed file because the private keys are not included.\n\nContinue?")) return;
+		if ((layoutDropdown.getSelectedText() === Layout.STANDARD && !includePrivateCheckbox.isChecked() ||
+				layoutDropdown.getSelectedText() === Layout.COMPACT && !includePrivateRadio.isChecked()) && 
+				!confirm("Funds CANNOT be recovered from the printed document because the private keys are not included.\n\nContinue?")) {
+			return;
+		}
 
 		// build print div
 		var piecesDiv = $("<div class='pieces_div'>");
