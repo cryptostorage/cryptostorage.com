@@ -4438,13 +4438,6 @@ function EditorSaveController(div, pieces) {
 		// body
 		var body = $("<div class='editor_popup_body'>").appendTo(div);
 		
-		// checkboxes
-		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
-		includePublicCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save public addresses").render();
-		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save private keys").render();
-		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
-		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
-		
 		// save as selector
 		var selectorOptions = ["Save as JSON", "Save as CSV", "Save as TXT"];
 		var ddslickData = [];
@@ -4452,6 +4445,13 @@ function EditorSaveController(div, pieces) {
 		var saveSelectorDiv = $("<div>").appendTo(body);
 		var ddslickConfig = {data: ddslickData};
 		saveAsDropdown = new DropdownController(saveSelectorDiv, ddslickConfig).render();
+		
+		// checkboxes
+		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
+		includePublicCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save public addresses").render();
+		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save private keys").render();
+		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
+		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
 		
 		// cancel and save buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(body);
