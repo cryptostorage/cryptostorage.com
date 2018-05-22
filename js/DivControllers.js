@@ -5718,7 +5718,7 @@ function CompactPieceRenderer(div, piece, config) {
 		var keypairsDiv;
 		var keypairsRow;
 		var tickers;
-		var pairsPerPage = 18;
+		var pairsPerPage = 16;
 		var renderFuncs = [];
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
 			
