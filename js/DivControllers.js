@@ -3167,7 +3167,7 @@ function EditorContentController(div, editorController, config) {
 						for (var i = 0; i < config.pieces.length; i++) {
 							var pieceDiv = $("<div>");
 							pieceDivs.push(pieceDiv);
-							pieceRenderers.push(new CompactPieceRenderer(pieceDiv, config.pieces[i]));
+							pieceRenderers.push(new StandardPieceRenderer(pieceDiv, config.pieces[i]));
 						}
 						
 						// set pieces and divs
