@@ -4990,7 +4990,7 @@ function NoticeController(div, config) {
 			
 			// tooltip
 			var description = $("<div>");
-			renderCheckDescription(description, info, check);
+			renderCheckDescription(description, info, check, true);
 			tippy(div.get(0), {
 				arrow: true,
 				html: description.get(0),
@@ -5058,7 +5058,7 @@ function NoticeController(div, config) {
 		}
 		
 		// render single check description
-		function renderCheckDescription(div, info, check) {
+		function renderCheckDescription(div, info, check, isTooltip) {
 			
 			// all checks pass
 			if (!check) {
@@ -5084,14 +5084,14 @@ function NoticeController(div, config) {
 						
 						// title
 						var msg = "An unexpected error occurred";
-						if (!info.runtimeError.message) msg += ": " + info.runtimeError.toString();	// no additional stacktrace
+						if (isTooltip || !info.runtimeError.message) msg += ": " + info.runtimeError.toString();	// no additional stacktrace
 						errDiv.append(msg);
 
 						// stack trace
-						if (info.runtimeError.stack) {
+						if (!isTooltip && info.runtimeError.stack) {
 							
 							// submit an issue
-							var submitIssue = $("<div style='margin:3px 0 5px 0; font-size:18px;'><a style='font-size:18px; color:yellow;' target='_blank' href='" + AppUtils.GITHUB_ISSUES_URL + "'>Submit an issue with the text below/a></div>").appendTo(errDiv);
+							var submitIssue = $("<div style='margin:3px 0 3px 0; font-size:18px;'><a style='font-size:18px; color:yellow;' target='_blank' href='" + AppUtils.GITHUB_ISSUES_URL + "'>Submit an issue with the text below</a></div>").appendTo(errDiv);
 							
 							// add stacktrace
 							var stacktrace = $("<div class='notice_stacktrace'>").appendTo(errDiv);
