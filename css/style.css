@@ -1562,7 +1562,7 @@ input[type='checkbox'][disabled] +label {
 }
 
 .compact_keypair_title {
-	margin-bottom: 5px;
+	margin-bottom: 3px;
 	max-width: 220px;
 }
 

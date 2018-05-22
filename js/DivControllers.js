@@ -4689,6 +4689,7 @@ function EditorPrintController(div, pieces) {
 				includePublicCheckbox.setVisible(true);
 				includePrivateRadio.setVisible(false);
 				includePublicRadio.setVisible(false);
+				includeLogosCheckbox.setVisible(true);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
 			case Layout.COMPACT:
@@ -4698,6 +4699,7 @@ function EditorPrintController(div, pieces) {
 				includePublicCheckbox.setVisible(false);
 				includePrivateRadio.setVisible(true);
 				includePublicRadio.setVisible(true);
+				includeLogosCheckbox.setVisible(true);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
 			case Layout.CRYPTOCASH:
@@ -4707,6 +4709,7 @@ function EditorPrintController(div, pieces) {
 				includePublicCheckbox.setVisible(false);
 				includePrivateRadio.setVisible(false);
 				includePublicRadio.setVisible(false);
+				includeLogosCheckbox.setVisible(false);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(true);
 				break;
 			default: throw new Error("Unsupported layout: " + layout.geSelectedText());
