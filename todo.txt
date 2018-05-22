@@ -6,6 +6,8 @@ stacktrace should be visible in editor if unexpected error
 standard layout needs to float around long xmr seed
 compact layout center title
 put homepage text in index.html and dynamically hide for seo
+fix zcash in bitcoinjs? or switch back to old plugin
+ensure time before offline update not up to MAX_TIME * 2
 
 test adblocker
 remove old code
@@ -14,7 +16,6 @@ address testing
 browser testing
 release
 
-decrease time before offline
 notice colors
 wait momentarily to let internet connect to avoid notice flicker
 plugins proper inheritance
@@ -28,6 +29,7 @@ document cold storage setup options in faq
 within bitaddress, why is encrypted bip38 not recreated from encrypting unencrypted wif? not my tool
 why are bip38s generated from ian and i's not importable into other dogecoin tools, why is output of bpw not importable in CS but is for others?
 InputLabelController.onChecked() only fires if changed
+custom error message for qrs not loading
 
 designer:
 passphrase confirmation

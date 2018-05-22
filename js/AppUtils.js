@@ -52,8 +52,8 @@ var AppUtils = {
 	MIN_PASSPHRASE_LENGTH: 7,
 	CRYPTOSTORAGE_URL: "https://cryptostorage.com",
 	ONLINE_IMAGE_URL: "https://cryptostorage.com/favicon.ico",
-	ENVIRONMENT_REFRESH_RATE: 8000,		// environment refresh rate in milliseconds
-	ONLINE_DETECTION_TIMEOUT: 8000,		// timeout to detect if online
+	ENVIRONMENT_REFRESH_RATE: 5000,		// environment refresh rate in milliseconds
+	ONLINE_DETECTION_TIMEOUT: 5000,		// timeout to detect if online
 	SLIDER_RATE: 4000,								// rate of slider transitions
 	NO_INTERNET_CAN_BE_ERROR: false,	// lack of internet can be critical error if running remotely
 	SIMULATED_LOAD_TIME: null,				// simulate slow load times in ms, disabled if null
