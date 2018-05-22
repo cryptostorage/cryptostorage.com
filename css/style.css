@@ -428,17 +428,17 @@ body {
 	margin-top: 25px;
 }
 
-input[type='checkbox'] {
+input[type='checkbox'], input[type='radio'] {
 	height: auto;
 	width: auto;
 	margin-right: 7px;
 }
 
-input[type='checkbox']:not([disabled]) {
+input[type='checkbox']:not([disabled]), input[type='radio']:not([disabled]) {
 	cursor: pointer;
 }
 
-input[type='checkbox']:not([disabled]) +label {
+input[type='checkbox']:not([disabled]) +label, input[type='radio']:not([disabled]) +label {
   	cursor: pointer;
 }
 
@@ -449,6 +449,10 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 
 input[type='checkbox'][disabled] +label {
   	opacity: 0.5;
+}
+
+.input_label {
+	white-space: nowrap;
 }
 
 .disabled {
@@ -1263,7 +1267,7 @@ input[type='checkbox'][disabled] +label {
 	margin-top: 10px;
 }
 
-.editor_export_checkbox * {
+.editor_export_input * {
 	font-size: 25px;
 }
 

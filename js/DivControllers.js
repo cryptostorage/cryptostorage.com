@@ -366,19 +366,24 @@ function OverlayController(div, config) {
 inheritsFrom(OverlayController, DivController);
 
 /**
- * Controls a single checkbox.
+ * Controls a checkbox or radio input.
  * 
  * @param div is the div to render to
- * @param label is the checkbox label
- * @param tooltip is the tooltip text
+ * @param type specifies 'checkbox' or 'radio'
+ * @param label is the input label
+ * @param tooltip is a tooltip to display with the input (optional)
+ * @param name is the name attribute to include with the input for radio grouping
  */
-function CheckboxController(div, label, tooltip) {
+function InputLabelController(div, type, label, tooltip, name) {
+	
 	DivController.call(this, div);
+	type = type ? type : "checkbox";
+	assertTrue(type === "checkbox" || type === "radio", "Type must be checkbox || radio but was " + type);
 	
 	var that = this;
-	var checkbox;
+	var input;
 	var infoImg;
-	var checkedListeners = [];
+	var clickListeners = [];
 	var enabledListeners = [];
 	
 	this.render = function(onDone) {
@@ -389,9 +394,10 @@ function CheckboxController(div, label, tooltip) {
 		
 		// build div
 		var id = uuidv4();
-		checkbox = $("<input type='checkbox' id='" + id + "'>").appendTo(div);
-		var checkboxLabel = $("<label style='white-space: nowrap;' class='user_select_none' for='" + id + "'>").appendTo(div);
-		checkboxLabel.html(label);
+		input = $("<input type='" + type + "' id='" + id + "'>").appendTo(div);
+		if (name) input.attr("name", name);
+		var inputLabel = $("<label class='input_label user_select_none' for='" + id + "'>").appendTo(div);
+		inputLabel.html(label);
 		
 		// info tooltip
 		if (tooltip) {
@@ -412,32 +418,32 @@ function CheckboxController(div, label, tooltip) {
 			});
 		}
 		
-		// register checkbox listener
-		checkbox.click(function(e) { invoke(checkedListeners, e); });
+		// register click listener
+		input.click(function(e) { invoke(clickListeners, e); });
 		
 		// done
 		if (onDone) onDone(div);
 		return that;
 	}
 	
-	this.onChecked = function(listener) {
-		assertFunction(listener);
-		checkedListeners.push(listener);
+	this.getInput = function() {
+		return input;
 	}
 	
-	this.getCheckbox = function() {
-		return checkbox;
+	this.onChecked = function(listener) {
+		assertFunction(listener);
+		clickListeners.push(listener);
 	}
 	
 	this.setChecked = function(bool) {
 		assertBoolean(bool);
 		if (bool === that.isChecked()) return;
-		checkbox.prop("checked", bool);
-		invoke(checkedListeners);
+		input.prop("checked", bool);
+		invoke(clickListeners);
 	}
 	
 	this.isChecked = function() {
-		return checkbox.prop("checked");
+		return input.prop("checked");
 	}
 	
 	this.onEnabled = function(listener) {
@@ -449,13 +455,13 @@ function CheckboxController(div, label, tooltip) {
 		assertBoolean(bool);
 		if (bool === that.isEnabled()) return;
 		if (bool) {
-			checkbox.removeAttr("disabled");
+			input.removeAttr("disabled");
 			if (infoImg) {
 				infoImg.removeClass("info_tooltip_img_disabled");
 				infoImg.get(0)._tippy.enable();
 			}
 		} else {
-			checkbox.attr("disabled", "disabled");
+			input.attr("disabled", "disabled");
 			if (infoImg) {
 				infoImg.addClass("info_tooltip_img_disabled");
 				infoImg.get(0)._tippy.disable();
@@ -465,14 +471,38 @@ function CheckboxController(div, label, tooltip) {
 	}
 	
 	this.isEnabled = function() {
-		return !isInitialized(checkbox.attr("disabled"));
+		return !isInitialized(input.attr("disabled"));
 	}
 	
 	this.setVisible = function(bool) {
 		bool ? div.show() : div.hide();
 	}
 }
-inheritsFrom(CheckboxController, DivController);
+
+/**
+ * Controls a single checkbox.
+ * 
+ * @param div is the div to render to
+ * @param label is the checkbox label
+ * @param tooltip is the tooltip text (optional)
+ */
+function CheckboxController(div, label, tooltip) {
+	InputLabelController.call(this, div, "checkbox", label, tooltip);
+}
+inheritsFrom(CheckboxController, InputLabelController);
+
+/**
+ * Controls a single radio input.
+ * 
+ * @parm div is the div to render to
+ * @param name specifies the radio group name
+ * @param label is the radio label
+ * @param tooltip is the tooltip text (optional)
+ */
+function RadioController(div, name, label, tooltip) {
+	InputLabelController.call(this, div, "radio", label, tooltip, name);
+}
+inheritsFrom(RadioController, InputLabelController);
 
 /**
  * Controls a dropdown selector.
@@ -4409,8 +4439,8 @@ function EditorSaveController(div, pieces) {
 		
 		// checkboxes
 		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
-		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save public addresses").render();
-		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Save private keys").render();
+		includePublicCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save public addresses").render();
+		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save private keys").render();
 		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
 		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
 		
@@ -4580,16 +4610,15 @@ function EditorPrintController(div, pieces) {
 		layoutDropdown.onSelected(function() { update(); });
 		
 		// checkboxes and radio buttons
-		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
-		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show public addresses").render();
-		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show private keys").render();
-		includeLogosCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show logos").render();
+		var inputsDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
+		includePublicCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show public addresses").render();
+		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show private keys").render();
+		includePublicRadio = new RadioController($("<div class='editor_export_input'>").appendTo(inputsDiv), "include_radios", "Show public addresses").render();
+		includePrivateRadio = new RadioController($("<div class='editor_export_input'>").appendTo(inputsDiv), "include_radios", "Show private keys").render();
+		includeLogosCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show logos").render();
 		if (cryptoCashApplies()) {
-			includeInstructionsCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Print Instructions (Two Sided)").render();
+			includeInstructionsCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Print Instructions (Two Sided)").render();
 		}
-		
-//		var includePublicRadio = $("<input type='radio' name='include_radios' id='include_public'>").appendTo(checkboxesDiv);
-//		$("<label for='include_public'>Include public addresses</label>").appendTo(checkboxesDiv);
 		
 		// print preview
 		previewDiv = $("<div class='editor_print_preview flex_horizontal flex_align_center flex_justify_center'>").appendTo(body);
@@ -4599,6 +4628,7 @@ function EditorPrintController(div, pieces) {
 		// initial state
 		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
 		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
+		includePrivateRadio.setChecked(true);
 		includeLogosCheckbox.setChecked(true);
 		if (cryptoCashApplies()) includeInstructionsCheckbox.setChecked(true);
 		
@@ -4617,6 +4647,8 @@ function EditorPrintController(div, pieces) {
 		// register changes
 		includePublicCheckbox.onChecked(function() { update(); });
 		includePrivateCheckbox.onChecked(function() { update(); });
+		includePublicRadio.onChecked(function() { update(); });
+		includePrivateRadio.onChecked(function() { update(); });
 		includeLogosCheckbox.onChecked(function() { update(); });
 		if (cryptoCashApplies()) {
 			includeInstructionsCheckbox.onChecked(function() { update(); });
@@ -4655,15 +4687,17 @@ function EditorPrintController(div, pieces) {
 				previewRendererClass = StandardPiecePreviewRenderer;
 				includePrivateCheckbox.setVisible(true);
 				includePublicCheckbox.setVisible(true);
+				includePrivateRadio.setVisible(false);
+				includePublicRadio.setVisible(false);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
 			case Layout.COMPACT:
 				pieceRendererClass = CompactPieceRenderer;
 				previewRendererClass = CompactPiecePreviewRenderer;
-				includePrivateCheckbox.setVisible(true); 	// TODO: switch to radio buttons
-				includePublicCheckbox.setVisible(true);
-				includePublicCheckbox.setChecked(false);
-				includePrivateCheckbox.setChecked(true);
+				includePrivateCheckbox.setVisible(false);
+				includePublicCheckbox.setVisible(false);
+				includePrivateRadio.setVisible(true);
+				includePublicRadio.setVisible(true);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
 			case Layout.CRYPTOCASH:
@@ -4671,6 +4705,8 @@ function EditorPrintController(div, pieces) {
 				previewRendererClass = StandardPiecePreviewRenderer;
 				includePrivateCheckbox.setVisible(false);
 				includePublicCheckbox.setVisible(false);
+				includePrivateRadio.setVisible(false);
+				includePublicRadio.setVisible(false);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(true);
 				break;
 			default: throw new Error("Unsupported layout: " + layout.geSelectedText());
@@ -4743,8 +4779,8 @@ function EditorPrintController(div, pieces) {
 				config.cryptoCash = false;
 				break;
 			case Layout.COMPACT:
-				config.showPublic = includePublicCheckbox.isChecked();
-				config.showPrivate = includePrivateCheckbox.isChecked();
+				config.showPublic = includePublicRadio.isChecked();
+				config.showPrivate = includePrivateRadio.isChecked();
 				config.showLogos = includeLogosCheckbox.isChecked();
 				config.cryptoCash = false;
 				break;
@@ -6014,6 +6050,8 @@ function CompactKeypairRenderer(div, keypair, config) {
 				// done rendering
 				if (onDone) onDone(div);
 			});
+		} else if (onDone) {
+			onDone(div);
 		}
 	}
 	
@@ -6081,7 +6119,7 @@ CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
 	// decode
 	var decoded = {};
 	decoded.cryptoLogo = config.showLogos ? keypair.getPlugin().getLogo() : null;
-	decoded.valueLabel = keypair.getPlugin().getName() + (keypair.isSplit() ? " (split)" : (keypair.isEncrypted() ? " (encrypted)" : " (unencrypted)"));
+	decoded.valueLabel = keypair.getPlugin().getName() + (config.showPublic ? " (public)" : (keypair.isSplit() ? " (split)" : (keypair.isEncrypted() ? " (encrypted)" : " (unencrypted)")));
 	if (config.showPublic) {
 		if (keypair.isPublicApplicable()) {
 			decoded.value = keypair.getPublicAddress();
