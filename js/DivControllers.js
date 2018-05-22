@@ -4740,8 +4740,6 @@ function EditorPrintController(div, pieces) {
 			}
 		}
 		
-		console.log("Rendering print");
-		
 		// render preview
 		if (previewGenerator) previewGenerator.destroy();
 		previewGenerator = new PieceGenerator({
