@@ -598,7 +598,7 @@ function BitcoinJsPlugin(ticker) {
 	
 	this.isAddress = function(str) {
 		try {
-			bitcoinjs.bitcoin.address.fromBase58Check(str);
+			bitcoinjs.bitcoin.address.fromBase58Check(str, that.getNetwork());
 			return true;
 		} catch (err) {
 			return false;
