@@ -467,6 +467,10 @@ function CheckboxController(div, label, tooltip) {
 	this.isEnabled = function() {
 		return !isInitialized(checkbox.attr("disabled"));
 	}
+	
+	this.setVisible = function(bool) {
+		bool ? div.show() : div.hide();
+	}
 }
 inheritsFrom(CheckboxController, DivController);
 
@@ -4528,11 +4532,19 @@ function EditorPrintController(div, pieces) {
 	assertArray(pieces);
 	assertTrue(pieces.length > 0);
 	
+	var Layout = {
+			STANDARD: "Standard layout",
+			COMPACT: "Compact layout",
+			CRYPTOCASH: "CryptoCash"
+	}
+	
 	var that = this;
+	var layoutDropdown;
 	var includePublicCheckbox;
 	var includePrivateCheckbox;
+	var includePublicRadio;
+	var includePrivateRadio;
 	var includeLogosCheckbox;
-	var cryptoCashCheckbox;
 	var includeInstructionsCheckbox
 	var printBtn;
 	var previewDiv;					// panel for print preview
@@ -4556,15 +4568,28 @@ function EditorPrintController(div, pieces) {
 		// body
 		var body = $("<div class='editor_popup_body'>").appendTo(div);
 		
-		// checkboxes
+		// layout selector
+		var data = [];
+		for (var prop in Layout) {
+			if (Layout.hasOwnProperty(prop.toString())) {
+				if (Layout[prop.toString()] === Layout.CRYPTOCASH && !cryptoCashApplies()) continue;	// skip cryptocash if not applicable
+				data.push({text: Layout[prop.toString()]});
+			}
+		}
+		layoutDropdown = new DropdownController($("<div>").appendTo(body), {data: data}).render();
+		layoutDropdown.onSelected(function() { update(); });
+		
+		// checkboxes and radio buttons
 		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show public addresses").render();
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show private keys").render();
 		includeLogosCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Show logos").render();
 		if (cryptoCashApplies()) {
-			cryptoCashCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "CryptoCash").render();
 			includeInstructionsCheckbox = new CheckboxController($("<div class='editor_export_checkbox'>").appendTo(checkboxesDiv), "Print Instructions (Two Sided)").render();
 		}
+		
+//		var includePublicRadio = $("<input type='radio' name='include_radios' id='include_public'>").appendTo(checkboxesDiv);
+//		$("<label for='include_public'>Include public addresses</label>").appendTo(checkboxesDiv);
 		
 		// print preview
 		previewDiv = $("<div class='editor_print_preview flex_horizontal flex_align_center flex_justify_center'>").appendTo(body);
@@ -4594,7 +4619,6 @@ function EditorPrintController(div, pieces) {
 		includePrivateCheckbox.onChecked(function() { update(); });
 		includeLogosCheckbox.onChecked(function() { update(); });
 		if (cryptoCashApplies()) {
-			cryptoCashCheckbox.onChecked(function() { update(); });
 			includeInstructionsCheckbox.onChecked(function() { update(); });
 		}
 		
@@ -4622,32 +4646,53 @@ function EditorPrintController(div, pieces) {
 	
 	function update(onDone) {
 		
+		// configure per layout
+		var pieceRendererClass;
+		var previewRendererClass
+		switch (layoutDropdown.getSelectedText()) {
+			case Layout.STANDARD:
+				pieceRendererClass = StandardPieceRenderer;
+				previewRendererClass = StandardPiecePreviewRenderer;
+				includePrivateCheckbox.setVisible(true);
+				includePublicCheckbox.setVisible(true);
+				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
+				break;
+			case Layout.COMPACT:
+				pieceRendererClass = CompactPieceRenderer;
+				previewRendererClass = CompactPiecePreviewRenderer;
+				includePrivateCheckbox.setVisible(true); 	// TODO: switch to radio buttons
+				includePublicCheckbox.setVisible(true);
+				includePublicCheckbox.setChecked(false);
+				includePrivateCheckbox.setChecked(true);
+				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
+				break;
+			case Layout.CRYPTOCASH:
+				pieceRendererClass = StandardPieceRenderer;
+				previewRendererClass = StandardPiecePreviewRenderer;
+				includePrivateCheckbox.setVisible(false);
+				includePublicCheckbox.setVisible(false);
+				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(true);
+				break;
+			default: throw new Error("Unsupported layout: " + layout.geSelectedText());
+		}
+		
 		// update checkboxes
 		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
 		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
-		if (cryptoCashApplies()) {
-			if (includePrivateCheckbox.isChecked()) {
-				cryptoCashCheckbox.setEnabled(true);
-				includeInstructionsCheckbox.setEnabled(cryptoCashCheckbox.isChecked());
-			} else {
-				cryptoCashCheckbox.setChecked(false);
-				cryptoCashCheckbox.setEnabled(false);
-				includeInstructionsCheckbox.setEnabled(false);
-			}
-		}
 		
 		// disable print button
 		setPrintEnabled(false);
 		
+		// get render config
+		var renderConfig = getPrintRenderConfig();
+		
 		// transform pieces per configuration
 		var transformedPieces = [];
-		if (!includePrivateCheckbox.isChecked()) {
-			assertTrue(includePublicCheckbox.isChecked());
+		if (!renderConfig.showPrivate) {
 			transformedPieces.push(pieces[0].copy().removePrivateKeys());
 		} else {
 			for (var i = 0; i < pieces.length; i++) {
-				if (!includePublicCheckbox.isChecked()) {
-					assertTrue(includePrivateCheckbox.isChecked());
+				if (!renderConfig.showPublic) {
 					transformedPieces.push(pieces[i].copy().removePublicAddresses());
 				} else {
 					transformedPieces.push(pieces[i]);
@@ -4659,7 +4704,7 @@ function EditorPrintController(div, pieces) {
 		if (previewGenerator) previewGenerator.destroy();
 		previewGenerator = new PieceGenerator({
 			pieces: [transformedPieces[0]],
-			pieceRendererClass: StandardPiecePreviewRenderer,
+			pieceRendererClass: previewRendererClass,
 			pieceRendererConfig: getPrintRenderConfig(true)
 		});
 		previewGenerator.generatePieces(null, function(err, _pieces, _previewRenderers) {
@@ -4671,8 +4716,8 @@ function EditorPrintController(div, pieces) {
 			if (pieceGenerator) pieceGenerator.destroy();
 			pieceGenerator = new PieceGenerator({
 				pieces: transformedPieces,
-				pieceRendererClass: StandardPieceRenderer,
-				pieceRendererConfig: getPrintRenderConfig()
+				pieceRendererClass: pieceRendererClass,
+				pieceRendererConfig: renderConfig
 			});
 			pieceGenerator.generatePieces(setRenderProgress, function(err, _pieces, _pieceRenderers) {
 				assertNull(err);
@@ -4687,15 +4732,32 @@ function EditorPrintController(div, pieces) {
 	}
 	
 	function getPrintRenderConfig(isPreview) {
-		return {
-			showPublic: includePublicCheckbox.isChecked(),
-			showPrivate: includePrivateCheckbox.isChecked(),
-			showLogos: includeLogosCheckbox.isChecked(),
-			cryptoCash: cryptoCashCheckbox && cryptoCashCheckbox.isVisible() ? cryptoCashCheckbox.isChecked() : false,
-			infoBack: includeInstructionsCheckbox ? includeInstructionsCheckbox.isChecked() : false,
-			pageBreaks: isPreview ? false : true,
-			copyable: false
+		var config = {};
+		config.pageBreaks = !isPreview;
+		config.copyable = false;
+		switch (layoutDropdown.getSelectedText()) {
+			case Layout.STANDARD:
+				config.showPublic = includePublicCheckbox.isChecked();
+				config.showPrivate = includePrivateCheckbox.isChecked();
+				config.showLogos = includeLogosCheckbox.isChecked();
+				config.cryptoCash = false;
+				break;
+			case Layout.COMPACT:
+				config.showPublic = includePublicCheckbox.isChecked();
+				config.showPrivate = includePrivateCheckbox.isChecked();
+				config.showLogos = includeLogosCheckbox.isChecked();
+				config.cryptoCash = false;
+				break;
+			case Layout.CRYPTOCASH:
+				config.showPublic = true;
+				config.showPrivate = true;
+				config.showLogos = true;
+				config.infoBack = includeInstructionsCheckbox.isChecked();
+				config.cryptoCash = true;
+				break;
+			default: throw new Error("Unsupported layout: " + layout.geSelectedText());
 		}
+		return config;
 	}
 	
 	function cryptoCashApplies() {
@@ -5594,7 +5656,11 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 			if (keypair.isSplit()) decoded.leftValue = "(combine shares to view)";
 			else if (keypair.isEncrypted()) decoded.leftValue = "(decrypt to view)";
 			else if (!config.showPublic) decoded.leftValue = "(not shown)";
-			else throw new Error("Unknown public address value");
+			else {
+				console.log(keypair.toJson());
+				console.log(config);
+				throw new Error("Unknown public address value");
+			}
 		}
 	} else {
 		decoded.leftLabel = null;
@@ -5652,7 +5718,7 @@ function CompactPieceRenderer(div, piece, config) {
 		var keypairsDiv;
 		var keypairsRow;
 		var tickers;
-		var pairsPerPage = 12;
+		var pairsPerPage = 18;
 		var renderFuncs = [];
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
 			
@@ -5815,10 +5881,8 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	this.render = function(onDone) {
 		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
 		
-		throw new Error("Not implemented");
-		
 		// get preview piece
-		var numKeypairs = config.cryptoCash ? (config.infoBack ? 1 : 2) : Math.min(2, piece.getKeypairs().length);
+		var numKeypairs = Math.min(4, piece.getKeypairs().length);
 		var previewKeypairs = [];
 		for (var i = 0; i < numKeypairs; i++) previewKeypairs.push(piece.getKeypairs()[i]);
 		var previewPiece = new CryptoPiece({keypairs: previewKeypairs});
@@ -5828,10 +5892,10 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 		pieceRenderer.onProgress(onProgressFn);
 		pieceRenderer.render(function(div) {
 			
-			// add sample overlay
-			var sampleDiv = $("<div class='editor_print_sample_overlay user_select_none'>SAMPLE</div>");
-			var keypairsDiv = div.children().first().children().eq(config.showLogos && !config.cryptoCash || piece.isSplit() ? 1 : 0);
-			new OverlayController(keypairsDiv, {contentDiv: sampleDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
+			// add preview overlay
+			var previewDiv = $("<div class='editor_print_preview_overlay user_select_none'>PREVIEW</div>");
+			var keypairsDiv = div.children().first().children().eq(1);
+			new OverlayController(keypairsDiv, {contentDiv: previewDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
 				if (onDone) onDone();
 			});
 		});

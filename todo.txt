@@ -1,4 +1,5 @@
 v0.3.0
+make sure no wasteful loops on print updates
 even longer xmr seed; needs to float around qr
 ultra compact view
 print selector compact | cryptocash | community design, etc
