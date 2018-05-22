@@ -1,4 +1,6 @@
 v0.3.0
+less margin on export inputs
+save select type at top
 no error message on reddit app when tab should open
 stacktrace should be visible in editor if unexpected error
 standard layout needs to float around long xmr seed
