@@ -5788,6 +5788,7 @@ function CompactPieceRenderer(div, piece, config) {
 		var tickers;
 		var pairsPerPage = 16;
 		var renderFuncs = [];
+		var qrLeft = false;
 		for (var i = 0; i < piece.getKeypairs().length; i++) {
 			
 			// add new page
@@ -5812,7 +5813,8 @@ function CompactPieceRenderer(div, piece, config) {
 			
 			// collect functions to render keypairs
 			var placeholderDiv = $("<div class='compact_keypair_div'>").appendTo(keypairsRow);
-			config.qrLeft = i % 2 === 0;
+			if (i % 2 === 0) qrLeft = !qrLeft;
+			config.qrLeft = qrLeft;
 			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
 		}
 		
