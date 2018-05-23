@@ -4594,7 +4594,8 @@ function EditorPrintController(div, pieces) {
 		
 		// div setup
 		div.empty();
-		div.addClass("editor_popup_div editor_print_div flex_vertical flex_align_center")
+		div.addClass("editor_popup_div editor_print_div flex_vertical flex_align_center");
+		div.css("min-width", "850px");
 		
 		// header
 		var header = $("<div class='editor_popup_header'>").appendTo(div);
