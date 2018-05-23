@@ -1,4 +1,5 @@
 v0.3.0
+why is error written to console twice
 csv don't include encryption, only include share_num if exists
 dynamic height page breaks
 compact layout center title
