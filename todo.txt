@@ -1,5 +1,4 @@
 v0.3.0
-no split default until clicked?
 alternating compact layout
 link to import text in footer
 csv don't include encryption, only include share_num if exists

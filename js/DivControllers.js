@@ -3700,25 +3700,29 @@ function EditorSplitController(div, editorController) {
 		if (!bool || !that.getUseSplit()) {
 			numPiecesInput.attr("disabled", "disabled");
 			minPiecesInput.attr("disabled", "disabled");
+	    numPiecesInput.css("color", "rgba(0, 0, 0, 0)");
+	    minPiecesInput.css("color", "rgba(0, 0, 0, 0)");
 		} else {
 			numPiecesInput.removeAttr("disabled");
 			minPiecesInput.removeAttr("disabled");
+			numPiecesInput.css("color", "black");
+			minPiecesInput.css("color", "black");
 		}
 	}
 	
 	function update() {
+	  
+	  // remove form errors
+    if (!hasError) {
+      numPiecesInput.removeClass("form_input_error_div");
+      minPiecesInput.removeClass("form_input_error_div");
+    }
 		
 		// disable if pieces already split
 		if (editorController.getImportedPieces() && editorController.getImportedPieces()[0].isSplit()) {
 			setEnabled(false);
 		} else {
 			setEnabled(true);
-		}
-		
-		// remove form errors
-		if (!hasError) {
-			numPiecesInput.removeClass("form_input_error_div");
-			minPiecesInput.removeClass("form_input_error_div");
 		}
 	}
 
