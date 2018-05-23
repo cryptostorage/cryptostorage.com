@@ -1036,6 +1036,8 @@ function HomeController(div) {
 			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=eth' class='footer_subtopic'>Ethereum</a>").appendTo(footerTopicGenerate);
 			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=ltc' class='footer_subtopic'>Litecoin</a>").appendTo(footerTopicGenerate);
 			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=xmr' class='footer_subtopic'>Monero</a>").appendTo(footerTopicGenerate);
+			var footerTopicImport = $("<div class='footer_topic_div flex_vertical'>");
+      $("<a href='#import' class='footer_topic'>Import Keypairs</a>").appendTo(footerTopicImport);
 			var footerTopicGitHub = $("<div class='footer_topic_div flex_vertical'>");
 			$("<a target='_blank' href='" + AppUtils.GITHUB_URL + "' class='footer_topic'>GitHub</a>").appendTo(footerTopicGitHub);
 			var footerTopicDownload = $("<div class='footer_topic_div flex_vertical'>");
@@ -1053,6 +1055,7 @@ function HomeController(div) {
 			var footerCol1 = $("<div class='flex_vertical flex_1'>").appendTo(footerTopicsDiv);
 			footerCol1.append(footerTopicGenerate);
 			var footerCol2 = $("<div class='flex_vertical flex_1'>").appendTo(footerTopicsDiv);
+			footerCol2.append(footerTopicImport);
 			footerCol2.append(footerTopicGitHub);
 			footerCol2.append(footerTopicDownload);
 			footerCol2.append(footerTopicReleaseNotes);
