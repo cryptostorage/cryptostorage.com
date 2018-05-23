@@ -1,4 +1,5 @@
 v0.3.0
+dynamic height page breaks
 standard layout needs to float around long xmr seed
 compact layout center title
 put homepage text in index.html and dynamically hide for seo
