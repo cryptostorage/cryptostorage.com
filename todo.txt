@@ -1,4 +1,22 @@
 v0.3.0
+Encrypts generated keypairs with a passphrase.  The passphrase is required in order to access funds in the future.
+
+The passphrase must be at least 7 characters.
+
+How are keypairs encrypted?
+
+Read about how keypairs are encrypted
+
+
+Splits [keypairs]() into separate pieces.  Funds cannot be accessed until a sufficient number of pieces are combined.
+
+For example, keypairs can be generated and split into 3 pieces.  Only when 2 of the 3 pieces are combined may private keys be recovered in order to access funds.
+
+
+A cryptocurrency keypair is a <b>public address</b> and a <p>private key</p>.  The public address is used to receive funds. 
+It can be shared with a sender in order to receive funds.  The private key authorizes received funds to be sent to other public addresses.
+The private key must remain private or all funds held in its corresponding public address can be stolen.
+
 passphrase and split description from a laymen's perspective
 no split default until clicked?
 alternating compact layout
