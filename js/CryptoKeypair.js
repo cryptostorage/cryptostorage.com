@@ -39,6 +39,8 @@
 function CryptoKeypair(config) {
 	
 	this._state = {};
+	this._isEncrypting = false;
+	this._isDecrypting = false;
 	this._isDestroyed = false;
 		
 	// direct copy internal state from keypair, no validation
@@ -152,6 +154,8 @@ CryptoKeypair.prototype.encrypt = function(scheme, passphrase, onProgress, onDon
 	
 	// validate input
 	assertFalse(this.isDestroyed(), "Keypair is destroyed");
+	assertFalse(this._isEncrypting, "Keypair is in the process of encrypting");
+  assertFalse(this._isDecrypting, "Keypair is in the process of decrypting");
 	assertNull(this.getEncryptionScheme(), "Keypair must be unencrypted to encrypt");
 	assertInitialized(scheme, "Scheme is not initialized");
 	assertInitialized(passphrase, "Passphrase is not initialized");
@@ -174,10 +178,12 @@ CryptoKeypair.prototype.encrypt = function(scheme, passphrase, onProgress, onDon
 	
 	// encrypt
 	var that = this;
+	that._isEncrypting = true;
 	encryptFunc(passphrase, function(percent, label) {
 		if (that._isDestroyed) return;
 		if (onProgress) onProgress(percent, label);
 	}, function(err, encryptedKey) {
+	  that._isEncrypting = false;
 		if (that._isDestroyed) return;
 		if (err) onDone(err);
 		else {
@@ -208,6 +214,8 @@ CryptoKeypair.prototype.decrypt = function(passphrase, onProgress, onDone) {
 	
 	// validate input
 	assertFalse(this.isDestroyed(), "Keypair is destroyed");
+	assertFalse(this._isEncrypting, "Keypair is in the process of encrypting");
+  assertFalse(this._isDecrypting, "Keypair is in the process of decrypting");
 	assertInitialized(this.getEncryptionScheme(), "Keypair must be encrypted to decrypt");
 	assertInitialized(passphrase, "Passphrase is not initialized");
 	assertInitialized(onDone, "onDone is not initialized");
@@ -229,10 +237,12 @@ CryptoKeypair.prototype.decrypt = function(passphrase, onProgress, onDone) {
 	
 	// decrypt
 	var that = this;
+	that._isDecrypting = true;
 	decryptFunc(passphrase, function(percent, label) {
 		if (that._isDestroyed) return;
 		if (onProgress) onProgress(percent, label);
 	}, function(err, decryptedKey) {
+	  that._isDecrypting = false;
 		if (that._isDestroyed) return;
 		if (err) onDone(err);
 		else {

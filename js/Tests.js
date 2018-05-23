@@ -364,6 +364,15 @@ function Tests() {
 					assertEquals("Encrypting keypairs", label);
 					assertTrue(percent >= lastPercent);
 					lastPercent = percent;
+					
+					// cannot encrypt encrypting piece
+					try {
+		        piece.encrypt(PASSPHRASE, schemes);
+		        fail("fail");
+		      } catch (err) {
+		        if (err.message === "fail") throw new Error("Consecutive encryption should fail");
+		        assertEquals("Piece is in the process of encrypting", err.message);
+		      }
 				}, function(err, encryptedPiece) {
 					if (err) throw err;
 					
@@ -386,7 +395,7 @@ function Tests() {
 						}
 						
 						// decrypt with wrong password
-						piece.decrypt("wrongPassphrase123", function(percent, label) {}, function(err, decryptedPiece) {
+						piece.decrypt("wrongPassphrase123", null, function(err, decryptedPiece) {
 							assertInitialized(err);
 							assertEquals("Incorrect passphrase", err.message);
 							assertUndefined(decryptedPiece);
@@ -398,6 +407,15 @@ function Tests() {
 								if (percent === 0) progressStarted = true;
 								if (percent === 1) progressComplete = true;
 								assertEquals("Decrypting", label);
+								
+	              // cannot decrypt decrypting piece
+	              try {
+	                piece.decrypt(PASSPHRASE);
+	                fail("fail");
+	              } catch (err) {
+	                if (err.message === "fail") throw new Error("Consecutive decryption should fail");
+	                assertEquals("Piece is in the process of decrypting", err.message);
+	              }
 							}, function(err, decryptedPiece) {
 								if (err) throw err;
 								
@@ -1176,20 +1194,6 @@ function Tests() {
 			}
 		}
 	}
-	
-	// TODO: test consecutive encrypt/decrypt calls
-	// test consecutive encryption
-//	copy.encrypt(PASSPHRASE, AppUtils.EncryptionScheme.BIP38, function(progress, label) {
-//		try {
-//			copy.encrypt(PASSPHRASE, AppUtils.EncryptionScheme.BIP38);
-//			fail("fail");
-//		} catch (err) {
-//			if (err.message === "fail") throw new Error("Consecutive encryption should fail");
-//			assertEquals("Keypair is already encrypting", err.message);
-//		}
-//	}, function(err, encryptedKeypair) {
-//		assertTrue(copy.isEncrypted());
-//	});
 	
 	function testDestroyPiece(piece, onDone) {
 		

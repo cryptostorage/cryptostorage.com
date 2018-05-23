@@ -39,6 +39,8 @@ function CryptoPiece(config) {
 	
 	var that = this;
 	var state;
+	var _isEncrypting;
+	var _isDecrypting;
 	var _isDestroyed;
 		
 	this.getKeypairs = function() {
@@ -67,9 +69,11 @@ function CryptoPiece(config) {
 	}
 	
 	this.encrypt = function(passphrase, schemes, onProgress, onDone) {
-		assertFalse(_isDestroyed, "Piece is destroyed");
 		
 		// verify input
+    assertFalse(_isDestroyed, "Piece is destroyed");
+    assertFalse(_isEncrypting, "Piece is in the process of encrypting");
+    assertFalse(_isDecrypting, "Piece is in the process of decrypting");
 		assertFalse(that.isEncrypted());
 		assertInitialized(passphrase);
 		assertEquals(state.keypairs.length, schemes.length);
@@ -86,9 +90,11 @@ function CryptoPiece(config) {
 		}
 		
 		// encrypt async
+		_isEncrypting = true;
 		if (onProgress) onProgress(0, "Encrypting keypairs");
 		setImmediate(function() {	// let browser breath
 			async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
+			  _isEncrypting = false;
 				if (err) onDone(err);
 				else onDone(null, that);
 			});
@@ -123,10 +129,12 @@ function CryptoPiece(config) {
 	}
 	
 	this.decrypt = function(passphrase, onProgress, onDone) {
-		assertFalse(_isDestroyed, "Piece is destroyed");
 
 		// validate input
-		assertTrue(that.isEncrypted());
+	  assertFalse(_isDestroyed, "Piece is destroyed");
+		assertFalse(_isEncrypting, "Piece is in the process of encrypting");
+    assertFalse(_isDecrypting, "Piece is in the process of decrypting");
+    assertTrue(that.isEncrypted());
 		assertTrue(state.keypairs.length > 0);
 		assertInitialized(passphrase);
 		assertInitialized(onDone);
@@ -141,9 +149,11 @@ function CryptoPiece(config) {
 		var funcs = [];
 		for (var i = 0; i < state.keypairs.length; i++) funcs.push(decryptFunc(state.keypairs[i], passphrase));
 		var doneWeight = 0;
+		_isDecrypting = true;
 		if (onProgress) onProgress(0, "Decrypting");
 		setImmediate(function() {	// let browser breath
 			async.parallelLimit(funcs, AppUtils.ENCRYPTION_THREADS, function(err, encryptedKeypairs) {
+			  _isDecrypting = false;
 				if (err) onDone(err);
 				else {
 					assertEquals(doneWeight, totalWeight);
@@ -357,6 +367,8 @@ function CryptoPiece(config) {
 	init();
 	function init() {
 		_isDestroyed = false;
+		_isEncrypting = false;
+		_isDecrypting = false;
 		state = {};
 		if (config.keypairs) setKeypairs(config.keypairs);
 		else if (config.json) fromJson(config.json);
