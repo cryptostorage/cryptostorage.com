@@ -13,6 +13,7 @@ address testing
 browser testing
 release
 
+ultra compact text
 reddit mobile app generate.html save silently fails
 preview overlay upper left?
 notice colors
