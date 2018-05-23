@@ -418,6 +418,7 @@ function InputLabelController(div, type, label, tooltip, name) {
 			tippy(infoImg.get(0), {
 				arrow: true,
 				html: tooltipDiv.get(0),
+				interactive: true,
 				placement: 'bottom',
 				theme: 'translucent',
 				trigger: "mouseenter",
@@ -1251,6 +1252,14 @@ function FaqController(div) {
 					getQuestion: function() { return "Can I send funds using CryptoStorage?"; },
 					getAnswer: function() { return "<p>Not currently.  It is expected that users will send funds using wallet software of their choice after private keys have been recovered using this tool.</p>"; }
 				}, {
+          id: "faq_encryption",
+          getQuestion: function() { return "How are keypairs encrypted?"; },
+          getAnswer: function() {
+            var answerDiv = $("<div>");
+            answerDiv.append("<p>Keypair encryption uses <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> with PBKDF2, 10000 iterations, SHA512, and an embedded version for future extensibility unless <a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is supported and enabled.</p>");
+            return answerDiv;
+          }
+        }, {
 					id: "faq_interoperable",
 					getQuestion: function() { return "Does CryptoStorage work with other wallet software?"; },
 					getAnswer: function() {
@@ -3323,9 +3332,9 @@ function EditorPassphraseController(div, editorController) {
 		
 		// passphrase checkbox
 		riskAccepted = false;
-		var passphraseTooltipTxt = "Encrypts your keypairs with a passphrase.<br><br>" +
-															 "The passphrase must be at least 7 characters long.<br><br>" +
-															 "Encrypts with <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> with PBKDF2, 10000 iterations, and SHA512 by default.";
+		var passphraseTooltipTxt = "Encrypts generated keypairs with a passphrase.  The passphrase is required in order to decrypt private keys and access funds.<br><br>" +
+															 "The passphrase must be at least 7 characters.<br><br>" +
+															 "<a target='_blank' href='index.html#faq_encryption'>How are keypairs encrypted?</a>";
 		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?", passphraseTooltipTxt);
 		passphraseCheckbox.render();
 		
@@ -3584,9 +3593,9 @@ function EditorSplitController(div, editorController) {
 		useSplitListeners = [];
 		
 		// split tooltip
-		var splitTooltip = "Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to split generated storage into separate pieces where some of the pieces must be combined in order to access funds.<br><br>" +
-											 "This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.<br><br>" +
-											 "For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.";
+		var splitTooltip = "Splits generated keypairs using <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a>.  Funds cannot be accessed from the keypairs until a sufficient number of pieces are combined.<br><br>" +
+		                   "For example, keypairs can be generated and split into 3 pieces.  Only when 2 of the 3 pieces are combined may private keys be recovered in order to access funds.<br><br>" +
+		                   "This is useful to prevent access to funds without physically combining a sufficient number of pieces.  Splitting can also provide fault tolerance so that private keys can be recovered even if one or more pieces are lost.  For example, if 2 of 3 pieces are necessary to recover private keys, then private keys can be recovered even if any one piece is lost.";
 		
 		// split input
 		splitCheckbox = new CheckboxController($("<div>").appendTo(div), "Split Keypairs?", splitTooltip).render();
