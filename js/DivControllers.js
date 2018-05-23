@@ -5939,7 +5939,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 			
 			// add preview overlay
 			var previewDiv = $("<div class='editor_print_preview_overlay user_select_none'>PREVIEW</div>");
-			var keypairsDiv = div.children().first().children().eq(1);
+      var keypairsDiv = div.children().first().children().eq(config.showLogos || piece.isSplit() ? 1 : 0);
 			new OverlayController(keypairsDiv, {contentDiv: previewDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
 				if (onDone) onDone();
 			});
