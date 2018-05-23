@@ -1136,10 +1136,10 @@ function FaqController(div) {
 				}, {
 					id: "faq_key_pair",
 					getQuestion: function() { return "What is a cryptocurrency keypair?" },
-					getAnswer: function() { return "<p>A cryptocurrency keypair is like an account that can send and receive cryptocurrency.  It is comprised of a public address and a private key.  For example, this is a Bitcoin keypair:</p>" +
-						"<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
-						"<p>The public address is used to receive funds.  It can be publicly shared with anyone.</p>" + 
-						"<p>The private key authorizes received funds to be spent.  <span style='color:red'>The private key must remain private or all funds can be lost.</span></p>"; }
+					getAnswer: function() { return "<p>A cryptocurrency keypair is a <b>public address</b> and a <b>private key</b>.  For example, this is a Bitcoin keypair:</p>" +
+	           "<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
+					  "<p>The <b>public address</b> is used to receive funds.  It can be shared with a sender in order to receive funds.</p>" +
+					  "<p>The <b>private key</b> authorizes received funds to be sent to other public addresses.  <span style='color:red'>The private key must remain private</span> or all funds held in its corresponding public address can be stolen.</p>"; }
 				}, {
 					id: "faq_safe_keys",
 					getQuestion: function() { return "How does CryptoStorage help keep my cryptocurrency safe and secure?"; },
