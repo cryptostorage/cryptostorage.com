@@ -1264,7 +1264,7 @@ function FaqController(div) {
           getQuestion: function() { return "How are keypairs encrypted?"; },
           getAnswer: function() {
             var answerDiv = $("<div>");
-            answerDiv.append("<p>Keypair encryption uses <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> with PBKDF2, 10000 iterations, SHA512, and an embedded version for future extensibility unless <a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is supported and enabled.</p>");
+            answerDiv.append("<p>Keypairs are encrypted using <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> with PBKDF2, 10000 iterations, SHA512, and an embedded version for future extensibility unless <a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is supported and enabled.</p>");
             return answerDiv;
           }
         }, {
