@@ -1,8 +1,9 @@
 v0.3.0
+link to import text in footer
 csv don't include encryption, only include share_num if exists
 dynamic height page breaks
-standard layout needs to float around long xmr seed
 compact layout center title
+standard layout needs to float around long xmr seed
 put homepage text in index.html and dynamically hide for seo
 test adblocker
 todos in code
