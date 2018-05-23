@@ -1288,11 +1288,11 @@ input[type='checkbox'][disabled] +label {
 	font-weight: 700;
 	color: rgb(146, 146, 146);
 	opacity: 0.42;
- 	-webkit-transform: rotate(-18deg);
-    -moz-transform: rotate(-18deg);
-    -o-transform: rotate(-18eg);
-    -ms-transform: rotate(-18deg);
-    transform: rotate(-18deg);
+ 	-webkit-transform: rotate(-20deg);
+    -moz-transform: rotate(-20deg);
+    -o-transform: rotate(-20eg);
+    -ms-transform: rotate(-20deg);
+    transform: rotate(-20deg);
 }
 
 .editor_piece_selection_label {
