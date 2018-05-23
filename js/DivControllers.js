@@ -431,7 +431,7 @@ function InputLabelController(div, type, label, tooltip, name) {
 		}
 		
 		// register click listener
-		input.click(function(e) { invoke(checkedListeners, e); });
+		input.click(function(e) { invoke(checkedListeners, e, that.isChecked()); });
 		
 		// done
 		if (onDone) onDone(div);
@@ -442,6 +442,11 @@ function InputLabelController(div, type, label, tooltip, name) {
 		return input;
 	}
 	
+	/**
+	 * Registers a listener for when input is checked.
+	 * 
+	 * @param listener(event, isChecked) is invoked when input is checked
+	 */
 	this.onChecked = function(listener) {
 		assertFunction(listener);
 		checkedListeners.push(listener);
@@ -3579,6 +3584,8 @@ function EditorSplitController(div, editorController) {
 	var splitInput;
 	var numPiecesInput;
 	var minPiecesInput;
+	var numPiecesVal;
+	var minPiecesVal;
 	var hasError;
 	var formErrorChangeListeners;
 	var useSplitListeners;
@@ -3616,10 +3623,19 @@ function EditorSplitController(div, editorController) {
 		splitMinLabelBottom.html("To Recover");		
 		
 		// register inputs
-		splitCheckbox.onChecked(function() {
+		splitCheckbox.onChecked(function(event, isChecked) {
 			setFormError(false);
 			invoke(useSplitListeners);
-			if (splitCheckbox.isChecked()) numPiecesInput.focus();
+			if (isChecked) {
+			  numPiecesInput.focus();
+        numPiecesInput.val(numPiecesVal);
+        minPiecesInput.val(minPiecesVal);
+      } else {
+        numPiecesVal = numPiecesInput.val();
+        minPiecesVal = minPiecesInput.val();
+        numPiecesInput.val("");
+        minPiecesInput.val("");
+      }
 		});
 		numPiecesInput.on("input", function(e) { validate(true); });
 		numPiecesInput.on("focusout", function(e) { validate(false); });
@@ -3671,7 +3687,7 @@ function EditorSplitController(div, editorController) {
 	
 	this.setUseSplit = function(bool) {
 		splitCheckbox.setChecked(bool);
-	}
+  }
 	
 	this.getNumPieces = function() {
 		var numPieces = Number(numPiecesInput.val());
@@ -3700,18 +3716,14 @@ function EditorSplitController(div, editorController) {
 		if (!bool || !that.getUseSplit()) {
 			numPiecesInput.attr("disabled", "disabled");
 			minPiecesInput.attr("disabled", "disabled");
-	    numPiecesInput.css("color", "rgba(0, 0, 0, 0)");
-	    minPiecesInput.css("color", "rgba(0, 0, 0, 0)");
 		} else {
 			numPiecesInput.removeAttr("disabled");
 			minPiecesInput.removeAttr("disabled");
-			numPiecesInput.css("color", "black");
-			minPiecesInput.css("color", "black");
 		}
 	}
 	
 	function update() {
-	  
+	
 	  // remove form errors
     if (!hasError) {
       numPiecesInput.removeClass("form_input_error_div");
@@ -3728,8 +3740,8 @@ function EditorSplitController(div, editorController) {
 
 	function reset() {
 		splitCheckbox.setChecked(false);
-		numPiecesInput.val("3");
-		minPiecesInput.val("2");
+		numPiecesVal = 3;
+		minPiecesVal = 2;
 		validate();
 		update();
 	}
