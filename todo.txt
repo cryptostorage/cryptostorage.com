@@ -1,5 +1,4 @@
 v0.3.0
-preview overlay upper left?
 standard layout needs to float around long xmr seed
 compact layout center title
 put homepage text in index.html and dynamically hide for seo
@@ -12,6 +11,7 @@ browser testing
 release
 
 reddit mobile app generate.html save silently fails
+preview overlay upper left?
 notice colors
 wait momentarily to let internet connect to avoid notice flicker
 plugins proper inheritance
