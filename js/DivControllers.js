@@ -211,8 +211,6 @@ var UiUtils = {
 	/**
 	 * Renders a QR code to an image.
 	 * 
-	 * TODO: move this to DivControllers.js
-	 * 
 	 * @param text is the text to codify
 	 * @param config specifies configuration options
 	 * @param callback will be called with the image node after creation
@@ -238,42 +236,47 @@ var UiUtils = {
 	},
 	
 	/**
-	 * Makes all divs within the given div and with class 'copyable' copyable (clipboard and tooltip).
+	 * Makes all divs within the given divs and with class 'copyable' copyable (clipboard and tooltip).
 	 * 
-	 * @param div is the div to find copyable classes within
+	 * @param divs is a div or divs to find copyable classes within
 	 */
-	makeCopyable: function(div) {
-		
-		// find copyable divs as NodeList
-		var copyables = div.get(0).querySelectorAll(".copyable");
-		
-		// copy to clipboard on click
-		new Clipboard(copyables, {
-			text: function(trigger) {
-				return $(trigger).html();
-			}
-		});
-		
-		// add styling and tooltips
-		for (var i = 0; i < copyables.length; i++) {
-			var copyable = copyables[i];
-			$(copyable).addClass("copyable_init");
-			tippy(copyable, {
-				arrow : true,
-				html : $("<div>Copied!</div>").get(0),
-				interactive : true,
-				placement : "top",
-				theme : 'translucent',
-				trigger : "click",
-				distance : 10,
-				arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
-				onShow : function() {
-					setTimeout(function() {
-						copyable._tippy.hide();
-					}, 2500)
-				}
-			});
-		}
+	makeCopyable: function(divs) {
+	  divs = listify(divs);
+	  assertTrue(divs.length > 0);
+	  for (var i = 0; i < divs.length; i++) {
+	    var div = divs[i];
+	    
+	    // find copyable divs as NodeList
+	    var copyables = div.get(0).querySelectorAll(".copyable");
+	    
+	    // copy to clipboard on click
+	    new Clipboard(copyables, {
+	      text: function(trigger) {
+	        return $(trigger).html();
+	      }
+	    });
+	    
+	    // add styling and tooltips
+	    for (var i = 0; i < copyables.length; i++) {
+	      var copyable = copyables[i];
+	      $(copyable).addClass("copyable_init");
+	      tippy(copyable, {
+	        arrow : true,
+	        html : $("<div>Copied!</div>").get(0),
+	        interactive : true,
+	        placement : "top",
+	        theme : 'translucent',
+	        trigger : "click",
+	        distance : 10,
+	        arrowTransform: 'scaleX(1.25) scaleY(1.5) translateY(1px)',
+	        onShow : function() {
+	          setTimeout(function() {
+	            copyable._tippy.hide();
+	          }, 2500)
+	        }
+	      });
+	    }
+	  }
 	}
 }
 
@@ -2556,11 +2559,9 @@ function DecryptionController(div, encryptedPiece) {
 		progressDiv.empty();
 		progressBar = UiUtils.getProgressBar(progressDiv);
 		
-		// let UI breath
+		// let UI breath then encrypt piece
 		setImmediate(function() {
-			
-			// decrypt piece TODO: ability to cancel decryption
-			encryptedPiece.decrypt(passphrase, function(percent, label) {
+		  encryptedPiece.decrypt(passphrase, function(percent, label) {
 				if (_isDestroyed) return;
 				setProgress(percent * decryptWeight / totalWeight, label);
 			}, function(err, decryptedPiece) {
@@ -2905,7 +2906,7 @@ function EditorController(div, config) {
 		
 		// handle imported pieces
 		if (that.getImportedPieces()) {
-			config.pieces = that.getImportedPieces();	// TODO: need to copy these so original stay in tact
+			config.pieces = that.getImportedPieces();
 			
 			// set encryption schemes
 			if (config.passphrase) {
@@ -3152,7 +3153,7 @@ function EditorContentController(div, editorController, config) {
 					
 					// add pre-existing piece divs
 					if (config.pieceDivs) {
-						StandardPieceRenderer.makeCopyable(config.pieceDivs);	// copy is lost when transferred across tabs	// TODO: not StandardPieceRenderer
+						UiUtils.makeCopyable(config.pieceDivs);	// copy is lost when transferred across tabs
 						editorController.setCurrentPieces(config.pieces, config.pieceDivs);
 					}
 					
@@ -5410,16 +5411,6 @@ function StandardPieceRenderer(div, piece, config) {
 inheritsFrom(StandardPieceRenderer, DivController);
 
 /**
- * Makes the given divs copyable assuming it is a rendered piece(s).
- */
-StandardPieceRenderer.makeCopyable = function(pieceDivs) {
-	pieceDivs = listify(pieceDivs);
-	for (var i = 0; i < pieceDivs.length; i++) {
-		UiUtils.makeCopyable(pieceDivs[i]);
-	}
-}
-
-/**
  * Relative weight to render a piece generation config.
  */
 StandardPieceRenderer.getRenderWeight = function(config) {
@@ -5888,16 +5879,6 @@ function CompactPieceRenderer(div, piece, config) {
 	}
 }
 inheritsFrom(CompactPieceRenderer, DivController);
-
-/**
- * Makes the given divs copyable assuming it is a rendered piece(s).
- */
-CompactPieceRenderer.makeCopyable = function(pieceDivs) {
-	pieceDivs = listify(pieceDivs);
-	for (var i = 0; i < pieceDivs.length; i++) {
-		UiUtils.makeCopyable(pieceDivs[i]);
-	}
-}
 
 /**
  * Relative weight to render a piece generation config.
