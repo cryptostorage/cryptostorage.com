@@ -1,4 +1,5 @@
 v0.3.0
+split values disappear while generating, need to remove then replace values for real
 link to import text in footer
 csv don't include encryption, only include share_num if exists
 dynamic height page breaks
