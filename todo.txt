@@ -1,6 +1,7 @@
 v0.3.0
 why is error written to console twice
 csv don't include encryption, only include share_num if exists
+don't include piece num in rendered keypairs
 dynamic height page breaks
 compact layout center title
 standard layout needs to float around long xmr seed
@@ -14,6 +15,7 @@ browser testing
 release
 
 ultra compact text
+option to not show qrs in compact view
 reddit mobile app generate.html save silently fails
 preview overlay upper left?
 notice colors
