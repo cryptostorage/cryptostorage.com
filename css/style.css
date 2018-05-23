@@ -1284,15 +1284,15 @@ input[type='checkbox'][disabled] +label {
 }
 
 .editor_print_preview_overlay {
-	font-size: 70px;
+	font-size: 65px;
 	font-weight: 700;
 	color: rgb(146, 146, 146);
 	opacity: 0.42;
- 	-webkit-transform: rotate(-20deg);
-    -moz-transform: rotate(-20deg);
-    -o-transform: rotate(-20eg);
-    -ms-transform: rotate(-20deg);
-    transform: rotate(-20deg);
+ 	-webkit-transform: rotate(-24deg);
+    -moz-transform: rotate(-24deg);
+    -o-transform: rotate(-24eg);
+    -ms-transform: rotate(-24deg);
+    transform: rotate(-24deg);
 }
 
 .editor_piece_selection_label {
