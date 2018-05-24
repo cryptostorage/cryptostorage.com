@@ -2,8 +2,7 @@ v0.3.0
 why is error written to console twice
 csv don't include encryption, only include share_num if exists
 don't include piece num in rendered keypairs
-dynamic height page breaks
-compact layout center title
+ability to hide compact qr
 standard layout needs to float around long xmr seed
 put homepage text in index.html and dynamically hide for seo
 test adblocker
