@@ -36,10 +36,9 @@
  */
 window.initEditor = function(window, config) {
 	
-	// catch unexpected errors
+	// make application aware of uncaught errors
 	window.onerror = function(message, source, lineno, colno, error) {
 		AppUtils.setRuntimeError(error ? error : message);
-		throw error ? error : message;
 	};
 	
 	// set initial environment info

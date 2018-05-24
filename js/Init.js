@@ -30,10 +30,9 @@ $(document).ready(function() {
 	// welcome :)
 	console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
 	
-	// catch unexpected errors
+  // make application aware of uncaught errors
 	window.onerror = function(message, source, lineno, colno, error) {
 		AppUtils.setRuntimeError(error ? error : message);
-		throw error ? error : message;
 	};
 
 	// assign window.crypto (supports IE11)
