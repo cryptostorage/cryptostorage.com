@@ -1370,6 +1370,7 @@ input[type='checkbox'][disabled] +label {
 
 .piece_page_header_logo {
 	width: 150px;
+	height: 39px;	/* Necessary to compute height in Safari */
 }
 
 .piece_page_header_right {

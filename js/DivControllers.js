@@ -5790,7 +5790,7 @@ function CompactPieceRenderer(div, piece, config) {
 	}, config);
 	assertTrue((config.showPrivate && !config.showPublic) || (!config.showPrivate && config.showPublic));
 	
-	var MAX_PAGE_HEIGHT = 940; // maximum height in pixels per page
+	var MAX_PAGE_HEIGHT = 948; // maximum height in pixels per page
 	var keypairRenderers;
 	var onProgressFn;
 	var _isDestroyed = false;
@@ -5830,7 +5830,6 @@ function CompactPieceRenderer(div, piece, config) {
           doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
           if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
           var height = div.get(0).offsetHeight;
-          console.log(height);
           div.detach();
           onDone(null, keypairRenderer, height);
         });
@@ -5848,26 +5847,36 @@ function CompactPieceRenderer(div, piece, config) {
         var keypairsDiv;
         var keypairsRow;
         var tickers;
-        var pairsPerPage = 16;
+        var usedHeight = 0;
         for (var i = 0; i < piece.getKeypairs().length; i++) {
           
+          // determine height used by keypair row
+          var rowHeight = 0;
+          if (i === 0 || i % 2 === 0) {
+            rowHeight = i < piece.getKeypairs().length - 1 ? Math.max(results[i][1], results[i + 1][1]) : results[i][1];
+            if (i === 0) rowHeight += 2;  // 2 pixel border not included
+            assertTrue(rowHeight > 0);
+          }
+          
           // add new page
-          if ((!config.pageBreaks && i === 0) || (config.pageBreaks && i % pairsPerPage === 0)) {
-            
-            // add new page
+          if (i === 0 || (config.pageBreaks && usedHeight + rowHeight > MAX_PAGE_HEIGHT)) {
+            usedHeight = 0;
             var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
             if (piece.getPieceNum() || config.showLogos) {
-              var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
+              var headerDiv = $("<div class='piece_page_header_div'>").appendTo(config.visibleScratchpad);
               headerDiv.append($("<div class='piece_page_header_left'>"));
               if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
               var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
               if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
+              usedHeight += headerDiv.get(0).offsetHeight;
+              headerDiv.appendTo(pageDiv);
             }
             keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
           }
           
           // add new row
           if (i === 0 || i % 2 === 0) {
+            usedHeight += rowHeight;
             keypairsRow = $("<div class='compact_keypairs_row flex_horizontal'>").appendTo(keypairsDiv);
           }
           
@@ -5880,6 +5889,9 @@ function CompactPieceRenderer(div, piece, config) {
         
         // make keypairs copyable
         if (config.copyable) UiUtils.makeCopyable(div);
+        
+        // empty scratchpad
+        config.visibleScratchpad.empty();
 
         // done
         if (onDone) onDone(div);
