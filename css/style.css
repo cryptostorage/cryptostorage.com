@@ -1295,6 +1295,14 @@ input[type='checkbox'][disabled] +label {
     transform: rotate(-24deg);
 }
 
+.editor_print_preview_overlay_reverse {
+	-webkit-transform: rotate(24deg);
+    -moz-transform: rotate(24deg);
+    -o-transform: rotate(24eg);
+    -ms-transform: rotate(24deg);
+    transform: rotate(24deg);
+}
+
 .editor_piece_selection_label {
 	margin-top: 5px;
 	color: white;
