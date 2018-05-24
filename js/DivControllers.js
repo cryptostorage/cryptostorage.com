@@ -4757,9 +4757,11 @@ function EditorPrintController(div, pieces) {
 			default: throw new Error("Unsupported layout: " + layout.geSelectedText());
 		}
 		
-		// update checkboxes
+		// enable/disable checkboxes and radios
 		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
 		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+		includePrivateRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicRadio.isChecked());
+    includePublicRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateRadio.isChecked());
 		
 		// disable print button
 		setPrintEnabled(false);

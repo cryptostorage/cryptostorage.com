@@ -442,13 +442,13 @@ input[type='checkbox']:not([disabled]) +label, input[type='radio']:not([disabled
   	cursor: pointer;
 }
 
+input[type='checkbox'][disabled] +label, input[type='radio'][disabled] +label {
+  	opacity: 0.55;
+}
+
 input[type='text'][disabled], input[type='password'][disabled], input[type='tel'][disabled]  {
 	background-color: rgb(218, 218, 218);
 	border-color: black;
-}
-
-input[type='checkbox'][disabled] +label {
-  	opacity: 0.5;
 }
 
 .input_label {
