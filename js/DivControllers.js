@@ -5873,10 +5873,10 @@ function CompactPieceRenderer(div, piece, config) {
           if (i === 0 || (config.pageBreaks && usedHeight + rowHeight > MAX_PAGE_HEIGHT)) {
             usedHeight = 0;
             var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-            if (config.showLogos) {
+            if (config.showLogos || piece.getPieceNum()) {
               var headerDiv = $("<div class='piece_page_header_div'>").appendTo(config.visiblePlaceholder);
               headerDiv.append($("<div class='piece_page_header_left'>"));
-              if (!config.cryptoCash) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+              if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
               var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
               if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
               usedHeight += headerDiv.get(0).offsetHeight;

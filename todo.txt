@@ -1,7 +1,6 @@
 v0.3.0
 ie11 squished print header, squished qr codes, squished keypair labels, scroll bar on progress
 csv don't include encryption, only include share_num if exists
-don't include piece num in rendered keypairs
 standard layout needs to float around long xmr seed
 put homepage text in index.html and dynamically hide for seo
 test adblocker

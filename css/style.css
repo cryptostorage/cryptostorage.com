@@ -1389,7 +1389,8 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	margin-left: auto;
 	text-align: right;
 	font-weight: bold;
-	font-size: 24px;
+	font-size: 22px;
+	line-height: 22px;
 }
 
 .keypair_div {
