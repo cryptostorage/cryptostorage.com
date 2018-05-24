@@ -6101,7 +6101,6 @@ function CompactKeypairRenderer(div, keypair, config) {
 		valueDiv.append(decoded.value);
 
 		// switch to vertical label if horizontal wraps
-    console.log(label.get(0).offsetHeight);
 		if (label.get(0).offsetHeight > 25) {
       cryptoName.css("margin-right", "0");
 		  label.removeClass("flex_horizontal flex_align_end");
