@@ -4609,6 +4609,7 @@ function EditorPrintController(div, pieces) {
 	var includePublicRadio;
 	var includePrivateRadio;
 	var includeLogosCheckbox;
+	var includeQrsCheckbox;
 	var includeInstructionsCheckbox
 	var printBtn;
 	var previewDiv;					// panel for print preview
@@ -4651,6 +4652,7 @@ function EditorPrintController(div, pieces) {
 		includePublicRadio = new RadioController($("<div class='editor_export_input'>").appendTo(inputsDiv), "include_radios", "Show public addresses").render();
 		includePrivateRadio = new RadioController($("<div class='editor_export_input'>").appendTo(inputsDiv), "include_radios", "Show private keys").render();
 		includeLogosCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show logos").render();
+		includeQrsCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show QRs").render();
 		if (cryptoCashApplies()) {
 			includeInstructionsCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Print Instructions (Two Sided)").render();
 		}
@@ -4665,6 +4667,7 @@ function EditorPrintController(div, pieces) {
 		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
 		includePrivateRadio.setChecked(true);
 		includeLogosCheckbox.setChecked(true);
+		includeQrsCheckbox.setChecked(true);
 		if (cryptoCashApplies()) includeInstructionsCheckbox.setChecked(true);
 		
 		// cancel and print buttons
@@ -4685,6 +4688,7 @@ function EditorPrintController(div, pieces) {
 		includePublicRadio.onChecked(function() { update(); });
 		includePrivateRadio.onChecked(function() { update(); });
 		includeLogosCheckbox.onChecked(function() { update(); });
+		includeQrsCheckbox.onChecked(function() { update(); });
 		if (cryptoCashApplies()) {
 			includeInstructionsCheckbox.onChecked(function() { update(); });
 		}
@@ -4725,6 +4729,7 @@ function EditorPrintController(div, pieces) {
 				includePrivateRadio.setVisible(false);
 				includePublicRadio.setVisible(false);
 				includeLogosCheckbox.setVisible(true);
+				includeQrsCheckbox.setVisible(false);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
 			case Layout.COMPACT:
@@ -4735,6 +4740,7 @@ function EditorPrintController(div, pieces) {
 				includePrivateRadio.setVisible(true);
 				includePublicRadio.setVisible(true);
 				includeLogosCheckbox.setVisible(true);
+				includeQrsCheckbox.setVisible(true);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
 			case Layout.CRYPTOCASH:
@@ -4745,6 +4751,7 @@ function EditorPrintController(div, pieces) {
 				includePrivateRadio.setVisible(false);
 				includePublicRadio.setVisible(false);
 				includeLogosCheckbox.setVisible(false);
+				includeQrsCheckbox.setVisible(false);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(true);
 				break;
 			default: throw new Error("Unsupported layout: " + layout.geSelectedText());
@@ -4820,7 +4827,8 @@ function EditorPrintController(div, pieces) {
 				config.showPublic = includePublicRadio.isChecked();
 				config.showPrivate = includePrivateRadio.isChecked();
 				config.showLogos = includeLogosCheckbox.isChecked();
-				config.visibleScratchpad = $("<div>").appendTo($("body"));
+				config.showQr = includeQrsCheckbox.isChecked();
+				config.visiblePlaceholder = $("<div>").appendTo($("body"));
 				config.cryptoCash = false;
 				break;
 			case Layout.CRYPTOCASH:
@@ -5764,12 +5772,13 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
  * Renders a piece with compact keypairs.
  * 
  * @param config specifies render configuration
- *  			config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
+ *        config.showLogos specifies if crypto logos should be shown
+ *        config.showQr specifies if QRs should be shown
  * 				config.pageBreaks specifies if piece should be rendered as pages
  * 				config.copyable specifies if the public/private values should be copyable
- *        config.visibleScratchpad specifies a visible div to temporarily render keypairs to in order to compute their height
+ *        config.visiblePlaceholder specifies a visible div to temporarily render keypairs to in order to compute their height
  * @param div is the div to render to
  * @param piece is the piece to render
  */
@@ -5777,8 +5786,8 @@ function CompactPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
-	assertDefined(config.visibleScratchpad, "config.visibleScratchpad required to compute height of compact keypairs");
-	assertTrue(config.visibleScratchpad.is(":visible"));
+	assertDefined(config.visiblePlaceholder, "config.visiblePlaceholder required to compute height of compact keypairs");
+	assertTrue(config.visiblePlaceholder.is(":visible"));
 	
 	// config default and validation
 	config = Object.assign({
@@ -5806,7 +5815,7 @@ function CompactPieceRenderer(div, piece, config) {
     var doneWeight = 0;
     var totalWeight  = 0;
     for (var i = 0; i < piece.getKeypairs().length; i++) {
-      totalWeight += CompactKeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker());
+      totalWeight += CompactKeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker(), config);
     }
     
     // collect functions to render keypairs
@@ -5815,7 +5824,7 @@ function CompactPieceRenderer(div, piece, config) {
     for (var i = 0; i < piece.getKeypairs().length; i++) {
       if (i % 2 === 0) qrLeft = !qrLeft;
       config.qrLeft = qrLeft; 
-      renderFuncs.push(renderFunc($("<div>").appendTo(config.visibleScratchpad), piece, i, config));
+      renderFuncs.push(renderFunc($("<div>").appendTo(config.visiblePlaceholder), piece, i, config));
     }
     
     // callback function to render keypair
@@ -5827,7 +5836,7 @@ function CompactPieceRenderer(div, piece, config) {
         var keypairRenderer = new CompactKeypairRenderer(div, piece.getKeypairs()[index], config);
         keypairRenderer.render(function(div) {
           if (_isDestroyed) return;
-          doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
+          doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker(), config);
           if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
           var height = div.get(0).offsetHeight;
           div.detach();
@@ -5862,10 +5871,10 @@ function CompactPieceRenderer(div, piece, config) {
           if (i === 0 || (config.pageBreaks && usedHeight + rowHeight > MAX_PAGE_HEIGHT)) {
             usedHeight = 0;
             var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-            if (piece.getPieceNum() || config.showLogos) {
-              var headerDiv = $("<div class='piece_page_header_div'>").appendTo(config.visibleScratchpad);
+            if (config.showLogos) {
+              var headerDiv = $("<div class='piece_page_header_div'>").appendTo(config.visiblePlaceholder);
               headerDiv.append($("<div class='piece_page_header_left'>"));
-              if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+              if (!config.cryptoCash) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
               var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
               if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
               usedHeight += headerDiv.get(0).offsetHeight;
@@ -5891,7 +5900,7 @@ function CompactPieceRenderer(div, piece, config) {
         if (config.copyable) UiUtils.makeCopyable(div);
         
         // empty scratchpad
-        config.visibleScratchpad.empty();
+        config.visiblePlaceholder.empty();
 
         // done
         if (onDone) onDone(div);
@@ -5927,7 +5936,7 @@ function CompactPieceRenderer(div, piece, config) {
 	this.getRenderWeight = function() {
 		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
 		var weight = 0;
-		for (var i = 0; i < piece.getKeypairs().length; i++) weight += CompactKeypairRenderer.getRenderWeight(piece.getKeypairs()[i]);
+		for (var i = 0; i < piece.getKeypairs().length; i++) weight += CompactKeypairRenderer.getRenderWeight(piece.getKeypairs()[i], config);
 		return weight;
 	}
 }
@@ -5944,14 +5953,14 @@ CompactPieceRenderer.getRenderWeight = function(config) {
 	// compute weight from pre-existing pieces
 	if (config.pieces) {
 		for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
-			weight += (CompactKeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker()) * numPieces);
+			weight += (CompactKeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker(), config) * numPieces);
 		}
 	}
 	
 	// compute weight from keypair generation config
 	else {
 		for (var i = 0; i < config.keypairs.length; i++) {
-			weight += config.keypairs[i].numKeypairs * CompactKeypairRenderer.getRenderWeight(config.keypairs[i].ticker) * numPieces;
+			weight += config.keypairs[i].numKeypairs * CompactKeypairRenderer.getRenderWeight(config.keypairs[i].ticker, config) * numPieces;
 		}
 	}
 	return weight;
@@ -6035,6 +6044,7 @@ CompactPiecePreviewRenderer.getRenderWeight = function(config) {
  * 				config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
+ *        config.showQr specifies if the QR code should be shown
  * 				config.qrLeft specifies if the qr code is on the left side else right side (default true)
  * 				config.keypairId is an identifier to render with the keypair (optional)
  */
@@ -6047,9 +6057,13 @@ function CompactKeypairRenderer(div, keypair, config) {
 		showLogos: true,
 		showPublic: false,
 		showPrivate: true,
+		showQr: true,
 		qrLeft: true
 	}, config);
 	assertTrue((config.showPrivate && !config.showPublic) || (!config.showPrivate && config.showPublic));
+	
+	// override left/right if QR not shown
+	if (!config.showQr) config.qrLeft = false;
 	
 	var that = this;
 	var _isDestroyed = false;
@@ -6108,7 +6122,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		}
 		
 		// qr code
-		if (decoded.valueCopyable) {
+		if (config.showQr && decoded.valueCopyable) {
 			UiUtils.renderQrCode(decoded.value, CompactKeypairRenderer.QR_CONFIG, function(img) {
 				if (_isDestroyed) return;
 				img.attr("class", "keypair_qr");
@@ -6145,11 +6159,28 @@ inheritsFrom(CompactKeypairRenderer, DivController);
  * Returns the weight to render the given ticker or keypair.
  * 
  * @param tickerOrKeypair can be a ticker or initialized keypair
+ * @param config is the render config
  * @returns the relative weight to render the keypair
  */
-CompactKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
+CompactKeypairRenderer.getRenderWeight = function(tickerOrKeypair, config) {
 	assertInitialized(tickerOrKeypair);
-	return 10;
+	assertInitialized(config);
+	
+	// check if QR not shown
+	if (!config.showQr) return 1;
+	
+	// get plugin
+	var plugin;
+	if (isString(tickerOrKeypair)) {
+	  plugin = AppUtils.getCryptoPlugin(tickerOrKeypair);
+	} else {
+	  assertObject(tickerOrKeypair, CryptoKeypair);
+	  plugin = tickerOrKeypair.getPlugin();
+	}
+	
+	// QR is rendered unless showing public and plugin does not have public
+	var showQr = !config.showPublic || plugin.hasPublicAddress();
+	return showQr ? 10 : 1;
 }
 
 /**
