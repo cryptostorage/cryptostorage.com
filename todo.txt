@@ -1,6 +1,5 @@
 v0.3.0
 view encrypted key print compact public throws error
-bitcoin js fix
 ie11 squished print header, squished qr codes, squished keypair labels, scroll bar on progress
 why is error written to console twice
 csv don't include encryption, only include share_num if exists
