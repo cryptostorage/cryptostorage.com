@@ -6110,7 +6110,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		valueType.append("(" + decoded.valueType + ")");		
 				
 		// content includes title and keypair value
-		var content = $("<div class='flex_vertical flex_align_center width_100'>").appendTo(div);
+		var content = $("<div class='flex_vertical flex_align_center flex_1'>").appendTo(div);
 		content.append(title);
 		var valueDiv = $("<div class='compact_keypair_value width_100'>").appendTo(content);
 		if (!hasWhitespace(decoded.value)) valueDiv.css("word-break", "break-all");
