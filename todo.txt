@@ -3,8 +3,6 @@ ie11 squished print header, squished qr codes, squished keypair labels, scroll b
 why is error written to console twice
 csv don't include encryption, only include share_num if exists
 don't include piece num in rendered keypairs
-
-compact layout center title
 standard layout needs to float around long xmr seed
 put homepage text in index.html and dynamically hide for seo
 test adblocker

@@ -1473,7 +1473,7 @@ input[type='checkbox'][disabled] +label {
 .keypair_label {
 	font-weight: bold;
 	font-size: 15px;
-	text-align: center;
+	white-space: nowrap;
 }
 
 .keypair_right_div {
@@ -1578,6 +1578,11 @@ input[type='checkbox'][disabled] +label {
 
 .compact_keypair_div > .keypair_qr:last-child {
 	margin-left: 6px;
+}
+
+.compact_keypair_type {
+	font-size: 14px;
+	margin-top: -2px;
 }
 
 .compact_keypair_value {

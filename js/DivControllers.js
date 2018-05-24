@@ -6078,29 +6078,35 @@ function CompactKeypairRenderer(div, keypair, config) {
 		// keypair title includes logo, name, and id
 		var title = $("<div class='compact_keypair_title flex_horizontal flex_align_center'>");
 		
-		// keypair label
-		var label = $("<div class='keypair_label flex_1'>");
-		label.append(decoded.valueLabel);
-		
 		// keypair logo
-		var logo;
-		if (decoded.cryptoLogo && config.showLogos) {
-			decoded.cryptoLogo.attr("width", "100%");
-			decoded.cryptoLogo.attr("height", "100%");
-			logo = $("<div class='keypair_logo'>");
-			logo.append(decoded.cryptoLogo);
-		}
+    if (decoded.cryptoLogo && config.showLogos) {
+      decoded.cryptoLogo.attr("width", "100%");
+      decoded.cryptoLogo.attr("height", "100%");
+      var logo = $("<div class='keypair_logo'>").appendTo(title);
+      logo.append(decoded.cryptoLogo);
+    }
 		
-		// place title elements
-		title.append(logo);
-		title.append(label);
-		
+		// keypair label
+		var label = $("<div style='flex-wrap:wrap;' class='flex_horizontal flex_align_end'>").appendTo(title);
+		var cryptoName = $("<div style='margin-right:5px' class='keypair_label'>").appendTo(label);
+		cryptoName.append(decoded.cryptoName);
+		var valueType = $("<div class='compact_keypair_type'>").appendTo(label);
+		valueType.append("(" + decoded.valueType + ")");		
+				
 		// content includes title and keypair value
 		var content = $("<div class='flex_vertical flex_align_center width_100'>").appendTo(div);
 		content.append(title);
 		var valueDiv = $("<div class='compact_keypair_value width_100'>").appendTo(content);
 		if (!hasWhitespace(decoded.value)) valueDiv.css("word-break", "break-all");
 		valueDiv.append(decoded.value);
+
+		// switch to vertical label if horizontal wraps
+    console.log(label.get(0).offsetHeight);
+		if (label.get(0).offsetHeight > 25) {
+      cryptoName.css("margin-right", "0");
+		  label.removeClass("flex_horizontal flex_align_end");
+		  label.addClass("flex_vertical flex_align_center")
+		}
 		
 		// qr code
 		if (decoded.valueCopyable) {
@@ -6164,9 +6170,10 @@ CompactKeypairRenderer.QR_CONFIG = {
  * @param config is custom configuration
  * @returns a decoded object with fields which inform rendering
  * 					decoded.value is the keypair value
- *  				decoded.valueLabel is the value label
+ *          decoded.valueType is one of public | unencrypted | encrypted | or split
  * 					decoded.valueCopyable indicates if the value is copyable and should be QR
  * 					decoded.cryptoLogo is the center logo to render
+ *          decoded.cryptoName is the name of the crypto the value is for
  */
 CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
 	
@@ -6181,7 +6188,8 @@ CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
 	// decode
 	var decoded = {};
 	decoded.cryptoLogo = config.showLogos ? keypair.getPlugin().getLogo() : null;
-	decoded.valueLabel = keypair.getPlugin().getName() + (config.showPublic ? " (public)" : (keypair.isSplit() ? " (split)" : (keypair.isEncrypted() ? " (encrypted)" : " (unencrypted)")));
+	decoded.cryptoName = keypair.getPlugin().getName();
+	decoded.valueType = config.showPublic ? "public" : (keypair.isSplit() ? "split" : (keypair.isEncrypted() ? "encrypted" : "unencrypted"));
 	if (config.showPublic) {
 		if (keypair.isPublicApplicable()) {
 			decoded.value = keypair.getPublicAddress();
