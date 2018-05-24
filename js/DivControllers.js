@@ -4820,6 +4820,7 @@ function EditorPrintController(div, pieces) {
 				config.showPublic = includePublicRadio.isChecked();
 				config.showPrivate = includePrivateRadio.isChecked();
 				config.showLogos = includeLogosCheckbox.isChecked();
+				config.visibleScratchpad = $("<div>").appendTo($("body"));
 				config.cryptoCash = false;
 				break;
 			case Layout.CRYPTOCASH:
@@ -5768,6 +5769,7 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
  * 				config.showPrivate specifies if private keys should be shown
  * 				config.pageBreaks specifies if piece should be rendered as pages
  * 				config.copyable specifies if the public/private values should be copyable
+ *        config.visibleScratchpad specifies a visible div to temporarily render keypairs to in order to compute their height
  * @param div is the div to render to
  * @param piece is the piece to render
  */
@@ -5775,6 +5777,8 @@ function CompactPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
+	assertDefined(config.visibleScratchpad, "config.visibleScratchpad required to compute height of compact keypairs");
+	assertTrue(config.visibleScratchpad.is(":visible"));
 	
 	// config default and validation
 	config = Object.assign({
@@ -5786,6 +5790,7 @@ function CompactPieceRenderer(div, piece, config) {
 	}, config);
 	assertTrue((config.showPrivate && !config.showPublic) || (!config.showPrivate && config.showPublic));
 	
+	var MAX_PAGE_HEIGHT = 940; // maximum height in pixels per page
 	var keypairRenderers;
 	var onProgressFn;
 	var _isDestroyed = false;
@@ -5797,83 +5802,89 @@ function CompactPieceRenderer(div, piece, config) {
 		div.empty();
 		div.addClass("piece_div");
 		
-		// build pages and collect functions to render keypairs
-		var keypairsDiv;
-		var keypairsRow;
-		var tickers;
-		var pairsPerPage = 16;
-		var renderFuncs = [];
-		var qrLeft = false;
-		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			
-			// add new page
-			if ((!config.pageBreaks && i === 0) || (config.pageBreaks && i % pairsPerPage === 0)) {
-				
-				// add new page
-				var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-				if (piece.getPieceNum() || config.showLogos) {
-					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
-					headerDiv.append($("<div class='piece_page_header_left'>"));
-					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
-					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-					if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
-				}
-				keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
-			}
-			
-			// add new row
-			if (i === 0 || i % 2 === 0) {
-				keypairsRow = $("<div class='compact_keypairs_row flex_horizontal'>").appendTo(keypairsDiv);
-			}
-			
-			// collect functions to render keypairs
-			var placeholderDiv = $("<div class='compact_keypair_div'>").appendTo(keypairsRow);
-			if (i % 2 === 0) qrLeft = !qrLeft;
-			config.qrLeft = qrLeft;
-			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
-		}
-		
-		// add blank placeholder if uneven number of keypairs
-		if (i % 2 !== 0) $("<div style='border-top:none; border-right:none; border-bottom:none;' class='compact_keypair_div'>").appendTo(keypairsRow);
-		
 		// compute weights
-		var doneWeight = 0;
-		var totalWeight  = 0;
-		for (var i = 0; i < piece.getKeypairs().length; i++) {
-			totalWeight += CompactKeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker());
-		}
+    var doneWeight = 0;
+    var totalWeight  = 0;
+    for (var i = 0; i < piece.getKeypairs().length; i++) {
+      totalWeight += CompactKeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker());
+    }
+    
+    // collect functions to render keypairs
+    var qrLeft = false;
+    var renderFuncs = [];
+    for (var i = 0; i < piece.getKeypairs().length; i++) {
+      if (i % 2 === 0) qrLeft = !qrLeft;
+      config.qrLeft = qrLeft; 
+      renderFuncs.push(renderFunc($("<div>").appendTo(config.visibleScratchpad), piece, i, config));
+    }
+    
+    // callback function to render keypair
+    function renderFunc(div, piece, index, config) {
+      config = Object.assign({}, config);
+      return function(onDone) {
+        if (_isDestroyed) return;
+        if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
+        var keypairRenderer = new CompactKeypairRenderer(div, piece.getKeypairs()[index], config);
+        keypairRenderer.render(function(div) {
+          if (_isDestroyed) return;
+          doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
+          if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
+          var height = div.get(0).offsetHeight;
+          console.log(height);
+          div.detach();
+          onDone(null, keypairRenderer, height);
+        });
+      }
+    }
 
-		// render keypairs
-		if (onProgressFn) onProgressFn(0, "Rendering keypairs");
-		setImmediate(function() {	// let browser breath
-			async.series(renderFuncs, function(err, _keypairRenderers) {
-				if (_isDestroyed) return;
-				assertNull(err);
-				
-				// make keypairs copyable
-				if (config.copyable) UiUtils.makeCopyable(div);
+    // render keypairs
+    if (onProgressFn) onProgressFn(0, "Rendering keypairs");
+    setImmediate(function() { // let browser breath
+      async.series(renderFuncs, function(err, results) {
+        if (_isDestroyed) return;
+        assertNull(err);
+        
+        // build pages
+        var keypairsDiv;
+        var keypairsRow;
+        var tickers;
+        var pairsPerPage = 16;
+        for (var i = 0; i < piece.getKeypairs().length; i++) {
+          
+          // add new page
+          if ((!config.pageBreaks && i === 0) || (config.pageBreaks && i % pairsPerPage === 0)) {
+            
+            // add new page
+            var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
+            if (piece.getPieceNum() || config.showLogos) {
+              var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
+              headerDiv.append($("<div class='piece_page_header_left'>"));
+              if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+              var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
+              if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
+            }
+            keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
+          }
+          
+          // add new row
+          if (i === 0 || i % 2 === 0) {
+            keypairsRow = $("<div class='compact_keypairs_row flex_horizontal'>").appendTo(keypairsDiv);
+          }
+          
+          // add rendered keyapir
+          results[i][0].getDiv().appendTo(keypairsRow);
+        }
+        
+        // add blank placeholder if uneven number of keypairs to preserve formatting
+        if (i % 2 !== 0) $("<div style='border-top:none; border-right:none; border-bottom:none;' class='compact_keypair_div'>").appendTo(keypairsRow);
+        
+        // make keypairs copyable
+        if (config.copyable) UiUtils.makeCopyable(div);
 
-				// done
-				if (onDone) onDone(div);
-			});
-		});
-		
-		// callback function to render keypair
-		function renderFunc(placeholderDiv, piece, index, config) {
-			config = Object.assign({}, config);
-			return function(onDone) {
-				if (_isDestroyed) return;
-				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
-				var keypairRenderer = new CompactKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
-				keypairRenderer.render(function(div) {
-					if (_isDestroyed) return;
-					placeholderDiv.replaceWith(div);
-					doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
-					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
-					onDone(null, keypairRenderer);
-				});
-			}
-		}
+        // done
+        if (onDone) onDone(div);
+      });
+    });
 	}
 	
 	/**
