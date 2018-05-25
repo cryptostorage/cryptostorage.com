@@ -1,6 +1,5 @@
 v0.3.0
 change out qr lib
-designer review
 ie11 squished print header, scroll bar on progress
 standard layout needs to float around long xmr seed
 put homepage text in index.html and dynamically hide for seo
