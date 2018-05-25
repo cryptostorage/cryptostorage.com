@@ -1,4 +1,14 @@
 v0.3.0
+cryptostorage logo blue
+keypairs to generate link
+text highlighted on click
+pieces -> shares, split -> divide
+split description
+remove selected item from dropdown selection so no duplicate
+compact (private split)
+red warning when private keys are not included
+addresses recognized as split share when obviously too short
+
 change out qr lib
 ie11 squished print header, scroll bar on progress
 standard layout needs to float around long xmr seed
