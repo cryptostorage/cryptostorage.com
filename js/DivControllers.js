@@ -45,7 +45,7 @@ var UiUtils = {
 	getProgressBar: function(div) {
 		return new ProgressBar.Line(div.get(0), {
 			strokeWidth: 2.5,
-			color: 'rgb(96, 178, 198)',	// cryptostorage teal
+			color: 'rgb(78, 188, 223)',
 			duration: 0,
 			svgStyle: {width: '100%', height: '100%'},
 			text: {
