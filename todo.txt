@@ -1,5 +1,5 @@
 v0.3.0
-cryptostorage logo blue
+- cryptostorage logo blue
 keypairs to generate link
 text highlighted on click
 pieces -> shares, split -> divide
