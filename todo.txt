@@ -1,4 +1,6 @@
 v0.3.0
+compact placeholder elements remaining
+change out qr lib
 ie11 squished print header, scroll bar on progress
 csv/json don't include encryption, only include share_num if exists, csv include type
 standard layout needs to float around long xmr seed
