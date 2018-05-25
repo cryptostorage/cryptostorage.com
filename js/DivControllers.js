@@ -40,12 +40,13 @@ var UiUtils = {
 	 * Renders a progress bar to the given div.
 	 * 
 	 * @param div is the div to render to
+	 * @param color is the progress bar color (optional)
 	 * @returns a progress bar instance
 	 */
-	getProgressBar: function(div) {
+	getProgressBar: function(div, color) {
 		return new ProgressBar.Line(div.get(0), {
 			strokeWidth: 2.5,
-			color: 'rgb(78, 188, 223)',
+			color: color ? color : 'rgb(132, 201, 223)',
 			duration: 0,
 			svgStyle: {width: '100%', height: '100%'},
 			text: {
@@ -2142,7 +2143,7 @@ function ImportTextController(div, plugins, printErrors) {
 		textArea.attr("placeholder", "Enter private keys, a split share, csv, or json");
 		
 		// submit button
-		var submit = $("<div class='import_button'>").appendTo(textInputDiv);
+		var submit = $("<div class='import_button flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(textInputDiv);
 		submit.html("Submit");
 		submit.click(function() { onSubmit(); });
 		
@@ -2458,8 +2459,9 @@ inheritsFrom(ImportTextController, DivController);
  */
 function DecryptionController(div, encryptedPiece) {
 	DivController.call(this, div);
-	
 	var that = this;
+	var PROGRESS_COLOR = "rgb(76, 213, 67)";
+	
 	var labelDiv;
 	var inputDiv;
 	var passphraseInput;
@@ -2484,7 +2486,7 @@ function DecryptionController(div, encryptedPiece) {
 		inputDiv = $("<div>").appendTo(div);
 		passphraseInput = $("<input type='password' class='import_passphrase_input'>").appendTo(inputDiv)
 		if (AppUtils.DEV_MODE) passphraseInput.val(AppUtils.DEV_MODE_PASSPHRASE);
-		submitButton = $("<div class='import_button'>").appendTo(inputDiv);
+		submitButton = $("<div class='import_button flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(inputDiv);
 		submitButton.html("Submit");
 		submitButton.click(function() { onSubmit(); });
 		
@@ -2574,7 +2576,7 @@ function DecryptionController(div, encryptedPiece) {
 		inputDiv.hide();
 		progressDiv.show();
 		progressDiv.empty();
-		progressBar = UiUtils.getProgressBar(progressDiv);
+		progressBar = UiUtils.getProgressBar(progressDiv, PROGRESS_COLOR);
 		
 		// let UI breath then encrypt piece
 		setImmediate(function() {

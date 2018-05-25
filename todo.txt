@@ -1,5 +1,5 @@
 v0.3.0
-update social logo, export progress rgb(78, 188, 223), import progress same as tabs
+update social logo
 text highlighted on click
 pieces -> shares, split -> divide
 split description
