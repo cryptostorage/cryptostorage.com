@@ -1,6 +1,8 @@
 v0.3.0
+change out qr lib
 compact placeholder elements remaining
 csv/json don't include encryption, only include share_num if exists, csv include type
+designer review
 ie11 squished print header, scroll bar on progress
 standard layout needs to float around long xmr seed
 put homepage text in index.html and dynamically hide for seo
@@ -12,7 +14,6 @@ address testing
 browser testing
 release
 
-change out qr lib
 ultra compact text
 option to not show qrs in compact view
 reddit mobile app generate.html save silently fails
