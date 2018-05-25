@@ -5388,7 +5388,7 @@ function StandardPieceRenderer(div, piece, config) {
 		function renderFunc(placeholderDiv, piece, index, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
-				if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
+				if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPieceNum())) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
 				var keypairRenderer = new StandardKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
