@@ -1,5 +1,5 @@
 v0.3.0
-- cryptostorage logo blue
+update social logo, export progress rgb(78, 188, 223), import progress same as tabs
 text highlighted on click
 pieces -> shares, split -> divide
 split description
