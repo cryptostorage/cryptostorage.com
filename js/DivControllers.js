@@ -5310,6 +5310,7 @@ function StandardPieceRenderer(div, piece, config) {
 		div.addClass("piece_div");
 		
 		// build pages and collect functions to render keypairs
+		keypairRenderers = [];
 		var keypairsDiv;
 		var tickers;
 		var pairsPerPage = config.cryptoCash ? 6 : 7;
@@ -5390,6 +5391,7 @@ function StandardPieceRenderer(div, piece, config) {
 				if (_isDestroyed) return;
 				if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPieceNum())) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
 				var keypairRenderer = new StandardKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
+				keypairRenderers.push(keypairRenderer);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
 					if (config.cryptoCash) div.addClass("keypair_div_spaced");
@@ -5823,6 +5825,7 @@ function CompactPieceRenderer(div, piece, config) {
     // collect functions to render keypairs
     var qrLeft = false;
     var renderFuncs = [];
+    keypairRenderers = [];
     for (var i = 0; i < piece.getKeypairs().length; i++) {
       if (i % 2 === 0) qrLeft = !qrLeft;
       config.qrLeft = qrLeft; 
@@ -5836,6 +5839,7 @@ function CompactPieceRenderer(div, piece, config) {
         if (_isDestroyed) return;
         if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
         var keypairRenderer = new CompactKeypairRenderer(div, piece.getKeypairs()[index], config);
+        keypairRenderers.push(keypairRenderer);
         keypairRenderer.render(function(div) {
           if (_isDestroyed) return;
           doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker(), config);
@@ -6143,6 +6147,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 	 */
 	this.destroy = function () {
 		assertFalse(_isDestroyed, "CompactKeypairRenderer is already destroyed");
+		div.remove();
 		_isDestroyed = true;
 	}
 	
