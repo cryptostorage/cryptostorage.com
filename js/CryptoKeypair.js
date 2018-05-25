@@ -330,14 +330,15 @@ CryptoKeypair.prototype.toJson = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	function isExcluded(field) { return arrayContains(CryptoKeypair.EXCLUDE_FIELDS, field); }
 	return {
-		ticker: isExcluded(CryptoKeypair.Field.TICKER) ? undefined : this.getPlugin().getTicker(),
-		publicAddress: isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS) ? undefined : this.getPublicAddress(),
-		privateWif: isExcluded(CryptoKeypair.Field.PRIVATE_WIF) ? undefined : this.getPrivateWif(),
-		privateHex: isExcluded(CryptoKeypair.Field.PRIVATE_HEX) ? undefined : this.getPrivateHex(),
-		encryption: isExcluded(CryptoKeypair.Field.ENCRYPTION) ? undefined : this.getEncryptionScheme(),
-		isSplit: isExcluded(CryptoKeypair.Field.IS_SPLIT) ? undefined : this.isSplit(),
-		minShares: isExcluded(CryptoKeypair.Field.MIN_SHARES) ? undefined : this.getMinShares(),
-		shareNum: isExcluded(CryptoKeypair.Field.SHARE_NUM) ? undefined : this.getShareNum(),
+		ticker: isExcluded(CryptoKeypair.Field.TICKER) ? undefined : this.getFieldValue(CryptoKeypair.Field.TICKER),
+		publicAddress: isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS) ? undefined : this.getFieldValue(CryptoKeypair.Field.PUBLIC_ADDRESS),
+		privateWif: isExcluded(CryptoKeypair.Field.PRIVATE_WIF) ? undefined : this.getFieldValue(CryptoKeypair.Field.PRIVATE_WIF),
+		privateHex: isExcluded(CryptoKeypair.Field.PRIVATE_HEX) ? undefined : this.getFieldValue(CryptoKeypair.Field.PRIVATE_HEX),
+		privateState: isExcluded(CryptoKeypair.Field.PRIVATE_STATE) ? undefined : this.getFieldValue(CryptoKeypair.Field.PRIVATE_STATE),
+		encryption: isExcluded(CryptoKeypair.Field.ENCRYPTION) || !this.isEncrypted() ? undefined : this.getFieldValue(CryptoKeypair.Field.ENCRYPTION),
+		isSplit: isExcluded(CryptoKeypair.Field.IS_SPLIT) ? undefined : this.getFieldValue(CryptoKeypair.Field.IS_SPLIT),
+		minShares: isExcluded(CryptoKeypair.Field.MIN_SHARES) ? undefined : this.getFieldValue(CryptoKeypair.Field.MIN_SHARES),
+		shareNum: isExcluded(CryptoKeypair.Field.SHARE_NUM) || !this.isSplit() ? undefined : this.getFieldValue(CryptoKeypair.Field.SHARE_NUM)
 	}
 }
 
@@ -360,6 +361,8 @@ CryptoKeypair.prototype.getFieldValue = function(field) {
 			return this.getMinShares();
 		case CryptoKeypair.Field.SHARE_NUM:
 			return this.getShareNum();
+		case CryptoKeypair.Field.PRIVATE_STATE:
+		  return this.isSplit() ? "Split" : (this.isEncrypted() ? "Encrypted" : (this.isEncrypted() === false ? "Unencrypted" : ""));
 		default:
 			throw new Error("Unrecognized keypair field: " + field);
 	}
@@ -975,20 +978,21 @@ CryptoKeypair.getDecryptWeight = function(schemes) {
 // enumerates keypair fields and maps to human readable strings
 CryptoKeypair.Field = {
 		TICKER: "Ticker",
+    PUBLIC_ADDRESS: "Public Address",
 		PRIVATE_HEX: "Private Hex",
 		PRIVATE_WIF: "Private WIF",
-		PUBLIC_ADDRESS: "Public Address",
+    PRIVATE_STATE: "Private State",
 		ENCRYPTION: "Encryption",
 		IS_SPLIT: "Is Split",
 		MIN_SHARES: "Minimum Shares",
-		SHARE_NUM: "Share Number"
+    SHARE_NUM: "Share Number"
 }
 
 // hardcoded fields to exclude from json and csv export
 CryptoKeypair.EXCLUDE_FIELDS = [
 	CryptoKeypair.Field.PRIVATE_HEX,
 	CryptoKeypair.Field.MIN_SHARES,
-	CryptoKeypair.Field.IS_SPLIT
+	CryptoKeypair.Field.IS_SPLIT,
 ];
 
 // split v2 encoded version

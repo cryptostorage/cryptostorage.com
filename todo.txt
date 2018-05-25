@@ -1,6 +1,5 @@
 v0.3.0
 change out qr lib
-csv/json don't include encryption, only include share_num if exists, csv include type
 designer review
 ie11 squished print header, scroll bar on progress
 standard layout needs to float around long xmr seed

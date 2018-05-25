@@ -281,10 +281,12 @@ function CryptoPiece(config) {
 		// collect headers
 		var headers = [];
 		for (prop in CryptoKeypair.Field) {
-			if (arrayContains(CryptoKeypair.EXCLUDE_FIELDS, CryptoKeypair.Field[prop.toString()])) continue;	// skip if excluded
-			if (CryptoKeypair.Field.hasOwnProperty(prop)) {
-	    	headers.push(CryptoKeypair.Field[prop.toString()]);
-	    }
+		  if (!CryptoKeypair.Field.hasOwnProperty(prop)) continue;
+		  var header = CryptoKeypair.Field[prop.toString()];
+		  if (arrayContains(CryptoKeypair.EXCLUDE_FIELDS, header)) continue;              // skip field if excluded
+		  if (header === CryptoKeypair.Field.SHARE_NUM && !this.isSplit()) continue;      // skip share num if not split
+		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue; // skip encryption if not encrypted
+			headers.push(header);
 		}
 		
 		// collect content
