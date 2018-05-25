@@ -1,18 +1,15 @@
 v0.3.0
-update social logo
-text highlighted on click
 pieces -> shares, split -> divide
 split description
 keypair description
-remove selected item from dropdown selection so no duplicate
 compact (private split)
 red warning when private keys are not included
 addresses recognized as split share when obviously too short
 
 change out qr lib
-ie11 squished print header, scroll bar on progress
 standard layout needs to float around long xmr seed
 put homepage text in index.html and dynamically hide for seo
+update social logo
 test adblocker
 todos in code
 remove old code
@@ -21,6 +18,10 @@ address testing
 browser testing
 release
 
+v0.3.1
+remove selected item from dropdown selection so no duplicate
+ie11 squished print header, scroll bar on progress
+text highlighted on click
 ultra compact text
 option to not show qrs in compact view
 reddit mobile app generate.html save silently fails
