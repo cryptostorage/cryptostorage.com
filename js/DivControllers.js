@@ -1138,11 +1138,11 @@ function FaqController(div) {
 				{
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is CryptoStorage?"; },
-					getAnswer: function() { return "<p>CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies.  This tool generates <a href='#faq_key_pair'>keypairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated keypairs can be easily printed and saved to digital files for long-term storage.</p>" +
+					getAnswer: function() { return "<p>CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies.  This tool generates <a href='#faq_keypair'>keypairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated keypairs can be easily printed and saved to digital files for long-term storage.</p>" +
 						"<p>This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
 					}
 				}, {
-					id: "faq_key_pair",
+					id: "faq_keypair",
 					getQuestion: function() { return "What is a cryptocurrency keypair?" },
 					getAnswer: function() { return "<p>A cryptocurrency keypair is a <b>public address</b> and a <b>private key</b>.  For example, this is a Bitcoin keypair:</p>" +
 	           "<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
