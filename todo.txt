@@ -3,6 +3,7 @@ v0.3.0
 text highlighted on click
 pieces -> shares, split -> divide
 split description
+keypair description
 remove selected item from dropdown selection so no duplicate
 compact (private split)
 red warning when private keys are not included
