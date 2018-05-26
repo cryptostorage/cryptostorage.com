@@ -1,12 +1,10 @@
 v0.3.0
-"download and verify" notice description with hyperlink to verify faq
-less vertical height on generate progress
-keypair description
-compact (private split)
-red warning when private keys are not included
-addresses recognized as split share when obviously too short
-change out qr lib
 standard layout needs to float around long xmr seed
+red warning when private keys are not included
+change out qr lib
+compact (private split)
+keypair description
+addresses recognized as split share when obviously too short
 put homepage text in index.html and dynamically hide for seo
 update social logo
 test adblocker
@@ -18,6 +16,9 @@ browser testing
 release
 
 v0.3.1
+text encryption, divisionn, and import
+"download and verify" notice description with hyperlink to verify faq
+less vertical height on generate progress
 keypairs to generate with info box which hyperlinks to keypairs
 remove open-source from home notice graphic
 remove selected item from dropdown selection so no duplicate
@@ -44,18 +45,9 @@ custom error message for qrs not loading
 common show logos checkbox shares state with standard and compact layouts
 
 designer:
-passphrase confirmation
 split qr and lines white?
-display interoperability warning if passphrase or split
-how to make passphrase visible?
-how to specify BIP38 encryption for Bitcoin and Bitcoin Cash?
-how to specify save type (json, csv, txt)?
-are passphrase/split inputs hidden if unchecked?
-what if floating regenerate/save/print controls cover form controls?
-want to confirm generation and grouping flow (I have mockups)
-currency inputs will be at bottom of generated storage which can be long.  Ok?
-split piece selector is part of header, but is not config.  Worth moving?
 crypto-cash faq and slider point
+reset button always visible?
 
 low priority:
 xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share
