@@ -1,4 +1,5 @@
 v0.3.0
+less vertical height on generate progress
 keypair description
 compact (private split)
 red warning when private keys are not included
