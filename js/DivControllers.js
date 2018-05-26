@@ -1978,8 +1978,8 @@ function ImportFileController(div, printErrors) {
 		if (importedPieces.length === 0) return;
 		
 		// add control to view pieces
-		addControl("view imported pieces", function() {
-			UiUtils.openEditorDynamic("Imported Pieces", {pieces: UiUtils.getPiecesForExport(importedPieces)});
+		addControl("view imported parts", function() {
+			UiUtils.openEditorDynamic("Imported Parts", {pieces: UiUtils.getPiecesForExport(importedPieces)});
 		});
 		
 		// handle undivided piece
@@ -2396,7 +2396,7 @@ function ImportTextController(div, plugins, printErrors) {
 		if (importedPieces.length === 0) return;
 		
 		// add control to view pieces
-		addControl("view imported pieces", function() {
+		addControl("view imported parts", function() {
 			UiUtils.openEditorDynamic("Imported Storage", {pieces: UiUtils.getPiecesForExport(importedPieces)});
 		});
 		
@@ -2755,9 +2755,9 @@ function EditorController(div, config) {
 		// view divided pieces
 		if (config.sourcePieces && config.sourcePieces.length > 1) {
 			var viewDivided = $("<div class='editor_control_link import_control_link'>").appendTo(headerDiv);
-			viewDivided.html("view imported pieces");
+			viewDivided.html("view imported parts");
 			viewDivided.click(function() {
-				UiUtils.openEditorDynamic("Imported Pieces", {pieces: UiUtils.getPiecesForExport(config.sourcePieces)});
+				UiUtils.openEditorDynamic("Imported Parts", {pieces: UiUtils.getPiecesForExport(config.sourcePieces)});
 			});
 		}
 		
