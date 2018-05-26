@@ -33,7 +33,7 @@
  * 				config.csv is csv to initialize from
  * 				config.dividedPieces are divided pieces to combine and initialize from
  * 				config.piece is an existing piece to copy from
- *  			config.pieceNum is the pieceNumber to assign to each piece (optional)
+ *  			config.partNum is the partNumber to assign to each piece (optional)
  */
 function CryptoPiece(config) {
 	
@@ -220,9 +220,9 @@ function CryptoPiece(config) {
 		return state.keypairs[0].getPartNum();
 	}
 	
-	this.setPartNum = function(pieceNum) {
+	this.setPartNum = function(partNum) {
 		assertFalse(_isDestroyed, "Piece is destroyed");
-		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].setPartNum(pieceNum);
+		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].setPartNum(partNum);
 		return this;
 	}
 	
@@ -263,7 +263,7 @@ function CryptoPiece(config) {
 	this.toJson = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		var json = {};
-		json.pieceNum = that.getPartNum();
+		json.partNum = that.getPartNum();
 		json.version = AppUtils.VERSION;
 		json.keypairs = [];
 		for (var i = 0; i < state.keypairs.length; i++) json.keypairs.push(state.keypairs[i].toJson());
@@ -326,7 +326,7 @@ function CryptoPiece(config) {
 		assertObject(piece, CryptoPiece);
 		var state2 = piece.getInternalState();
 		if (state.version !== state2.version) return false;
-		if (state.pieceNum !== state2.pieceNum) return false;
+		if (state.partNum !== state2.partNum) return false;
 		if (state.keypairs.length !== state2.keypairs.length) return false;
 		for (var i = 0; i < state.keypairs.length; i++) {
 			if (!state.keypairs[i].equals(state2.keypairs[i])) return false;
@@ -379,14 +379,14 @@ function CryptoPiece(config) {
 		else if (config.csv) fromCsv(config.csv);
 		else if (config.txt) fromTxt(config.txt);
 		else throw new Error("Config missing required fields");
-		if (isDefined(config.pieceNum)) that.setPartNum(config.pieceNum);
+		if (isDefined(config.partNum)) that.setPartNum(config.partNum);
 	}
 	
-	function setKeypairs(keypairs, pieceNum) {
+	function setKeypairs(keypairs, partNum) {
 		assertTrue(keypairs.length > 0);
 		for (var i = 0; i < keypairs.length; i++) {
 			assertObject(keypairs[i], CryptoKeypair);
-			if (isDefined(pieceNum)) keypairs[i].setPartNum(pieceNum);
+			if (isDefined(partNum)) keypairs[i].setPartNum(partNum);
 		}
 		state.keypairs = keypairs;
 	}
@@ -405,7 +405,7 @@ function CryptoPiece(config) {
 			if (keypair.wif) {
 				keypair.privateWif = keypair.wif;
 				delete keypair.wif;
-				keypair.partNum = json.pieceNum;
+				keypair.partNum = json.partNum;
 			}
 			if (!keypair.privateWif) delete keypair.partNum;	// no part num if not divided
 			if (keypair.address) {

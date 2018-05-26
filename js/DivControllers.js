@@ -113,7 +113,7 @@ var UiUtils = {
 		// assign piece numbers
 		for (var i = 0; i < copies.length; i++) {
 			if (copies[i].isDivided() && !copies[i].getPartNum()) {
-				copies[i].setPartNum(getNextAvailablePieceNum(copies));
+				copies[i].setPartNum(getNextAvailablepartNum(copies));
 			}
 		}
 		
@@ -128,18 +128,18 @@ var UiUtils = {
 		
 		return(copies);
 		
-		function getNextAvailablePieceNum(pieces) {
-			var pieceNum = 1;
+		function getNextAvailablepartNum(pieces) {
+			var partNum = 1;
 			while (true) {
 				var found = false;
 				for (var i = 0; i < pieces.length; i++) {
-					if (pieces[i].getPartNum() === pieceNum) {
+					if (pieces[i].getPartNum() === partNum) {
 						found = true;
 						break;
 					} 
 				}
-				if (!found) return pieceNum;
-				pieceNum++;
+				if (!found) return partNum;
+				partNum++;
 			}
 		}
 	},
@@ -3021,9 +3021,9 @@ function EditorController(div, config) {
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
-	function setVisiblePiece(pieceNum) {
+	function setVisiblePiece(partNum) {
 		window.location.hash = "";
-		window.location.hash = "piece_" + pieceNum;
+		window.location.hash = "piece_" + partNum;
 	}
 	
 	function updateFormError() {
@@ -3850,9 +3850,9 @@ function EditorPaginatorController(div, editorController) {
 		div.empty();
 		paginator = null;
 		piecesLabel = null;
-		var pieceNums = getPartNums();
-		if (pieceNums.length > 1) {
-			paginator = new PaginatorController($("<div>").appendTo(div), pieceNums);
+		var partNums = getPartNums();
+		if (partNums.length > 1) {
+			paginator = new PaginatorController($("<div>").appendTo(div), partNums);
 			paginator.render();
 			paginator.onClick(function(index, label) { invoke(clickListeners, index, label); });
 			piecesLabel = $("<div class='editor_part_selection_label'>").appendTo(div);
@@ -3864,17 +3864,17 @@ function EditorPaginatorController(div, editorController) {
 	}
 	
 	function getPartNums() {
-		var pieceNums = [];
+		var partNums = [];
 		var currentPieces = editorController.getCurrentPieces();
 		var config = editorController.getInitConfig();
 		if (currentPieces && currentPieces.length > 1) {
-			for (var i = 0; i < currentPieces.length; i++) pieceNums.push(currentPieces[i].getPartNum());
+			for (var i = 0; i < currentPieces.length; i++) partNums.push(currentPieces[i].getPartNum());
 		} else if (config.pieces && config.pieces.length > 1) {
-			for (var i = 0; i < config.pieces.length; i++) pieceNums.push(config.pieces[i].getPartNum());
+			for (var i = 0; i < config.pieces.length; i++) partNums.push(config.pieces[i].getPartNum());
 		} else if (config.genConfig && isDefined(config.genConfig.numParts) && config.genConfig.numParts > 1) {
-			for (var i = 0; i < config.genConfig.numParts; i++) pieceNums.push(i + 1);
+			for (var i = 0; i < config.genConfig.numParts; i++) partNums.push(i + 1);
 		}
-		return pieceNums;
+		return partNums;
 	}
 }
 inheritsFrom(EditorPaginatorController, DivController)
@@ -5340,8 +5340,8 @@ function StandardPieceRenderer(div, piece, config) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
 					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
-					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-					if (piece.getPartNum()) pieceNumDiv.append("Part " + piece.getPartNum());
+					var partNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
+					if (piece.getPartNum()) partNumDiv.append("Part " + piece.getPartNum());
 				}
 				keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
 			}
@@ -5883,8 +5883,8 @@ function CompactPieceRenderer(div, piece, config) {
               var headerDiv = $("<div class='piece_page_header_div'>").appendTo(config.visiblePlaceholder);
               headerDiv.append($("<div class='piece_page_header_left'>"));
               if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
-              var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-              if (piece.getPartNum()) pieceNumDiv.append("Part " + piece.getPartNum());
+              var partNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
+              if (piece.getPartNum()) partNumDiv.append("Part " + piece.getPartNum());
               usedHeight += headerDiv.get(0).offsetHeight;
               headerDiv.appendTo(pageDiv);
             }

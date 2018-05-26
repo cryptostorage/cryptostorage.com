@@ -71,10 +71,10 @@ $(document).ready(function() {
 				
 				// run full tests
 				if (AppUtils.RUN_FULL_TESTS) {
-					console.log("Running crypto test suite...")
+					console.log("Running test suite...")
 					tester.runTestSuite(function(err) {
 						if (err) throw err;
-						console.log("Crypto test suite passes");
+						console.log("Test suite passes");
 					});
 				}
 			});
