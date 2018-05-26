@@ -1,6 +1,7 @@
 v0.3.0
 update home split terminology
 split description
+keypairs hyperlink softened
 keypair description
 compact (private split)
 red warning when private keys are not included
