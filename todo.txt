@@ -19,6 +19,7 @@ browser testing
 release
 
 v0.3.1
+update code pieces -> parts, split -> divide
 remove selected item from dropdown selection so no duplicate
 ie11 squished print header, scroll bar on progress
 text highlighted on click
