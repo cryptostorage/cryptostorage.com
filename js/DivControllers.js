@@ -1249,9 +1249,8 @@ function FaqController(div) {
 				}, {
 					id: "faq_divide_keys",
 					getQuestion: function() { return "What does it mean to divide private keys?"; },
-					getAnswer: function() { return "<p>Generated storage can be divided into separate parts where some of the parts must be combined in order to access funds.</p>" +
-						"<p>This is useful for geographically dividing your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple parts.</p>" +
-						"<p>For example, 10 keypairs can be divided into 3 parts where 2 parts must be combined to access funds.  No funds can be accessed from any of the parts until 2 of the 3 parts are combined.</p>"; }
+					getAnswer: function() { return "<p>Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to divide private keys into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
+                        "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where any 2 parts may recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted sibling.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>"; }
 				}, {
 					id: "faq_online_to_recover",
 					getQuestion: function() { return "Do I need to be online to recover private keys?"; },
@@ -3605,9 +3604,8 @@ function EditorDivideController(div, editorController) {
 		useDivideListeners = [];
 		
 		// divide tooltip
-		var divideTooltip = "Divides generated keypairs using <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a>.  Funds cannot be accessed from the keypairs until a sufficient number of pieces are combined.<br><br>" +
-		                   "For example, keypairs can be generated and divided into 3 pieces.  Only when 2 of the 3 pieces are combined may private keys be recovered in order to access funds.<br><br>" +
-		                   "This is useful to prevent access to funds without physically combining a sufficient number of pieces.  Dividing can also provide fault tolerance so that private keys can be recovered even if one or more pieces are lost.  For example, if 2 of 3 pieces are necessary to recover private keys, then private keys can be recovered even if any one piece is lost.";
+		var divideTooltip = "Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to divide private keys into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.<br><br>" +
+		                    "For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where any 2 parts may recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted sibling.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.";
 		
 		// divide input
 		divideCheckbox = new CheckboxController($("<div>").appendTo(div), "Divide Keypairs?", divideTooltip).render();
