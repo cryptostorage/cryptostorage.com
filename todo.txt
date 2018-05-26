@@ -1,4 +1,5 @@
 v0.3.0
+update home split terminology
 split description
 keypair description
 compact (private split)
@@ -18,6 +19,7 @@ browser testing
 release
 
 v0.3.1
+remove open-source from home notice graphic
 remove selected item from dropdown selection so no duplicate
 ie11 squished print header, scroll bar on progress
 text highlighted on click
