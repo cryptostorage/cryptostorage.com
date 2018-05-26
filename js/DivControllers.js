@@ -1157,7 +1157,7 @@ function FaqController(div) {
 					getQuestion: function() { return "What is a cryptocurrency keypair?" },
 					getAnswer: function() { return "<p>A cryptocurrency keypair is a <b>public address</b> and a <b>private key</b>.  For example, this is a Bitcoin keypair:</p>" +
 	           "<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
-					  "<p>The <b>public address</b> is used to receive funds.  It can be partd with a sender in order to receive funds.</p>" +
+					  "<p>The <b>public address</b> is used to receive funds.  It can be shared with a sender in order to receive funds.</p>" +
 					  "<p>The <b>private key</b> authorizes received funds to be sent to other public addresses.  <span style='color:red'>The private key must remain private</span> or all funds held in its corresponding public address can be stolen.</p>"; }
 				}, {
 					id: "faq_safe_keys",
@@ -1255,7 +1255,7 @@ function FaqController(div) {
 				}, {
 					id: "faq_trusted_third_party",
 					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
-					getAnswer: function() { return "<p>No.  The public/private keypairs are generated only in your devices browser so they are never partd with a third party by design.</p>"; }
+					getAnswer: function() { return "<p>No.  The public/private keypairs are generated only in your devices browser so they are never shared with a third party by design.</p>"; }
 				}, {
           id: "faq_encryption",
           getQuestion: function() { return "How are keypairs encrypted?"; },
