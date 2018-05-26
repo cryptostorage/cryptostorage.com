@@ -1,5 +1,4 @@
 v0.3.0
-split description with keypair hyperlink
 keypair description
 compact (private split)
 red warning when private keys are not included
