@@ -3,7 +3,6 @@ keypair description
 compact (private split)
 red warning when private keys are not included
 addresses recognized as split share when obviously too short
-
 change out qr lib
 standard layout needs to float around long xmr seed
 put homepage text in index.html and dynamically hide for seo
