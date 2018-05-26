@@ -3937,7 +3937,7 @@ function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 		
 		// create right div
 		var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
-		rightDiv.append("<a target='_blank' href='index.html#faq_keypair'>Keypairs</a>&nbsp;to generate&nbsp;&nbsp;");
+		rightDiv.append("Keypairs to generate&nbsp;&nbsp;");
 		numKeysInput = $("<input class='num_keys_input' type='tel' value='1' min='1'>").appendTo(rightDiv);
 		numKeysInput.on("input", function(e) { validateNumKeys(true); });
 		numKeysInput.on("focusout", function(e) { validateNumKeys(false); });

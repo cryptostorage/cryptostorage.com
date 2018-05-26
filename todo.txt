@@ -1,7 +1,6 @@
 v0.3.0
 update home split terminology
-split description
-keypairs hyperlink softened
+split description with keypair hyperlink
 keypair description
 compact (private split)
 red warning when private keys are not included
@@ -20,6 +19,7 @@ browser testing
 release
 
 v0.3.1
+keypairs to generate with info box which hyperlinks to keypairs
 remove open-source from home notice graphic
 remove selected item from dropdown selection so no duplicate
 ie11 squished print header, scroll bar on progress
