@@ -35,6 +35,16 @@ var UiUtils = {
 	RASPBIAN_LINK: "<a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>",
 	INFO_TOOLTIP_MAX_WIDTH: "700px",
 	NOTICE_TOOLTIP_MAX_WIDTH: "700px",
+  
+	/**
+	 * Gets a description for dividing into parts.
+	 * 
+	 * @param faqNewTab whether or not to open faq hyperlink in new tab
+	 */
+  getDivideDescription: function(faqNewTab) {
+    return "<p>This tool uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to divide <a " + (faqNewTab ? "target='_blank'" : "") + "href='index.html#faq_keypair'>private keys</a> into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
+    "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted family member.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>"
+	},    
 	
 	/**
 	 * Renders a progress bar to the given div.
@@ -278,7 +288,7 @@ var UiUtils = {
 	      });
 	    }
 	  }
-	}
+	},
 }
 
 /**
@@ -1257,8 +1267,7 @@ function FaqController(div) {
         }, {
 					id: "faq_divide_keys",
 					getQuestion: function() { return "What does it mean to divide private keys?"; },
-					getAnswer: function() { return "<p>Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to divide private keys into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
-                        "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 <a href='index.html#faq_keypair'>keypairs</a>, one for each grandchild, and divides the 6 keypairs into 3 parts where any 2 parts may recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted sibling.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>"; }
+					getAnswer: function() { return UiUtils.getDivideDescription(false); }
 				}, {
           id: "faq_interoperable",
           getQuestion: function() { return "Does CryptoStorage work with other wallet software?"; },
@@ -3341,9 +3350,9 @@ function EditorPassphraseController(div, editorController) {
 		
 		// passphrase checkbox
 		riskAccepted = false;
-		var passphraseTooltipTxt = "Encrypts generated <a target='_blank' href='index.html#faq_keypair'>keypairs</a> with a passphrase.  The passphrase is required in order to decrypt private keys and access funds.<br><br>" +
-															 "The passphrase must be at least 7 characters.<br><br>" +
-															 "<a target='_blank' href='index.html#faq_encryption'>How are keypairs encrypted?</a>";
+		var passphraseTooltipTxt = "<p>Encrypts generated <a target='_blank' href='index.html#faq_keypair'>keypairs</a> with a passphrase.  The passphrase is required in order to decrypt private keys and access funds.</p>" +
+															 "<p>The passphrase must be at least 7 characters.</p>" +
+															 "<p><a target='_blank' href='index.html#faq_encryption'>How are keypairs encrypted?</a></p>";
 		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?", passphraseTooltipTxt);
 		passphraseCheckbox.render();
 		
@@ -3603,12 +3612,8 @@ function EditorDivideController(div, editorController) {
 		formErrorChangeListeners = [];
 		useDivideListeners = [];
 		
-		// divide tooltip
-		var divideTooltip = "Uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to divide private keys into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.<br><br>" +
-		                    "For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 <a target='_blank' href='index.html#faq_keypair'>keypairs</a>, one for each grandchild, and divides the 6 keypairs into 3 parts where any 2 parts may recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted sibling.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.";
-		
 		// divide input
-		divideCheckbox = new CheckboxController($("<div>").appendTo(div), "Divide Keypairs?", divideTooltip).render();
+		divideCheckbox = new CheckboxController($("<div>").appendTo(div), "Divide Keypairs?", UiUtils.getDivideDescription(true)).render();
 		var divideQr = $("<img class='divide_qr' src='img/qr_code.png'>").appendTo(div);
 		var divideLines3 = $("<img class='divide_lines_3' src='img/divide_lines_3.png'>").appendTo(div);
 		var divideNumDiv = $("<div class='divided_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);

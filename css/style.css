@@ -150,6 +150,14 @@ body {
 	text-decoration: underline;
 }
 
+.tippy-tooltip * p {
+	margin-bottom: 20px;
+}
+
+.tippy-tooltip * p:last-child {
+	margin-bottom: 0px;
+}
+
 .intro_div {
 	display: -webkit-flex;
 	display: -ms-flexbox;
