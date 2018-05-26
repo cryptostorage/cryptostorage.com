@@ -5139,7 +5139,7 @@ function NoticeController(div, config) {
 						if (!isTooltip && info.runtimeError.stack) {
 							
 							// submit an issue
-							var submitIssue = $("<div style='margin:3px 0 3px 0; font-size:18px;'><a style='font-size:18px; color:yellow;' target='_blank' href='" + AppUtils.GITHUB_ISSUES_URL + "'>Submit an issue with the text below</a></div>").appendTo(errDiv);
+              var submitIssue = $("<div style='margin:5px 0 5px 0; font-size:18px;'>Please let us know by <a style='font-size:18px; color:yellow;' target='_blank' href='" + AppUtils.GITHUB_NEW_ISSUE_URL + "'>submitting an issue</a> with the text below and a description of steps to recreate the error.</div>").appendTo(errDiv);
 							
 							// add stacktrace
 							var stacktrace = $("<div class='notice_stacktrace'>").appendTo(errDiv);
