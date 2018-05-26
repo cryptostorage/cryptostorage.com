@@ -43,7 +43,7 @@ var AppUtils = {
 	VERSION: "0.3.0",
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
-	RUN_FULL_TESTS: false,
+	RUN_FULL_TESTS: true,
 	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
@@ -67,6 +67,7 @@ var AppUtils = {
 	GITHUB_URL: "https://github.com/cryptostorage/cryptostorage.com",
 	GITHUB_DOWNLOAD_URL: "https://github.com/cryptostorage/cryptostorage.com/archive/master.zip",
 	GITHUB_ISSUES_URL: "https://github.com/cryptostorage/cryptostorage.com/issues",
+	GITHUB_NEW_ISSUE_URL: "https://github.com/cryptostorage/cryptostorage.com/issues/new",
 	REDDIT_URL: "https://www.reddit.com/r/cryptostorage/",
 	
 	// encryption v1 constants
