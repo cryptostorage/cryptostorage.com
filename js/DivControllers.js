@@ -4882,9 +4882,9 @@ function EditorPrintController(div, pieces) {
 	}
 	
 	function setPrintEnabled(bool) {
+    printBtn.unbind("click");
 		if (bool) {
 			printBtn.removeClass("btn_disabled");
-			printBtn.unbind("click");
 			printBtn.click(function() { print(); });
 		} else {
 			printBtn.addClass("btn_disabled");
