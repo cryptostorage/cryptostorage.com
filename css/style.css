@@ -990,11 +990,11 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	white-space: nowrap;
 }
 
-.editor_passphrase_split {
+.editor_passphrase_divide {
 	flex-wrap: wrap;
 }
 
-.editor_passphrase_split > div {
+.editor_passphrase_divide > div {
 	margin: 20px 20px 0px 20px;
 }
 
@@ -1046,29 +1046,23 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	max-width: 675px;
 }
 
-.split_warn_div {
-	width: 100%;
-	text-align: center;
-	margin-bottom: 15px;
-}
-
-.split_qr {
+.divide_qr {
 	width: 60px;
 	height: 60px;
 	margin: 0px 7px 0px 25px;
 }
 
-.split_lines_3 {
+.divide_lines_3 {
 	width: 40px;
 	height: 40px;
 	margin: 7px;
 }
 
-.split_input_div {
+.divide_input_div {
 	margin: 0 5px 0 5px;
 }
 
-.split_input {
+.divide_input {
 	height: 40px;
 	width: 70px;
 	color: black;
@@ -1078,22 +1072,22 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	padding: 5px;
 }
 
-.split_lines_2 {
+.divide_lines_2 {
 	width: 40px;
 	height: 40px;
 	margin: 7px;
 }
 
-.split_config_label {
+.divide_config_label {
 	text-align: center;
 	font-size: 18px;
 }
 
-.split_config_label_top {
+.divide_config_label_top {
 	margin-bottom: 3px;
 }
 
-.split_config_label_bottom {
+.divide_config_label_bottom {
 	margin-top: 3px;
 }
 
@@ -1290,7 +1284,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
     transform: rotate(24deg);
 }
 
-.editor_piece_selection_label {
+.editor_part_selection_label {
 	margin-top: 5px;
 	color: white;
 }

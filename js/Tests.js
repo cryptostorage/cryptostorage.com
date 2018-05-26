@@ -30,17 +30,17 @@
 function Tests() {
 	
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
-	var REPEAT_KEYS = 1;							// number of keys to test per plugin without encryption throughout tests
-	var REPEAT_KEYS_ENCRYPTION = 1;		// number of keys to test per plugin with encryption throughout tests
-	var TEST_MAX_SHARES = false;			// computationally intensive
-	var NUM_PIECES = 3;
-	var MIN_PIECES = 2;
+	var REPEAT_KEYS = 1;             // number of keys to test per plugin without encryption throughout tests
+	var REPEAT_KEYS_ENCRYPTION = 0;  // number of keys to test per plugin with encryption throughout tests
+	var TEST_MAX_PARTS = false;			 // computationally intensive
+	var NUM_PARTS = 3;
+	var MIN_PARTS = 2;
 	
 	// list of invalid private keys to test per plugin
 	var INVALID_PKS = [" ", "ab", "abctesting123", "abc testing 123", 12345, "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "7ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a", "3b20836520fe2e8eef1fd3f898fd97b5a3bcb6702fae72e3ca1ba8fb6e1ddd75b12f74dc6422606d1750e40"];
 	
 	/**
-	 * Runs minimum tests to verify key generation and splitting.
+	 * Runs minimum tests to verify key generation and dividing.
 	 * 
 	 * @param onDone(err) is invoked when done
 	 */
@@ -48,8 +48,8 @@ function Tests() {
 		
 		// build key generation configuration
 		var config = {};
-		config.numPieces = 3;
-		config.minPieces = 2;
+		config.numParts = 3;
+		config.minParts = 2;
 		config.keypairs = [];
 		config.keypairs.push({
 			ticker: AppUtils.getCryptoPlugin("BTC").getTicker(),
@@ -235,9 +235,9 @@ function Tests() {
 			
 			// verify shamirs initialized with 7 bits
 			var keypair = new CryptoKeypair({plugin: plugin});
-			var shares = secrets.share(keypair.getPrivateHex(), NUM_PIECES, MIN_PIECES);
-			for (var j = 0; j < shares.length; j++)  {
-				var b58 = AppUtils.toBase(16, 58, shares[j]);
+			var parts = secrets.share(keypair.getPrivateHex(), NUM_PARTS, MIN_PARTS);
+			for (var j = 0; j < parts.length; j++)  {
+				var b58 = AppUtils.toBase(16, 58, parts[j]);
 				assertTrue(b58.startsWith("3X") || b58.startsWith("3Y"));
 			}
 			
@@ -290,8 +290,8 @@ function Tests() {
 				assertInitialized(keypair.getPrivateWif());
 				assertFalse(keypair.isEncrypted());
 				assertNull(keypair.getEncryptionScheme());
-				assertFalse(keypair.isSplit());
-				assertNull(keypair.getMinShares());
+				assertFalse(keypair.isDivided());
+				assertNull(keypair.getMinParts());
 				assertTrue(plugin.isAddress(keypair.getPublicAddress()));
 				var copy = new CryptoKeypair({plugin: plugin, privateKey: keypair.getPrivateHex()});
 				assertTrue(keypair.equals(copy));
@@ -332,7 +332,7 @@ function Tests() {
 		});
 		
 		function testPieceEncryptionPlugin(plugin, onDone) {
-			console.log("Testing " + plugin.getTicker() + " encryption and splitting");
+			console.log("Testing " + plugin.getTicker() + " encryption and dividing");
 			
 			// collect keypair per encryption scheme
 			var keypairs = [];
@@ -350,7 +350,7 @@ function Tests() {
 			
 			// test piece
 			assertFalse(piece.isEncrypted());
-			assertFalse(piece.isSplit());
+			assertFalse(piece.isDivided());
 			testPieceWithoutEncryption(piece);
 			testDestroyPiece(piece, function() {
 				
@@ -381,8 +381,8 @@ function Tests() {
 					assertTrue(progressStarted, "Progress was not started");
 					assertTrue(progressComplete, "Progress was not completed");
 					assertTrue(piece.isEncrypted());
-					assertFalse(piece.isSplit());
-					assertNull(piece.getPieceNum());
+					assertFalse(piece.isDivided());
+					assertNull(piece.getPartNum());
 					testPieceWithoutEncryption(encryptedPiece);
 					testDestroyPiece(encryptedPiece, function() {
 						
@@ -424,8 +424,8 @@ function Tests() {
 								assertTrue(progressComplete, "Progress was not completed");
 								assertTrue(piece.equals(original));
 								assertFalse(piece.isEncrypted());
-								assertFalse(piece.isSplit());
-								assertNull(piece.getPieceNum());
+								assertFalse(piece.isDivided());
+								assertNull(piece.getPartNum());
 								
 								// done testing
 								onDone();
@@ -437,107 +437,107 @@ function Tests() {
 		}
 	}
 	
-	// tests piece splitting, initialization, and conversion
+	// tests piece dividing, initialization, and conversion
 	function testPieceWithoutEncryption(piece) {
 		assertObject(piece, CryptoPiece);
-		if (piece.isSplit() === false) testPieceSplit(piece);
+		if (piece.isDivided() === false) testPieceDivide(piece);
 		testPieceState(piece);
 		testPieceInit(piece);
 		testPieceRemoval(piece);
 	}
 	
-	function testPieceSplit(unsplitPiece) {
-		assertObject(unsplitPiece, CryptoPiece);
-		assertFalse(unsplitPiece.isSplit());
+	function testPieceDivide(undividedPiece) {
+		assertObject(undividedPiece, CryptoPiece);
+		assertFalse(undividedPiece.isDivided());
 				
 		// copy original for later testing
-		var original = unsplitPiece.copy();
-		assertTrue(original.equals(unsplitPiece));
+		var original = undividedPiece.copy();
+		assertTrue(original.equals(undividedPiece));
 		
-		// split piece
-		var splitPieces = unsplitPiece.split(NUM_PIECES, MIN_PIECES);
-		assertEquals(splitPieces.length, NUM_PIECES);
-		for (var i = 0; i < splitPieces.length; i++) {
+		// divide piece
+		var dividedPieces = undividedPiece.divide(NUM_PARTS, MIN_PARTS);
+		assertEquals(dividedPieces.length, NUM_PARTS);
+		for (var i = 0; i < dividedPieces.length; i++) {
 			
-			// test split piece state
-			testPieceState(splitPieces[i]);
-			assertTrue(splitPieces[i].isSplit());
-			assertEquals(i + 1, splitPieces[i].getPieceNum());
-			assertEquals(unsplitPiece.getKeypairs().length, splitPieces[i].getKeypairs().length);
+			// test divided piece state
+			testPieceState(dividedPieces[i]);
+			assertTrue(dividedPieces[i].isDivided());
+			assertEquals(i + 1, dividedPieces[i].getPartNum());
+			assertEquals(undividedPiece.getKeypairs().length, dividedPieces[i].getKeypairs().length);
 			
 			// test that public addresses are equal
-			for (var j = 0; j < unsplitPiece.getKeypairs().length; j++) {
-				assertEquals(unsplitPiece.getKeypairs()[j].getPublicAddress(), splitPieces[i].getKeypairs()[j].getPublicAddress());
+			for (var j = 0; j < undividedPiece.getKeypairs().length; j++) {
+				assertEquals(undividedPiece.getKeypairs()[j].getPublicAddress(), dividedPieces[i].getKeypairs()[j].getPublicAddress());
 			}
 		}
 		
-		// cannot encrypt split pieces
+		// cannot encrypt divided pieces
 		try {
-			splitPieces[0].encrypt(PASSPHRASE, [], function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
+			dividedPieces[0].encrypt(PASSPHRASE, [], function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
 			fail("fail");
 		} catch (err) {
-			if (err.message === "fail") throw new Error("Cannot encrypt split unsplitPiece");
+			if (err.message === "fail") throw new Error("Cannot encrypt divided undivided piece");
 		}
 		
-		// cannot split split piece
+		// cannot divide divided piece
 		try {
-			var temps = splitPieces[0].split(NUM_PIECES, MIN_PIECES);
+			var temps = dividedPieces[0].divide(NUM_PARTS, MIN_PARTS);
 			fail("fail");
 		} catch (err) {
-			if (err.message === "fail") throw new Error("Cannot split split piece");
+			if (err.message === "fail") throw new Error("Cannot divide divided piece");
 		}
 		
-		// test combining insufficient shares
-		for (var combinationSize = 1; combinationSize < MIN_PIECES; combinationSize++) {
-			var combinations = getCombinations(splitPieces, combinationSize);
+		// test combining insufficient parts
+		for (var combinationSize = 1; combinationSize < MIN_PARTS; combinationSize++) {
+			var combinations = getCombinations(dividedPieces, combinationSize);
 			for (var i = 0; i < combinations.length; i++) {
 				var combination = combinations[i];
 				try {
-					var combined = new CryptoPiece({splitPieces: combination});
+					var combined = new CryptoPiece({dividedPieces: combination});
 					fail("fail");
 				} catch (err) {
-					if (err.message === "fail") throw new Error("Should not be able to create piece with insufficient shares");
+					if (err.message === "fail") throw new Error("Should not be able to create piece with insufficient parts");
 				}
 			}
 		}
 				
-		// test combining duplicate shares
+		// test combining duplicate parts
 		var invalidCombination = [];
-		for (var i = 0; i < MIN_PIECES; i++) invalidCombination.push(splitPieces[0]);
+		for (var i = 0; i < MIN_PARTS; i++) invalidCombination.push(dividedPieces[0]);
 		try {
-			new CryptoPiece({splitPieces: invalidCombination});
+			new CryptoPiece({dividedPieces: invalidCombination});
 			throw new Error("fail");
 		} catch (err) {
-			if (err.message === "fail") throw new Error("Cannot create piece from duplicate shares");
+			if (err.message === "fail") throw new Error("Cannot create piece from duplicate parts");
 		}
 				
 		// test each piece combination
-		var combinations = getCombinations(splitPieces, MIN_PIECES);
+		var combinations = getCombinations(dividedPieces, MIN_PARTS);
 		for (var i = 0; i < combinations.length; i++) {
 			var combination = combinations[i];
-			var combined = new CryptoPiece({splitPieces: combination});
+			var combined = new CryptoPiece({dividedPieces: combination});
 			if (!original.hasPublicAddresses()) combined.removePublicAddresses();
 			assertTrue(original.equals(combined));
 		}
 				
 		// combine all pieces
-		var combined = new CryptoPiece({splitPieces: splitPieces});
+		var combined = new CryptoPiece({dividedPieces: dividedPieces});
 		if (!original.hasPublicAddresses()) combined.removePublicAddresses();
 		assertTrue(original.equals(combined));
 				
-		// test split with more than max shares
+		// test divided with more than max parts
 		try {
-			combined.split(AppUtils.MAX_SHARES + 1, AppUtils.MAX_SHARES - 10);
+			combined.divide(AppUtils.MAX_PARTS + 1, AppUtils.MAX_PARTS - 10);
 			fail("fail");
 		} catch (err) {
-			if (err.message === "fail") throw new Error("Cannot split piece with more than MAX_SHARES");
-			assertEquals("Cannot split into more than " + AppUtils.MAX_SHARES + " shares", err.message);
+			if (err.message === "fail") throw new Error("Cannot divide piece with more than MAX_PARTS");
+			assertEquals("Cannot divide into more than " + AppUtils.MAX_PARTS + " parts", err.message);
 		}
 		
-		// test split with max shares
-		if (TEST_MAX_SHARES) {
-			splitPieces = combined.split(AppUtils.MAX_SHARES, AppUtils.MAX_SHARES - 10);
-			var combined = new CryptoPiece({splitPieces: splitPieces});
+		// test divide with max parts
+		if (TEST_MAX_PARTS) {
+			dividedPieces = combined.divide(AppUtils.MAX_PARTS, AppUtils.MAX_PARTS - 10);
+			var combined = new CryptoPiece({dividedPieces: dividedPieces});
 			if (!original.hasPublicAddresses()) combined.removePublicAddresses();
 			assertTrue(original.equals(combined));
 		}
@@ -552,17 +552,17 @@ function Tests() {
 	function testKeypairState(keypair) {
 		assertInitialized(keypair.getPlugin());
 		
-		// test split keypair
-		if (keypair.isSplit()) {
+		// test divided keypair
+		if (keypair.isDivided()) {
 			assertInitialized(keypair.getPrivateHex());
 			assertInitialized(keypair.getPrivateWif());
 			assertEquals(undefined, keypair.isEncrypted());
 			assertEquals(undefined, keypair.getEncryptionScheme());
-			if (isNumber(keypair.getMinShares())) {
-				assertTrue(keypair.getMinShares() >= 2);
-				assertTrue(keypair.getMinShares() <= AppUtils.MAX_SHARES);
+			if (isNumber(keypair.getMinParts())) {
+				assertTrue(keypair.getMinParts() >= 2);
+				assertTrue(keypair.getMinParts() <= AppUtils.MAX_PARTS);
 			} else {
-				assertUndefined(keypair.getMinShares());
+				assertUndefined(keypair.getMinParts());
 			}
 			if (keypair.hasPublicAddress()) {
 				keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
@@ -573,9 +573,9 @@ function Tests() {
 		
 		// test encrypted keypair
 		else if (keypair.isEncrypted()) {
-			assertFalse(keypair.isSplit());
-			assertNull(keypair.getMinShares());
-			assertNull(keypair.getShareNum());
+			assertFalse(keypair.isDivided());
+			assertNull(keypair.getMinParts());
+			assertNull(keypair.getPartNum());
 			if (keypair.hasPublicAddress()) {
 				keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
 			} else {
@@ -589,8 +589,8 @@ function Tests() {
 			assertInitialized(keypair.getPrivateWif());
 			assertFalse(keypair.isEncrypted());
 			assertNull(keypair.getEncryptionScheme());
-			assertFalse(keypair.isSplit());
-			assertNull(keypair.getMinShares());
+			assertFalse(keypair.isDivided());
+			assertNull(keypair.getMinParts());
 			if (keypair.hasPublicAddress()) {
 				keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
 			} else {
@@ -604,8 +604,8 @@ function Tests() {
 			assertUndefined(keypair.getPrivateWif());
 			assertUndefined(keypair.isEncrypted());
 			assertUndefined(keypair.getEncryptionScheme());
-			assertUndefined(keypair.isSplit());
-			assertUndefined(keypair.getMinShares());
+			assertUndefined(keypair.isDivided());
+			assertUndefined(keypair.getMinParts());
 			keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
 		}
 		
@@ -630,52 +630,52 @@ function Tests() {
 			assertFalse(piece.getKeypairs()[i] === piece2.getKeypairs()[i]);
 		}
 		
-		// test init from split pieces
-		if (piece.isSplit() === false) {
-			var splitPieces = piece.split(3, 2);
+		// test init from divided pieces
+		if (piece.isDivided() === false) {
+			var dividedPieces = piece.divide(3, 2);
 			
 			// test ability to assign piece num one time if not previously assigned
-			var splitKeypair = new CryptoKeypair({plugin: splitPieces[0].getKeypairs()[0].getPlugin(), privateKey: splitPieces[0].getKeypairs()[0].getPrivateWif()});
-			var splitPiece = new CryptoPiece({keypairs: [splitKeypair]});
-			assertUndefined(splitPiece.getPieceNum());
-			splitPiece.setPieceNum(5);
-			assertEquals(5, splitPiece.getPieceNum());
+			var dividedKeypair = new CryptoKeypair({plugin: dividedPieces[0].getKeypairs()[0].getPlugin(), privateKey: dividedPieces[0].getKeypairs()[0].getPrivateWif()});
+			var dividedPiece = new CryptoPiece({keypairs: [dividedKeypair]});
+			assertUndefined(dividedPiece.getPartNum());
+			dividedPiece.setPartNum(5);
+			assertEquals(5, dividedPiece.getPartNum());
 			var canSetEqual = false;
 			try {
-				splitPiece.setPieceNum(5);
+				dividedPiece.setPartNum(5);
 				canSetEqual = true;
-				splitPiece.setPieceNum(6);
+				dividedPiece.setPartNum(6);
 				fail("fail");
 			} catch (err) {
-				if (err.message === "fail") throw new Error("Should not be able to override previously set share num");
+				if (err.message === "fail") throw new Error("Should not be able to override previously set part num");
 				assertTrue(canSetEqual);
 			}
 			
-			// test init from split pieces
-			for (var i = 0; i < splitPieces.length; i++) {
-				assertEquals(i + 1, splitPieces[i].getPieceNum());
-				var splitPiece = new CryptoPiece({piece: splitPieces[i]});
-				assertEquals(i + 1, splitPiece.getPieceNum());
-				testPieceInit(splitPieces[i]);
+			// test init from divided pieces
+			for (var i = 0; i < dividedPieces.length; i++) {
+				assertEquals(i + 1, dividedPieces[i].getPartNum());
+				var dividedPiece = new CryptoPiece({piece: dividedPieces[i]});
+				assertEquals(i + 1, dividedPiece.getPartNum());
+				testPieceInit(dividedPieces[i]);
 			}
-			piece2 = new CryptoPiece({splitPieces: splitPieces});
+			piece2 = new CryptoPiece({dividedPieces: dividedPieces});
 			if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 			assertTrue(piece.equals(piece2));
 			
 			/**
-			 * Tests init with shares with different minimum thresholds.
+			 * Tests init with parts with different minimum thresholds.
 			 * 
-			 * This test is commented out because shares from different keys can appear
-			 * valid, so this test is invalid without knowing share threshold which was
+			 * This test is commented out because parts from different keys can appear
+			 * valid, so this test is invalid without knowing part threshold which was
 			 * removed by default in v0.3.0.
 			 */
-//			var splitPieces1 = piece.split(3, 2);
-//			var splitPieces2 = piece.split(5, 3);
+//			var dividedPieces1 = piece.divide(3, 2);
+//			var dividedPieces2 = piece.divide(5, 3);
 //			try {
-//				new CryptoPiece({splitPieces: [splitPieces1[0], splitPieces2[0]]});
+//				new CryptoPiece({dividedPieces: [dividedPieces1[0], dividedPieces2[0]]});
 //				fail("fail");
 //			} catch (err) {
-//				if (err.message === "fail") throw new Error("Cannot initialize piece from incompatible shares");
+//				if (err.message === "fail") throw new Error("Cannot initialize piece from incompatible parts");
 //			}
 		}
 		
@@ -714,7 +714,7 @@ function Tests() {
 		assertString(piece.toTxt());
 		piece2 = new CryptoPiece({txt: piece.toTxt()});
 		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
-		if (piece.getPieceNum()) piece2.setPieceNum(piece.getPieceNum());
+		if (piece.getPartNum()) piece2.setPartNum(piece.getPartNum());
 		assertTrue(piece.equals(piece2));
 	}
 	
@@ -742,7 +742,7 @@ function Tests() {
 			assertUndefined(keypair.getPublicAddress());
 			assertTrue(keypair.hasPrivateKey());
 			testKeypairState(keypair);
-			if (piece.getPieceNum()) assertEquals(piece.getPieceNum(), modified.getPieceNum());
+			if (piece.getPartNum()) assertEquals(piece.getPartNum(), modified.getPartNum());
 		}
 		if (anyPublicsApply) testPieceWithoutEncryption(modified);
 		
@@ -754,8 +754,8 @@ function Tests() {
 			keypair.isPublicApplicable() ? assertDefined(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
 			assertFalse(keypair.hasPrivateKey());
 			assertUndefined(keypair.isEncrypted());
-			assertUndefined(keypair.getMinShares());
-			assertUndefined(keypair.getShareNum());
+			assertUndefined(keypair.getMinParts());
+			assertUndefined(keypair.getPartNum());
 			testKeypairState(keypair);
 		}
 		if (anyPublicsApply) testPieceWithoutEncryption(modified);
@@ -780,13 +780,13 @@ function Tests() {
 				return;
 			}
 			
-			// config with encryption and split
+			// config with encryption and divided
 			config.passphrase = PASSPHRASE;
 			for (var i = 0; i < config.keypairs.length; i++) {
 				config.keypairs[i].encryption = AppUtils.EncryptionScheme.V0_CRYPTOJS;
 			}
-			config.numPieces = NUM_PIECES;
-			config.minPieces = MIN_PIECES;
+			config.numParts = NUM_PARTS;
+			config.minParts = MIN_PARTS;
 			testGenerateConfig(config, function(err) {
 				if (err) {
 					onDone(err);
@@ -829,7 +829,7 @@ function Tests() {
 				assertTrue(progressMiddle);
 				assertTrue(progressEnd);
 				assertEquals(pieces.length, pieceRenderers.length);
-				if (config.numPieces) assertEquals(config.numPieces, pieces.length);
+				if (config.numParts) assertEquals(config.numParts, pieces.length);
 				else assertEquals(1, pieces.length);
 				assertEquals(plugins.length * REPEAT_KEYS, pieces[0].getKeypairs().length);
 				for (var i = 0; i < pieces.length; i++) {
@@ -862,13 +862,13 @@ function Tests() {
 			funcs.push(testUnencryptedJson());
 			funcs.push(testEncryptedJson());
 			funcs.push(testEncryptedCsv());
-			funcs.push(testCompatibleShares());
+			funcs.push(testCompatibleParts());
 			funcs.push(testInvalidPieces());
-			funcs.push(testIncompatibleShares());
+			funcs.push(testIncompatibleParts());
 			funcs.push(testDuplicateNames());
 			funcs.push(testUnsupportedFileTypes());
 			funcs.push(testZip());
-			funcs.push(testShareThenUnencrypted());
+			funcs.push(testPartThenUnencrypted());
 			funcs.push(testNoPrivateKeys());
 //		funcs.push(testInvalidZip());
 			
@@ -916,10 +916,10 @@ function Tests() {
 			}
 		}
 		
-		function testCompatibleShares() {
+		function testCompatibleParts() {
 			return function(onDone) {
 				
-				// add shares at same time
+				// add parts at same time
 				fileImporter.startOver();
 				var file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo"}]}', "file1.json", AppUtils.FileType.JSON);
 				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneCaD85wAWaLRggV6jqeKoYh1qeadp1WWG85Hgmgvf5Sf36"}]}', "file2.json", AppUtils.FileType.JSON);
@@ -927,11 +927,11 @@ function Tests() {
 					assertEquals(2, fileImporter.getNamedPieces().length);
 					assertEquals("", fileImporter.getWarning());
 					
-					// add shares one at a time
+					// add parts one at a time
 					fileImporter.startOver();
 					fileImporter.addFiles([file1], function() {
 						assertEquals(1, fileImporter.getNamedPieces().length);
-						assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
+						assertEquals("Need 1 additional part to recover private keys", fileImporter.getWarning());
 						fileImporter.addFiles([file2], function() {
 							assertEquals(2, fileImporter.getNamedPieces().length);
 							assertEquals("", fileImporter.getWarning());
@@ -978,39 +978,39 @@ function Tests() {
 			}
 		}
 		
-		function testIncompatibleShares() {
+		function testIncompatibleParts() {
 			return function(onDone) {
 				fileImporter.startOver();
 				
-				// test unsplit different currencies
+				// test undivided different currencies
 				var file1 = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"L5WpQ4Nn7P7bWMXr7LbvTWo9iYJQYTbLJPfLt1CdyS4hmsBo7xEd"}]}', "file1.json", AppUtils.FileType.JSON);
 				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"L1ncoCWShq4M5HS4csnFD6uiMZnjQTbpGjVASxowbLkSyJ8ocSkL"}]}', "file2.json", AppUtils.FileType.JSON);
 				fileImporter.addFiles([file1, file2], function() {
 					assertEquals(2, fileImporter.getNamedPieces().length);
-					assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+					assertEquals("Parts are not compatible", fileImporter.getWarning());
 					
-					// test unsplit same currency
+					// test undivided same currency
 					fileImporter.startOver();
 					file2 = getFile('{"keypairs":[{"ticker":"BTC","privateWif":"KxL6QF8gb4aZX6Nm2udUzkeaA69HE2gsYJLpQ16N5jhRY5Tbqixf"}]}', "file2.json", AppUtils.FileType.JSON);
 					fileImporter.addFiles([file1, file2], function() {
 						assertEquals(2, fileImporter.getNamedPieces().length);
-						assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+						assertEquals("Parts are not compatible", fileImporter.getWarning());
 						
-						// test split with incompatible addresses
+						// test divided with incompatible addresses
 						fileImporter.startOver();
 						file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9G9sJN1tqPwYwN5uXug42P9KqQrNjVrUyZV61oZphPnGi","publicAddress":"qqqam8u2tdsll4n5enrnky8h5p2t6r6tdvkhvmdm53"}]}', "file1.json", AppUtils.FileType.JSON);
 						file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneDDq8GxWUgUUo2Ju3jmZvEcf5vQFXsgydBnb4uzmL2aYdt","publicAddress":"qz0g46c6lj9k2nrh6jw28sm3vw3entqfys0hxxjnqx"}]}', "file2.json", AppUtils.FileType.JSON);
 						fileImporter.addFiles([file1, file2], function() {
 							assertEquals(2, fileImporter.getNamedPieces().length);
-							assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+							assertEquals("Parts are not compatible", fileImporter.getWarning());
 							
-							// test split with incompatible private shares
+							// test divided with incompatible private parts
 							fileImporter.startOver();
 							file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne8yTZQdrxKRfanFop628APvbfqysYFfsEQhJFYhEjE7vJ5"}]}', "file1.json", AppUtils.FileType.JSON);
 							file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"Sne9jYhr4zgKrvDRvJuCe8X4w9w6vTJvbWmVDZ8ZcN1jzBNp"}]}', "file2.json", AppUtils.FileType.JSON);
 							fileImporter.addFiles([file1, file2], function() {
 								assertEquals(2, fileImporter.getNamedPieces().length);
-								assertEquals("Need additional pieces to recover private keys", fileImporter.getWarning());
+								assertEquals("Need additional parts to recover private keys", fileImporter.getWarning());
 								onDone();
 							});
 						});
@@ -1028,14 +1028,14 @@ function Tests() {
 				var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"SneCaD85wAWaLRggV6jqeKoYh1qeadp1WWG85Hgmgvf5Sf36"}]}', "file1.json", AppUtils.FileType.JSON);
 				fileImporter.addFiles([file1, file2], function() {
 					assertEquals(1, fileImporter.getNamedPieces().length);
-					assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
+					assertEquals("Need 1 additional part to recover private keys", fileImporter.getWarning());
 					assertEquals("Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo", fileImporter.getNamedPieces()[0].piece.getKeypairs()[0].getPrivateWif());
 					
 					// add files one at a time
 					fileImporter.startOver();
 					fileImporter.addFiles([file1], function() {
 						assertEquals(1, fileImporter.getNamedPieces().length);
-						assertEquals("Need 1 additional piece to recover private keys", fileImporter.getWarning());
+						assertEquals("Need 1 additional part to recover private keys", fileImporter.getWarning());
 						assertEquals("Sne9W4vwiVbBJfpSCFdUMCH1jjr8e3tKUNKyLsvWAPaHQCuo", fileImporter.getNamedPieces()[0].piece.getKeypairs()[0].getPrivateWif());
 						fileImporter.addFiles([file2], function() {
 							assertEquals(1, fileImporter.getNamedPieces().length);
@@ -1055,11 +1055,11 @@ function Tests() {
 				for (var i = 0; i < plugins.length; i++) keypairs.push(new CryptoKeypair({plugin: plugins[i]}));
 				var piece = new CryptoPiece({keypairs: keypairs});
 				
-				// split piece
-				var splitPieces = piece.split(NUM_PIECES, MIN_PIECES);
+				// divided piece
+				var dividedPieces = piece.divide(NUM_PARTS, MIN_PARTS);
 				
 				// convert to zip file
-				AppUtils.piecesToBlob(splitPieces, AppUtils.FileType.CSV, function(err, blob, name) {
+				AppUtils.piecesToBlob(dividedPieces, AppUtils.FileType.CSV, function(err, blob, name) {
 					assertNull(err);
 					blob.lastModifiedDate = new Date();
 			    blob.name = name;
@@ -1067,7 +1067,7 @@ function Tests() {
 			    // import
 			    fileImporter.startOver();
 			    fileImporter.addFiles([blob], function() {
-						assertEquals(NUM_PIECES, fileImporter.getNamedPieces().length);
+						assertEquals(NUM_PARTS, fileImporter.getNamedPieces().length);
 						assertEquals("", fileImporter.getWarning());
 						onDone();
 					});
@@ -1088,14 +1088,14 @@ function Tests() {
 			}
 		}
 		
-		function testShareThenUnencrypted() {
+		function testPartThenUnencrypted() {
 			return function(onDone) {
 				fileImporter.startOver();
 				var file1 = getFile('{"keypairs":[{"ticker":"XMR","privateWif":"StRy32d5vCnoDQE1S7GLviyTRaZmhgTnHL4YwjdUheBVu5ev"}]}', "file1.json", AppUtils.FileType.JSON);
 				var file2 = getFile('{"keypairs":[{"ticker":"XMR","privateWif":"scamper framed voted taken espionage dosage nomad point unnoticed oscar uneven mesh plotting huge dice luxury oilfield orphans fitting alerts goodbye unafraid daily divers dice"}]}', "file2.json", AppUtils.FileType.JSON);
 				fileImporter.addFiles([file1, file2], function() {
 					assertEquals(2, fileImporter.getNamedPieces().length);
-					assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+					assertEquals("Parts are not compatible", fileImporter.getWarning());
 					onDone();
 				});
 			}
@@ -1116,7 +1116,7 @@ function Tests() {
 					fileImporter.startOver();
 					fileImporter.addFiles([file1, file2], function() {
 						assertEquals(2, fileImporter.getNamedPieces().length);
-						assertEquals("Pieces are not compatible shares", fileImporter.getWarning());
+						assertEquals("Parts are not compatible", fileImporter.getWarning());
 						onDone();
 					});
 				});
@@ -1133,10 +1133,10 @@ function Tests() {
 			
 			// get test functions
 			var funcs = [];
-			funcs.push(testIncompatibleShares());
+			funcs.push(testIncompatibleParts());
 			funcs.push(testJsonNoPrivateKeys());
 			funcs.push(testListOfPrivateKeys());
-			funcs.push(testSplitShares());
+			funcs.push(testDividedParts());
 			
 			// run tests async
 			async.series(funcs, function(err, results) {
@@ -1144,15 +1144,15 @@ function Tests() {
 			});
 		});
 		
-		function testIncompatibleShares() {
+		function testIncompatibleParts() {
 			return function(onDone) {
 				textImporter.startOver();
 				textImporter.setSelectedCurrency("XMR");
 				textImporter.addText("Sne8L5gQB5isnKcCPfF6SA514f5PE97QJ6yA8AEoo4hLtaao");
-				assertEquals("Need 1 additional piece to recover private keys", textImporter.getWarning());
+				assertEquals("Need 1 additional part to recover private keys", textImporter.getWarning());
 				assertEquals(1, textImporter.getImportedPieces().length);
 				textImporter.addText("aunt useful womanly vixen vowels business obtains weekday warped doorway sniff molten coexist enigma aplomb wallets value taunts makeup opposite joyous muzzle physics pledge doorway");
-				assertEquals("Pieces are not compatible shares", textImporter.getWarning());
+				assertEquals("Parts are not compatible", textImporter.getWarning());
 				assertEquals(2, textImporter.getImportedPieces().length);
 				onDone();
 			}
@@ -1180,12 +1180,12 @@ function Tests() {
 			}
 		}
 		
-		function testSplitShares() {
+		function testDividedParts() {
 			return function(onDone) {
 				textImporter.startOver();
 				textImporter.setSelectedCurrency("BTC");
 				textImporter.addText("Sne8qX2HPiBQe62QN5MvRSbABVWcTzfVJG4BbibDLrqGN4DE");
-				assertEquals("Need 1 additional piece to recover private keys", textImporter.getWarning());
+				assertEquals("Need 1 additional part to recover private keys", textImporter.getWarning());
 				assertEquals(1, textImporter.getImportedPieces().length);
 				textImporter.addText("SneEBeRMJRQ5K5BCd64LE6jDPHi1hWzJqBKY7pAeawuvhRJC");
 				assertEquals(2, textImporter.getImportedPieces().length);
@@ -1197,8 +1197,8 @@ function Tests() {
 	
 	function testDestroyPiece(piece, onDone) {
 		
-		// only continue if piece is known to be unsplit
-		if (piece.isSplit() !== false) {
+		// only continue if piece is known to be undivided
+		if (piece.isDivided() !== false) {
 			onDone();
 			return;
 		}
@@ -1383,16 +1383,16 @@ function Tests() {
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", publicAddress: "4ArXGi8gnxZA7Y9j1nK8ZmbspwCFcWLxyYeZkAnyCsYZ38c8FbyVvNfe3dAcp9Bk9P8Fa9fVp1gzz6v3B84rFW3SK9J7KPi", privateKey: "U2FsdGVkX19mwVwGQhm8jrqGIroOYfA4ckFDgBRhgGaQEE/uRpFXwFJlwwZ4DAGTTXTaAMEW6KSSzdsrjB7GE41U5L+Na5uuMK9wweoaoGH6j5rVTkRvToHYka4hAr9F"})]});
 		assertTrue(piece1.equals(piece2));
 		
-		// 0.1.0 json encrypted and split
+		// 0.1.0 json encrypted and divided
 		json = {"pieceNum":1,"version":"0.1.0","keys":[{"ticker":"XMR","address":"45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm","wif":"2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez","encryption":"CryptoJS"}]};
 		piece1 = new CryptoPiece({json: json});
-		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", shareNum: 1, publicAddress: "45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm", privateKey: "2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez"})]});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", partNum: 1, publicAddress: "45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm", privateKey: "2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez"})]});
 		assertTrue(piece1.equals(piece2));
 		
 		// 0.1.6 json bip39
 		json = {"pieceNum":2,"version":"0.1.6","keys":[{"ticker":"BIP39","address":"Not applicable","wif":"2FDYwUaFBJhM4HFd2aG7uJWJ1kT6QLnN47AirWQRGH4wCYe4qQ2Uvr4Q1GMt4kELu3FfLM5YHoNS1f2KPL4c3n3B6vbNxVQC4VGM8xC5LEbXbkGzJwidXnEwZVwVHEMAAQ9Gp1k","encryption":"V1_CRYPTOJS"}]};
 		piece1 = new CryptoPiece({json: json});
-		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", shareNum: 2, privateKey: "2FDYwUaFBJhM4HFd2aG7uJWJ1kT6QLnN47AirWQRGH4wCYe4qQ2Uvr4Q1GMt4kELu3FfLM5YHoNS1f2KPL4c3n3B6vbNxVQC4VGM8xC5LEbXbkGzJwidXnEwZVwVHEMAAQ9Gp1k"})]});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", partNum: 2, privateKey: "2FDYwUaFBJhM4HFd2aG7uJWJ1kT6QLnN47AirWQRGH4wCYe4qQ2Uvr4Q1GMt4kELu3FfLM5YHoNS1f2KPL4c3n3B6vbNxVQC4VGM8xC5LEbXbkGzJwidXnEwZVwVHEMAAQ9Gp1k"})]});
 		assertTrue(piece1.equals(piece2));
 		
 		// 0.2.3 json unencrypted
@@ -1407,13 +1407,13 @@ function Tests() {
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", publicAddress: "49J6bLmRd5nUxMquQkBpDkTuPFgJ3dva8LcpWYnBWpMjCRN7u4KXGczNBenRfc7fHQcSpUPNHPXviXcf6cz5aB5621xrcTd", privateKey: "6ihMiRRf7NgYhVpHyAAFuoZd17Jf5SNwbUxVD9qg2FuZfbKmsKu4i5ErfZfRPttgksuhArNhG6ajRs5f64o2aviEGZFhJ7PpADFitjNq9ukzWpR5JLmyJVXBGCYTBYGo2T5"})]});
 		assertTrue(piece1.equals(piece2));
 		
-		// 0.2.3 json encrypted and split
+		// 0.2.3 json encrypted and divided
 		json = {"pieceNum":1,"version":"0.2.3","keys":[{"ticker":"BTC","address":"19LbxpV9eMtSppiVhxibHDfPJYCLY7YFJZ","wif":"3Gz5MbtY98FdKoFYLF1QcXvGszwPnBtUsvKRpNfEzhvDma3noDETGqYJRXFL4oCRemJyHDoSmmnUPvLSawKFJvEER2Q7ixbsr6BtYZdXr4kDWnLy8NiYhMEHKcD86oskjzpD1MWz"}]};
 		piece1 = new CryptoPiece({json: json}); 
-		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BTC", shareNum: 1, publicAddress: "19LbxpV9eMtSppiVhxibHDfPJYCLY7YFJZ", privateKey: "3Gz5MbtY98FdKoFYLF1QcXvGszwPnBtUsvKRpNfEzhvDma3noDETGqYJRXFL4oCRemJyHDoSmmnUPvLSawKFJvEER2Q7ixbsr6BtYZdXr4kDWnLy8NiYhMEHKcD86oskjzpD1MWz"})]});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BTC", partNum: 1, publicAddress: "19LbxpV9eMtSppiVhxibHDfPJYCLY7YFJZ", privateKey: "3Gz5MbtY98FdKoFYLF1QcXvGszwPnBtUsvKRpNfEzhvDma3noDETGqYJRXFL4oCRemJyHDoSmmnUPvLSawKFJvEER2Q7ixbsr6BtYZdXr4kDWnLy8NiYhMEHKcD86oskjzpD1MWz"})]});
 		assertTrue(piece1.equals(piece2));
 		
-		// 0.2.3 json no private key and split
+		// 0.2.3 json no private key and divided
 		json = {"pieceNum":1,"version":"0.2.3","keys":[{"ticker":"BTC","address":"1AiWGJRuCkt1WP3N1B3Yo73t5kgNP3J17Q"}]}
 		piece1 = new CryptoPiece({json: json}); 
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BTC", publicAddress: "1AiWGJRuCkt1WP3N1B3Yo73t5kgNP3J17Q"})]});
@@ -1431,13 +1431,13 @@ function Tests() {
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", publicAddress: "48zYRRTqfVpEKW2JFh4vbpbm2NsYEhwcJBwhaZGDkctyho5kpSbdx4SDFfNZLZxySgDaSrzuxNmtZ5VvVDDVLDXmBvNFQK5", privateKey: "9FqGDi3vAQV6nCobhuKyFr8FDormZ4dzt5mSX2GgYA1q8nQVniRQ4KrBfVXrLbzf1LUwgqVRnFzmhFWx5yZaarrHwM4ucczJGJwPPYNLoTZZUXGKGdvEPwEkDE2eu9ExBok"})]});
 		assertTrue(piece1.equals(piece2));
 		
-		// 0.2.3 csv split
+		// 0.2.3 csv divided
 		csv = "TICKER,ADDRESS,WIF,PIECE_NUM\nXMR,49NR7bLTrAtPgVYtx8F1MUe3PZFiYC8sKFGB8VfuBK44KhUXrEoDtQkP77KgdirP4BDGSRJSinoUD5MzdyqaDzc9JYw4Zpw,Sne9BnjFn4fgGA3UFLpDGn6o5r9Eo9T7p11mJYX2Gdw2mMCs,1";
 		piece1 = new CryptoPiece({csv: csv});
-		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", shareNum: 1, publicAddress: "49NR7bLTrAtPgVYtx8F1MUe3PZFiYC8sKFGB8VfuBK44KhUXrEoDtQkP77KgdirP4BDGSRJSinoUD5MzdyqaDzc9JYw4Zpw", privateKey: "Sne9BnjFn4fgGA3UFLpDGn6o5r9Eo9T7p11mJYX2Gdw2mMCs"})]});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", partNum: 1, publicAddress: "49NR7bLTrAtPgVYtx8F1MUe3PZFiYC8sKFGB8VfuBK44KhUXrEoDtQkP77KgdirP4BDGSRJSinoUD5MzdyqaDzc9JYw4Zpw", privateKey: "Sne9BnjFn4fgGA3UFLpDGn6o5r9Eo9T7p11mJYX2Gdw2mMCs"})]});
 		assertTrue(piece1.equals(piece2));
 		
-		// 0.2.3 csv no private keys split
+		// 0.2.3 csv no private keys divided
 		csv = "TICKER,ADDRESS,PIECE_NUM\nXMR,475DC8KdSQgTEq5CbGeZvFhGX7f4qMYdC1eABNY2Vu3xTFEBnHfqfA3EYyyirXsy6a8MiBsjMWYVAfyhHM3UoFHMUN3giDG,1";
 		piece1 = new CryptoPiece({csv: csv});
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", publicAddress: "475DC8KdSQgTEq5CbGeZvFhGX7f4qMYdC1eABNY2Vu3xTFEBnHfqfA3EYyyirXsy6a8MiBsjMWYVAfyhHM3UoFHMUN3giDG"})]});

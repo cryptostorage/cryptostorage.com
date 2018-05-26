@@ -59,7 +59,7 @@ var AppUtils = {
 	SIMULATED_LOAD_TIME: null,				// simulate slow load times in ms, disabled if null
 	IGNORE_HASH_CHANGE: false,				// specifies that the browser should ignore hash changes
 	NA: "Not applicable",							// "not applicable" constant
-	MAX_SHARES: 127,									// maximum number of split shares
+	MAX_PARTS: 127,									  // maximum number of parts
 	//MAX_KEYPAIRS: 1000,							// limit max keypairs per currency selection
 	TICKERS_PARAM: "tickers",					// generate.html?tickers=xmr
 	
@@ -125,7 +125,7 @@ var AppUtils = {
 			"img/keys.png",
 			"img/checklist.png",
 			"img/passphrase_input.png",
-			"img/split_input.png",
+			"img/divide_input.png",
 			"img/print_sample.png",
 			"img/notice_bars.png",
 			"img/key.png",
@@ -249,8 +249,8 @@ var AppUtils = {
 			"img/information_white.png",
 			"img/caution_solid.png",
 			"img/qr_code.png",
-			"img/split_lines_2.png",
-			"img/split_lines_3.png",
+			"img/divide_lines_2.png",
+			"img/divide_lines_3.png",
 			
 			// import images
 			"img/file.png",
@@ -839,7 +839,7 @@ var AppUtils = {
 			// build names for pieces
 			var pieceNames = [];
 			for (var i = 0; i < pieces.length; i++) {
-				var name = "cryptostorage_" + ticker + (pieces[i].getPieceNum() ? "_piece_" + pieces[i].getPieceNum() : "");
+				var name = "cryptostorage_" + ticker + (pieces[i].getPartNum() ? "_part_" + pieces[i].getPartNum() : "");
 				pieceNames.push(getNextAvailableName(pieceNames, name));
 			}
 

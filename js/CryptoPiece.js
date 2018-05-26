@@ -31,7 +31,7 @@
  * 				config.keypairs keypairs are keypairs to initialize with
  * 				config.json is json to initialize from
  * 				config.csv is csv to initialize from
- * 				config.splitPieces are split pieces to combine and initialize from
+ * 				config.dividedPieces are divided pieces to combine and initialize from
  * 				config.piece is an existing piece to copy from
  *  			config.pieceNum is the pieceNumber to assign to each piece (optional)
  */
@@ -181,48 +181,48 @@ function CryptoPiece(config) {
 		}
 	}
 	
-	this.split = function(numShares, minShares) {
+	this.divide = function(numParts, minParts) {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		
-		// collect all split keypairs
-		var allSplitKeypairs = [];
-		for (var i = 0; i < numShares; i++) allSplitKeypairs.push([]);
+		// collect all divided keypairs
+		var allDividedKeypairs = [];
+		for (var i = 0; i < numParts; i++) allDividedKeypairs.push([]);
 		for (var i = 0; i < state.keypairs.length; i++) {
-			var splitKeypairs = state.keypairs[i].split(numShares, minShares);
-			for (var j = 0; j < splitKeypairs.length; j++) {
-				allSplitKeypairs[j].push(splitKeypairs[j]);
+			var dividedKeypairs = state.keypairs[i].divide(numParts, minParts);
+			for (var j = 0; j < dividedKeypairs.length; j++) {
+				allDividedKeypairs[j].push(dividedKeypairs[j]);
 			}
 		}
 		
-		// build split pieces
-		var splitPieces = [];
-		for (var i = 0; i < allSplitKeypairs.length; i++) {
-			splitPieces.push(new CryptoPiece({keypairs: allSplitKeypairs[i]}));
+		// build divided pieces
+		var dividedPieces = [];
+		for (var i = 0; i < allDividedKeypairs.length; i++) {
+			dividedPieces.push(new CryptoPiece({keypairs: allDividedKeypairs[i]}));
 		}
-		return splitPieces;
+		return dividedPieces;
 	}
 	
-	this.isSplit = function() {
+	this.isDivided = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		assertTrue(state.keypairs.length > 0);
-		return state.keypairs[0].isSplit();
+		return state.keypairs[0].isDivided();
 	}
 	
-	this.getMinPieces = function() {
+	this.getMinParts = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		assertTrue(state.keypairs.length > 0);
-		return state.keypairs[0].getMinShares();
+		return state.keypairs[0].getMinParts();
 	}
 	
-	this.getPieceNum = function() {
+	this.getPartNum = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		assertTrue(state.keypairs.length > 0);
-		return state.keypairs[0].getShareNum();
+		return state.keypairs[0].getPartNum();
 	}
 	
-	this.setPieceNum = function(pieceNum) {
+	this.setPartNum = function(pieceNum) {
 		assertFalse(_isDestroyed, "Piece is destroyed");
-		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].setShareNum(pieceNum);
+		for (var i = 0; i < state.keypairs.length; i++) state.keypairs[i].setPartNum(pieceNum);
 		return this;
 	}
 	
@@ -263,7 +263,7 @@ function CryptoPiece(config) {
 	this.toJson = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		var json = {};
-		json.pieceNum = that.getPieceNum();
+		json.pieceNum = that.getPartNum();
 		json.version = AppUtils.VERSION;
 		json.keypairs = [];
 		for (var i = 0; i < state.keypairs.length; i++) json.keypairs.push(state.keypairs[i].toJson());
@@ -284,7 +284,7 @@ function CryptoPiece(config) {
 		  if (!CryptoKeypair.Field.hasOwnProperty(prop)) continue;
 		  var header = CryptoKeypair.Field[prop.toString()];
 		  if (arrayContains(CryptoKeypair.EXCLUDE_FIELDS, header)) continue;              // skip field if excluded
-		  if (header === CryptoKeypair.Field.SHARE_NUM && !this.isSplit()) continue;      // skip share num if not split
+		  if (header === CryptoKeypair.Field.PART_NUM && !this.isDivided()) continue;      // skip part num if not divided
 		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue; // skip encryption if not encrypted
 			headers.push(header);
 		}
@@ -316,7 +316,7 @@ function CryptoPiece(config) {
 				if (!state.keypairs[i].getPlugin().hasPublicAddress()) publicAddress = "Not applicable";
 				str += "Public Address:\r\n" + publicAddress + "\r\n\r\n";
 			}
-			if (isDefined(state.keypairs[i].getPrivateWif())) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPieceNum() ? "(split)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
+			if (isDefined(state.keypairs[i].getPrivateWif())) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPartNum() ? "(divided)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
 		}
 		return str.trim();
 	}
@@ -374,19 +374,19 @@ function CryptoPiece(config) {
 		state = {};
 		if (config.keypairs) setKeypairs(config.keypairs);
 		else if (config.json) fromJson(config.json);
-		else if (config.splitPieces) combine(config.splitPieces);
+		else if (config.dividedPieces) combine(config.dividedPieces);
 		else if (config.piece) fromPiece(config.piece);
 		else if (config.csv) fromCsv(config.csv);
 		else if (config.txt) fromTxt(config.txt);
 		else throw new Error("Config missing required fields");
-		if (isDefined(config.pieceNum)) that.setPieceNum(config.pieceNum);
+		if (isDefined(config.pieceNum)) that.setPartNum(config.pieceNum);
 	}
 	
 	function setKeypairs(keypairs, pieceNum) {
 		assertTrue(keypairs.length > 0);
 		for (var i = 0; i < keypairs.length; i++) {
 			assertObject(keypairs[i], CryptoKeypair);
-			if (isDefined(pieceNum)) keypairs[i].setShareNum(pieceNum);
+			if (isDefined(pieceNum)) keypairs[i].setPartNum(pieceNum);
 		}
 		state.keypairs = keypairs;
 	}
@@ -405,9 +405,9 @@ function CryptoPiece(config) {
 			if (keypair.wif) {
 				keypair.privateWif = keypair.wif;
 				delete keypair.wif;
-				keypair.shareNum = json.pieceNum;
+				keypair.partNum = json.pieceNum;
 			}
-			if (!keypair.privateWif) delete keypair.shareNum;	// no share num if not split
+			if (!keypair.privateWif) delete keypair.partNum;	// no part num if not divided
 			if (keypair.address) {
 				keypair.publicAddress = keypair.address;
 				delete keypair.address;
@@ -441,7 +441,7 @@ function CryptoPiece(config) {
 				csvArr[0][col] = CryptoKeypair.Field.PRIVATE_WIF;
 				break;
 			case "piece_num":
-				csvArr[0][col] = CryptoKeypair.Field.SHARE_NUM;
+				csvArr[0][col] = CryptoKeypair.Field.PART_NUM;
 				break;
 			}
 		}
@@ -466,16 +466,16 @@ function CryptoPiece(config) {
 					case CryptoKeypair.Field.PUBLIC_ADDRESS.toLowerCase():
 						keypairConfig.publicAddress = value;
 						break;
-					case CryptoKeypair.Field.SHARE_NUM.toLowerCase():
+					case CryptoKeypair.Field.PART_NUM.toLowerCase():
 						if (value) {
 							value = parseInt(value, 10);
 							assertTrue(isInt(value));
 						}
-						keypairConfig.shareNum = value;
+						keypairConfig.partNum = value;
 						break;
 				}
 			}
-			if (!keypairConfig.privateKey) delete keypairConfig.shareNum;	// no share num if no private key
+			if (!keypairConfig.privateKey) delete keypairConfig.partNum;	// no part num if no private key
 			keypairs.push(new CryptoKeypair(keypairConfig));
 		}
 		
@@ -491,37 +491,37 @@ function CryptoPiece(config) {
 		fromPiece(piece);
 	}
 	
-	function combine(splitPieces) {
+	function combine(dividedPieces) {
 		
 		// verify consistent min pieces and num keypairs
-		var minPieces;
+		var minParts;
 		var numKeypairs;
-		for (var i = 0; i < splitPieces.length; i++) {
-			assertTrue(splitPieces[0].isSplit());
-			if (!minPieces) minPieces = splitPieces[i].getMinPieces();
-			else if (minPieces !== splitPieces[i].getMinPieces()) throw new Error("config.splitPieces[" + i + "].getMinPieces() has inconsistent min pieces");
-			if (!numKeypairs) numKeypairs = splitPieces[i].getKeypairs().length;
-			else if (numKeypairs !== splitPieces[i].getKeypairs().length) throw new Error("config.splitPieces[" + i + "].getKeypairs() has inconsistent number of keypairs");
+		for (var i = 0; i < dividedPieces.length; i++) {
+			assertTrue(dividedPieces[0].isDivided());
+			if (!minParts) minParts = dividedPieces[i].getMinParts();
+			else if (minParts !== dividedPieces[i].getMinParts()) throw new Error("config.dividedPieces[" + i + "].getMinParts() has inconsistent min pieces");
+			if (!numKeypairs) numKeypairs = dividedPieces[i].getKeypairs().length;
+			else if (numKeypairs !== dividedPieces[i].getKeypairs().length) throw new Error("config.dividedPieces[" + i + "].getKeypairs() has inconsistent number of keypairs");
 		}
 		assertTrue(numKeypairs > 0);
 		
-		// check if min pieces met
-		if (isNumber(minPieces) && splitPieces.length < minPieces) {
-			var additional = minPieces - splitPieces.length;
-			throw new Error("Need " + additional + " additional " + (additional === 1 ? "piece" : "pieces") + " to recover private keys");
-		} else if (splitPieces.length < 2) {
-			throw new Error("Need additional shares to recover private key");
+		// check if min parts met
+		if (isNumber(minParts) && dividedPieces.length < minParts) {
+			var additional = minParts - dividedPieces.length;
+			throw new Error("Need " + additional + " additional " + (additional === 1 ? "part" : "parts") + " to recover private keys");
+		} else if (dividedPieces.length < 2) {
+			throw new Error("Need additional parts to recover private key");
 		}
 		
 		// combine keypairs
 		var combinedKeypairs = [];
 		for (var i = 0; i < numKeypairs; i++) {
-			var splitKeypairs = [];
-			for (var j = 0; j < splitPieces.length; j++) splitKeypairs.push(splitPieces[j].getKeypairs()[i]);
+			var dividedKeypairs = [];
+			for (var j = 0; j < dividedPieces.length; j++) dividedKeypairs.push(dividedPieces[j].getKeypairs()[i]);
 			try {
-				combinedKeypairs.push(new CryptoKeypair({splitKeypairs: splitKeypairs}));
+				combinedKeypairs.push(new CryptoKeypair({dividedKeypairs: dividedKeypairs}));
 			} catch (err) {
-				if (err.message.indexOf("additional") > -1) throw new Error("Need additional pieces to recover private keys");
+				if (err.message.indexOf("additional") > -1) throw new Error("Need additional parts to recover private keys");
 				else throw err;
 			}
 		}

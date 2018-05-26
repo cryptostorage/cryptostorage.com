@@ -3,8 +3,8 @@
  *  
  * @param config specifies piece generation configuration
  * 				config.passphrase causes encryption with this field as the passphrase
- * 				config.numPieces causes splitting with this field as the number of split pieces
- * 				config.minPieces specifies the minimum number of split pieces necessary to reconstitute private keys
+ * 				config.numParts causes dividing with this field as the number of divided pieces
+ * 				config.minParts specifies the minimum number of divided pieces necessary to reconstitute private keys
  * 				config.keypairs[{ticker: "BCH", numKeypairs: 7, encryptionScheme: "BIP38"}, ...] specifies the keypair generation configuration
  * 				config.pieces are existing pieces to start with instead of generating new keypairs
  *				config.encryptionSchemes are encryption schemes to encrypt existing pieces if passphrase is set
@@ -35,7 +35,7 @@ function PieceGenerator(config) {
 		var weights = that.getWeights();
 		var createWeight = weights.createWeight;
 		var encryptWeight = weights.encryptWeight
-		var splitWeight = weights.splitWeight;
+		var divideWeight = weights.divideWeight;
 		var renderWeight = weights.renderWeight;
 		var totalWeight = weights.totalWeight;
 		
@@ -60,14 +60,14 @@ function PieceGenerator(config) {
 				assertNull(err);
 				doneWeight += encryptWeight;
 				
-				// split
-				splitIfApplicable(pieces, function(percent, label) {
+				// divide
+				divideIfApplicable(pieces, function(percent, label) {
 					if (_isDestroyed) return;
-					if (onProgress) onProgress((doneWeight + percent * splitWeight) / totalWeight, label);
+					if (onProgress) onProgress((doneWeight + percent * divideWeight) / totalWeight, label);
 				}, function(err, pieces) {
 					if (_isDestroyed) return;
 					assertNull(err);
-					doneWeight += splitWeight;
+					doneWeight += divideWeight;
 					
 					// render
 					renderIfApplicable(pieces, function(percent, label) {
@@ -90,7 +90,7 @@ function PieceGenerator(config) {
 		weights = {};
 		weights.createWeight = 0;
 		weights.encryptWeight = 0;
-		weights.splitWeight = 0;
+		weights.divideWeight = 0;
 		weights.renderWeight = config.pieceRendererClass ? config.pieceRendererClass.getRenderWeight(config) : 0;
 		
 		// compute weights with key generation
@@ -110,7 +110,7 @@ function PieceGenerator(config) {
 		}
 		
 		// compute total and return
-		weights.totalWeight = weights.createWeight + weights.encryptWeight + weights.splitWeight + weights.renderWeight;
+		weights.totalWeight = weights.createWeight + weights.encryptWeight + weights.divideWeight + weights.renderWeight;
 		return weights;
 	}
 	
@@ -205,18 +205,18 @@ function PieceGenerator(config) {
 		});
 	}
 	
-	function splitIfApplicable(pieces, onProgress, onDone) {
+	function divideIfApplicable(pieces, onProgress, onDone) {
 		
-		// no splitting
-		if (!isDefined(config.numPieces)) {
+		// no dividing
+		if (!isDefined(config.numParts)) {
 			onDone(null, pieces);
 			return;
 		}
 		
-		// split
+		// divide
 		assertEquals(1, pieces.length);
-		assertFalse(pieces[0].isSplit());
-		onDone(null, pieces[0].split(config.numPieces, config.minPieces));
+		assertFalse(pieces[0].isDivided());
+		onDone(null, pieces[0].divide(config.numParts, config.minParts));
 	}
 	
 	function renderIfApplicable(pieces, onProgress, onDone) {
@@ -273,15 +273,15 @@ PieceGenerator.validateConfig = function(config) {
 		assertTrue(config.passphrase.length >= AppUtils.MIN_PASSPHRASE_LENGTH)
 	}
 	
-	// validate split config
-	if (isDefined(config.numPieces) || isDefined(config.minPieces)) {
-		assertNumber(config.numPieces);
-		assertNumber(config.minPieces);
-		assertTrue(config.numPieces >= 2);
-		assertTrue(config.numPieces <= AppUtils.MAX_SHARES);
-		assertTrue(config.minPieces >= 2);
-		assertTrue(config.minPieces <= AppUtils.MAX_SHARES);
-		assertTrue(config.minPieces <= config.numPieces);
+	// validate divide config
+	if (isDefined(config.numParts) || isDefined(config.minParts)) {
+		assertNumber(config.numParts);
+		assertNumber(config.minParts);
+		assertTrue(config.numParts >= 2);
+		assertTrue(config.numParts <= AppUtils.MAX_PARTS);
+		assertTrue(config.minParts >= 2);
+		assertTrue(config.minParts <= AppUtils.MAX_PARTS);
+		assertTrue(config.minParts <= config.numParts);
 	}
 	
 	// validate piece renderer
@@ -314,15 +314,15 @@ PieceGenerator.validateConfig = function(config) {
 		if (config.passphrase) {
 			assertEquals(1, config.pieces.length);
 			assertFalse(config.pieces[0].isEncrypted());
-			assertFalse(config.pieces[0].isSplit());
+			assertFalse(config.pieces[0].isDivided());
 			assertEquals(config.pieces[0].getKeypairs().length, config.encryptionSchemes.length);
 			for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
 				assertTrue(arrayContains(config.pieces[0].getKeypairs()[i].getPlugin().getEncryptionSchemes(), config.encryptionSchemes[i]));
 			}
 		}
-		if (isDefined(config.numPieces)) {
+		if (isDefined(config.numParts)) {
 			assertEquals(1, config.pieces.length);
-			assertFalse(config.pieces[0].isSplit());
+			assertFalse(config.pieces[0].isDivided());
 		}
 	}
 	

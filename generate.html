@@ -47,7 +47,7 @@
 				// get tickers
 				var tickerParamValue = getParameterByName(AppUtils.TICKERS_PARAM);
 				if (!tickerParamValue) return null;
-				var tickers = tickerParamValue.split(",");
+				var tickers = tickerParamValue.divide(",");
 				
 				// trim and validate tickers
 				var tickersValid = true;

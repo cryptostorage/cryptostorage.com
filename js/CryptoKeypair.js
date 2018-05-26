@@ -25,16 +25,16 @@
 /**
  * Encapsulates a crypto keypair which has a public and private component.
  * 
- * One of keypair, plugin, json, or splitKeypairs is required.
+ * One of keypair, plugin, json, or dividedKeypairs is required.
  * 
  * @param config is initialization configuration
  * 				config.keypair is a keypair to copy from
  * 				config.plugin is the crypto plugin or string ticker
  * 				config.json is exportable json to initialize from
- * 				config.splitKeypairs are split keypairs to combine and initialize from
+ * 				config.dividedKeypairs are divided keypairs to combine and initialize from
  * 				config.privateKey is a private key (hex or wif, encrypted or unencrypted) (optional)
  * 				config.publicAddress is a public address to manually set if not unencrypted (optional)
- * 				config.shareNum is the share number if otherwise undefined (optional)
+ * 				config.partNum is the part number if otherwise undefined (optional)
  */
 function CryptoKeypair(config) {
 	
@@ -46,10 +46,10 @@ function CryptoKeypair(config) {
 	// direct copy internal state from keypair, no validation
 	if (config.keypair) {
 		assertUndefined(config.json);
-		assertUndefined(config.splitKeypairs);
+		assertUndefined(config.dividedKeypairs);
 		assertUndefined(config.privateKey);
 		assertUndefined(config.publicAddress);
-		assertUndefined(config.shareNum);
+		assertUndefined(config.partNum);
 		assertObject(config.keypair, CryptoKeypair);
 		this._state = Object.assign({}, config.keypair._state);
 		return;
@@ -58,7 +58,7 @@ function CryptoKeypair(config) {
 	// create from plugin
 	if (config.plugin) {
 		assertUndefined(config.keypair);
-		assertUndefined(config.splitKeypairs);
+		assertUndefined(config.dividedKeypairs);
 		assertUndefined(config.json);
 		var plugin = isString(config.plugin) ? AppUtils.getCryptoPlugin(config.plugin) : config.plugin;
 		assertTrue(isObject(plugin, CryptoPlugin), "Plugin is not a CryptoPlugin");
@@ -72,20 +72,20 @@ function CryptoKeypair(config) {
 	else if (config.json) {
 		assertUndefined(config.keypair);
 		assertUndefined(config.plugin);
-		assertUndefined(config.splitKeypairs);
+		assertUndefined(config.dividedKeypairs);
 		this._fromJson(config.json);
 	}
 	
-	// create from splitKeypairs
-	else if (config.splitKeypairs) {
+	// create from dividedKeypairs
+	else if (config.dividedKeypairs) {
 		assertUndefined(config.keypair);
 		assertUndefined(config.plugin);
 		assertUndefined(config.json);
-		this._combine(config.splitKeypairs);
+		this._combine(config.dividedKeypairs);
 	}
 	
-	// set share num
-	if (isDefined(config.shareNum)) this.setShareNum(config.shareNum);
+	// set part num
+	if (isDefined(config.partNum)) this.setPartNum(config.partNum);
 	
 	// verify state
 	this._validateState();
@@ -144,9 +144,9 @@ CryptoKeypair.prototype.removePrivateKey = function() {
 	delete this._state.privateHex;
 	delete this._state.privateWif;
 	delete this._state.encryption;
-	delete this._state.isSplit;
-	delete this._state.minShares;
-	delete this._state.shareNum;
+	delete this._state.isDivided;
+	delete this._state.minParts;
+	delete this._state.partNum;
 	return this;
 }
 
@@ -260,68 +260,68 @@ CryptoKeypair.prototype.decrypt = function(passphrase, onProgress, onDone) {
 	});
 }
 
-CryptoKeypair.prototype.split = function(numShares, minShares) {
+CryptoKeypair.prototype.divide = function(numParts, minParts) {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	
 	// validate input
-	assertFalse(this.isSplit());
-	assertTrue(numShares >= 2);
-	assertTrue(numShares <= AppUtils.MAX_SHARES, "Cannot split into more than " + AppUtils.MAX_SHARES + " shares");
-	assertTrue(minShares >= 2);
-	assertTrue(minShares <= numShares);
+	assertFalse(this.isDivided());
+	assertTrue(numParts >= 2);
+	assertTrue(numParts <= AppUtils.MAX_PARTS, "Cannot divide into more than " + AppUtils.MAX_PARTS + " parts");
+	assertTrue(minParts >= 2);
+	assertTrue(minParts <= numParts);
 	
-	// split private hex into shares
-	var shares = secrets.share(this.getPrivateHex(), numShares, minShares);
+	// divide private hex into parts
+	var parts = secrets.share(this.getPrivateHex(), numParts, minParts);
 	
-	// encode shares with minimum threshold
-	for (var i = 0; i < shares.length; i++) {
-		shares[i] = CryptoKeypair.encodeHexShare(shares[i], minShares);
+	// encode parts with minimum threshold
+	for (var i = 0; i < parts.length; i++) {
+		parts[i] = CryptoKeypair.encodeHexPart(parts[i], minParts);
 	}
 	
 	// create keypairs
-	var splitKeypairs = [];
-	for (var i = 0; i < shares.length; i++) {
+	var dividedKeypairs = [];
+	for (var i = 0; i < parts.length; i++) {
 		var keypair = new CryptoKeypair({
 			plugin: this._state.plugin,
-			privateKey: shares[i],
+			privateKey: parts[i],
 			publicAddress: this.getPublicAddress(),
-			shareNum: i + 1
+			partNum: i + 1
 		});
 		if (!this.hasPublicAddress()) keypair.removePublicAddress();
-		splitKeypairs.push(keypair);
+		dividedKeypairs.push(keypair);
 	}
-	return splitKeypairs;
+	return dividedKeypairs;
 }
 
-CryptoKeypair.prototype.isSplit = function() {
+CryptoKeypair.prototype.isDivided = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	return this._state.isSplit;
+	return this._state.isDivided;
 }
 
-CryptoKeypair.prototype.getMinShares = function() {
+CryptoKeypair.prototype.getMinParts = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	return this._state.minShares;
+	return this._state.minParts;
 }
 
-CryptoKeypair.prototype.getShareNum = function() {
+CryptoKeypair.prototype.getPartNum = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	return this._state.shareNum;
+	return this._state.partNum;
 }
 
-CryptoKeypair.prototype.setShareNum = function(shareNum) {
+CryptoKeypair.prototype.setPartNum = function(partNum) {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	if (this.isSplit()) {
-		assertNumber(shareNum);
-		assertTrue(shareNum >= 1);
-		assertTrue(shareNum <= AppUtils.MAX_SHARES);
-		assertTrue(isUndefined(this._state.shareNum) || this._state.shareNum === shareNum, "Cannot override previously assigned share num");
-		this._state.shareNum = shareNum;
-	} else if (this.isSplit() === false) {
-		assertNull(shareNum);
-		assertNull(this._state.shareNum);
-	} else if (this.isSplit() === undefined) {
-		assertUndefined(shareNum);
-		assertUndefined(this._state.shareNum);
+	if (this.isDivided()) {
+		assertNumber(partNum);
+		assertTrue(partNum >= 1);
+		assertTrue(partNum <= AppUtils.MAX_PARTS);
+		assertTrue(isUndefined(this._state.partNum) || this._state.partNum === partNum, "Cannot override previously assigned part num");
+		this._state.partNum = partNum;
+	} else if (this.isDivided() === false) {
+		assertNull(partNum);
+		assertNull(this._state.partNum);
+	} else if (this.isDivided() === undefined) {
+		assertUndefined(partNum);
+		assertUndefined(this._state.partNum);
 	}
 	return this;
 }
@@ -336,9 +336,9 @@ CryptoKeypair.prototype.toJson = function() {
 		privateHex: isExcluded(CryptoKeypair.Field.PRIVATE_HEX) ? undefined : this.getFieldValue(CryptoKeypair.Field.PRIVATE_HEX),
 		privateState: isExcluded(CryptoKeypair.Field.PRIVATE_STATE) ? undefined : this.getFieldValue(CryptoKeypair.Field.PRIVATE_STATE),
 		encryption: isExcluded(CryptoKeypair.Field.ENCRYPTION) || !this.isEncrypted() ? undefined : this.getFieldValue(CryptoKeypair.Field.ENCRYPTION),
-		isSplit: isExcluded(CryptoKeypair.Field.IS_SPLIT) ? undefined : this.getFieldValue(CryptoKeypair.Field.IS_SPLIT),
-		minShares: isExcluded(CryptoKeypair.Field.MIN_SHARES) ? undefined : this.getFieldValue(CryptoKeypair.Field.MIN_SHARES),
-		shareNum: isExcluded(CryptoKeypair.Field.SHARE_NUM) || !this.isSplit() ? undefined : this.getFieldValue(CryptoKeypair.Field.SHARE_NUM)
+		isDivided: isExcluded(CryptoKeypair.Field.IS_DIVIDED) ? undefined : this.getFieldValue(CryptoKeypair.Field.IS_DIVIDED),
+		minParts: isExcluded(CryptoKeypair.Field.MIN_PARTS) ? undefined : this.getFieldValue(CryptoKeypair.Field.MIN_PARTS),
+		partNum: isExcluded(CryptoKeypair.Field.PART_NUM) || !this.isDivided() ? undefined : this.getFieldValue(CryptoKeypair.Field.PART_NUM)
 	}
 }
 
@@ -355,14 +355,14 @@ CryptoKeypair.prototype.getFieldValue = function(field) {
 			return this.getPublicAddress();
 		case CryptoKeypair.Field.ENCRYPTION:
 			return this.getEncryptionScheme();
-		case CryptoKeypair.Field.IS_SPLIT:
-			return this.isSplit();
-		case CryptoKeypair.Field.MIN_SHARES:
-			return this.getMinShares();
-		case CryptoKeypair.Field.SHARE_NUM:
-			return this.getShareNum();
+		case CryptoKeypair.Field.IS_DIVIDED:
+			return this.isDivided();
+		case CryptoKeypair.Field.MIN_PARTS:
+			return this.getMinParts();
+		case CryptoKeypair.Field.PART_NUM:
+			return this.getPartNum();
 		case CryptoKeypair.Field.PRIVATE_STATE:
-		  return this.isSplit() ? "Split" : (this.isEncrypted() ? "Encrypted" : (this.isEncrypted() === false ? "Unencrypted" : ""));
+		  return this.isDivided() ? "Divided" : (this.isEncrypted() ? "Encrypted" : (this.isEncrypted() === false ? "Unencrypted" : ""));
 		default:
 			throw new Error("Unrecognized keypair field: " + field);
 	}
@@ -381,9 +381,9 @@ CryptoKeypair.prototype.equals = function(keypair) {
 	if (this._state.privateWif !== keypair._state.privateWif) return false;
 	if (this._state.publicAddress !== keypair._state.publicAddress) return false;
 	if (this._state.encryption !== keypair._state.encryption) return false;
-	if (this._state.isSplit !== keypair._state.isSplit) return false;
-	if (this._state.minShares !== keypair._state.minShares) return false;
-	if (this._state.shareNum !== keypair._state.shareNum) return false;
+	if (this._state.isDivided !== keypair._state.isDivided) return false;
+	if (this._state.minParts !== keypair._state.minParts) return false;
+	if (this._state.partNum !== keypair._state.partNum) return false;
 	return true;
 }
 
@@ -401,31 +401,31 @@ CryptoKeypair.prototype.isDestroyed = function() {
 
 CryptoKeypair.prototype._validateState = function() {
 	if (!this._state.plugin) throw new Error("Keypair has no plugin");
-	if (this._state.isSplit === true) {
+	if (this._state.isDivided === true) {
 		assertInitialized(this._state.privateHex);
 		assertInitialized(this._state.privateWif);
-	} else if (this._state.isSplit === false) {
+	} else if (this._state.isDivided === false) {
 		assertInitialized(this._state.privateHex);
 		assertInitialized(this._state.privateWif);
-		assertNull(this._state.minShares);
-		assertNull(this._state.shareNum);
-	} else if (this._state.isSplit ===  undefined) {
+		assertNull(this._state.minParts);
+		assertNull(this._state.partNum);
+	} else if (this._state.isDivided ===  undefined) {
 		assertUndefined(this._state.privateHex);
 		assertUndefined(this._state.privateWif);
-		assertUndefined(this._state.minShares);
-		assertUndefined(this._state.shareNum);
+		assertUndefined(this._state.minParts);
+		assertUndefined(this._state.partNum);
 	}
 	
-	if (this._state.minShares) {
-		assertTrue(this._state.isSplit);
-		assertNumber(this._state.minShares);
-		assertTrue(this._state.minShares >= 2 && this._state.minShares <= AppUtils.MAX_SHARES);
+	if (this._state.minParts) {
+		assertTrue(this._state.isDivided);
+		assertNumber(this._state.minParts);
+		assertTrue(this._state.minParts >= 2 && this._state.minParts <= AppUtils.MAX_PARTS);
 	}
 	
-	if (this._state.shareNum) {
-		assertTrue(this._state.isSplit);
-		assertNumber(this._state.shareNum);
-		assertTrue(this._state.shareNum >= 1 && this._state.shareNum <= AppUtils.MAX_SHARES);
+	if (this._state.partNum) {
+		assertTrue(this._state.isDivided);
+		assertNumber(this._state.partNum);
+		assertTrue(this._state.partNum >= 1 && this._state.partNum <= AppUtils.MAX_PARTS);
 	}
 	
 	// hex and wif must both be initialized or undefined
@@ -446,31 +446,31 @@ CryptoKeypair.prototype._validateState = function() {
 	// private key known
 	if (this.hasPrivateKey()) {
 		
-		// split state is known or not applicable
-		assertDefined(this._state.isSplit);
+		// divided state is known or not applicable
+		assertDefined(this._state.isDivided);
 		
-		// if not split then encryption is known
-		if (this._state.isSplit === false) assertDefined(this._state.encryption);
+		// if not divided then encryption is known
+		if (this._state.isDivided === false) assertDefined(this._state.encryption);
 		
 		// unencrypted
 		if (this._state.encryption === null) {
 			this._state.plugin.hasPublicAddress() ? assertInitialized(this._state.publicAddress) : assertNull(this._state.publicAddress);
-			assertFalse(this._state.isSplit);
-			assertNull(this._state.minShares);
-			assertNull(this._state.shareNum);
+			assertFalse(this._state.isDivided);
+			assertNull(this._state.minParts);
+			assertNull(this._state.partNum);
 		}
 		
-		// split
-		if (this._state.encryption === undefined || this._state.isSplit) {
+		// divide
+		if (this._state.encryption === undefined || this._state.isDivided) {
 			assertUndefined(this._state.encryption);
-			assertNotNull(this._state.minShares);	// either undefined or share number
+			assertNotNull(this._state.minParts);	// either undefined or part number
 		}
 		
 		// encrypted
 		if (isInitialized(this._state.encryption)) {
-			assertFalse(this._state.isSplit);
-			assertNull(this._state.minShares);
-			assertNull(this._state.shareNum);
+			assertFalse(this._state.isDivided);
+			assertNull(this._state.minParts);
+			assertNull(this._state.partNum);
 		}
 	}
 	
@@ -478,9 +478,9 @@ CryptoKeypair.prototype._validateState = function() {
 	if (!this.hasPrivateKey()) {
 		assertUndefined(this._state.privateHex);
 		assertUndefined(this._state.privateWif);
-		assertUndefined(this._state.isSplit);
-		assertUndefined(this._state.minShares);
-		assertUndefined(this._state.shareNum);
+		assertUndefined(this._state.isDivided);
+		assertUndefined(this._state.minParts);
+		assertUndefined(this._state.partNum);
 		assertUndefined(this._state.encryption);
 	}
 }
@@ -497,9 +497,9 @@ CryptoKeypair.prototype._setPrivateKey = function(privateKey) {
 		this._state.privateWif = decoded.privateWif;
 		this._state.publicAddress = decoded.publicAddress;
 		this._state.encryption = decoded.encryption;
-		this._state.isSplit = false;
-		this._state.minShares = null;
-		this._state.shareNum = null;
+		this._state.isDivided = false;
+		this._state.minParts = null;
+		this._state.partNum = null;
 		return;
 	}
 	
@@ -510,22 +510,22 @@ CryptoKeypair.prototype._setPrivateKey = function(privateKey) {
 		this._state.privateWif = decoded.privateWif;
 		this._state.publicAddress = this._state.plugin.hasPublicAddress() ? undefined : null;
 		this._state.encryption = decoded.encryption;
-		this._state.isSplit = false;
-		this._state.minShares = null;
-		this._state.shareNum = null;
+		this._state.isDivided = false;
+		this._state.minParts = null;
+		this._state.partNum = null;
 		return;
 	}
 	
-	// split share
-	decoded = CryptoKeypair.decodeShare(privateKey);
+	// part
+	decoded = CryptoKeypair.decodePart(privateKey);
 	if (decoded) {
 		this._state.privateHex = decoded.privateHex.toLowerCase();
 		this._state.privateWif = decoded.privateWif;
 		this._state.publicAddress = this._state.plugin.hasPublicAddress() ? undefined : null;
 		this._state.encryption = undefined;
-		this._state.isSplit = true;
-		this._state.minShares = decoded.minShares;
-		this._state.shareNum = undefined;
+		this._state.isDivided = true;
+		this._state.minParts = decoded.minParts;
+		this._state.partNum = undefined;
 		return;
 	}
 	
@@ -541,64 +541,64 @@ CryptoKeypair.prototype._fromJson = function(json) {
 	this._state.privateHex = json.privateHex;
 	this._state.privateWif = json.privateWif;
 	this._state.encryption = json.encryption;
-	this._state.isSplit = json.isSplit;
-	this._state.minShares = json.minShares;
+	this._state.isDivided = json.isDivided;
+	this._state.minParts = json.minParts;
 	if (isDefined(this._state.privateHex)) this._setPrivateKey(this._state.privateHex);
 	else if (isDefined(this._state.privateWif)) this._setPrivateKey(this._state.privateWif);
 	if (isDefined(json.publicAddress)) this._setPublicAddress(json.publicAddress);
-	if (json.encryption === null) assertUninitialized(json.shareNum);
-	if (isDefined(json.shareNum)) this.setShareNum(json.shareNum);
+	if (json.encryption === null) assertUninitialized(json.partNum);
+	if (isDefined(json.partNum)) this.setPartNum(json.partNum);
 }
 
-CryptoKeypair.prototype._combine = function(splitKeypairs) {
+CryptoKeypair.prototype._combine = function(dividedKeypairs) {
 	
 	// verify keypairs and assign plugin
 	var publicAddress;
-	for (var i = 0; i < splitKeypairs.length; i++) {
-		if (!this._state.plugin) this._state.plugin = splitKeypairs[i].getPlugin();
-		else if (this._state.plugin !== splitKeypairs[i].getPlugin()) throw new Error("splitKeypairs[" + i + "] has inconsistent plugin");
-		if (!publicAddress) publicAddress = splitKeypairs[i].getPublicAddress();
-		else if (publicAddress !== splitKeypairs[i].getPublicAddress()) throw new Error("splitKeypairs[" + i + "] has inconsistent public address");
+	for (var i = 0; i < dividedKeypairs.length; i++) {
+		if (!this._state.plugin) this._state.plugin = dividedKeypairs[i].getPlugin();
+		else if (this._state.plugin !== dividedKeypairs[i].getPlugin()) throw new Error("dividedKeypairs[" + i + "] has inconsistent plugin");
+		if (!publicAddress) publicAddress = dividedKeypairs[i].getPublicAddress();
+		else if (publicAddress !== dividedKeypairs[i].getPublicAddress()) throw new Error("dividedKeypairs[" + i + "] has inconsistent public address");
 	}
 	
-	// collect decoded hex shares and verify consistent min shares
-	var minShares;
+	// collect decoded hex parts and verify consistent min parts
+	var minParts;
 	var shamirHexes = [];
-	for (var i = 0; i < splitKeypairs.length; i++) {
-		var decodedShare = CryptoKeypair.decodeShare(splitKeypairs[i].getPrivateWif());
-		assertInitialized(decodedShare, "Could not decode share: " + splitKeypairs[i].getPrivateWif());
-		if (!minShares) minShares = decodedShare.minShares;
-		else if (minShares !== decodedShare.minShares) throw new Error("splitKeypairs[" + i + "] has inconsistent min shares");
-		shamirHexes.push(decodedShare.shamirHex);
+	for (var i = 0; i < dividedKeypairs.length; i++) {
+		var decodedPart = CryptoKeypair.decodePart(dividedKeypairs[i].getPrivateWif());
+		assertInitialized(decodedPart, "Could not decode part: " + dividedKeypairs[i].getPrivateWif());
+		if (!minParts) minParts = decodedPart.minParts;
+		else if (minParts !== decodedPart.minParts) throw new Error("dividedKeypairs[" + i + "] has inconsistent min parts");
+		shamirHexes.push(decodedPart.shamirHex);
 	}
 	
 	// verify no duplicates
 	for (var i = 0; i < shamirHexes.length - 1; i++) {
 		for (var j = i + 1; j < shamirHexes.length; j++) {
-			assertFalse(shamirHexes[i] === shamirHexes[j], "Cannot create keypair from duplicate shares");
+			assertFalse(shamirHexes[i] === shamirHexes[j], "Cannot create keypair from duplicate parts");
 		}
 	}
 	
-	// ensure sufficient shares provided
-	if (isNumber(minShares) && splitKeypairs.length < minShares) {
-		var additional = minShares - splitKeypairs.length;
-		throw new Error("Need " + additional + " additional " + (additional === 1 ? "share" : "shares") + " to recover private key");
-	} else if (splitKeypairs.length < 2) {
-		throw new Error("Need additional shares to recover private key");
+	// ensure sufficient parts provided
+	if (isNumber(minParts) && dividedKeypairs.length < minParts) {
+		var additional = minParts - dividedKeypairs.length;
+		throw new Error("Need " + additional + " additional " + (additional === 1 ? "part" : "parts") + " to recover private key");
+	} else if (dividedKeypairs.length < 2) {
+		throw new Error("Need additional parts to recover private key");
 	}
 	
-	// try to combine shares to create private key and public address, which might be invalid or incompatible
+	// try to combine parts to create private key and public address, which might be invalid or incompatible
 	try {
 		var privateHex = secrets.combine(shamirHexes);
 		this._setPrivateKey(privateHex);
 		if (isDefined(publicAddress)) this._setPublicAddress(publicAddress);
 	} catch (err) {
-		throw new Error("Need additional shares to recover private key");
+		throw new Error("Need additional parts to recover private key");
 	}
 	
-	// pieces must combine to create an unsplit piece with known encryption
-  assertFalse(this.isSplit(), "Pieces are not compatible shares");
-  assertBoolean(this.isEncrypted(), "Pieces are not compatible shares");
+	// parts must combine to create an undivided piece with known encryption
+  assertFalse(this.isDivided(), "Parts are not compatible");
+  assertBoolean(this.isEncrypted(), "Parts are not compatible");
 }
 
 CryptoKeypair.prototype._setPublicAddress = function(address) {
@@ -798,31 +798,31 @@ CryptoKeypair.decodeEncryptedKey = function(str) {
 }
 
 /**
- * Encodes the given share with the given minimum pieces threshold.
+ * Encodes the given part with the given minimum threshold.
  * 
- * @param share is the share hex to encode
- * @param minShares is the minimum threshold to combine shares
- * @returns encoded hex share
+ * @param part is the part hex to encode
+ * @param minParts is the minimum threshold to combine parts
+ * @returns encoded hex part
  */
-CryptoKeypair.encodeHexShare = function(share, minShares) {
-	assertTrue(isHex(share));
-	assertTrue(isNumber(minShares) && minShares <= AppUtils.MAX_SHARES);
-	return encodeShareV0(share, minShares);
+CryptoKeypair.encodeHexPart = function(part, minParts) {
+	assertTrue(isHex(part));
+	assertTrue(isNumber(minParts) && minParts <= AppUtils.MAX_PARTS);
+	return encodePartV0(part, minParts);
 	
-	function encodeShareV0(share) {
-		return padLeft(share, 2);
+	function encodePartV0(part) {
+		return padLeft(part, 2);
 	}
 	
-	function encodeShareV1(share, minShares) {
+	function encodePartV1(part, minParts) {
 		try {
-			return minShares + 'c' + AppUtils.toBase(16, 58, padLeft(share, 2));
+			return minParts + 'c' + AppUtils.toBase(16, 58, padLeft(part, 2));
 		} catch (err) {
 			return null;
 		}
 	}
 	
-	function encodeShareV2(share, minShares) {
-		return padLeft(CryptoKeypair.SPLIT_V2_VERSION.toString(16), 2) + padLeft(minShares.toString(16), 2) + padLeft(share, 2);
+	function encodePartV2(part, minParts) {
+		return padLeft(CryptoKeypair.DIVIDE_V2_VERSION.toString(16), 2) + padLeft(minParts.toString(16), 2) + padLeft(part, 2);
 	}
 	
 	// Pads a string `str` with zeros on the left so that its length is a multiple of `bits` (credit: bitaddress.org)
@@ -834,61 +834,61 @@ CryptoKeypair.encodeHexShare = function(share, minShares) {
 }
 
 /**
- * Provides a decoding of the given share which is assumed to be a correctly encoded share.
+ * Provides a decoding of the given part which is assumed to be a correctly encoded part.
  * 
- * @param share is the encoded wif or hex share to decode
- * @returns Object with privateHex, privateWif, shamirHex, and minShares initialized as known
+ * @param part is the encoded wif or hex part to decode
+ * @returns Object with privateHex, privateWif, shamirHex, and minParts initialized as known
  */
-CryptoKeypair.decodeShare = function(share) {
-	if (!isString(share)) return null;
+CryptoKeypair.decodePart = function(part) {
+	if (!isString(part)) return null;
 	var decoded;
-	if ((decoded = decodeShareHexV1(share))) return decoded;	// 2c prefix for 2 minimum shares + hex
-	if ((decoded = decodeShareWifV1(share))) return decoded;
-	if ((decoded = decodeShareHexV2(share))) return decoded;	// min shares encoded in hex and b58
-	if ((decoded = decodeShareWifV2(share))) return decoded;
-	if ((decoded = decodeShareHexV0(share))) return decoded;	// no min shares encoding
-	if ((decoded = decodeShareWifV0(share))) return decoded;
+	if ((decoded = decodePartHexV1(part))) return decoded;	// 2c prefix for 2 minimum parts + hex
+	if ((decoded = decodePartWifV1(part))) return decoded;
+	if ((decoded = decodePartHexV2(part))) return decoded;	// min parts encoded in hex and b58
+	if ((decoded = decodePartWifV2(part))) return decoded;
+	if ((decoded = decodePartHexV0(part))) return decoded;	// no min parts encoding
+	if ((decoded = decodePartWifV0(part))) return decoded;
 	return null;
 	
-	function decodeShareHexV0(share) {
-		if (!isHex(share)) return null;
-		if (share.length % 2 !== 0) return null;
-		assertTrue(share.length > 10);
+	function decodePartHexV0(part) {
+		if (!isHex(part)) return null;
+		if (part.length % 2 !== 0) return null;
+		assertTrue(part.length > 10);
 		return {
-			shamirHex: ninja.wallets.splitwallet.stripLeadZeros(share),
-			privateHex: share,
-			privateWif: AppUtils.toBase(16, 58, share)
+			shamirHex: ninja.wallets.splitwallet.stripLeadZeros(part),
+			privateHex: part,
+			privateWif: AppUtils.toBase(16, 58, part)
 		};
 	}
 	
-	function decodeShareWifV0(share) {
-		if (!isBase58(share)) return null;
-		assertTrue(share.length > 10);
-		if (share.length < 32) return null;
-		var hex = AppUtils.toBase(58, 16, share);
+	function decodePartWifV0(part) {
+		if (!isBase58(part)) return null;
+		assertTrue(part.length > 10);
+		if (part.length < 32) return null;
+		var hex = AppUtils.toBase(58, 16, part);
 		return {
 			shamirHex: ninja.wallets.splitwallet.stripLeadZeros(hex),
 			privateHex: hex,
-			privateWif: share
+			privateWif: part
 		}
 	}
 	
-	function decodeShareHexV1(share) {
-		if (!isHex(share)) return null;
-		if (share.length % 2 !== 0) return null;
-		return decodeShareWifV1(AppUtils.toBase(16, 58, share));
+	function decodePartHexV1(part) {
+		if (!isHex(part)) return null;
+		if (part.length % 2 !== 0) return null;
+		return decodePartWifV1(AppUtils.toBase(16, 58, part));
 	}
 	
-	function decodeShareWifV1(share) {
+	function decodePartWifV1(part) {
 		try {
-			if (share.length < 34) return null;
+			if (part.length < 34) return null;
 			var decoded = {};
-			decoded.minShares = getMinPiecesV1(share);
-			if (!decoded.minShares) return null;
-			var wif = share.substring(share.indexOf('c') + 1);
+			decoded.minParts = getMinPartsV1(part);
+			if (!decoded.minParts) return null;
+			var wif = part.substring(part.indexOf('c') + 1);
 			if (!isBase58(wif)) return null;
 			decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(AppUtils.toBase(58, 16, wif));
-			decoded.privateWif = share;
+			decoded.privateWif = part;
 			decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
 			return decoded;
 		} catch (err) {
@@ -896,40 +896,40 @@ CryptoKeypair.decodeShare = function(share) {
 		}
 		
 		/**
-		 * Determines the minimum pieces to reconstitute based on a possible split piece string.
+		 * Determines the minimum parts to reconstitute based on a possible divided part string.
 		 * 
-		 * Looks for 'XXXc' prefix in the given split piece where XXX is the minimum to reconstitute.
+		 * Looks for 'XXXc' prefix in the given divided piece where XXX is the minimum to reconstitute.
 		 * 
-		 * @param splitPiece is a string which may be prefixed with 'XXXc...'
-		 * @return the minimum pieces to reconstitute if prefixed, null otherwise
+		 * @param dividedPiece is a string which may be prefixed with 'XXXc...'
+		 * @return the minimum parts to reconstitute if prefixed, null otherwise
 		 */
-		function getMinPiecesV1(splitPiece) {
-			var idx = splitPiece.indexOf('c');	// look for first lowercase 'c'
+		function getMinPartsV1(dividedPiece) {
+			var idx = dividedPiece.indexOf('c');	// look for first lowercase 'c'
 			if (idx <= 0) return null;
-			var minShares = Number(splitPiece.substring(0, idx));	// parse preceding numbers to int
-			if (!isNumber(minShares) || minShares < 2 || minShares > AppUtils.MAX_SHARES) return null;
-			return minShares;
+			var minParts = Number(dividedPiece.substring(0, idx));	// parse preceding numbers to int
+			if (!isNumber(minParts) || minParts < 2 || minParts > AppUtils.MAX_PARTS) return null;
+			return minParts;
 		}
 	}
 	
-	function decodeShareHexV2(share) {
-		if (!isHex(share)) return null;
-		if (share.length % 2 !== 0) return null;
-		return decodeShareWifV2(AppUtils.toBase(16, 58, share));
+	function decodePartHexV2(part) {
+		if (!isHex(part)) return null;
+		if (part.length % 2 !== 0) return null;
+		return decodePartWifV2(AppUtils.toBase(16, 58, part));
 	}
 	
-	function decodeShareWifV2(share) {
-		if (share.length < 33) return null;
-		if (!isBase58(share)) return null;
-		var hex = AppUtils.toBase(58, 16, share);
+	function decodePartWifV2(part) {
+		if (part.length < 33) return null;
+		if (!isBase58(part)) return null;
+		var hex = AppUtils.toBase(58, 16, part);
 		if (hex.length % 2 !== 0) return null;
 		var version = parseInt(hex.substring(0, 2), 16);
-		if (version !== CryptoKeypair.SPLIT_V2_VERSION) return null;
+		if (version !== CryptoKeypair.DIVIDE_V2_VERSION) return null;
 		var decoded = {};
-		decoded.minShares = parseInt(hex.substring(2, 4), 16);
-		if (!isNumber(decoded.minShares) || decoded.minShares < 2 || decoded.minShares > AppUtils.MAX_SHARES) return null;
+		decoded.minParts = parseInt(hex.substring(2, 4), 16);
+		if (!isNumber(decoded.minParts) || decoded.minParts < 2 || decoded.minParts > AppUtils.MAX_PARTS) return null;
 		decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
-		decoded.privateWif = share;
+		decoded.privateWif = part;
 		decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
 		return decoded;
 	}
@@ -983,17 +983,17 @@ CryptoKeypair.Field = {
 		PRIVATE_WIF: "Private WIF",
     PRIVATE_STATE: "Private State",
 		ENCRYPTION: "Encryption",
-		IS_SPLIT: "Is Split",
-		MIN_SHARES: "Minimum Shares",
-    SHARE_NUM: "Share Number"
+		IS_DIVIDED: "Is Divided",
+		MIN_PARTS: "Minimum Parts",
+    PART_NUM: "Part Number"
 }
 
 // hardcoded fields to exclude from json and csv export
 CryptoKeypair.EXCLUDE_FIELDS = [
 	CryptoKeypair.Field.PRIVATE_HEX,
-	CryptoKeypair.Field.MIN_SHARES,
-	CryptoKeypair.Field.IS_SPLIT,
+	CryptoKeypair.Field.MIN_PARTS,
+	CryptoKeypair.Field.IS_DIVIDED,
 ];
 
-// split v2 encoded version
-CryptoKeypair.SPLIT_V2_VERSION = 1;
+// divided v2 encoded version
+CryptoKeypair.DIVIDE_V2_VERSION = 1;

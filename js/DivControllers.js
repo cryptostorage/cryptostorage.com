@@ -112,15 +112,15 @@ var UiUtils = {
 		
 		// assign piece numbers
 		for (var i = 0; i < copies.length; i++) {
-			if (copies[i].isSplit() && !copies[i].getPieceNum()) {
-				copies[i].setPieceNum(getNextAvailablePieceNum(copies));
+			if (copies[i].isDivided() && !copies[i].getPartNum()) {
+				copies[i].setPartNum(getNextAvailablePieceNum(copies));
 			}
 		}
 		
 		// sort
 		copies.sort(function(piece1, piece2) {
-			var num1 = piece1.getPieceNum();
-			var num2 = piece2.getPieceNum();
+			var num1 = piece1.getPartNum();
+			var num2 = piece2.getPartNum();
 			assertNumber(num1);
 			assertNumber(num2);
 			return num1 - num2;
@@ -133,7 +133,7 @@ var UiUtils = {
 			while (true) {
 				var found = false;
 				for (var i = 0; i < pieces.length; i++) {
-					if (pieces[i].getPieceNum() === pieceNum) {
+					if (pieces[i].getPartNum() === pieceNum) {
 						found = true;
 						break;
 					} 
@@ -894,7 +894,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			getSlide($("<img src='img/printer.png'>"), "Print paper wallets or save keys to a file for long-term storage.").appendTo(sliderDiv);
 			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-			getSlide($("<img src='img/keys.png'>"), "Passphrase-protect and split private keys for maximum security.").appendTo(sliderDiv);
+			getSlide($("<img src='img/keys.png'>"), "Passphrase-protect and divide private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automatic environment checks.").appendTo(sliderDiv);
 			
 			function getSlide(img, text) {
@@ -991,12 +991,12 @@ function HomeController(div) {
 			pageDiv.append("<div class='home_description'>Save keys to a file which can be stored on a flash drive, or print to paper to easily create paper wallets.</div>")
 			pageDiv.append($("<img width=750px src='img/print_sample.png'>"));
 			
-			// split and passphrase section
+			// divide and passphrase section
 			pageDiv.append("<div style='height: 10px'>");
-			pageDiv.append("<div class='home_label'>Passphrase-protect and split private keys for maximum security</div>");
-			pageDiv.append("<div class='home_description'>Encrypt private keys with a passphrase or split them into pieces so funds are not accessible at any one location.  Set how many pieces are needed to recover the keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
+			pageDiv.append("<div class='home_label'>Passphrase-protect and divide private keys for maximum security</div>");
+			pageDiv.append("<div class='home_description'>Encrypt private keys with a passphrase or divide them into parts so funds are not accessible at any one location.  Set how many parts are needed to recover the keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
 			pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
-			pageDiv.append($("<img style='width:600px;' src='img/split_input.png'>"));
+			pageDiv.append($("<img style='width:600px;' src='img/divide_input.png'>"));
 			
 			// check environment section
 			pageDiv.append("<div style='height: 70px'>");
@@ -1140,21 +1140,21 @@ function FaqController(div) {
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is CryptoStorage?"; },
 					getAnswer: function() { return "<p>CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies.  This tool generates <a href='#faq_keypair'>keypairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated keypairs can be easily printed and saved to digital files for long-term storage.</p>" +
-						"<p>This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and <a href='#faq_split_keys'>split into pieces</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
+						"<p>This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and <a href='#faq_divide_keys'>divided into parts</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
 					}
 				}, {
 					id: "faq_keypair",
 					getQuestion: function() { return "What is a cryptocurrency keypair?" },
 					getAnswer: function() { return "<p>A cryptocurrency keypair is a <b>public address</b> and a <b>private key</b>.  For example, this is a Bitcoin keypair:</p>" +
 	           "<p><img class='sample_key_pair_img' src='img/key_pair.png'></p>" +
-					  "<p>The <b>public address</b> is used to receive funds.  It can be shared with a sender in order to receive funds.</p>" +
+					  "<p>The <b>public address</b> is used to receive funds.  It can be partd with a sender in order to receive funds.</p>" +
 					  "<p>The <b>private key</b> authorizes received funds to be sent to other public addresses.  <span style='color:red'>The private key must remain private</span> or all funds held in its corresponding public address can be stolen.</p>"; }
 				}, {
 					id: "faq_safe_keys",
 					getQuestion: function() { return "How does CryptoStorage help keep my cryptocurrency safe and secure?"; },
 					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys can be generated offline and are never shared with a third party by design.</p>" + 
 						"<p>Second, private keys can be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
-						"<p>Third, private keys can be split into separate pieces which must be combined to access funds.  For example, a Bitcoin keypair can be split into 3 pieces where 2 pieces must be combined to recover the private key.  These pieces can be geographically separated to prevent access at any one location.</p>" +
+						"<p>Third, private keys can be divided into parts which must be combined to access funds.  For example, a Bitcoin keypair can be divided into 3 parts where 2 parts must be combined to recover the private key.  These parts can be geographically separated to prevent access at any one location.</p>" +
 						"<p>Fourth, keys can printed and saved to digital files for long-term storage.</p>" +
 						"<p>Finally, this tool <a href='#faq_recommendations'>automatically detects and recommends</a> ways to improve the security of its environment.</p>"; }
 				}, {
@@ -1193,7 +1193,7 @@ function FaqController(div) {
 						var generateKeys = $("<li><p>Fill out the form and click Generate Keys.</p></li>").appendTo(generateList);
 						var generateKeysList = $("<ul>").appendTo(generateKeys);
 						generateKeysList.append("<li><p>Protecting your keys with a passphrase is <i>highly recommended</i>.  Otherwise anyone in possession of the unencrypted keys can access the funds.</p>");
-						generateKeysList.append("<li><p>Optionally split your keys for maximum security.</p></li>");
+						generateKeysList.append("<li><p>Optionally divide your keys for maximum security.</p></li>");
 						generateList.append("<li><p>Save the generated keys to a flash drive or printed paper for safe keeping.  Geographic redundancy is <i>highly recommended</i> so if one location is lost due to fire, flood, theft, etc, there are backup copies at other locations.</p>" +
 							"<p>The keys can be imported at any time by relaunching this tool in a secure environment.</p>" +
 							"<p><span style='color:red'>Do not lose the generated keys or the password or all funds will be lost.</span></p></li>");
@@ -1245,13 +1245,13 @@ function FaqController(div) {
 				}, {
 					id: "faq_trusted_third_party",
 					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
-					getAnswer: function() { return "<p>No.  The public/private keypairs are generated only in your devices browser so they are never shared with a third party by design.</p>"; }
+					getAnswer: function() { return "<p>No.  The public/private keypairs are generated only in your devices browser so they are never partd with a third party by design.</p>"; }
 				}, {
-					id: "faq_split_keys",
-					getQuestion: function() { return "What does it mean to split private keys?"; },
-					getAnswer: function() { return "<p>Generated storage can be split into separate pieces where some of the pieces must be combined in order to access funds.</p>" +
-						"<p>This is useful for geographically splitting your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple pieces.</p>" +
-						"<p>For example, 10 keypairs can be split into 3 pieces where 2 pieces must be combined to access funds.  Each piece will contain shares for all 10 keypairs.  No funds can be accessed from any of the pieces until 2 of the 3 pieces are combined.</p>"; }
+					id: "faq_divide_keys",
+					getQuestion: function() { return "What does it mean to divide private keys?"; },
+					getAnswer: function() { return "<p>Generated storage can be divided into separate parts where some of the parts must be combined in order to access funds.</p>" +
+						"<p>This is useful for geographically dividing your cryptocurrency storage so that funds cannot be accessed at any one physical location without obtaining and combining multiple parts.</p>" +
+						"<p>For example, 10 keypairs can be divided into 3 parts where 2 parts must be combined to access funds.  No funds can be accessed from any of the parts until 2 of the 3 parts are combined.</p>"; }
 				}, {
 					id: "faq_online_to_recover",
 					getQuestion: function() { return "Do I need to be online to recover private keys?"; },
@@ -1854,7 +1854,7 @@ function ImportFileController(div, printErrors) {
 		}
 	}
 	
-	function onUnsplitPieceImported(importedPieces, piece) {
+	function onUndividedPieceImported(importedPieces, piece) {
 		assertObject(piece, CryptoPiece);
 		resetControls();
 		setWarning("");
@@ -1935,19 +1935,19 @@ function ImportFileController(div, printErrors) {
 	}
 	
 	function addNamedPieces(namedPieces) {
-		var numPiecesBefore = importedNamedPieces.length;
+		var numPartsBefore = importedNamedPieces.length;
 		for (var i = 0; i < namedPieces.length; i++) {
 			var namedPiece = namedPieces[i];
 			assertObject(namedPiece.piece, CryptoPiece);
 			if (isPieceImported(namedPiece.name)) setWarning(namedPiece.name + " already imported");
 			else importedNamedPieces.push(namedPiece);
 		}
-		if (numPiecesBefore !== importedNamedPieces.length) updatePieces();
+		if (numPartsBefore !== importedNamedPieces.length) updatePieces();
 	}
 	
 	function removePieces() {
 		importedNamedPieces = [];
-		lastUnsplitPiece = undefined;
+		lastUndividedPiece = undefined;
 		updatePieces();
 	}
 	
@@ -1982,21 +1982,21 @@ function ImportFileController(div, printErrors) {
 			UiUtils.openEditorDynamic("Imported Pieces", {pieces: UiUtils.getPiecesForExport(importedPieces)});
 		});
 		
-		// handle unsplit piece
-		if (importedPieces.length === 1 && !importedPieces[0].isSplit()) {
-			onUnsplitPieceImported(importedPieces, importedPieces[0]);
+		// handle undivided piece
+		if (importedPieces.length === 1 && !importedPieces[0].isDivided()) {
+			onUndividedPieceImported(importedPieces, importedPieces[0]);
 			return;
 		}
 		
 		// try to combine pieces
 		try {
-			var piece = new CryptoPiece({splitPieces: importedPieces});
-			onUnsplitPieceImported(importedPieces, piece);
+			var piece = new CryptoPiece({dividedPieces: importedPieces});
+			onUndividedPieceImported(importedPieces, piece);
 		} catch (err) {
 			if (err.message.indexOf("additional") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 			else {
 				if (printErrors) console.log(err);
-				setWarning("Pieces are not compatible shares");
+				setWarning("Parts are not compatible");
 			}
 		}
 	}
@@ -2140,7 +2140,7 @@ function ImportTextController(div, plugins, printErrors) {
 		
 		// text area
 		textArea = $("<textarea class='import_textarea'>").appendTo(textInputDiv);
-		textArea.attr("placeholder", "Enter private keys, a split share, csv, or json");
+		textArea.attr("placeholder", "Enter private keys, a divided part, csv, or json");
 		
 		// submit button
 		var submit = $("<div class='import_button flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(textInputDiv);
@@ -2272,7 +2272,7 @@ function ImportTextController(div, plugins, printErrors) {
 		return plugins[cryptoSelector.getSelectedIndex()];
 	}
 	
-	function onUnsplitPieceImported(importedPieces, piece) {
+	function onUndividedPieceImported(importedPieces, piece) {
 		assertObject(piece, CryptoPiece);
 		resetControls();
 		setWarning("");
@@ -2400,21 +2400,21 @@ function ImportTextController(div, plugins, printErrors) {
 			UiUtils.openEditorDynamic("Imported Storage", {pieces: UiUtils.getPiecesForExport(importedPieces)});
 		});
 		
-		// handle unsplit piece
-		if (importedPieces.length === 1 && !importedPieces[0].isSplit()) {
-			onUnsplitPieceImported(importedPieces, importedPieces[0]);
+		// handle undivided piece
+		if (importedPieces.length === 1 && !importedPieces[0].isDivided()) {
+			onUndividedPieceImported(importedPieces, importedPieces[0]);
 			return;
 		}
 		
 		// try to combine pieces
 		try {
-			var piece = new CryptoPiece({splitPieces: importedPieces});
-			onUnsplitPieceImported(importedPieces, piece);
+			var piece = new CryptoPiece({dividedPieces: importedPieces});
+			onUndividedPieceImported(importedPieces, piece);
 		} catch (err) {
 			if (err.message.indexOf("additional") > -1) setWarning(err.message, $("<img src='img/files.png'>"));
 			else {
 				if (printErrors) console.log(err);
-				setWarning("Pieces are not compatible shares");
+				setWarning("Parts are not compatible");
 			}
 		}
 	}
@@ -2441,7 +2441,7 @@ function ImportTextController(div, plugins, printErrors) {
 			var importedPieceDiv = $("<div class='import_text_imported_piece'>").appendTo(importedPiecesDiv);
 			var icon = $("<img src='img/file.png' class='import_imported_icon'>").appendTo(importedPieceDiv);
 			assertTrue(piece.getKeypairs().length > 0);
-			var pieceLabel = piece.getKeypairs().length === 1 ? (piece.getKeypairs()[0].hasPrivateKey() ? piece.getKeypairs()[0].getPrivateWif() : piece.getKeypairs()[0].getPublicAddress()) : "Imported piece" + (piece.getPieceNum() ? " " + piece.getPieceNum() : "");
+			var pieceLabel = piece.getKeypairs().length === 1 ? (piece.getKeypairs()[0].hasPrivateKey() ? piece.getKeypairs()[0].getPrivateWif() : piece.getKeypairs()[0].getPublicAddress()) : "Imported piece" + (piece.getPartNum() ? " " + piece.getPartNum() : "");
 			importedPieceDiv.append(AppUtils.getShortenedString(pieceLabel, MAX_PIECE_LENGTH));
 			var trash = $("<img src='img/trash.png' class='import_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
@@ -2705,7 +2705,7 @@ function EditorController(div, config) {
 	var QUICK_GENERATE_MAX = 300;	// generation is 'quick' up to this weight to avoid flickering
 	var that = this;
 	var passphraseController
-	var splitController;
+	var divideController;
 	var paginatorController;
 	var contentController;
 	var importedPieces;			// original imported pieces
@@ -2739,24 +2739,24 @@ function EditorController(div, config) {
 		// header
 		var headerDiv = $("<div class='editor_header flex_vertical flex_align_center'>").appendTo(div);
 		
-		// passphrase and split input div
-		var passphraseSplitDiv = $("<div class='editor_passphrase_split flex_horizontal flex_align_center flex_justify_center'>").appendTo(headerDiv);
+		// passphrase and divide input div
+		var passphraseDivideDiv = $("<div class='editor_passphrase_divide flex_horizontal flex_align_center flex_justify_center'>").appendTo(headerDiv);
 		
 		// passphrase controller
-		passphraseController = new EditorPassphraseController($("<div>").appendTo(passphraseSplitDiv), that);
+		passphraseController = new EditorPassphraseController($("<div>").appendTo(passphraseDivideDiv), that);
 		passphraseController.render();
 		passphraseController.setUsePassphrase(false);
 		
-		// split controller
-		splitController = new EditorSplitController($("<div>").appendTo(passphraseSplitDiv), that);
-		splitController.render();
-		splitController.setUseSplit(false);
+		// divide controller
+		divideController = new EditorDivideController($("<div>").appendTo(passphraseDivideDiv), that);
+		divideController.render();
+		divideController.setUseDivided(false);
 		
-		// view split pieces
+		// view divided pieces
 		if (config.sourcePieces && config.sourcePieces.length > 1) {
-			var viewSplit = $("<div class='editor_control_link import_control_link'>").appendTo(headerDiv);
-			viewSplit.html("view imported pieces");
-			viewSplit.click(function() {
+			var viewDivided = $("<div class='editor_control_link import_control_link'>").appendTo(headerDiv);
+			viewDivided.html("view imported pieces");
+			viewDivided.click(function() {
 				UiUtils.openEditorDynamic("Imported Pieces", {pieces: UiUtils.getPiecesForExport(config.sourcePieces)});
 			});
 		}
@@ -2781,7 +2781,7 @@ function EditorController(div, config) {
 			contentController.getActionsController().onSave(save);
 			contentController.getActionsController().onPrint(print);
 			passphraseController.onFormErrorChange(updateFormError);
-			splitController.onFormErrorChange(updateFormError);
+			divideController.onFormErrorChange(updateFormError);
 			contentController.onFormErrorChange(updateFormError);
 			
 			// confirm exit if keypairs generated
@@ -2815,8 +2815,8 @@ function EditorController(div, config) {
 		return passphraseController;
 	}
 	
-	this.getSplitController = function() {
-		return splitController;
+	this.getDividedController = function() {
+		return divideController;
 	}
 	
 	this.getContentController = function() {
@@ -2825,7 +2825,7 @@ function EditorController(div, config) {
 	
 	this.hasFormError = function() {
 		if (passphraseController.hasFormError()) return true;
-		if (splitController.hasFormError()) return true;
+		if (divideController.hasFormError()) return true;
 		if (contentController.hasFormError()) return true;
 		return false;
 	}
@@ -2903,11 +2903,11 @@ function EditorController(div, config) {
 		// set passphrase
 		if (config.passphrase) passphraseController.setPassphrase(config.passphrase);
 		
-		// set split
-		if (config.numPieces) splitController.setNumPieces(config.numPieces);
-		if (config.minPieces) {
-			splitController.setMinPieces(config.minPieces);
-			splitController.setUseSplit(true);
+		// set divided
+		if (config.numParts) divideController.setNumPieces(config.numParts);
+		if (config.minParts) {
+			divideController.setMinPieces(config.minParts);
+			divideController.setUseDivided(true);
 		}
 		
 		// set currencies
@@ -2962,10 +2962,10 @@ function EditorController(div, config) {
 			}
 		}		
 
-		// set split config
-		if (splitController.getUseSplit()) {
-			config.numPieces = splitController.getNumPieces();
-			config.minPieces = splitController.getMinPieces();
+		// set divide config
+		if (divideController.getUseDivided()) {
+			config.numParts = divideController.getNumPieces();
+			config.minParts = divideController.getMinParts();
 		}
 		
 		// set piece renderer class
@@ -3268,8 +3268,8 @@ function EditorContentController(div, editorController, config) {
 			assertTrue(pieceDivs.length > 0);
 			for (var i = 0; i < pieceDivs.length; i++) {
 				if (pieceDivs.length > 1) {
-					assertDefined(pieces[i].getPieceNum());
-					pieceDivs[i].attr("id", "piece_" + pieces[i].getPieceNum());
+					assertDefined(pieces[i].getPartNum());
+					pieceDivs[i].attr("id", "piece_" + pieces[i].getPartNum());
 				}
 				piecesDiv.append(pieceDivs[i]);
 			}
@@ -3475,8 +3475,8 @@ function EditorPassphraseController(div, editorController) {
 	
 	function update() {
 		
-		// enable passphrase unless split or encrypted imported piece
-		if (!editorController.getImportedPieces() || (!editorController.getImportedPieces()[0].isSplit() && !editorController.getImportedPieces()[0].isEncrypted())) {
+		// enable passphrase unless divided or encrypted imported piece
+		if (!editorController.getImportedPieces() || (!editorController.getImportedPieces()[0].isDivided() && !editorController.getImportedPieces()[0].isEncrypted())) {
 			setEnabled(true);
 			
 			// set bip38 checkbox visible
@@ -3576,76 +3576,76 @@ function EditorPassphraseController(div, editorController) {
 inheritsFrom(EditorPassphraseController, DivController);
 
 /**
- * Controls split input and validation.
+ * Controls divide input and validation.
  * 
  * @param div is the div to render to
  * @param editorController is the top-level editor controller
  */
-function EditorSplitController(div, editorController) {
+function EditorDivideController(div, editorController) {
 	DivController.call(this, div);
 	
 	var that = this;
-	var splitCheckbox;
-	var splitInput;
-	var numPiecesInput;
-	var minPiecesInput;
-	var numPiecesVal;
-	var minPiecesVal;
+	var divideCheckbox;
+	var divideInput;
+	var numPartsInput;
+	var minPartsInput;
+	var numPartsVal;
+	var minPartsVal;
 	var hasError;
 	var formErrorChangeListeners;
-	var useSplitListeners;
+	var useDivideListeners;
 	
 	this.render = function(onDone) {
 		
 		// init
 		div.empty();
-		div.addClass("editor_split_div flex_horizontal flex_align_center flex_justify_start");
+		div.addClass("editor_divide_div flex_horizontal flex_align_center flex_justify_start");
 		hasError = false;
 		formErrorChangeListeners = [];
-		useSplitListeners = [];
+		useDivideListeners = [];
 		
-		// split tooltip
-		var splitTooltip = "Splits generated keypairs using <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a>.  Funds cannot be accessed from the keypairs until a sufficient number of pieces are combined.<br><br>" +
-		                   "For example, keypairs can be generated and split into 3 pieces.  Only when 2 of the 3 pieces are combined may private keys be recovered in order to access funds.<br><br>" +
-		                   "This is useful to prevent access to funds without physically combining a sufficient number of pieces.  Splitting can also provide fault tolerance so that private keys can be recovered even if one or more pieces are lost.  For example, if 2 of 3 pieces are necessary to recover private keys, then private keys can be recovered even if any one piece is lost.";
+		// divide tooltip
+		var divideTooltip = "Divides generated keypairs using <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a>.  Funds cannot be accessed from the keypairs until a sufficient number of pieces are combined.<br><br>" +
+		                   "For example, keypairs can be generated and divided into 3 pieces.  Only when 2 of the 3 pieces are combined may private keys be recovered in order to access funds.<br><br>" +
+		                   "This is useful to prevent access to funds without physically combining a sufficient number of pieces.  Dividing can also provide fault tolerance so that private keys can be recovered even if one or more pieces are lost.  For example, if 2 of 3 pieces are necessary to recover private keys, then private keys can be recovered even if any one piece is lost.";
 		
-		// split input
-		splitCheckbox = new CheckboxController($("<div>").appendTo(div), "Split Keypairs?", splitTooltip).render();
-		var splitQr = $("<img class='split_qr' src='img/qr_code.png'>").appendTo(div);
-		var splitLines3 = $("<img class='split_lines_3' src='img/split_lines_3.png'>").appendTo(div);
-		var splitNumDiv = $("<div class='split_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
-		var splitNumLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitNumDiv);
-		splitNumLabelTop.html("Split Into");
-		numPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitNumDiv);
-		var splitNumLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitNumDiv);
-		splitNumLabelBottom.html("Pieces");
-		var splitLines2 = $("<img class='split_lines_2' src='img/split_lines_2.png'>").appendTo(div);
-		var splitMinDiv = $("<div class='split_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
-		var splitMinLabelTop = $("<div class='split_config_label split_config_label_top'>").appendTo(splitMinDiv);
-		splitMinLabelTop.html("Require");
-		minPiecesInput = $("<input class='split_input' type='tel' min='2'>").appendTo(splitMinDiv);
-		var splitMinLabelBottom = $("<div class='split_config_label split_config_label_bottom'>").appendTo(splitMinDiv);
-		splitMinLabelBottom.html("To Recover");		
+		// divide input
+		divideCheckbox = new CheckboxController($("<div>").appendTo(div), "Divide Keypairs?", divideTooltip).render();
+		var divideQr = $("<img class='divide_qr' src='img/qr_code.png'>").appendTo(div);
+		var divideLines3 = $("<img class='divide_lines_3' src='img/divide_lines_3.png'>").appendTo(div);
+		var divideNumDiv = $("<div class='divided_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
+		var divideNumLabelTop = $("<div class='divide_config_label divide_config_label_top'>").appendTo(divideNumDiv);
+		divideNumLabelTop.html("Divide Into");
+		numPartsInput = $("<input class='divide_input' type='tel' min='2'>").appendTo(divideNumDiv);
+		var divideNumLabelBottom = $("<div class='divide_config_label divide_config_label_bottom'>").appendTo(divideNumDiv);
+		divideNumLabelBottom.html("Parts");
+		var divideLines2 = $("<img class='divide_lines_2' src='img/divide_lines_2.png'>").appendTo(div);
+		var divideMinDiv = $("<div class='divided_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
+		var divideMinLabelTop = $("<div class='divide_config_label divide_config_label_top'>").appendTo(divideMinDiv);
+		divideMinLabelTop.html("Require");
+		minPartsInput = $("<input class='divide_input' type='tel' min='2'>").appendTo(divideMinDiv);
+		var divideMinLabelBottom = $("<div class='divide_config_label divide_config_label_bottom'>").appendTo(divideMinDiv);
+		divideMinLabelBottom.html("To Recover");		
 		
 		// register inputs
-		splitCheckbox.onChecked(function(event, isChecked) {
+		divideCheckbox.onChecked(function(event, isChecked) {
 			setFormError(false);
-			invoke(useSplitListeners);
+			invoke(useDivideListeners);
 			if (isChecked) {
-			  numPiecesInput.focus();
-        numPiecesInput.val(numPiecesVal);
-        minPiecesInput.val(minPiecesVal);
+			  numPartsInput.focus();
+        numPartsInput.val(numPartsVal);
+        minPartsInput.val(minPartsVal);
       } else {
-        numPiecesVal = numPiecesInput.val();
-        minPiecesVal = minPiecesInput.val();
-        numPiecesInput.val("");
-        minPiecesInput.val("");
+        numPartsVal = numPartsInput.val();
+        minPartsVal = minPartsInput.val();
+        numPartsInput.val("");
+        minPartsInput.val("");
       }
 		});
-		numPiecesInput.on("input", function(e) { validate(true); });
-		numPiecesInput.on("focusout", function(e) { validate(false); });
-		minPiecesInput.on("input", function(e) { validate(true); });
-		minPiecesInput.on("focusout", function(e) { validate(false); });
+		numPartsInput.on("input", function(e) { validate(true); });
+		numPartsInput.on("focusout", function(e) { validate(false); });
+		minPartsInput.on("input", function(e) { validate(true); });
+		minPartsInput.on("focusout", function(e) { validate(false); });
 		
 		// listen for actions when editor ready
 		editorController.onReady(function() {
@@ -3681,49 +3681,49 @@ function EditorSplitController(div, editorController) {
 		return hasError;
 	}
 	
-	this.onUseSplitChange = function(listener) {
+	this.onUseDividedChange = function(listener) {
 		assertFunction(listener);
-		useSplitListeners.push(listener);
+		useDivideListeners.push(listener);
 	}
 	
-	this.getUseSplit = function() {
-		return splitCheckbox.isChecked();
+	this.getUseDivided = function() {
+		return divideCheckbox.isChecked();
 	}
 	
-	this.setUseSplit = function(bool) {
-		splitCheckbox.setChecked(bool);
+	this.setUseDivided = function(bool) {
+		divideCheckbox.setChecked(bool);
   }
 	
 	this.getNumPieces = function() {
-		var numPieces = Number(numPiecesInput.val());
-		if (!isInt(numPieces)) return null;
-		return numPieces;
+		var numParts = Number(numPartsInput.val());
+		if (!isInt(numParts)) return null;
+		return numParts;
 	}
 	
-	this.setNumPieces = function(numPieces) {
-		numPiecesInput.val(numPieces);
+	this.setNumPieces = function(numParts) {
+		numPartsInput.val(numParts);
 	}
 	
-	this.getMinPieces = function() {
-		var minPieces = Number(minPiecesInput.val());
-		if (!isInt(minPieces)) return null;
-		return minPieces;
+	this.getMinParts = function() {
+		var minParts = Number(minPartsInput.val());
+		if (!isInt(minParts)) return null;
+		return minParts;
 	}
 	
-	this.setMinPieces = function(minPieces) {
-		minPiecesInout.val(minPieces);
+	this.setMinPieces = function(minParts) {
+		minPartsInout.val(minParts);
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
 	
 	function setEnabled(bool) {
-		splitCheckbox.setEnabled(bool);
-		if (!bool || !that.getUseSplit()) {
-			numPiecesInput.attr("disabled", "disabled");
-			minPiecesInput.attr("disabled", "disabled");
+		divideCheckbox.setEnabled(bool);
+		if (!bool || !that.getUseDivided()) {
+			numPartsInput.attr("disabled", "disabled");
+			minPartsInput.attr("disabled", "disabled");
 		} else {
-			numPiecesInput.removeAttr("disabled");
-			minPiecesInput.removeAttr("disabled");
+			numPartsInput.removeAttr("disabled");
+			minPartsInput.removeAttr("disabled");
 		}
 	}
 	
@@ -3731,12 +3731,12 @@ function EditorSplitController(div, editorController) {
 	
 	  // remove form errors
     if (!hasError) {
-      numPiecesInput.removeClass("form_input_error_div");
-      minPiecesInput.removeClass("form_input_error_div");
+      numPartsInput.removeClass("form_input_error_div");
+      minPartsInput.removeClass("form_input_error_div");
     }
 		
-		// disable if pieces already split
-		if (editorController.getImportedPieces() && editorController.getImportedPieces()[0].isSplit()) {
+		// disable if pieces already divided
+		if (editorController.getImportedPieces() && editorController.getImportedPieces()[0].isDivided()) {
 			setEnabled(false);
 		} else {
 			setEnabled(true);
@@ -3744,9 +3744,9 @@ function EditorSplitController(div, editorController) {
 	}
 
 	function reset() {
-		splitCheckbox.setChecked(false);
-		numPiecesVal = 3;
-		minPiecesVal = 2;
+		divideCheckbox.setChecked(false);
+		numPartsVal = 3;
+		minPartsVal = 2;
 		validate();
 		update();
 	}
@@ -3760,48 +3760,48 @@ function EditorSplitController(div, editorController) {
 	
 	function validate(lenientBlankAndRange) {
 		var err = false;
-		if (that.getUseSplit()) {
+		if (that.getUseDivided()) {
 			
 			// validate num pieces
-			var numPieces = Number(numPiecesInput.val());
+			var numParts = Number(numPartsInput.val());
 			if (lenientBlankAndRange) {
-				if (!numPiecesInput.val() || (isInt(numPieces) && numPieces >= 0)) {
-					numPiecesInput.removeClass("form_input_error_div");
+				if (!numPartsInput.val() || (isInt(numParts) && numParts >= 0)) {
+					numPartsInput.removeClass("form_input_error_div");
 				} else {
 					err = true;
-					numPiecesInput.addClass("form_input_error_div");
+					numPartsInput.addClass("form_input_error_div");
 				}
 			} else {
-				if (numPiecesInput.val() && isInt(numPieces) && numPieces >= 2 && numPieces <= AppUtils.MAX_SHARES) {
-					numPiecesInput.removeClass("form_input_error_div");
+				if (numPartsInput.val() && isInt(numParts) && numParts >= 2 && numParts <= AppUtils.MAX_PARTS) {
+					numPartsInput.removeClass("form_input_error_div");
 				} else {
 					err = true;
-					numPiecesInput.addClass("form_input_error_div");
+					numPartsInput.addClass("form_input_error_div");
 				}
 			}
 			
 			// validate min pieces
-			var minPieces = Number(minPiecesInput.val());
+			var minParts = Number(minPartsInput.val());
 			if (lenientBlankAndRange) {
-				if (!minPiecesInput.val() || (isInt(minPieces) && minPieces >= 0)) {
-					minPiecesInput.removeClass("form_input_error_div");
+				if (!minPartsInput.val() || (isInt(minParts) && minParts >= 0)) {
+					minPartsInput.removeClass("form_input_error_div");
 				} else {
 					err = true;
-					minPiecesInput.addClass("form_input_error_div");
+					minPartsInput.addClass("form_input_error_div");
 				}
 			} else {
-				if (minPiecesInput.val() && isInt(minPieces) && minPieces >= 2 && minPieces <= AppUtils.MAX_SHARES && (err || minPieces <= numPieces)) {
-					minPiecesInput.removeClass("form_input_error_div");
+				if (minPartsInput.val() && isInt(minParts) && minParts >= 2 && minParts <= AppUtils.MAX_PARTS && (err || minParts <= numParts)) {
+					minPartsInput.removeClass("form_input_error_div");
 				} else {
 					err = true;
-					minPiecesInput.addClass("form_input_error_div");
+					minPartsInput.addClass("form_input_error_div");
 				}
 			}
 		}
 		setFormError(err);
 	}
 }
-inheritsFrom(EditorSplitController, DivController);
+inheritsFrom(EditorDivideController, DivController);
 
 /**
  * Controls the editor paginator.
@@ -3850,29 +3850,29 @@ function EditorPaginatorController(div, editorController) {
 		div.empty();
 		paginator = null;
 		piecesLabel = null;
-		var pieceNums = getPieceNums();
+		var pieceNums = getPartNums();
 		if (pieceNums.length > 1) {
 			paginator = new PaginatorController($("<div>").appendTo(div), pieceNums);
 			paginator.render();
 			paginator.onClick(function(index, label) { invoke(clickListeners, index, label); });
-			piecesLabel = $("<div class='editor_piece_selection_label'>").appendTo(div);
-			piecesLabel.html("Piece");
+			piecesLabel = $("<div class='editor_part_selection_label'>").appendTo(div);
+			piecesLabel.html("Part");
 			div.show();
 		} else {
 			div.hide();
 		}
 	}
 	
-	function getPieceNums() {
+	function getPartNums() {
 		var pieceNums = [];
 		var currentPieces = editorController.getCurrentPieces();
 		var config = editorController.getInitConfig();
 		if (currentPieces && currentPieces.length > 1) {
-			for (var i = 0; i < currentPieces.length; i++) pieceNums.push(currentPieces[i].getPieceNum());
+			for (var i = 0; i < currentPieces.length; i++) pieceNums.push(currentPieces[i].getPartNum());
 		} else if (config.pieces && config.pieces.length > 1) {
-			for (var i = 0; i < config.pieces.length; i++) pieceNums.push(config.pieces[i].getPieceNum());
-		} else if (config.genConfig && isDefined(config.genConfig.numPieces) && config.genConfig.numPieces > 1) {
-			for (var i = 0; i < config.genConfig.numPieces; i++) pieceNums.push(i + 1);
+			for (var i = 0; i < config.pieces.length; i++) pieceNums.push(config.pieces[i].getPartNum());
+		} else if (config.genConfig && isDefined(config.genConfig.numParts) && config.genConfig.numParts > 1) {
+			for (var i = 0; i < config.genConfig.numParts; i++) pieceNums.push(i + 1);
 		}
 		return pieceNums;
 	}
@@ -4341,7 +4341,7 @@ function EditorActionsController(div, editorController) {
 		editorController.onSetCurrentPieces(update);
 		editorController.onFormErrorChange(update);
 		editorController.getPassphraseController().onUsePassphraseChange(update);
-		editorController.getSplitController().onUseSplitChange(update);
+		editorController.getDividedController().onUseDividedChange(update);
 		editorController.onGenerate(function(isQuick) {
 			if (isQuick) return;
 			btnCancel.show();
@@ -4412,8 +4412,8 @@ function EditorActionsController(div, editorController) {
 		else {
 			btnGenerate.hide();
 			
-			// apply and reset shown if passphrase or split checked
-			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getSplitController().getUseSplit()) {
+			// apply and reset shown if passphrase or divided checked
+			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided()) {
 				btnApply.html(!editorController.newPiecesGenerated() ? "Apply" : "Reapply");
 				btnApply.show()
 				btnApply.unbind("click");
@@ -5298,7 +5298,7 @@ function StandardPieceRenderer(div, piece, config) {
 	}, config);
 	if (!config.showPublic) assertTrue(config.showPrivate);
 	if (!config.showPrivate) assertTrue(config.showPublic);
-	if (config.infoBack) assertFalse(piece.isSplit());
+	if (config.infoBack) assertFalse(piece.isDivided());
 	
 	var keypairRenderers;
 	var onProgressFn;
@@ -5336,12 +5336,12 @@ function StandardPieceRenderer(div, piece, config) {
 				
 				// add new page
 				var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-				if (piece.getPieceNum() || (!config.cryptoCash && config.showLogos)) {
+				if (piece.getPartNum() || (!config.cryptoCash && config.showLogos)) {
 					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
 					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
 					var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-					if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
+					if (piece.getPartNum()) pieceNumDiv.append("Part " + piece.getPartNum());
 				}
 				keypairsDiv = $("<div class='keypairs_div'>").appendTo(pageDiv);
 			}
@@ -5391,7 +5391,7 @@ function StandardPieceRenderer(div, piece, config) {
 		function renderFunc(placeholderDiv, piece, index, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
-				if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPieceNum())) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
+				if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPartNum())) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
 				var keypairRenderer = new StandardKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
 				keypairRenderers.push(keypairRenderer);
 				keypairRenderer.render(function(div) {
@@ -5458,20 +5458,20 @@ inheritsFrom(StandardPieceRenderer, DivController);
  */
 StandardPieceRenderer.getRenderWeight = function(config) {
 	PieceGenerator.validateConfig(config);
-	var numPieces = config.numPieces ? config.numPieces : 1;
+	var numParts = config.numParts ? config.numParts : 1;
 	var weight = 0;
 	
 	// compute weight from pre-existing pieces
 	if (config.pieces) {
 		for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
-			weight += (StandardKeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker()) * numPieces);
+			weight += (StandardKeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker()) * numParts);
 		}
 	}
 	
 	// compute weight from keypair generation config
 	else {
 		for (var i = 0; i < config.keypairs.length; i++) {
-			weight += config.keypairs[i].numKeypairs * StandardKeypairRenderer.getRenderWeight(config.keypairs[i].ticker) * numPieces;
+			weight += config.keypairs[i].numKeypairs * StandardKeypairRenderer.getRenderWeight(config.keypairs[i].ticker) * numParts;
 		}
 	}
 	return weight;
@@ -5515,7 +5515,7 @@ function StandardPiecePreviewRenderer(div, piece, config) {
 			
 			// add preview overlay
 			var previewDiv = $("<div class='editor_print_preview_overlay user_select_none'>PREVIEW</div>");
-			var keypairsDiv = div.children().first().children().eq(config.showLogos && !config.cryptoCash || piece.isSplit() ? 1 : 0);
+			var keypairsDiv = div.children().first().children().eq(config.showLogos && !config.cryptoCash || piece.isDivided() ? 1 : 0);
 			new OverlayController(keypairsDiv, {contentDiv: previewDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
 				if (onDone) onDone();
 			});
@@ -5751,7 +5751,7 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 			decoded.leftValue = keypair.getPublicAddress();
 		} else {
 			decoded.leftValueCopyable = false;
-			if (keypair.isSplit()) decoded.leftValue = "(combine shares to view)";
+			if (keypair.isDivided()) decoded.leftValue = "(combine parts to view)";
 			else if (keypair.isEncrypted()) decoded.leftValue = "(decrypt to view)";
 			else if (!config.showPublic) decoded.leftValue = "(not shown)";
 			else {
@@ -5768,7 +5768,7 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 	
 	// initialize right values
 	decoded.rightLabel = keypair.getPlugin().getPrivateLabel();
-	decoded.rightLabel += " " + (config.showPrivate ? keypair.isSplit() ? "(split)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
+	decoded.rightLabel += " " + (config.showPrivate ? keypair.isDivided() ? "(divided)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
 	decoded.rightValue = keypair.getPrivateWif() && config.showPrivate ? keypair.getPrivateWif() : "(not shown)";
 	decoded.rightValueCopyable = isDefined(keypair.getPrivateWif()) && config.showPrivate;
 	return decoded;
@@ -5839,7 +5839,7 @@ function CompactPieceRenderer(div, piece, config) {
       config = Object.assign({}, config);
       return function(onDone) {
         if (_isDestroyed) return;
-        if (piece.getKeypairs().length > 1 || piece.getPieceNum()) config.keypairId = (piece.getPieceNum() ? piece.getPieceNum() + "." : "") + (index + 1);
+        if (piece.getKeypairs().length > 1 || piece.getPartNum()) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
         var keypairRenderer = new CompactKeypairRenderer(div, piece.getKeypairs()[index], config);
         keypairRenderers.push(keypairRenderer);
         keypairRenderer.render(function(div) {
@@ -5879,12 +5879,12 @@ function CompactPieceRenderer(div, piece, config) {
           if (i === 0 || (config.pageBreaks && usedHeight + rowHeight > MAX_PAGE_HEIGHT)) {
             usedHeight = 0;
             var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
-            if (config.showLogos || piece.getPieceNum()) {
+            if (config.showLogos || piece.getPartNum()) {
               var headerDiv = $("<div class='piece_page_header_div'>").appendTo(config.visiblePlaceholder);
               headerDiv.append($("<div class='piece_page_header_left'>"));
               if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
               var pieceNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
-              if (piece.getPieceNum()) pieceNumDiv.append("Piece " + piece.getPieceNum());
+              if (piece.getPartNum()) pieceNumDiv.append("Part " + piece.getPartNum());
               usedHeight += headerDiv.get(0).offsetHeight;
               headerDiv.appendTo(pageDiv);
             }
@@ -5955,20 +5955,20 @@ inheritsFrom(CompactPieceRenderer, DivController);
  */
 CompactPieceRenderer.getRenderWeight = function(config) {
 	PieceGenerator.validateConfig(config);
-	var numPieces = config.numPieces ? config.numPieces : 1;
+	var numParts = config.numParts ? config.numParts : 1;
 	var weight = 0;
 	
 	// compute weight from pre-existing pieces
 	if (config.pieces) {
 		for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
-			weight += (CompactKeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker(), config) * numPieces);
+			weight += (CompactKeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker(), config) * numParts);
 		}
 	}
 	
 	// compute weight from keypair generation config
 	else {
 		for (var i = 0; i < config.keypairs.length; i++) {
-			weight += config.keypairs[i].numKeypairs * CompactKeypairRenderer.getRenderWeight(config.keypairs[i].ticker, config) * numPieces;
+			weight += config.keypairs[i].numKeypairs * CompactKeypairRenderer.getRenderWeight(config.keypairs[i].ticker, config) * numParts;
 		}
 	}
 	return weight;
@@ -6009,7 +6009,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 			
 			// add preview overlay
 			var previewDiv = $("<div class='editor_print_preview_overlay editor_print_preview_overlay_reverse user_select_none'>PREVIEW</div>");
-      var keypairsDiv = div.children().first().children().eq(config.showLogos || piece.isSplit() ? 1 : 0);
+      var keypairsDiv = div.children().first().children().eq(config.showLogos || piece.isDivided() ? 1 : 0);
 			new OverlayController(keypairsDiv, {contentDiv: previewDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
 				if (onDone) onDone();
 			});
@@ -6209,7 +6209,7 @@ CompactKeypairRenderer.QR_CONFIG = {
  * @param config is custom configuration
  * @returns a decoded object with fields which inform rendering
  * 					decoded.value is the keypair value
- *          decoded.valueType is one of public | unencrypted | encrypted | or split
+ *          decoded.valueType is one of public | unencrypted | encrypted | or divided
  * 					decoded.valueCopyable indicates if the value is copyable and should be QR
  * 					decoded.cryptoLogo is the center logo to render
  *          decoded.cryptoName is the name of the crypto the value is for
@@ -6228,7 +6228,7 @@ CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
 	var decoded = {};
 	decoded.cryptoLogo = config.showLogos ? keypair.getPlugin().getLogo() : null;
 	decoded.cryptoName = keypair.getPlugin().getName();
-	decoded.valueType = config.showPublic ? "public" : (keypair.isSplit() ? "split" : (keypair.isEncrypted() ? "encrypted" : "unencrypted"));
+	decoded.valueType = config.showPublic ? "public" : (keypair.isDivided() ? "divided" : (keypair.isEncrypted() ? "encrypted" : "unencrypted"));
 	if (config.showPublic) {
 		if (keypair.isPublicApplicable()) {
 			decoded.value = keypair.getPublicAddress();
