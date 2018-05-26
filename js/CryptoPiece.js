@@ -510,7 +510,7 @@ function CryptoPiece(config) {
 			var additional = minParts - dividedPieces.length;
 			throw new Error("Need " + additional + " additional " + (additional === 1 ? "part" : "parts") + " to recover private keys");
 		} else if (dividedPieces.length < 2) {
-			throw new Error("Need additional parts to recover private key");
+			throw new Error("Need additional parts to recover private keys");
 		}
 		
 		// combine keypairs

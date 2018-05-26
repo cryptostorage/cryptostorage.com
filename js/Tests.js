@@ -862,7 +862,8 @@ function Tests() {
 			funcs.push(testUnencryptedJson());
 			funcs.push(testEncryptedJson());
 			funcs.push(testEncryptedCsv());
-			funcs.push(testCompatibleParts());
+			funcs.push(testCompatibleParts1());
+	    funcs.push(testCompatibleParts2());
 			funcs.push(testInvalidPieces());
 			funcs.push(testIncompatibleParts());
 			funcs.push(testDuplicateNames());
@@ -916,7 +917,7 @@ function Tests() {
 			}
 		}
 		
-		function testCompatibleParts() {
+		function testCompatibleParts1() {
 			return function(onDone) {
 				
 				// add parts at same time
@@ -941,6 +942,32 @@ function Tests() {
 				});
 			}
 		}
+		
+		function testCompatibleParts2() {
+      return function(onDone) {
+        
+        // add parts at same time
+        fileImporter.startOver();
+        var file1 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"3XyNhuJwKyRbvfXeCgCUEREnTgUmvtuvDGwL6sb66DLomvB"}]}', "file1.json", AppUtils.FileType.JSON);
+        var file2 = getFile('{"keypairs":[{"ticker":"BCH","privateWif":"3Y37PFVGgLhRoL2H9rVjimTaz5MnCM9imTBhapQeG3BEy5z"}]}', "file2.json", AppUtils.FileType.JSON);
+        fileImporter.addFiles([file1, file2], function() {
+          assertEquals(2, fileImporter.getNamedPieces().length);
+          assertEquals("", fileImporter.getWarning());
+          
+          // add parts one at a time
+          fileImporter.startOver();
+          fileImporter.addFiles([file1], function() {
+            assertEquals(1, fileImporter.getNamedPieces().length);
+            assertEquals("Need additional parts to recover private keys", fileImporter.getWarning());
+            fileImporter.addFiles([file2], function() {
+              assertEquals(2, fileImporter.getNamedPieces().length);
+              assertEquals("", fileImporter.getWarning());
+              onDone();
+            });
+          });
+        });
+      }
+    }
 
 		function testInvalidPieces() {	
 			return function(onDone) {
