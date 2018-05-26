@@ -1579,12 +1579,12 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .compact_keypair_type {
-	font-size: 14px;
+	font-size: 13px;
 	margin-top: -2px;
 }
 
 .compact_keypair_value {
-	font-size: 13px;
+	font-size: 12px;
 	font-family: monospace;
 	text-align: center;
 }

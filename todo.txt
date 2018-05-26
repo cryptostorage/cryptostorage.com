@@ -1,7 +1,6 @@
 v0.3.0
 standard layout needs to float around long xmr seed
 red warning when private keys are not included
-change out qr lib
 compact (private split)
 keypair description
 addresses recognized as split share when obviously too short
@@ -16,6 +15,7 @@ browser testing
 release
 
 v0.3.1
+change out qr lib
 text encryption, divisionn, and import
 "download and verify" notice description with hyperlink to verify faq
 less vertical height on generate progress
