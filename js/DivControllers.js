@@ -6115,7 +6115,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		var label = $("<div style='flex-wrap:wrap;' class='flex_horizontal flex_align_end'>").appendTo(title);
 		var cryptoName = $("<div style='margin-right:5px' class='keypair_label'>").appendTo(label);
 		cryptoName.append(decoded.cryptoName);
-		var valueType = $("<div class='compact_keypair_type'>").appendTo(label);
+		var valueType = $("<div class='compact_keypair_sublabel'>").appendTo(label);
 		valueType.append("(" + decoded.valueType + ")");		
 				
 		// content includes title and keypair value
@@ -6231,7 +6231,7 @@ CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
 	var decoded = {};
 	decoded.cryptoLogo = config.showLogos ? keypair.getPlugin().getLogo() : null;
 	decoded.cryptoName = keypair.getPlugin().getName();
-	decoded.valueType = config.showPublic ? "public" : (keypair.isDivided() ? "divided" : (keypair.isEncrypted() ? "encrypted" : "unencrypted"));
+	decoded.valueType = config.showPublic ? "public" : (keypair.isDivided() ? "private divided" : (keypair.isEncrypted() ? "private encrypted" : "private"));
 	if (config.showPublic) {
 		if (keypair.isPublicApplicable()) {
 			decoded.value = keypair.getPublicAddress();

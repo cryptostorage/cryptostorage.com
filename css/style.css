@@ -1562,6 +1562,11 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	max-width: 220px;
 }
 
+.compact_keypair_sublabel {
+	font-size: 13px;
+	margin-top: -2px;
+}
+
 .compact_keypair_div * .compact_keypair_title > div {
 	margin-right: 5px;
 }
@@ -1576,11 +1581,6 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 
 .compact_keypair_div > .keypair_qr:last-child {
 	margin-left: 6px;
-}
-
-.compact_keypair_type {
-	font-size: 13px;
-	margin-top: -2px;
 }
 
 .compact_keypair_value {
