@@ -329,17 +329,17 @@ CryptoKeypair.prototype.setPartNum = function(partNum) {
 CryptoKeypair.prototype.toJson = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	function isExcluded(field) { return arrayContains(CryptoKeypair.getExcludedFields(), field); }
-	return {
-		ticker: isExcluded(CryptoKeypair.Field.TICKER) ? undefined : this.getFieldValue(CryptoKeypair.Field.TICKER),
-		publicAddress: isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS) ? undefined : this.getFieldValue(CryptoKeypair.Field.PUBLIC_ADDRESS),
-		privateWif: isExcluded(CryptoKeypair.Field.PRIVATE_WIF) ? undefined : this.getFieldValue(CryptoKeypair.Field.PRIVATE_WIF),
-		privateHex: isExcluded(CryptoKeypair.Field.PRIVATE_HEX) ? undefined : this.getFieldValue(CryptoKeypair.Field.PRIVATE_HEX),
-		privateState: isExcluded(CryptoKeypair.Field.PRIVATE_STATE) ? undefined : this.getFieldValue(CryptoKeypair.Field.PRIVATE_STATE),
-		encryption: isExcluded(CryptoKeypair.Field.ENCRYPTION) || !this.isEncrypted() ? undefined : this.getFieldValue(CryptoKeypair.Field.ENCRYPTION),
-		isDivided: isExcluded(CryptoKeypair.Field.IS_DIVIDED) ? undefined : this.getFieldValue(CryptoKeypair.Field.IS_DIVIDED),
-		minParts: isExcluded(CryptoKeypair.Field.MIN_PARTS) ? undefined : this.getFieldValue(CryptoKeypair.Field.MIN_PARTS),
-		partNum: isExcluded(CryptoKeypair.Field.PART_NUM) || !this.isDivided() ? undefined : this.getFieldValue(CryptoKeypair.Field.PART_NUM)
-	}
+	var json = {};
+	if (!isExcluded(CryptoKeypair.Field.TICKER)) json.ticker = this.getPlugin().getTicker();
+	if (!isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS)) json.publicAddress = this.getPublicAddress();
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_WIF)) json.privateWif = this.getPrivateWif();
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_HEX)) json.privateHex = this.getPrivateHex();
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_STATE)) json.privateState = this.getFieldValue(CryptoKeypair.Field.PRIVATE_STATE);
+	if (!isExcluded(CryptoKeypair.Field.ENCRYPTION)) json.encryption = this.getEncryptionScheme();
+	if (!isExcluded(CryptoKeypair.Field.IS_DIVIDED)) json.isDivided = this.isDivided();
+	if (!isExcluded(CryptoKeypair.Field.MIN_PARTS)) json.minParts = this.getMinParts();
+	if (!isExcluded(CryptoKeypair.Field.PART_NUM)) json.partNum = this.getPartNum()
+	return json;
 }
 
 CryptoKeypair.prototype.getFieldValue = function(field) {
@@ -362,7 +362,10 @@ CryptoKeypair.prototype.getFieldValue = function(field) {
 		case CryptoKeypair.Field.PART_NUM:
 			return this.getPartNum();
 		case CryptoKeypair.Field.PRIVATE_STATE:
-		  return this.isDivided() ? "Divided" : (this.isEncrypted() ? "Encrypted" : (this.isEncrypted() === false ? "Unencrypted" : ""));
+		  if (this.isDivided()) return "Divided";
+		  if (this.isEncrypted()) return "Encrypted";
+		  assertFalse(this.isEncrypted());
+		  return "Unencrypted";
 		default:
 			throw new Error("Unrecognized keypair field: " + field);
 	}
