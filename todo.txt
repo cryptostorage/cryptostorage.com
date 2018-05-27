@@ -12,6 +12,7 @@ browser testing
 release
 
 v0.3.1
+TypeError: event.dataTransfer is null drag and drop DivController2084.js: event.dataTransfer.dropEffect = 'copy';
 change out qr lib
 text encryption, divisionn, and import
 "download and verify" notice description with hyperlink to verify faq
