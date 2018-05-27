@@ -283,7 +283,7 @@ function CryptoPiece(config) {
 		for (prop in CryptoKeypair.Field) {
 		  if (!CryptoKeypair.Field.hasOwnProperty(prop)) continue;
 		  var header = CryptoKeypair.Field[prop.toString()];
-		  if (arrayContains(CryptoKeypair.EXCLUDE_FIELDS, header)) continue;              // skip field if excluded
+		  if (arrayContains(CryptoKeypair.getExcludedFields(), header)) continue;              // skip field if excluded
 		  if (header === CryptoKeypair.Field.PART_NUM && !this.isDivided()) continue;      // skip part num if not divided
 		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue; // skip encryption if not encrypted
 			headers.push(header);

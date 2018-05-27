@@ -328,7 +328,7 @@ CryptoKeypair.prototype.setPartNum = function(partNum) {
 
 CryptoKeypair.prototype.toJson = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	function isExcluded(field) { return arrayContains(CryptoKeypair.EXCLUDE_FIELDS, field); }
+	function isExcluded(field) { return arrayContains(CryptoKeypair.getExcludedFields(), field); }
 	return {
 		ticker: isExcluded(CryptoKeypair.Field.TICKER) ? undefined : this.getFieldValue(CryptoKeypair.Field.TICKER),
 		publicAddress: isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS) ? undefined : this.getFieldValue(CryptoKeypair.Field.PUBLIC_ADDRESS),
@@ -988,12 +988,15 @@ CryptoKeypair.Field = {
     PART_NUM: "Part Number"
 }
 
-// hardcoded fields to exclude from json and csv export
-CryptoKeypair.EXCLUDE_FIELDS = [
-	CryptoKeypair.Field.PRIVATE_HEX,
-	CryptoKeypair.Field.MIN_PARTS,
-	CryptoKeypair.Field.IS_DIVIDED,
-];
+// fields to exclude from json and csv export
+CryptoKeypair.getExcludedFields = function() {
+  var excluded = [
+    CryptoKeypair.Field.MIN_PARTS,
+    CryptoKeypair.Field.IS_DIVIDED,
+  ];
+  if (!AppUtils.DEV_MODE) excluded.push(CryptoKeypair.Field.PRIVATE_HEX);
+  return excluded
+}
 
 // divided v2 encoded version
 CryptoKeypair.DIVIDE_V2_VERSION = 1;
