@@ -230,7 +230,7 @@ function Tests() {
 			}
 		}
 		
-		// bitcoin-specific tests
+		// bitcoin specific tests
 		if (plugin.getTicker() === "BTC") {
 			
 			// verify shamirs initialized with 7 bits
@@ -260,6 +260,21 @@ function Tests() {
 					onDone();
 				});
 			});
+		}
+		
+		// litecoin specific tests
+		else if (plugin.getTicker() === "LTC") {
+		  
+		  // test initialization from wif that has 62 character private hex
+		  var shortPrivateWif = "T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup";
+		  var keypair = new CryptoKeypair({plugin: plugin, privateKey: shortPrivateHex});
+      console.log(keypair.toJson());
+		  
+		  // test initialization from 62 character private hex
+		  var shortPrivateHex = "3294fbf83ee27cb46ecbc6d86dc5e1b254af2b9058597278a957e99154a065";
+		  keypair = new CryptoKeypair({plugin: plugin, privateKey: shortPrivateHex});
+		  console.log(keypair.toJson());
+		  throw new Error("Stawp");
 		}
 		
 		// otherwise done
