@@ -1,4 +1,10 @@
 v0.3.0
+hex interpreted as divided
+- wif encryption not set: building wrong json, bug fixed
+- state being set to "Unencrypted" which checks for encryption === false: building wrong json, bug fixed
+ability to run arbitrary keypair through the ringer in tests, including encryption
+
+
 LTC T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup cannot encrypt imported
 standard layout needs to float around long xmr seed
 addresses recognized as split share when obviously too short
