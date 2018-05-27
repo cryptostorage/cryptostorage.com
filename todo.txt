@@ -1,4 +1,5 @@
 v0.3.0
+LTC T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup cannot encrypt imported
 standard layout needs to float around long xmr seed
 addresses recognized as split share when obviously too short
 put homepage text in index.html and dynamically hide for seo
