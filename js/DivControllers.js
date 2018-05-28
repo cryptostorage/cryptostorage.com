@@ -1077,7 +1077,7 @@ function HomeController(div) {
 			
 			// footer license
 			var footerLicenseDiv = $("<div class='footer_license'>").appendTo(footerDiv);
-			footerLicenseDiv.append("<a href='./LICENSE.txt' class='footer_license'>MIT licensed</a>");
+			footerLicenseDiv.append("<a href='./LICENSE.txt' class='footer_license'>MIT licensed.</a>  No warranty expressed or implied.");
 			
 			// done rendering
 			if (onDone) onDone(div);
