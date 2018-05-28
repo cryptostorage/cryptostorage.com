@@ -266,34 +266,20 @@ function Tests() {
 			});
 		}
 		
-//		// litecoin specific tests
-//		else if (plugin.getTicker() === "LTC") {
-//		  
-//		  var keypair = new CryptoKeypair({plugin: plugin, privateKey: "T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup"});
-//		  assertEquals("T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup", keypair.getPrivateWif());
-//		  assertEquals("3294fbf83ee27cb46ecbc6d86dc5e1b254af2b9058597278a957e99154a065", keypair.getPrivateHex());
-//		  assertEquals("address", keypair.getPublicAddress());
-//		  
-//		  // test piece
-//      var piece = new CryptoPiece({keypairs: keypair});
-//		  testPieceEncryption(piece, [AppUtils.EncryptionScheme.BIP38], function(err, encryptedPiece) {
-//        assertNull(err);
-//        assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", encryptedPiece.getKeypairs()[0].getPublicAddress());
-//        assertEquals("6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL", encryptedPiece.getKeypairs()[0].getPrivateWif());
-//        onDone();
-//      });
-//		  
-////		  // test initialization from wif that has 62 character private hex
-////		  var shortPrivateWif = "T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup";
-////		  var keypair = new CryptoKeypair({plugin: plugin, privateKey: shortPrivateHex});
-////      console.log(keypair.toJson());
-////		  
-////		  // test initialization from 62 character private hex
-////		  var shortPrivateHex = "3294fbf83ee27cb46ecbc6d86dc5e1b254af2b9058597278a957e99154a065";
-////		  keypair = new CryptoKeypair({plugin: plugin, privateKey: shortPrivateHex});
-////		  console.log(keypair.toJson());
-////		  throw new Error("Stawp");
-//		}
+		// litecoin specific tests
+		else if (plugin.getTicker() === "LTC") {
+		  
+		  // test with 62 character private hex
+		  var keypair = new CryptoKeypair({plugin: plugin, privateKey: "T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup"});
+		  assertEquals("T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup", keypair.getPrivateWif());
+		  assertEquals("3294fbf83ee27cb46ecbc6d86dc5e1b254af2b9058597278a957e99154a065", keypair.getPrivateHex());
+		  assertEquals("LgCNyq7GfXBLgUbxRq7w6qFfkomJoYxZKP", keypair.getPublicAddress());
+      var piece = new CryptoPiece({keypairs: keypair});
+		  testPieceEncryption(piece, [AppUtils.EncryptionScheme.V1_CRYPTOJS], function(err, encryptedPiece) {
+        assertNull(err);
+        onDone();
+      });
+		}
 		
 		// otherwise done
 		else onDone();
