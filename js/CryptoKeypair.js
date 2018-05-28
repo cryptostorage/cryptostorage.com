@@ -269,7 +269,7 @@ CryptoKeypair.prototype.divide = function(numParts, minParts) {
 	assertTrue(numParts <= AppUtils.MAX_PARTS, "Cannot divide into more than " + AppUtils.MAX_PARTS + " parts");
 	assertTrue(minParts >= 2);
 	assertTrue(minParts <= numParts);
-
+	
 	// divide private hex into parts
 	var parts = secrets.share(this.getPrivateHex(), numParts, minParts);
 	

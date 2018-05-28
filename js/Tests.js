@@ -243,15 +243,12 @@ function Tests() {
 			
 			// import uncompressed keypair from bitaddress.org
 			keypair = new CryptoKeypair({plugin: plugin, privateKey: "5HyajPXtXY46WEQheAtqL6VmQPW22iKuzUZdAfycQqFtxQPran2"});
-			//assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
-	    //assertEquals("5HyajPXtXY46WEQheAtqL6VmQPW22iKuzUZdAfycQqFtxQPran2", keypair.getPrivateWif());
 	    assertEquals("1CUyCk8GjFzzYE9ctaZ1PuHNEyZi8zKApX", keypair.getPublicAddress());
 			assertEquals("Kwvjt6TLRn4fJ2BcP4fnKHFxzEK5YZQUtgezdh2sJBzkKDCVJfXo", keypair.getPrivateWif());
 			var piece = new CryptoPiece({keypairs: keypair});
 			testPieceEncryption(piece, [AppUtils.EncryptionScheme.BIP38], function(err, encryptedPiece) {
 			  assertNull(err);
 			  assertEquals("1CUyCk8GjFzzYE9ctaZ1PuHNEyZi8zKApX", encryptedPiece.getKeypairs()[0].getPublicAddress());
-        //assertEquals("6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL", encryptedPiece.getKeypairs()[0].getPrivateWif());
         assertEquals("6PYLFYzzG9NAz2s8y4KutrdDh18iwmAJmSR4uoUirSAvUsgMFXBz4kEFPK", encryptedPiece.getKeypairs()[0].getPrivateWif());
         
         // import uncompressed bip38 from bitaddress.org
@@ -1463,8 +1460,6 @@ function Tests() {
 		json = {"pieceNum":2,"version":"0.1.6","keys":[{"ticker":"BIP39","address":"Not applicable","wif":"2cDy7cp3VXN1gts7JdJkMFQjF1eJ3L1AT8fqXWxwRydd7GsVtE3dEnn2ugSkgKpP2vuS52fZhV6zyNYbKXCE9xY5c8Z8zQ1fFzRx1p4zXuRZPeKTpiyA2rBZ4NVUCV6wVqUNzrHk","encryption":"V0_CRYPTOJS"}]};
 		piece1 = new CryptoPiece({json: json});
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", partNum: 2, privateKey: "2cDy7cp3VXN1gts7JdJkMFQjF1eJ3L1AT8fqXWxwRydd7GsVtE3dEnn2ugSkgKpP2vuS52fZhV6zyNYbKXCE9xY5c8Z8zQ1fFzRx1p4zXuRZPeKTpiyA2rBZ4NVUCV6wVqUNzrHk"})]});
-		console.log(piece1.toJson());
-		console.log(piece2.toJson());
 		assertTrue(piece1.equals(piece2));
 		
 		// 0.2.3 json unencrypted
