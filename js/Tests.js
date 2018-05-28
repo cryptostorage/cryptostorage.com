@@ -37,7 +37,7 @@ function Tests() {
 	var MIN_PARTS = 2;
 	
 	// list of invalid private keys to test per plugin
-	var INVALID_PKS = [" ", "ab", "abctesting123", "abc testing 123", 12345, "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "7ac1f31ddd1ce02ac13cf10b77b42be0aca008faa2f45f223a73d32e261e98013002b3086c88c4fcd8912cd5729d56c2eee2dcd10a8035666f848112fc58317ab7f9ada371b8fc8ac6c3fd5eaf24056ec7fdc785597f6dada9c66c67329a140a", "3b20836520fe2e8eef1fd3f898fd97b5a3bcb6702fae72e3ca1ba8fb6e1ddd75b12f74dc6422606d1750e40"];
+	var INVALID_PKS = [" ", "ab", "abctesting123", "abc testing 123", 12345, "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "3b20836520fe2e8eef1fd3f898fd97b5a3bcb6702fae72e3ca1ba8fb6e1ddd75b12f74dc6422606d1750e40"];
 	
 	/**
 	 * Runs minimum tests to verify key generation and dividing.
@@ -288,15 +288,20 @@ function Tests() {
 	function testPieceAllPlugins(plugins) {
 		console.log("Testing piece with all plugins");
 		
-		// test init keypairs with invalid private keys
-		for (var i = 0; i < INVALID_PKS.length; i++) {
-			var invalid = INVALID_PKS[i];
-			try {
-				new CryptoKeypair({plugin: plugin, privateKey: invalid});
-				fail("fail");
-			} catch (err) {
-				if (err.message === "fail") throw new Error("Should not create " + plugin.getTicker() + " keypair from invalid private key: " + invalid);
-			}
+    // test init keypairs with invalid private keys
+		for (var i = 0; i < plugins.length; i++) {
+		  var plugin = plugins[i];
+		  var invalids = copyArray(INVALID_PKS);
+		  invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());
+		  for (var j = 0; j < invalids.length; j++) {
+	      var invalid = invalids[j];
+	      try {
+	        new CryptoKeypair({plugin: plugin, privateKey: invalid});
+	        fail("fail");
+	      } catch (err) {
+	        if (err.message === "fail") throw new Error("Should not create " + plugin.getTicker() + " keypair from invalid private key: " + invalid);
+	      }
+	    }
 		}
 		
 		// create and test keypairs
