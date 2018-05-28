@@ -400,6 +400,10 @@ function CryptoPiece(config) {
 			json.keypairs = json.keys;
 			delete json.keys;
 		}
+		if (json.pieceNum) {
+		  json.partNum = json.pieceNum;
+		  delete json.pieceNum;
+		}
 		for (var i = 0; i < json.keypairs.length; i++) {
 			var keypair = json.keypairs[i];
 			if (keypair.wif) {

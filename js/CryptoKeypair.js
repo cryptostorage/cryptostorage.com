@@ -763,9 +763,10 @@ CryptoKeypair.prototype._decodePart = function(part) {
   function decodePartWifV0(part) {
     if (!isBase58(part)) return null;
     var hex = AppUtils.toBase(58, 16, part);
+    if (that._state.plugin.getTicker() === "XRP" && hex.substring(0, 2) !== "07") return null; // XRP address format is nearly indistinguishable from v0 part
     if (hex.length % 2 !== 0) return null;
     var shamirHex = ninja.wallets.splitwallet.stripLeadZeros(hex);
-    if (!isValidShamirHexLength(that._state.plugin, shamirHex.length)) return null;
+    if (!isValidShamirHex(that._state.plugin, shamirHex)) return null;
     return {
       shamirHex: shamirHex,
       privateHex: hex,
@@ -789,7 +790,7 @@ CryptoKeypair.prototype._decodePart = function(part) {
       var hex = AppUtils.toBase(58, 16, wif);
       if (hex.length % 2 !== 0) return null;
       decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(hex);
-      if (!isValidShamirHexLength(that._state.plugin, decoded.shamirHex.length)) return null;
+      if (!isValidShamirHex(that._state.plugin, decoded.shamirHex)) return null;
       decoded.privateWif = part;
       decoded.privateHex = hex;
       return decoded;
@@ -820,7 +821,7 @@ CryptoKeypair.prototype._decodePart = function(part) {
     return decodePartWifV2(AppUtils.toBase(16, 58, part));
   }
   
-  function decodePartWifV2(part) {    
+  function decodePartWifV2(part) {
     if (part.length < 33) return null;
     if (!isBase58(part)) return null;
     var hex = AppUtils.toBase(58, 16, part);
@@ -831,35 +832,44 @@ CryptoKeypair.prototype._decodePart = function(part) {
     decoded.minParts = parseInt(hex.substring(2, 4), 16);
     if (!isNumber(decoded.minParts) || decoded.minParts < 2 || decoded.minParts > AppUtils.MAX_PARTS) return null;
     decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
-    if (!isValidShamirHexLength(that._state.plugin, decoded.shamirHex.length)) return null;
+    if (!isValidShamirHex(that._state.plugin, decoded.shamirHex)) return null;
     decoded.privateWif = part;
     decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
     return decoded;
   }
   
   /**
-   * Indicates if the given length is a valid shamir part length for the given plugin.
+   * Indicates if the given hex is a valid shamir part by length and beginning prefix.
 	 *
    * Used to rule out false positives such as if a user tries to import a public address.
    * 
    * @param plugin specifies the min and max unencrypted hex length
-   * @param len is the length to test as a valid shamir hex length
-   * @returns true if the len is a valid shamir length, false otherwise
+   * @param hex is the hex to test
+   * @returns true if the hex is a valid shamir part, false otherwise
    */
-  function isValidShamirHexLength(plugin, len) {
+  function isValidShamirHex(plugin, hex) {
+    assertString(hex);
     
-    // unencrypted part range
+    // hex parts start with '7'
+    if (hex[0] !== '7') return false;
+    
+    // values to compute length ranges
+    var MIN_DIVIDE = 4; // dividing adds 4 characters minimum
+    var MAX_DIVIDE = 6; // dividing adds 6 characters maximum
     var min = plugin.getMinHexLength();
     var max = plugin.getMaxHexLength();
-    if (len >= min + 4 && len <= max + 4) return true;
+    var len = hex.length;
     
-    // cryptojs part range
-    if (len >= min * 3 - 32 + 4 && len <= max * 3 + 4) return true;
+    // unencrypted only adds divide length
+    if (len >= min + MIN_DIVIDE && len <= max + MAX_DIVIDE) return true;
     
-    // bip38 part range
-    if (len >= min + 20 + 4 && len <= max + 22 + 6) return true;
+    // cryptojs adds between min * 3 - 32 and max * 3 + 2 hex characters
+    if (len >= min * 3 - 32 + MIN_DIVIDE && len <= max * 3 + 2 + MAX_DIVIDE) return true;
+    
+    // BIP38 adds 20-22 hex characters
+    if (len >= min + 20 + MIN_DIVIDE && len <= max + 22 + MAX_DIVIDE) return true;
 
-    // otherwise not a valid part length
+    // otherwise not a valid part
     return false;
   }
 }

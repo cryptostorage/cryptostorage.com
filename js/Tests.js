@@ -111,13 +111,13 @@ function Tests() {
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function getTestPlugins() {
-//		return AppUtils.getCryptoPlugins();
-		var plugins = [];
+		return AppUtils.getCryptoPlugins();
+//		var plugins = [];
 //		plugins.push(AppUtils.getCryptoPlugin("BCH"));
 //		plugins.push(AppUtils.getCryptoPlugin("ETC"));
 //		plugins.push(AppUtils.getCryptoPlugin("XMR"));
-		plugins.push(AppUtils.getCryptoPlugin("BTC"));
-		plugins.push(AppUtils.getCryptoPlugin("LTC"));
+//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+//		plugins.push(AppUtils.getCryptoPlugin("LTC"));
 //		plugins.push(AppUtils.getCryptoPlugin("DOGE"));
 //		plugins.push(AppUtils.getCryptoPlugin("NEO"));
 //		plugins.push(AppUtils.getCryptoPlugin("DASH"));
@@ -131,7 +131,7 @@ function Tests() {
 //		plugins.push(AppUtils.getCryptoPlugin("BAT"));
 //		plugins.push(AppUtils.getCryptoPlugin("BIP39"));
 //		plugins.push(AppUtils.getCryptoPlugin("UBIQ"));
-		return plugins;
+//		return plugins;
 	}
 	
 	function testUtils() {
@@ -292,14 +292,18 @@ function Tests() {
 		for (var i = 0; i < plugins.length; i++) {
 		  var plugin = plugins[i];
 		  var invalids = copyArray(INVALID_PKS);
-		  invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());
+		  invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());  // test public address is not recognized
 		  for (var j = 0; j < invalids.length; j++) {
 	      var invalid = invalids[j];
+	      var keypair;
 	      try {
-	        new CryptoKeypair({plugin: plugin, privateKey: invalid});
+	        keypair = new CryptoKeypair({plugin: plugin, privateKey: invalid});
 	        fail("fail");
 	      } catch (err) {
-	        if (err.message === "fail") throw new Error("Should not create " + plugin.getTicker() + " keypair from invalid private key: " + invalid);
+	        if (err.message === "fail") {
+	          console.log(keypair.toJson());
+	          throw new Error("Should not create " + plugin.getTicker() + " keypair from invalid private key: " + invalid);
+	        }
 	      }
 	    }
 		}
@@ -1450,15 +1454,17 @@ function Tests() {
 		assertTrue(piece1.equals(piece2));
 		
 		// 0.1.0 json encrypted and divided
-		json = {"partNum":1,"version":"0.1.0","keys":[{"ticker":"XMR","address":"45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm","wif":"2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez","encryption":"CryptoJS"}]};
+		json = {"pieceNum":1,"version":"0.1.0","keys":[{"ticker":"XMR","address":"45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm","wif":"2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez","encryption":"CryptoJS"}]};
 		piece1 = new CryptoPiece({json: json});
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "XMR", partNum: 1, publicAddress: "45KxzuKQKv1WsyFcfVdspsKzMW5JSbzw2Qb8LtXzMVHU6xX7SqXnx9GbqEjuaoEeRJBLTaCUB72LTQCsyuettu4SGGGWEXm", privateKey: "2cDy5mHRcbVUyk2HxT7R4JKMNd4MwydtvDoDProeJaTFou8KLffnwYrRM66JbLHQfEnTcRMPNkDDEZKjyPu8VYWFrnw2R2x7n2QPFtG7d2atNyXq6hzNZCTSUNhWUwGGQLT2xMez"})]});
 		assertTrue(piece1.equals(piece2));
 		
-		// 0.1.6 json bip39
-		json = {"partNum":2,"version":"0.1.6","keys":[{"ticker":"BIP39","address":"Not applicable","wif":"2FDYwUaFBJhM4HFd2aG7uJWJ1kT6QLnN47AirWQRGH4wCYe4qQ2Uvr4Q1GMt4kELu3FfLM5YHoNS1f2KPL4c3n3B6vbNxVQC4VGM8xC5LEbXbkGzJwidXnEwZVwVHEMAAQ9Gp1k","encryption":"V1_CRYPTOJS"}]};
+		// 0.1.6 json encrypted and split bip39
+		json = {"pieceNum":2,"version":"0.1.6","keys":[{"ticker":"BIP39","address":"Not applicable","wif":"2cDy7cp3VXN1gts7JdJkMFQjF1eJ3L1AT8fqXWxwRydd7GsVtE3dEnn2ugSkgKpP2vuS52fZhV6zyNYbKXCE9xY5c8Z8zQ1fFzRx1p4zXuRZPeKTpiyA2rBZ4NVUCV6wVqUNzrHk","encryption":"V0_CRYPTOJS"}]};
 		piece1 = new CryptoPiece({json: json});
-		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", partNum: 2, privateKey: "2FDYwUaFBJhM4HFd2aG7uJWJ1kT6QLnN47AirWQRGH4wCYe4qQ2Uvr4Q1GMt4kELu3FfLM5YHoNS1f2KPL4c3n3B6vbNxVQC4VGM8xC5LEbXbkGzJwidXnEwZVwVHEMAAQ9Gp1k"})]});
+		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", partNum: 2, privateKey: "2cDy7cp3VXN1gts7JdJkMFQjF1eJ3L1AT8fqXWxwRydd7GsVtE3dEnn2ugSkgKpP2vuS52fZhV6zyNYbKXCE9xY5c8Z8zQ1fFzRx1p4zXuRZPeKTpiyA2rBZ4NVUCV6wVqUNzrHk"})]});
+		console.log(piece1.toJson());
+		console.log(piece2.toJson());
 		assertTrue(piece1.equals(piece2));
 		
 		// 0.2.3 json unencrypted
@@ -1474,13 +1480,13 @@ function Tests() {
 		assertTrue(piece1.equals(piece2));
 		
 		// 0.2.3 json encrypted and divided
-		json = {"partNum":1,"version":"0.2.3","keys":[{"ticker":"BTC","address":"19LbxpV9eMtSppiVhxibHDfPJYCLY7YFJZ","wif":"3Gz5MbtY98FdKoFYLF1QcXvGszwPnBtUsvKRpNfEzhvDma3noDETGqYJRXFL4oCRemJyHDoSmmnUPvLSawKFJvEER2Q7ixbsr6BtYZdXr4kDWnLy8NiYhMEHKcD86oskjzpD1MWz"}]};
+		json = {"pieceNum":1,"version":"0.2.3","keys":[{"ticker":"BTC","address":"19LbxpV9eMtSppiVhxibHDfPJYCLY7YFJZ","wif":"3Gz5MbtY98FdKoFYLF1QcXvGszwPnBtUsvKRpNfEzhvDma3noDETGqYJRXFL4oCRemJyHDoSmmnUPvLSawKFJvEER2Q7ixbsr6BtYZdXr4kDWnLy8NiYhMEHKcD86oskjzpD1MWz"}]};
 		piece1 = new CryptoPiece({json: json}); 
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BTC", partNum: 1, publicAddress: "19LbxpV9eMtSppiVhxibHDfPJYCLY7YFJZ", privateKey: "3Gz5MbtY98FdKoFYLF1QcXvGszwPnBtUsvKRpNfEzhvDma3noDETGqYJRXFL4oCRemJyHDoSmmnUPvLSawKFJvEER2Q7ixbsr6BtYZdXr4kDWnLy8NiYhMEHKcD86oskjzpD1MWz"})]});
 		assertTrue(piece1.equals(piece2));
 		
 		// 0.2.3 json no private key and divided
-		json = {"partNum":1,"version":"0.2.3","keys":[{"ticker":"BTC","address":"1AiWGJRuCkt1WP3N1B3Yo73t5kgNP3J17Q"}]}
+		json = {"pieceNum":1,"version":"0.2.3","keys":[{"ticker":"BTC","address":"1AiWGJRuCkt1WP3N1B3Yo73t5kgNP3J17Q"}]}
 		piece1 = new CryptoPiece({json: json}); 
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BTC", publicAddress: "1AiWGJRuCkt1WP3N1B3Yo73t5kgNP3J17Q"})]});
 		assertTrue(piece1.equals(piece2));

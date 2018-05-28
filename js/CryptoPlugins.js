@@ -279,6 +279,8 @@ function RipplePlugin() {
 	this.getLogoPath = function() { return "img/ripple.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/ripple-key-pairs.js"]; }
 	this.getDonationAddress = function() { return "r9AWMe2aSjTaj9aWpGrXQAHruodTDnHfaK"; }
+	this.getMinHexLength = function() { return 44; }
+	this.getMaxHexLength = function() { return 44; }
 	
 	this.randomPrivateKey = function() {
 		return ripple_key_pairs.generateSeed();
@@ -380,6 +382,8 @@ function BIP39Plugin() {
 	this.getDependencies = function() { return ["lib/bip39.js"]; }
 	this.getDonationAddress = function() { return null; }
 	this.hasPublicAddress = function() { return false; }
+	this.getMinHexLength = function() { return 66; }
+	this.getMaxHexLength = function() { return 66; }
 	
 	var mnemonic;
 	var language = "english";
@@ -435,8 +439,10 @@ function WavesPlugin() {
 	this.getLogoPath = function() { return "img/waves.png"; }
 	this.getDependencies = function() { return ["lib/bip39.js", "lib/polyfill.js", "lib/waves-api.js"]; }
 	this.getDonationAddress = function() { return "3P2xXtsfe4FUnQmu2iuKwXLshYYc2CjnXQH"; }
+	this.getMinHexLength = function() { return 42; }
+	this.getMaxHexLength = function() { return 42; }
 	
-	var waves; 
+	var waves;
 	
 	this.randomPrivateKey = function() {
 		if (!waves) waves = WavesAPI.create(WavesAPI.MAINNET_CONFIG);
@@ -463,7 +469,7 @@ function WavesPlugin() {
 		}
 		
 		// unencrypted hex
-		if (str.length === 42 && isHex(str)) {
+		if (str.length >= this.getMinHexLength() && str.length <= this.getMaxHexLength() && isHex(str)) {
 			decoded.privateHex = str;
 			decoded.privateWif = shamir39.getWordsFromHex(str, wordlist).join(' ');
 			decoded.publicAddress = waves.Seed.fromExistingPhrase(decoded.privateWif).address;
