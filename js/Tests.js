@@ -31,7 +31,7 @@ function Tests() {
 	
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_KEYS = 1;             // number of keys to test per plugin without encryption throughout tests
-	var REPEAT_KEYS_ENCRYPTION = 0;  // number of keys to test per plugin with encryption throughout tests
+	var REPEAT_KEYS_ENCRYPTION = 1;  // number of keys to test per plugin with encryption throughout tests
 	var TEST_MAX_PARTS = false;			 // computationally intensive
 	var NUM_PARTS = 3;
 	var MIN_PARTS = 2;
@@ -99,7 +99,7 @@ function Tests() {
 		funcs.push(function(onDone) { testTextImport(AppUtils.getCryptoPlugins(), onDone); });
 		funcs.push(function(onDone) { testGeneratePieces(plugins, onDone); });
 		funcs.push(function(onDone) { testDestroyPieceGenerator(plugins, onDone); });
-		funcs.push(function(onDone) { testPieceEncryption(plugins, onDone); });
+		funcs.push(function(onDone) { testPluginsEncryption(plugins, onDone); });
 		
 		// execute in series
 		async.series(funcs, function(err) {
@@ -111,13 +111,13 @@ function Tests() {
 	// --------------------------------- PRIVATE --------------------------------
 	
 	function getTestPlugins() {
-		return AppUtils.getCryptoPlugins();
-//		var plugins = [];
+//		return AppUtils.getCryptoPlugins();
+		var plugins = [];
 //		plugins.push(AppUtils.getCryptoPlugin("BCH"));
 //		plugins.push(AppUtils.getCryptoPlugin("ETC"));
 //		plugins.push(AppUtils.getCryptoPlugin("XMR"));
-//		plugins.push(AppUtils.getCryptoPlugin("BTC"));
-//		plugins.push(AppUtils.getCryptoPlugin("LTC"));
+		plugins.push(AppUtils.getCryptoPlugin("BTC"));
+		plugins.push(AppUtils.getCryptoPlugin("LTC"));
 //		plugins.push(AppUtils.getCryptoPlugin("DOGE"));
 //		plugins.push(AppUtils.getCryptoPlugin("NEO"));
 //		plugins.push(AppUtils.getCryptoPlugin("DASH"));
@@ -131,7 +131,7 @@ function Tests() {
 //		plugins.push(AppUtils.getCryptoPlugin("BAT"));
 //		plugins.push(AppUtils.getCryptoPlugin("BIP39"));
 //		plugins.push(AppUtils.getCryptoPlugin("UBIQ"));
-//		return plugins;
+		return plugins;
 	}
 	
 	function testUtils() {
@@ -241,41 +241,59 @@ function Tests() {
 				assertTrue(b58.startsWith("3X") || b58.startsWith("3Y"));
 			}
 			
-			// import uncompressed keypair
+			// import uncompressed keypair from bitaddress.org
 			keypair = new CryptoKeypair({plugin: plugin, privateKey: "5HyajPXtXY46WEQheAtqL6VmQPW22iKuzUZdAfycQqFtxQPran2"});
-			assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
-			
-			// encrypt uncompressed from bitaddress
-			keypair.encrypt(AppUtils.EncryptionScheme.BIP38, "abctesting123", null, function(err, encryptedKeypair) {
-				assertNull(err);
-				assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
-				assertEquals("6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL", keypair.getPrivateWif());
-				
-				// decrypt uncompressed from bitaddress
-				keypair = new CryptoKeypair({plugin: plugin, privateKey: "6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL"});
-				keypair.decrypt("abctesting123", null, function(err, decryptedKeypair) {
-					assertNull(err);
-					assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
-					assertEquals("5HyajPXtXY46WEQheAtqL6VmQPW22iKuzUZdAfycQqFtxQPran2", keypair.getPrivateWif());
-					onDone();
-				});
+			//assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", keypair.getPublicAddress());
+	    //assertEquals("5HyajPXtXY46WEQheAtqL6VmQPW22iKuzUZdAfycQqFtxQPran2", keypair.getPrivateWif());
+	    assertEquals("1CUyCk8GjFzzYE9ctaZ1PuHNEyZi8zKApX", keypair.getPublicAddress());
+			assertEquals("Kwvjt6TLRn4fJ2BcP4fnKHFxzEK5YZQUtgezdh2sJBzkKDCVJfXo", keypair.getPrivateWif());
+			var piece = new CryptoPiece({keypairs: keypair});
+			testPieceEncryption(piece, [AppUtils.EncryptionScheme.BIP38], function(err, encryptedPiece) {
+			  assertNull(err);
+			  assertEquals("1CUyCk8GjFzzYE9ctaZ1PuHNEyZi8zKApX", encryptedPiece.getKeypairs()[0].getPublicAddress());
+        //assertEquals("6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL", encryptedPiece.getKeypairs()[0].getPrivateWif());
+        assertEquals("6PYLFYzzG9NAz2s8y4KutrdDh18iwmAJmSR4uoUirSAvUsgMFXBz4kEFPK", encryptedPiece.getKeypairs()[0].getPrivateWif());
+        
+        // import uncompressed bip38 from bitaddress.org
+        keypair = new CryptoKeypair({plugin: plugin, privateKey: "6PnRUF3GnHeNpiN6dbsempHokmkpJmM2AvGZvKuchWCCwWS8LF6pevcxPD"});
+        assertEquals("6PnRUF3GnHeNpiN6dbsempHokmkpJmM2AvGZvKuchWCCwWS8LF6pevcxPD", keypair.getPrivateWif());
+        assertEquals(AppUtils.EncryptionScheme.BIP38, keypair.getEncryptionScheme());
+        keypair.decrypt(PASSPHRASE, null, function(err, decryptedKeypair) {
+          assertEquals("1MRwFRLXHn53z2mWCDJDWtkScnAUsGPRaK", keypair.getPublicAddress());
+          assertEquals("L4SmSt2n58xNuu45CwJgFu9eN9uo9osqcsEgwp95CSJ2Bq4t8b3Y", keypair.getPrivateWif());
+          onDone();
+        });
 			});
 		}
 		
-		// litecoin specific tests
-		else if (plugin.getTicker() === "LTC") {
-		  
-		  // test initialization from wif that has 62 character private hex
-		  var shortPrivateWif = "T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup";
-		  var keypair = new CryptoKeypair({plugin: plugin, privateKey: shortPrivateHex});
-      console.log(keypair.toJson());
-		  
-		  // test initialization from 62 character private hex
-		  var shortPrivateHex = "3294fbf83ee27cb46ecbc6d86dc5e1b254af2b9058597278a957e99154a065";
-		  keypair = new CryptoKeypair({plugin: plugin, privateKey: shortPrivateHex});
-		  console.log(keypair.toJson());
-		  throw new Error("Stawp");
-		}
+//		// litecoin specific tests
+//		else if (plugin.getTicker() === "LTC") {
+//		  
+//		  var keypair = new CryptoKeypair({plugin: plugin, privateKey: "T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup"});
+//		  assertEquals("T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup", keypair.getPrivateWif());
+//		  assertEquals("3294fbf83ee27cb46ecbc6d86dc5e1b254af2b9058597278a957e99154a065", keypair.getPrivateHex());
+//		  assertEquals("address", keypair.getPublicAddress());
+//		  
+//		  // test piece
+//      var piece = new CryptoPiece({keypairs: keypair});
+//		  testPieceEncryption(piece, [AppUtils.EncryptionScheme.BIP38], function(err, encryptedPiece) {
+//        assertNull(err);
+//        assertEquals("1Aa7sExRe64ZrBxUYWuBwu8d1rxXKaTcNE", encryptedPiece.getKeypairs()[0].getPublicAddress());
+//        assertEquals("6PRPk4dTF7oJ5FWFpAK1x2eU3EZwJE3L5ihWEczCEX3dFSnM9L44vzKZeL", encryptedPiece.getKeypairs()[0].getPrivateWif());
+//        onDone();
+//      });
+//		  
+////		  // test initialization from wif that has 62 character private hex
+////		  var shortPrivateWif = "T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup";
+////		  var keypair = new CryptoKeypair({plugin: plugin, privateKey: shortPrivateHex});
+////      console.log(keypair.toJson());
+////		  
+////		  // test initialization from 62 character private hex
+////		  var shortPrivateHex = "3294fbf83ee27cb46ecbc6d86dc5e1b254af2b9058597278a957e99154a065";
+////		  keypair = new CryptoKeypair({plugin: plugin, privateKey: shortPrivateHex});
+////		  console.log(keypair.toJson());
+////		  throw new Error("Stawp");
+//		}
 		
 		// otherwise done
 		else onDone();
@@ -321,7 +339,7 @@ function Tests() {
 		testPieceWithoutEncryption(piece);
 	}
 	
-	function testPieceEncryption(plugins, onDone) {
+	function testPluginsEncryption(plugins, onDone) {
 		
 		// skip if intensive operations disabled
 		if (REPEAT_KEYS_ENCRYPTION === 0) {
@@ -336,7 +354,7 @@ function Tests() {
 		}
 		function testFunc(plugin) {
 			return function(onDone) {
-				testPieceEncryptionPlugin(plugin, onDone);
+				testPluginEncryption(plugin, onDone);
 			}
 		}
 		
@@ -346,7 +364,7 @@ function Tests() {
 			onDone();
 		});
 		
-		function testPieceEncryptionPlugin(plugin, onDone) {
+		function testPluginEncryption(plugin, onDone) {
 			console.log("Testing " + plugin.getTicker() + " encryption and dividing");
 			
 			// collect keypair per encryption scheme
@@ -359,97 +377,112 @@ function Tests() {
 				}
 			}
 			
-			// create piece from keypairs
-			var piece = new CryptoPiece({keypairs: keypairs});
-			var original = piece.copy();
-			
-			// test piece
-			assertFalse(piece.isEncrypted());
-			assertFalse(piece.isDivided());
-			testPieceWithoutEncryption(piece);
-			testDestroyPiece(piece, function() {
-				
-				// encrypt piece
-				var progressStarted = false;
-				var progressComplete = false;
-				var lastPercent = 0;
-				piece.encrypt(PASSPHRASE, schemes, function(percent, label) {
-					if (percent === 0) progressStarted = true;
-					if (percent === 1) progressComplete = true;
-					assertEquals("Encrypting keypairs", label);
-					assertTrue(percent >= lastPercent);
-					lastPercent = percent;
-					
-					// cannot encrypt encrypting piece
-					try {
-		        piece.encrypt(PASSPHRASE, schemes);
-		        fail("fail");
-		      } catch (err) {
-		        if (err.message === "fail") throw new Error("Consecutive encryption should fail");
-		        assertEquals("Piece is in the process of encrypting", err.message);
-		      }
-				}, function(err, encryptedPiece) {
-					if (err) throw err;
-					
-					// test state
-					assertTrue(piece === encryptedPiece);
-					assertTrue(progressStarted, "Progress was not started");
-					assertTrue(progressComplete, "Progress was not completed");
-					assertTrue(piece.isEncrypted());
-					assertFalse(piece.isDivided());
-					assertNull(piece.getPartNum());
-					testPieceWithoutEncryption(encryptedPiece);
-					testDestroyPiece(encryptedPiece, function() {
-						
-						// cannot encrypt encrypted piece
-						try {
-							piece.encrypt(PASSPHRASE, schemes, function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
-							fail("fail");
-						} catch (err) {
-							if (err.message === "fail") throw new Error("Cannot encrypt encrypted piece");
-						}
-						
-						// decrypt with wrong password
-						piece.decrypt("wrongPassphrase123", null, function(err, decryptedPiece) {
-							assertInitialized(err);
-							assertEquals("Incorrect passphrase", err.message);
-							assertUndefined(decryptedPiece);
-							
-							// decrypt piece
-							progressStarted = false;
-							progressCompleted = false;
-							piece.decrypt(PASSPHRASE, function(percent, label) {
-								if (percent === 0) progressStarted = true;
-								if (percent === 1) progressComplete = true;
-								assertEquals("Decrypting", label);
-								
-	              // cannot decrypt decrypting piece
-	              try {
-	                piece.decrypt(PASSPHRASE);
-	                fail("fail");
-	              } catch (err) {
-	                if (err.message === "fail") throw new Error("Consecutive decryption should fail");
-	                assertEquals("Piece is in the process of decrypting", err.message);
-	              }
-							}, function(err, decryptedPiece) {
-								if (err) throw err;
-								
-								// test state
-								assertTrue(progressStarted, "Progress was not started");
-								assertTrue(progressComplete, "Progress was not completed");
-								assertTrue(piece.equals(original));
-								assertFalse(piece.isEncrypted());
-								assertFalse(piece.isDivided());
-								assertNull(piece.getPartNum());
-								
-								// done testing
-								onDone();
-							});
-						});
-					});
-				});
-			});
+			// test piece created from keypairs
+	    var piece = new CryptoPiece({keypairs: keypairs});
+	    testPieceEncryption(piece, schemes, onDone);
 		}
+	}
+	
+	/**
+	 * Tests piece division, encryption, decryption, initialization, and conversion.
+	 * 
+	 * @param piece is the piece to test
+	 * @param schemes are the encryption schemes for each keypair to test
+	 * @param onDone(err, encryptedPiece) is invoked when done
+	 */
+	function testPieceEncryption(piece, schemes, onDone) {
+	  
+	  // preserve original
+    var original = piece.copy();
+    
+    // test piece
+    assertFalse(piece.isEncrypted());
+    assertFalse(piece.isDivided());
+    testPieceWithoutEncryption(piece);
+    testDestroyPiece(piece, function() {
+      
+      // encrypt piece
+      var progressStarted = false;
+      var progressComplete = false;
+      var lastPercent = 0;
+      piece.encrypt(PASSPHRASE, schemes, function(percent, label) {
+        if (percent === 0) progressStarted = true;
+        if (percent === 1) progressComplete = true;
+        assertEquals("Encrypting keypairs", label);
+        assertTrue(percent >= lastPercent);
+        lastPercent = percent;
+        
+        // cannot encrypt encrypting piece
+        try {
+          piece.encrypt(PASSPHRASE, schemes);
+          fail("fail");
+        } catch (err) {
+          if (err.message === "fail") throw new Error("Consecutive encryption should fail");
+          assertEquals("Piece is in the process of encrypting", err.message);
+        }
+      }, function(err, encryptedPiece) {
+        if (err) throw err;
+        var encryptedPieceCopy = encryptedPiece.copy();
+        
+        // test state
+        assertTrue(piece === encryptedPiece);
+        assertTrue(progressStarted, "Progress was not started");
+        assertTrue(progressComplete, "Progress was not completed");
+        assertTrue(piece.isEncrypted());
+        assertFalse(piece.isDivided());
+        assertNull(piece.getPartNum());
+        testPieceWithoutEncryption(encryptedPiece);
+        testDestroyPiece(encryptedPiece, function() {
+          
+          // cannot encrypt encrypted piece
+          try {
+            piece.encrypt(PASSPHRASE, schemes, function(percent, label) {}, function(err, encryptedPiece) { fail("fail"); });
+            fail("fail");
+          } catch (err) {
+            if (err.message === "fail") throw new Error("Cannot encrypt encrypted piece");
+          }
+          
+          // decrypt with wrong password
+          piece.decrypt("wrongPassphrase123", null, function(err, decryptedPiece) {
+            assertInitialized(err);
+            assertEquals("Incorrect passphrase", err.message);
+            assertUndefined(decryptedPiece);
+            assertInitialized(piece.isEncrypted());
+                        
+            // decrypt piece
+            progressStarted = false;
+            progressCompleted = false;
+            piece.decrypt(PASSPHRASE, function(percent, label) {
+              if (percent === 0) progressStarted = true;
+              if (percent === 1) progressComplete = true;
+              assertEquals("Decrypting", label);
+              
+              // cannot decrypt decrypting piece
+              try {
+                piece.decrypt(PASSPHRASE);
+                fail("fail");
+              } catch (err) {
+                if (err.message === "fail") throw new Error("Consecutive decryption should fail");
+                assertEquals("Piece is in the process of decrypting", err.message);
+              }
+            }, function(err, decryptedPiece) {
+              if (err) throw err;
+              
+              // test state
+              assertTrue(progressStarted, "Progress was not started");
+              assertTrue(progressComplete, "Progress was not completed");
+              assertTrue(piece.equals(original));
+              assertFalse(piece.isEncrypted());
+              assertFalse(piece.isDivided());
+              assertNull(piece.getPartNum());
+              
+              // done testing
+              onDone(null, encryptedPieceCopy);
+            });
+          });
+        });
+      });
+    });
 	}
 	
 	// tests piece dividing, initialization, and conversion
@@ -525,7 +558,7 @@ function Tests() {
 		} catch (err) {
 			if (err.message === "fail") throw new Error("Cannot create piece from duplicate parts");
 		}
-				
+		
 		// test each piece combination
 		var combinations = getCombinations(dividedPieces, MIN_PARTS);
 		for (var i = 0; i < combinations.length; i++) {

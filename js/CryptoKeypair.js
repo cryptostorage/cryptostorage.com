@@ -364,8 +364,8 @@ CryptoKeypair.prototype.getFieldValue = function(field) {
 		case CryptoKeypair.Field.PRIVATE_STATE:
 		  if (this.isDivided()) return "Divided";
 		  if (this.isEncrypted()) return "Encrypted";
-		  assertFalse(this.isEncrypted());
-		  return "Unencrypted";
+		  if (this.isEncrypted() === false) return "Unencrypted";
+		  return "Unknown";
 		default:
 			throw new Error("Unrecognized keypair field: " + field);
 	}
@@ -520,7 +520,7 @@ CryptoKeypair.prototype._setPrivateKey = function(privateKey) {
 	}
 	
 	// part
-	decoded = CryptoKeypair.decodePart(privateKey);
+	decoded = this._decodePart(privateKey);
 	if (decoded) {
 		this._state.privateHex = decoded.privateHex.toLowerCase();
 		this._state.privateWif = decoded.privateWif;
@@ -546,8 +546,8 @@ CryptoKeypair.prototype._fromJson = function(json) {
 	this._state.encryption = json.encryption;
 	this._state.isDivided = json.isDivided;
 	this._state.minParts = json.minParts;
-	if (isDefined(this._state.privateHex)) this._setPrivateKey(this._state.privateHex);
-	else if (isDefined(this._state.privateWif)) this._setPrivateKey(this._state.privateWif);
+	if (isDefined(this._state.privateWif)) this._setPrivateKey(this._state.privateWif);
+	else if (isDefined(this._state.privateHex)) this._setPrivateKey(this._state.privateHex);
 	if (isDefined(json.publicAddress)) this._setPublicAddress(json.publicAddress);
 	if (json.encryption === null) assertUninitialized(json.partNum);
 	if (isDefined(json.partNum)) this.setPartNum(json.partNum);
@@ -568,7 +568,7 @@ CryptoKeypair.prototype._combine = function(dividedKeypairs) {
 	var minParts;
 	var shamirHexes = [];
 	for (var i = 0; i < dividedKeypairs.length; i++) {
-		var decodedPart = CryptoKeypair.decodePart(dividedKeypairs[i].getPrivateWif());
+		var decodedPart = this._decodePart(dividedKeypairs[i].getPrivateWif());
 		assertInitialized(decodedPart, "Could not decode part: " + dividedKeypairs[i].getPrivateWif());
 		if (!minParts) minParts = decodedPart.minParts;
 		else if (minParts !== decodedPart.minParts) throw new Error("dividedKeypairs[" + i + "] has inconsistent min parts");
@@ -736,6 +736,132 @@ CryptoKeypair.prototype._decryptBip38 = function(passphrase, onProgress, onDone)
 	});
 }
 
+/**
+ * Provides a decoding of the given part which is assumed to be a correctly encoded part.
+ * 
+ * @param part is the encoded wif or hex part to decode
+ * @returns Object with privateHex, privateWif, shamirHex, and minParts initialized as known
+ */
+CryptoKeypair.prototype._decodePart = function(part) {  
+  if (!isString(part)) return null;
+  var decoded;
+  if ((decoded = decodePartHexV1(part))) { console.log("decodePartHexV1"); return decoded; }  // 2c prefix for 2 minimum parts + hex
+  if ((decoded = decodePartWifV1(part))) { console.log("decodePartWifV1"); return decoded; }
+  if ((decoded = decodePartHexV2(part))) { console.log("decodePartHexV2"); return decoded; }  // min parts encoded in hex and b58
+  if ((decoded = decodePartWifV2(part))) { console.log("decodePartWifV2"); return decoded; }
+  if ((decoded = decodePartHexV0(part))) { console.log("decodePartHexV0"); return decoded; }  // no min parts encoding
+  if ((decoded = decodePartWifV0(part))) { console.log("decodePartWifV0"); return decoded; }
+  return null;
+  
+  function decodePartHexV0(part) {
+    if (!isHex(part)) return null;
+    if (part.length % 2 !== 0) return null;
+    assertTrue(part.length > 10);
+    return {
+      shamirHex: ninja.wallets.splitwallet.stripLeadZeros(part),
+      privateHex: part,
+      privateWif: AppUtils.toBase(16, 58, part)
+    };
+  }
+  
+  function decodePartWifV0(part) {
+    if (!isBase58(part)) return null;
+    assertTrue(part.length > 10);
+    if (part.length < 32) return null;
+    var hex = AppUtils.toBase(58, 16, part);
+    return {
+      shamirHex: ninja.wallets.splitwallet.stripLeadZeros(hex),
+      privateHex: hex,
+      privateWif: part
+    }
+  }
+  
+  function decodePartHexV1(part) {
+    if (!isHex(part)) return null;
+    if (part.length % 2 !== 0) return null;
+    return decodePartWifV1(AppUtils.toBase(16, 58, part));
+  }
+  
+  function decodePartWifV1(part) {
+    try {
+      var minLength = this.getPlugin().getMinHexLength();
+      
+      
+      
+      
+      if (part.length < 34) return null;
+      var decoded = {};
+      decoded.minParts = getMinPartsV1(part);
+      if (!decoded.minParts) return null;
+      var wif = part.substring(part.indexOf('c') + 1);
+      if (!isBase58(wif)) return null;
+      decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(AppUtils.toBase(58, 16, wif));
+      decoded.privateWif = part;
+      decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
+      return decoded;
+    } catch (err) {
+      return null;
+    }
+    
+    function getMinLength() {
+      
+      // hex range
+      var min = this.getPlugin().getMinHexLength();
+      var max = this.getPlugin().getMaxHexLength();
+      
+      // v0 cryptojs range
+      min = this.getPlugin().getMinHexLength() * 3;
+      max = this.getPlugin().getMaxHexLength() * 3;
+      
+      // v1 cryptojs range
+      min = this.getPlugin.getMinHexLength() * 3 - 2;
+      max = this.getPlugin.getMaxHexLength() * 3;
+      
+      // bip38 range
+      min = this.getPlugin().getMinHexLength() + 20;
+      max = this.getPlugin().getMaxHexLength() + 22;
+    }
+    
+    /**
+     * Determines the minimum parts to reconstitute based on a possible divided part string.
+     * 
+     * Looks for 'XXXc' prefix in the given divided piece where XXX is the minimum to reconstitute.
+     * 
+     * @param dividedPiece is a string which may be prefixed with 'XXXc...'
+     * @return the minimum parts to reconstitute if prefixed, null otherwise
+     */
+    function getMinPartsV1(dividedPiece) {
+      var idx = dividedPiece.indexOf('c');  // look for first lowercase 'c'
+      if (idx <= 0) return null;
+      var minParts = Number(dividedPiece.substring(0, idx));  // parse preceding numbers to int
+      if (!isNumber(minParts) || minParts < 2 || minParts > AppUtils.MAX_PARTS) return null;
+      return minParts;
+    }
+  }
+  
+  function decodePartHexV2(part) {
+    if (!isHex(part)) return null;
+    if (part.length % 2 !== 0) return null;
+    return decodePartWifV2(AppUtils.toBase(16, 58, part));
+  }
+  
+  function decodePartWifV2(part) {    
+    if (part.length < 33) return null;
+    if (!isBase58(part)) return null;
+    var hex = AppUtils.toBase(58, 16, part);
+    if (hex.length % 2 !== 0) return null;
+    var version = parseInt(hex.substring(0, 2), 16);
+    if (version !== CryptoKeypair.DIVIDE_V2_VERSION) return null;
+    var decoded = {};
+    decoded.minParts = parseInt(hex.substring(2, 4), 16);
+    if (!isNumber(decoded.minParts) || decoded.minParts < 2 || decoded.minParts > AppUtils.MAX_PARTS) return null;
+    decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
+    decoded.privateWif = part;
+    decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
+    return decoded;
+  }
+}
+
 // --------------------------------- STATIC -----------------------------------
 
 /**
@@ -833,108 +959,6 @@ CryptoKeypair.encodeHexPart = function(part, minParts) {
 		bits = bits || config.bits
 		var missing = str.length % bits;
 		return (missing ? new Array(bits - missing + 1).join('0') : '') + str;
-	}
-}
-
-/**
- * Provides a decoding of the given part which is assumed to be a correctly encoded part.
- * 
- * @param part is the encoded wif or hex part to decode
- * @returns Object with privateHex, privateWif, shamirHex, and minParts initialized as known
- */
-CryptoKeypair.decodePart = function(part) {
-	if (!isString(part)) return null;
-	var decoded;
-	if ((decoded = decodePartHexV1(part))) return decoded;	// 2c prefix for 2 minimum parts + hex
-	if ((decoded = decodePartWifV1(part))) return decoded;
-	if ((decoded = decodePartHexV2(part))) return decoded;	// min parts encoded in hex and b58
-	if ((decoded = decodePartWifV2(part))) return decoded;
-	if ((decoded = decodePartHexV0(part))) return decoded;	// no min parts encoding
-	if ((decoded = decodePartWifV0(part))) return decoded;
-	return null;
-	
-	function decodePartHexV0(part) {
-		if (!isHex(part)) return null;
-		if (part.length % 2 !== 0) return null;
-		assertTrue(part.length > 10);
-		return {
-			shamirHex: ninja.wallets.splitwallet.stripLeadZeros(part),
-			privateHex: part,
-			privateWif: AppUtils.toBase(16, 58, part)
-		};
-	}
-	
-	function decodePartWifV0(part) {
-		if (!isBase58(part)) return null;
-		assertTrue(part.length > 10);
-		if (part.length < 32) return null;
-		var hex = AppUtils.toBase(58, 16, part);
-		return {
-			shamirHex: ninja.wallets.splitwallet.stripLeadZeros(hex),
-			privateHex: hex,
-			privateWif: part
-		}
-	}
-	
-	function decodePartHexV1(part) {
-		if (!isHex(part)) return null;
-		if (part.length % 2 !== 0) return null;
-		return decodePartWifV1(AppUtils.toBase(16, 58, part));
-	}
-	
-	function decodePartWifV1(part) {
-		try {
-			if (part.length < 34) return null;
-			var decoded = {};
-			decoded.minParts = getMinPartsV1(part);
-			if (!decoded.minParts) return null;
-			var wif = part.substring(part.indexOf('c') + 1);
-			if (!isBase58(wif)) return null;
-			decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(AppUtils.toBase(58, 16, wif));
-			decoded.privateWif = part;
-			decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
-			return decoded;
-		} catch (err) {
-			return null;
-		}
-		
-		/**
-		 * Determines the minimum parts to reconstitute based on a possible divided part string.
-		 * 
-		 * Looks for 'XXXc' prefix in the given divided piece where XXX is the minimum to reconstitute.
-		 * 
-		 * @param dividedPiece is a string which may be prefixed with 'XXXc...'
-		 * @return the minimum parts to reconstitute if prefixed, null otherwise
-		 */
-		function getMinPartsV1(dividedPiece) {
-			var idx = dividedPiece.indexOf('c');	// look for first lowercase 'c'
-			if (idx <= 0) return null;
-			var minParts = Number(dividedPiece.substring(0, idx));	// parse preceding numbers to int
-			if (!isNumber(minParts) || minParts < 2 || minParts > AppUtils.MAX_PARTS) return null;
-			return minParts;
-		}
-	}
-	
-	function decodePartHexV2(part) {
-		if (!isHex(part)) return null;
-		if (part.length % 2 !== 0) return null;
-		return decodePartWifV2(AppUtils.toBase(16, 58, part));
-	}
-	
-	function decodePartWifV2(part) {
-		if (part.length < 33) return null;
-		if (!isBase58(part)) return null;
-		var hex = AppUtils.toBase(58, 16, part);
-		if (hex.length % 2 !== 0) return null;
-		var version = parseInt(hex.substring(0, 2), 16);
-		if (version !== CryptoKeypair.DIVIDE_V2_VERSION) return null;
-		var decoded = {};
-		decoded.minParts = parseInt(hex.substring(2, 4), 16);
-		if (!isNumber(decoded.minParts) || decoded.minParts < 2 || decoded.minParts > AppUtils.MAX_PARTS) return null;
-		decoded.shamirHex = ninja.wallets.splitwallet.stripLeadZeros(hex.substring(4));
-		decoded.privateWif = part;
-		decoded.privateHex = AppUtils.toBase(58, 16, decoded.privateWif);
-		return decoded;
 	}
 }
 

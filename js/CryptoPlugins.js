@@ -108,6 +108,16 @@ CryptoPlugin.prototype.randomPrivateKey = function() { throw new Error("Subclass
 CryptoPlugin.prototype.decode = function(privateKey) { throw new Error("Subclass must implement"); }
 
 /**
+ * Returns the minimum unencoded private hex length.
+ */
+CryptoPlugin.prototype.getMinHexLength = function() { return 62; }
+
+/**
+ * Returns the maximum unencoded private hex length.
+ */
+CryptoPlugin.prototype.getMaxHexLength = function() { return 64; }
+
+/**
  * Indicates if the plugin has public addresses (e.g. BIP39 does not)
  */
 CryptoPlugin.prototype.hasPublicAddress = function() { return true; };
@@ -564,7 +574,7 @@ function BitcoinJsPlugin(ticker) {
 		var decoded = {};
 		
 		// bip38 wif
-		if (AppUtils.isBIP38Format(str)) {
+		if (AppUtils.isBIP38Format(str)) {  // TODO: need to compress bip38 if unecompressed
 			decoded.privateWif = str;
 			decoded.privateHex = AppUtils.toBase(58, 16, str);
 			decoded.publicAddress = undefined;
@@ -578,12 +588,19 @@ function BitcoinJsPlugin(ticker) {
 		}
 		
 		// unencrypted
-		var keypair;
 		try {
+	    var keypair;
 			
-			// get keypair from hex or wif
-			if (str.length === 64 && isHex(str)) keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, this.getNetwork(), BitcoinJsPlugin.COMPRESSED_KEYPAIRS);
-			else keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, this.getNetwork());
+			// build compressed keypair from hex
+			if (str.length % 2 === 0 && str.length >= this.getMinHexLength() && str.length <= this.getMaxHexLength() && isHex(str)) {
+			  keypair = bitcoinjs.bitcoin.ECPair.fromUncheckedHex(str, this.getNetwork(), BitcoinJsPlugin.COMPRESSED_KEYPAIRS);
+			}
+			
+			// build compressed keypair from wif
+			else {
+			  keypair = bitcoinjs.bitcoin.ECPair.fromWIF(str, this.getNetwork());
+			  keypair = new bitcoinjs.bitcoin.ECPair(keypair.d, null, {compressed: BitcoinJsPlugin.COMPRESSED_KEYPAIRS, network: this.getNetwork()});
+			}
 			
 			// decode
 			decoded.privateWif = keypair.toWIF();

@@ -372,7 +372,7 @@ function CryptoPiece(config) {
 		_isEncrypting = false;
 		_isDecrypting = false;
 		state = {};
-		if (config.keypairs) setKeypairs(config.keypairs);
+		if (config.keypairs) setKeypairs(listify(config.keypairs));
 		else if (config.json) fromJson(config.json);
 		else if (config.dividedPieces) combine(config.dividedPieces);
 		else if (config.piece) fromPiece(config.piece);
