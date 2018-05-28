@@ -1406,13 +1406,13 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .keypair_qr {
-	width: 87px;
-	height: 87px;
+	width: 90px;
+	height: 90px;
 }
 
 .keypair_qr_omitted_div {
-	width: 87px;
-	height: 87px;
+	width: 90px;
+	height: 90px;
 	border: solid thin;
 }
 
@@ -1422,75 +1422,64 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .keypair_left_div {
-	width: 87px;
+	
 }
 
-.keypair_left_label {
+.keypair_public_qr_div {
+	float: left;
+	margin-right: 5px;
+	height: 90px;
+}
+
+.keypair_public_label {
 	font-weight: bold;
 	font-size: 14px;
 }
 
-.keypair_left_value {
-	padding-right: 5px;
+.keypair_public_value {
 	font-size: 13px;
 	font-family: monospace;
 	word-break: break-all;
 	z-index: 1;
 }
 
-.keypair_center_div {
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
-	margin: 0 7px 0 7px;
-	position: relative;
+.keypair_crypto_div {
+
 }
 
-.keypair_id {
-	font-size: 13px;
-}
-
-.keypair_center_id {
-	left: 0;
-	right: 0;
-	text-align: center;
-}
-
-.keypair_title {
-	-webkit-flex: 1;
-	-ms-flex: 1;
-	flex: 1;
-}
-
-.keypair_logo {
+.keypair_crypto_logo {
 	width: 29px;
 	height: 29px;
 	margin-right: 5px;
 }
 
-.keypair_label {
+.keypair_crypto_label {
 	font-weight: bold;
 	font-size: 15px;
 	white-space: nowrap;
 }
 
-.keypair_right_div {
-
-}
-
-.keypair_right_label {
+.keypair_private_label {
 	font-weight: bold;
 	font-size: 14px;
 	text-align: right;
 	margin-top: -20px;
 }
 
-.keypair_right_value {
+.keypair_private_value {
 	margin-left: 5px;
 	font-size: 13px;
 	text-align: right;
 	font-family: monospace;
 	line-height: 14px;
+}
+
+.keypair_private_qr_div {
+	margin-left: 5px;
+}
+
+.keypair_id {
+	font-size: 13px;
 }
 
 .cryptocash_instructions {

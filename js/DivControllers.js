@@ -44,7 +44,7 @@ var UiUtils = {
   getDivideDescription: function(faqNewTab) {
     return "<p>This tool uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to divide <a " + (faqNewTab ? "target='_blank'" : "") + "href='index.html#faq_keypair'>private keys</a> into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
     "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted family member.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>"
-	},    
+	},
 	
 	/**
 	 * Renders a progress bar to the given div.
@@ -5587,89 +5587,173 @@ function StandardKeypairRenderer(div, keypair, config) {
 		div.empty();
 		div.addClass("keypair_div flex_horizontal");
 		
-		// left, center, right divs
-		var keypairLeftDiv = $("<div class='keypair_left_div flex_horizontal flex_align_start flex_justify_center'>").appendTo(div);
-		var keypairCenterDiv = $("<div class='keypair_center_div flex_vertical'>").appendTo(div);
-		var keypairRightDiv = $("<div class='keypair_right_div flex_horizontal flex_align_end flex_justify_center'>").appendTo(div);
-		
 		// decode keypair for rendering
 		var decoded = StandardKeypairRenderer.decodeKeypair(keypair, config);
 		
-		// keypair id
-		var idDiv = $("<div class='keypair_id keypair_center_id'>").appendTo(keypairCenterDiv);
-		if (decoded.leftLabel) idDiv.css("position", "absolute");
-		if (config.keypairId) idDiv.html(config.keypairId);
-		
-		// left label and value
-		if (decoded.leftLabel) {
-			var keypairLeftLabel = $("<div class='keypair_left_label'>").appendTo(keypairCenterDiv);
-			keypairLeftLabel.html(decoded.leftLabel);
-			keypairLeftValue = $("<div class='keypair_left_value'>").appendTo(keypairCenterDiv);
-			if (!hasWhitespace(decoded.leftValue)) keypairLeftValue.css("word-break", "break-all");
-			keypairLeftValue.html(decoded.leftValue);
-			if (decoded.leftValueCopyable) keypairLeftValue.addClass("copyable");
-		}
-		
+		// left div contains everything except right qr
+		var leftDiv = $("<div class='keypair_left_div flex_1'>").appendTo(div);
+    
+    // public qr div
+    var leftQrDiv = $("<div class='keypair_public_qr_div'>").appendTo(leftDiv);
+    
+		// public label and value
+    if (decoded.leftLabel) {
+      var publicDiv = $("<div class='keypair_public_div'>").appendTo(leftDiv);
+      var publicLabel = $("<div class='keypair_public_label'>").appendTo(publicDiv);
+      publicLabel.append(decoded.leftLabel);
+      var publicValue = $("<div class='keypair_public_value'>").appendTo(publicDiv);
+      if (!hasWhitespace(decoded.leftValue)) publicValue.css("word-break", "break-all");
+      publicValue.append(decoded.leftValue);
+      if (decoded.leftValueCopyable) publicValue.addClass("copyable");
+    }
+  
 		// crypto logo and label
-		var keypairCrypto = $("<div class='keypair_title flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairCenterDiv);
+		var cryptoDiv = $("<div class='keypair_crypto_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(leftDiv);
 		if (config.showLogos && decoded.cryptoLogo) {
-			decoded.cryptoLogo.attr("width", "100%");
-			decoded.cryptoLogo.attr("height", "100%");
-			var keypairCryptoLogo = $("<div class='keypair_logo'>").appendTo(keypairCrypto);
-			keypairCryptoLogo.append(decoded.cryptoLogo);
-		}
-		var keypairCryptoLabel = $("<div class='keypair_label'>").appendTo(keypairCrypto);
-		keypairCryptoLabel.html(decoded.cryptoLabel);
+	    decoded.cryptoLogo.attr("width", "100%");
+	    decoded.cryptoLogo.attr("height", "100%");
+	    var cryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(cryptoDiv);
+	    cryptoLogo.append(decoded.cryptoLogo);
+	  }
+		var cryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(cryptoDiv);
+		cryptoLabel.append(decoded.cryptoLabel);
 		
-		// right label and value
-		var keypairRightLabel = $("<div class='keypair_right_label'>").appendTo(keypairCenterDiv);
-		keypairRightLabel.html(decoded.rightLabel);
-		keypairRightValue = $("<div class='keypair_right_value'>").appendTo(keypairCenterDiv);
-		if (!decoded.leftLabel) keypairRightValue.css("margin-left", "-87px");
-		if (!hasWhitespace(decoded.rightValue)) keypairRightValue.css("word-break", "break-all");
-		keypairRightValue.html(decoded.rightValue);
-		if (decoded.rightValueCopyable) keypairRightValue.addClass("copyable");
+		// private label and value
+		var privateDiv = $("<div class='keypair_private_div'>").appendTo(leftDiv);
+    var privateLabel = $("<div class='keypair_private_label'>").appendTo(privateDiv);
+    privateLabel.append(decoded.rightLabel);
+    var privateValue = $("<div class='keypair_private_value'>").appendTo(privateDiv);
+    //if (!decoded.leftLabel) privateValue.css("margin-left", "-87px");
+    privateValue.append(decoded.rightValue);
+    if (decoded.rightValueCopyable) privateValue.addClass("copyable");
+    
+    // collapse spacing for long keys
+    if (decoded.leftLabel) {
+      if (decoded.leftValue.length > 71) {
+        cryptoDiv.css("margin-top", "-15px");
+      }
+      if (decoded.rightValue && decoded.rightValue.length > 140) {
+        cryptoDiv.css("margin-top", "-10px");
+        privateLabel.css("margin-top", "-15px");
+      }
+    }
+    
+    // private qr div
+    var rightQrDiv = $("<div class='keypair_private_qr_div flex_vertical flex_justify_end'>").appendTo(div);
+    
+    // add qr codes
+    if (decoded.leftValueCopyable) {
+      UiUtils.renderQrCode(decoded.leftValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
+        if (_isDestroyed) return;
+        img.attr("class", "keypair_qr");
+        leftQrDiv.append(img);
+        addPrivateQr();
+      });
+    } else {
+      if (decoded.leftLabel) {
+        var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(leftQrDiv);
+        omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
+      }
+      addPrivateQr();
+    }
+    function addPrivateQr() {
+      if (decoded.rightValueCopyable) {
+        UiUtils.renderQrCode(decoded.rightValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
+          if (_isDestroyed) return;
+          img.attr("class", "keypair_qr");
+          rightQrDiv.append(img);
+          if (onDone) onDone(div);
+        });
+      } else {
+        var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(rightQrDiv);
+        omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
+        if (onDone) onDone(div);
+      }
+    }
 		
-		// collapse spacing for long keys
-		if (decoded.leftLabel) {
-			if (decoded.leftValue.length > 71) {
-				keypairCrypto.css("margin-top", "-15px");
-			}
-			if (decoded.rightValue && decoded.rightValue.length > 140) {
-				keypairCrypto.css("margin-top", "-10px");
-				keypairRightLabel.css("margin-top", "-15px");
-			}
-		}
-		
-		// add qr codes
-		if (decoded.leftValueCopyable) {
-			UiUtils.renderQrCode(decoded.leftValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
-				if (_isDestroyed) return;
-				img.attr("class", "keypair_qr");
-				keypairLeftDiv.append(img);
-				addPrivateQr();
-			});
-		} else {
-			if (decoded.leftLabel) {
-				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairLeftDiv);
-				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
-			}
-			addPrivateQr();
-		}
-		function addPrivateQr() {
-			if (decoded.rightValueCopyable) {
-				UiUtils.renderQrCode(decoded.rightValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
-					if (_isDestroyed) return;
-					img.attr("class", "keypair_qr");
-					keypairRightDiv.append(img);
-					if (onDone) onDone(div);
-				});
-			} else {
-				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairRightDiv);
-				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
-				if (onDone) onDone(div);
-			}
-		}
+//		// left, center, right divs
+//		var keypairLeftDiv = $("<div class='keypair_left_div flex_horizontal flex_align_start flex_justify_center'>").appendTo(div);
+//		var keypairCenterDiv = $("<div class='keypair_center_div flex_vertical'>").appendTo(div);
+//		var keypairRightDiv = $("<div class='keypair_right_div flex_horizontal flex_align_end flex_justify_center'>").appendTo(div);
+//		
+//		// decode keypair for rendering
+//		var decoded = StandardKeypairRenderer.decodeKeypair(keypair, config);
+//		
+//		// keypair id
+//		var idDiv = $("<div class='keypair_id keypair_center_id'>").appendTo(keypairCenterDiv);
+//		if (decoded.leftLabel) idDiv.css("position", "absolute");
+//		if (config.keypairId) idDiv.html(config.keypairId);
+//		
+//		// left label and value
+//		if (decoded.leftLabel) {
+//			var keypairLeftLabel = $("<div class='keypair_left_label'>").appendTo(keypairCenterDiv);
+//			keypairLeftLabel.html(decoded.leftLabel);
+//			keypairLeftValue = $("<div class='keypair_left_value'>").appendTo(keypairCenterDiv);
+//			if (!hasWhitespace(decoded.leftValue)) keypairLeftValue.css("word-break", "break-all");
+//			keypairLeftValue.html(decoded.leftValue);
+//			if (decoded.leftValueCopyable) keypairLeftValue.addClass("copyable");
+//		}
+//		
+//		// crypto logo and label
+//		var keypairCrypto = $("<div class='keypair_title flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairCenterDiv);
+//		if (config.showLogos && decoded.cryptoLogo) {
+//			decoded.cryptoLogo.attr("width", "100%");
+//			decoded.cryptoLogo.attr("height", "100%");
+//			var keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
+//			keypairCryptoLogo.append(decoded.cryptoLogo);
+//		}
+//		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(keypairCrypto);
+//		keypairCryptoLabel.html(decoded.cryptoLabel);
+//		
+//		// right label and value
+//		var keypairRightLabel = $("<div class='keypair_right_label'>").appendTo(keypairCenterDiv);
+//		keypairRightLabel.html(decoded.rightLabel);
+//		keypairRightValue = $("<div class='keypair_right_value'>").appendTo(keypairCenterDiv);
+//		if (!decoded.leftLabel) keypairRightValue.css("margin-left", "-87px");
+//		if (!hasWhitespace(decoded.rightValue)) keypairRightValue.css("word-break", "break-all");
+//		keypairRightValue.html(decoded.rightValue);
+//		if (decoded.rightValueCopyable) keypairRightValue.addClass("copyable");
+//		
+//		// collapse spacing for long keys
+//		if (decoded.leftLabel) {
+//			if (decoded.leftValue.length > 71) {
+//				keypairCrypto.css("margin-top", "-15px");
+//			}
+//			if (decoded.rightValue && decoded.rightValue.length > 140) {
+//				keypairCrypto.css("margin-top", "-10px");
+//				keypairRightLabel.css("margin-top", "-15px");
+//			}
+//		}
+//		
+//		// add qr codes
+//		if (decoded.leftValueCopyable) {
+//			UiUtils.renderQrCode(decoded.leftValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
+//				if (_isDestroyed) return;
+//				img.attr("class", "keypair_qr");
+//				keypairLeftDiv.append(img);
+//				addPrivateQr();
+//			});
+//		} else {
+//			if (decoded.leftLabel) {
+//				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairLeftDiv);
+//				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
+//			}
+//			addPrivateQr();
+//		}
+//		function addPrivateQr() {
+//			if (decoded.rightValueCopyable) {
+//				UiUtils.renderQrCode(decoded.rightValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
+//					if (_isDestroyed) return;
+//					img.attr("class", "keypair_qr");
+//					keypairRightDiv.append(img);
+//					if (onDone) onDone(div);
+//				});
+//			} else {
+//				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairRightDiv);
+//				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
+//				if (onDone) onDone(div);
+//			}
+//		}
 	}
 	
 	/**
@@ -5712,7 +5796,7 @@ StandardKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
  * Default keypair QR config.
  */
 StandardKeypairRenderer.QR_CONFIG = {
-		size: 87,
+		size: 90,
 		version: null,
 		errorCorrectionLevel: 'H',
 		scale: 4,
@@ -6108,13 +6192,13 @@ function CompactKeypairRenderer(div, keypair, config) {
     if (decoded.cryptoLogo && config.showLogos) {
       decoded.cryptoLogo.attr("width", "100%");
       decoded.cryptoLogo.attr("height", "100%");
-      var logo = $("<div class='keypair_logo'>").appendTo(title);
+      var logo = $("<div class='keypair_crypto_logo'>").appendTo(title);
       logo.append(decoded.cryptoLogo);
     }
 		
 		// keypair label
 		var label = $("<div style='flex-wrap:wrap;' class='flex_horizontal flex_align_end'>").appendTo(title);
-		var cryptoName = $("<div style='margin-right:5px' class='keypair_label'>").appendTo(label);
+		var cryptoName = $("<div style='margin-right:5px' class='keypair_crypto_label'>").appendTo(label);
 		cryptoName.append(decoded.cryptoName);
 		var valueType = $("<div class='compact_keypair_sublabel'>").appendTo(label);
 		valueType.append("(" + decoded.valueType + ")");		
@@ -6130,7 +6214,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		if (label.get(0).offsetHeight > 25) {
       cryptoName.css("margin-right", "0");
 		  label.removeClass("flex_horizontal flex_align_end");
-		  label.addClass("flex_vertical flex_align_center")
+		  label.addClass("flex_vertical flex_align_center");
 		}
 		
 		// qr code
@@ -6200,7 +6284,7 @@ CompactKeypairRenderer.getRenderWeight = function(tickerOrKeypair, config) {
  * Default keypair QR config.
  */
 CompactKeypairRenderer.QR_CONFIG = {
-		size: 87,
+		size: 90,
 		version: null,
 		errorCorrectionLevel: 'H',
 		scale: 4,
