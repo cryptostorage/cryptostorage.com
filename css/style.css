@@ -978,7 +978,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .editor_div {
-	min-width: 900px;
+	min-width: 750px;
 	-webkit-text-size-adjust: 100%;
 	background-color: white;
 }
