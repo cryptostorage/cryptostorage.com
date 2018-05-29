@@ -1,5 +1,5 @@
 v0.3.0
-public addresses is only option if piece has public addresses
+hide public/private checkboxes/radios if only one option available
 ultra compact text
 put homepage text in index.html and dynamically hide for seo
 update social logo
