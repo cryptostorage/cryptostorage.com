@@ -1,5 +1,4 @@
 v0.3.0
-moneroaddress donate pushed down
 safari print private getting pushed after QR
 hide public/private checkboxes/radios if only one option available
 ultra compact text

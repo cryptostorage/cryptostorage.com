@@ -643,10 +643,19 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 .donate_title, .donate_title * {
 	font-weight: bold;
 	font-size: 22px;
+	line-height: 22px;
+}
+
+.donate_div * a {
+	text-decoration: none;
+}
+
+.donate_div * a:hover {
+	text-decoration: underline;
 }
 
 .donate_icon_name {
-	margin: 2px 0 5px 0px;
+	margin: 4px 0 6px 0px;
 }
 
 .donate_icon_name > :first-child {
@@ -661,6 +670,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 .donate_address {
 	max-width: 100%;
 	font-size: 18px;
+	line-height: 18px;
 	font-family: monospace;
 	word-break: break-all;
 }
