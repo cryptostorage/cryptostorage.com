@@ -1,7 +1,6 @@
 v0.3.0
-first keypair needs 2 less?
 bip39 center
-keypair id
+first keypair needs 2 less?
 smaller compact logo
 
 standard layout needs to float around long xmr seed

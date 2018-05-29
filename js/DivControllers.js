@@ -289,6 +289,20 @@ var UiUtils = {
 	    }
 	  }
 	},
+	
+	/**
+	 * Returns an absolutely positioned div attached to the body for attaching rendering scratchpads
+	 * to in order to measure heights.
+	 * 
+	 * The returned div should not be rendered to or moved, only attached to.
+	 * 
+	 * @returns the visible parent to attach rendering scratchpads to
+	 */
+	getDefaultScratchpadParent: function() {
+	  if (UiUtils.SCRATCHPAD_PARENT) return UiUtils.SCRATCHPAD_PARENT;
+	  UiUtils.SCRATCHPAD_PARENT = $("<div style='position:absolute; top:0; left:0; z-index:-1'>").appendTo("body");
+	  return UiUtils.SCRATCHPAD_PARENT;
+	}
 }
 
 /**
@@ -5283,7 +5297,7 @@ inheritsFrom(LoadController, DivController);
  *        config.infoBack specifies if double-sided sweep instructions should be included for crypto cash
  *        config.pageBreaks specifies if piece should be rendered as pages
  *        config.copyable specifies if the public/private values should be copyable
- *        config.visiblePlaceholder is a visible placeholder to render keypairs so dimensions can be measured
+ *        config.scratchpadParent is a visible div to attach render scratchpads to so heights can be measured
  */
 function StandardPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
@@ -5299,12 +5313,12 @@ function StandardPieceRenderer(div, piece, config) {
 		infoBack: false,
 		pageBreaks: false,
 		copyable: true,
-		visiblePlaceholder: $("body")
+		scratchpadParent: UiUtils.getDefaultScratchpadParent()
 	}, config);
 	if (!config.showPublic) assertTrue(config.showPrivate);
 	if (!config.showPrivate) assertTrue(config.showPublic);
 	if (config.infoBack) assertFalse(piece.isDivided());
-	assertTrue(config.visiblePlaceholder.is(":visible"));
+	assertTrue(config.scratchpadParent.is(":visible"));
 	
 	var keypairRenderers;
 	var onProgressFn;
@@ -5353,9 +5367,35 @@ function StandardPieceRenderer(div, piece, config) {
 			}
 			
 			// collect functions to render keypairs
-			var placeholderDiv = $("<div class='keypair_div'>").appendTo(keypairsDiv);
-			if (config.cryptoCash) placeholderDiv.addClass("keypair_div_spaced");
-			renderFuncs.push(renderFunc(placeholderDiv, piece, i, config));
+			var replaceDiv = $("<div class='keypair_div'>").appendTo(keypairsDiv); // blank placeholder until rendered
+			if (config.cryptoCash) replaceDiv.addClass("keypair_div_spaced");
+			renderFuncs.push(renderFunc(config.scratchpadParent, replaceDiv, piece, i, config));
+		}
+		
+    /**
+     * Callback function to render a keypair.
+     * 
+     * @param scratchpadParent is a visible div to attach a scratchpad to for rendering so heights can be measured
+     * @param replaceDiv is replaced with the rendered div after rendering
+     * @param piece contains the keypairs to render
+     * @param index is the index of the keypair within the piece to render
+     * @param config is keypair render configuration
+     */
+		function renderFunc(scratchpadParent, replaceDiv, piece, index, config) {
+		  return function(onDone) {
+        if (_isDestroyed) return;
+        if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPartNum())) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
+        var keypairRenderer = new StandardKeypairRenderer($("<div>").appendTo(scratchpadParent), piece.getKeypairs()[index], config);
+        keypairRenderers.push(keypairRenderer);
+        keypairRenderer.render(function(div) {
+          if (_isDestroyed) return;
+          if (config.cryptoCash) div.addClass("keypair_div_spaced");
+          replaceDiv.replaceWith(div);
+          doneWeight += StandardKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
+          if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
+          onDone(null, keypairRenderer);
+        });
+		  }
 		}
 		
 		// add final sweep instructions
@@ -5392,26 +5432,6 @@ function StandardPieceRenderer(div, piece, config) {
 				if (onDone) onDone(div);
 			});
 		});
-		
-		// callback function to render keypair
-		function renderFunc(placeholderDiv, piece, index, config) {
-			return function(onDone) {
-				if (_isDestroyed) return;
-				if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPartNum())) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
-				var keypairRenderer = new StandardKeypairRenderer($("<div style='position:absolute; top:0; left:0; z-index: -1;'>").appendTo(config.visiblePlaceholder), piece.getKeypairs()[index], config);
-				keypairRenderers.push(keypairRenderer);
-				keypairRenderer.render(function(div) {
-					if (_isDestroyed) return;
-					if (config.cryptoCash) div.addClass("keypair_div_spaced");
-					div.css("position", "static");
-					div.css("z-index", "0");
-					placeholderDiv.replaceWith(div);
-					doneWeight += StandardKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
-					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
-					onDone(null, keypairRenderer);
-				});
-			}
-		}
 	}
 	
 	/**
@@ -5593,6 +5613,12 @@ function StandardKeypairRenderer(div, keypair, config) {
 		
 		// decode keypair for rendering
 		var decoded = StandardKeypairRenderer.decodeKeypair(keypair, config);
+		
+		// keypair id
+		if (config.keypairId) {
+		  var keypairNumDiv = $("<div class='keypair_id flex_horizontal flex_justify_center width_100'>").appendTo(div);
+	    keypairNumDiv.append(config.keypairId);
+		}
 		
 		// left div contains everything except right qr
 		var leftDiv = $("<div class='keypair_left_div flex_1'>").appendTo(div);
@@ -5797,16 +5823,16 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 /**
  * Renders a piece with compact keypairs.
  * 
- * @param config specifies render configuration
- * 				config.showPublic specifies if public addresses should be shown
- * 				config.showPrivate specifies if private keys should be shown
- *        config.showLogos specifies if crypto logos should be shown
- *        config.showQr specifies if QRs should be shown
- * 				config.pageBreaks specifies if piece should be rendered as pages
- * 				config.copyable specifies if the public/private values should be copyable
- *        config.visiblePlaceholder is a visible placeholder to render keypairs so dimensions can be measured
  * @param div is the div to render to
  * @param piece is the piece to render
+ * @param config specifies render configuration
+ *        config.showPublic specifies if public addresses should be shown
+ *        config.showPrivate specifies if private keys should be shown
+ *        config.showLogos specifies if crypto logos should be shown
+ *        config.showQr specifies if QRs should be shown
+ *        config.pageBreaks specifies if piece should be rendered as pages
+ *        config.copyable specifies if the public/private values should be copyable
+ *        config.scratchpadParent is a visible div to attach render scratchpads to so heights can be measured
  */
 function CompactPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
@@ -5819,10 +5845,10 @@ function CompactPieceRenderer(div, piece, config) {
 		showLogos: true,
 		pageBreaks: false,
 		copyable: true,
-		visiblePlaceholder: $("body")
+		scratchpadParent: UiUtils.getDefaultScratchpadParent()
 	}, config);
 	assertTrue((config.showPrivate && !config.showPublic) || (!config.showPrivate && config.showPublic));
-	assertTrue(config.visiblePlaceholder.is(":visible"));
+	assertTrue(config.scratchpadParent.is(":visible"));
 	
 	var MAX_PAGE_HEIGHT = 948; // maximum height in pixels per page
 	var keypairRenderers;
@@ -5859,15 +5885,13 @@ function CompactPieceRenderer(div, piece, config) {
       return function(onDone) {
         if (_isDestroyed) return;
         if (piece.getKeypairs().length > 1 || piece.getPartNum()) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
-        var keypairRenderer = new CompactKeypairRenderer($("<div style='position:absolute; top:0; left:0; z-index:-1'>").appendTo(config.visiblePlaceholder), piece.getKeypairs()[index], config);
+        var keypairRenderer = new CompactKeypairRenderer($("<div'>").appendTo(config.scratchpadParent), piece.getKeypairs()[index], config);
         keypairRenderers.push(keypairRenderer);
         keypairRenderer.render(function(div) {
           if (_isDestroyed) return;
           doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker(), config);
           if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
           var height = div.get(0).offsetHeight;
-          div.css("position", "static");
-          div.css("z-index", 0);
           div.detach();
           onDone(null, keypairRenderer, height);
         });
@@ -5901,7 +5925,7 @@ function CompactPieceRenderer(div, piece, config) {
             usedHeight = 0;
             var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
             if (config.showLogos || piece.getPartNum()) {
-              var headerDiv = $("<div class='piece_page_header_div'>").appendTo(config.visiblePlaceholder);
+              var headerDiv = $("<div class='piece_page_header_div'>").appendTo(config.scratchpadParent);
               headerDiv.append($("<div class='piece_page_header_left'>"));
               if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
               var partNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
@@ -6107,7 +6131,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		// keypair id
 		var id;
 		if (config.keypairId) {
-			id = $("<div class='compact_keypair_id'>");
+			id = $("<div class='compact_keypair_num'>");
 			id.html(config.keypairId)
 			id.css("position", "absolute");
 			id.css("top", "5px");

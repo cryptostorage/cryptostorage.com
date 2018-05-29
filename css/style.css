@@ -1390,6 +1390,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	border: 2px solid;
 	border-color: green;
 	border-top: none;
+	position: relative;
 }
 
 .keypair_div:first-child {
@@ -1404,6 +1405,14 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 
 .keypair_div_spaced:first-child {
 	margin-top: 0;
+}
+
+.keypair_id {
+	position: absolute;
+	top: 0;
+	left: 0;
+	font-size: 12px;
+	padding: 7px;
 }
 
 .keypair_qr {
@@ -1479,10 +1488,6 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	margin-left: 5px;
 }
 
-.keypair_id {
-	font-size: 13px;
-}
-
 .cryptocash_instructions {
 	flex: 1;
 	margin-left: 10px;
@@ -1543,7 +1548,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	border-right: 2px solid green;
 }
 
-.compact_keypair_id {
+.compact_keypair_num {
 	font-size: 12px;
 }
 
