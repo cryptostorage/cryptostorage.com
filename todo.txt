@@ -1,5 +1,4 @@
 v0.3.0
-raise crypto selector in editor
 hide public/private checkboxes/radios if only one option available
 ultra compact text
 slider points cleanup
