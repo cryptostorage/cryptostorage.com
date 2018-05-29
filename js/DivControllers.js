@@ -1926,7 +1926,7 @@ function ImportFileController(div, printErrors) {
 		if (pieceRenderer) {
 			pieceRenderer.getDiv().appendTo(inlinePiecesDiv);
 		} else {
-			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
+			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece, {visiblePlaceholder: $("body")});
 			pieceRenderer.render();
 		}
 		
@@ -2344,7 +2344,7 @@ function ImportTextController(div, plugins, printErrors) {
 		if (pieceRenderer) {
 			pieceRenderer.getDiv().appendTo(inlinePiecesDiv);
 		} else {
-			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
+			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece, {visiblePlaceholder: $("body")});
 			pieceRenderer.render();
 		}
 		
@@ -2979,6 +2979,8 @@ function EditorController(div, config) {
 		
 		// set piece renderer class
 		config.pieceRendererClass = StandardPieceRenderer;
+		config.pieceRendererConfig = {};
+		config.pieceRendererConfig.visiblePlaceholder = $("body");
 		return config;
 	}
 	
@@ -4824,6 +4826,7 @@ function EditorPrintController(div, pieces) {
 		var config = {};
 		config.pageBreaks = !isPreview;
 		config.copyable = false;
+    config.visiblePlaceholder = $("body");
 		switch (layoutDropdown.getSelectedText()) {
 			case Layout.STANDARD:
 				config.showPublic = includePublicCheckbox.isChecked();
@@ -4836,7 +4839,6 @@ function EditorPrintController(div, pieces) {
 				config.showPrivate = includePrivateRadio.isChecked();
 				config.showLogos = includeLogosCheckbox.isChecked();
 				config.showQr = includeQrsCheckbox.isChecked();
-				config.visiblePlaceholder = $("<div>").appendTo($("body"));
 				config.cryptoCash = false;
 				break;
 			case Layout.CRYPTOCASH:
@@ -5274,21 +5276,25 @@ inheritsFrom(LoadController, DivController);
 /**
  * Renders a piece with standard keypairs.
  * 
- * @param config specifies render configuration
- *  			config.showLogos specifies if crypto logos should be shown
- * 				config.showPublic specifies if public addresses should be shown
- * 				config.showPrivate specifies if private keys should be shown
- * 				config.cryptoCash specifies to space 6 keypairs per page with no cryptostorage logo
- * 				config.infoBack specifies if double-sided sweep instructions should be included for crypto cash
- * 				config.pageBreaks specifies if piece should be rendered as pages
- *  			config.copyable specifies if the public/private values should be copyable
  * @param div is the div to render to
  * @param piece is the piece to render
+ * @param config specifies render configuration
+ *        config.showLogos specifies if crypto logos should be shown
+ *        config.showPublic specifies if public addresses should be shown
+ *        config.showPrivate specifies if private keys should be shown
+ *        config.cryptoCash specifies to space 6 keypairs per page with no cryptostorage logo
+ *        config.infoBack specifies if double-sided sweep instructions should be included for crypto cash
+ *        config.pageBreaks specifies if piece should be rendered as pages
+ *        config.copyable specifies if the public/private values should be copyable
+ *        config.visiblePlaceholder is a visible placeholder to render keypairs so dimensions can be measured
  */
 function StandardPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
+	assertDefined(config);
+	assertDefined(config.visiblePlaceholder, "config.visiblePlaceholder required to render keypairs");
+  assertTrue(config.visiblePlaceholder.is(":visible"));
 	
 	// config default and validation
 	config = Object.assign({
@@ -5396,11 +5402,13 @@ function StandardPieceRenderer(div, piece, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
 				if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPartNum())) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
-				var keypairRenderer = new StandardKeypairRenderer($("<div>").appendTo("body"), piece.getKeypairs()[index], config);
+				var keypairRenderer = new StandardKeypairRenderer($("<div style='position:absolute; z-index: -1;'>").appendTo(config.visiblePlaceholder), piece.getKeypairs()[index], config);
 				keypairRenderers.push(keypairRenderer);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
 					if (config.cryptoCash) div.addClass("keypair_div_spaced");
+					div.css("position", "static");
+					div.css("z-index", "0");
 					placeholderDiv.replaceWith(div);
 					doneWeight += StandardKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
 					if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
@@ -5801,7 +5809,7 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
  *        config.showQr specifies if QRs should be shown
  * 				config.pageBreaks specifies if piece should be rendered as pages
  * 				config.copyable specifies if the public/private values should be copyable
- *        config.visiblePlaceholder specifies a visible div to temporarily render keypairs to in order to compute their height
+ *        config.visiblePlaceholder is a visible placeholder to render keypairs so dimensions can be measured
  * @param div is the div to render to
  * @param piece is the piece to render
  */
@@ -5809,7 +5817,7 @@ function CompactPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
-	assertDefined(config.visiblePlaceholder, "config.visiblePlaceholder required to compute height of compact keypairs");
+	assertDefined(config.visiblePlaceholder, "config.visiblePlaceholder required to render keypairs");
 	assertTrue(config.visiblePlaceholder.is(":visible"));
 	
 	// config default and validation
@@ -5848,22 +5856,24 @@ function CompactPieceRenderer(div, piece, config) {
     for (var i = 0; i < piece.getKeypairs().length; i++) {
       if (i % 2 === 0) qrLeft = !qrLeft;
       config.qrLeft = qrLeft; 
-      renderFuncs.push(renderFunc($("<div>").appendTo(config.visiblePlaceholder), piece, i, config));
+      renderFuncs.push(renderFunc(piece, i, config));
     }
     
     // callback function to render keypair
-    function renderFunc(div, piece, index, config) {
+    function renderFunc(piece, index, config) {
       config = Object.assign({}, config);
       return function(onDone) {
         if (_isDestroyed) return;
         if (piece.getKeypairs().length > 1 || piece.getPartNum()) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
-        var keypairRenderer = new CompactKeypairRenderer(div, piece.getKeypairs()[index], config);
+        var keypairRenderer = new CompactKeypairRenderer($("<div style='position:absolute; z-index:-1'>").appendTo(config.visiblePlaceholder), piece.getKeypairs()[index], config);
         keypairRenderers.push(keypairRenderer);
         keypairRenderer.render(function(div) {
           if (_isDestroyed) return;
           doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker(), config);
           if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
           var height = div.get(0).offsetHeight;
+          div.css("position", "static");
+          div.css("z-index", 0);
           div.detach();
           onDone(null, keypairRenderer, height);
         });
@@ -5923,9 +5933,6 @@ function CompactPieceRenderer(div, piece, config) {
         
         // make keypairs copyable
         if (config.copyable) UiUtils.makeCopyable(div);
-        
-        // empty scratchpad
-        config.visiblePlaceholder.empty();
 
         // done
         if (onDone) onDone(div);
