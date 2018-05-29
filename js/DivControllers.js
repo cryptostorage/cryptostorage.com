@@ -1926,7 +1926,7 @@ function ImportFileController(div, printErrors) {
 		if (pieceRenderer) {
 			pieceRenderer.getDiv().appendTo(inlinePiecesDiv);
 		} else {
-			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece, {visiblePlaceholder: $("body")});
+			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
 			pieceRenderer.render();
 		}
 		
@@ -2344,7 +2344,7 @@ function ImportTextController(div, plugins, printErrors) {
 		if (pieceRenderer) {
 			pieceRenderer.getDiv().appendTo(inlinePiecesDiv);
 		} else {
-			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece, {visiblePlaceholder: $("body")});
+			pieceRenderer = new StandardPieceRenderer($("<div>").appendTo(inlinePiecesDiv), piece);
 			pieceRenderer.render();
 		}
 		
@@ -2979,8 +2979,6 @@ function EditorController(div, config) {
 		
 		// set piece renderer class
 		config.pieceRendererClass = StandardPieceRenderer;
-		config.pieceRendererConfig = {};
-		config.pieceRendererConfig.visiblePlaceholder = $("body");
 		return config;
 	}
 	
@@ -4826,7 +4824,6 @@ function EditorPrintController(div, pieces) {
 		var config = {};
 		config.pageBreaks = !isPreview;
 		config.copyable = false;
-    config.visiblePlaceholder = $("body");
 		switch (layoutDropdown.getSelectedText()) {
 			case Layout.STANDARD:
 				config.showPublic = includePublicCheckbox.isChecked();
@@ -5292,9 +5289,6 @@ function StandardPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
-	assertDefined(config);
-	assertDefined(config.visiblePlaceholder, "config.visiblePlaceholder required to render keypairs");
-  assertTrue(config.visiblePlaceholder.is(":visible"));
 	
 	// config default and validation
 	config = Object.assign({
@@ -5304,11 +5298,13 @@ function StandardPieceRenderer(div, piece, config) {
 		cryptoCash: false,
 		infoBack: false,
 		pageBreaks: false,
-		copyable: true
+		copyable: true,
+		visiblePlaceholder: $("body")
 	}, config);
 	if (!config.showPublic) assertTrue(config.showPrivate);
 	if (!config.showPrivate) assertTrue(config.showPublic);
 	if (config.infoBack) assertFalse(piece.isDivided());
+	assertTrue(config.visiblePlaceholder.is(":visible"));
 	
 	var keypairRenderers;
 	var onProgressFn;
@@ -5816,9 +5812,6 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 function CompactPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
-	assertObject(piece, CryptoPiece);
-	assertDefined(config.visiblePlaceholder, "config.visiblePlaceholder required to render keypairs");
-	assertTrue(config.visiblePlaceholder.is(":visible"));
 	
 	// config default and validation
 	config = Object.assign({
@@ -5826,9 +5819,11 @@ function CompactPieceRenderer(div, piece, config) {
 		showPrivate: true,
 		showLogos: true,
 		pageBreaks: false,
-		copyable: true
+		copyable: true,
+		visiblePlaceholder: $("body")
 	}, config);
 	assertTrue((config.showPrivate && !config.showPublic) || (!config.showPrivate && config.showPublic));
+	assertTrue(config.visiblePlaceholder.is(":visible"));
 	
 	var MAX_PAGE_HEIGHT = 948; // maximum height in pixels per page
 	var keypairRenderers;
