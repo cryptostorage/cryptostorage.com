@@ -5697,7 +5697,10 @@ function StandardKeypairRenderer(div, keypair, config) {
       privateLabel.append(decoded.rightLabel);
       var privateValue = $("<div class='keypair_private_value'>").appendTo(privateDiv);
       privateValue.append(decoded.rightValue);
-      if (!hasWhitespace(decoded.rightValue)) privateValue.css("word-break", "break-all");
+      if (!hasWhitespace(decoded.rightValue)) {
+        privateValue.addClass("flex_horizontal");
+        privateValue.css("word-break", "break-all");
+      }
       if (decoded.rightValueCopyable) privateValue.addClass("copyable");
       
       // manually set crypto margin to vertically center
