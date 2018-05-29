@@ -5670,7 +5670,6 @@ function StandardKeypairRenderer(div, keypair, config) {
       
       // manually set crypto margin to vertically center
       var freeSpace = 128 - 7 * 2 - (publicDiv ? publicDivHeight : 0) - cryptoDiv.get(0).offsetHeight - privateValue.get(0).offsetHeight;
-      if (publicValue) 
       var marginTop = freeSpace / 2 - (publicValue ? publicValue.get(0).offsetHeight - singleLineValueHeight : 0);
       var marginBottom = freeSpace / 2;
       cryptoDiv.css("margin-top", marginTop + "px");
