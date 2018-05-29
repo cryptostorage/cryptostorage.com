@@ -674,7 +674,7 @@ function Tests() {
 		if (piece.isDivided() === false) {
 			var dividedPieces = piece.divide(3, 2);
 			
-			// test ability to assign piece num one time if not previously assigned
+			// test ability to assign part num one time if not previously assigned
 			var dividedKeypair = new CryptoKeypair({plugin: dividedPieces[0].getKeypairs()[0].getPlugin(), privateKey: dividedPieces[0].getKeypairs()[0].getPrivateWif()});
 			var dividedPiece = new CryptoPiece({keypairs: [dividedKeypair]});
 			assertUndefined(dividedPiece.getPartNum());
@@ -802,7 +802,7 @@ function Tests() {
 	}
 	
 	function testGeneratePieces(plugins, onDone) {
-		console.log("Testing generating pieces from config");
+		console.log("Testing generate pieces from config");
 		
 		// simple config
 		var config = {};
