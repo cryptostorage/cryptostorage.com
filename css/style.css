@@ -1384,6 +1384,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 
 .keypair_div {
 	height: 128px;
+	width: 750px;
 	box-sizing: border-box;
 	padding: 7px;
 	border: 2px solid;

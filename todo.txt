@@ -1,4 +1,9 @@
 v0.3.0
+keypairs not visible while rendering
+bip39 center
+keypair id
+smaller compact logo
+
 standard layout needs to float around long xmr seed
 put homepage text in index.html and dynamically hide for seo
 update social logo

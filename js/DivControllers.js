@@ -5396,7 +5396,7 @@ function StandardPieceRenderer(div, piece, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
 				if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPartNum())) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
-				var keypairRenderer = new StandardKeypairRenderer($("<div>"), piece.getKeypairs()[index], config);
+				var keypairRenderer = new StandardKeypairRenderer($("<div>").appendTo("body"), piece.getKeypairs()[index], config);
 				keypairRenderers.push(keypairRenderer);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
@@ -5596,48 +5596,6 @@ function StandardKeypairRenderer(div, keypair, config) {
     // public qr div
     var leftQrDiv = $("<div class='keypair_public_qr_div'>").appendTo(leftDiv);
     
-		// public label and value
-    if (decoded.leftLabel) {
-      var publicDiv = $("<div class='keypair_public_div'>").appendTo(leftDiv);
-      var publicLabel = $("<div class='keypair_public_label'>").appendTo(publicDiv);
-      publicLabel.append(decoded.leftLabel);
-      var publicValue = $("<div class='keypair_public_value'>").appendTo(publicDiv);
-      if (!hasWhitespace(decoded.leftValue)) publicValue.css("word-break", "break-all");
-      publicValue.append(decoded.leftValue);
-      if (decoded.leftValueCopyable) publicValue.addClass("copyable");
-    }
-  
-		// crypto logo and label
-		var cryptoDiv = $("<div class='keypair_crypto_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(leftDiv);
-		if (config.showLogos && decoded.cryptoLogo) {
-	    decoded.cryptoLogo.attr("width", "100%");
-	    decoded.cryptoLogo.attr("height", "100%");
-	    var cryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(cryptoDiv);
-	    cryptoLogo.append(decoded.cryptoLogo);
-	  }
-		var cryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(cryptoDiv);
-		cryptoLabel.append(decoded.cryptoLabel);
-		
-		// private label and value
-		var privateDiv = $("<div class='keypair_private_div'>").appendTo(leftDiv);
-    var privateLabel = $("<div class='keypair_private_label'>").appendTo(privateDiv);
-    privateLabel.append(decoded.rightLabel);
-    var privateValue = $("<div class='keypair_private_value'>").appendTo(privateDiv);
-    //if (!decoded.leftLabel) privateValue.css("margin-left", "-87px");
-    privateValue.append(decoded.rightValue);
-    if (decoded.rightValueCopyable) privateValue.addClass("copyable");
-    
-    // collapse spacing for long keys
-    if (decoded.leftLabel) {
-      if (decoded.leftValue.length > 71) {
-        cryptoDiv.css("margin-top", "-15px");
-      }
-      if (decoded.rightValue && decoded.rightValue.length > 140) {
-        cryptoDiv.css("margin-top", "-10px");
-        privateLabel.css("margin-top", "-15px");
-      }
-    }
-    
     // private qr div
     var rightQrDiv = $("<div class='keypair_private_qr_div flex_vertical flex_justify_end'>").appendTo(div);
     
@@ -5656,104 +5614,76 @@ function StandardKeypairRenderer(div, keypair, config) {
       }
       addPrivateQr();
     }
+    
     function addPrivateQr() {
       if (decoded.rightValueCopyable) {
         UiUtils.renderQrCode(decoded.rightValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
           if (_isDestroyed) return;
           img.attr("class", "keypair_qr");
           rightQrDiv.append(img);
-          if (onDone) onDone(div);
+          afterQrs();
         });
       } else {
         var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(rightQrDiv);
         omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
-        if (onDone) onDone(div);
+        afterQrs();
       }
     }
-		
-//		// left, center, right divs
-//		var keypairLeftDiv = $("<div class='keypair_left_div flex_horizontal flex_align_start flex_justify_center'>").appendTo(div);
-//		var keypairCenterDiv = $("<div class='keypair_center_div flex_vertical'>").appendTo(div);
-//		var keypairRightDiv = $("<div class='keypair_right_div flex_horizontal flex_align_end flex_justify_center'>").appendTo(div);
-//		
-//		// decode keypair for rendering
-//		var decoded = StandardKeypairRenderer.decodeKeypair(keypair, config);
-//		
+    
+    function afterQrs() {
+      
+      // public label and value
+      if (decoded.leftLabel) {
+        var publicDiv = $("<div class='keypair_public_div'>").appendTo(leftDiv);
+        var publicLabel = $("<div class='keypair_public_label'>").appendTo(publicDiv);
+        publicLabel.append(decoded.leftLabel);
+        var publicValue = $("<div class='keypair_public_value'>").appendTo(publicDiv);
+        if (!hasWhitespace(decoded.leftValue)) publicValue.css("word-break", "break-all");
+        if (decoded.leftValueCopyable) publicValue.addClass("copyable");
+        
+        // measure height of single line value and public div
+        publicValue.html("temporary"); 
+        var singleLineValueHeight = publicValue.get(0).offsetHeight;
+        var publicDivHeight = publicDiv.get(0).offsetHeight;
+        publicValue.html(decoded.leftValue);
+      }
+    
+      // crypto logo and label
+      var cryptoDiv = $("<div class='keypair_crypto_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(leftDiv);
+      if (config.showLogos && decoded.cryptoLogo) {
+        decoded.cryptoLogo.attr("width", "100%");
+        decoded.cryptoLogo.attr("height", "100%");
+        var cryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(cryptoDiv);
+        cryptoLogo.append(decoded.cryptoLogo);
+      }
+      var cryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(cryptoDiv);
+      cryptoLabel.append(decoded.cryptoLabel);
+      
+      // private label and value
+      var privateDiv = $("<div class='keypair_private_div'>").appendTo(leftDiv);
+      var privateLabel = $("<div class='keypair_private_label'>").appendTo(privateDiv);
+      privateLabel.append(decoded.rightLabel);
+      var privateValue = $("<div class='keypair_private_value'>").appendTo(privateDiv);
+      privateValue.append(decoded.rightValue);
+      if (!hasWhitespace(decoded.rightValue)) privateValue.css("word-break", "break-all");
+      if (decoded.rightValueCopyable) privateValue.addClass("copyable");
+      
+      // manually set crypto margin to vertically center
+      var freeSpace = 128 - 7 * 2 - (publicDiv ? publicDivHeight : 0) - cryptoDiv.get(0).offsetHeight - privateValue.get(0).offsetHeight;
+      if (publicValue) 
+      var marginTop = freeSpace / 2 - (publicValue ? publicValue.get(0).offsetHeight - singleLineValueHeight : 0);
+      var marginBottom = freeSpace / 2;
+      cryptoDiv.css("margin-top", marginTop + "px");
+      cryptoDiv.css("margin-bottom", marginBottom + "px");
+      
+      // done rendering
+      if (onDone) onDone(div);
+    }
+    
 //		// keypair id
 //		var idDiv = $("<div class='keypair_id keypair_center_id'>").appendTo(keypairCenterDiv);
 //		if (decoded.leftLabel) idDiv.css("position", "absolute");
 //		if (config.keypairId) idDiv.html(config.keypairId);
-//		
-//		// left label and value
-//		if (decoded.leftLabel) {
-//			var keypairLeftLabel = $("<div class='keypair_left_label'>").appendTo(keypairCenterDiv);
-//			keypairLeftLabel.html(decoded.leftLabel);
-//			keypairLeftValue = $("<div class='keypair_left_value'>").appendTo(keypairCenterDiv);
-//			if (!hasWhitespace(decoded.leftValue)) keypairLeftValue.css("word-break", "break-all");
-//			keypairLeftValue.html(decoded.leftValue);
-//			if (decoded.leftValueCopyable) keypairLeftValue.addClass("copyable");
-//		}
-//		
-//		// crypto logo and label
-//		var keypairCrypto = $("<div class='keypair_title flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairCenterDiv);
-//		if (config.showLogos && decoded.cryptoLogo) {
-//			decoded.cryptoLogo.attr("width", "100%");
-//			decoded.cryptoLogo.attr("height", "100%");
-//			var keypairCryptoLogo = $("<div class='keypair_crypto_logo'>").appendTo(keypairCrypto);
-//			keypairCryptoLogo.append(decoded.cryptoLogo);
-//		}
-//		var keypairCryptoLabel = $("<div class='keypair_crypto_label'>").appendTo(keypairCrypto);
-//		keypairCryptoLabel.html(decoded.cryptoLabel);
-//		
-//		// right label and value
-//		var keypairRightLabel = $("<div class='keypair_right_label'>").appendTo(keypairCenterDiv);
-//		keypairRightLabel.html(decoded.rightLabel);
-//		keypairRightValue = $("<div class='keypair_right_value'>").appendTo(keypairCenterDiv);
-//		if (!decoded.leftLabel) keypairRightValue.css("margin-left", "-87px");
-//		if (!hasWhitespace(decoded.rightValue)) keypairRightValue.css("word-break", "break-all");
-//		keypairRightValue.html(decoded.rightValue);
-//		if (decoded.rightValueCopyable) keypairRightValue.addClass("copyable");
-//		
-//		// collapse spacing for long keys
-//		if (decoded.leftLabel) {
-//			if (decoded.leftValue.length > 71) {
-//				keypairCrypto.css("margin-top", "-15px");
-//			}
-//			if (decoded.rightValue && decoded.rightValue.length > 140) {
-//				keypairCrypto.css("margin-top", "-10px");
-//				keypairRightLabel.css("margin-top", "-15px");
-//			}
-//		}
-//		
-//		// add qr codes
-//		if (decoded.leftValueCopyable) {
-//			UiUtils.renderQrCode(decoded.leftValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
-//				if (_isDestroyed) return;
-//				img.attr("class", "keypair_qr");
-//				keypairLeftDiv.append(img);
-//				addPrivateQr();
-//			});
-//		} else {
-//			if (decoded.leftLabel) {
-//				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairLeftDiv);
-//				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
-//			}
-//			addPrivateQr();
-//		}
-//		function addPrivateQr() {
-//			if (decoded.rightValueCopyable) {
-//				UiUtils.renderQrCode(decoded.rightValue, StandardKeypairRenderer.QR_CONFIG, function(img) {
-//					if (_isDestroyed) return;
-//					img.attr("class", "keypair_qr");
-//					keypairRightDiv.append(img);
-//					if (onDone) onDone(div);
-//				});
-//			} else {
-//				var omitted = $("<div class='keypair_qr_omitted_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(keypairRightDiv);
-//				omitted.append($("<img src='img/restricted.png' class='keypair_qr_omitted_img'>"));
-//				if (onDone) onDone(div);
-//			}
-//		}
 	}
 	
 	/**
