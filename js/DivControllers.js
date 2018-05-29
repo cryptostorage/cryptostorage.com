@@ -5698,7 +5698,7 @@ function StandardKeypairRenderer(div, keypair, config) {
       var privateValue = $("<div class='keypair_private_value'>").appendTo(privateDiv);
       privateValue.append(decoded.rightValue);
       if (!hasWhitespace(decoded.rightValue)) {
-        privateValue.addClass("flex_horizontal");
+        privateValue.addClass("flex_horizontal flex_justify_end");
         privateValue.css("word-break", "break-all");
       }
       if (decoded.rightValueCopyable) privateValue.addClass("copyable");
