@@ -1,6 +1,4 @@
 v0.3.0
-keypairs not visible while rendering
-div persisting when compact keypair selected in print export
 first keypair needs 2 less?
 bip39 center
 keypair id

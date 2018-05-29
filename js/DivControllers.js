@@ -5398,7 +5398,7 @@ function StandardPieceRenderer(div, piece, config) {
 			return function(onDone) {
 				if (_isDestroyed) return;
 				if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPartNum())) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
-				var keypairRenderer = new StandardKeypairRenderer($("<div style='position:absolute; z-index: -1;'>").appendTo(config.visiblePlaceholder), piece.getKeypairs()[index], config);
+				var keypairRenderer = new StandardKeypairRenderer($("<div style='position:absolute; top:0; left:0; z-index: -1;'>").appendTo(config.visiblePlaceholder), piece.getKeypairs()[index], config);
 				keypairRenderers.push(keypairRenderer);
 				keypairRenderer.render(function(div) {
 					if (_isDestroyed) return;
@@ -5860,7 +5860,7 @@ function CompactPieceRenderer(div, piece, config) {
       return function(onDone) {
         if (_isDestroyed) return;
         if (piece.getKeypairs().length > 1 || piece.getPartNum()) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
-        var keypairRenderer = new CompactKeypairRenderer($("<div style='position:absolute; z-index:-1'>").appendTo(config.visiblePlaceholder), piece.getKeypairs()[index], config);
+        var keypairRenderer = new CompactKeypairRenderer($("<div style='position:absolute; top:0; left:0; z-index:-1'>").appendTo(config.visiblePlaceholder), piece.getKeypairs()[index], config);
         keypairRenderers.push(keypairRenderer);
         keypairRenderer.render(function(div) {
           if (_isDestroyed) return;
