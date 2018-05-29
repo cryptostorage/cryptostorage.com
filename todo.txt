@@ -6,6 +6,7 @@ keypair id
 smaller compact logo
 
 standard layout needs to float around long xmr seed
+public addresses is only option if piece has public addresses
 put homepage text in index.html and dynamically hide for seo
 update social logo
 test adblocker
