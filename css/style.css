@@ -1552,6 +1552,12 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	font-size: 12px;
 }
 
+.compact_keypair_crypto_logo {
+	width: 26px;
+	height: 26px;
+	margin-right: 5px;	
+}
+
 .compact_keypair_title {
 	margin-bottom: 3px;
 	max-width: 220px;

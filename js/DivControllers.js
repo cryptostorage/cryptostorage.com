@@ -6145,7 +6145,7 @@ function CompactKeypairRenderer(div, keypair, config) {
     if (decoded.cryptoLogo && config.showLogos) {
       decoded.cryptoLogo.attr("width", "100%");
       decoded.cryptoLogo.attr("height", "100%");
-      var logo = $("<div class='keypair_crypto_logo'>").appendTo(title);
+      var logo = $("<div class='compact_keypair_crypto_logo'>").appendTo(title);
       logo.append(decoded.cryptoLogo);
     }
 		
