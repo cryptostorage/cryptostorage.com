@@ -1,5 +1,4 @@
 v0.3.0
-bip39 center
 first keypair needs 2 less?
 smaller compact logo
 

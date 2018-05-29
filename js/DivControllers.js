@@ -5624,7 +5624,9 @@ function StandardKeypairRenderer(div, keypair, config) {
 		var leftDiv = $("<div class='keypair_left_div flex_1'>").appendTo(div);
     
     // public qr div
-    var leftQrDiv = $("<div class='keypair_public_qr_div'>").appendTo(leftDiv);
+		if (keypair.getPlugin().hasPublicAddress()) {
+	    var leftQrDiv = $("<div class='keypair_public_qr_div'>").appendTo(leftDiv);
+		}
     
     // private qr div
     var rightQrDiv = $("<div class='keypair_private_qr_div flex_vertical flex_justify_end'>").appendTo(div);
@@ -5679,6 +5681,7 @@ function StandardKeypairRenderer(div, keypair, config) {
     
       // crypto logo and label
       var cryptoDiv = $("<div class='keypair_crypto_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(leftDiv);
+      if (!keypair.getPlugin().hasPublicAddress()) cryptoDiv.css("margin-left", 90 + 5 + "px"); // QR size and margin
       if (config.showLogos && decoded.cryptoLogo) {
         decoded.cryptoLogo.attr("width", "100%");
         decoded.cryptoLogo.attr("height", "100%");
