@@ -1,5 +1,6 @@
 v0.3.0
 keypairs not visible while rendering
+first keypair needs 2 less?
 bip39 center
 keypair id
 smaller compact logo
