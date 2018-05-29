@@ -5638,11 +5638,10 @@ function StandardKeypairRenderer(div, keypair, config) {
       
       // public label and value
       if (decoded.leftLabel) {
-        var publicDiv = $("<div class='keypair_public_div'>").appendTo(leftDiv);
+        var publicDiv = $("<div class='keypair_public_div flex_vertical'>").appendTo(leftDiv);
         var publicLabel = $("<div class='keypair_public_label'>").appendTo(publicDiv);
         publicLabel.append(decoded.leftLabel);
         var publicValue = $("<div class='keypair_public_value'>").appendTo(publicDiv);
-        if (!hasWhitespace(decoded.leftValue)) publicValue.css("word-break", "break-all");
         if (decoded.leftValueCopyable) publicValue.addClass("copyable");
         
         // measure height of single line value and public div
