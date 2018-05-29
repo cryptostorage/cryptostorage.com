@@ -1,4 +1,5 @@
 v0.3.0
+moneroaddress donate pushed down
 hide public/private checkboxes/radios if only one option available
 ultra compact text
 put homepage text in index.html and dynamically hide for seo
@@ -12,6 +13,7 @@ browser testing
 release
 
 v0.3.1
+what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
 TypeError: event.dataTransfer is null drag and drop DivController2084.js: event.dataTransfer.dropEffect = 'copy';
 change out qr lib
