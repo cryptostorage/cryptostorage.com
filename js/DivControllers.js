@@ -5885,7 +5885,7 @@ function CompactPieceRenderer(div, piece, config) {
       return function(onDone) {
         if (_isDestroyed) return;
         if (piece.getKeypairs().length > 1 || piece.getPartNum()) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
-        var keypairRenderer = new CompactKeypairRenderer($("<div'>").appendTo(config.scratchpadParent), piece.getKeypairs()[index], config);
+        var keypairRenderer = new CompactKeypairRenderer($("<div>").appendTo(config.scratchpadParent), piece.getKeypairs()[index], config);
         keypairRenderers.push(keypairRenderer);
         keypairRenderer.render(function(div) {
           if (_isDestroyed) return;
