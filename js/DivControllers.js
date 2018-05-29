@@ -5384,7 +5384,7 @@ function StandardPieceRenderer(div, piece, config) {
 		function renderFunc(scratchpadParent, replaceDiv, piece, index, config) {
 		  return function(onDone) {
         if (_isDestroyed) return;
-        if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPartNum())) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
+        if (!config.cryptoCash && (piece.getKeypairs().length > 1 || piece.getPartNum())) config.keypairIdx = index;
         var keypairRenderer = new StandardKeypairRenderer($("<div>").appendTo(scratchpadParent), piece.getKeypairs()[index], config);
         keypairRenderers.push(keypairRenderer);
         keypairRenderer.render(function(div) {
@@ -5586,7 +5586,7 @@ StandardPiecePreviewRenderer.getRenderWeight = function(config) {
  * 				config.showLogos specifies if crypto logos should be shown
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
- * 				config.keypairId is an identifier to render with the keypair (optional)
+ * 				config.keypairIdx is the index of the keypair relative to other keypairs (optional)
  */
 function StandardKeypairRenderer(div, keypair, config) {
 	DivController.call(this, div);
@@ -5615,9 +5615,9 @@ function StandardKeypairRenderer(div, keypair, config) {
 		var decoded = StandardKeypairRenderer.decodeKeypair(keypair, config);
 		
 		// keypair id
-		if (config.keypairId) {
-		  var keypairNumDiv = $("<div class='keypair_id flex_horizontal flex_justify_center width_100'>").appendTo(div);
-	    keypairNumDiv.append(config.keypairId);
+		if (isDefined(config.keypairIdx)) {
+		  var keypairIdDiv = $("<div class='keypair_id flex_horizontal flex_justify_center width_100'>").appendTo(div);
+		  keypairIdDiv.append((keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (config.keypairIdx + 1));
 		}
 		
 		// left div contains everything except right qr
@@ -5702,6 +5702,7 @@ function StandardKeypairRenderer(div, keypair, config) {
       
       // manually set crypto margin to vertically center
       var freeSpace = 128 - 7 * 2 - (publicDiv ? publicDivHeight : 0) - cryptoDiv.get(0).offsetHeight - privateValue.get(0).offsetHeight;
+      if (!isDefined(config.keypairIdx) || config.keypairIdx === 0) freeSpace -= 2; // first keypair has 2px top border
       var marginTop = freeSpace / 2 - (publicValue ? publicValue.get(0).offsetHeight - singleLineValueHeight : 0);
       var marginBottom = freeSpace / 2;
       cryptoDiv.css("margin-top", marginTop + "px");
@@ -5710,11 +5711,6 @@ function StandardKeypairRenderer(div, keypair, config) {
       // done rendering
       if (onDone) onDone(div);
     }
-    
-//		// keypair id
-//		var idDiv = $("<div class='keypair_id keypair_center_id'>").appendTo(keypairCenterDiv);
-//		if (decoded.leftLabel) idDiv.css("position", "absolute");
-//		if (config.keypairId) idDiv.html(config.keypairId);
 	}
 	
 	/**
@@ -5887,7 +5883,7 @@ function CompactPieceRenderer(div, piece, config) {
       config = Object.assign({}, config);
       return function(onDone) {
         if (_isDestroyed) return;
-        if (piece.getKeypairs().length > 1 || piece.getPartNum()) config.keypairId = (piece.getPartNum() ? piece.getPartNum() + "." : "") + (index + 1);
+        if (piece.getKeypairs().length > 1 || piece.getPartNum()) config.keypairIdx = index;
         var keypairRenderer = new CompactKeypairRenderer($("<div>").appendTo(config.scratchpadParent), piece.getKeypairs()[index], config);
         keypairRenderers.push(keypairRenderer);
         keypairRenderer.render(function(div) {
@@ -6099,7 +6095,7 @@ CompactPiecePreviewRenderer.getRenderWeight = function(config) {
  * 				config.showPrivate specifies if private keys should be shown
  *        config.showQr specifies if the QR code should be shown
  * 				config.qrLeft specifies if the qr code is on the left side else right side (default true)
- * 				config.keypairId is an identifier to render with the keypair (optional)
+ *        config.keypairIdx is the index of the keypair relative to other keypairs (optional)
  */
 function CompactKeypairRenderer(div, keypair, config) {
 	DivController.call(this, div);
@@ -6133,9 +6129,9 @@ function CompactKeypairRenderer(div, keypair, config) {
 		
 		// keypair id
 		var id;
-		if (config.keypairId) {
+		if (isDefined(config.keypairIdx)) {
 			id = $("<div class='compact_keypair_num'>");
-			id.html(config.keypairId)
+			id.html((keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (config.keypairIdx + 1));
 			id.css("position", "absolute");
 			id.css("top", "5px");
 			config.qrLeft ? id.css("right", "5px") : id.css("left", "5px");
