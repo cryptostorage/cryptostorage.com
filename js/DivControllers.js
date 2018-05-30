@@ -268,8 +268,8 @@ var UiUtils = {
 	    });
 	    
 	    // add styling and tooltips
-	    for (var i = 0; i < copyables.length; i++) {
-	      var copyable = copyables[i];
+	    for (var i = 0; i < copyables.length; i++) addTooltip(copyables[i]);	      
+	    function addTooltip(copyable) {
 	      $(copyable).addClass("copyable_init");
 	      tippy(copyable, {
 	        arrow : true,
