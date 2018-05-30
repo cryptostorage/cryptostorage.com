@@ -98,12 +98,12 @@ CryptoKeypair.prototype.getPlugin = function() {
 
 CryptoKeypair.prototype.isPublicApplicable = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	return this._state.plugin.hasPublicAddress();
+	return this._state.plugin.isPublicApplicable();
 }
 
 CryptoKeypair.prototype.hasPublicAddress = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	return isDefined(this._state.publicAddress);
+	return isInitialized(this._state.publicAddress);
 }
 
 CryptoKeypair.prototype.getPublicAddress = function() {
@@ -114,7 +114,7 @@ CryptoKeypair.prototype.getPublicAddress = function() {
 CryptoKeypair.prototype.removePublicAddress = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	assertTrue(this.hasPrivateKey());
-	delete this._state.publicAddress;
+	if (this.isPublicApplicable()) delete this._state.publicAddress;
 	return this;
 }
 
@@ -287,7 +287,6 @@ CryptoKeypair.prototype.divide = function(numParts, minParts) {
 			publicAddress: this.getPublicAddress(),
 			partNum: i + 1
 		});
-		if (!this.hasPublicAddress()) keypair.removePublicAddress();
 		dividedKeypairs.push(keypair);
 	}
 	return dividedKeypairs;
@@ -441,7 +440,7 @@ CryptoKeypair.prototype._validateState = function() {
 	}
 	
 	// public or private must be known if address applicable
-	if (this.getPlugin().hasPublicAddress()) {
+	if (this.getPlugin().isPublicApplicable()) {
 		if (isUndefined(this._state.publicAddress)) assertTrue(this.hasPrivateKey());
 		if (!this.hasPrivateKey()) assertInitialized(this._state.publicAddress);
 	}
@@ -457,7 +456,7 @@ CryptoKeypair.prototype._validateState = function() {
 		
 		// unencrypted
 		if (this._state.encryption === null) {
-			this._state.plugin.hasPublicAddress() ? assertInitialized(this._state.publicAddress) : assertNull(this._state.publicAddress);
+			this._state.plugin.isPublicApplicable() ? assertInitialized(this._state.publicAddress) : assertNull(this._state.publicAddress);
 			assertFalse(this._state.isDivided);
 			assertNull(this._state.minParts);
 			assertNull(this._state.partNum);
@@ -511,7 +510,7 @@ CryptoKeypair.prototype._setPrivateKey = function(privateKey) {
 	if (decoded) {
 		this._state.privateHex = decoded.privateHex.toLowerCase();
 		this._state.privateWif = decoded.privateWif;
-		this._state.publicAddress = this._state.plugin.hasPublicAddress() ? undefined : null;
+		this._state.publicAddress = this._state.plugin.isPublicApplicable() ? undefined : null;
 		this._state.encryption = decoded.encryption;
 		this._state.isDivided = false;
 		this._state.minParts = null;
@@ -524,7 +523,7 @@ CryptoKeypair.prototype._setPrivateKey = function(privateKey) {
 	if (decoded) {
 		this._state.privateHex = decoded.privateHex.toLowerCase();
 		this._state.privateWif = decoded.privateWif;
-		this._state.publicAddress = this._state.plugin.hasPublicAddress() ? undefined : null;
+		this._state.publicAddress = this._state.plugin.isPublicApplicable() ? undefined : null;
 		this._state.encryption = undefined;
 		this._state.isDivided = true;
 		this._state.minParts = decoded.minParts;

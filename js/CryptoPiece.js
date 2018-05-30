@@ -50,19 +50,10 @@ function CryptoPiece(config) {
 	
 	this.hasPublicAddresses = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
-		var bool;
 		for (var i = 0; i < state.keypairs.length; i++) {
-			if (isUndefined(bool)) bool = state.keypairs[i].hasPublicAddress();
-			else if (bool !== state.keypairs[i].hasPublicAddress()) throw new Error("Inconsistent hasPublicAddress() on keypair[" + i + "]");
+		  if (state.keypairs[i].hasPublicAddress()) return true;
 		}
-		return isDefined(bool) ? bool : false;
-	}
-	
-	this.isPublicApplicable = function() {
-	  for (var i = 0; i < state.keypairs.length; i++) {
-	    if (state.keypairs[i].isPublicApplicable()) return true;
-	  }
-	  return false;
+		return false;
 	}
 	
 	this.hasPrivateKeys = function() {
@@ -321,10 +312,10 @@ function CryptoPiece(config) {
 			str += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\r\n\r\n";
 			var publicAddress = state.keypairs[i].getPublicAddress();
 			if (isDefined(publicAddress)) {
-				if (!state.keypairs[i].getPlugin().hasPublicAddress()) publicAddress = "Not applicable";
-				str += "Public Address:\r\n" + publicAddress + "\r\n\r\n";
-			}
-			if (isDefined(state.keypairs[i].getPrivateWif())) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPartNum() ? "(divided)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
+        if (!state.keypairs[i].getPlugin().isPublicApplicable()) publicAddress = "Not applicable";
+        str += "Public Address:\r\n" + publicAddress + "\r\n\r\n";
+      }
+ 			if (isDefined(state.keypairs[i].getPrivateWif())) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPartNum() ? "(divided)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
 		}
 		return str.trim();
 	}

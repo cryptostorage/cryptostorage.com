@@ -120,7 +120,7 @@ CryptoPlugin.prototype.getMaxHexLength = function() { return 64; }
 /**
  * Indicates if the plugin has public addresses (e.g. BIP39 does not)
  */
-CryptoPlugin.prototype.hasPublicAddress = function() { return true; };
+CryptoPlugin.prototype.isPublicApplicable = function() { return true; };
 
 /**
  * Determines if the given string is a valid address.
@@ -381,7 +381,7 @@ function BIP39Plugin() {
 	this.getLogoPath = function() { return "img/usb.png"; }
 	this.getDependencies = function() { return ["lib/bip39.js"]; }
 	this.getDonationAddress = function() { return null; }
-	this.hasPublicAddress = function() { return false; }
+	this.isPublicApplicable = function() { return false; }
 	this.getMinHexLength = function() { return 66; }
 	this.getMaxHexLength = function() { return 66; }
 	

@@ -4541,10 +4541,10 @@ function EditorSaveController(div, pieces) {
 	function update(onDone) {
 		
 		// set checkboxes visibility and enabled
-		includePrivateCheckbox.setVisible(pieces[0].isPublicApplicable());
-		includePublicCheckbox.setVisible(pieces[0].isPublicApplicable());
-		includePrivateCheckbox.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+		includePrivateCheckbox.setVisible(pieces[0].hasPublicAddresses());
+		includePublicCheckbox.setVisible(pieces[0].hasPublicAddresses());
+		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
 		
 		// disable save button
 		setSaveEnabled(false);
@@ -4746,8 +4746,8 @@ function EditorPrintController(div, pieces) {
 			case Layout.STANDARD:
 				pieceRendererClass = StandardPieceRenderer;
 				previewRendererClass = StandardPiecePreviewRenderer;
-				includePrivateCheckbox.setVisible(pieces[0].isPublicApplicable());
-				includePublicCheckbox.setVisible(pieces[0].isPublicApplicable());
+				includePrivateCheckbox.setVisible(pieces[0].hasPublicAddresses());
+				includePublicCheckbox.setVisible(pieces[0].hasPublicAddresses());
 				includePrivateRadio.setVisible(false);
 				includePublicRadio.setVisible(false);
 				includeLogosCheckbox.setVisible(true);
@@ -4759,8 +4759,8 @@ function EditorPrintController(div, pieces) {
 				previewRendererClass = CompactPiecePreviewRenderer;
 				includePrivateCheckbox.setVisible(false);
 				includePublicCheckbox.setVisible(false);
-				includePrivateRadio.setVisible(pieces[0].isPublicApplicable());
-				includePublicRadio.setVisible(pieces[0].isPublicApplicable());
+				includePrivateRadio.setVisible(pieces[0].hasPublicAddresses());
+				includePublicRadio.setVisible(pieces[0].hasPublicAddresses());
 				includeLogosCheckbox.setVisible(true);
 				includeQrsCheckbox.setVisible(true);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
@@ -4780,10 +4780,10 @@ function EditorPrintController(div, pieces) {
 		}
 		
 		// enable/disable checkboxes and radios
-		includePrivateCheckbox.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
-		includePrivateRadio.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys());
-    includePublicRadio.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys());
+		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+		includePrivateRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
+    includePublicRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
 		
 		// disable print button
 		setPrintEnabled(false);
@@ -5626,7 +5626,7 @@ function StandardKeypairRenderer(div, keypair, config) {
 		var leftDiv = $("<div class='keypair_left_div flex_1'>").appendTo(div);
     
     // public qr div
-		if (keypair.getPlugin().hasPublicAddress()) {
+		if (keypair.getPlugin().isPublicApplicable()) {
 	    var leftQrDiv = $("<div class='keypair_public_qr_div'>").appendTo(leftDiv);
 		}
     
@@ -5683,7 +5683,7 @@ function StandardKeypairRenderer(div, keypair, config) {
     
       // crypto logo and label
       var cryptoDiv = $("<div class='keypair_crypto_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(leftDiv);
-      if (!keypair.getPlugin().hasPublicAddress()) cryptoDiv.css("margin-left", 90 + 5 + "px"); // QR size and margin
+      if (!keypair.getPlugin().isPublicApplicable()) cryptoDiv.css("margin-left", 90 + 5 + "px"); // QR size and margin
       if (config.showLogos && decoded.cryptoLogo) {
         decoded.cryptoLogo.attr("width", "100%");
         decoded.cryptoLogo.attr("height", "100%");
@@ -5747,7 +5747,7 @@ StandardKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
 	assertInitialized(tickerOrKeypair);
 	if (isString(tickerOrKeypair)) {
 		var plugin = AppUtils.getCryptoPlugin(tickerOrKeypair);
-		return 10 * (plugin.hasPublicAddress() ? 2 : 1);
+		return 10 * (plugin.isPublicApplicable() ? 2 : 1);
 	} else {
 		assertObject(tickerOrKeypair, CryptoKeypair);
 		return (tickerOrKeypair.hasPublicAddress() ? 10 : 0) + (tickerOrKeypair.hasPrivateKey() ? 10 : 0); 
@@ -6234,7 +6234,7 @@ CompactKeypairRenderer.getRenderWeight = function(tickerOrKeypair, config) {
 	}
 	
 	// QR is rendered unless showing public and plugin does not have public
-	var showQr = !config.showPublic || plugin.hasPublicAddress();
+	var showQr = !config.showPublic || plugin.isPublicApplicable();
 	return showQr ? 10 : 1;
 }
 

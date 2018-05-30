@@ -210,7 +210,7 @@ function Tests() {
 		// test invalid addresses
 		assertFalse(plugin.isAddress("invalidAddress123"));
 		assertFalse(plugin.isAddress(undefined));
-		plugin.hasPublicAddress() ? assertFalse(plugin.isAddress(null)) : assertTrue(plugin.isAddress(null));
+		plugin.isPublicApplicable() ? assertFalse(plugin.isAddress(null)) : assertTrue(plugin.isAddress(null));
 		assertFalse(plugin.isAddress([]));
 
 		// test decode invalid private keys
@@ -562,9 +562,14 @@ function Tests() {
 				
 		// combine all pieces
 		var combined = new CryptoPiece({dividedPieces: dividedPieces});
-		if (!original.hasPublicAddresses()) combined.removePublicAddresses();
+		if (!original.hasPublicAddresses()) {
+		  combined.removePublicAddresses();
+		  assertFalse(combined.hasPublicAddresses());
+		} else {
+		  assertTrue(combined.hasPublicAddresses());
+		}
 		assertTrue(original.equals(combined));
-				
+
 		// test divided with more than max parts
 		try {
 			combined.divide(AppUtils.MAX_PARTS + 1, AppUtils.MAX_PARTS - 10);
@@ -592,6 +597,11 @@ function Tests() {
 	function testKeypairState(keypair) {
 		assertInitialized(keypair.getPlugin());
 		
+		// test public address
+		if (!keypair.isPublicApplicable()) assertNull(keypair.getPublicAddress());
+    else if (keypair.hasPublicAddress()) assertInitialized(keypair.getPublicAddress());
+    else assertUndefined(keypair.getPublicAddress());
+		
 		// test divided keypair
 		if (keypair.isDivided()) {
 			assertInitialized(keypair.getPrivateHex());
@@ -604,11 +614,6 @@ function Tests() {
 			} else {
 				assertUndefined(keypair.getMinParts());
 			}
-			if (keypair.hasPublicAddress()) {
-				keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
-			} else {
-				assertUndefined(keypair.getPublicAddress());
-			}
 		}
 		
 		// test encrypted keypair
@@ -616,11 +621,6 @@ function Tests() {
 			assertFalse(keypair.isDivided());
 			assertNull(keypair.getMinParts());
 			assertNull(keypair.getPartNum());
-			if (keypair.hasPublicAddress()) {
-				keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
-			} else {
-				assertUndefined(keypair.getPublicAddress());
-			}
 		}
 		
 		// test unencrypted keypair
@@ -631,11 +631,6 @@ function Tests() {
 			assertNull(keypair.getEncryptionScheme());
 			assertFalse(keypair.isDivided());
 			assertNull(keypair.getMinParts());
-			if (keypair.hasPublicAddress()) {
-				keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
-			} else {
-				assertUndefined(keypair.getPublicAddress());
-			}
 		}
 		
 		// test keypair without private keys
@@ -646,7 +641,6 @@ function Tests() {
 			assertUndefined(keypair.getEncryptionScheme());
 			assertUndefined(keypair.isDivided());
 			assertUndefined(keypair.getMinParts());
-			keypair.isPublicApplicable() ? assertInitialized(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
 		}
 		
 		// invalid state
@@ -779,7 +773,8 @@ function Tests() {
 		modified.removePublicAddresses();
 		for (var i = 0; i < modified.getKeypairs().length; i++) {
 			var keypair = modified.getKeypairs()[i];
-			assertUndefined(keypair.getPublicAddress());
+			if (keypair.isPublicApplicable()) assertUndefined(keypair.getPublicAddress());
+			else assertNull(keypair.getPublicAddress());
 			assertTrue(keypair.hasPrivateKey());
 			testKeypairState(keypair);
 			if (piece.getPartNum()) assertEquals(piece.getPartNum(), modified.getPartNum());
