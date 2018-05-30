@@ -13,6 +13,9 @@ address testing
 browser testing
 release
 
+designer:
+divide interoperability warning
+
 v0.3.1
 what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
