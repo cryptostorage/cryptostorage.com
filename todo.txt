@@ -1,4 +1,5 @@
 v0.3.0
+insufficient shares creates keypair that appears to be encrypted
 hide public/private checkboxes/radios if only one option available
 ultra compact text
 slider points cleanup
