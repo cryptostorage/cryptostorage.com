@@ -48,8 +48,8 @@ function Tests() {
 		
 		// build key generation configuration
 		var config = {};
-		config.numParts = 3;
-		config.minParts = 2;
+		config.numParts = 5;
+		config.minParts = 3;
 		config.keypairs = [];
 		config.keypairs.push({
 			ticker: AppUtils.getCryptoPlugin("BTC").getTicker(),
@@ -672,7 +672,7 @@ function Tests() {
 		
 		// test init from divided pieces
 		if (piece.isDivided() === false) {
-			var dividedPieces = piece.divide(3, 2);
+			var dividedPieces = piece.divide(NUM_PARTS, MIN_PARTS);
 			
 			// test ability to assign part num one time if not previously assigned
 			var dividedKeypair = new CryptoKeypair({plugin: dividedPieces[0].getKeypairs()[0].getPlugin(), privateKey: dividedPieces[0].getKeypairs()[0].getPrivateWif()});
