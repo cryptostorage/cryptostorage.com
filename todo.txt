@@ -1,8 +1,6 @@
 v0.3.0
-copied tooltip persists in safari
 insufficient shares creates keypair that appears to be encrypted
 hide public/private checkboxes/radios if only one option available
-ultra compact text
 slider points cleanup
 put homepage text in index.html and dynamically hide for seo
 update social logo
@@ -18,6 +16,8 @@ designer:
 divide interoperability warning
 
 v0.3.1
+ultra compact text
+copied tooltip persists in safari
 what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
 TypeError: event.dataTransfer is null drag and drop DivController2084.js: event.dataTransfer.dropEffect = 'copy';
@@ -30,7 +30,6 @@ remove open-source from home notice graphic
 remove selected item from dropdown selection so no duplicate
 ie11 squished print header, scroll bar on progress
 text highlighted on click
-ultra compact text
 option to not show qrs in compact view
 reddit mobile app generate.html save silently fails
 preview overlay upper left?
