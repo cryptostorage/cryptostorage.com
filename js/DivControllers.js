@@ -2585,7 +2585,7 @@ function DecryptionController(div, encryptedPiece) {
 		
 		// validate passphrase
 		if (!passphrase || passphrase.trim() === "") {
-			onWarning("Enter a passphrase to decrypt private keys");
+			onWarningFn("Enter a passphrase to decrypt private keys");
 			return;
 		}
 		
