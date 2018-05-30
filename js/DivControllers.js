@@ -4540,9 +4540,11 @@ function EditorSaveController(div, pieces) {
 	
 	function update(onDone) {
 		
-		// toggle include checkboxes
-		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+		// set checkboxes visibility and enabled
+		includePrivateCheckbox.setVisible(pieces[0].isPublicApplicable());
+		includePublicCheckbox.setVisible(pieces[0].isPublicApplicable());
+		includePrivateCheckbox.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
 		
 		// disable save button
 		setSaveEnabled(false);
@@ -4744,8 +4746,8 @@ function EditorPrintController(div, pieces) {
 			case Layout.STANDARD:
 				pieceRendererClass = StandardPieceRenderer;
 				previewRendererClass = StandardPiecePreviewRenderer;
-				includePrivateCheckbox.setVisible(true);
-				includePublicCheckbox.setVisible(true);
+				includePrivateCheckbox.setVisible(pieces[0].isPublicApplicable());
+				includePublicCheckbox.setVisible(pieces[0].isPublicApplicable());
 				includePrivateRadio.setVisible(false);
 				includePublicRadio.setVisible(false);
 				includeLogosCheckbox.setVisible(true);
@@ -4757,8 +4759,8 @@ function EditorPrintController(div, pieces) {
 				previewRendererClass = CompactPiecePreviewRenderer;
 				includePrivateCheckbox.setVisible(false);
 				includePublicCheckbox.setVisible(false);
-				includePrivateRadio.setVisible(true);
-				includePublicRadio.setVisible(true);
+				includePrivateRadio.setVisible(pieces[0].isPublicApplicable());
+				includePublicRadio.setVisible(pieces[0].isPublicApplicable());
 				includeLogosCheckbox.setVisible(true);
 				includeQrsCheckbox.setVisible(true);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
@@ -4778,10 +4780,10 @@ function EditorPrintController(div, pieces) {
 		}
 		
 		// enable/disable checkboxes and radios
-		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
-		includePrivateRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
-    includePublicRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
+		includePrivateCheckbox.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+		includePrivateRadio.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys());
+    includePublicRadio.setEnabled(pieces[0].isPublicApplicable() && pieces[0].hasPrivateKeys());
 		
 		// disable print button
 		setPrintEnabled(false);

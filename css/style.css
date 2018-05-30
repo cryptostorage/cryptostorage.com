@@ -1239,6 +1239,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 .editor_popup_body {
 	padding: 30px 50px 30px 50px;
 	background-color: white;
+	min-width: 600px;
 }
 
 .editor_popup_body > div {

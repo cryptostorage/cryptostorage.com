@@ -58,6 +58,13 @@ function CryptoPiece(config) {
 		return isDefined(bool) ? bool : false;
 	}
 	
+	this.isPublicApplicable = function() {
+	  for (var i = 0; i < state.keypairs.length; i++) {
+	    if (state.keypairs[i].isPublicApplicable()) return true;
+	  }
+	  return false;
+	}
+	
 	this.hasPrivateKeys = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		var bool;

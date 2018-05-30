@@ -1,6 +1,6 @@
 v0.3.0
-insufficient shares creates keypair that appears to be encrypted
-hide public/private checkboxes/radios if only one option available
+copied tooltips persist in safari
+don't include private state if private not included
 slider points cleanup
 put homepage text in index.html and dynamically hide for seo
 update social logo
@@ -17,7 +17,6 @@ divide interoperability warning
 
 v0.3.1
 ultra compact text
-copied tooltip persists in safari
 what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
 TypeError: event.dataTransfer is null drag and drop DivController2084.js: event.dataTransfer.dropEffect = 'copy';
