@@ -4541,10 +4541,12 @@ function EditorSaveController(div, pieces) {
 	function update(onDone) {
 		
 		// set checkboxes visibility and enabled
-		includePrivateCheckbox.setVisible(pieces[0].hasPublicAddresses());
-		includePublicCheckbox.setVisible(pieces[0].hasPublicAddresses());
 		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
 		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+		if (!includePublicCheckbox.isEnabled() && !includePrivateCheckbox.isEnabled()) {
+      includePublicCheckbox.setVisible(false);
+		  includePrivateCheckbox.setVisible(false);
+		}
 		
 		// disable save button
 		setSaveEnabled(false);
@@ -4687,7 +4689,8 @@ function EditorPrintController(div, pieces) {
 		// initial state
 		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
 		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
-		includePrivateRadio.setChecked(true);
+		if (pieces[0].hasPrivateKeys()) includePrivateRadio.setChecked(true);
+		else includePublicRadio.setChecked(true);
 		includeLogosCheckbox.setChecked(true);
 		includeQrsCheckbox.setChecked(true);
 		if (cryptoCashApplies()) includeInstructionsCheckbox.setChecked(true);
@@ -4738,6 +4741,12 @@ function EditorPrintController(div, pieces) {
 	}
 	
 	function update(onDone) {
+	  
+	   // enable/disable checkboxes and radios
+    includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
+    includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+    includePrivateRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
+    includePublicRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
 		
 		// configure per layout
 		var pieceRendererClass;
@@ -4746,8 +4755,8 @@ function EditorPrintController(div, pieces) {
 			case Layout.STANDARD:
 				pieceRendererClass = StandardPieceRenderer;
 				previewRendererClass = StandardPiecePreviewRenderer;
-				includePrivateCheckbox.setVisible(pieces[0].hasPublicAddresses());
-				includePublicCheckbox.setVisible(pieces[0].hasPublicAddresses());
+				includePrivateCheckbox.setVisible(includePublicCheckbox.isEnabled() || includePrivateCheckbox.isEnabled());
+				includePublicCheckbox.setVisible(includePublicCheckbox.isEnabled() || includePrivateCheckbox.isEnabled());
 				includePrivateRadio.setVisible(false);
 				includePublicRadio.setVisible(false);
 				includeLogosCheckbox.setVisible(true);
@@ -4759,8 +4768,8 @@ function EditorPrintController(div, pieces) {
 				previewRendererClass = CompactPiecePreviewRenderer;
 				includePrivateCheckbox.setVisible(false);
 				includePublicCheckbox.setVisible(false);
-				includePrivateRadio.setVisible(pieces[0].hasPublicAddresses());
-				includePublicRadio.setVisible(pieces[0].hasPublicAddresses());
+				includePrivateRadio.setVisible(includePublicRadio.isEnabled() || includePrivateRadio.isEnabled());
+				includePublicRadio.setVisible(includePublicRadio.isEnabled() || includePrivateRadio.isEnabled());
 				includeLogosCheckbox.setVisible(true);
 				includeQrsCheckbox.setVisible(true);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
@@ -4778,12 +4787,6 @@ function EditorPrintController(div, pieces) {
 				break;
 			default: throw new Error("Unsupported layout: " + layout.geSelectedText());
 		}
-		
-		// enable/disable checkboxes and radios
-		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
-		includePrivateRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
-    includePublicRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
 		
 		// disable print button
 		setPrintEnabled(false);
@@ -5818,8 +5821,8 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 	
 	// initialize right values
 	decoded.rightLabel = keypair.getPlugin().getPrivateLabel();
-	decoded.rightLabel += " " + (config.showPrivate ? keypair.isDivided() ? "(divided)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
-	decoded.rightValue = keypair.getPrivateWif() && config.showPrivate ? keypair.getPrivateWif() : "(not shown)";
+	decoded.rightLabel += " " + (config.showPrivate && keypair.hasPrivateKey() ? keypair.isDivided() ? "(divided)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
+	decoded.rightValue = keypair.hasPrivateKey() && config.showPrivate ? keypair.getPrivateWif() : "(not shown)";
 	decoded.rightValueCopyable = isDefined(keypair.getPrivateWif()) && config.showPrivate;
 	return decoded;
 }

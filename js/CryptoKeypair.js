@@ -336,8 +336,8 @@ CryptoKeypair.prototype.toJson = function() {
 	if (!isExcluded(CryptoKeypair.Field.PRIVATE_STATE) && this.hasPrivateKey()) json.privateState = this.getFieldValue(CryptoKeypair.Field.PRIVATE_STATE);
 	if (!isExcluded(CryptoKeypair.Field.ENCRYPTION) && this.isEncrypted()) json.encryption = this.getEncryptionScheme();
 	if (!isExcluded(CryptoKeypair.Field.IS_DIVIDED)) json.isDivided = this.isDivided();
-	if (!isExcluded(CryptoKeypair.Field.MIN_PARTS)) json.minParts = this.getMinParts();
-	if (!isExcluded(CryptoKeypair.Field.PART_NUM)) json.partNum = this.getPartNum()
+	if (!isExcluded(CryptoKeypair.Field.MIN_PARTS) && this.isDivided()) json.minParts = this.getMinParts();
+	if (!isExcluded(CryptoKeypair.Field.PART_NUM) && this.isDivided()) json.partNum = this.getPartNum()
 	return json;
 }
 

@@ -311,10 +311,7 @@ function CryptoPiece(config) {
 		for (var i = 0; i < state.keypairs.length; i++) {
 			str += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\r\n\r\n";
 			var publicAddress = state.keypairs[i].getPublicAddress();
-			if (isDefined(publicAddress)) {
-        if (!state.keypairs[i].getPlugin().isPublicApplicable()) publicAddress = "Not applicable";
-        str += "Public Address:\r\n" + publicAddress + "\r\n\r\n";
-      }
+			if (isInitialized(publicAddress)) str += "Public Address:\r\n" + publicAddress + "\r\n\r\n";
  			if (isDefined(state.keypairs[i].getPrivateWif())) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPartNum() ? "(divided)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
 		}
 		return str.trim();
@@ -742,6 +739,7 @@ CryptoPiece.parseTextPiece = function(txt) {
 		var keypairs = [];
 		for (var i = 0; i < keypairsRaw.length; i++) {
 			var keypairRaw = keypairsRaw[i];
+			if (!keypairRaw.plugin.isPublicApplicable()) keypairRaw.publicValue = null;  // inapplicable addresses are known to be null
 			if (!isDefined(keypairRaw.publicValue) && !isDefined(keypairRaw.privateValue)) {	// public and private can be missing iff next keypair is same plugin
 				if (i === keypairsRaw.length - 1 || keypairRaw.plugin !== keypairsRaw[i + 1].plugin) throw new Error("Keypair does not have public or private value");
 			} else {
