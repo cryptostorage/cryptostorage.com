@@ -948,7 +948,7 @@ CryptoKeypair.decodeEncryptedKey = function(str) {
 CryptoKeypair.encodeHexPart = function(part, minParts) {
 	assertTrue(isHex(part));
 	assertTrue(isNumber(minParts) && minParts <= AppUtils.MAX_PARTS);
-	return encodePartV0(part, minParts);
+	return encodePartV2(part, minParts);
 	
 	function encodePartV0(part) {
 		return padLeft(part, 2);

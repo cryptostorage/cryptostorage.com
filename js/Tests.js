@@ -33,8 +33,8 @@ function Tests() {
 	var REPEAT_KEYS = 1;             // number of keys to test per plugin without encryption throughout tests
 	var REPEAT_KEYS_ENCRYPTION = 1;  // number of keys to test per plugin with encryption throughout tests
 	var TEST_MAX_PARTS = false;			 // computationally intensive
-	var NUM_PARTS = 3;
-	var MIN_PARTS = 2;
+	var NUM_PARTS = 5;
+	var MIN_PARTS = 3;
 	
 	// list of invalid private keys to test per plugin
 	var INVALID_PKS = [" ", "ab", "abctesting123", "abc testing 123", 12345, "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "3b20836520fe2e8eef1fd3f898fd97b5a3bcb6702fae72e3ca1ba8fb6e1ddd75b12f74dc6422606d1750e40"];
