@@ -17,7 +17,6 @@ v0.3.1
 what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
 TypeError: event.dataTransfer is null drag and drop DivController2084.js: event.dataTransfer.dropEffect = 'copy';
-change out qr lib
 print export height down then up when selecting dropdown
 text encryption, divisionn, and import
 "download and verify" notice description with hyperlink to verify faq
