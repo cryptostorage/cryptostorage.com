@@ -97,7 +97,7 @@ body {
 }
 
 .app_body {
-	min-width: 946px;
+	min-width: 960px;
 	-webkit-text-size-adjust: 100%;
 	background-color: rgb(235, 242, 254);
 }
