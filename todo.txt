@@ -1,5 +1,4 @@
 v0.3.0
-test encryption with full piece instead of piece per plugin
 visible keypair render flashing on large piece with consecutive renders, not getting removed from placeholder
 standard all placeholders placed upfront, way to only add then when they're ready?
 slider points cleanup
@@ -17,6 +16,7 @@ designer:
 divide interoperability warning
 
 v0.3.1
+test encryption with full piece instead of piece per plugin
 ultra compact text
 what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
