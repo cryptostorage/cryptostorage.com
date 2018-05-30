@@ -1,6 +1,5 @@
 v0.3.0
 visible keypair render flashing on large piece with consecutive renders, not getting removed from placeholder
-standard all placeholders placed upfront, way to only add then when they're ready?
 slider points cleanup
 put homepage text in index.html and dynamically hide for seo
 update social logo

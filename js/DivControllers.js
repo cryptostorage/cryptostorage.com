@@ -5372,8 +5372,7 @@ function StandardPieceRenderer(div, piece, config) {
 			}
 			
 			// collect functions to render keypairs
-			var replaceDiv = $("<div class='keypair_div'>").appendTo(keypairsDiv); // blank placeholder until rendered
-			if (config.cryptoCash) replaceDiv.addClass("keypair_div_spaced");
+			var replaceDiv = $("<div>").appendTo(keypairsDiv); // placeholder until rendered
 			renderFuncs.push(renderFunc(config.scratchpadParent, replaceDiv, piece, i, config));
 		}
 		
@@ -5395,6 +5394,7 @@ function StandardPieceRenderer(div, piece, config) {
         keypairRenderer.render(function(div) {
           if (_isDestroyed) return;
           if (config.cryptoCash) div.addClass("keypair_div_spaced");
+          if (config.copyable) UiUtils.makeCopyable(div);
           replaceDiv.replaceWith(div);
           doneWeight += StandardKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker());
           if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
@@ -5429,9 +5429,6 @@ function StandardPieceRenderer(div, piece, config) {
 			async.series(renderFuncs, function(err, _keypairRenderers) {
 				if (_isDestroyed) return;
 				assertNull(err);
-				
-				// make keypairs copyable
-				if (config.copyable) UiUtils.makeCopyable(div);
 
 				// done
 				if (onDone) onDone(div);
