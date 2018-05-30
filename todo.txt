@@ -1,4 +1,5 @@
 v0.3.0
+error on cancel decrypt with large piece
 visible keypair render flashing large piece consecutive renders, not getting removed from placeholder
 standard all placeholders placed upfront, way to only add then when they're ready?
 slider points cleanup
