@@ -1,5 +1,4 @@
 v0.3.0
-don't include private state if private not included
 don't export not applicable public addresses in txt
 slider points cleanup
 put homepage text in index.html and dynamically hide for seo

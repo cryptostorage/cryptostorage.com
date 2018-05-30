@@ -290,9 +290,10 @@ function CryptoPiece(config) {
 		for (prop in CryptoKeypair.Field) {
 		  if (!CryptoKeypair.Field.hasOwnProperty(prop)) continue;
 		  var header = CryptoKeypair.Field[prop.toString()];
-		  if (arrayContains(CryptoKeypair.getExcludedFields(), header)) continue;              // skip field if excluded
-		  if (header === CryptoKeypair.Field.PART_NUM && !this.isDivided()) continue;      // skip part num if not divided
-		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue; // skip encryption if not encrypted
+		  if (arrayContains(CryptoKeypair.getExcludedFields(), header)) continue;               // skip field if excluded
+		  if (header === CryptoKeypair.Field.PART_NUM && !this.isDivided()) continue;           // skip part num if not divided
+		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue;       // skip encryption if not encrypted
+		  if (header === CryptoKeypair.Field.PRIVATE_STATE && !this.hasPrivateKeys()) continue; // skip private state if no private keys
 			headers.push(header);
 		}
 		
