@@ -708,11 +708,14 @@ CryptoKeypair.prototype._decryptCryptoJsV1 = function(passphrase, onProgress, on
 }
 
 CryptoKeypair.prototype._encryptBip38 = function(passphrase, onProgress, onDone) {
+  var that = this;
 	try {
 		var decoded = bitcoinjs.wif.decode(this.getPrivateWif());
 		bitcoinjs.bip38.encryptAsync(decoded.privateKey, decoded.compressed, passphrase, function(progress) {
+		  if (that.isDestroyed()) return;
 			if (onProgress) onProgress(progress.percent / 100);
 		}, null, function(err, encryptedWif) {
+		  if (that.isDestroyed()) return;
 			if (err) onDone(err);
 			else onDone(null, encryptedWif);
 		});
@@ -724,8 +727,10 @@ CryptoKeypair.prototype._encryptBip38 = function(passphrase, onProgress, onDone)
 CryptoKeypair.prototype._decryptBip38 = function(passphrase, onProgress, onDone) {
 	var that = this;
 	bitcoinjs.bip38.decryptAsync(this.getPrivateWif(), passphrase, function(progress) {
+	  if (that.isDestroyed()) return;
 		if (onProgress) onProgress(progress.percent / 100);
 	}, null, function(err, decryptedKey) {
+	  if (that.isDestroyed()) return;
 		if (err) onDone(new Error("Incorrect passphrase"));
 		else {
 			var decryptedWif = bitcoinjs.wif.encode(that._state.plugin.getNetwork().wif, decryptedKey.privateKey, decryptedKey.compressed);

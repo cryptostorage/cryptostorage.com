@@ -1279,21 +1279,23 @@ function Tests() {
 			piece.decrypt(PASSPHRASE, onProgressCb, onDoneCb);
 		}
 		
-		// destroy
-		piece.destroy();
-		isDestroyed = true;
-		assertTrue(piece.isDestroyed());
-		try {
-			piece.copy();
-			fail("fail");
-		} catch (err) {
-			if (err.message === "fail") throw new Error("Cannot use destroyed piece");
-		}
-		onDone();
-		
-		// test on intermediate progress
+		// called on intermediate progress
 		function onProgressCb(percent, label) {
 			assertFalse(isDestroyed, "Should not call progress after being destroyed");
+			
+			// destroy after first keypair complete or progress exceeds 10%
+			if (percent > 1 / piece.getKeypairs().length || percent > 0.1) {
+			  piece.destroy();
+	      isDestroyed = true;
+	      assertTrue(piece.isDestroyed());
+	      try {
+	        piece.copy();
+	        fail("fail");
+	      } catch (err) {
+	        if (err.message === "fail") throw new Error("Cannot use destroyed piece");
+	      }
+	      onDone();
+			}
 		}
 		
 		// test on done
