@@ -4820,8 +4820,13 @@ function EditorPrintController(div, pieces) {
 			}
 		}
 		
+		// preserve height if previous preview to reduce height bouncing
+    if (previewGenerator) {
+      previewDiv.css("height", previewDiv.get(0).offsetHeight);
+      previewGenerator.destroy();
+    }
+		
 		// render preview
-		if (previewGenerator) previewGenerator.destroy();
 		previewGenerator = new PieceGenerator({
 			pieces: [transformedPieces[0]],
 			pieceRendererClass: previewRendererClass,
@@ -4843,6 +4848,7 @@ function EditorPrintController(div, pieces) {
 				assertNull(err);
 				previewDiv.children().replaceWith(previewLoadDiv);
 				previewDiv.append(_previewRenderers[0].getDiv());
+				previewDiv.css("height", "auto");
 				previewLoadDiv.hide();
 				pieceRenderers = _pieceRenderers;
 				setPrintEnabled(true);
