@@ -5452,7 +5452,6 @@ function StandardPieceRenderer(div, piece, config) {
 	 * Destroys the renderer.  Does not destroy the underlying piece.
 	 */
 	this.destroy = function() {
-	  console.log("Destroying!");
 		assertFalse(_isDestroyed, "StandardPieceRenderer already destroyed");
 		if (keypairRenderers) {
 			for (var i = 0; i < keypairRenderers.length; i++) keypairRenderers[i].destroy();
@@ -5912,7 +5911,13 @@ function CompactPieceRenderer(div, piece, config) {
           if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
           var height = div.get(0).offsetHeight;
           div.detach();
-          onDone(null, keypairRenderer, height);
+          if (i % 100 === 0) {  // fix issue where call stack exceeded for large pieces because compact can be synchronous
+            setImmediate(function() {
+              onDone(null, keypairRenderer, height);
+            });
+          } else {
+            onDone(null, keypairRenderer, height);
+          }
         });
       }
     }
