@@ -1053,13 +1053,12 @@ function HomeController(div) {
 			var footerDiv = $("<div class='footer flex_vertical flex_align_center'>").appendTo(div);
 			var footerTopicsDiv = $("<div class='flex_horizontal flex_justify_space_between width_100'>").appendTo(footerDiv);
 			
-			// footer topics
+			// footer topics and subtopics
 			var footerTopicGenerate = $("<div class='footer_topic_div flex_vertical'>");
 			$("<a target='_blank' href='generate.html' class='footer_topic'>Generate Keypairs</a>").appendTo(footerTopicGenerate);
 			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=btc' class='footer_subtopic'>Bitcoin</a>").appendTo(footerTopicGenerate);
 			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=bch' class='footer_subtopic'>Bitcoin Cash</a>").appendTo(footerTopicGenerate);
 			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=eth' class='footer_subtopic'>Ethereum</a>").appendTo(footerTopicGenerate);
-			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=ltc' class='footer_subtopic'>Litecoin</a>").appendTo(footerTopicGenerate);
 			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=xmr' class='footer_subtopic'>Monero</a>").appendTo(footerTopicGenerate);
 			var footerTopicImport = $("<div class='footer_topic_div flex_vertical'>");
       $("<a href='#import' class='footer_topic'>Import Keypairs</a>").appendTo(footerTopicImport);
@@ -1076,16 +1075,16 @@ function HomeController(div) {
 			var footerTopicIssueTracker = $("<div class='footer_topic_div flex_vertical'>");
 			$("<a target='_blank' href='" + AppUtils.GITHUB_ISSUES_URL + "' class='footer_topic'>Issue Tracker</a>").appendTo(footerTopicIssueTracker);
 			
-			// footer columns
+			// footer layout
 			var footerCol1 = $("<div class='flex_vertical flex_1'>").appendTo(footerTopicsDiv);
 			footerCol1.append(footerTopicGenerate);
+	    footerCol1.append(footerTopicFaq);
 			var footerCol2 = $("<div class='flex_vertical flex_1'>").appendTo(footerTopicsDiv);
 			footerCol2.append(footerTopicImport);
+	    footerCol2.append(footerTopicDownload);
 			footerCol2.append(footerTopicGitHub);
-			footerCol2.append(footerTopicDownload);
-			footerCol2.append(footerTopicReleaseNotes);
 			var footerCol3 = $("<div class='flex_vertical flex_1'>").appendTo(footerTopicsDiv);
-			footerCol3.append(footerTopicFaq);
+	    footerCol3.append(footerTopicReleaseNotes);
 			footerCol3.append(footerTopicDonate);
 			footerCol3.append(footerTopicIssueTracker);
 			

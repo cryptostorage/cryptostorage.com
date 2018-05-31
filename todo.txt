@@ -1,5 +1,4 @@
 v0.3.0
-re-arrange footer in order of likely use
 slider points cleanup
 put homepage text in index.html and dynamically hide for seo
 update social logo
