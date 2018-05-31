@@ -3156,7 +3156,7 @@ function EditorContentController(div, editorController, config) {
 				bodyDiv = $("<div class='editor_body_div flex_vertical flex_align_center'>").appendTo(div);
 				
 				// cryptostorage logo
-				logoHeader = $("<div class='piece_page_header_div'>").appendTo(bodyDiv);
+				logoHeader = $("<div class='piece_page_header_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(bodyDiv);
 				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
 				
 				// progress bar
@@ -5380,7 +5380,7 @@ function StandardPieceRenderer(div, piece, config) {
 				// add new page
 				var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
 				if (piece.getPartNum() || (!config.cryptoCash && config.showLogos)) {
-					var headerDiv = $("<div class='piece_page_header_div'>").appendTo(pageDiv);
+					var headerDiv = $("<div class='piece_page_header_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
 					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
 					var partNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
@@ -5962,7 +5962,7 @@ function CompactPieceRenderer(div, piece, config) {
             usedHeight = 0;
             var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
             if (config.showLogos || piece.getPartNum()) {
-              var headerDiv = $("<div class='piece_page_header_div'>").appendTo(config.scratchpadParent);
+              var headerDiv = $("<div class='piece_page_header_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(config.scratchpadParent);
               headerDiv.append($("<div class='piece_page_header_left'>"));
               if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
               var partNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);

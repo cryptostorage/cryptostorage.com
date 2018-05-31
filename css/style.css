@@ -1360,18 +1360,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .piece_page_header_div {
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: -moz-flex;
-	display: flex;
-	-webkit-align-items: center;
-	-ms-flex-align: center;
-	align-items: center;
-	-webkit-justify-content: center; -ms-flex-pack : center;
-	justify-content : center;
 	padding: 0 15px 5px 15px;
-	-ms-flex-pack: center;
-	justify-content: center;
 }
 
 .piece_page_header_left {
