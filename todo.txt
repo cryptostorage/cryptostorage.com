@@ -1,4 +1,5 @@
 v0.3.0
+understand new bitcoinjs method of working with unchecked hex
 update home divide graphic
 cryptostorage logo not displayed during progress
 slider points cleanup

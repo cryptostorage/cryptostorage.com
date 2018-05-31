@@ -680,12 +680,12 @@ CryptoPiece.parseTextPiece = function(txt) {
 		for (var i = 0; i < annotatedText.getAnnotations().length; i++) {
 			var ann = annotatedText.getAnnotations()[i];
 			if (ann.getMetadata().type === "public_label") {
-				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);	// TODO: look for ':' for end index
+				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);
 				if (!nextValue) continue;
 				nextValue.getMetadata().type = "public_value";
 				annotatedValues.push(nextValue);
 			} else if (ann.getMetadata().type === "private_label") {
-				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);	// TODO: look for ':' for end index
+				var nextValue = getNextValueAnnotation(annotatedText, ann.getEndIdx() + 1);
 				if (!nextValue) continue;
 				nextValue.getMetadata().type = "private_value";
 				annotatedValues.push(nextValue);

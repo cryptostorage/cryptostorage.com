@@ -580,7 +580,7 @@ function BitcoinJsPlugin(ticker) {
 		var decoded = {};
 		
 		// bip38 wif
-		if (AppUtils.isBIP38Format(str)) {  // TODO: need to compress bip38 if unecompressed
+		if (AppUtils.isBIP38Format(str)) {
 			decoded.privateWif = str;
 			decoded.privateHex = AppUtils.toBase(58, 16, str);
 			decoded.publicAddress = undefined;
