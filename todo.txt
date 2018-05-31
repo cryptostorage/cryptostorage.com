@@ -18,9 +18,9 @@ weigh risk of incorrect keypair combining insufficient shares
 divide interoperability warning
 original design had groups that could be trashed.  How does that work with pieces?  Worth doing?
 split qr and lines white?
-crypto-cash faq and slider point
 reset button always visible?
 could show print preview right away then print button is progress bar
+cryptocash ideas, slider point
 
 v0.3.1
 could show print preview right away then print button is progress bar
