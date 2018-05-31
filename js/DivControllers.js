@@ -1265,7 +1265,8 @@ function FaqController(div) {
 				}, {
 					id: "faq_trust",
 					getQuestion: function() { return "How can I trust this tool?"; },
-					getAnswer: function() { return "<p>Don't trust.  Verify.  CryptoStorage is 100% open source which means anyone can review the source code.</p>" +
+					getAnswer: function() { return "<p>Don't trust.  Verify.</p>" + 
+					  "<p>CryptoStorage is 100% open source which means anyone can review the source code.</p>" +
 						"<p><a href='#faq_download_verify'>Downloading and verifying</a> the source code ensures you have a copy that has been publicly reviewed and has not been modified by an attacker.</p>"; }
 				}, {
 					id: "faq_trusted_third_party",

@@ -19,6 +19,7 @@ crypto-cash faq and slider point
 reset button always visible?
 
 v0.3.1
+bip39 appears vertically too high on standard keypair
 copied tooltip is not centered for some private keys because div goes under QR
 test encryption with full piece instead of piece per plugin
 ultra compact text
