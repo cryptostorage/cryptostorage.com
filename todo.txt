@@ -1,5 +1,8 @@
 v0.3.0
+address testing
 understand new bitcoinjs method of working with unchecked hex
+browser testing
+exhaustive tests
 cryptostorage logo not displayed during progress
 slider points cleanup
 recommend destroy printer for ultimate security
@@ -7,9 +10,6 @@ put homepage text in index.html and dynamically hide for seo
 upate readme.md
 update social logo
 update home divide graphic
-exhaustive tests
-address testing
-browser testing
 release
 
 designer:
