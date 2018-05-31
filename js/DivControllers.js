@@ -3065,12 +3065,22 @@ function EditorController(div, config) {
 	}
 		
 	function print() {
-		var printController = new EditorPrintController($("<div>"), currentPieces);
-		var popupController = new OverlayController(div, {contentDiv: printController.getDiv(), fullScreen: true, hideOnExternalClick: true});
-		printController.onPrint(popupController.destroy);
-		printController.onCancel(popupController.destroy);
-		printController.render();
+	  
+	  // print controller
+	  var printController = new EditorPrintController($("<div>"), currentPieces);
+    printController.onPrint(destroyPrint);
+    printController.onCancel(destroyPrint);
+    printController.render();
+    
+    // print setup goes in popup overlay
+	  var popupController = new OverlayController(div, {contentDiv: printController.getDiv(), fullScreen: true, hideOnExternalClick: true});
+    popupController.onHide(destroyPrint);
 		popupController.render();
+		
+		function destroyPrint() {
+		  popupController.destroy();
+		  printController.destroy();
+		}
 	}
 	
 	function reset() {
@@ -4699,10 +4709,7 @@ function EditorPrintController(div, pieces) {
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(body);
 		var cancelBtn = $("<div class='editor_export_btn_red flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(buttonsDiv);
 		cancelBtn.html("Cancel");
-		cancelBtn.click(function() {
-			if (pieceGenerator) pieceGenerator.destroy();
-			if (callbackFnCancel) callbackFnCancel();
-		});
+		cancelBtn.click(function() { if (callbackFnCancel) callbackFnCancel(); });
 		buttonsDiv.append($("<div style='width:150px;'>"));
 		printBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(buttonsDiv);
 		printBtn.html("Print");
@@ -4732,6 +4739,11 @@ function EditorPrintController(div, pieces) {
 	
 	this.onCancel = function(callbackFn) {
 		callbackFnCancel = callbackFn;
+	}
+	
+	this.destroy = function() {
+	  if (pieceGenerator) pieceGenerator.destroy();
+	  div.remove();
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
@@ -5440,10 +5452,12 @@ function StandardPieceRenderer(div, piece, config) {
 	 * Destroys the renderer.  Does not destroy the underlying piece.
 	 */
 	this.destroy = function() {
+	  console.log("Destroying!");
 		assertFalse(_isDestroyed, "StandardPieceRenderer already destroyed");
 		if (keypairRenderers) {
 			for (var i = 0; i < keypairRenderers.length; i++) keypairRenderers[i].destroy();
 		}
+		div.remove();
 		_isDestroyed = true;
 	}
 	
@@ -5723,6 +5737,7 @@ function StandardKeypairRenderer(div, keypair, config) {
 	 */
 	this.destroy = function () {
 		assertFalse(_isDestroyed, "StandardKeypairRenderer is already destroyed");
+		div.remove();
 		_isDestroyed = true;
 	}
 	

@@ -1111,6 +1111,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 
 .editor_content_div {
 	width: 100%;
+	background-color: white;
 }
 
 .editor_body_div {
