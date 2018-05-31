@@ -79,17 +79,19 @@ cryptostorage-v0.2.2-beta
 
 03/25/2018
 cryptostorage-v0.2.3-beta
-- Introducing crypto-cash.  A convenient format to print and tip people IRL :)
-- To generate crypto-cash, generate unencrypted storage and check the crypto-cash checkbox in the export tab
+- Introducing CryptoCash.  A convenient format to print and tip people IRL :)
+- To generate CryptoCash, generate unencrypted storage and check the CryptoCash checkbox in the export tab
 
-05/25/2018
+06/10/2018
 cryptostorage-v0.3.0-beta
-- New editor design!
+- Major redesign of dedicated tab for keypair generation and export
+- Print to standard, compact, and CryptoCash layouts with options
+- Import and export to/from JSON, CSV, and TXT
+- Import existing keys (e.g. BIP39 hardware wallet seeds) and re-export with passphrase encryption and division
+- Support direct links to keypair generation (e.g. cryptostorage.com/generate.html?tickers=xmr)
 - Added support for Dogecoin and Zcoin
-- Import BIP39 seeds and other private keys and re-export with encryption and/or splitting
-- Import from text
 - Refactored codebase to be more object-oriented
-- Minimum threshold no longer encoded in split shares
-- Switched from individual dependencies to BitcoinJS with extensible network configurations
-- Improved test suite to be more thorough
-- More thorough test suite
+- Replaced individual dependencies with BitcoinJS for extensible network configurations
+- Changed terminology from "split into pieces" to "divide into parts"
+- Updated test suite to be more exhaustive
+- Many other bug fixes and improvements
