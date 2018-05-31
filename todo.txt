@@ -1,4 +1,5 @@
 v0.3.0
+large piece chrome maximum call stack exceeded on compact with no logos or qrs
 slider points cleanup
 put homepage text in index.html and dynamically hide for seo
 update social logo
