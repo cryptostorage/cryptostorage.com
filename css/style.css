@@ -1844,6 +1844,9 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 @media screen and (max-device-width: 667px) {
+	body {
+    	-webkit-text-size-adjust: 100%;
+	}
 	.editor_div {
 		max-width: 900px;
 	}

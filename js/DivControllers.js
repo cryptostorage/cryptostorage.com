@@ -5868,7 +5868,6 @@ function CompactPieceRenderer(div, piece, config) {
 	assertTrue((config.showPrivate && !config.showPublic) || (!config.showPrivate && config.showPublic));
 	assertTrue(config.scratchpadParent.is(":visible"));
 	
-	var MAX_PAGE_HEIGHT = 948; // maximum height in pixels per page
 	var keypairRenderers;
 	var onProgressFn;
 	var _isDestroyed = false;
@@ -5934,6 +5933,7 @@ function CompactPieceRenderer(div, piece, config) {
         var keypairsRow;
         var tickers;
         var usedHeight = 0;
+        
         for (var i = 0; i < piece.getKeypairs().length; i++) {
           
           // determine height used by keypair row
@@ -5945,7 +5945,14 @@ function CompactPieceRenderer(div, piece, config) {
           }
           
           // add new page
-          if (i === 0 || (config.pageBreaks && usedHeight + rowHeight > MAX_PAGE_HEIGHT)) {
+          if (i === 0 || (config.pageBreaks && usedHeight + rowHeight > AppUtils.MAX_PAGE_HEIGHT)) {
+            
+//            // stretch last row to max height for testing
+//            if (i > 0) {
+//              var leftOver = AppUtils.MAX_PAGE_HEIGHT - usedHeight;
+//              results[i - 1][0].getDiv().css("height", Math.max(results[i - 2][1], results[i - 1][1]) + leftOver + "px");
+//            }
+            
             usedHeight = 0;
             var pageDiv = $("<div class='piece_page_div'>").appendTo(div);
             if (config.showLogos || piece.getPartNum()) {

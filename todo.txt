@@ -1,5 +1,5 @@
 v0.3.0
-mobile safari print can bleed into next page with XMR
+print screen preview height does not persist until next preview causing bounce
 slightly smaller compact key so unencrypted is on one line?
 slider points cleanup
 recommend destroy printer for ultimate security
@@ -22,8 +22,10 @@ original design had groups that could be trashed.  How does that work with piece
 split qr and lines white?
 crypto-cash faq and slider point
 reset button always visible?
+could show print preview right away then print button is progress bar
 
 v0.3.1
+could show print preview right away then print button is progress bar
 bip39 appears vertically too high on standard keypair
 copied tooltip is not centered for some private keys because div goes under QR
 test encryption with full piece instead of piece per plugin

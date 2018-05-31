@@ -44,7 +44,7 @@ var AppUtils = {
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
 	RUN_FULL_TESTS: false,
-	DEV_MODE: false,
+	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
@@ -62,6 +62,7 @@ var AppUtils = {
 	MAX_PARTS: 127,									  // maximum number of parts
 	//MAX_KEYPAIRS: 1000,							// limit max keypairs per currency selection
 	TICKERS_PARAM: "tickers",					// generate.html?tickers=xmr
+	MAX_PAGE_HEIGHT: 940,             // maximum print page height in pixels
 	
 	// urls
 	GITHUB_URL: "https://github.com/cryptostorage/cryptostorage.com",
