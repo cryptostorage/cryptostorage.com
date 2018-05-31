@@ -1,5 +1,5 @@
 v0.3.0
-safari print cancel save squish while switching layouts
+safari print cancel save squish while switching to last layout
 slider points cleanup
 put homepage text in index.html and dynamically hide for seo
 update social logo
