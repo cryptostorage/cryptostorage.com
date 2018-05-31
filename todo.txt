@@ -1,4 +1,5 @@
 v0.3.0
+cryptostorage logo not displayed during progress
 slider points cleanup
 recommend destroy printer for ultimate security
 put homepage text in index.html and dynamically hide for seo
