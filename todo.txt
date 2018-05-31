@@ -1,8 +1,5 @@
 v0.3.0
-address testing
-understand new bitcoinjs method of working with unchecked hex
 browser testing
-exhaustive tests
 cryptostorage logo not displayed during progress
 slider points cleanup
 recommend destroy printer for ultimate security
@@ -11,6 +8,9 @@ upate readme.md
 update social logo
 update home divide graphic
 release
+
+understand new bitcoinjs method of working with unchecked hex
+exhaustive tests
 
 designer:
 update home graphic to reflect new design? or keep as representation
