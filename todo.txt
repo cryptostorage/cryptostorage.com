@@ -1,4 +1,5 @@
 v0.3.0
+update home divide graphic
 cryptostorage logo not displayed during progress
 slider points cleanup
 recommend destroy printer for ultimate security
@@ -15,6 +16,7 @@ browser testing
 release
 
 designer:
+update home graphic to reflect new design? or keep as representation
 weigh risk of incorrect keypair combining insufficient shares
 divide interoperability warning
 original design had groups that could be trashed.  How does that work with pieces?  Worth doing?
