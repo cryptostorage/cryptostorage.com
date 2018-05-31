@@ -4681,10 +4681,10 @@ function EditorPrintController(div, pieces) {
 		
 		// checkboxes and radio buttons
 		var inputsDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
-		includePublicCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show public addresses").render();
-		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show private keys").render();
-		includePublicRadio = new RadioController($("<div class='editor_export_input'>").appendTo(inputsDiv), "include_radios", "Show public addresses").render();
-		includePrivateRadio = new RadioController($("<div class='editor_export_input'>").appendTo(inputsDiv), "include_radios", "Show private keys").render();
+		includePublicCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show public").render();
+		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show private").render();
+		includePublicRadio = new RadioController($("<div class='editor_export_input'>").appendTo(inputsDiv), "include_radios", "Show public").render();
+		includePrivateRadio = new RadioController($("<div class='editor_export_input'>").appendTo(inputsDiv), "include_radios", "Show private").render();
 		includeLogosCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show logos").render();
 		includeQrsCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(inputsDiv), "Show QRs").render();
 		if (cryptoCashApplies()) {
