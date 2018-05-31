@@ -1,12 +1,11 @@
 v0.3.0
-browser testing
-cryptostorage logo not displayed during progress
 slider points cleanup
 recommend destroy printer for ultimate security
 put homepage text in index.html and dynamically hide for seo
 upate readme.md
 update social logo
 update home divide graphic
+browser testing
 release
 
 understand new bitcoinjs method of working with unchecked hex

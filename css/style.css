@@ -1119,7 +1119,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .editor_body_div > div {
-	margin-top: 40px;
+	margin-top: 50px;
 }
 
 .editor_body_div > div:last-child {
@@ -1314,11 +1314,11 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .editor_progress_div {
-	margin-bottom: 40px;
+
 }
 
 .editor_progress_bar_div {
-	margin: 100px 0 10px 0;
+	margin: 0 0 10px 0;
 	width: 750px;
 	height: 50px;
 }

@@ -3156,7 +3156,7 @@ function EditorContentController(div, editorController, config) {
 				bodyDiv = $("<div class='editor_body_div flex_vertical flex_align_center'>").appendTo(div);
 				
 				// cryptostorage logo
-				logoHeader = $("<div class='piece_page_header_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(bodyDiv);
+				logoHeader = $("<div class='flex_horizontal flex_align_center flex_justify_center'>").appendTo(bodyDiv);
 				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
 				
 				// progress bar
@@ -3188,6 +3188,9 @@ function EditorContentController(div, editorController, config) {
 				$(window).resize(placeActionsController);
 				editorController.onSetCurrentPieces(setCurrentPieces);
 				editorController.onGenerateProgress(setGenerateProgress);
+				actionsController.onGenerate(function() {
+				  logoHeader.show();
+				});
 				
 				// listen for actions when editor ready
 				editorController.onReady(function() {
@@ -4149,7 +4152,7 @@ function EditorCurrenciesController(div, plugins) {
 		
 		// one of each link
 		if (AppUtils.DEV_MODE) {
-			var linksDiv = $("<div class='flex_horizontal flex_justify_end'>").appendTo(div);
+			var linksDiv = $("<div style='margin-top:-24px;' class='flex_horizontal flex_justify_end'>").appendTo(div);
 			var oneOfEachLink = $("<div class='form_link'>").appendTo(linksDiv);
 			oneOfEachLink.html("One of each");
 			oneOfEachLink.click(function() {
