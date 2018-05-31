@@ -5767,10 +5767,10 @@ StandardKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
 	assertInitialized(tickerOrKeypair);
 	if (isString(tickerOrKeypair)) {
 		var plugin = AppUtils.getCryptoPlugin(tickerOrKeypair);
-		return 10 * (plugin.isPublicApplicable() ? 2 : 1);
+		return 15 * (plugin.isPublicApplicable() ? 2 : 1);
 	} else {
 		assertObject(tickerOrKeypair, CryptoKeypair);
-		return (tickerOrKeypair.hasPublicAddress() ? 10 : 0) + (tickerOrKeypair.hasPrivateKey() ? 10 : 0); 
+		return (tickerOrKeypair.hasPublicAddress() ? 15 : 0) + (tickerOrKeypair.hasPrivateKey() ? 15 : 0); 
 	}
 }
 
