@@ -1,12 +1,12 @@
 v0.3.0
 understand new bitcoinjs method of working with unchecked hex
-update home divide graphic
 cryptostorage logo not displayed during progress
 slider points cleanup
 recommend destroy printer for ultimate security
 put homepage text in index.html and dynamically hide for seo
-update faq_key_pair -> faq_keypair
+upate readme.md
 update social logo
+update home divide graphic
 exhaustive tests
 address testing
 browser testing
