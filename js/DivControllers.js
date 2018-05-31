@@ -3188,9 +3188,6 @@ function EditorContentController(div, editorController, config) {
 				$(window).resize(placeActionsController);
 				editorController.onSetCurrentPieces(setCurrentPieces);
 				editorController.onGenerateProgress(setGenerateProgress);
-				actionsController.onGenerate(function() {
-				  logoHeader.show();
-				});
 				
 				// listen for actions when editor ready
 				editorController.onReady(function() {
@@ -3313,10 +3310,15 @@ function EditorContentController(div, editorController, config) {
 	}
 	
 	function setGenerateProgress(percent, label) {
+	  
+	  // show header
+    if (!logoHeader.is(":visible")) logoHeader.show();
+    
+    // set progress bar
 		progressBar.set(percent);
 		progressBar.setText(Math.round(percent * 100)  + "%");
 		progressLabel.html(label);
-		progressDiv.show();
+		if (!progressDiv.is(":visible")) progressDiv.show();
 		
 		// hide other elements
 		piecesDiv.hide();
