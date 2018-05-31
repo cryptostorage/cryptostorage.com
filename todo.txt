@@ -11,7 +11,12 @@ browser testing
 release
 
 designer:
+weigh risk of incorrect keypair combining insufficient shares
 divide interoperability warning
+original design had groups that could be trashed.  How does that work with pieces?  Worth doing?
+split qr and lines white?
+crypto-cash faq and slider point
+reset button always visible?
 
 v0.3.1
 copied tooltip is not centered for some private keys because div goes under QR
@@ -29,10 +34,8 @@ remove open-source from home notice graphic
 remove selected item from dropdown selection so no duplicate
 ie11 squished print header, scroll bar on progress
 text highlighted on click
-option to not show qrs in compact view
 reddit mobile app generate.html save silently fails
 preview overlay upper left?
-notice colors
 wait momentarily to let internet connect to avoid notice flicker
 plugins proper inheritance
 community paper wallet designs
@@ -48,13 +51,7 @@ InputLabelController.onChecked() only fires if changed
 custom error message for qrs not loading
 common show logos checkbox shares state with standard and compact layouts
 
-designer:
-split qr and lines white?
-crypto-cash faq and slider point
-reset button always visible?
-
 low priority:
-xmr address 486fREbiPAi9gWHRzkXZDpKb48kEJKgpVJu9BiRbvH1ZMCvUEwVx1SG3pp3564R6X27b464sNvR7ALSaR67ksMe5VobKu5P recognized as split share
 view balance qr code on cryptocash
 different print layouts
 blue link against red notice is hard to read
