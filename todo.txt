@@ -1,5 +1,6 @@
 v0.3.0
 slider points cleanup
+recommend destroy printer for ultimate security
 put homepage text in index.html and dynamically hide for seo
 update social logo
 test adblocker
