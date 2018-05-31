@@ -1154,7 +1154,7 @@ function FaqController(div) {
 			var pageDiv = $("<div class='page_div'>").appendTo(div);
 			
 			// title
-			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
+			var titleDiv = $("<div class='page_title'>").appendTo(pageDiv);
 			titleDiv.html("Frequently Asked Questions");
 			
 			// build questions and ansewrs
@@ -1489,7 +1489,7 @@ function DonateController(div, appController) {
 			var pageDiv = $("<div class='page_div'>").appendTo(div);
 
 			// build donate section
-			var titleDiv = $("<div class='title'>").appendTo(pageDiv);
+			var titleDiv = $("<div class='page_title'>").appendTo(pageDiv);
 			titleDiv.html("Donate");
 			var donations = [];
 			var plugins = AppUtils.getCryptoPlugins();
@@ -1506,7 +1506,7 @@ function DonateController(div, appController) {
 				
 				// build credits section
 				pageDiv.append("<br><br>");
-				titleDiv = $("<div class='title'>").appendTo(pageDiv);
+				titleDiv = $("<div class='page_title'>").appendTo(pageDiv);
 				titleDiv.html("Special Thanks To");
 				var credits = [];
 				credits.push({
