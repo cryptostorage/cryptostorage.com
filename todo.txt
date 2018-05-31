@@ -3,6 +3,7 @@ slightly smaller compact key so unencrypted is on one line?
 slider points cleanup
 recommend destroy printer for ultimate security
 put homepage text in index.html and dynamically hide for seo
+update faq_key_pair -> faq_keypair
 update social logo
 test adblocker
 todos in code
