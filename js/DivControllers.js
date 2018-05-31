@@ -4667,7 +4667,7 @@ function EditorPrintController(div, pieces) {
 		header.append("Print");
 		
 		// body
-		var body = $("<div class='editor_popup_body'>").appendTo(div);
+		var body = $("<div class='editor_popup_body editor_print_body'>").appendTo(div);
 		
 		// layout selector
 		var data = [];

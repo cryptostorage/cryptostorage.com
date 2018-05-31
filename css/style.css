@@ -1255,6 +1255,10 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	overflow-y: auto;
 }
 
+.editor_print_body {
+	min-width: 850px;
+}
+
 .editor_export_checkboxes {
 	flex-wrap: wrap;
 	max-width: 750px;
