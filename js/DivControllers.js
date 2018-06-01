@@ -3938,7 +3938,7 @@ function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 	var hasError;
 	var currencyError;
 	var numKeysError;
-	var currencyChangeListeners;
+	var inputChangeListeners;
 	var deleteListeners;
 	var formErrorChangeListeners;
 	
@@ -3950,7 +3950,7 @@ function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 		hasError = false;
 		currencyError = false;
 		numKeysError = false;
-		currencyChangeListeners = [];
+		inputChangeListeners = [];
 		deleteListeners = [];
 		formErrorChangeListeners = [];
 		
@@ -3972,7 +3972,10 @@ function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 		var rightDiv = $("<div class='currency_input_right_div'>").appendTo(div);
 		rightDiv.append("Keypairs to generate&nbsp;&nbsp;");
 		numKeysInput = $("<input class='num_keys_input' type='tel' value='1' min='1'>").appendTo(rightDiv);
-		numKeysInput.on("input", function(e) { validateNumKeys(true); });
+		numKeysInput.on("input", function(e) {
+		  invoke(inputChangeListeners);
+		  validateNumKeys(true);
+		});
 		numKeysInput.on("focusout", function(e) { validateNumKeys(false); });
 		rightDiv.append("&nbsp;&nbsp;");
 		trashDiv = $("<div class='trash_div'>").appendTo(rightDiv);
@@ -3987,9 +3990,9 @@ function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 		if (onDone) onDone(div);
 	};
 	
-	this.onCurrencyChange = function(listener) {
-		assertFunction(listener);
-		currencyChangeListeners.push(listener);
+	this.onInputChange = function(listener) {
+	  assertFunction(listener);
+	  inputChangeListeners.push(listener);
 	}
 	
 	this.onDelete = function(listener) {
@@ -4020,7 +4023,7 @@ function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 				defeaultSelectedIndex: null,
 				onSelected: function(selection) {
 					selectedPlugin = plugins[selection.selectedIndex];
-					invoke(currencyChangeListeners, ticker);
+					invoke(inputChangeListeners, ticker);
 					validateCurrency();
 				}
 			});
@@ -4035,7 +4038,7 @@ function EditorCurrencyController(div, plugins, defaultTicker, defaultNumKeys) {
 				if (selectorData[i].text === name) {
 					selector.ddslick('select', {index: i});
 					selectedPlugin = plugins[i];
-					invoke(currencyChangeListeners, ticker);
+					invoke(inputChangeListeners, ticker);
 					validateCurrency();
 					break;
 				}
@@ -4187,7 +4190,7 @@ function EditorCurrenciesController(div, plugins) {
 	this.add = function(ticker, numKepairs) {
 		var currencyInput = new EditorCurrencyController($("<div>"), plugins, ticker, numKepairs)
 		currencyInput.render();
-		currencyInput.onCurrencyChange(function() { invoke(inputChangeListeners); });
+		currencyInput.onInputChange(function() { invoke(inputChangeListeners); });
 		currencyInput.onDelete(function() { remove(currencyInput); });
 		currencyInput.onFormErrorChange(updateFormError);
 		currencyInput.getDiv().appendTo(currencyInputsDiv);
@@ -4375,6 +4378,7 @@ function EditorActionsController(div, editorController) {
 		editorController.onFormErrorChange(update);
 		editorController.getPassphraseController().onUsePassphraseChange(update);
 		editorController.getDividedController().onUseDividedChange(update);
+		if (editorController.getContentController().getCurrenciesController()) editorController.getContentController().getCurrenciesController().onInputChange(update);		
 		editorController.onGenerate(function(isQuick) {
 			if (isQuick) return;
 			btnCancel.show();
@@ -4425,14 +4429,24 @@ function EditorActionsController(div, editorController) {
 	
 	function update() {
 		btnCancel.hide();
+		
+		// show reset button if form state changed
+		if (editorController.getContentController().getCurrenciesController()) {
+		  var config = editorController.getContentController().getCurrenciesController().getConfig();
+		  var configModified = config.length !== 1 || config[0].ticker !== null || config[0].numKeypairs !== 1; 
+		}
+		if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided() || editorController.newPiecesGenerated() || configModified) {
+		  btnReset.show();
+		} else {
+		  btnReset.hide();
+		}
 				
 		// handle no imported pieces
 		if (!editorController.getImportedPieces()) {
 			btnApply.hide();
-			btnGenerate.html(editorController.getCurrentPieces() ? "Regenerate" : "Generate");
+			btnGenerate.html(editorController.newPiecesGenerated() ? "Regenerate" : "Generate");
 			btnGenerate.show();
 			btnGenerate.unbind("click");
-			btnReset.show();
 			if (editorController.hasFormError()) {
 				btnGenerate.addClass("btn_disabled");
 			} else {
@@ -4445,12 +4459,11 @@ function EditorActionsController(div, editorController) {
 		else {
 			btnGenerate.hide();
 			
-			// apply and reset shown if passphrase or divided checked
+			// apply shown iff passphrase or divided checked
 			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided()) {
 				btnApply.html(!editorController.newPiecesGenerated() ? "Apply" : "Reapply");
 				btnApply.show()
 				btnApply.unbind("click");
-				btnReset.show();
 				if (editorController.hasFormError()) {
 					btnApply.addClass("btn_disabled");
 				} else {
@@ -4459,7 +4472,6 @@ function EditorActionsController(div, editorController) {
 				}
 			} else {
 				btnApply.hide();
-				editorController.newPiecesGenerated() ? btnReset.show() : btnReset.hide();
 			}
 		}
 		
