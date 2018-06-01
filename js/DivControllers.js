@@ -3457,6 +3457,7 @@ function EditorPassphraseController(div, editorController) {
         invoke(inputChangeListeners);
 			}
 		});
+		bip38Checkbox.onChecked(function() { invoke(inputChangeListeners); });
 		
 		// listen for actions when editor ready
 		editorController.onReady(function() {
