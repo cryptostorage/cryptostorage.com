@@ -1,5 +1,5 @@
 v0.3.0
-always apply not reapply and only show if changes made
+passphrase and divide onInputChange
 uncheck bip38 on passphrase unchecked
 interoperability disclaimer bar when passphrase or divide checked first time
 show print preview when ready then print button becomes progress bar until ready
