@@ -4430,17 +4430,17 @@ function EditorActionsController(div, editorController) {
 	function update() {
 		btnCancel.hide();
 		
-		// determine if editor state modified
-		var isModified = false;
+		// determine if editor state has input
+		var hasInput = false;
 		if (editorController.getContentController().getCurrenciesController()) {
 		  var config = editorController.getContentController().getCurrenciesController().getConfig();
-		  isModified = config.length !== 1 || config[0].ticker !== null || config[0].numKeypairs !== 1; 
+		  hasInput = config.length !== 1 || config[0].ticker !== null || config[0].numKeypairs !== 1; 
 		}
-		isModified = isModified || editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided() || editorController.newPiecesGenerated();
+		hasInput = hasInput || editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided() || editorController.newPiecesGenerated();
 		
-		// show reset button iff modified
-		isModified ? btnReset.show() : btnReset.hide();
-				
+		// show reset button iff user input
+		hasInput ? btnReset.show() : btnReset.hide();
+		
 		// handle no imported pieces
 		if (!editorController.getImportedPieces()) {
 			btnApply.hide();
@@ -4450,6 +4450,7 @@ function EditorActionsController(div, editorController) {
 			if (editorController.hasFormError()) {
 				btnGenerate.addClass("btn_disabled");
 			} else {
+			  hasInput ? btnGenerate.addClass("editor_btn_green_pulse") : btnGenerate.removeClass("editor_btn_green_pulse");
 				btnGenerate.removeClass("btn_disabled");
 				btnGenerate.click(function() { invoke(generateListeners); });
 			}
@@ -4467,6 +4468,7 @@ function EditorActionsController(div, editorController) {
 				if (editorController.hasFormError()) {
 					btnApply.addClass("btn_disabled");
 				} else {
+				  hasInput ? btnApply.addClass("editor_btn_green_pulse") : btnApply.removeClass("editor_btn_green_pulse");
 					btnApply.removeClass("btn_disabled");
 					btnApply.click(function() { invoke(applyListeners); });
 				}
