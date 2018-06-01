@@ -1,4 +1,16 @@
 v0.3.0
+keynote with all designs
+only show reset button if action taken
+pulse generate button to lighter green on change
+always apply not reapply and only show if changes made
+interoperability disclaimer bar when passphrase or divide checked first time
+show print preview when ready then print button becomes progress bar until ready
+alert when regenerating keypairs
+alert when reapplying keypairs
+divide part checksum instead of min part encoding
+
+switch to bitcoinjs buffer instead of to/from unchecked hex
+exhaustive tests
 slider points cleanup
 recommend destroy printer for ultimate security
 put homepage text in index.html and dynamically hide for seo
@@ -7,20 +19,19 @@ update home divide graphic
 browser testing
 release
 
-understand new bitcoinjs method of working with unchecked hex
-exhaustive tests
-
 designer:
-update home graphic to reflect new design? or keep as representation
-weigh risk of incorrect keypair combining insufficient shares
-divide interoperability warning
-original design had groups that could be trashed.  How does that work with pieces?  Worth doing?
-split qr and lines white?
-reset button always visible?
+update home graphic to reflect new design? or keep as representation - going to sketch
+weigh risk of incorrect keypair combining insufficient shares - encode keypair hash into split part as checksum?
+divide interoperability warning - see screenshot
+original design had groups that could be trashed.  How does that work with pieces?  Worth doing? - design wip
+split qr and lines white? - keep black
+reset button always visible? - reset
 could show print preview right away then print button is progress bar
 cryptocash ideas, slider point
 
 v0.3.1
+better cryptocash design
+dynamic editor with horizontal groupings (designer todo)
 qr scanner
 could show print preview right away then print button is progress bar
 bip39 appears vertically too high on standard keypair
