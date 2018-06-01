@@ -2977,9 +2977,9 @@ function EditorController(div, config) {
 			}
 		}
 		
-		// handle no imported pieces
-		else {
-			
+		// handle no imported pieces which uses currency inputs
+		else if (contentController.getCurrenciesController()) {
+		  
 			// set keypairs
 			config.keypairs = contentController.getCurrenciesController().getConfig();
 			
@@ -4447,6 +4447,9 @@ function EditorActionsController(div, editorController) {
 		// determine if configuration has changed since last time generate button clicked
     var generateConfigChanged = false;
     if (lastGenerateConfig) generateConfigChanged = !equals(editorController.getGenerateConfig(), lastGenerateConfig)
+    console.log(lastGenerateConfig);
+    console.log(editorController.getGenerateConfig());
+    console.log(generateConfigChanged);
 		
 		// show reset button iff user input
 		isReset ? btnReset.hide() : btnReset.show();
@@ -4480,7 +4483,7 @@ function EditorActionsController(div, editorController) {
 					btnApply.addClass("btn_disabled");
 				} else {
 					btnApply.removeClass("btn_disabled");
-	        if (!isReset) btnApply.addClass("editor_btn_green_pulse");
+	        if (generateConfigChanged) btnApply.addClass("editor_btn_green_pulse");
 					btnApply.click(function() { invoke(applyListeners); });
 				}
 			} else {

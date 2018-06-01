@@ -7,6 +7,7 @@ alert when regenerating keypairs
 alert when reapplying keypairs
 divide part checksum instead of min part encoding
 
+copied tooltip is not centered for some private keys because div goes under QR
 deepen / brighten hover state of red and blue export buttons
 switch to bitcoinjs buffer instead of to/from unchecked hex
 exhaustive tests
@@ -34,7 +35,6 @@ dynamic editor with horizontal groupings (designer todo)
 qr scanner
 could show print preview right away then print button is progress bar
 bip39 appears vertically too high on standard keypair
-copied tooltip is not centered for some private keys because div goes under QR
 test encryption with full piece instead of piece per plugin
 ultra compact text
 what takes the most time within testPieceWithoutEncryption() with large test set
