@@ -3619,7 +3619,7 @@ function EditorPassphraseController(div, editorController) {
 		var interoperableDiv = $("<div style='font-size:20px; text-align:center'>Encrypted keys may not be interoperable with other tools.&nbsp;&nbsp;</div>").appendTo(bodyDiv);
 		var learnMoreLink = $("<a style='font-size:20px;' target='_blank' href='index.html#faq_interoperable'>Learn more</a>").appendTo(div);
 		interoperableDiv.append(learnMoreLink);
-		var okButton = $("<div style='font-size:22px;' class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(bodyDiv);
+		var okButton = $("<div style='font-size:22px;' class='editor_btn_green editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(bodyDiv);
 		okButton.append("Okay, I understand the risk");
 		okButton.click(onAgree);
 		return div;
@@ -4566,7 +4566,7 @@ function EditorSaveController(div, pieces) {
 		cancelBtn.html("Cancel");
 		cancelBtn.click(function() { if (callbackFnCancel) callbackFnCancel(); });
 		buttonsDiv.append($("<div style='width:150px;'>"));
-		saveBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(buttonsDiv);
+		saveBtn = $("<div class='editor_btn_green editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(buttonsDiv);
 		saveBtn.html("Save");
 		
 		// register changes
@@ -4755,7 +4755,7 @@ function EditorPrintController(div, pieces) {
 		cancelBtn.html("Cancel");
 		cancelBtn.click(function() { if (callbackFnCancel) callbackFnCancel(); });
 		buttonsDiv.append($("<div style='width:150px;'>"));
-		printBtn = $("<div class='editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(buttonsDiv);
+		printBtn = $("<div class='editor_btn_green editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(buttonsDiv);
 		printBtn.html("Print");
 		
 		// register changes

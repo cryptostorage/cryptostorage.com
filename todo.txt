@@ -1,5 +1,4 @@
 v0.3.0
-generate button not highlighting on hover
 pulse generate button to lighter green on change
 always apply not reapply and only show if changes made
 uncheck bip38 on passphrase unchecked
@@ -9,6 +8,7 @@ alert when regenerating keypairs
 alert when reapplying keypairs
 divide part checksum instead of min part encoding
 
+deepen / brighten hover state of red and blue export buttons
 switch to bitcoinjs buffer instead of to/from unchecked hex
 exhaustive tests
 slider points cleanup

@@ -1137,7 +1137,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	right: 40px;
 }
 
-.editor_btn_green_pulse {
+.editor_btn_green_pulse:not(:hover) {
 	animation: green_pulse 1s infinite alternate;
 }
 
@@ -1155,7 +1155,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .editor_btn_green:hover {
-	background-color: rgb(121, 234, 87);
+	background-color: rgb(141, 244, 97);
 	cursor: pointer;
 }
 
@@ -1206,11 +1206,6 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	width: 100%;
 }
 
-.editor_export_btn_green:hover {
-	background-color: rgb(121, 234, 87);
-	cursor: pointer;
-}
-
 .editor_export_btn_green:active {
 	background-color: rgb(81, 194, 47);
 }
@@ -1249,7 +1244,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 .editor_popup_body {
 	padding: 30px 50px 30px 50px;
 	background-color: white;
-	min-width: 600px;
+	min-width: 700px;
 }
 
 .editor_popup_body > div {
