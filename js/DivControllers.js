@@ -3445,7 +3445,8 @@ function EditorPassphraseController(div, editorController) {
 					disclaimerPopup.destroy();
 				});
 			} else {
-				passphraseCheckbox.isChecked() ? passphraseInput.focus() : that.setPassphraseVisible(false);
+			  if (passphraseCheckbox.isChecked()) passphraseInput.focus();
+			  else that.setPassphraseVisible(false);
 				setFormError(false);
 				invoke(usePassphraseListeners);
 			}
