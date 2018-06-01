@@ -1114,6 +1114,16 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	background-color: white;
 }
 
+.editor_interoperable_disclaimer {
+	font-size: 16px;
+	background-color: rgb(255, 250, 208);
+	padding: 10px;
+}
+
+.editor_interoperable_subtitle {
+	font-size: 14px;
+}
+
 .editor_body_div {
 	width: 750px;
 }

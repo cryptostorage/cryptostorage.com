@@ -3136,6 +3136,7 @@ function EditorContentController(div, editorController, config) {
 	var currenciesController;
 	var actionsController;
 	var pieceRenderers;
+	var interoperableDisclaimerDiv;
 	
 	this.render = function(onDone) {
 		
@@ -3165,7 +3166,12 @@ function EditorContentController(div, editorController, config) {
 			}
 			
 			function renderAux() {
-				
+			  
+			  // interoperability disclaimr
+			  interoperableDisclaimerDiv = $("<div class='editor_interoperable_disclaimer flex_vertical flex_align_center width_100'>").appendTo(div);
+			  interoperableDisclaimerDiv.append("Passphrase encryption and keypair division may not be interoperable with other tools");
+			  interoperableDisclaimerDiv.append($("<div class='editor_interoperable_subtitle'>Learn More</div>"));
+			  
 				// editor body div
 				bodyDiv = $("<div class='editor_body_div flex_vertical flex_align_center'>").appendTo(div);
 				
