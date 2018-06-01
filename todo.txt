@@ -1,6 +1,7 @@
 v0.3.0
 pulse generate button to lighter green on change
 always apply not reapply and only show if changes made
+uncheck bip38 on passphrase unchecked
 interoperability disclaimer bar when passphrase or divide checked first time
 show print preview when ready then print button becomes progress bar until ready
 alert when regenerating keypairs

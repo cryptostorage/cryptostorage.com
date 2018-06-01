@@ -2914,6 +2914,18 @@ function EditorController(div, config) {
 		return importedPieceDivs;
 	}
 	
+	this.isReset = function() {
+	  var config = that.getGenerateConfig();
+	  if (isDefined(config.passphrase)) return false;
+    if (isDefined(config.numParts)) return false;
+    if (config.keypairs) {
+      if (config.keypairs.length !== 1) return false;
+      if (config.keypairs[0].ticker) return false;
+      if (config.keypairs[0].numKeypairs !== 1) return false;
+    }     
+    return true;
+	}
+	
 	this.newPiecesGenerated = function() {
 		return !equals(this.getCurrentPieces(), this.getImportedPieces());
 	}
@@ -2938,7 +2950,6 @@ function EditorController(div, config) {
 	}
 	
 	this.getGenerateConfig = function() {
-		assertFalse(that.hasFormError());
 		var config = {};
 		
 		// set passphrase
@@ -2973,6 +2984,7 @@ function EditorController(div, config) {
 			// set keypair encryption
 			for (var i = 0; i < config.keypairs.length; i++) {
 				var keypair = config.keypairs[i];
+				if (!keypair.ticker) continue;
 				if (passphraseController.getUsePassphrase()) {
 					if (passphraseController.getBip38Checkbox().isChecked() && arrayContains(AppUtils.getCryptoPlugin(keypair.ticker).getEncryptionSchemes(), AppUtils.EncryptionScheme.BIP38)) {
 						keypair.encryption = AppUtils.EncryptionScheme.BIP38;
@@ -3663,7 +3675,6 @@ function EditorDivideController(div, editorController) {
 		// register inputs
 		divideCheckbox.onChecked(function(event, isChecked) {
 			setFormError(false);
-			invoke(useDivideListeners);
 			if (isChecked) {
 			  numPartsInput.focus();
         numPartsInput.val(numPartsVal);
@@ -3674,6 +3685,7 @@ function EditorDivideController(div, editorController) {
         numPartsInput.val("");
         minPartsInput.val("");
       }
+	    invoke(useDivideListeners);
 		});
 		numPartsInput.on("input", function(e) { validate(true); });
 		numPartsInput.on("focusout", function(e) { validate(false); });
@@ -4428,17 +4440,15 @@ function EditorActionsController(div, editorController) {
 	
 	function update() {
 		btnCancel.hide();
-		
-		// determine if editor state has input
-		var hasInput = false;
-		if (editorController.getContentController().getCurrenciesController()) {
-		  var config = editorController.getContentController().getCurrenciesController().getConfig();
-		  hasInput = config.length !== 1 || config[0].ticker !== null || config[0].numKeypairs !== 1; 
-		}
-		hasInput = hasInput || editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided() || editorController.newPiecesGenerated();
+	  
+		// get editor generation config
+		var config = editorController.getGenerateConfig();
+
+		// determine if editor state has changed
+		var isReset = editorController.isReset();
 		
 		// show reset button iff user input
-		hasInput ? btnReset.show() : btnReset.hide();
+		isReset ? btnReset.hide() : btnReset.show();
 		
 		// handle no imported pieces
 		if (!editorController.getImportedPieces()) {
@@ -4446,11 +4456,12 @@ function EditorActionsController(div, editorController) {
 			btnGenerate.html(editorController.newPiecesGenerated() ? "Regenerate" : "Generate");
 			btnGenerate.show();
 			btnGenerate.unbind("click");
+			btnGenerate.removeClass("editor_btn_green_pulse");
 			if (editorController.hasFormError()) {
 				btnGenerate.addClass("btn_disabled");
 			} else {
-			  hasInput ? btnGenerate.addClass("editor_btn_green_pulse") : btnGenerate.removeClass("editor_btn_green_pulse");
 				btnGenerate.removeClass("btn_disabled");
+        if (!isReset) btnGenerate.addClass("editor_btn_green_pulse");
 				btnGenerate.click(function() { invoke(generateListeners); });
 			}
 		}
@@ -4463,11 +4474,12 @@ function EditorActionsController(div, editorController) {
 			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided()) {
 				btnApply.show()
 				btnApply.unbind("click");
+				btnApply.removeClass("editor_btn_green_pulse");
 				if (editorController.hasFormError()) {
 					btnApply.addClass("btn_disabled");
 				} else {
-				  hasInput ? btnApply.addClass("editor_btn_green_pulse") : btnApply.removeClass("editor_btn_green_pulse");
 					btnApply.removeClass("btn_disabled");
+	        if (!isReset) btnApply.addClass("editor_btn_green_pulse");
 					btnApply.click(function() { invoke(applyListeners); });
 				}
 			} else {

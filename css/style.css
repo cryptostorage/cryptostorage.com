@@ -1137,23 +1137,6 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	right: 40px;
 }
 
-.editor_btn_green {
-	color: white;
-	background-color: rgb(101, 214, 67);
-	padding: 18px;
-	font-size: 30px;
-	font-weight: bold;
-}
-
-.editor_btn_green:hover {
-	background-color: rgb(121, 234, 87) !important;
-	cursor: pointer !important;
-}
-
-.editor_btn_green:active {
-	background-color: rgb(81, 194, 47);
-}
-
 .editor_btn_green_pulse {
 	animation: green_pulse 1s infinite alternate;
 }
@@ -1168,6 +1151,23 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
   100% {
     background-color: rgb(141, 244, 97);
   }
+}
+
+.editor_btn_green {
+	color: white;
+	background-color: rgb(101, 214, 67);
+	padding: 18px;
+	font-size: 30px;
+	font-weight: bold;
+}
+
+.editor_btn_green:hover {
+	background-color: rgb(121, 234, 87);
+	cursor: pointer;
+}
+
+.editor_btn_green:active {
+	background-color: rgb(81, 194, 47);
 }
 
 .editor_btn_red {
