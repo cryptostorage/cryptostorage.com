@@ -1162,7 +1162,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
   0% {
     background-color: rgb(101, 214, 67);
   }
-  50% {
+  30% {
   	background-color: rgb(101, 214, 67);
   }
   100% {

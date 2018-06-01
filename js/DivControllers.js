@@ -4339,12 +4339,11 @@ function EditorActionsController(div, editorController) {
 		printListeners = [];
 		
 		// generate button
-		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
-		btnGenerate.appendTo(div);
+		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>").appendTo(div);
 		
 		// apply button
-		btnApply = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>");
-		btnApply.appendTo(div);
+		btnApply = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>").appendTo(div)
+		btnApply.html("Apply");
 		
 		// reset button
 		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
@@ -4462,7 +4461,6 @@ function EditorActionsController(div, editorController) {
 			
 			// apply shown iff passphrase or divided checked
 			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided()) {
-				btnApply.html(!editorController.newPiecesGenerated() ? "Apply" : "Reapply");
 				btnApply.show()
 				btnApply.unbind("click");
 				if (editorController.hasFormError()) {
