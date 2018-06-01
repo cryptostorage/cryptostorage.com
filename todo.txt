@@ -1,5 +1,4 @@
 v0.3.0
-keynote with all designs
 only show reset button if action taken
 pulse generate button to lighter green on change
 always apply not reapply and only show if changes made
