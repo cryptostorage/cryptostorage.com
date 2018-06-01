@@ -4332,6 +4332,7 @@ function EditorActionsController(div, editorController) {
 	var savePrintDiv;
 	var btnSave;
 	var btnPrint;
+	var lastGenerateConfig;
 	var generateListeners;
 	var applyLiseners;
 	var resetListeners;
@@ -4350,6 +4351,7 @@ function EditorActionsController(div, editorController) {
 		cancelListeners = [];
 		saveListeners = [];
 		printListeners = [];
+		lastGenerateConfig = editorController.getGenerateConfig();
 		
 		// generate button
 		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>").appendTo(div);
@@ -4388,7 +4390,7 @@ function EditorActionsController(div, editorController) {
 		// register callbacks
 		editorController.onSetCurrentPieces(update);
 		editorController.onFormErrorChange(update);
-		editorController.getPassphraseController().onUsePassphraseChange(update);
+		editorController.getPassphraseController().onUsePassphraseChange(update); // TODO: register for all input changes
 		editorController.getDividedController().onUseDividedChange(update);
 		if (editorController.getContentController().getCurrenciesController()) editorController.getContentController().getCurrenciesController().onInputChange(update);		
 		editorController.onGenerate(function(isQuick) {
@@ -4441,12 +4443,12 @@ function EditorActionsController(div, editorController) {
 	
 	function update() {
 		btnCancel.hide();
+		
+		// determine if editor is in initial state
+    var isReset = editorController.isReset();
 	  
-		// get editor generation config
-		var config = editorController.getGenerateConfig();
-
-		// determine if editor state has changed
-		var isReset = editorController.isReset();
+		// determine if configuration has changed since last time generate button clicked
+		var generateConfigChanged = !equals(editorController.getGenerateConfig(), lastGenerateConfig);
 		
 		// show reset button iff user input
 		isReset ? btnReset.hide() : btnReset.show();
@@ -4462,8 +4464,11 @@ function EditorActionsController(div, editorController) {
 				btnGenerate.addClass("btn_disabled");
 			} else {
 				btnGenerate.removeClass("btn_disabled");
-        if (!isReset) btnGenerate.addClass("editor_btn_green_pulse");
-				btnGenerate.click(function() { invoke(generateListeners); });
+        if (generateConfigChanged) btnGenerate.addClass("editor_btn_green_pulse");
+				btnGenerate.click(function() {
+		      lastGenerateConfig = editorController.getGenerateConfig();
+				  invoke(generateListeners);
+				});
 			}
 		}
 		
