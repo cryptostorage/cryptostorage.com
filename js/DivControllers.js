@@ -2916,6 +2916,7 @@ function EditorController(div, config) {
 	
 	this.isReset = function() {
 	  var config = that.getGenerateConfig();
+	  if (that.hasFormError()) return false;
 	  if (isDefined(config.passphrase)) return false;
     if (isDefined(config.numParts)) return false;
     if (that.newPiecesGenerated()) return false;
