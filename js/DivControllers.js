@@ -4365,11 +4365,7 @@ function EditorActionsController(div, editorController) {
 		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
 		btnReset.append("Reset");
 		btnReset.appendTo(div);
-		btnReset.click(function() {
-			if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
-				invoke(resetListeners);
-			}
-		});
+		btnReset.click(reset);
 		
 		// cancel button
 		btnCancel =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
@@ -4449,7 +4445,8 @@ function EditorActionsController(div, editorController) {
     var isReset = editorController.isReset();
 	  
 		// determine if configuration has changed since last time generate button clicked
-		var generateConfigChanged = !equals(editorController.getGenerateConfig(), lastGenerateConfig);
+    var generateConfigChanged = false;
+    if (lastGenerateConfig) generateConfigChanged = !equals(editorController.getGenerateConfig(), lastGenerateConfig)
 		
 		// show reset button iff user input
 		isReset ? btnReset.hide() : btnReset.show();
@@ -4466,10 +4463,7 @@ function EditorActionsController(div, editorController) {
 			} else {
 				btnGenerate.removeClass("btn_disabled");
         if (generateConfigChanged) btnGenerate.addClass("editor_btn_green_pulse");
-				btnGenerate.click(function() {
-		      lastGenerateConfig = editorController.getGenerateConfig();
-				  invoke(generateListeners);
-				});
+				btnGenerate.click(generate);
 			}
 		}
 		
@@ -4496,6 +4490,20 @@ function EditorActionsController(div, editorController) {
 		
 		// update save print buttons
 		editorController.getCurrentPieces() ? savePrintDiv.show() : savePrintDiv.hide();
+	}
+	
+	// --------------------------------- PRIVATE --------------------------------
+	
+	function reset() {
+	  if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
+      lastGenerateConfig = null;
+      invoke(resetListeners);
+    }
+	}
+	
+	function generate() {
+	  lastGenerateConfig = editorController.getGenerateConfig();
+    invoke(generateListeners);
 	}
 }
 inheritsFrom(EditorActionsController, DivController);
