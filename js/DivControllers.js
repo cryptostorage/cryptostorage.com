@@ -4430,16 +4430,16 @@ function EditorActionsController(div, editorController) {
 	function update() {
 		btnCancel.hide();
 		
-		// show reset button if form state changed
+		// determine if editor state modified
+		var isModified = false;
 		if (editorController.getContentController().getCurrenciesController()) {
 		  var config = editorController.getContentController().getCurrenciesController().getConfig();
-		  var configModified = config.length !== 1 || config[0].ticker !== null || config[0].numKeypairs !== 1; 
+		  isModified = config.length !== 1 || config[0].ticker !== null || config[0].numKeypairs !== 1; 
 		}
-		if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided() || editorController.newPiecesGenerated() || configModified) {
-		  btnReset.show();
-		} else {
-		  btnReset.hide();
-		}
+		isModified = isModified || editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided() || editorController.newPiecesGenerated();
+		
+		// show reset button iff modified
+		isModified ? btnReset.show() : btnReset.hide();
 				
 		// handle no imported pieces
 		if (!editorController.getImportedPieces()) {
