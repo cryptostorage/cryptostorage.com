@@ -634,8 +634,9 @@ function equals(arg1, arg2) {
  * @returns true if the maps have identical keys and values, false otherwise
  */
 function objectsEqual(map1, map2) {
-	if (map1.size !== map2.size) return false;
-	for (var i = 0; i < Object.keys(map1).length; i++) {
+	var keys1 = Object.keys(map1);
+	if (keys1.length !== Object.keys(map2).length) return false;
+	for (var i = 0; i < keys1.length; i++) {
 		var key = Object.keys(map1)[i];
 		if (!equals(map1[key], map2[key])) return false;
 	}

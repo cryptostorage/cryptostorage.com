@@ -4352,7 +4352,7 @@ function EditorActionsController(div, editorController) {
 		cancelListeners = [];
 		saveListeners = [];
 		printListeners = [];
-		lastGenerateConfig = editorController.getGenerateConfig();
+		lastGenerateConfig = null;
 		
 		// generate button
 		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>").appendTo(div);
@@ -4446,9 +4446,11 @@ function EditorActionsController(div, editorController) {
 	  
 		// determine if configuration has changed since last time generate button clicked
     var generateConfigChanged = false;
-    if (lastGenerateConfig) generateConfigChanged = !equals(editorController.getGenerateConfig(), lastGenerateConfig)
+    var generateConfig = getInputGenerateConfig();
     console.log(lastGenerateConfig);
-    console.log(editorController.getGenerateConfig());
+    console.log(generateConfig);
+    console.log(equals(generateConfig, lastGenerateConfig));
+    generateConfigChanged = !equals(generateConfig, lastGenerateConfig);
     console.log(generateConfigChanged);
 		
 		// show reset button iff user input
@@ -4484,7 +4486,7 @@ function EditorActionsController(div, editorController) {
 				} else {
 					btnApply.removeClass("btn_disabled");
 	        if (generateConfigChanged) btnApply.addClass("editor_btn_green_pulse");
-					btnApply.click(function() { invoke(applyListeners); });
+					btnApply.click(apply);
 				}
 			} else {
 				btnApply.hide();
@@ -4504,9 +4506,20 @@ function EditorActionsController(div, editorController) {
     }
 	}
 	
+	function getInputGenerateConfig() {
+	  var config = Object.assign(editorController.getGenerateConfig());
+	  delete config.pieces;  // pieces are not part of user form input
+	  return config;
+	}
+	
 	function generate() {
-	  lastGenerateConfig = editorController.getGenerateConfig();
+	  lastGenerateConfig = getInputGenerateConfig();
     invoke(generateListeners);
+	}
+	
+	function apply() {
+	  lastGenerateConfig = getInputGenerateConfig();
+    invoke(applyListeners);
 	}
 }
 inheritsFrom(EditorActionsController, DivController);
