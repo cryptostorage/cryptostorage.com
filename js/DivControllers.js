@@ -3379,8 +3379,9 @@ function EditorPassphraseController(div, editorController) {
 	var bip38Div;
 	var bip38Checkbox;
 	var hasError;
-	var formErrorChangeListeners;
+	var inputChangeListeners;
 	var usePassphraseListeners;
+	var formErrorChangeListeners;
 	var riskAccepted;
 
 	this.render = function(onDone) {
@@ -3389,8 +3390,9 @@ function EditorPassphraseController(div, editorController) {
 		div.empty();
 		div.addClass("editor_passphrase_div flex_horizontal flex_align_center flex_justify_start");
 		hasError = false;
-		formErrorChangeListeners = [];
+		inputChangeListeners = [];
 		usePassphraseListeners = [];
+    formErrorChangeListeners = [];
 		
 		// passphrase checkbox
 		riskAccepted = false;
@@ -3432,7 +3434,10 @@ function EditorPassphraseController(div, editorController) {
 		});
 		
 		// register callbacks
-		passphraseInput.on("input", function(e) { setFormError(false); });
+		passphraseInput.on("input", function(e) {
+		  setFormError(false);
+		  invoke(inputChangeListeners);
+		});
 		passphraseCheckbox.onChecked(function(e) {
 			if (passphraseCheckbox.isChecked() && !riskAccepted) {
 				e.preventDefault();
@@ -3449,6 +3454,7 @@ function EditorPassphraseController(div, editorController) {
 			  else that.setPassphraseVisible(false);
 				setFormError(false);
 				invoke(usePassphraseListeners);
+        invoke(inputChangeListeners);
 			}
 		});
 		
@@ -3493,6 +3499,11 @@ function EditorPassphraseController(div, editorController) {
 	
 	this.setUsePassphrase = function(checked) {
 		passphraseCheckbox.setChecked(checked);
+	}
+	
+	this.onInputChange = function(listener) {
+	  assertFunction(listener);
+	  inputChangeListeners.push(listener);
 	}
 	
 	this.setPassphraseVisible = function(bool) {
@@ -3645,8 +3656,9 @@ function EditorDivideController(div, editorController) {
 	var numPartsVal;
 	var minPartsVal;
 	var hasError;
-	var formErrorChangeListeners;
+	var inputChangeListeners;
 	var useDivideListeners;
+	var formErrorChangeListeners;
 	
 	this.render = function(onDone) {
 		
@@ -3654,8 +3666,9 @@ function EditorDivideController(div, editorController) {
 		div.empty();
 		div.addClass("editor_divide_div flex_horizontal flex_align_center flex_justify_start");
 		hasError = false;
+		inputChangeListeners = [];
+    useDivideListeners = [];
 		formErrorChangeListeners = [];
-		useDivideListeners = [];
 		
 		// divide input
 		divideCheckbox = new CheckboxController($("<div>").appendTo(div), "Divide Keypairs?", UiUtils.getDivideDescription(true)).render();
@@ -3689,10 +3702,11 @@ function EditorDivideController(div, editorController) {
         minPartsInput.val("");
       }
 	    invoke(useDivideListeners);
+	    invoke(inputChangeListeners);
 		});
-		numPartsInput.on("input", function(e) { validate(true); });
-		numPartsInput.on("focusout", function(e) { validate(false); });
-		minPartsInput.on("input", function(e) { validate(true); });
+		numPartsInput.on("input", function(e) { validate(true); invoke(inputChangeListeners); });
+		numPartsInput.on("focusout", function(e) { validate(false);});
+		minPartsInput.on("input", function(e) { validate(true); invoke(inputChangeListeners); });
 		minPartsInput.on("focusout", function(e) { validate(false); });
 		
 		// listen for actions when editor ready
@@ -3741,6 +3755,11 @@ function EditorDivideController(div, editorController) {
 	this.setUseDivided = function(bool) {
 		divideCheckbox.setChecked(bool);
   }
+	
+	this.onInputChange = function(listener) {
+	  assertFunction(listener);
+	  inputChangeListeners.push(listener);
+	}
 	
 	this.getNumPieces = function() {
 		var numParts = Number(numPartsInput.val());
@@ -4353,7 +4372,6 @@ function EditorActionsController(div, editorController) {
 		cancelListeners = [];
 		saveListeners = [];
 		printListeners = [];
-		lastGenerateConfig = null;
 		
 		// generate button
 		btnGenerate = $("<div class='editor_btn_green flex_horizontal flex_justify_center user_select_none'>").appendTo(div);
@@ -4388,9 +4406,9 @@ function EditorActionsController(div, editorController) {
 		// register callbacks
 		editorController.onSetCurrentPieces(update);
 		editorController.onFormErrorChange(update);
-		editorController.getPassphraseController().onUsePassphraseChange(update); // TODO: register for all input changes
-		editorController.getDividedController().onUseDividedChange(update);
-		if (editorController.getContentController().getCurrenciesController()) editorController.getContentController().getCurrenciesController().onInputChange(update);		
+    editorController.getPassphraseController().onInputChange(update);
+		editorController.getDividedController().onInputChange(update);
+		if (editorController.getContentController().getCurrenciesController()) editorController.getContentController().getCurrenciesController().onInputChange(update);
 		editorController.onGenerate(function(isQuick) {
 			if (isQuick) return;
 			btnCancel.show();
@@ -4401,7 +4419,7 @@ function EditorActionsController(div, editorController) {
 		});
 		
 		// initial state
-		update();
+		reset();
 		
 		// done rendering
 		if (onDone) onDone();
@@ -4448,11 +4466,7 @@ function EditorActionsController(div, editorController) {
 		// determine if configuration has changed since last time generate button clicked
     var generateConfigChanged = false;
     var generateConfig = getInputGenerateConfig();
-    console.log(lastGenerateConfig);
-    console.log(generateConfig);
-    console.log(equals(generateConfig, lastGenerateConfig));
     generateConfigChanged = !equals(generateConfig, lastGenerateConfig);
-    console.log(generateConfigChanged);
 		
 		// show reset button iff user input
 		isReset ? btnReset.hide() : btnReset.show();
@@ -4500,27 +4514,28 @@ function EditorActionsController(div, editorController) {
 	
 	// --------------------------------- PRIVATE --------------------------------
 	
+	 function getInputGenerateConfig() {
+	    var config = Object.assign(editorController.getGenerateConfig());
+	    delete config.pieces;  // pieces are not part of user form input
+	    return config;
+	  }
+	
 	function reset() {
 	  if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
-      lastGenerateConfig = null;
       invoke(resetListeners);
+      lastGenerateConfig = getInputGenerateConfig();
+      update();
     }
 	}
 	
-	function getInputGenerateConfig() {
-	  var config = Object.assign(editorController.getGenerateConfig());
-	  delete config.pieces;  // pieces are not part of user form input
-	  return config;
-	}
-	
 	function generate() {
-	  lastGenerateConfig = getInputGenerateConfig();
     invoke(generateListeners);
+    lastGenerateConfig = getInputGenerateConfig();
 	}
 	
 	function apply() {
-	  lastGenerateConfig = getInputGenerateConfig();
     invoke(applyListeners);
+    lastGenerateConfig = getInputGenerateConfig();
 	}
 }
 inheritsFrom(EditorActionsController, DivController);
