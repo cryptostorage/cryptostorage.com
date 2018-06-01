@@ -2918,6 +2918,7 @@ function EditorController(div, config) {
 	  var config = that.getGenerateConfig();
 	  if (isDefined(config.passphrase)) return false;
     if (isDefined(config.numParts)) return false;
+    if (that.newPiecesGenerated()) return false;
     if (config.keypairs) {
       if (config.keypairs.length !== 1) return false;
       if (config.keypairs[0].ticker) return false;
