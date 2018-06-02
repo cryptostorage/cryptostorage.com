@@ -3403,6 +3403,7 @@ function EditorPassphraseController(div, editorController) {
 	DivController.call(this, div);
 	
 	var that = this;
+	var PLACEHOLDER = "Do NOT lose this";
 	var passphraseCheckbox;
 	var passphraseInput;
 	var passphraseEyeDiv;
@@ -3560,10 +3561,11 @@ function EditorPassphraseController(div, editorController) {
 		// enable passphrase unless divided or encrypted imported piece
 		if (!editorController.getImportedPieces() || (!editorController.getImportedPieces()[0].isDivided() && !editorController.getImportedPieces()[0].isEncrypted())) {
 			setEnabled(true);
-			
-			// set bip38 checkbox visible
 			var bip38Visible = false;
 			if (that.getUsePassphrase()) {
+			  
+			  // passphrase placeholder
+			  passphraseInput.attr("placeholder", PLACEHOLDER);
 			
 				// look for bip38 in imported piece
 				if (editorController.getImportedPieces()) {
@@ -3586,7 +3588,12 @@ function EditorPassphraseController(div, editorController) {
 						}
 					}
 				}
+			} else {
+			  passphraseInput.removeAttr("placeholder");
+			  passphraseInput.val("");
 			}
+			
+			// set bip38 visibility
 			that.setBip38Visible(bip38Visible);
 		}
 		
