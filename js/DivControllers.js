@@ -3137,6 +3137,7 @@ function EditorContentController(div, editorController, config) {
 	var actionsController;
 	var pieceRenderers;
 	var interoperableDisclaimerDiv;
+	var interoperableDisclaimerDismissed;
 	
 	this.render = function(onDone) {
 		
@@ -3146,6 +3147,7 @@ function EditorContentController(div, editorController, config) {
 		hasError = false;
 		formErrorChangeListeners = [];
 		inputChangeListeners = [];
+		interoperableDisclaimerDismissed = false;
 		
 		// load dependencies
 		LOADER.load(AppUtils.getImportExportDependencies(), function(err) {
@@ -3168,9 +3170,12 @@ function EditorContentController(div, editorController, config) {
 			function renderAux() {
 			  
 			  // interoperability disclaimr
-			  interoperableDisclaimerDiv = $("<div class='editor_interoperable_disclaimer flex_vertical flex_align_center width_100'>").appendTo(div);
-			  interoperableDisclaimerDiv.append("Passphrase encryption and keypair division may not be interoperable with other tools");
-			  interoperableDisclaimerDiv.append($("<div class='editor_interoperable_subtitle'>Learn More</div>"));
+			  interoperableDisclaimerDiv = getInteroperableDisclaimerDiv(function() {
+			    interoperableDisclaimerDismissed = true;
+			    interoperableDisclaimerDiv.hide();
+			  });
+			  interoperableDisclaimerDiv.hide();
+			  interoperableDisclaimerDiv.appendTo(div);
 			  
 				// editor body div
 				bodyDiv = $("<div class='editor_body_div flex_vertical flex_align_center'>").appendTo(div);
@@ -3208,11 +3213,11 @@ function EditorContentController(div, editorController, config) {
 				$(window).resize(placeActionsController);
 				editorController.onSetCurrentPieces(setCurrentPieces);
 				editorController.onGenerateProgress(setGenerateProgress);
-				
-				// listen for actions when editor ready
 				editorController.onReady(function() {
 					actionsController.onGenerate(validate);
 					actionsController.onReset(reset);
+					editorController.getPassphraseController().onUsePassphraseChange(updateInteroperableDisclaimer);
+					editorController.getDividedController().onUseDividedChange(updateInteroperableDisclaimer);
 				});
 				
 				// handle pre-existing pieces
@@ -3298,6 +3303,26 @@ function EditorContentController(div, editorController, config) {
 	}
 	
 	// -------------------------------- PRIVATE ---------------------------------
+	
+	function updateInteroperableDisclaimer() {
+	  if (interoperableDisclaimerDismissed) return;
+	  if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided()) {
+	    interoperableDisclaimerDiv.show();
+	  } else {
+	    interoperableDisclaimerDiv.hide();
+	  }
+	}
+	
+	function getInteroperableDisclaimerDiv(onDismiss) {
+	  var div = $("<div class='editor_interoperable_disclaimer flex_vertical flex_align_center width_100'>");
+    div.append("Passphrase encryption and keypair division may not be interoperable with other tools");
+    var subtitleDiv = $("<div class='editor_interoperable_disclaimer_subtitle'>").appendTo(div);
+    $("<a class='styled_link' target='_blank' href='index.html#faq_interoperable'>Learn more</a>").appendTo(subtitleDiv);
+    subtitleDiv.append("&nbsp;|&nbsp");
+    var dismissLink = $("<span class='styled_link'>Dismiss</a>").appendTo(subtitleDiv);
+    dismissLink.click(onDismiss);
+    return div;
+  }
 	
 	function reset() {
 		if (currenciesController) currenciesController.reset();
@@ -3388,7 +3413,6 @@ function EditorPassphraseController(div, editorController) {
 	var inputChangeListeners;
 	var usePassphraseListeners;
 	var formErrorChangeListeners;
-	var riskAccepted;
 
 	this.render = function(onDone) {
 		
@@ -3401,7 +3425,6 @@ function EditorPassphraseController(div, editorController) {
     formErrorChangeListeners = [];
 		
 		// passphrase checkbox
-		riskAccepted = false;
 		var passphraseTooltipTxt = "<p>Encrypts generated <a target='_blank' href='index.html#faq_keypair'>keypairs</a> with a passphrase.  The passphrase is required in order to decrypt private keys and access funds.</p>" +
 															 "<p>The passphrase must be at least 7 characters.</p>" +
 															 "<p><a target='_blank' href='index.html#faq_encryption'>How are keypairs encrypted?</a></p>";
@@ -3445,23 +3468,11 @@ function EditorPassphraseController(div, editorController) {
 		  invoke(inputChangeListeners);
 		});
 		passphraseCheckbox.onChecked(function(e) {
-			if (passphraseCheckbox.isChecked() && !riskAccepted) {
-				e.preventDefault();
-				var disclaimerDiv = getPassphraseDisclaimerDiv(function() { riskAccepted = true; disclaimerPopup.hide(); });
-				var disclaimerPopup = new OverlayController(editorController.getDiv(), {contentDiv: disclaimerDiv, fullScreen: true, hideOnExternalClick: true});
-				disclaimerPopup.render();
-				disclaimerPopup.onHide(function() {
-					that.setUsePassphrase(riskAccepted);
-					if (passphraseCheckbox.isChecked()) passphraseInput.focus();
-					disclaimerPopup.destroy();
-				});
-			} else {
-			  if (passphraseCheckbox.isChecked()) passphraseInput.focus();
-			  else that.setPassphraseVisible(false);
-				setFormError(false);
-				invoke(usePassphraseListeners);
-        invoke(inputChangeListeners);
-			}
+		  if (passphraseCheckbox.isChecked()) passphraseInput.focus();
+      else that.setPassphraseVisible(false);
+      setFormError(false);
+      invoke(usePassphraseListeners);
+      invoke(inputChangeListeners);
 		});
 		bip38Checkbox.onChecked(function() { invoke(inputChangeListeners); });
 		
@@ -3625,23 +3636,6 @@ function EditorPassphraseController(div, editorController) {
 		that.setPassphraseVisible(false);
 		validate();
 		update();
-	}
-	
-	function getPassphraseDisclaimerDiv(onAgree) {
-		var div = $("<div class='editor_popup_div editor_passphrase_warn_div flex_vertical flex_align_center'>");
-		var headerDiv = $("<div class='editor_popup_header flex_horizontal flex_align_center'>").appendTo(div);
-		var headerTitle = $("<div class='flex_horizontal flex_align_center'>").appendTo(headerDiv);
-		headerTitle.append("<img src='img/caution_solid.png' style='width:40px; height: 40px; margin-right: 10px;'>");
-		headerTitle.append("Caution");
-		var bodyDiv = $("<div class='editor_popup_body flex_vertical flex_align_center'>").appendTo(div);		
-		bodyDiv.append($("<div style='font-size:20px; font-weight:bold; color:red; text-align:center;'>Do not lose your passphrase or your funds will be lost.</div>"));
-		var interoperableDiv = $("<div style='font-size:20px; text-align:center'>Encrypted keys may not be interoperable with other tools.&nbsp;&nbsp;</div>").appendTo(bodyDiv);
-		var learnMoreLink = $("<a style='font-size:20px;' target='_blank' href='index.html#faq_interoperable'>Learn more</a>").appendTo(div);
-		interoperableDiv.append(learnMoreLink);
-		var okButton = $("<div style='font-size:22px;' class='editor_btn_green editor_export_btn_green flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(bodyDiv);
-		okButton.append("Okay, I understand the risk");
-		okButton.click(onAgree);
-		return div;
 	}
 }
 inheritsFrom(EditorPassphraseController, DivController);

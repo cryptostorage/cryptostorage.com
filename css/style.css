@@ -14,6 +14,16 @@ body {
 	width: 100%;
 }
 
+.styled_link {
+	color: rgb(27, 71, 250);
+	text-decoration: none;
+}
+
+.styled_link:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
 .flex_horizontal {
 	max-width: 100%;
 	display: -webkit-flex;
@@ -1060,10 +1070,6 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	height: 30px;
 }
 
-.editor_passphrase_warn_div {
-	max-width: 675px;
-}
-
 .divide_qr {
 	width: 60px;
 	height: 60px;
@@ -1118,6 +1124,10 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	font-size: 16px;
 	background-color: rgb(255, 250, 208);
 	padding: 10px;
+}
+
+.editor_interoperable_disclaimer_subtitle, .editor_interoperable_disclaimer_subtitle * {
+	font-size: 14px;
 }
 
 .editor_interoperable_subtitle {
@@ -1663,7 +1673,13 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .notice_bar_center a {
-	color: blue;
+	text-decoration: none;
+	color: rgb(27, 71, 250);
+}
+
+.notice_bar_center a:hover {
+	text-decoration: underline;
+	cursor: pointer;
 }
 
 .notice_bar_center_major, notice_bar_center_major * {

@@ -1,5 +1,5 @@
 v0.3.0
-interoperability disclaimer bar when passphrase or divide checked first time
+Do NOT lose this passphrase placeholder
 show print preview when ready then print button becomes progress bar until ready
 alert when regenerating keypairs
 alert when reapplying keypairs
