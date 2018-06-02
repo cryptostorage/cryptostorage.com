@@ -3016,7 +3016,10 @@ function EditorController(div, config) {
 		if (that.hasFormError()) return;
 		
 		// confirm discard
-		if (!AppUtils.DEV_MODE && that.newPiecesGenerated() && !confirm("Discard and create new keypairs?")) return;
+		if (!AppUtils.DEV_MODE && that.newPiecesGenerated()) {
+		  var confirmMsg = that.getImportedPieces() ? "Discard changes to imported keypairs and apply settings?" : "Discard and generate new keypairs?";
+		  if (!confirm(confirmMsg)) return;
+		}
 		
 		// get generation config based on current state
 		var genConfig = that.getGenerateConfig();
@@ -4393,7 +4396,7 @@ function EditorActionsController(div, editorController) {
 		btnReset.append("Reset");
 		btnReset.appendTo(div);
 		btnReset.click(function() {
-		  if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
+		  if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm("Discard changes to the imported keypairs?")) {
 	      invoke(resetListeners);
 	    }
 		});
