@@ -5,7 +5,6 @@ alert when regenerating keypairs
 alert when reapplying keypairs
 divide part checksum instead of min part encoding
 
-recheck use passphrase applies focus then loses it
 copied tooltip is not centered for some private keys because div goes under QR
 deepen / brighten hover state of red and blue export buttons
 switch to bitcoinjs buffer instead of to/from unchecked hex

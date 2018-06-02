@@ -3468,11 +3468,11 @@ function EditorPassphraseController(div, editorController) {
 		  invoke(inputChangeListeners);
 		});
 		passphraseCheckbox.onChecked(function(e) {
-		  if (passphraseCheckbox.isChecked()) passphraseInput.focus();
-      else that.setPassphraseVisible(false);
       setFormError(false);
       invoke(usePassphraseListeners);
       invoke(inputChangeListeners);
+      if (passphraseCheckbox.isChecked()) passphraseInput.focus();
+      else that.setPassphraseVisible(false);
 		});
 		bip38Checkbox.onChecked(function() { invoke(inputChangeListeners); });
 		
