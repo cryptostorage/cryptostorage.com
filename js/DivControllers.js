@@ -3017,7 +3017,7 @@ function EditorController(div, config) {
 		
 		// confirm discard
 		if (!AppUtils.DEV_MODE && that.newPiecesGenerated()) {
-		  var confirmMsg = that.getImportedPieces() ? "Discard changes to imported keypairs and apply settings?" : "Discard and generate new keypairs?";
+		  var confirmMsg = that.getImportedPieces() ? "Discard changes to imported keypairs and apply new settings?" : "Discard and generate new keypairs?";
 		  if (!confirm(confirmMsg)) return;
 		}
 		
@@ -3101,7 +3101,10 @@ function EditorController(div, config) {
 	}
 	
 	function reset() {
-		that.setCurrentPieces(importedPieces, importedPieceDivs);
+	  var confirmMsg = that.getImportedPieces() ? "Discard changes to the imported keypairs?" : "Discard the generated keypairs?";
+    if (AppUtils.DEV_MODE || !that.newPiecesGenerated() || confirm(confirmMsg)) {
+      that.setCurrentPieces(importedPieces, importedPieceDivs);
+    }
 	}
 	
 	function cancel() {
@@ -4395,11 +4398,7 @@ function EditorActionsController(div, editorController) {
 		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
 		btnReset.append("Reset");
 		btnReset.appendTo(div);
-		btnReset.click(function() {
-		  if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm("Discard changes to the imported keypairs?")) {
-	      invoke(resetListeners);
-	    }
-		});
+		btnReset.click(function() { invoke(resetListeners); });
 		
 		// cancel button
 		btnCancel =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
