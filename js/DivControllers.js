@@ -4391,7 +4391,11 @@ function EditorActionsController(div, editorController) {
 		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
 		btnReset.append("Reset");
 		btnReset.appendTo(div);
-		btnReset.click(reset);
+		btnReset.click(function() {
+		  if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
+	      invoke(resetListeners);
+	    }
+		});
 		
 		// cancel button
 		btnCancel =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
@@ -4411,7 +4415,10 @@ function EditorActionsController(div, editorController) {
 		savePrintDiv.appendTo(div);
 		
 		// register callbacks
-		editorController.onSetCurrentPieces(update);
+		editorController.onSetCurrentPieces(function() {
+		  lastGenerateConfig = getInputGenerateConfig();
+		  update();
+		});
 		editorController.onFormErrorChange(update);
     editorController.getPassphraseController().onInputChange(update);
 		editorController.getDividedController().onInputChange(update);
@@ -4426,7 +4433,7 @@ function EditorActionsController(div, editorController) {
 		});
 		
 		// initial state
-		reset();
+		update();
 		
 		// done rendering
 		if (onDone) onDone();
@@ -4490,7 +4497,7 @@ function EditorActionsController(div, editorController) {
 			} else {
 				btnGenerate.removeClass("btn_disabled");
         if (generateConfigChanged) btnGenerate.addClass("editor_btn_green_pulse");
-				btnGenerate.click(generate);
+				btnGenerate.click(function() { invoke(generateListeners); });
 			}
 		}
 		
@@ -4508,7 +4515,7 @@ function EditorActionsController(div, editorController) {
 				} else {
 					btnApply.removeClass("btn_disabled");
 	        if (generateConfigChanged) btnApply.addClass("editor_btn_green_pulse");
-					btnApply.click(apply);
+					btnApply.click(function() { invoke(applyListeners); });
 				}
 			} else {
 				btnApply.hide();
@@ -4526,24 +4533,6 @@ function EditorActionsController(div, editorController) {
 	    delete config.pieces;  // pieces are not part of user form input
 	    return config;
 	  }
-	
-	function reset() {
-	  if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm("Discard the generated keypairs?")) {
-      invoke(resetListeners);
-      lastGenerateConfig = getInputGenerateConfig();
-      update();
-    }
-	}
-	
-	function generate() {
-    invoke(generateListeners);
-    lastGenerateConfig = getInputGenerateConfig();
-	}
-	
-	function apply() {
-    invoke(applyListeners);
-    lastGenerateConfig = getInputGenerateConfig();
-	}
 }
 inheritsFrom(EditorActionsController, DivController);
 
