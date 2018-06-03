@@ -1159,12 +1159,13 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 
 .editor_btn_green_pulse:not(:hover) {
 	animation: green_pulse 1s infinite alternate;
+	animation-timing-function: ease-in;
 }
 
-@-moz-keyframes green_pulse { 0%{ background-color: rgb(101, 214, 67); } 30%{ background-color: rgb(101, 214, 67); } 100%{ background-color: rgb(141, 244, 97); } }
-@-webkit-keyframe { 0%{ background-color: rgb(101, 214, 67); } 30%{ background-color: rgb(101, 214, 67); } 100%{ background-color: rgb(141, 244, 97); } }
-@-o-keyframes green_pulse { 0%{ background-color: rgb(101, 214, 67); } 30%{ background-color: rgb(101, 214, 67); } 100%{ background-color: rgb(141, 244, 97); } }
-@keyframes green_pulse { 0%{ background-color: rgb(101, 214, 67); } 30%{ background-color: rgb(101, 214, 67); } 100%{ background-color: rgb(141, 244, 97); } }
+@-moz-keyframes green_pulse { 0%{ background-color: rgb(101, 214, 67); } 100%{ background-color: rgb(141, 244, 97); } }
+@-webkit-keyframe { 0%{ background-color: rgb(101, 214, 67); } 100%{ background-color: rgb(141, 244, 97); } }
+@-o-keyframes green_pulse { 0%{ background-color: rgb(101, 214, 67); } 100%{ background-color: rgb(141, 244, 97); } }
+@keyframes green_pulse { 0%{ background-color: rgb(101, 214, 67); } 100%{ background-color: rgb(141, 244, 97); } }
 
 .editor_btn_green {
 	color: white;
