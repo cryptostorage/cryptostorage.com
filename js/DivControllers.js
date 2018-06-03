@@ -3101,10 +3101,7 @@ function EditorController(div, config) {
 	}
 	
 	function reset() {
-	  var confirmMsg = that.getImportedPieces() ? "Discard changes to the imported keypairs?" : "Discard the generated keypairs?";
-    if (AppUtils.DEV_MODE || !that.newPiecesGenerated() || confirm(confirmMsg)) {
-      that.setCurrentPieces(importedPieces, importedPieceDivs);
-    }
+	  that.setCurrentPieces(importedPieces, importedPieceDivs);
 	}
 	
 	function cancel() {
@@ -4398,7 +4395,12 @@ function EditorActionsController(div, editorController) {
 		btnReset =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
 		btnReset.append("Reset");
 		btnReset.appendTo(div);
-		btnReset.click(function() { invoke(resetListeners); });
+		btnReset.click(function() {
+	    var confirmMsg = editorController.getImportedPieces() ? "Discard changes to the imported keypairs?" : "Discard the generated keypairs?";
+	    if (AppUtils.DEV_MODE || !editorController.newPiecesGenerated() || confirm(confirmMsg)) {
+	      invoke(resetListeners);
+	    }
+		});
 		
 		// cancel button
 		btnCancel =  $("<div class='editor_btn_red flex_horizontal flex_justify_center user_select_none'>");
