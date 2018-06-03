@@ -3277,8 +3277,11 @@ function EditorContentController(div, editorController, config) {
 					});
 				}
 				
-				// otherwise done
-				else if (onDone) onDone(div);
+				// otherwise set blank pieces to initialize
+				else {
+				  editorController.setCurrentPieces();
+				  if (onDone) onDone(div);
+				}
 			}
 		});
 	}
