@@ -24,6 +24,7 @@ could show print preview right away then print button is progress bar
 cryptocash ideas, slider point
 
 v0.3.1
+disabled info boxes should still be active
 2500ms copied tooltip timeout stays active even if tooltip re-clicked so it hides quickly
 better cryptocash design
 dynamic editor with horizontal groupings (designer todo)
