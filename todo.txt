@@ -1,4 +1,5 @@
 v0.3.0
+update favicon
 copied tooltip is not centered for some private keys because div goes under QR
 encryption and division method outlined in faq
 division interoperability
