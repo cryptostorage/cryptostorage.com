@@ -1,5 +1,7 @@
 v0.3.0
 copied tooltip is not centered for some private keys because div goes under QR
+encryption and division method outlined in faq
+division interoperability
 show print preview when ready then print button becomes progress bar until ready
 divide part checksum instead of min part encoding
 deepen / brighten hover state of red and blue export buttons
