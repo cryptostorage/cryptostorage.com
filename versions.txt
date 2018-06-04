@@ -90,8 +90,8 @@ cryptostorage-v0.3.0-beta
 - Import existing keys (e.g. BIP39 hardware wallet seeds) and re-export with passphrase encryption and division
 - Support direct links to keypair generation (e.g. cryptostorage.com/generate.html?tickers=xmr)
 - Added support for Dogecoin and Zcoin
-- Refactored codebase to be more object-oriented
 - Replaced individual dependencies with BitcoinJS for extensible network configurations
+- Refactored codebase to be more object-oriented
 - Changed terminology from "split into pieces" to "divide into parts"
-- Updated test suite to be more exhaustive
+- Made test suite more thorough
 - Many other bug fixes and improvements
