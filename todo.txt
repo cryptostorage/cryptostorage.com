@@ -1,10 +1,11 @@
 v0.3.0
+divide part checksum instead of min part encoding
+switch to bitcoinjs buffer instead of to/from unchecked hex
+
 update favicon
 encryption and division method outlined in faq
 show print preview when ready then print button becomes progress bar until ready
-divide part checksum instead of min part encoding
 deepen / brighten hover state of red and blue export buttons
-switch to bitcoinjs buffer instead of to/from unchecked hex
 exhaustive tests
 slider points cleanup
 recommend destroy printer for ultimate security
