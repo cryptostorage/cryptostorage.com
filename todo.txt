@@ -1,8 +1,6 @@
 v0.3.0
 update favicon
-copied tooltip is not centered for some private keys because div goes under QR
 encryption and division method outlined in faq
-division interoperability
 show print preview when ready then print button becomes progress bar until ready
 divide part checksum instead of min part encoding
 deepen / brighten hover state of red and blue export buttons
@@ -16,17 +14,8 @@ update home divide graphic
 browser testing
 release
 
-designer:
-update home graphic to reflect new design? or keep as representation - going to sketch
-weigh risk of incorrect keypair combining insufficient shares - encode keypair hash into split part as checksum?
-divide interoperability warning - see screenshot
-original design had groups that could be trashed.  How does that work with pieces?  Worth doing? - design wip
-split qr and lines white? - keep black
-reset button always visible? - reset
-could show print preview right away then print button is progress bar
-cryptocash ideas, slider point
-
 v0.3.1
+copied tooltip is not centered for some private keys because div goes under QR
 disabled info boxes should still be active
 2500ms copied tooltip timeout stays active even if tooltip re-clicked so it hides quickly
 better cryptocash design
