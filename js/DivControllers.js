@@ -2808,7 +2808,7 @@ function EditorController(div, config) {
 			contentController.onFormErrorChange(updateFormError);
 			
 			// select BCH if in dev mode for convenience
-      if (AppUtils.DEV_MODE && !that.getImportedPieces()) {
+      if (AppUtils.DEV_MODE && !that.getImportedPieces() && !that.getCurrentPieces()) {
         contentController.getCurrenciesController().getCurrencyInputs()[0].setSelectedCurrency("BCH");
       }
 			
