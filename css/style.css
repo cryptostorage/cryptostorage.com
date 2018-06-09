@@ -1158,7 +1158,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .editor_btn_green_pulse:not(:hover) {
-	animation: green_pulse 1s infinite alternate;
+	animation: green_pulse .75s infinite alternate;
 	animation-timing-function: ease-in;
 }
 

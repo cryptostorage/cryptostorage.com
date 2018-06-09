@@ -2807,6 +2807,11 @@ function EditorController(div, config) {
 			divideController.onFormErrorChange(updateFormError);
 			contentController.onFormErrorChange(updateFormError);
 			
+			// select BCH if in dev mode for convenience
+      if (AppUtils.DEV_MODE && !that.getImportedPieces()) {
+        contentController.getCurrenciesController().getCurrencyInputs()[0].setSelectedCurrency("BCH");
+      }
+			
 			// confirm exit if keypairs generated
 			window.addEventListener("beforeunload", function (e) {
 				if (AppUtils.DEV_MODE || !that.newPiecesGenerated()) return;
@@ -3202,7 +3207,6 @@ function EditorContentController(div, editorController, config) {
 					currenciesDiv = $("<div>").appendTo(bodyDiv);
 					currenciesController = new EditorCurrenciesController(currenciesDiv, AppUtils.getCryptoPlugins());
 					currenciesController.render();
-					if (AppUtils.DEV_MODE) currenciesController.getCurrencyInputs()[0].setSelectedCurrency("BCH");	// dev mode convenience
 					currenciesController.onFormErrorChange(setFormError);
 					currenciesController.onInputChange(function() { invoke(inputChangeListeners); });
 				}
