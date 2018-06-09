@@ -149,7 +149,7 @@ function EthereumPlugin() {
 		if (str.length >= 63 && str.length <= 65 && isHex(str)) {
 			var decoded = {};
 			decoded.privateHex = str;
-			decoded.privateWif = str;
+			decoded.privateWif = str.toLowerCase();
 			decoded.publicAddress = ethereumjsutil.toChecksumAddress(keythereum.privateKeyToAddress(decoded.privateHex));
 			decoded.encryption = null;
 			return decoded;

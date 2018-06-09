@@ -1,6 +1,7 @@
 v0.3.0
 switch to bitcoinjs buffer instead of to/from unchecked hex
 
+faster pulse
 update favicon
 encryption and division method outlined in faq
 show print preview when ready then print button becomes progress bar until ready

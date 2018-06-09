@@ -268,10 +268,10 @@ function Tests() {
 		// litecoin specific tests
 		else if (plugin.getTicker() === "LTC") {
 		  
-		  // test with 62 character private hex
+		  // test that hexidecimal format is padded (this private key converts to 62 character hex if not padded)
 		  var keypair = new CryptoKeypair({plugin: plugin, privateKey: "T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup"});
 		  assertEquals("T34MuTEaRxt3kj6dn2MMHbvSPQHrsBjKrdz6WtwrLe1KzCzYkMup", keypair.getPrivateWif());
-		  assertEquals("3294fbf83ee27cb46ecbc6d86dc5e1b254af2b9058597278a957e99154a065", keypair.getPrivateHex());
+		  assertEquals("003294FBF83EE27CB46ECBC6D86DC5E1B254AF2B9058597278A957E99154A065", keypair.getPrivateHex());
 		  assertEquals("LgCNyq7GfXBLgUbxRq7w6qFfkomJoYxZKP", keypair.getPublicAddress());
       var piece = new CryptoPiece({keypairs: keypair});
 		  testPieceEncryption(piece, [AppUtils.EncryptionScheme.V1_CRYPTOJS], function(err, encryptedPiece) {
@@ -482,8 +482,8 @@ function Tests() {
 	// tests piece dividing, initialization, and conversion
 	function testPieceWithoutEncryption(piece) {
 		assertObject(piece, CryptoPiece);
+    testPieceState(piece);
 		if (piece.isDivided() === false) testPieceDivide(piece);
-		testPieceState(piece);
 		testPieceInit(piece);
 		testPieceRemoval(piece);
 	}
@@ -607,6 +607,7 @@ function Tests() {
 		// test divided keypair
 		if (keypair.isDivided()) {
 			assertInitialized(keypair.getPrivateHex());
+      assertTrue(isUpperCase(keypair.getPrivateHex()), "Hex is not uppercase: " + keypair.getPrivateHex());
 			assertInitialized(keypair.getPrivateWif());
 			assertEquals(undefined, keypair.isEncrypted());
 			assertEquals(undefined, keypair.getEncryptionScheme());
@@ -620,6 +621,9 @@ function Tests() {
 		
 		// test encrypted keypair
 		else if (keypair.isEncrypted()) {
+		  assertInitialized(keypair.getPrivateHex());
+		  assertTrue(isUpperCase(keypair.getPrivateHex()), "Hex is not uppercase: " + keypair.getPrivateHex());
+      assertInitialized(keypair.getPrivateWif());
 			assertFalse(keypair.isDivided());
 			assertNull(keypair.getMinParts());
 			assertNull(keypair.getPartNum());
@@ -628,6 +632,7 @@ function Tests() {
 		// test unencrypted keypair
 		else if (keypair.isEncrypted() === false) {
 			assertInitialized(keypair.getPrivateHex());
+      assertTrue(isUpperCase(keypair.getPrivateHex()), "Hex is not uppercase: " + keypair.getPrivateHex());
 			assertInitialized(keypair.getPrivateWif());
 			assertFalse(keypair.isEncrypted());
 			assertNull(keypair.getEncryptionScheme());
