@@ -1,8 +1,9 @@
 v0.3.0
+exhaustive tests
+
 encryption and division method outlined in faq
 show print preview when ready then print button becomes progress bar until ready
 deepen / brighten hover state of red and blue export buttons
-exhaustive tests
 slider points cleanup
 recommend destroy printer for ultimate security
 put homepage text in index.html and dynamically hide for seo
