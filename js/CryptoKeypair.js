@@ -495,7 +495,7 @@ CryptoKeypair.prototype._setPrivateKey = function(privateKey) {
 	// decode with plugin
 	var decoded = this._state.plugin.decode(privateKey);
 	if (decoded) {
-		this._state.privateHex = decoded.privateHex.toLowerCase();
+		this._state.privateHex = decoded.privateHex;
 		this._state.privateWif = decoded.privateWif;
 		this._state.publicAddress = decoded.publicAddress;
 		this._state.encryption = decoded.encryption;
@@ -508,7 +508,7 @@ CryptoKeypair.prototype._setPrivateKey = function(privateKey) {
 	// encrypted with cryptostorage conventions
 	decoded = CryptoKeypair.decodeEncryptedKey(privateKey);
 	if (decoded) {
-		this._state.privateHex = decoded.privateHex.toLowerCase();
+		this._state.privateHex = decoded.privateHex;
 		this._state.privateWif = decoded.privateWif;
 		this._state.publicAddress = this._state.plugin.isPublicApplicable() ? undefined : null;
 		this._state.encryption = decoded.encryption;
@@ -521,7 +521,7 @@ CryptoKeypair.prototype._setPrivateKey = function(privateKey) {
 	// part
 	decoded = this._decodePart(privateKey);
 	if (decoded) {
-		this._state.privateHex = decoded.privateHex.toLowerCase();
+		this._state.privateHex = decoded.privateHex;
 		this._state.privateWif = decoded.privateWif;
 		this._state.publicAddress = this._state.plugin.isPublicApplicable() ? undefined : null;
 		this._state.encryption = undefined;

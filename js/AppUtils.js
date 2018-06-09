@@ -794,13 +794,13 @@ var AppUtils = {
 			} else throw new Error("Unsupported target base: " + tgtBase);
 		} else if (srcBase === 58) {
 			if (tgtBase === 16) {
-				return Crypto.util.bytesToHex(Bitcoin.Base58.decode(str));
+				return Crypto.util.bytesToHex(Bitcoin.Base58.decode(str)).toUpperCase();
 			} else if (tgtBase === 64) {
 				return AppUtils.toBase(16, 64, AppUtils.toBase(58, 16, str));
 			} else throw new Error("Unsupported target base: " + tgtBase);
 		} else if (srcBase === 64) {
 			if (tgtBase === 16) {
-				return CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex);
+				return CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Hex).toUpperCase();
 			} else if (tgtBase === 58) {
 				return AppUtils.toBase(16, 58, AppUtils.toBase(64, 16, str));
 			} else throw new Error("Unsupported target base: " + tgtBase);

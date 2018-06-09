@@ -1,5 +1,4 @@
 v0.3.0
-divide part checksum instead of min part encoding
 switch to bitcoinjs buffer instead of to/from unchecked hex
 
 update favicon
@@ -16,6 +15,7 @@ browser testing
 release
 
 v0.3.1
+divide part checksum instead of min part encoding
 copied tooltip is not centered for some private keys because div goes under QR
 disabled info boxes should still be active
 2500ms copied tooltip timeout stays active even if tooltip re-clicked so it hides quickly

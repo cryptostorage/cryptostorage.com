@@ -169,8 +169,8 @@ function Tests() {
 		assertFalse(isBase58("abcd0"))
 		assertTrue(isHex("fcc256cbc5a180831956fba7b9b7de5f521037c39980921ebe6dbd822f791007"));
 		var keypair = new CryptoKeypair({plugin: getTestPlugins()[0]});
-		testBaseConversion(keypair.getPrivateHex(), 16);
-		testBaseConversion("070115462b1f10cd83733218cd5f720ae66891aa2d1cad4eb9", 16);
+    testBaseConversion("070115462b1f10cd83733218cd5f720ae66891aa2d1cad4eb9", 16);
+    testBaseConversion(keypair.getPrivateHex(), 16);
 		testBaseConversion("0142e0bd5032652e3d01248cede2afe96a0f372cd85a3005de5d308a45cce598c797d22b3082789ba5d1ab", 16);
 		function testBaseConversion(str, base) {
 			assertNumber(base);
@@ -183,9 +183,11 @@ function Tests() {
 				testToFrom(combinations[i][0], combinations[i][1], srcStr);
 			}
 			
-			function testToFrom(srcBase, tgtBase, str) {
-				var tgtStr = AppUtils.toBase(srcBase, tgtBase, str);
-				assertEquals(AppUtils.toBase(tgtBase, srcBase, tgtStr), str, "Conversion from base " + srcBase + " to " + tgtBase + " and back failed for string " + str);
+			function testToFrom(srcBase, tgtBase, srcStr) {
+        if (srcBase === 16) srcStr = srcStr.toUpperCase();
+				var tgtStr = AppUtils.toBase(srcBase, tgtBase, srcStr);
+				var endStr = AppUtils.toBase(tgtBase, srcBase, tgtStr);
+				assertEquals(endStr, srcStr, "Conversion from base " + srcBase + " to " + tgtBase + " started with " + srcStr + " ended with " + endStr);
 			}
 		}
 	}
