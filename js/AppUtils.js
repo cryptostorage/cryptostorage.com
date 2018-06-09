@@ -44,14 +44,14 @@ var AppUtils = {
 	VERSION_POSTFIX: " beta",
 	RUN_MIN_TESTS: false,
 	RUN_FULL_TESTS: false,
-	DEV_MODE: false,
+	DEV_MODE: true,
 	DEV_MODE_PASSPHRASE: "abctesting123",
 	DELETE_WINDOW_CRYPTO: false,
 	VERIFY_ENCRYPTION: false,
 	ENCRYPTION_THREADS: 1,
 	MIN_PASSPHRASE_LENGTH: 7,
 	CRYPTOSTORAGE_URL: "https://cryptostorage.com",
-	ONLINE_IMAGE_URL: "https://cryptostorage.com/favicon.ico",
+	ONLINE_IMAGE_URL: "https://cryptostorage.com/favicon.png",
 	ENVIRONMENT_REFRESH_RATE: 6000,		// environment refresh rate in milliseconds
 	ONLINE_DETECTION_TIMEOUT: 6000,		// timeout to detect if online
 	SLIDER_RATE: 4000,								// rate of slider transitions
