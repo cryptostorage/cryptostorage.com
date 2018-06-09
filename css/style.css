@@ -1192,12 +1192,12 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .editor_btn_red:hover {
-	background-color: rgb(272, 121, 104);
+	background-color: rgb(255, 121, 104);
 	cursor: pointer;
 }
 
 .editor_btn_red:active {
-	background-color: rgb(232, 91, 74);
+	background-color: rgb(232, 81, 64);
 }
 
 .editor_btn_blue {
