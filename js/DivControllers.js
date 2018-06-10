@@ -5298,7 +5298,7 @@ function NoticeController(div, config) {
 					else {
 						var content = $("<div>").appendTo(div);
 						content.append("<div class='notice_bar_center_major'>Operating system is not open source (" + info.os.name + ")</div>");
-						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
+						content.append("<div class='notice_bar_center_minor'>Recommended operating systems: " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + "</li>");
 					}
 					break;
 				case AppUtils.EnvironmentCode.DEV_MODE:
