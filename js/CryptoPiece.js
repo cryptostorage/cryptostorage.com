@@ -309,14 +309,24 @@ function CryptoPiece(config) {
 	
 	this.toTxt = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
-		var str = "";
+		var txt = "";
 		for (var i = 0; i < state.keypairs.length; i++) {
-			str += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\r\n\r\n";
+			txt += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\r\n\r\n";
 			var publicAddress = state.keypairs[i].getPublicAddress();
-			if (isInitialized(publicAddress)) str += "Public Address:\r\n" + publicAddress + "\r\n\r\n";
- 			if (isDefined(state.keypairs[i].getPrivateWif())) str += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPartNum() ? "(divided)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
+			if (isInitialized(publicAddress)) txt += "Public Address:\r\n" + publicAddress + "\r\n\r\n";
+ 			if (isDefined(state.keypairs[i].getPrivateWif())) txt += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPartNum() ? "(divided)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
 		}
-		return str.trim();
+		return txt.trim();
+	}
+	
+	this.toCompactTxt = function() {
+	  assertFalse(_isDestroyed, "Piece is destroyed");
+    var txt = "";
+    for (var i = 0; i < state.keypairs.length; i++) {
+      txt += state.keypairs[i].toCompactTxt(i);
+      if (i < state.keypairs.length - 1) txt += " | ";
+    }
+    return txt.trim();
 	}
 	
 	this.equals = function(piece) {

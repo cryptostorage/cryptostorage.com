@@ -341,6 +341,21 @@ CryptoKeypair.prototype.toJson = function() {
 	return json;
 }
 
+CryptoKeypair.prototype.toCompactTxt = function(index) {
+  assertFalse(this._isDestroyed, "Keypair is destroyed");
+  var txt = "";
+  if (isDefined(index)) txt += "#" + (this.getPartNum() ? this.getPartNum() + "." : "") + (index + 1) + ", ";
+  txt += this.getPlugin().getTicker();
+  if (isInitialized(this.getPublicAddress())) {
+    txt += ", public: " + this.getPublicAddress();
+  }
+  if (isInitialized(this.getPrivateWif())) {
+    var state = this.getExportValue(CryptoKeypair.Field.PRIVATE_STATE);
+    txt += ", private: " + this.getPrivateWif() + (this.getPartNum() ? ", divided" : (this.isEncrypted() ? ", encrypted" : ""));
+  }
+  return txt;
+}
+
 CryptoKeypair.prototype.getExportValue = function(field) {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	switch(field) {
