@@ -1,6 +1,6 @@
 v0.3.0
 break points
-compact preview min height
+compact preview min max height
 
 compact text
 exhaustive tests
