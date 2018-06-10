@@ -4715,10 +4715,10 @@ function EditorPrintController(div, pieces) {
 	assertTrue(pieces.length > 0);
 	
 	var Layout = {
-			STANDARD: "Standard layout",
-			COMPACT_GRID: "Compact grid layout",
-			COMPACT_TEXT: "Compact text layout",
-			CRYPTOCASH: "CryptoCash"
+			STANDARD: "Standard Layout",
+			COMPACT_GRID: "Grid Layout",
+			COMPACT_TEXT: "Compact Layout",
+			CRYPTOCASH: "CryptoCash Layout"
 	}
 	
 	var that = this;
