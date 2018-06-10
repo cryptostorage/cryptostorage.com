@@ -6453,9 +6453,30 @@ function CompactTextPieceRenderer(div, piece, config) {
     div.empty();
     div.addClass("piece_div");
     
-    // add text content
+    // build text with breakpoints
+    var txt = "";
+    for (var i = 0; i < piece.getKeypairs().length; i++) {
+      txt += toCompactTextKeypair(piece.getKeypairs()[i], i);
+      if (i < piece.getKeypairs().length - 1) txt += "&nbsp;|&nbsp;";
+    }
+    
+    function toCompactTextKeypair(keypair, index) {
+      var txt = "";
+      if (isDefined(index)) txt += "#" + (keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (index + 1) + ",&nbsp;";
+      txt += keypair.getPlugin().getTicker();
+      if (isInitialized(keypair.getPublicAddress())) {
+        txt += ",&nbsp;public:&nbsp;<span class='word_break_break_all'>" + keypair.getPublicAddress() + "</span>";
+      }
+      if (isInitialized(keypair.getPrivateWif())) {
+        txt += ",&nbsp;private:&nbsp;<span" + (keypair.getPrivateWif().indexOf(" ") < 0 ? " class='word_break_break_all'" : "") + ">" + keypair.getPrivateWif() + "</span>";
+        txt += keypair.getPartNum() ? ",&nbsp;divided" : (keypair.isEncrypted() ? ",&nbsp;encrypted" : "");
+      }
+      return txt;
+    }
+    
+    // add text
     var txtDiv = $("<div class='compact_text_value'>").appendTo(div);
-    txtDiv.append(piece.toCompactTxt());
+    txtDiv.append(txt);
 
     // done
     if (onProgressFn) onProgressFn(1, "Rendering");

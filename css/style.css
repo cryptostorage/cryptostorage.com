@@ -97,6 +97,10 @@ body {
 	user-select: none;
 }
 
+.word_break_break_all {
+	word-break: break-all;
+}
+
 .overlay_div {
 	height: 100%;
     width: 100%;
@@ -1620,10 +1624,9 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	text-align: center;
 }
 
-.compact_text_value {
+.compact_text_value, .compact_text_value * {
 	font-size: 12px;
 	font-family: monospace;
-	word-break: break-all;
 }
 
 .hidden {

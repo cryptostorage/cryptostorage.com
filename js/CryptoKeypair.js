@@ -350,7 +350,6 @@ CryptoKeypair.prototype.toCompactTxt = function(index) {
     txt += ", public: " + this.getPublicAddress();
   }
   if (isInitialized(this.getPrivateWif())) {
-    var state = this.getExportValue(CryptoKeypair.Field.PRIVATE_STATE);
     txt += ", private: " + this.getPrivateWif() + (this.getPartNum() ? ", divided" : (this.isEncrypted() ? ", encrypted" : ""));
   }
   return txt;
