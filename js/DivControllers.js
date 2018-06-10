@@ -3569,7 +3569,7 @@ function EditorPassphraseController(div, editorController) {
 	function update() {
 		
 		// enable passphrase unless divided or encrypted imported piece
-		if (!editorController.getImportedPieces() || (!editorController.getImportedPieces()[0].isDivided() && !editorController.getImportedPieces()[0].isEncrypted())) {
+		if (!editorController.getImportedPieces() || (editorController.getImportedPieces()[0].isDivided() === false && editorController.getImportedPieces()[0].isEncrypted() === false)) {
 			setEnabled(true);
 			var bip38Visible = false;
 			if (that.getUsePassphrase()) {
@@ -3820,12 +3820,12 @@ function EditorDivideController(div, editorController) {
       minPartsInput.removeClass("form_input_error_div");
     }
 		
-		// disable if pieces already divided
-		if (editorController.getImportedPieces() && editorController.getImportedPieces()[0].isDivided()) {
-			setEnabled(false);
-		} else {
-			setEnabled(true);
-		}
+		// enable if no imported pieces or the imported pieces are undivided
+    if (!editorController.getImportedPieces() || editorController.getImportedPieces()[0].isDivided() === false) {
+      setEnabled(true);
+    } else {
+      setEnabled(false);
+    }
 	}
 
 	function reset() {
