@@ -1,4 +1,5 @@
 v0.3.0
+waves keypair created from its public address (failing test)
 compact text
 exhaustive tests
 
