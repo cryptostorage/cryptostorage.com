@@ -329,19 +329,19 @@ CryptoKeypair.prototype.toJson = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	function isExcluded(field) { return arrayContains(CryptoKeypair.getExcludedFields(), field); }
 	var json = {};
-	if (!isExcluded(CryptoKeypair.Field.TICKER)) json.ticker = this.getPlugin().getTicker();
-	if (!isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS)) json.publicAddress = this.getPublicAddress();
-	if (!isExcluded(CryptoKeypair.Field.PRIVATE_WIF)) json.privateWif = this.getPrivateWif();
-	if (!isExcluded(CryptoKeypair.Field.PRIVATE_HEX)) json.privateHex = this.getPrivateHex();
-	if (!isExcluded(CryptoKeypair.Field.PRIVATE_STATE) && this.hasPrivateKey()) json.privateState = this.getFieldValue(CryptoKeypair.Field.PRIVATE_STATE);
-	if (!isExcluded(CryptoKeypair.Field.ENCRYPTION) && this.isEncrypted()) json.encryption = this.getEncryptionScheme();
-	if (!isExcluded(CryptoKeypair.Field.IS_DIVIDED)) json.isDivided = this.isDivided();
-	if (!isExcluded(CryptoKeypair.Field.MIN_PARTS) && this.isDivided()) json.minParts = this.getMinParts();
-	if (!isExcluded(CryptoKeypair.Field.PART_NUM) && this.isDivided()) json.partNum = this.getPartNum()
+	if (!isExcluded(CryptoKeypair.Field.TICKER)) json.ticker = this.getExportValue(CryptoKeypair.Field.TICKER);
+	if (!isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS)) json.publicAddress = this.getExportValue(CryptoKeypair.Field.PUBLIC_ADDRESS);
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_WIF)) json.privateWif = this.getExportValue(CryptoKeypair.Field.PRIVATE_WIF);
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_HEX)) json.privateHex = this.getExportValue(CryptoKeypair.Field.PRIVATE_HEX);
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_STATE) && this.hasPrivateKey()) json.privateState = this.getExportValue(CryptoKeypair.Field.PRIVATE_STATE);
+	if (!isExcluded(CryptoKeypair.Field.ENCRYPTION) && this.isEncrypted()) json.encryption = this.getExportValue(CryptoKeypair.Field.ENCRYPTION);
+	if (!isExcluded(CryptoKeypair.Field.IS_DIVIDED)) json.isDivided = this.getExportValue(CryptoKeypair.Field.IS_DIVIDED);
+	if (!isExcluded(CryptoKeypair.Field.MIN_PARTS) && this.isDivided()) json.minParts = this.getExportValue(CryptoKeypair.Field.MIN_PARTS);
+	if (!isExcluded(CryptoKeypair.Field.PART_NUM) && this.isDivided()) json.partNum = this.getExportValue(CryptoKeypair.Field.PART_NUM);
 	return json;
 }
 
-CryptoKeypair.prototype.getFieldValue = function(field) {
+CryptoKeypair.prototype.getExportValue = function(field) {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	switch(field) {
 		case CryptoKeypair.Field.TICKER:
@@ -351,7 +351,7 @@ CryptoKeypair.prototype.getFieldValue = function(field) {
 		case CryptoKeypair.Field.PRIVATE_HEX:
 			return this.getPrivateHex();
 		case CryptoKeypair.Field.PUBLIC_ADDRESS:
-			return this.getPublicAddress();
+		  return this.isPublicApplicable() ? this.getPublicAddress() : AppUtils.NA;
 		case CryptoKeypair.Field.ENCRYPTION:
 			return this.getEncryptionScheme();
 		case CryptoKeypair.Field.IS_DIVIDED:
@@ -547,7 +547,7 @@ CryptoKeypair.prototype._fromJson = function(json) {
 	this._state.minParts = json.minParts;
 	if (isDefined(this._state.privateWif)) this._setPrivateKey(this._state.privateWif);
 	else if (isDefined(this._state.privateHex)) this._setPrivateKey(this._state.privateHex);
-	if (isDefined(json.publicAddress)) this._setPublicAddress(json.publicAddress);
+	if (isDefined(json.publicAddress)) this._setPublicAddress(json.publicAddress === AppUtils.NA ? null : json.publicAddress);
 	if (json.encryption === null) assertUninitialized(json.partNum);
 	if (isDefined(json.partNum)) this.setPartNum(json.partNum);
 }

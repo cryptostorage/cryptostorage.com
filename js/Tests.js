@@ -37,7 +37,7 @@ function Tests() {
 	var MIN_PARTS = 3;
 	
 	// list of invalid private keys to test per plugin
-	var INVALID_PKS = [" ", "ab", "abctesting123", "abc testing 123", 12345, "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "3b20836520fe2e8eef1fd3f898fd97b5a3bcb6702fae72e3ca1ba8fb6e1ddd75b12f74dc6422606d1750e40"];
+	var INVALID_PKS = [" ", "ab", "abctesting123", "abc testing 123", 12345, "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "3b20836520fe2e8eef1fd3f898fd97b5a3bcb6702fae72e3ca1ba8fb6e1ddd75b12f74dc6422606d1750e40", "3P2ecsHZa9VXsb6j5Vg8RZ6tnidEHqCp7UT"];
 	
 	/**
 	 * Runs minimum tests to verify key generation and dividing.
@@ -92,7 +92,7 @@ function Tests() {
 		// collect test functions
 		var funcs = [];
 		funcs.push(function(onDone) { testUtils(); onDone(); });
-		funcs.push(function(onDone) { testPlugins(plugins, onDone); });
+		//funcs.push(function(onDone) { testPlugins(plugins, onDone); });
 		funcs.push(function(onDone) { testPieceAllPlugins(plugins); onDone(); });
 		funcs.push(function(onDone) { testBackwardsCompatibility(onDone); });
 		funcs.push(function(onDone) { testFileImport(plugins, onDone); });
@@ -739,6 +739,10 @@ function Tests() {
 		// test init from json
 		piece2 = new CryptoPiece({json: piece.toJson()});
 		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
+		if (!piece.equals(piece2)) {
+		  console.log(piece.toJson());
+		  console.log(piece2.toJson());
+		}
 		assertTrue(piece.equals(piece2));
 		
 		// test init from json string
@@ -1519,6 +1523,7 @@ function Tests() {
 		piece1 = new CryptoPiece({csv: csv});
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", privateKey: "tomato domain essence fat velvet robot bring index slab daughter artist cover book image disease divert used paddle hire put index spare busy clap"})]});
 		assertTrue(piece1.equals(piece2));
+    assertTrue(piece1.toCsv().indexOf("Not applicable") > -1);
 		
 		// done testing compatibility
 		onDone();

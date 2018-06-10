@@ -1,5 +1,4 @@
 v0.3.0
-bip39 public null -> NA?
 compact text
 exhaustive tests
 

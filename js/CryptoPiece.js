@@ -295,7 +295,7 @@ function CryptoPiece(config) {
 		for (i = 0; i < state.keypairs.length; i++) {
 			var keypairValues = [];
 			for (var j = 0; j < headers.length; j++) {
-				var value = state.keypairs[i].getFieldValue(headers[j]);
+				var value = state.keypairs[i].getExportValue(headers[j]);
 				if (value === null) value = "null";
 				if (value === undefined) value = "";
 				keypairValues.push(value);
