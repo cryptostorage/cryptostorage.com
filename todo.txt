@@ -1,5 +1,5 @@
 v0.3.0
-export csv only public has private labels, removing causes encryption error which shouldn't be option
+bip39 public null -> NA?
 compact text
 exhaustive tests
 

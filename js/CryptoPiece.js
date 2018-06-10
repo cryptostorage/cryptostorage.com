@@ -284,7 +284,9 @@ function CryptoPiece(config) {
 		  if (arrayContains(CryptoKeypair.getExcludedFields(), header)) continue;               // skip field if excluded
 		  if (header === CryptoKeypair.Field.PART_NUM && !this.isDivided()) continue;           // skip part num if not divided
 		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue;       // skip encryption if not encrypted
-		  if (header === CryptoKeypair.Field.PRIVATE_STATE && !this.hasPrivateKeys()) continue; // skip private state if no private keys
+		  if (header === CryptoKeypair.Field.PRIVATE_WIF && !this.hasPrivateKeys()) continue;   // skip private wif if no private keys
+      if (header === CryptoKeypair.Field.PRIVATE_HEX && !this.hasPrivateKeys()) continue;   // skip private hex if no private keys
+      if (header === CryptoKeypair.Field.PRIVATE_STATE && !this.hasPrivateKeys()) continue; // skip private state if no private keys
 			headers.push(header);
 		}
 		
