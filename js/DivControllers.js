@@ -4716,7 +4716,8 @@ function EditorPrintController(div, pieces) {
 	
 	var Layout = {
 			STANDARD: "Standard layout",
-			COMPACT: "Compact layout",
+			COMPACT_GRID: "Compact grid layout",
+			COMPACT_TEXT: "Compact text layout",
 			CRYPTOCASH: "CryptoCash"
 	}
 	
@@ -4859,7 +4860,7 @@ function EditorPrintController(div, pieces) {
 				includeQrsCheckbox.setVisible(false);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
-			case Layout.COMPACT:
+			case Layout.COMPACT_GRID:
 				pieceRendererClass = CompactPieceRenderer;
 				previewRendererClass = CompactPiecePreviewRenderer;
 				includePrivateCheckbox.setVisible(false);
@@ -4870,6 +4871,17 @@ function EditorPrintController(div, pieces) {
 				includeQrsCheckbox.setVisible(true);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
+      case Layout.COMPACT_TEXT:
+        pieceRendererClass = CompactTextPieceRenderer;
+        previewRendererClass = CompactTextPiecePreviewRenderer;
+        includePrivateCheckbox.setVisible(includePublicCheckbox.isEnabled() || includePrivateCheckbox.isEnabled());
+        includePublicCheckbox.setVisible(includePublicCheckbox.isEnabled() || includePrivateCheckbox.isEnabled());
+        includePrivateRadio.setVisible(false);
+        includePublicRadio.setVisible(false);
+        includeLogosCheckbox.setVisible(false);
+        includeQrsCheckbox.setVisible(false);
+        if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
+        break;
 			case Layout.CRYPTOCASH:
 				pieceRendererClass = StandardPieceRenderer;
 				previewRendererClass = StandardPiecePreviewRenderer;
@@ -4881,7 +4893,7 @@ function EditorPrintController(div, pieces) {
 				includeQrsCheckbox.setVisible(false);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(true);
 				break;
-			default: throw new Error("Unsupported layout: " + layout.geSelectedText());
+			default: throw new Error("Unsupported layout: " + layoutDropdown.getSelectedText());
 		}
 		
 		// disable print button
@@ -4950,15 +4962,17 @@ function EditorPrintController(div, pieces) {
 				config.showPublic = includePublicCheckbox.isChecked();
 				config.showPrivate = includePrivateCheckbox.isChecked();
 				config.showLogos = includeLogosCheckbox.isChecked();
-				config.cryptoCash = false;
 				break;
-			case Layout.COMPACT:
+			case Layout.COMPACT_GRID:
 				config.showPublic = includePublicRadio.isChecked();
 				config.showPrivate = includePrivateRadio.isChecked();
 				config.showLogos = includeLogosCheckbox.isChecked();
 				config.showQr = includeQrsCheckbox.isChecked();
-				config.cryptoCash = false;
 				break;
+      case Layout.COMPACT_TEXT:
+        config.showPublic = includePublicCheckbox.isChecked();
+        config.showPrivate = includePrivateCheckbox.isChecked();
+        break;
 			case Layout.CRYPTOCASH:
 				config.showPublic = true;
 				config.showPrivate = true;
@@ -4982,7 +4996,8 @@ function EditorPrintController(div, pieces) {
 		
 		// confirm printing without private keys
 		if ((layoutDropdown.getSelectedText() === Layout.STANDARD && !includePrivateCheckbox.isChecked() ||
-				layoutDropdown.getSelectedText() === Layout.COMPACT && !includePrivateRadio.isChecked()) && 
+		    layoutDropdown.getSelectedText() === Layout.COMPACT_TEXT && !includePrivateCheckbox.isChecked() ||
+				layoutDropdown.getSelectedText() === Layout.COMPACT_GRID && !includePrivateRadio.isChecked()) && 
 				!confirm("Funds CANNOT be recovered from the printed document because the private keys are not included.\n\nContinue?")) {
 			return;
 		}
@@ -6405,4 +6420,149 @@ CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
 		decoded.valueCopyable = true;
 	}
 	return decoded;
+}
+
+/**
+ * Renders a piece as compact text.
+ * 
+ * @param div is the div to render to
+ * @param piece is the piece to render
+ * @param config specifies render configuration
+ *        config.showPublic specifies if public addresses should be shown
+ *        config.showPrivate specifies if private keys should be shown
+ */
+function CompactTextPieceRenderer(div, piece, config) {
+  if (!div) div = $("<div>");
+  DivController.call(this, div);
+  
+  // config default and validation
+  config = Object.assign({
+    showPublic: true,
+    showPrivate: true
+  }, config);
+  assertTrue(config.showPublic || config.showPrivate);
+  
+  var onProgressFn;
+  var _isDestroyed = false;
+  
+  this.render = function(onDone) {
+    assertFalse(_isDestroyed, "CompactTextPieceRenderer is destroyed");
+    if (onProgressFn) onProgressFn(0, "Rendering");
+    
+    // div setup
+    div.empty();
+    div.addClass("piece_div");
+    
+    // add text content
+    var txtDiv = $("<div class='compact_text_value'>").appendTo(div);
+    txtDiv.append(piece.toCompactTxt());
+
+    // done
+    if (onProgressFn) onProgressFn(1, "Rendering");
+    if (onDone) onDone(div);
+  }
+  
+  /**
+   * Destroys the renderer.  Does not destroy the underlying piece.
+   */
+  this.destroy = function() {
+    assertFalse(_isDestroyed, "CompactTextPieceRenderer already destroyed");
+    _isDestroyed = true;
+  }
+  
+  this.isDestroyed = function() {
+    return _isDestroyed;
+  }
+  
+  this.getPiece = function() {
+    assertFalse(_isDestroyed, "CompactTextPieceRenderer is destroyed");
+    return piece;
+  }
+  
+  this.onProgress = function(callbackFn) {
+    assertFalse(_isDestroyed, "CompactTextPieceRenderer is destroyed");
+    onProgressFn = callbackFn;
+  }
+  
+  this.getRenderWeight = function() {
+    assertFalse(_isDestroyed, "CompactTextPieceRenderer is destroyed");
+    return 1;
+  }
+}
+inheritsFrom(CompactTextPieceRenderer, DivController);
+
+/**
+ * Relative weight to render a piece generation config.
+ */
+CompactTextPieceRenderer.getRenderWeight = function(config) {
+  PieceGenerator.validateConfig(config);
+  return 1;
+}
+
+/**
+ * Renders a preview of what CompactTextPieceRenderer will render.
+
+ * @param div is the div to render to
+ * @param piece is the piece to render
+ * @param config specifies render configuration
+ *        config.showPublic specifies if public addresses should be shown
+ *        config.showPrivate specifies if private keys should be shown
+ */
+function CompactTextPiecePreviewRenderer(div, piece, config) {
+  if (!div) div = $("<div>");
+  DivController.call(this, div);
+  assertObject(piece, CryptoPiece);
+  
+  var onProgressFn;
+  var pieceRenderer;
+  var _isDestroyed = false;
+  
+  this.render = function(onDone) {
+    assertFalse(_isDestroyed, "CompactTextPiecePreviewRenderer is destroyed");
+    
+    // get preview piece
+    var numKeypairs = Math.min(20, piece.getKeypairs().length);
+    var previewKeypairs = [];
+    for (var i = 0; i < numKeypairs; i++) previewKeypairs.push(piece.getKeypairs()[i]);
+    var previewPiece = new CryptoPiece({keypairs: previewKeypairs});
+    
+    // render preview piece
+    pieceRenderer = new CompactTextPieceRenderer(div, previewPiece, config);
+    pieceRenderer.onProgress(onProgressFn);
+    pieceRenderer.render(function(div) {
+      
+      // add preview overlay
+      var previewDiv = $("<div class='editor_print_preview_overlay editor_print_preview_overlay_reverse user_select_none'>PREVIEW</div>");
+      new OverlayController(div, {contentDiv: previewDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
+        if (onDone) onDone();
+      });
+    });
+  }
+  
+  this.onProgress = function(callbackFn) {
+    assertFalse(_isDestroyed, "CompactTextPiecePreviewRenderer is destroyed");
+    onProgressFn = callbackFn;
+  }
+  
+  /**
+   * Destroys the renderer.  Does not destroy the underlying piece.
+   */
+  this.destroy = function() {
+    assertFalse(_isDestroyed, "CompactTextPiecePreviewRenderer already destroyed");
+    if (pieceRenderer) pieceRenderer.destroy();
+    _isDestroyed = true;
+  }
+  
+  this.isDestroyed = function() {
+    return _isDestroyed;
+  }
+}
+inheritsFrom(CompactTextPiecePreviewRenderer, DivController);
+
+/**
+ * Register preview generation weight.
+ */
+CompactTextPiecePreviewRenderer.getRenderWeight = function(config) {
+  PieceGenerator.validateConfig(config);
+  return 1;
 }

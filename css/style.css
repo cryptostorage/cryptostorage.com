@@ -1620,6 +1620,12 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	text-align: center;
 }
 
+.compact_text_value {
+	font-size: 12px;
+	font-family: monospace;
+	word-break: break-all;
+}
+
 .hidden {
 	display: none;
 }
