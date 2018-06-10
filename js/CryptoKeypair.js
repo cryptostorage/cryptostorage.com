@@ -767,8 +767,8 @@ CryptoKeypair.prototype._decodePart = function(part) {
   function decodePartWifV0(part) {
     if (!isBase58(part)) return null;
     var hex = AppUtils.toBase(58, 16, part);
-    if (that._state.plugin.getTicker() === "XRP" && hex.substring(0, 2) !== "07") return null; // XRP address format is nearly indistinguishable from v0 part
     if (hex.length % 2 !== 0) return null;
+    if (that._state.plugin.getTicker() === "XRP" && hex.substring(0, 2) !== "07") return null; // XRP address format is distinguished by hex (avoids potential false positive)
     var shamirHex = ninja.wallets.splitwallet.stripLeadZeros(hex);
     if (!isValidShamirHex(that._state.plugin, shamirHex)) return null;
     return {
@@ -830,6 +830,7 @@ CryptoKeypair.prototype._decodePart = function(part) {
     if (!isBase58(part)) return null;
     var hex = AppUtils.toBase(58, 16, part);
     if (hex.length % 2 !== 0) return null;
+    if (that._state.plugin.getTicker() === "WAVES" && hex.substring(0, 3) !== "010") return null; // Waves address format is distinguished by hex (avoids potential false positive)
     var version = parseInt(hex.substring(0, 2), 16);
     if (version !== CryptoKeypair.DIVIDE_V2_VERSION) return null;
     var decoded = {};

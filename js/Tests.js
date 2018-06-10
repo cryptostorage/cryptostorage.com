@@ -37,7 +37,7 @@ function Tests() {
 	var MIN_PARTS = 3;
 	
 	// list of invalid private keys to test per plugin
-	var INVALID_PKS = [" ", "ab", "abctesting123", "abc testing 123", 12345, "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "3b20836520fe2e8eef1fd3f898fd97b5a3bcb6702fae72e3ca1ba8fb6e1ddd75b12f74dc6422606d1750e40", "3P2ecsHZa9VXsb6j5Vg8RZ6tnidEHqCp7UT"];
+	var INVALID_PKS = [" ", "ab", "abctesting123", "abc testing 123", 12345, "U2FsdGVkX1+41CvHWzRBzaBdh5Iz/Qu42bV4t0Q5WMeuvkiI7bzns76l6gJgquKcH2GqHjHpfh7TaYmJwYgr3QYzNtNA/vRrszD/lkqR2+uRVABUnfVziAW1JgdccHE", "U2FsdGVkX19kbqSAg6GjhHE+DEgGjx2mY4Sb7K/op0NHAxxHZM34E6eKEBviUp1U9OC6MdG fEOfc9zkAfMTCAvRwoZu36h5tpHl7TKdQvOg3BanArtii8s4UbvXxeGgy", "3b20836520fe2e8eef1fd3f898fd97b5a3bcb6702fae72e3ca1ba8fb6e1ddd75b12f74dc6422606d1750e40"];
 	
 	/**
 	 * Runs minimum tests to verify key generation and dividing.
@@ -92,7 +92,7 @@ function Tests() {
 		// collect test functions
 		var funcs = [];
 		funcs.push(function(onDone) { testUtils(); onDone(); });
-		//funcs.push(function(onDone) { testPlugins(plugins, onDone); });
+		funcs.push(function(onDone) { testPlugins(plugins, onDone); });
 		funcs.push(function(onDone) { testPieceAllPlugins(plugins); onDone(); });
 		funcs.push(function(onDone) { testBackwardsCompatibility(onDone); });
 		funcs.push(function(onDone) { testFileImport(plugins, onDone); });
@@ -204,7 +204,7 @@ function Tests() {
 		async.series(testFuncs, onDone);
 	}
 	
-	function testPlugin(plugin, onDone) {		
+	function testPlugin(plugin, onDone) {
 		assertInitialized(plugin.getName());
 		assertInitialized(plugin.getTicker());
 		assertInitialized(plugin.getLogo());
@@ -214,23 +214,35 @@ function Tests() {
 		assertFalse(plugin.isAddress(undefined));
 		plugin.isPublicApplicable() ? assertFalse(plugin.isAddress(null)) : assertTrue(plugin.isAddress(null));
 		assertFalse(plugin.isAddress([]));
-
-		// test decode invalid private keys
-		var invalids = copyArray(INVALID_PKS);
-		invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());
-		for (var j = 0; j < invalids.length; j++) {
-			var invalid = invalids[j];
-			if (isString(invalid)) {
-				assertNull(plugin.decode(invalid));	
-			} else {
-				try {
-					plugin.decode(invalid);
-					fail("fail");
-				} catch (err) {
-					if (err.message === "fail") throw new Error(plugin.getTicker() + " should throw exception if decoding non-string");
-				}
-			}
-		}
+		
+		// test invalid private keys
+    var invalids = copyArray(INVALID_PKS);
+    for (var i = 0; i < REPEAT_KEYS; i++) {
+      invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());  // test public address is not recognized
+    }
+    for (var i = 0; i < invalids.length; i++) {
+      var invalid = invalids[i];
+      if (isString(invalid)) {
+        assertNull(plugin.decode(invalid)); 
+      } else {
+        try {
+          plugin.decode(invalid);
+          fail("fail");
+        } catch (err) {
+          if (err.message === "fail") throw new Error(plugin.getTicker() + " should throw exception if decoding non-string");
+        }
+      }
+      var keypair;
+      try {
+        keypair = new CryptoKeypair({plugin: plugin, privateKey: invalid});
+        fail("fail");
+      } catch (err) {
+        if (err.message === "fail") {
+          console.log(keypair._state);
+          throw new Error("Should not create " + plugin.getTicker() + " keypair from invalid private key: " + invalid);
+        }
+      }
+    }
 		
 		// bitcoin specific tests
 		if (plugin.getTicker() === "BTC") {
@@ -286,26 +298,6 @@ function Tests() {
 	
 	function testPieceAllPlugins(plugins) {
 		console.log("Testing piece with all plugins");
-		
-    // test init keypairs with invalid private keys
-		for (var i = 0; i < plugins.length; i++) {
-		  var plugin = plugins[i];
-		  var invalids = copyArray(INVALID_PKS);
-		  invalids.push(new CryptoKeypair({plugin: plugin}).getPublicAddress());  // test public address is not recognized
-		  for (var j = 0; j < invalids.length; j++) {
-	      var invalid = invalids[j];
-	      var keypair;
-	      try {
-	        keypair = new CryptoKeypair({plugin: plugin, privateKey: invalid});
-	        fail("fail");
-	      } catch (err) {
-	        if (err.message === "fail") {
-	          console.log(keypair.toJson());
-	          throw new Error("Should not create " + plugin.getTicker() + " keypair from invalid private key: " + invalid);
-	        }
-	      }
-	    }
-		}
 		
 		// create and test keypairs
 		var keypairs = [];
