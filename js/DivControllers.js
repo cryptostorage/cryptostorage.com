@@ -6453,29 +6453,15 @@ function CompactTextPieceRenderer(div, piece, config) {
     div.empty();
     div.addClass("piece_div");
     
-    // build text with breakpoints
+    // build text with break points
     var txt = "";
     for (var i = 0; i < piece.getKeypairs().length; i++) {
       txt += toCompactTextKeypair(piece.getKeypairs()[i], i);
-      if (i < piece.getKeypairs().length - 1) txt += "&nbsp;|&nbsp;";
-    }
-    
-    function toCompactTextKeypair(keypair, index) {
-      var txt = "";
-      if (isDefined(index)) txt += "#" + (keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (index + 1) + ",&nbsp;";
-      txt += keypair.getPlugin().getTicker();
-      if (isInitialized(keypair.getPublicAddress())) {
-        txt += ",&nbsp;public:&nbsp;<span class='word_break_break_all'>" + keypair.getPublicAddress() + "</span>";
-      }
-      if (isInitialized(keypair.getPrivateWif())) {
-        txt += ",&nbsp;private:&nbsp;<span" + (keypair.getPrivateWif().indexOf(" ") < 0 ? " class='word_break_break_all'" : "") + ">" + keypair.getPrivateWif() + "</span>";
-        txt += keypair.getPartNum() ? ",&nbsp;divided" : (keypair.isEncrypted() ? ",&nbsp;encrypted" : "");
-      }
-      return txt;
+      if (i < piece.getKeypairs().length - 1) txt += " | ";
     }
     
     // add text
-    var txtDiv = $("<div class='compact_text_value'>").appendTo(div);
+    var txtDiv = $("<div class='compact_text_value word_break_all'>").appendTo(div);
     txtDiv.append(txt);
 
     // done
@@ -6508,6 +6494,39 @@ function CompactTextPieceRenderer(div, piece, config) {
   this.getRenderWeight = function() {
     assertFalse(_isDestroyed, "CompactTextPieceRenderer is destroyed");
     return 1;
+  }
+  
+  function toCompactTextKeypair(keypair, index) {
+    var txt = "";
+    if (isDefined(index)) txt += getNoWrapSpan("#" + (keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (index + 1) + ",") + " ";
+    txt += getNoWrapSpan(keypair.getPlugin().getTicker() + ",");
+    if (isInitialized(keypair.getPublicAddress())) {
+      txt += " " + getNoWrapSpan("public:") + " " + keypair.getPublicAddress();
+      if (isInitialized(keypair.getPrivateWif())) txt += ",";
+    }
+    if (isInitialized(keypair.getPrivateWif())) {
+      txt += " " + getNoWrapSpan("private:") + " " + getPrivateTxt(keypair);
+      txt += keypair.getPartNum() ? ", " + getNoWrapSpan("divided") : (keypair.isEncrypted() ? ", " + getNoWrapSpan("encrypted") : "");
+    }
+    return txt;
+  }
+  
+  function getNoWrapSpan(txt) {
+    return "<span class='nowrap'>" + txt + "</span>";
+  }
+  
+  function getPrivateTxt(keypair) {
+    var words = keypair.getPrivateWif().split(" ");
+    if (words.length > 1) {
+      var span = "";
+      for (var i = 0; i < words.length; i++) {
+        span += getNoWrapSpan(words[i]);
+        if (i < words.length - 1) span += " ";
+      }
+      return span;
+    } else {
+      return words[0];
+    }
   }
 }
 inheritsFrom(CompactTextPieceRenderer, DivController);

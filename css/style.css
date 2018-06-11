@@ -97,8 +97,16 @@ body {
 	user-select: none;
 }
 
-.word_break_break_all {
+.nowrap {
+	white-space: nowrap;
+}
+
+.word_break_all {
 	word-break: break-all;
+}
+
+.word_wrap_break_word {
+	word-wrap: break-word;
 }
 
 .overlay_div {
