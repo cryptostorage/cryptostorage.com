@@ -1389,6 +1389,8 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 .piece_div {
 	min-width: 750px;
 	width: 750px;
+	page-break-inside: avoid;
+	page-break-after: always;
 }
 
 .piece_preview_div {

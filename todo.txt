@@ -1,9 +1,5 @@
 v0.3.0
-page break after compact piece
-
-compact text
 exhaustive tests
-
 encryption and division method outlined in faq
 slider points cleanup
 recommend destroy printer for ultimate security
