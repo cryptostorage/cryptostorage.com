@@ -1,5 +1,7 @@
 v0.3.0
 compact preview min max height
+preview overlay other direction
+paper border
 
 compact text
 exhaustive tests
