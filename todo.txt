@@ -3,14 +3,12 @@ print "are not shown"
 brave str.indexof error screenshot
 brave error opening editor in homepage even though tab opens
 brave print document goes to /undefined and causes error in editor tab
-
-exhaustive tests
+update home divide graphic
 encryption and division method outlined in faq
 slider points cleanup
-recommend destroy printer for ultimate security
+address sensitivity of printer and flash drive after use
 put homepage text in index.html and dynamically hide for seo
 upate readme.md
-update home divide graphic
 browser testing
 release
 
