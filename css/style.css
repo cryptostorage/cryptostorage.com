@@ -1311,7 +1311,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .editor_print_preview {
-	min-height: 180px;
+	min-height: 150px;
 	position: relative;
 }
 
@@ -1389,6 +1389,12 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 .piece_div {
 	min-width: 750px;
 	width: 750px;
+}
+
+.piece_preview_div {
+	min-height: 106px;
+	max-height: 300px;
+	overflow: hidden;
 }
 
 .piece_page_div {
@@ -1635,6 +1641,7 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 .compact_text_value, .compact_text_value * {
 	font-size: 12px;
 	font-family: monospace;
+	text-align: justify;
 }
 
 .hidden {

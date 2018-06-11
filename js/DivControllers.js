@@ -5650,6 +5650,9 @@ function StandardPiecePreviewRenderer(div, piece, config) {
 	this.render = function(onDone) {
 		assertFalse(_isDestroyed, "StandardPiecePreviewRenderer is destroyed");
 		
+		// div setup
+    div.addClass("piece_preview_div");
+		
 		// get preview piece
 		var numKeypairs = config.cryptoCash && config.infoBack ? 1 : Math.min(2, piece.getKeypairs().length);
 		var previewKeypairs = [];
@@ -6174,6 +6177,9 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	this.render = function(onDone) {
 		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
 		
+		// div setup
+    div.addClass("piece_preview_div");
+		
 		// get preview piece
 		var numKeypairs = Math.min(4, piece.getKeypairs().length);
 		var previewKeypairs = [];
@@ -6560,8 +6566,11 @@ function CompactTextPiecePreviewRenderer(div, piece, config) {
   this.render = function(onDone) {
     assertFalse(_isDestroyed, "CompactTextPiecePreviewRenderer is destroyed");
     
+    // div setup
+    div.addClass("piece_preview_div");
+    
     // get preview piece
-    var numKeypairs = Math.min(20, piece.getKeypairs().length);
+    var numKeypairs = Math.min(30, piece.getKeypairs().length);
     var previewKeypairs = [];
     for (var i = 0; i < numKeypairs; i++) previewKeypairs.push(piece.getKeypairs()[i]);
     var previewPiece = new CryptoPiece({keypairs: previewKeypairs});
@@ -6570,9 +6579,11 @@ function CompactTextPiecePreviewRenderer(div, piece, config) {
     pieceRenderer = new CompactTextPieceRenderer(div, previewPiece, config);
     pieceRenderer.onProgress(onProgressFn);
     pieceRenderer.render(function(div) {
+      div.css("border", "2px solid");
+      div.css("padding", "4px");
       
       // add preview overlay
-      var previewDiv = $("<div class='editor_print_preview_overlay editor_print_preview_overlay_reverse user_select_none'>PREVIEW</div>");
+      var previewDiv = $("<div class='editor_print_preview_overlay editor_print_preview_overlay user_select_none'>PREVIEW</div>");
       new OverlayController(div, {contentDiv: previewDiv, backgroundColor: "rgb(0, 0, 0, 0)"}).render(function() {
         if (onDone) onDone();
       });
