@@ -1017,10 +1017,9 @@ function HomeController(div) {
 			
 			// divide and passphrase section
 			pageDiv.append("<div style='height: 10px'>");
-			pageDiv.append("<div class='home_label'>Passphrase-protect and divide private keys for maximum security</div>");
+			pageDiv.append("<div class='home_label'>Encrypt and divide private keys for maximum security</div>");
 			pageDiv.append("<div class='home_description'>Encrypt private keys with a passphrase or divide them into parts so funds are not accessible at any one location.  Set how many parts are needed to recover the keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
-			pageDiv.append($("<img style='width:785px; margin-bottom:15px;' src='img/passphrase_input.png'>"));
-			pageDiv.append($("<img style='width:600px;' src='img/divide_input.png'>"));
+			pageDiv.append("<img style='width:625px; margin-top:5px;' src='img/passphrase_divide.png'>");
 			
 			// check environment section
 			pageDiv.append("<div style='height: 70px'>");
