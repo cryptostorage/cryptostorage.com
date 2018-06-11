@@ -1,4 +1,5 @@
 v0.3.0
+all passes check green too dark?
 print "are not shown"
 brave str.indexof error screenshot
 brave error opening editor in homepage even though tab opens
