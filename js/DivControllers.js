@@ -4998,7 +4998,7 @@ function EditorPrintController(div, pieces) {
 		if ((layoutDropdown.getSelectedText() === Layout.STANDARD && !includePrivateCheckbox.isChecked() ||
 		    layoutDropdown.getSelectedText() === Layout.TEXT && !includePrivateCheckbox.isChecked() ||
 				layoutDropdown.getSelectedText() === Layout.GRID && !includePrivateRadio.isChecked()) && 
-				!confirm("Funds CANNOT be recovered from the printed document because the private keys are not included.\n\nContinue?")) {
+				!confirm("Funds CANNOT be recovered from the printed document because the private keys are not shown.\n\nContinue?")) {
 			return;
 		}
 
