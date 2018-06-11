@@ -1,6 +1,4 @@
 v0.3.0
-brave error opening editor in homepage even though tab opens
-brave print document goes to /undefined and causes error in editor tab
 encryption and division method outlined in faq
 slider points cleanup
 address sensitivity of printer and flash drive after use
@@ -10,6 +8,8 @@ browser testing
 release
 
 v0.3.1
+brave error opening editor in homepage even though tab opens
+brave print document goes to /undefined and causes error in editor tab
 show print preview when ready then print button becomes progress bar until ready
 divide part checksum instead of min part encoding
 copied tooltip is not centered for some private keys because div goes under QR
