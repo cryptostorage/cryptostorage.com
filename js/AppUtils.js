@@ -80,7 +80,7 @@ var AppUtils = {
 	/**
 	 * Mock environment checks.
 	 */
-	MOCK_ENVIRONMENT_ENABLED: true,
+	MOCK_ENVIRONMENT_ENABLED: false,
 	MOCK_ENVIRONMENT: {
 		browser: {name: "Firefox", version: "42.0", major: 42, isOpenSource: true, isSupported: true, windowCryptoExists: true},
 		os: {name: "Linux", version: "10.12", isOpenSource: true},
