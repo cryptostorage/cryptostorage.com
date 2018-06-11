@@ -719,8 +719,9 @@ inheritsFrom(PaginatorController, DivController);
  * Controls the entire application.
  * 
  * @param div is the div to render the application to
+ * @param hash is an initial window hash (e.g. #faq)
  */
-function AppController(div) {
+function AppController(div, hash) {
 	
 	var that = this;
 	var showFuncs;
@@ -759,8 +760,8 @@ function AppController(div) {
 		
 		// header logo
 		var headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
-		var logo = $("<img class='app_header_logo_img' src='img/cryptostorage_white.png'>").appendTo(headerTopDiv);
-		logo.click(function() { navigate("#home"); });
+		var logo = $("<a href='index.html'><img class='app_header_logo_img' src='img/cryptostorage_white.png'></a>").appendTo(headerTopDiv);
+		//logo.click(function() { navigate("#home"); });
 		
 		// header links
 		var linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
@@ -813,7 +814,7 @@ function AppController(div) {
 		});
 		
 		// navigate to first page
-		navigate(window.location.hash, function() {
+		navigate(hash ? hash : window.location.hash, function() {
 			
 			// load notice dependencies and start polling
 			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
@@ -1060,7 +1061,7 @@ function HomeController(div) {
 			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=eth' class='footer_subtopic'>Ethereum</a>").appendTo(footerTopicGenerate);
 			$("<a target='_blank' href='generate.html?" + AppUtils.TICKERS_PARAM + "=xmr' class='footer_subtopic'>Monero</a>").appendTo(footerTopicGenerate);
 			var footerTopicImport = $("<div class='footer_topic_div flex_vertical'>");
-      $("<a href='#import' class='footer_topic'>Import Keypairs</a>").appendTo(footerTopicImport);
+      $("<a href='import.html' class='footer_topic'>Import Keypairs</a>").appendTo(footerTopicImport);
 			var footerTopicGitHub = $("<div class='footer_topic_div flex_vertical'>");
 			$("<a target='_blank' href='" + AppUtils.GITHUB_URL + "' class='footer_topic'>GitHub</a>").appendTo(footerTopicGitHub);
 			var footerTopicDownload = $("<div class='footer_topic_div flex_vertical'>");
