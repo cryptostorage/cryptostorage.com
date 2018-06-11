@@ -4716,8 +4716,8 @@ function EditorPrintController(div, pieces) {
 	
 	var Layout = {
 			STANDARD: "Standard Layout",
-			COMPACT_GRID: "Grid Layout",
-			COMPACT_TEXT: "Compact Layout",
+			GRID: "Grid Layout",
+			TEXT: "Text Layout",
 			CRYPTOCASH: "CryptoCash Layout"
 	}
 	
@@ -4860,9 +4860,9 @@ function EditorPrintController(div, pieces) {
 				includeQrsCheckbox.setVisible(false);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
-			case Layout.COMPACT_GRID:
-				pieceRendererClass = CompactPieceRenderer;
-				previewRendererClass = CompactPiecePreviewRenderer;
+			case Layout.GRID:
+				pieceRendererClass = GridPieceRenderer;
+				previewRendererClass = GridPiecePreviewRenderer;
 				includePrivateCheckbox.setVisible(false);
 				includePublicCheckbox.setVisible(false);
 				includePrivateRadio.setVisible(includePublicRadio.isEnabled() || includePrivateRadio.isEnabled());
@@ -4871,9 +4871,9 @@ function EditorPrintController(div, pieces) {
 				includeQrsCheckbox.setVisible(true);
 				if (includeInstructionsCheckbox) includeInstructionsCheckbox.setVisible(false);
 				break;
-      case Layout.COMPACT_TEXT:
-        pieceRendererClass = CompactTextPieceRenderer;
-        previewRendererClass = CompactTextPiecePreviewRenderer;
+      case Layout.TEXT:
+        pieceRendererClass = TextPieceRenderer;
+        previewRendererClass = TextPiecePreviewRenderer;
         includePrivateCheckbox.setVisible(includePublicCheckbox.isEnabled() || includePrivateCheckbox.isEnabled());
         includePublicCheckbox.setVisible(includePublicCheckbox.isEnabled() || includePrivateCheckbox.isEnabled());
         includePrivateRadio.setVisible(false);
@@ -4963,13 +4963,13 @@ function EditorPrintController(div, pieces) {
 				config.showPrivate = includePrivateCheckbox.isChecked();
 				config.showLogos = includeLogosCheckbox.isChecked();
 				break;
-			case Layout.COMPACT_GRID:
+			case Layout.GRID:
 				config.showPublic = includePublicRadio.isChecked();
 				config.showPrivate = includePrivateRadio.isChecked();
 				config.showLogos = includeLogosCheckbox.isChecked();
 				config.showQr = includeQrsCheckbox.isChecked();
 				break;
-      case Layout.COMPACT_TEXT:
+      case Layout.TEXT:
         config.showPublic = includePublicCheckbox.isChecked();
         config.showPrivate = includePrivateCheckbox.isChecked();
         break;
@@ -4996,8 +4996,8 @@ function EditorPrintController(div, pieces) {
 		
 		// confirm printing without private keys
 		if ((layoutDropdown.getSelectedText() === Layout.STANDARD && !includePrivateCheckbox.isChecked() ||
-		    layoutDropdown.getSelectedText() === Layout.COMPACT_TEXT && !includePrivateCheckbox.isChecked() ||
-				layoutDropdown.getSelectedText() === Layout.COMPACT_GRID && !includePrivateRadio.isChecked()) && 
+		    layoutDropdown.getSelectedText() === Layout.TEXT && !includePrivateCheckbox.isChecked() ||
+				layoutDropdown.getSelectedText() === Layout.GRID && !includePrivateRadio.isChecked()) && 
 				!confirm("Funds CANNOT be recovered from the printed document because the private keys are not included.\n\nContinue?")) {
 			return;
 		}
@@ -5947,7 +5947,7 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 }
 
 /**
- * Renders a piece with compact keypairs.
+ * Renders a piece with keypairs in a grid.
  * 
  * @param div is the div to render to
  * @param piece is the piece to render
@@ -5960,7 +5960,7 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
  *        config.copyable specifies if the public/private values should be copyable
  *        config.scratchpadParent is a visible div to attach render scratchpads to so heights can be measured
  */
-function CompactPieceRenderer(div, piece, config) {
+function GridPieceRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	
@@ -5981,7 +5981,7 @@ function CompactPieceRenderer(div, piece, config) {
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
-		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
+		assertFalse(_isDestroyed, "GridPieceRenderer is destroyed");
 		
 		// div setup
 		div.empty();
@@ -5991,7 +5991,7 @@ function CompactPieceRenderer(div, piece, config) {
     var doneWeight = 0;
     var totalWeight  = 0;
     for (var i = 0; i < piece.getKeypairs().length; i++) {
-      totalWeight += CompactKeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker(), config);
+      totalWeight += GridKeypairRenderer.getRenderWeight(piece.getKeypairs()[i].getPlugin().getTicker(), config);
     }
     
     // collect functions to render keypairs
@@ -6010,15 +6010,15 @@ function CompactPieceRenderer(div, piece, config) {
       return function(onDone) {
         if (_isDestroyed) return;
         if (piece.getKeypairs().length > 1 || piece.getPartNum()) config.keypairIdx = index;
-        var keypairRenderer = new CompactKeypairRenderer($("<div>").appendTo(config.scratchpadParent), piece.getKeypairs()[index], config);
+        var keypairRenderer = new GridKeypairRenderer($("<div>").appendTo(config.scratchpadParent), piece.getKeypairs()[index], config);
         keypairRenderers.push(keypairRenderer);
         keypairRenderer.render(function(div) {
           if (_isDestroyed) return;
-          doneWeight += CompactKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker(), config);
+          doneWeight += GridKeypairRenderer.getRenderWeight(keypairRenderer.getKeypair().getPlugin().getTicker(), config);
           if (onProgressFn) onProgressFn(doneWeight / totalWeight, "Rendering keypairs");
           var height = div.get(0).offsetHeight;
           div.detach();
-          if (i % 100 === 0) {  // fix issue where call stack exceeded for large pieces because compact can be synchronous
+          if (i % 100 === 0) {  // fix issue where call stack exceeded for large pieces because grid can be synchronous
             setImmediate(function() {
               onDone(null, keypairRenderer, height);
             });
@@ -6078,7 +6078,7 @@ function CompactPieceRenderer(div, piece, config) {
           // add new row
           if (i === 0 || i % 2 === 0) {
             usedHeight += rowHeight;
-            keypairsRow = $("<div class='compact_keypairs_row flex_horizontal'>").appendTo(keypairsDiv);
+            keypairsRow = $("<div class='grid_keypairs_row flex_horizontal'>").appendTo(keypairsDiv);
           }
           
           // add rendered keyapir
@@ -6086,7 +6086,7 @@ function CompactPieceRenderer(div, piece, config) {
         }
         
         // add blank placeholder if uneven number of keypairs to preserve formatting
-        if (i % 2 !== 0) $("<div style='border-top:none; border-right:none; border-bottom:none;' class='compact_keypair_div'>").appendTo(keypairsRow);
+        if (i % 2 !== 0) $("<div style='border-top:none; border-right:none; border-bottom:none;' class='grid_keypair_div'>").appendTo(keypairsRow);
         
         // make keypairs copyable
         if (config.copyable) UiUtils.makeCopyable(div);
@@ -6101,7 +6101,7 @@ function CompactPieceRenderer(div, piece, config) {
 	 * Destroys the renderer.  Does not destroy the underlying piece.
 	 */
 	this.destroy = function() {
-		assertFalse(_isDestroyed, "CompactPieceRenderer already destroyed");
+		assertFalse(_isDestroyed, "GridPieceRenderer already destroyed");
 		if (keypairRenderers) {
 			for (var i = 0; i < keypairRenderers.length; i++) keypairRenderers[i].destroy();
 		}
@@ -6113,28 +6113,28 @@ function CompactPieceRenderer(div, piece, config) {
 	}
 	
 	this.getPiece = function() {
-		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
+		assertFalse(_isDestroyed, "GridPieceRenderer is destroyed");
 		return piece;
 	}
 	
 	this.onProgress = function(callbackFn) {
-		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
+		assertFalse(_isDestroyed, "GridPieceRenderer is destroyed");
 		onProgressFn = callbackFn;
 	}
 	
 	this.getRenderWeight = function() {
-		assertFalse(_isDestroyed, "CompactPieceRenderer is destroyed");
+		assertFalse(_isDestroyed, "GridPieceRenderer is destroyed");
 		var weight = 0;
-		for (var i = 0; i < piece.getKeypairs().length; i++) weight += CompactKeypairRenderer.getRenderWeight(piece.getKeypairs()[i], config);
+		for (var i = 0; i < piece.getKeypairs().length; i++) weight += GridKeypairRenderer.getRenderWeight(piece.getKeypairs()[i], config);
 		return weight;
 	}
 }
-inheritsFrom(CompactPieceRenderer, DivController);
+inheritsFrom(GridPieceRenderer, DivController);
 
 /**
  * Relative weight to render a piece generation config.
  */
-CompactPieceRenderer.getRenderWeight = function(config) {
+GridPieceRenderer.getRenderWeight = function(config) {
 	PieceGenerator.validateConfig(config);
 	var numParts = config.numParts ? config.numParts : 1;
 	var weight = 0;
@@ -6142,21 +6142,21 @@ CompactPieceRenderer.getRenderWeight = function(config) {
 	// compute weight from pre-existing pieces
 	if (config.pieces) {
 		for (var i = 0; i < config.pieces[0].getKeypairs().length; i++) {
-			weight += (CompactKeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker(), config) * numParts);
+			weight += (GridKeypairRenderer.getRenderWeight(config.pieces[0].getKeypairs()[i].getPlugin().getTicker(), config) * numParts);
 		}
 	}
 	
 	// compute weight from keypair generation config
 	else {
 		for (var i = 0; i < config.keypairs.length; i++) {
-			weight += config.keypairs[i].numKeypairs * CompactKeypairRenderer.getRenderWeight(config.keypairs[i].ticker, config) * numParts;
+			weight += config.keypairs[i].numKeypairs * GridKeypairRenderer.getRenderWeight(config.keypairs[i].ticker, config) * numParts;
 		}
 	}
 	return weight;
 }
 
 /**
- * Renders a preview of what CompactPieceRenderer will render.
+ * Renders a preview of what GridPieceRenderer will render.
 
  * @param div is the div to render to
  * @param piece is the piece to render
@@ -6165,7 +6165,7 @@ CompactPieceRenderer.getRenderWeight = function(config) {
  * 				config.showPublic specifies if public addresses should be shown
  * 				config.showPrivate specifies if private keys should be shown
  */
-function CompactPiecePreviewRenderer(div, piece, config) {
+function GridPiecePreviewRenderer(div, piece, config) {
 	if (!div) div = $("<div>");
 	DivController.call(this, div);
 	assertObject(piece, CryptoPiece);
@@ -6175,7 +6175,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
-		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
+		assertFalse(_isDestroyed, "GridPiecePreviewRenderer is destroyed");
 		
 		// div setup
     div.addClass("piece_preview_div");
@@ -6187,7 +6187,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 		var previewPiece = new CryptoPiece({keypairs: previewKeypairs});
 		
 		// render preview piece
-		pieceRenderer = new CompactPieceRenderer(div, previewPiece, config);
+		pieceRenderer = new GridPieceRenderer(div, previewPiece, config);
 		pieceRenderer.onProgress(onProgressFn);
 		pieceRenderer.render(function(div) {
 			
@@ -6201,7 +6201,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	}
 	
 	this.onProgress = function(callbackFn) {
-		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer is destroyed");
+		assertFalse(_isDestroyed, "GridPiecePreviewRenderer is destroyed");
 		onProgressFn = callbackFn;
 	}
 	
@@ -6209,7 +6209,7 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 	 * Destroys the renderer.  Does not destroy the underlying piece.
 	 */
 	this.destroy = function() {
-		assertFalse(_isDestroyed, "CompactPiecePreviewRenderer already destroyed");
+		assertFalse(_isDestroyed, "GridPiecePreviewRenderer already destroyed");
 		if (pieceRenderer) pieceRenderer.destroy();
 		_isDestroyed = true;
 	}
@@ -6218,17 +6218,17 @@ function CompactPiecePreviewRenderer(div, piece, config) {
 		return _isDestroyed;
 	}
 }
-inheritsFrom(CompactPiecePreviewRenderer, DivController);
+inheritsFrom(GridPiecePreviewRenderer, DivController);
 
 /**
  * Register preview generation weight.
  */
-CompactPiecePreviewRenderer.getRenderWeight = function(config) {
+GridPiecePreviewRenderer.getRenderWeight = function(config) {
 	return 1;
 }
 
 /**
- * Renders a single compact keypair.
+ * Renders a single grid keypair.
  * 
  * @param div is the div to render to
  * @param keypair is the keypair to render
@@ -6240,7 +6240,7 @@ CompactPiecePreviewRenderer.getRenderWeight = function(config) {
  * 				config.qrLeft specifies if the qr code is on the left side else right side (default true)
  *        config.keypairIdx is the index of the keypair relative to other keypairs (optional)
  */
-function CompactKeypairRenderer(div, keypair, config) {
+function GridKeypairRenderer(div, keypair, config) {
 	DivController.call(this, div);
 	assertObject(keypair, CryptoKeypair);
 	
@@ -6261,19 +6261,19 @@ function CompactKeypairRenderer(div, keypair, config) {
 	var _isDestroyed = false;
 	
 	this.render = function(onDone) {
-		assertFalse(_isDestroyed, "CompactKeypairRenderer is destroyed");
+		assertFalse(_isDestroyed, "GridKeypairRenderer is destroyed");
 			
 		// keypair div setup
 		div.empty();
-		div.addClass("compact_keypair_div flex_horizontal flex_align_center width_100");
+		div.addClass("grid_keypair_div flex_horizontal flex_align_center width_100");
 		
 		// decode keypair for rendering
-		var decoded = CompactKeypairRenderer.decodeKeypair(keypair, config);
+		var decoded = GridKeypairRenderer.decodeKeypair(keypair, config);
 		
 		// keypair id
 		var id;
 		if (isDefined(config.keypairIdx)) {
-			id = $("<div class='compact_keypair_num'>");
+			id = $("<div class='grid_keypair_num'>");
 			id.html((keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (config.keypairIdx + 1));
 			id.css("position", "absolute");
 			id.css("top", "5px");
@@ -6282,13 +6282,13 @@ function CompactKeypairRenderer(div, keypair, config) {
 		div.append(id);
 		
 		// keypair title includes logo, name, and id
-		var title = $("<div class='compact_keypair_title flex_horizontal flex_align_center'>");
+		var title = $("<div class='grid_keypair_title flex_horizontal flex_align_center'>");
 		
 		// keypair logo
     if (decoded.cryptoLogo && config.showLogos) {
       decoded.cryptoLogo.attr("width", "100%");
       decoded.cryptoLogo.attr("height", "100%");
-      var logo = $("<div class='compact_keypair_crypto_logo'>").appendTo(title);
+      var logo = $("<div class='grid_keypair_crypto_logo'>").appendTo(title);
       logo.append(decoded.cryptoLogo);
     }
 		
@@ -6296,13 +6296,13 @@ function CompactKeypairRenderer(div, keypair, config) {
 		var label = $("<div style='flex-wrap:wrap;' class='flex_horizontal flex_align_end'>").appendTo(title);
 		var cryptoName = $("<div style='margin-right:5px' class='keypair_crypto_label'>").appendTo(label);
 		cryptoName.append(decoded.cryptoName);
-		var valueType = $("<div class='compact_keypair_sublabel'>").appendTo(label);
+		var valueType = $("<div class='grid_keypair_sublabel'>").appendTo(label);
 		valueType.append("(" + decoded.valueType + ")");		
 				
 		// content includes title and keypair value
 		var content = $("<div class='flex_vertical flex_align_center flex_1'>").appendTo(div);
 		content.append(title);
-		var valueDiv = $("<div class='compact_keypair_value width_100'>").appendTo(content);
+		var valueDiv = $("<div class='grid_keypair_value width_100'>").appendTo(content);
 		if (!hasWhitespace(decoded.value)) valueDiv.css("word-break", "break-all");
 		valueDiv.append(decoded.value);
 
@@ -6315,7 +6315,7 @@ function CompactKeypairRenderer(div, keypair, config) {
 		
 		// qr code
 		if (config.showQr && decoded.valueCopyable) {
-			UiUtils.renderQrCode(decoded.value, CompactKeypairRenderer.QR_CONFIG, function(img) {
+			UiUtils.renderQrCode(decoded.value, GridKeypairRenderer.QR_CONFIG, function(img) {
 				if (_isDestroyed) return;
 				img.attr("class", "keypair_qr");
 				config.qrLeft ? div.prepend(img) : div.append(img);	
@@ -6329,10 +6329,10 @@ function CompactKeypairRenderer(div, keypair, config) {
 	}
 	
 	/**
-	 * Destroys the CompactKeypairRenderer.  Does not destroy the underlying keypair.
+	 * Destroys the GridKeypairRenderer.  Does not destroy the underlying keypair.
 	 */
 	this.destroy = function () {
-		assertFalse(_isDestroyed, "CompactKeypairRenderer is already destroyed");
+		assertFalse(_isDestroyed, "GridKeypairRenderer is already destroyed");
 		div.remove();
 		_isDestroyed = true;
 	}
@@ -6342,11 +6342,11 @@ function CompactKeypairRenderer(div, keypair, config) {
 	}
 	
 	this.getKeypair = function() {
-		assertFalse(_isDestroyed, "CompactKeypairRenderer is destroyed");
+		assertFalse(_isDestroyed, "GridKeypairRenderer is destroyed");
 		return keypair;
 	}
 }
-inheritsFrom(CompactKeypairRenderer, DivController);
+inheritsFrom(GridKeypairRenderer, DivController);
 
 /**
  * Returns the weight to render the given ticker or keypair.
@@ -6355,7 +6355,7 @@ inheritsFrom(CompactKeypairRenderer, DivController);
  * @param config is the render config
  * @returns the relative weight to render the keypair
  */
-CompactKeypairRenderer.getRenderWeight = function(tickerOrKeypair, config) {
+GridKeypairRenderer.getRenderWeight = function(tickerOrKeypair, config) {
 	assertInitialized(tickerOrKeypair);
 	assertInitialized(config);
 	
@@ -6379,7 +6379,7 @@ CompactKeypairRenderer.getRenderWeight = function(tickerOrKeypair, config) {
 /**
  * Default keypair QR config.
  */
-CompactKeypairRenderer.QR_CONFIG = {
+GridKeypairRenderer.QR_CONFIG = {
 		size: 90,
 		version: null,
 		errorCorrectionLevel: 'H',
@@ -6398,7 +6398,7 @@ CompactKeypairRenderer.QR_CONFIG = {
  * 					decoded.cryptoLogo is the center logo to render
  *          decoded.cryptoName is the name of the crypto the value is for
  */
-CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
+GridKeypairRenderer.decodeKeypair = function(keypair, config) {
 	
 	// default render config
 	config = Object.assign({
@@ -6429,7 +6429,7 @@ CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
 }
 
 /**
- * Renders a piece as compact text.
+ * Renders a piece as text.
  * 
  * @param div is the div to render to
  * @param piece is the piece to render
@@ -6437,7 +6437,7 @@ CompactKeypairRenderer.decodeKeypair = function(keypair, config) {
  *        config.showPublic specifies if public addresses should be shown
  *        config.showPrivate specifies if private keys should be shown
  */
-function CompactTextPieceRenderer(div, piece, config) {
+function TextPieceRenderer(div, piece, config) {
   if (!div) div = $("<div>");
   DivController.call(this, div);
   
@@ -6452,7 +6452,7 @@ function CompactTextPieceRenderer(div, piece, config) {
   var _isDestroyed = false;
   
   this.render = function(onDone) {
-    assertFalse(_isDestroyed, "CompactTextPieceRenderer is destroyed");
+    assertFalse(_isDestroyed, "TextPieceRenderer is destroyed");
     if (onProgressFn) onProgressFn(0, "Rendering");
     
     // div setup
@@ -6462,12 +6462,12 @@ function CompactTextPieceRenderer(div, piece, config) {
     // build text with break points
     var txt = "";
     for (var i = 0; i < piece.getKeypairs().length; i++) {
-      txt += toCompactTextKeypair(piece.getKeypairs()[i], i);
+      txt += toTextKeypair(piece.getKeypairs()[i], i);
       if (i < piece.getKeypairs().length - 1) txt += " | ";
     }
     
     // add text
-    var txtDiv = $("<div class='compact_text_value word_break_all'>").appendTo(div);
+    var txtDiv = $("<div class='text_piece word_break_all'>").appendTo(div);
     txtDiv.append(txt);
 
     // done
@@ -6479,7 +6479,7 @@ function CompactTextPieceRenderer(div, piece, config) {
    * Destroys the renderer.  Does not destroy the underlying piece.
    */
   this.destroy = function() {
-    assertFalse(_isDestroyed, "CompactTextPieceRenderer already destroyed");
+    assertFalse(_isDestroyed, "TextPieceRenderer already destroyed");
     _isDestroyed = true;
   }
   
@@ -6488,21 +6488,21 @@ function CompactTextPieceRenderer(div, piece, config) {
   }
   
   this.getPiece = function() {
-    assertFalse(_isDestroyed, "CompactTextPieceRenderer is destroyed");
+    assertFalse(_isDestroyed, "TextPieceRenderer is destroyed");
     return piece;
   }
   
   this.onProgress = function(callbackFn) {
-    assertFalse(_isDestroyed, "CompactTextPieceRenderer is destroyed");
+    assertFalse(_isDestroyed, "TextPieceRenderer is destroyed");
     onProgressFn = callbackFn;
   }
   
   this.getRenderWeight = function() {
-    assertFalse(_isDestroyed, "CompactTextPieceRenderer is destroyed");
+    assertFalse(_isDestroyed, "TextPieceRenderer is destroyed");
     return 1;
   }
   
-  function toCompactTextKeypair(keypair, index) {
+  function toTextKeypair(keypair, index) {
     var txt = "";
     if (isDefined(index)) txt += getNoWrapSpan("#" + (keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (index + 1) + ",") + " ";
     txt += getNoWrapSpan(keypair.getPlugin().getTicker() + ",");
@@ -6535,18 +6535,18 @@ function CompactTextPieceRenderer(div, piece, config) {
     }
   }
 }
-inheritsFrom(CompactTextPieceRenderer, DivController);
+inheritsFrom(TextPieceRenderer, DivController);
 
 /**
  * Relative weight to render a piece generation config.
  */
-CompactTextPieceRenderer.getRenderWeight = function(config) {
+TextPieceRenderer.getRenderWeight = function(config) {
   PieceGenerator.validateConfig(config);
   return 1;
 }
 
 /**
- * Renders a preview of what CompactTextPieceRenderer will render.
+ * Renders a preview of what TextPieceRenderer will render.
 
  * @param div is the div to render to
  * @param piece is the piece to render
@@ -6554,7 +6554,7 @@ CompactTextPieceRenderer.getRenderWeight = function(config) {
  *        config.showPublic specifies if public addresses should be shown
  *        config.showPrivate specifies if private keys should be shown
  */
-function CompactTextPiecePreviewRenderer(div, piece, config) {
+function TextPiecePreviewRenderer(div, piece, config) {
   if (!div) div = $("<div>");
   DivController.call(this, div);
   assertObject(piece, CryptoPiece);
@@ -6564,7 +6564,7 @@ function CompactTextPiecePreviewRenderer(div, piece, config) {
   var _isDestroyed = false;
   
   this.render = function(onDone) {
-    assertFalse(_isDestroyed, "CompactTextPiecePreviewRenderer is destroyed");
+    assertFalse(_isDestroyed, "TextPiecePreviewRenderer is destroyed");
     
     // div setup
     div.addClass("piece_preview_div");
@@ -6576,7 +6576,7 @@ function CompactTextPiecePreviewRenderer(div, piece, config) {
     var previewPiece = new CryptoPiece({keypairs: previewKeypairs});
     
     // render preview piece
-    pieceRenderer = new CompactTextPieceRenderer(div, previewPiece, config);
+    pieceRenderer = new TextPieceRenderer(div, previewPiece, config);
     pieceRenderer.onProgress(onProgressFn);
     pieceRenderer.render(function(div) {
       div.css("border", "2px solid");
@@ -6591,7 +6591,7 @@ function CompactTextPiecePreviewRenderer(div, piece, config) {
   }
   
   this.onProgress = function(callbackFn) {
-    assertFalse(_isDestroyed, "CompactTextPiecePreviewRenderer is destroyed");
+    assertFalse(_isDestroyed, "TextPiecePreviewRenderer is destroyed");
     onProgressFn = callbackFn;
   }
   
@@ -6599,7 +6599,7 @@ function CompactTextPiecePreviewRenderer(div, piece, config) {
    * Destroys the renderer.  Does not destroy the underlying piece.
    */
   this.destroy = function() {
-    assertFalse(_isDestroyed, "CompactTextPiecePreviewRenderer already destroyed");
+    assertFalse(_isDestroyed, "TextPiecePreviewRenderer already destroyed");
     if (pieceRenderer) pieceRenderer.destroy();
     _isDestroyed = true;
   }
@@ -6608,12 +6608,12 @@ function CompactTextPiecePreviewRenderer(div, piece, config) {
     return _isDestroyed;
   }
 }
-inheritsFrom(CompactTextPiecePreviewRenderer, DivController);
+inheritsFrom(TextPiecePreviewRenderer, DivController);
 
 /**
  * Register preview generation weight.
  */
-CompactTextPiecePreviewRenderer.getRenderWeight = function(config) {
+TextPiecePreviewRenderer.getRenderWeight = function(config) {
   PieceGenerator.validateConfig(config);
   return 1;
 }

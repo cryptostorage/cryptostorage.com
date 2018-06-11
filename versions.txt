@@ -84,8 +84,8 @@ cryptostorage-v0.2.3-beta
 
 06/10/2018
 cryptostorage-v0.3.0-beta
-- Major redesign of dedicated tab for keypair generation and export
-- Print to standard, compact, and CryptoCash layouts with options
+- Major redesign with dedicated tab for keypair generation and export
+- Print to different layouts including standard, grid, text, and CryptoCash
 - Import and export to/from JSON, CSV, and TXT
 - Import existing keys (e.g. BIP39 hardware wallet seeds) and re-export with passphrase encryption and division
 - Support direct links to keypair generation (e.g. cryptostorage.com/generate.html?tickers=xmr)

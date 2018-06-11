@@ -1576,15 +1576,15 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	width: 175px;
 }
 
-.compact_keypairs_row {
+.grid_keypairs_row {
 
 }
 
-.compact_keypairs_row:first-child > .compact_keypair_div {
+.grid_keypairs_row:first-child > .grid_keypair_div {
 	border-top: 2px solid green;
 }
 
-.compact_keypair_div {
+.grid_keypair_div {
 	width: 375px;
 	padding: 6px;
 	box-sizing: border-box;
@@ -1594,53 +1594,53 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	position: relative;
 }
 
-.compact_keypair_div:last-child {
+.grid_keypair_div:last-child {
 	border-right: 2px solid green;
 }
 
-.compact_keypair_num {
+.grid_keypair_num {
 	font-size: 12px;
 }
 
-.compact_keypair_crypto_logo {
+.grid_keypair_crypto_logo {
 	width: 26px;
 	height: 26px;
 	margin-right: 5px;	
 }
 
-.compact_keypair_title {
+.grid_keypair_title {
 	margin-bottom: 3px;
 	max-width: 220px;
 }
 
-.compact_keypair_sublabel {
+.grid_keypair_sublabel {
 	font-size: 13px;
 	margin-top: -2px;
 }
 
-.compact_keypair_div * .compact_keypair_title > div {
+.grid_keypair_div * .grid_keypair_title > div {
 	margin-right: 5px;
 }
 
-.compact_keypair_div * .compact_keypair_title > div:last-child {
+.grid_keypair_div * .grid_keypair_title > div:last-child {
 	margin-right: 0;
 }
 
-.compact_keypair_div > .keypair_qr:first-child {
+.grid_keypair_div > .keypair_qr:first-child {
 	margin-right: 6px;
 }
 
-.compact_keypair_div > .keypair_qr:last-child {
+.grid_keypair_div > .keypair_qr:last-child {
 	margin-left: 6px;
 }
 
-.compact_keypair_value {
+.grid_keypair_value {
 	font-size: 12px;
 	font-family: monospace;
 	text-align: center;
 }
 
-.compact_text_value, .compact_text_value * {
+.text_piece, .text_piece * {
 	font-size: 12px;
 	font-family: monospace;
 	text-align: justify;

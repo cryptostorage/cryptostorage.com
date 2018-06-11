@@ -22,7 +22,6 @@ qr scanner
 could show print preview right away then print button is progress bar
 bip39 appears vertically too high on standard keypair
 test encryption with full piece instead of piece per plugin
-ultra compact text
 what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
 TypeError: event.dataTransfer is null drag and drop DivController2084.js: event.dataTransfer.dropEffect = 'copy';
@@ -50,7 +49,6 @@ within bitaddress, why is encrypted bip38 not recreated from encrypting unencryp
 why are bip38s generated from ian and i's not importable into other dogecoin tools, why is output of bpw not importable in CS but is for others?
 InputLabelController.onChecked() only fires if changed
 custom error message for qrs not loading
-common show logos checkbox shares state with standard and compact layouts
 
 low priority:
 view balance qr code on cryptocash
