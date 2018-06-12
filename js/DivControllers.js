@@ -722,6 +722,12 @@ inheritsFrom(PaginatorController, DivController);
  * @param hash is an initial window hash (e.g. #faq)
  */
 function AppController(div, hash) {
+  
+  // redirect to index.html#hash
+  if (hash) {
+    window.location.href = "index.html" + hash;
+    return;
+  }
 	
 	var that = this;
 	var showFuncs;
