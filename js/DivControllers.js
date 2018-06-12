@@ -6512,11 +6512,11 @@ function TextPieceRenderer(div, piece, config) {
     var txt = "";
     if (isDefined(index)) txt += getNoWrapSpan("#" + (keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (index + 1) + ",") + " ";
     txt += getNoWrapSpan(keypair.getPlugin().getTicker() + ",");
-    if (isInitialized(keypair.getPublicAddress())) {
-      txt += " " + getNoWrapSpan("public:") + " " + keypair.getPublicAddress();
-      if (isInitialized(keypair.getPrivateWif())) txt += ",";
+    if (isDefined(keypair.getPublicAddress())) {
+      txt += " " + getNoWrapSpan("public:") + " " + (keypair.isPublicApplicable() ? keypair.getPublicAddress() : getNoWrapSpan("Not applicable"));
+      if (isDefined(keypair.getPrivateWif())) txt += ",";
     }
-    if (isInitialized(keypair.getPrivateWif())) {
+    if (isDefined(keypair.getPrivateWif())) {
       txt += " " + getNoWrapSpan("private:") + " " + getPrivateTxt(keypair);
       txt += keypair.getPartNum() ? ", " + getNoWrapSpan("divided") : (keypair.isEncrypted() ? ", " + getNoWrapSpan("encrypted") : "");
     }
