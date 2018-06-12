@@ -16,6 +16,7 @@ browser testing
 release
 
 v0.3.1
+news articles about tool
 brave error opening editor in homepage even though tab opens
 brave print document goes to /undefined and causes error in editor tab
 show print preview when ready then print button becomes progress bar until ready
