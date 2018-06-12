@@ -2,11 +2,11 @@
 <html>
 	<head>
 		<title>Generate Keypairs</title>
-		<meta name="Description" content="Generate keypairs for major cryptocurrencies in your browser with passphrase protection and compartmentalization.  100% open source and client-side.">
+		<meta name="Description" content="Generate cryptocurrency keypairs in your browser with encryption and division  100% open source and client-side.">
 		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
 		<meta name="viewport" content="width=900px, user-scalable=no"/>
 		<meta property="og:title" content="Generate Keypairs">
-		<meta property="og:description" content="Generate keypairs for major cryptocurrencies in your browser with passphrase protection and compartmentalization.  100% open source and client-side.">
+		<meta property="og:description" content="Generate cryptocurrency keypairs in your browser with encryption and division  100% open source and client-side.">
 		<meta property="og:image" content="https://cryptostorage.com/img/cryptostorage_social.png">
 		<meta property="og:url" content="https://cryptostorage.com/generate.html">
 		<link rel="shortcut icon" href="/favicon.png" type="image/png">
@@ -25,8 +25,8 @@
 		
 		<!-- Initialize -->
 		<script type="text/javascript">
-		
 		$(document).ready(function() {
+			$("#static_seo").hide();
 			
 			// welcome :)
 			console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
@@ -86,6 +86,41 @@
      	</script> 
 	</head>
 	<body>
-		<!-- Application content -->
+		<!-- Static content for SEO which is deleted when application starts -->	
+		<div id='static_seo'>
+			
+			<!-- Main sitelinks -->
+			<h1><a href='index.html'>Home</a></h1>
+			<h1><a href='generate.html'>Generate Keypairs</a></h1>
+			<h1><a href='import.html'>Import Keypairs</a></h1>
+			<h1><a href='faq.html'>FAQ</a></h1>
+			<h1><a href='donate.html'>Donate</a></h1>
+			<h1><a href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a></h1>
+			<h1><a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download</a></h1>
+			<a href='index.html'><img src='img/cryptostorage_export.png' alt='Button to go home' title='CryptoStorage Logo'></a>
+			
+			<!-- Passphrase -->
+			<h2>Use Passphrase?</h2>
+			<div>
+				Encrypts generated keypairs with a passphrase. The passphrase is required in order to decrypt private keys and access funds.
+				The passphrase must be at least 7 characters.
+			</div>
+			<div>Use BIP38 for BTC &amp; BCH?</div>
+			<div>Show passphrase?</div>
+			
+			<!--  Divide -->
+			<h2>Divide Keypairs?</h2>
+			<div>
+				This tool uses Shamir's Secret Sharing to divide private keys into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member. The private keys cannot be accessed from the parts until a sufficient number of parts are combined.
+				For example, Alice wants to save Bitcoin Cash for her 6 grandchildren. She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys. She keeps one part, puts one in a bank, and gives one to a trusted family member. Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.
+			</div>
+			<div>Divide each keypair into 3 parts</div>
+			<div>Require 2 to recover</div>
+			
+			<!-- Currency selection -->
+			<h2>Select a currency</h2>
+			<div>Bitcoin, Bitcoin Cash, Ethereum, Monero, Litecoin, Dogecoin, Neo, Dash, Zcoin, Zcash, Waves, Stellar, Ripple, Ethereum Classic, OmiseGo, Basic Attention Token, BIP39, Ubiq</div>
+			<div>Keypairs to generate</div>
+		</div>
 	</body>
 </html>
