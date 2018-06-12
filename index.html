@@ -5,7 +5,7 @@
 		<meta name="Description" content="Generate cryptocurrency keypairs in your browser.  100% open source and free to use.  Save and print keypairs for long term storage.  Passphrase-protect and divide keypairs for maximum security.">
 		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
 		<meta name="viewport" content="user-scalable=no"/>
-		<meta property="og:title" content="CryptoStorage Offline Wallet Generator for Major Cryptocurrencies">
+		<meta property="og:title" content="CryptoStorage Offline Wallet Generator">
 		<meta property="og:description" content="Generate cryptocurrency keypairs in your browser.  100% open source and free to use.  Save and print keypairs for long term storage.  Passphrase-protect and divide keypairs for maximum security.">
 		<meta property="og:image" content="https://cryptostorage.com/img/cryptostorage_social.png">
 		<meta property="og:url" content="https://cryptostorage.com">
@@ -23,14 +23,59 @@
 	</head>
 	<script type="text/javascript">
 	$(document).ready(function() {
-	  AppUtils.startApplication();
+	  //AppUtils.startApplication();
 	});
 	</script>
 	<body class='app_body flex_vertical flex_align_center'>
 	
 		<!-- Static content for SEO which is deleted when application starts -->	
 		<div id='seo_placeholder'>
-			TODO
+		
+			<!-- Main sitelinks -->
+			<h1><a href='index.html'>Home</a></h1>
+			<h1><a href='generate.html'>Generate Keypairs</a></h1>
+			<h1><a href='import.html'>Import Keypairs</a></h1>
+			<h1><a href='faq.html'>FAQ</a></h1>
+			<h1><a href='donate.html'>Donate</a></h1>
+			<h1><a href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a></h1>
+			<h1><a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download</a></h1>
+			<a href='index.html'><img src='img/cryptostorage_white.png' alt='Button to go home' title='CryptoStorage Logo'></a>
+			
+			<!-- Slider text -->
+			<div>Generate offline wallets for major cryptocurrencies.</div>
+			<div>Save or print paper wallets for long-term storage.</div>
+			<div>Runs only in your browser so funds are never entrusted to a third party.</div>
+			<div>100% open source and free to use.  No account necessary.</div>
+			<div>Passphrase-protect and divide private keys for maximum security.</div>
+			<div>Generate keys securely with automatic environment checks.</div>
+			
+			<!-- Supported tokens -->
+			<h2>Supported Tokens</h2>
+			<div>Supports Bitcoin, Bitcoin Cash, Ethereum, Monero, Litecoin, Dogecoin, Neo, Dash, Zcoin, Zcash, Waves, Stellar, Ripple, Ethereum Classic, OmiseGo, Basic Attention Token, BIP39, and Ubiq.</div>
+			
+			<!-- Export -->
+			<h2>Export to printable and digital formats for long-term storage.</h2>
+			<div>Save keys to a file which can be stored on a flash drive, or print to paper to easily create paper wallets.</div>
+			
+			<!-- Encrypt & Divide -->
+			<h2>Encrypt and divide private keys for maximum security.</h2>
+			<div>Encrypt private keys with a passphrase or divide them into parts so funds are not accessible at any one location. Set how many parts are needed to recover the keys. Store one in your safe, one in a bank vault, or one with a trusted family member.</div>
+			
+			<!-- Security checks -->
+			<h2>Generate keys securely with automatic environment checks.</h2>
+			<div>Following a few simple recommendations can improve the security of your cryptocurrency. Automatic environment checks encourage keys to be generated in a secure environment.</div>
+			<div>Checks if internet connection is active</div>
+			<div>Checks if tool is running locally</div>
+			<div>Checks if browser is open source</div>
+			<div>Checks if operating system is open source</div>
+			
+			<!-- Security checks -->
+			<h2>Strong Cryptography</h2>
+			<div>Uses the latest <a target='_blank' href='https://www.w3.org/TR/WebCryptoAPI/#dfn-GlobalCrypto'>window.crypto API</a> available in browsers which provides access to a cryptographically secure random number generator. This allows generation of random values as seeds for your keys.</div>
+			
+			<!-- Security checks -->
+			<h2>Download our 100% free and open source software and run it offline.</h2>
+			<div>Feel confident in the software you’re using. Inspect the source code and know that your money is secure. CryptoStorage is open source, so the community can maintain it indefinitely.</div>
 		</div>
 	</body>
 </html>
