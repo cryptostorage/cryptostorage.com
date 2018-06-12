@@ -1195,7 +1195,7 @@ function FaqController(div) {
 						answerDiv.append("<p>In order of importance:</p>");
 						var recommendationsList = $("<ol>").appendTo(answerDiv);
 						recommendationsList.append("<li><a href='#faq_download_verify'>Download and verify</a> then run the source code offline, not from the cryptostorage.com domain.</li>");
-						recommendationsList.append("<li>Run this tool on a device that is disconnected from the internet.  For maximum security, the device should never connect to the internet again after generating high-value storage.</li>");
+						recommendationsList.append("<li>Run this tool on a device that is disconnected from the internet.  For maximum security, the device should not connect to the internet after generating high value storage.</li>");
 						recommendationsList.append("<li>Run this tool in an open source browser like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
 						recommendationsList.append("<li>Run this tool on an open source operating system like " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 						return answerDiv;
