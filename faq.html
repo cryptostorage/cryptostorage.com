@@ -45,25 +45,185 @@
 			<div>What is CryptoStorage?</div>
 			<div>
 				CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies. This tool generates keypairs in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device. Generated keypairs can be easily printed and saved to digital files for long-term storage.
+
 				This tool is security-focused. Funds are never entrusted to a third party. Private keys can be passphrase-protected and divided into parts which can be geographically separated so funds are not accessible at any one location. Recommendations are automatically provided to improve the security of the tool's environment.
 			</div>
 			
 			<div>What is a cryptocurrency keypair?</div>
 			<div>
-				A cryptocurrency keypair is like an account to send and receive cryptocurrency. It has a public address and a private key. For example, this is a Bitcoin keypair:<br>
+				A cryptocurrency keypair is like an account to send and receive cryptocurrency. It has a public address and a private key. For example, this is a Bitcoin keypair:
+				
 				Funds may be received to the public address and spent using the private key.
+				
 				The public address may be publicly shared in order to receive cryptocurrency.
+				
 				The private key must remain private as it authorizes all received funds to be spent.
 			</div>
 			
 			<div>How does CryptoStorage help keep my cryptocurrency safe and secure?</div>
 			<div>
 				First, this tool generates keys only in your device's browser. Keys can be generated offline and are never shared with a third party by design.
+
 				Second, private keys can be protected with a passphrase. The passphrase is required to decrypt the private keys in order to access funds.
+				
 				Third, private keys can be divided into parts which must be combined to access funds. For example, a Bitcoin keypair can be divided into 3 parts where 2 parts must be combined to recover the private key. These parts can be geographically separated to prevent access at any one location.
+				
 				Fourth, keys can printed and saved to digital files for long-term storage.
+				
 				Finally, this tool automatically detects and recommends ways to improve the security of its environment.
 			</div>
+			
+			<div>What security recommendations does CryptoStorage make?</div>
+			<div>
+				In order of importance:
+
+			    Download and verify then run the source code offline, not from the cryptostorage.com domain.
+			    Run this tool on a device that is disconnected from the internet. For maximum security, the device should not connect to the internet after generating high value storage.
+			    Run this tool in an open source browser like Firefox or Chromium.
+			    Run this tool on an open source operating system like Tails, Debian, or Raspbian for the Raspberry Pi.
+			</div>
+			
+			<div>How can I generate keys as securely as possible using CryptoStorage?</div>
+			<div>
+			       Download and verify cryptostorage.com-[version].zip.
+
+				    Transfer cryptostorage.com-[version].zip to a secure computer using a flash drive.
+				        The computer should be disconnected from the internet. For maximum security, the device should never connect to the internet again after generating cryptocurrency storage.
+				        An open source operating system is recommended like Tails, Debian, or Raspbian for the Raspberry Pi.
+				    Unzip cryptostorage.com-[version].zip
+				
+				    Open index.html in the unzipped folder in a browser.
+				        An open source browser is recommended like Firefox or Chromium.
+				
+				    Confirm that all environment checks pass.
+				
+				        Go to Generate New Keys from the homepage.
+				
+				        The notice bar at the top should indicate that all security checks pass:
+				
+				    Fill out the form and click Generate Keys.
+				
+				        Protecting your keys with a passphrase is highly recommended. Otherwise anyone in possession of the unencrypted keys can access the funds.
+				
+				        Optionally divide your keys for maximum security.
+				
+				    Save the generated keys to a flash drive or printed paper for safe keeping. Geographic redundancy is highly recommended so if one location is lost due to fire, flood, theft, etc, there are backup copies at other locations.
+				
+				    The keys can be imported at any time by relaunching this tool in a secure environment.
+				
+				    Do not lose the generated keys or the password or all funds will be lost.
+			</div>
+			
+			<div>Why should I download and verify the source code?</div>
+			<div>
+			    Downloading and verifying the source code ensures you have a copy of this tool that has been publicly reviewed and has not been modified by an attacker.
+				
+				Verifying the source code is highly recommended but not required to use this tool.
+			</div>
+			
+			<div>How can I download and verify the source code?</div>
+			<div>
+			    The source code can be verified in two ways. Either method is sufficient.
+
+				Method #1: Verify the source code has the correct checksum.
+				
+				    Download cryptostorage-[version].zip and cryptostorage-[version]-checksum.txt from the latest release on GitHub.
+				
+				    Determine the SHA256 hash of the zip file. Instructions depend on your operating system.
+				
+				    Linux:
+				    sha256sum cryptostorage-[version].zip
+				
+				    Mac:
+				    openssl sha -sha256 cryptostorage-[version].zip
+				
+				    Windows:
+				    certUtil -hashfile cryptostorage-[version].zip SHA256
+				
+				    Verify that the checksum matches the contents of the previously downloaded cryptostorage-[version]-checksum.txt.
+				
+				Method #2: Verify the source code has been signed by the developer's PGP key.
+				
+				    Install PGP software on your device.
+				
+				    Download the developer’s public PGP key, "woodser.asc", from the root of the GitHub source repository.
+				
+				    Import the PGP key:
+				
+				    gpg --import woodser.asc
+				
+				    Download cryptostorage-[version].zip, cryptostorage-[version].sig, and woodser-pgp-fingerprint.txt from the latest release on GitHub.
+				
+				    Verify the signature of cryptostorage-[version].zip:
+				
+				    gpg --verify cryptostorage-[version].sig cryptostorage-[version].zip
+				
+				    You should see output with this RSA key:
+				
+				    gpg: Signature made Fri Jan 12 09:22:37 2018 EST
+				    gpg: using RSA key 52FD7C01877CA968C97118D055A10DD48ADEE5EF
+				    gpg: Good signature ...
+				
+				    The RSA key will also match the contents of the previously downloaded woodser-pgp-fingerprint.txt.
+				
+				    Note: You will probably also see a warning that the key is not certified with a trusted signature. This is expected unless you told PGP to trust woodser’s PGP key, which is not necessary.
+			</div>
+			
+			<div>How can I trust this tool?</div>
+			<div>
+				Don't trust. Verify.
+				
+				CryptoStorage is 100% open source which means anyone can review the source code.
+				
+				Downloading and verifying the source code ensures you have a copy that has been publicly reviewed and has not been modified by an attacker.
+			</div>
+			
+			<div>Are my funds ever entrusted to a third party?</div>
+			<div>
+				No. The public/private keypairs are generated only in your devices browser so they are never shared with a third party by design.
+			</div>
+			
+			<div>How are keypairs encrypted?</div>
+			<div>
+				Keypairs are encrypted using CryptoJS with PBKDF2, 10000 iterations, SHA512, and an embedded version for future extensibility unless BIP38 is supported and enabled.
+			</div>
+			
+			<div>What does it mean to divide private keys?</div>
+			<div>
+				This tool uses Shamir's Secret Sharing to divide private keys into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member. The private keys cannot be accessed from the parts until a sufficient number of parts are combined.
+				
+				For example, Alice wants to save Bitcoin Cash for her 6 grandchildren. She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys. She keeps one part, puts one in a bank, and gives one to a trusted family member. Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.
+			</div>
+			
+			<div>Does CryptoStorage work with other wallet software?</div>
+			<div>
+				All unencrypted keys generated with CryptoStorage will work with other wallet software and vice versa.
+				
+				However, there is currently no standardized way of encrypting cryptocurrency keypairs with a passphrase except for BIP38. When BIP38 is not supported, CryptoStorage uses a specific encryption configuration (CryptoJS with PBDKF2, 10000 iterations, SHA512, and an embedded verison for future extensibility) which will not work with other tools unless they use the same configuration.
+				
+				A copy of this tool should be saved to recover keys in the future if using passphrase encryption.
+			</div>
+			
+			<div>Do I need to be online to recover private keys?</div>
+			<div>
+				No. This tool's source code has everything needed to import and recover the private keys. A copy of this tool can be saved for future use so it doesn't need to be re-downloaded from GitHub.
+			</div>
+			
+			<div>Can I send funds using CryptoStorage?</div>
+			<div>
+				Not currently. It is expected that users will send funds using wallet software of their choice after private keys have been recovered using this tool.
+			</div>
+			
+			<div>I still need help. Who can I contact?</div>
+			<div>
+				For bug reports and feature requests, please submit an issue to https://github.com/cryptostorage/cryptostorage.com/issues.
+				
+				For community discussion, please join the conversation on Reddit at https://reddit.com/r/cryptostorage.
+				
+				For email support, please email support@cryptostorage.com.
+				
+				No one can recover lost keys or passwords for you. Do not lose these or your funds will be lost.
+			</div>			
 		</div>
 	</body>
 </html>
