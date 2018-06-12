@@ -2169,7 +2169,7 @@ function ImportTextController(div, plugins, printErrors) {
 		
 		// text area
 		textArea = $("<textarea class='import_textarea'>").appendTo(textInputDiv);
-		textArea.attr("placeholder", "Enter private keys, a divided part, csv, or json");
+		textArea.attr("placeholder", "Enter private keys, a divided part, CSV, JSON, or TXT");
 		
 		// submit button
 		var submit = $("<div class='import_button flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(textInputDiv);

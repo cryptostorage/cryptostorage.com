@@ -1,11 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-		<title>Frequently Asked Questions</title>
+		<title>FAQ</title>
 		<meta name="Description" content="Get answers to the most frequently asked questions.">
 		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
 		<meta name="viewport" content="user-scalable=no"/>
-		<meta property="og:title" content="Frequently Asked Questions">
+		<meta property="og:title" content="FAQ">
 		<meta property="og:description" content="Get answers to the most frequently asked questions.">
 		<meta property="og:image" content="https://cryptostorage.com/img/cryptostorage_social.png">
 		<meta property="og:url" content="https://cryptostorage.com/#faq">
@@ -30,7 +30,39 @@
 	
 		<!-- Static content for SEO which is deleted when application starts -->	
 		<div id='seo_placeholder'>
-			TODO
+		
+			<!-- Main sitelinks -->
+			<h1><a href='index.html'>Home</a></h1>
+			<h1><a href='generate.html'>Generate Keypairs</a></h1>
+			<h1><a href='import.html'>Import Keypairs</a></h1>
+			<h1><a href='faq.html'>FAQ</a></h1>
+			<h1><a href='donate.html'>Donate</a></h1>
+			<h1><a href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a></h1>
+			<h1><a href='https://github.com/cryptostorage/cryptostorage.com/archive/master.zip'>Download</a></h1>
+			<a href='index.html'><img src='img/cryptostorage_white.png' alt='Button to go home' title='CryptoStorage Logo'></a>
+		
+			<div>What is CryptoStorage?</div>
+			<div>
+				CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies. This tool generates keypairs in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device. Generated keypairs can be easily printed and saved to digital files for long-term storage.
+				This tool is security-focused. Funds are never entrusted to a third party. Private keys can be passphrase-protected and divided into parts which can be geographically separated so funds are not accessible at any one location. Recommendations are automatically provided to improve the security of the tool's environment.
+			</div>
+			
+			<div>What is a cryptocurrency keypair?</div>
+			<div>
+				A cryptocurrency keypair is like an account to send and receive cryptocurrency. It has a public address and a private key. For example, this is a Bitcoin keypair:<br>
+				Funds may be received to the public address and spent using the private key.
+				The public address may be publicly shared in order to receive cryptocurrency.
+				The private key must remain private as it authorizes all received funds to be spent.
+			</div>
+			
+			<div>How does CryptoStorage help keep my cryptocurrency safe and secure?</div>
+			<div>
+				First, this tool generates keys only in your device's browser. Keys can be generated offline and are never shared with a third party by design.
+				Second, private keys can be protected with a passphrase. The passphrase is required to decrypt the private keys in order to access funds.
+				Third, private keys can be divided into parts which must be combined to access funds. For example, a Bitcoin keypair can be divided into 3 parts where 2 parts must be combined to recover the private key. These parts can be geographically separated to prevent access at any one location.
+				Fourth, keys can printed and saved to digital files for long-term storage.
+				Finally, this tool automatically detects and recommends ways to improve the security of its environment.
+			</div>
 		</div>
 	</body>
 </html>
