@@ -2470,7 +2470,7 @@ function ImportTextController(div, plugins, printErrors) {
 			var importedPieceDiv = $("<div class='import_text_imported_piece'>").appendTo(importedPiecesDiv);
 			var icon = $("<img src='img/file.png' class='import_imported_icon'>").appendTo(importedPieceDiv);
 			assertTrue(piece.getKeypairs().length > 0);
-			var pieceLabel = piece.getKeypairs().length === 1 ? (piece.getKeypairs()[0].privateKeyDefined() ? piece.getKeypairs()[0].getPrivateWif() : piece.getKeypairs()[0].getPublicAddress()) : "Imported piece" + (piece.getPartNum() ? " " + piece.getPartNum() : "");
+			var pieceLabel = piece.getKeypairs().length === 1 ? (piece.getKeypairs()[0].hasPrivateKey() ? piece.getKeypairs()[0].getPrivateWif() : piece.getKeypairs()[0].getPublicAddress()) : "Imported piece" + (piece.getPartNum() ? " " + piece.getPartNum() : "");
 			importedPieceDiv.append(AppUtils.getShortenedString(pieceLabel, MAX_PIECE_LENGTH));
 			var trash = $("<img src='img/trash.png' class='import_imported_trash'>").appendTo(importedPieceDiv);
 			trash.click(function() { removePiece(piece); });
@@ -4603,8 +4603,8 @@ function EditorSaveController(div, pieces) {
 		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save public addresses").render();
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save private keys").render();
-		includePublicCheckbox.setChecked(pieces[0].publicAddressesDefined());
-		includePrivateCheckbox.setChecked(pieces[0].privateKeysDefined());
+		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
+		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
 		
 		// cancel and save buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(body);
@@ -4641,8 +4641,8 @@ function EditorSaveController(div, pieces) {
 	function update(onDone) {
 		
 		// set checkboxes visibility and enabled
-		includePrivateCheckbox.setEnabled(pieces[0].publicAddressesDefined() && pieces[0].privateKeysDefined() && includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(pieces[0].publicAddressesDefined() && pieces[0].privateKeysDefined() && includePrivateCheckbox.isChecked());
+		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
 		if (!includePublicCheckbox.isEnabled() && !includePrivateCheckbox.isEnabled()) {
       includePublicCheckbox.setVisible(false);
 		  includePrivateCheckbox.setVisible(false);
@@ -4788,9 +4788,9 @@ function EditorPrintController(div, pieces) {
 		previewLoadDiv.append("<img src='img/loading.gif' class='loading'>");
 		
 		// initial state
-		includePublicCheckbox.setChecked(pieces[0].publicAddressesDefined());
-		includePrivateCheckbox.setChecked(pieces[0].privateKeysDefined());
-		if (pieces[0].privateKeysDefined()) includePrivateRadio.setChecked(true);
+		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
+		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
+		if (pieces[0].hasPrivateKeys()) includePrivateRadio.setChecked(true);
 		else includePublicRadio.setChecked(true);
 		includeLogosCheckbox.setChecked(true);
 		includeQrsCheckbox.setChecked(true);
@@ -4846,10 +4846,10 @@ function EditorPrintController(div, pieces) {
 	function update(onDone) {
 	  
 	   // enable/disable checkboxes and radios
-    includePrivateCheckbox.setEnabled(pieces[0].publicAddressesDefined() && pieces[0].privateKeysDefined() && includePublicCheckbox.isChecked());
-    includePublicCheckbox.setEnabled(pieces[0].publicAddressesDefined() && pieces[0].privateKeysDefined() && includePrivateCheckbox.isChecked());
-    includePrivateRadio.setEnabled(pieces[0].publicAddressesDefined() && pieces[0].privateKeysDefined());
-    includePublicRadio.setEnabled(pieces[0].publicAddressesDefined() && pieces[0].privateKeysDefined());
+    includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
+    includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+    includePrivateRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
+    includePublicRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
 		
 		// configure per layout
 		var pieceRendererClass;
@@ -5878,7 +5878,7 @@ StandardKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
 		return 15 * (plugin.isPublicApplicable() ? 2 : 1);
 	} else {
 		assertObject(tickerOrKeypair, CryptoKeypair);
-		return (tickerOrKeypair.publicAddressDefined() && tickerOrKeypair.isPublicApplicable() ? 15 : 0) + (tickerOrKeypair.privateKeyDefined() ? 15 : 0); 
+		return (tickerOrKeypair.hasPublicAddress() ? 15 : 0) + (tickerOrKeypair.hasPrivateKey() ? 15 : 0); 
 	}
 }
 
@@ -5946,8 +5946,8 @@ StandardKeypairRenderer.decodeKeypair = function(keypair, config) {
 	
 	// initialize right values
 	decoded.rightLabel = keypair.getPlugin().getPrivateLabel();
-	decoded.rightLabel += " " + (config.showPrivate && keypair.privateKeyDefined() ? keypair.isDivided() ? "(divided)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
-	decoded.rightValue = keypair.privateKeyDefined() && config.showPrivate ? keypair.getPrivateWif() : "(not shown)";
+	decoded.rightLabel += " " + (config.showPrivate && keypair.hasPrivateKey() ? keypair.isDivided() ? "(divided)" : keypair.isEncrypted() ? "(encrypted)" : "(unencrypted)" : "") + " \u25ba";
+	decoded.rightValue = keypair.hasPrivateKey() && config.showPrivate ? keypair.getPrivateWif() : "(not shown)";
 	decoded.rightValueCopyable = isDefined(keypair.getPrivateWif()) && config.showPrivate;
 	return decoded;
 }

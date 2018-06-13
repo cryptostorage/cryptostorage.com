@@ -48,22 +48,20 @@ function CryptoPiece(config) {
 		return state.keypairs;
 	}
 	
-	this.publicAddressesDefined = function() {
+	this.hasPublicAddresses = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
-		var bool;
 		for (var i = 0; i < state.keypairs.length; i++) {
-		  if (isUndefined(bool)) bool = state.keypairs[i].publicAddressDefined();
-		  else if (bool !== state.keypairs[i].publicAddressDefined()) throw new Error("Inconsistent publicAddressDefined() on keypair[" + i + "]");
+		  if (state.keypairs[i].hasPublicAddress()) return true;
 		}
-		return bool;
+		return false;
 	}
 	
-	this.privateKeysDefined = function() {
+	this.hasPrivateKeys = function() {
 		assertFalse(_isDestroyed, "Piece is destroyed");
 		var bool;
 		for (var i = 0; i < state.keypairs.length; i++) {
-			if (isUndefined(bool)) bool = state.keypairs[i].privateKeyDefined();
-			else if (bool !== state.keypairs[i].privateKeyDefined()) throw new Error("Inconsistent privateKeyDefined() on keypair[" + i + "]");
+			if (isUndefined(bool)) bool = state.keypairs[i].hasPrivateKey();
+			else if (bool !== state.keypairs[i].hasPrivateKey()) throw new Error("Inconsistent hasPrivateKey() on keypair[" + i + "]");
 		}
 		return bool;
 	}
@@ -283,13 +281,13 @@ function CryptoPiece(config) {
 		for (prop in CryptoKeypair.Field) {
 		  if (!CryptoKeypair.Field.hasOwnProperty(prop)) continue;
 		  var header = CryptoKeypair.Field[prop.toString()];
-		  if (arrayContains(CryptoKeypair.getExcludedFields(), header)) continue;                   // skip field if excluded
-		  if (header === CryptoKeypair.Field.PART_NUM && !this.isDivided()) continue;               // skip part num if not divided
-		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue;           // skip encryption if not encrypted
-		  if (header === CryptoKeypair.Field.PRIVATE_WIF && !this.privateKeysDefined()) continue;   // skip private wif if no private keys
-      if (header === CryptoKeypair.Field.PRIVATE_HEX && !this.privateKeysDefined()) continue;   // skip private hex if no private keys
-      if (header === CryptoKeypair.Field.PRIVATE_STATE && !this.privateKeysDefined()) continue; // skip private state if no private keys
-      if (header === CryptoKeypair.Field.PUBLIC_ADDRESS && !this.publicAddressesDefined()) continue;  // skip public address if no public addresses
+		  if (arrayContains(CryptoKeypair.getExcludedFields(), header)) continue;               			// skip field if excluded
+		  if (header === CryptoKeypair.Field.PART_NUM && !this.isDivided()) continue;           			// skip part num if not divided
+		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue;       			// skip encryption if not encrypted
+		  if (header === CryptoKeypair.Field.PRIVATE_WIF && !this.hasPrivateKeys()) continue;   			// skip private wif if no private keys
+      if (header === CryptoKeypair.Field.PRIVATE_HEX && !this.hasPrivateKeys()) continue;  				// skip private hex if no private keys
+      if (header === CryptoKeypair.Field.PRIVATE_STATE && !this.hasPrivateKeys()) continue; 			// skip private state if no private keys
+      if (header === CryptoKeypair.Field.PUBLIC_ADDRESS && !this.hasPublicAddresses()) continue;  // skip public address if no public addresses
 			headers.push(header);
 		}
 		
@@ -316,7 +314,7 @@ function CryptoPiece(config) {
 		for (var i = 0; i < state.keypairs.length; i++) {
 			txt += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\r\n\r\n";
 			var publicAddress = state.keypairs[i].getPublicAddress();
-			if (isDefined(publicAddress)) txt += "Public Address:\r\n" + state.keypairs[i].getExportValue(CryptoKeypair.Field.PUBLIC_ADDRESS) + "\r\n\r\n";
+			if (isDefined(publicAddress) && this.hasPublicAddresses()) txt += "Public Address:\r\n" + state.keypairs[i].getExportValue(CryptoKeypair.Field.PUBLIC_ADDRESS) + "\r\n\r\n";
  			if (isDefined(state.keypairs[i].getPrivateWif())) txt += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPartNum() ? "(divided)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
 		}
 		return txt.trim();

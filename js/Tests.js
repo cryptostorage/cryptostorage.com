@@ -91,8 +91,8 @@ function Tests() {
 		
 		// collect test functions
 		var funcs = [];
-		funcs.push(function(onDone) { testUtils(); onDone(); });
-		funcs.push(function(onDone) { testPlugins(plugins, onDone); });
+		//funcs.push(function(onDone) { testUtils(); onDone(); });
+		//funcs.push(function(onDone) { testPlugins(plugins, onDone); });
 		funcs.push(function(onDone) { testPieceAllPlugins(plugins); onDone(); });
 		funcs.push(function(onDone) { testBackwardsCompatibility(onDone); });
 		funcs.push(function(onDone) { testFileImport(plugins, onDone); });
@@ -551,17 +551,17 @@ function Tests() {
 		for (var i = 0; i < combinations.length; i++) {
 			var combination = combinations[i];
 			var combined = new CryptoPiece({dividedPieces: combination});
-			if (!original.publicAddressesDefined()) combined.removePublicAddresses();
+			if (!original.hasPublicAddresses()) combined.removePublicAddresses();
 			assertTrue(original.equals(combined));
 		}
 				
 		// combine all pieces
 		var combined = new CryptoPiece({dividedPieces: dividedPieces});
-		if (!original.publicAddressesDefined()) {
+		if (!original.hasPublicAddresses()) {
 		  combined.removePublicAddresses();
-		  assertFalse(combined.publicAddressesDefined());
+		  assertFalse(combined.hasPublicAddresses());
 		} else {
-		  assertTrue(combined.publicAddressesDefined());
+		  assertTrue(combined.hasPublicAddresses());
 		}
 		assertTrue(original.equals(combined));
 
@@ -578,7 +578,7 @@ function Tests() {
 		if (TEST_MAX_PARTS) {
 			dividedPieces = combined.divide(AppUtils.MAX_PARTS, AppUtils.MAX_PARTS - 10);
 			var combined = new CryptoPiece({dividedPieces: dividedPieces});
-			if (!original.publicAddressesDefined()) combined.removePublicAddresses();
+			if (!original.hasPublicAddresses()) combined.removePublicAddresses();
 			assertTrue(original.equals(combined));
 		}
 	}
@@ -593,7 +593,8 @@ function Tests() {
 		assertInitialized(keypair.getPlugin());
 		
 		// test public address
-    if (keypair.publicAddressDefined()) assertDefined(keypair.getPublicAddress());
+		if (!keypair.isPublicApplicable()) assertNull(keypair.getPublicAddress());
+    else if (keypair.hasPublicAddress()) assertInitialized(keypair.getPublicAddress());
     else assertUndefined(keypair.getPublicAddress());
 		
 		// test divided keypair
@@ -633,7 +634,7 @@ function Tests() {
 		}
 		
 		// test keypair without private keys
-		else if (!keypair.privateKeyDefined()) {
+		else if (!keypair.hasPrivateKey()) {
 			assertUndefined(keypair.getPrivateHex());
 			assertUndefined(keypair.getPrivateWif());
 			assertUndefined(keypair.isEncrypted());
@@ -692,7 +693,7 @@ function Tests() {
 				testPieceInit(dividedPieces[i]);
 			}
 			piece2 = new CryptoPiece({dividedPieces: dividedPieces});
-			if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
+			if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 			assertTrue(piece.equals(piece2));
 			
 			/**
@@ -730,27 +731,33 @@ function Tests() {
 		
 		// test init from json
 		piece2 = new CryptoPiece({json: piece.toJson()});
-		if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
+		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 		if (!piece.equals(piece2)) {
-		  console.log(piece.toJson());
-		  console.log(piece2.toJson());
+		  console.log(piece.getInternalState());
+		  console.log(piece2.getInternalState());
+		  for (var i = 0; i < piece.getKeypairs().length; i++) {
+		    if (!piece.getKeypairs()[i].equals(piece2.getKeypairs()[i])) {
+		      console.log(piece.getKeypairs()[i]._state);
+		      console.log(piece2.getKeypairs()[i]._state);
+		    }
+		  }
 		}
 		assertTrue(piece.equals(piece2));
 		
 		// test init from json string
 		piece2 = new CryptoPiece({json: piece.toString(AppUtils.FileType.JSON)});
-		if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
+		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 		assertTrue(piece.equals(piece2));
 		
 		// test init from csv
 		piece2 = new CryptoPiece({csv: piece.toCsv()});
-		if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
+		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 		assertTrue(piece.equals(piece2));
 		
 		// test init from txt
 		assertString(piece.toTxt());
 		piece2 = new CryptoPiece({txt: piece.toTxt()});
-		if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
+		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 		if (piece.getPartNum()) piece2.setPartNum(piece.getPartNum());
 		assertTrue(piece.equals(piece2));
 	}
@@ -768,16 +775,17 @@ function Tests() {
 		}
 		
 		// don't test removal if public or private missing
-		if (!piece.privateKeysDefined()) return;
-		if (!piece.publicAddressesDefined()) return;
+		if (!piece.hasPrivateKeys()) return;
+		if (!piece.hasPublicAddresses() && anyPublicsApply) return;
 		
 		// test remove public addresses
 		var modified = piece.copy();
 		modified.removePublicAddresses();
 		for (var i = 0; i < modified.getKeypairs().length; i++) {
 			var keypair = modified.getKeypairs()[i];
-			assertUndefined(keypair.getPublicAddress());
-			assertTrue(keypair.privateKeyDefined());
+			if (keypair.isPublicApplicable()) assertUndefined(keypair.getPublicAddress());
+			else assertNull(keypair.getPublicAddress());
+			assertTrue(keypair.hasPrivateKey());
 			testKeypairState(keypair);
 			if (piece.getPartNum()) assertEquals(piece.getPartNum(), modified.getPartNum());
 		}
@@ -789,7 +797,7 @@ function Tests() {
 		for (var i = 0; i < modified.getKeypairs().length; i++) {
 			var keypair = modified.getKeypairs()[i];
 			keypair.isPublicApplicable() ? assertDefined(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
-			assertFalse(keypair.privateKeyDefined());
+			assertFalse(keypair.hasPrivateKey());
 			assertUndefined(keypair.isEncrypted());
 			assertUndefined(keypair.getMinParts());
 			assertUndefined(keypair.getPartNum());
@@ -812,12 +820,12 @@ function Tests() {
     
     // test json
     var json = piece.toJson();
-    if (piece.publicAddressesDefined()) assertEquals(null, json.keypairs[naIdx].publicAddress);
-    else assertUndefined(json.keypairs[naIdx].publicAddress);
+    assertEquals(undefined, json.keypairs[naIdx].publicAddress);
     
     // test csv
     var csv = piece.toCsv();
-    if (piece.publicAddressesDefined()) {
+    assertTrue(csv.indexOf("Not applicable") < 0);
+    if (piece.hasPublicAddresses()) {
       assertTrue(csv.indexOf("Not applicable") >= 0);
     } else {
       assertFalse(csv.indexOf("Not applicable") >= 0);
@@ -825,7 +833,7 @@ function Tests() {
     
     // test txt
     var txt = piece.toTxt();
-    if (piece.publicAddressesDefined()) {
+    if (piece.hasPublicAddresses()) {
       assertTrue(txt.indexOf("Not applicable") >= 0);
     } else {
       assertFalse(txt.indexOf("Not applicable") >= 0);
@@ -1548,7 +1556,7 @@ function Tests() {
 		piece1 = new CryptoPiece({csv: csv});
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", privateKey: "tomato domain essence fat velvet robot bring index slab daughter artist cover book image disease divert used paddle hire put index spare busy clap"})]});
 		assertTrue(piece1.equals(piece2));
-    assertTrue(piece1.toCsv().indexOf("Not applicable") > -1);
+    assertTrue(piece1.toCsv().indexOf("Not applicable") < 0);
 		
 		// done testing compatibility
 		onDone();
