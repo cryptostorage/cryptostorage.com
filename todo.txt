@@ -59,6 +59,7 @@ within bitaddress, why is encrypted bip38 not recreated from encrypting unencryp
 why are bip38s generated from ian and i's not importable into other dogecoin tools, why is output of bpw not importable in CS but is for others?
 InputLabelController.onChecked() only fires if changed
 custom error message for qrs not loading
+evidence of keypair render scratch pad when importing consecutive txts containing only public addresses on linux
 
 low priority:
 view balance qr code on cryptocash
