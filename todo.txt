@@ -1,5 +1,4 @@
 v0.3.0
-bip39 text export should show public not applicable
 flashing with seo
 faq links
 faq proper lists?
@@ -9,6 +8,7 @@ every page unique title and links back to homepage
 update sitemap.xml
 
 
+bip39 appears vertically too high on standard keypair
 encryption and division method outlined in faq
 slider points cleanup
 address sensitivity of printer and flash drive after use
@@ -31,7 +31,6 @@ better cryptocash design
 dynamic editor with horizontal groupings (designer todo)
 qr scanner
 could show print preview right away then print button is progress bar
-bip39 appears vertically too high on standard keypair
 test encryption with full piece instead of piece per plugin
 what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded

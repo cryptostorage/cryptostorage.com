@@ -101,16 +101,6 @@ CryptoKeypair.prototype.isPublicApplicable = function() {
 	return this._state.plugin.isPublicApplicable();
 }
 
-/**
- * Indicates if the public address has not been removed.
- * 
- * @returns true if the public address has not been removed, false otherwise
- */
-CryptoKeypair.prototype.hasPublicAddress = function() {
-	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	return isDefined(this._state.publicAddress);
-}
-
 CryptoKeypair.prototype.getPublicAddress = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	return this._state.publicAddress;
@@ -118,19 +108,19 @@ CryptoKeypair.prototype.getPublicAddress = function() {
 
 CryptoKeypair.prototype.removePublicAddress = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	assertTrue(this.hasPrivateKey());
-	if (this.isPublicApplicable()) delete this._state.publicAddress;
+	assertTrue(this.privateKeyDefined());
+	delete this._state.publicAddress;
 	return this;
+}
+
+CryptoKeypair.prototype.publicAddressDefined = function() {
+  assertFalse(this._isDestroyed, "Keypair is destroyed");
+  return isDefined(this.getPublicAddress());
 }
 
 CryptoKeypair.prototype.getPrivateLabel = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	return this._state.plugin.getPrivateLabel();
-}
-
-CryptoKeypair.prototype.hasPrivateKey = function() {
-	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	return isDefined(this.getPrivateHex());
 }
 
 CryptoKeypair.prototype.getPrivateHex = function() {
@@ -153,6 +143,11 @@ CryptoKeypair.prototype.removePrivateKey = function() {
 	delete this._state.minParts;
 	delete this._state.partNum;
 	return this;
+}
+
+CryptoKeypair.prototype.privateKeyDefined = function() {
+  assertFalse(this._isDestroyed, "Keypair is destroyed");
+  return isDefined(this.getPrivateHex());
 }
 
 CryptoKeypair.prototype.encrypt = function(scheme, passphrase, onProgress, onDone) {
@@ -292,6 +287,7 @@ CryptoKeypair.prototype.divide = function(numParts, minParts) {
 			publicAddress: this.getPublicAddress(),
 			partNum: i + 1
 		});
+		if (!this.publicAddressDefined()) keypair.removePublicAddress();
 		dividedKeypairs.push(keypair);
 	}
 	return dividedKeypairs;
@@ -334,15 +330,15 @@ CryptoKeypair.prototype.toJson = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	function isExcluded(field) { return arrayContains(CryptoKeypair.getExcludedFields(), field); }
 	var json = {};
-	if (!isExcluded(CryptoKeypair.Field.TICKER)) json.ticker = this.getExportValue(CryptoKeypair.Field.TICKER);
-	if (!isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS)) json.publicAddress = this.getExportValue(CryptoKeypair.Field.PUBLIC_ADDRESS);
-	if (!isExcluded(CryptoKeypair.Field.PRIVATE_WIF)) json.privateWif = this.getExportValue(CryptoKeypair.Field.PRIVATE_WIF);
-	if (!isExcluded(CryptoKeypair.Field.PRIVATE_HEX)) json.privateHex = this.getExportValue(CryptoKeypair.Field.PRIVATE_HEX);
-	if (!isExcluded(CryptoKeypair.Field.PRIVATE_STATE) && this.hasPrivateKey()) json.privateState = this.getExportValue(CryptoKeypair.Field.PRIVATE_STATE);
-	if (!isExcluded(CryptoKeypair.Field.ENCRYPTION) && this.isEncrypted()) json.encryption = this.getExportValue(CryptoKeypair.Field.ENCRYPTION);
-	if (!isExcluded(CryptoKeypair.Field.IS_DIVIDED)) json.isDivided = this.getExportValue(CryptoKeypair.Field.IS_DIVIDED);
-	if (!isExcluded(CryptoKeypair.Field.MIN_PARTS) && this.isDivided()) json.minParts = this.getExportValue(CryptoKeypair.Field.MIN_PARTS);
-	if (!isExcluded(CryptoKeypair.Field.PART_NUM) && this.isDivided()) json.partNum = this.getExportValue(CryptoKeypair.Field.PART_NUM);
+	if (!isExcluded(CryptoKeypair.Field.TICKER)) json.ticker = this.getPlugin().getTicker();
+	if (!isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS)) json.publicAddress = this.getPublicAddress();
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_WIF)) json.privateWif = this.getPrivateWif();
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_HEX)) json.privateHex = this.getPrivateHex();
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_STATE) && this.privateKeyDefined()) json.privateState = this.getExportValue(CryptoKeypair.Field.PRIVATE_STATE);
+	if (!isExcluded(CryptoKeypair.Field.ENCRYPTION) && this.isEncrypted()) json.encryption = this.getEncryptionScheme();
+	if (!isExcluded(CryptoKeypair.Field.IS_DIVIDED)) json.isDivided = this.isDivided();
+	if (!isExcluded(CryptoKeypair.Field.MIN_PARTS) && this.isDivided()) json.minParts = this.getMinParts();
+	if (!isExcluded(CryptoKeypair.Field.PART_NUM) && this.isDivided()) json.partNum = this.getPartNum();
 	return json;
 }
 
@@ -460,12 +456,12 @@ CryptoKeypair.prototype._validateState = function() {
 	
 	// public or private must be known if address applicable
 	if (this.getPlugin().isPublicApplicable()) {
-		if (isUndefined(this._state.publicAddress)) assertTrue(this.hasPrivateKey());
-		if (!this.hasPrivateKey()) assertInitialized(this._state.publicAddress);
+		if (isUndefined(this._state.publicAddress)) assertTrue(this.privateKeyDefined());
+		if (!this.privateKeyDefined()) assertInitialized(this._state.publicAddress);
 	}
 			
 	// private key known
-	if (this.hasPrivateKey()) {
+	if (this.privateKeyDefined()) {
 		
 		// divided state is known or not applicable
 		assertDefined(this._state.isDivided);
@@ -496,7 +492,7 @@ CryptoKeypair.prototype._validateState = function() {
 	}
 	
 	// private key unknown
-	if (!this.hasPrivateKey()) {
+	if (!this.privateKeyDefined()) {
 		assertUndefined(this._state.privateHex);
 		assertUndefined(this._state.privateWif);
 		assertUndefined(this._state.isDivided);

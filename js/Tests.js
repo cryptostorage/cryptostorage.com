@@ -478,6 +478,7 @@ function Tests() {
 		if (piece.isDivided() === false) testPieceDivide(piece);
 		testPieceInit(piece);
 		testPieceRemoval(piece);
+		testNotApplicableAddressExports(piece);
 	}
 	
 	function testPieceDivide(undividedPiece) {
@@ -550,17 +551,17 @@ function Tests() {
 		for (var i = 0; i < combinations.length; i++) {
 			var combination = combinations[i];
 			var combined = new CryptoPiece({dividedPieces: combination});
-			if (!original.hasPublicAddresses()) combined.removePublicAddresses();
+			if (!original.publicAddressesDefined()) combined.removePublicAddresses();
 			assertTrue(original.equals(combined));
 		}
 				
 		// combine all pieces
 		var combined = new CryptoPiece({dividedPieces: dividedPieces});
-		if (!original.hasPublicAddresses()) {
+		if (!original.publicAddressesDefined()) {
 		  combined.removePublicAddresses();
-		  assertFalse(combined.hasPublicAddresses());
+		  assertFalse(combined.publicAddressesDefined());
 		} else {
-		  assertTrue(combined.hasPublicAddresses());
+		  assertTrue(combined.publicAddressesDefined());
 		}
 		assertTrue(original.equals(combined));
 
@@ -577,7 +578,7 @@ function Tests() {
 		if (TEST_MAX_PARTS) {
 			dividedPieces = combined.divide(AppUtils.MAX_PARTS, AppUtils.MAX_PARTS - 10);
 			var combined = new CryptoPiece({dividedPieces: dividedPieces});
-			if (!original.hasPublicAddresses()) combined.removePublicAddresses();
+			if (!original.publicAddressesDefined()) combined.removePublicAddresses();
 			assertTrue(original.equals(combined));
 		}
 	}
@@ -592,8 +593,7 @@ function Tests() {
 		assertInitialized(keypair.getPlugin());
 		
 		// test public address
-		if (!keypair.isPublicApplicable()) assertNull(keypair.getPublicAddress());
-    else if (keypair.hasPublicAddress()) assertDefined(keypair.getPublicAddress());
+    if (keypair.publicAddressDefined()) assertDefined(keypair.getPublicAddress());
     else assertUndefined(keypair.getPublicAddress());
 		
 		// test divided keypair
@@ -633,7 +633,7 @@ function Tests() {
 		}
 		
 		// test keypair without private keys
-		else if (!keypair.hasPrivateKey()) {
+		else if (!keypair.privateKeyDefined()) {
 			assertUndefined(keypair.getPrivateHex());
 			assertUndefined(keypair.getPrivateWif());
 			assertUndefined(keypair.isEncrypted());
@@ -692,7 +692,7 @@ function Tests() {
 				testPieceInit(dividedPieces[i]);
 			}
 			piece2 = new CryptoPiece({dividedPieces: dividedPieces});
-			if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
+			if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
 			assertTrue(piece.equals(piece2));
 			
 			/**
@@ -730,7 +730,7 @@ function Tests() {
 		
 		// test init from json
 		piece2 = new CryptoPiece({json: piece.toJson()});
-		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
+		if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
 		if (!piece.equals(piece2)) {
 		  console.log(piece.toJson());
 		  console.log(piece2.toJson());
@@ -739,18 +739,18 @@ function Tests() {
 		
 		// test init from json string
 		piece2 = new CryptoPiece({json: piece.toString(AppUtils.FileType.JSON)});
-		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
+		if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
 		assertTrue(piece.equals(piece2));
 		
 		// test init from csv
 		piece2 = new CryptoPiece({csv: piece.toCsv()});
-		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
+		if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
 		assertTrue(piece.equals(piece2));
 		
 		// test init from txt
 		assertString(piece.toTxt());
 		piece2 = new CryptoPiece({txt: piece.toTxt()});
-		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
+		if (!piece.publicAddressesDefined()) piece2.removePublicAddresses();
 		if (piece.getPartNum()) piece2.setPartNum(piece.getPartNum());
 		assertTrue(piece.equals(piece2));
 	}
@@ -768,17 +768,16 @@ function Tests() {
 		}
 		
 		// don't test removal if public or private missing
-		if (!piece.hasPrivateKeys()) return;
-		if (!piece.hasPublicAddresses()) return;
+		if (!piece.privateKeysDefined()) return;
+		if (!piece.publicAddressesDefined()) return;
 		
 		// test remove public addresses
 		var modified = piece.copy();
 		modified.removePublicAddresses();
 		for (var i = 0; i < modified.getKeypairs().length; i++) {
 			var keypair = modified.getKeypairs()[i];
-			if (keypair.isPublicApplicable()) assertUndefined(keypair.getPublicAddress());
-			else assertNull(keypair.getPublicAddress());
-			assertTrue(keypair.hasPrivateKey());
+			assertUndefined(keypair.getPublicAddress());
+			assertTrue(keypair.privateKeyDefined());
 			testKeypairState(keypair);
 			if (piece.getPartNum()) assertEquals(piece.getPartNum(), modified.getPartNum());
 		}
@@ -790,7 +789,7 @@ function Tests() {
 		for (var i = 0; i < modified.getKeypairs().length; i++) {
 			var keypair = modified.getKeypairs()[i];
 			keypair.isPublicApplicable() ? assertDefined(keypair.getPublicAddress()) : assertNull(keypair.getPublicAddress());
-			assertFalse(keypair.hasPrivateKey());
+			assertFalse(keypair.privateKeyDefined());
 			assertUndefined(keypair.isEncrypted());
 			assertUndefined(keypair.getMinParts());
 			assertUndefined(keypair.getPartNum());
@@ -798,6 +797,40 @@ function Tests() {
 		}
 		if (anyPublicsApply) testPieceWithoutEncryption(modified);
 	}
+	 
+  function testNotApplicableAddressExports(piece) {
+    
+    // ensure piece contains keypair whose address is not applicable
+    var naIdx = -1;
+    for (var i = 0; i < piece.getKeypairs().length; i++) {
+      if (!piece.getKeypairs()[i].isPublicApplicable()) {
+        naIdx = i;
+        break;
+      }
+    }
+    if (naIdx < 0) return;
+    
+    // test json
+    var json = piece.toJson();
+    if (piece.publicAddressesDefined()) assertEquals(null, json.keypairs[naIdx].publicAddress);
+    else assertUndefined(json.keypairs[naIdx].publicAddress);
+    
+    // test csv
+    var csv = piece.toCsv();
+    if (piece.publicAddressesDefined()) {
+      assertTrue(csv.indexOf("Not applicable") >= 0);
+    } else {
+      assertFalse(csv.indexOf("Not applicable") >= 0);
+    }
+    
+    // test txt
+    var txt = piece.toTxt();
+    if (piece.publicAddressesDefined()) {
+      assertTrue(txt.indexOf("Not applicable") >= 0);
+    } else {
+      assertFalse(txt.indexOf("Not applicable") >= 0);
+    }
+  }
 	
 	function testGeneratePieces(plugins, onDone) {
 		console.log("Testing generate pieces from config");
