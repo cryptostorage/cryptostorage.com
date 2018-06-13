@@ -4603,8 +4603,8 @@ function EditorSaveController(div, pieces) {
 		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save public addresses").render();
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save private keys").render();
-		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
-		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
+		includePublicCheckbox.setChecked(AppUtils.hasPublicAddresses(pieces));
+		includePrivateCheckbox.setChecked(AppUtils.hasPrivateKeys(pieces));
 		
 		// cancel and save buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(body);
@@ -4641,8 +4641,8 @@ function EditorSaveController(div, pieces) {
 	function update(onDone) {
 		
 		// set checkboxes visibility and enabled
-		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+		includePrivateCheckbox.setEnabled(AppUtils.hasPublicAddresses(pieces) && AppUtils.hasPrivateKeys(pieces) && includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(AppUtils.hasPublicAddresses(pieces) && AppUtils.hasPrivateKeys(pieces) && includePrivateCheckbox.isChecked());
 		if (!includePublicCheckbox.isEnabled() && !includePrivateCheckbox.isEnabled()) {
       includePublicCheckbox.setVisible(false);
 		  includePrivateCheckbox.setVisible(false);
@@ -4788,9 +4788,9 @@ function EditorPrintController(div, pieces) {
 		previewLoadDiv.append("<img src='img/loading.gif' class='loading'>");
 		
 		// initial state
-		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
-		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
-		if (pieces[0].hasPrivateKeys()) includePrivateRadio.setChecked(true);
+		includePublicCheckbox.setChecked(AppUtils.hasPublicAddresses(pieces));
+		includePrivateCheckbox.setChecked(AppUtils.hasPrivateKeys(pieces));
+		if (AppUtils.hasPrivateKeys(pieces)) includePrivateRadio.setChecked(true);
 		else includePublicRadio.setChecked(true);
 		includeLogosCheckbox.setChecked(true);
 		includeQrsCheckbox.setChecked(true);
@@ -4846,10 +4846,11 @@ function EditorPrintController(div, pieces) {
 	function update(onDone) {
 	  
 	   // enable/disable checkboxes and radios
-    includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
-    includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
-    includePrivateRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
-    includePublicRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
+	  var hasPublicAndPrivate = AppUtils.hasPublicAddresses(pieces) && AppUtils.hasPrivateKeys(pieces);
+    includePrivateCheckbox.setEnabled(hasPublicAndPrivate && includePublicCheckbox.isChecked());
+    includePublicCheckbox.setEnabled(hasPublicAndPrivate && includePrivateCheckbox.isChecked());
+    includePrivateRadio.setEnabled(hasPublicAndPrivate);
+    includePublicRadio.setEnabled(hasPublicAndPrivate);
 		
 		// configure per layout
 		var pieceRendererClass;

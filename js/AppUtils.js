@@ -1047,5 +1047,19 @@ var AppUtils = {
 				}
 			}
 		}
+	},
+	
+	hasPublicAddresses: function(pieces) {
+	  for (var i = 0; i < pieces.length; i++) {
+	    if (pieces[i].hasPublicAddresses()) return true;
+	  }
+	  return false;
+	},
+	
+	hasPrivateKeys: function(pieces) {
+	  for (var i = 0; i < pieces.length; i++) {
+	    if (pieces[i].hasPrivateKeys()) return true;
+	  }
+	  return false;
 	}
 }
