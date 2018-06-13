@@ -578,7 +578,7 @@ CryptoKeypair.prototype._combine = function(dividedKeypairs) {
 		if (!this._state.plugin) this._state.plugin = dividedKeypairs[i].getPlugin();
 		else if (this._state.plugin !== dividedKeypairs[i].getPlugin()) throw new Error("dividedKeypairs[" + i + "] has inconsistent plugin");
 		if (!publicAddress) publicAddress = dividedKeypairs[i].getPublicAddress();
-		else if (publicAddress !== dividedKeypairs[i].getPublicAddress()) throw new Error("dividedKeypairs[" + i + "] has inconsistent public address");
+		else if (isDefined(publicAddress) && isDefined(dividedKeypairs[i].getPublicAddress()) && publicAddress !== dividedKeypairs[i].getPublicAddress()) throw new Error("dividedKeypairs[" + i + "] has inconsistent public address");
 	}
 	
 	// collect decoded hex parts and verify consistent min parts
