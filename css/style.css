@@ -1394,6 +1394,8 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .piece_preview_div {
+	min-width: 750px;
+	width: 750px;
 	min-height: 106px;
 	max-height: 300px;
 	overflow: hidden;
@@ -1644,6 +1646,11 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	font-size: 12px;
 	font-family: monospace;
 	text-align: justify;
+}
+
+.text_piece {
+	page-break-inside: avoid;
+	page-break-after: always;
 }
 
 .hidden {

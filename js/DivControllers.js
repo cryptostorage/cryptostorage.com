@@ -6463,7 +6463,7 @@ function TextPieceRenderer(div, piece, config) {
     
     // div setup
     div.empty();
-    div.addClass("piece_div");
+    div.addClass("text_piece");
     
     // build text with break points
     var txt = "";
@@ -6473,7 +6473,7 @@ function TextPieceRenderer(div, piece, config) {
     }
     
     // add text
-    var txtDiv = $("<div class='text_piece word_break_all'>").appendTo(div);
+    var txtDiv = $("<div class='word_break_all'>").appendTo(div);
     txtDiv.append(txt);
 
     // done
@@ -6513,7 +6513,7 @@ function TextPieceRenderer(div, piece, config) {
     if (isDefined(index)) txt += getNoWrapSpan("#" + (keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (index + 1) + ",") + " ";
     txt += getNoWrapSpan(keypair.getPlugin().getTicker() + ",");
     if (isDefined(keypair.getPublicAddress())) {
-      txt += " " + getNoWrapSpan("public:") + " " + (keypair.isPublicApplicable() ? keypair.getPublicAddress() : getNoWrapSpan("Not applicable"));
+      txt += " " + getNoWrapSpan("public:") + " " + (keypair.isPublicApplicable() ? keypair.getPublicAddress() : getNoWrapSpan("Not") + " " + getNoWrapSpan("applicable"));
       if (isDefined(keypair.getPrivateWif())) txt += ",";
     }
     if (isDefined(keypair.getPrivateWif())) {
