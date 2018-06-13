@@ -1642,15 +1642,15 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	text-align: center;
 }
 
-.text_piece, .text_piece * {
+.text_piece_div {
+	page-break-inside: avoid;
+	page-break-after: always;
+}
+
+.text_piece_text, .text_piece_text * {
 	font-size: 12px;
 	font-family: monospace;
 	text-align: justify;
-}
-
-.text_piece {
-	page-break-inside: avoid;
-	page-break-after: always;
 }
 
 .hidden {

@@ -6463,7 +6463,7 @@ function TextPieceRenderer(div, piece, config) {
     
     // div setup
     div.empty();
-    div.addClass("text_piece");
+    div.addClass("text_piece_div");
     
     // build text with break points
     var txt = "";
@@ -6473,7 +6473,7 @@ function TextPieceRenderer(div, piece, config) {
     }
     
     // add text
-    var txtDiv = $("<div class='word_break_all'>").appendTo(div);
+    var txtDiv = $("<div class='text_piece_text word_break_all'>").appendTo(div);
     txtDiv.append(txt);
 
     // done
