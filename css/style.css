@@ -1387,8 +1387,6 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .piece_div {
-	min-width: 750px;
-	width: 750px;
 	page-break-inside: avoid;
 	page-break-after: always;
 }
@@ -1402,6 +1400,8 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 }
 
 .piece_page_div {
+	min-width: 750px;
+	width: 750px;
 	page-break-inside: avoid;
 	page-break-after: always;
 }
@@ -1640,11 +1640,6 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	font-size: 12px;
 	font-family: monospace;
 	text-align: center;
-}
-
-.text_piece_div {
-	page-break-inside: avoid;
-	page-break-after: always;
 }
 
 .text_piece_text, .text_piece_text * {

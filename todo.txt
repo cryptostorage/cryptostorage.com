@@ -1,5 +1,4 @@
 v0.3.0
-bip39 print text private only shows public
 bip39 text export should show public not applicable
 flashing with seo
 faq links

@@ -101,9 +101,14 @@ CryptoKeypair.prototype.isPublicApplicable = function() {
 	return this._state.plugin.isPublicApplicable();
 }
 
+/**
+ * Indicates if the public address has not been removed.
+ * 
+ * @returns true if the public address has not been removed, false otherwise
+ */
 CryptoKeypair.prototype.hasPublicAddress = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
-	return isInitialized(this._state.publicAddress);
+	return isDefined(this._state.publicAddress);
 }
 
 CryptoKeypair.prototype.getPublicAddress = function() {

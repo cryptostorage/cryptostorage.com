@@ -5878,7 +5878,7 @@ StandardKeypairRenderer.getRenderWeight = function(tickerOrKeypair) {
 		return 15 * (plugin.isPublicApplicable() ? 2 : 1);
 	} else {
 		assertObject(tickerOrKeypair, CryptoKeypair);
-		return (tickerOrKeypair.hasPublicAddress() ? 15 : 0) + (tickerOrKeypair.hasPrivateKey() ? 15 : 0); 
+		return (tickerOrKeypair.hasPublicAddress() && tickerOrKeypair.isPublicApplicable() ? 15 : 0) + (tickerOrKeypair.hasPrivateKey() ? 15 : 0); 
 	}
 }
 
@@ -6463,12 +6463,12 @@ function TextPieceRenderer(div, piece, config) {
     
     // div setup
     div.empty();
-    div.addClass("text_piece_div");
+    div.addClass("piece_div");
     
     // build text with break points
     var txt = "";
     for (var i = 0; i < piece.getKeypairs().length; i++) {
-      txt += toTextKeypair(piece.getKeypairs()[i], i);
+      txt += toTextKeypair(piece.getKeypairs()[i], i, config);
       if (i < piece.getKeypairs().length - 1) txt += " | ";
     }
     
@@ -6508,15 +6508,15 @@ function TextPieceRenderer(div, piece, config) {
     return 1;
   }
   
-  function toTextKeypair(keypair, index) {
+  function toTextKeypair(keypair, index, config) {
     var txt = "";
     if (isDefined(index)) txt += getNoWrapSpan("#" + (keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (index + 1) + ",") + " ";
     txt += getNoWrapSpan(keypair.getPlugin().getTicker() + ",");
-    if (isDefined(keypair.getPublicAddress())) {
+    if (isDefined(keypair.getPublicAddress()) && config.showPublic) {
       txt += " " + getNoWrapSpan("public:") + " " + (keypair.isPublicApplicable() ? keypair.getPublicAddress() : getNoWrapSpan("Not") + " " + getNoWrapSpan("applicable"));
       if (isDefined(keypair.getPrivateWif())) txt += ",";
     }
-    if (isDefined(keypair.getPrivateWif())) {
+    if (isDefined(keypair.getPrivateWif()) && config.showPrivate) {
       txt += " " + getNoWrapSpan("private:") + " " + getPrivateTxt(keypair);
       txt += keypair.getPartNum() ? ", " + getNoWrapSpan("divided") : (keypair.isEncrypted() ? ", " + getNoWrapSpan("encrypted") : "");
     }

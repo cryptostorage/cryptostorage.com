@@ -593,7 +593,7 @@ function Tests() {
 		
 		// test public address
 		if (!keypair.isPublicApplicable()) assertNull(keypair.getPublicAddress());
-    else if (keypair.hasPublicAddress()) assertInitialized(keypair.getPublicAddress());
+    else if (keypair.hasPublicAddress()) assertDefined(keypair.getPublicAddress());
     else assertUndefined(keypair.getPublicAddress());
 		
 		// test divided keypair
@@ -769,7 +769,7 @@ function Tests() {
 		
 		// don't test removal if public or private missing
 		if (!piece.hasPrivateKeys()) return;
-		if (!piece.hasPublicAddresses() && anyPublicsApply) return;
+		if (!piece.hasPublicAddresses()) return;
 		
 		// test remove public addresses
 		var modified = piece.copy();
