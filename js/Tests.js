@@ -91,8 +91,8 @@ function Tests() {
 		
 		// collect test functions
 		var funcs = [];
-		//funcs.push(function(onDone) { testUtils(); onDone(); });
-		//funcs.push(function(onDone) { testPlugins(plugins, onDone); });
+		funcs.push(function(onDone) { testUtils(); onDone(); });
+		funcs.push(function(onDone) { testPlugins(plugins, onDone); });
 		funcs.push(function(onDone) { testPieceAllPlugins(plugins); onDone(); });
 		funcs.push(function(onDone) { testBackwardsCompatibility(onDone); });
 		funcs.push(function(onDone) { testFileImport(plugins, onDone); });
@@ -824,7 +824,6 @@ function Tests() {
     
     // test csv
     var csv = piece.toCsv();
-    assertTrue(csv.indexOf("Not applicable") < 0);
     if (piece.hasPublicAddresses()) {
       assertTrue(csv.indexOf("Not applicable") >= 0);
     } else {

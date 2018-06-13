@@ -297,8 +297,6 @@ function CryptoPiece(config) {
 			var keypairValues = [];
 			for (var j = 0; j < headers.length; j++) {
 				var value = state.keypairs[i].getExportValue(headers[j]);
-				if (value === null) value = "null";
-				if (value === undefined) value = "";
 				keypairValues.push(value);
 			}
 			csvArr.push(keypairValues);
@@ -465,9 +463,7 @@ function CryptoPiece(config) {
 			var keypairConfig = {};
 			for (var col = 0; col < csvArr[0].length; col++) {
 				var value = csvArr[row][col];
-				if (value === "") value = undefined;
-				if (value === "null") value = null;
-				if (value === AppUtils.NA) value = null;
+				if (value === "" || value === "null" || value === AppUtils.NA) value = null;
 				switch (csvArr[0][col].toLowerCase()) {
 					case CryptoKeypair.Field.TICKER.toLowerCase():
 						keypairConfig.plugin = AppUtils.getCryptoPlugin(value);
