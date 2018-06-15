@@ -732,16 +732,6 @@ function Tests() {
 		// test init from json
 		piece2 = new CryptoPiece({json: piece.toJson()});
 		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
-		if (!piece.equals(piece2)) {
-		  console.log(piece.getInternalState());
-		  console.log(piece2.getInternalState());
-		  for (var i = 0; i < piece.getKeypairs().length; i++) {
-		    if (!piece.getKeypairs()[i].equals(piece2.getKeypairs()[i])) {
-		      console.log(piece.getKeypairs()[i]._state);
-		      console.log(piece2.getKeypairs()[i]._state);
-		    }
-		  }
-		}
 		assertTrue(piece.equals(piece2));
 		
 		// test init from json string
