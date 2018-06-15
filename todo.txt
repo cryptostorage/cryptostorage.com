@@ -1,13 +1,7 @@
 v0.3.0
-flashing with seo
-faq links
-faq proper lists?
 editor divide into parts opacity on disabled
-back button when accessed through faq.html
 use anchor text and alt text in internal site links
 every page unique title and links back to homepage
-update sitemap.xml
-
 
 bip39 appears vertically too high on standard keypair
 encryption and division method outlined in faq

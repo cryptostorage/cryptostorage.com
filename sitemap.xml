@@ -28,26 +28,26 @@
 	</url>
 	<url>
 		<loc>https://cryptostorage.com/#faq</loc>
-		<lastmod>2018-01-30</lastmod>
+		<lastmod>2018-06-15</lastmod>
 		<changefreq>monthly</changefreq>
 		<priority>0.9</priority>
 	</url>
 	<url>
-		<loc>https://cryptostorage.com/#new</loc>
-		<lastmod>2018-01-30</lastmod>
-		<priority>0.8</priority>
-		<changefreq>monthly</changefreq>
-	</url>
-	<url>
 		<loc>https://cryptostorage.com/#import</loc>
-		<lastmod>2018-01-30</lastmod>
+		<lastmod>2018-06-15</lastmod>
 		<priority>0.8</priority>
 		<changefreq>monthly</changefreq>
 	</url>
 	<url>
 		<loc>https://cryptostorage.com/#donate</loc>
-		<lastmod>2018-01-30</lastmod>
+		<lastmod>2018-06-15</lastmod>
 		<priority>0.6</priority>
 		<changefreq>monthly</changefreq>
+	</url>
+	<url>
+		<loc>https://cryptostorage.com/generate.html</loc>
+		<lastmod>2018-06-15</lastmod>
+		<changefreq>monthly</changefreq>
+		<priority>0.9</priority>
 	</url>
 </urlset>

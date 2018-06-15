@@ -1,4 +1,3 @@
 User-agent: *
-Disallow: /lib/
 
 Sitemap: https://cryptostorage.com/sitemap.xml
