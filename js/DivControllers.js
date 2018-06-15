@@ -1536,11 +1536,6 @@ function DonateController(div, appController) {
 					image: $("<img src='img/bitcoinjs.png'>")
 				});
 				credits.push({
-					title: "BitPay",
-					subtitle: $("<a target='_blank' href='https://bitpay.com'>www.bitpay.com</a>"),
-					image: $("<img src='img/bitpay.png'>")
-				});
-				credits.push({
 					title: "EthereumJS",
 					subtitle: $("<a target='_blank' href='https://github.com/ethereumjs'>https://github.com/ethereumjs</a>"),
 					image: $("<img src='img/ethereumjs.png'>")

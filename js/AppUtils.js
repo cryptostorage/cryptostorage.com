@@ -219,7 +219,6 @@ var AppUtils = {
 			"lib/clipboard.js",
 			"lib/qrcode.js",
 			"img/loading.gif",
-			"img/bitpay.png",
 			"img/ethereumjs.png",
 		];
 	},
