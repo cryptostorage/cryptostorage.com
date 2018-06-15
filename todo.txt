@@ -7,7 +7,6 @@ bip39 appears vertically too high on standard keypair
 encryption and division method outlined in faq
 slider points cleanup
 address sensitivity of printer and flash drive after use
-put homepage text in index.html and dynamically hide for seo
 upate readme.md
 browser testing
 release
