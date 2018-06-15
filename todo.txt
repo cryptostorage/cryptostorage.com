@@ -9,6 +9,7 @@ browser testing
 release
 
 v0.3.1
+different print layouts on homepage
 editor divide into parts opacity on disabled
 bip39 appears vertically too high on standard keypair
 quotes from news articles
