@@ -719,8 +719,15 @@ inheritsFrom(PaginatorController, DivController);
  * Controls the entire application.
  * 
  * @param div is the div to render the application to
+ * @param hash is an initial window hash (e.g. #faq)
  */
-function AppController(div) {
+function AppController(div, hash) {
+  
+  // redirect to index.html#hash
+  if (hash) {
+    window.location.href = "index.html" + hash;
+    return;
+  }
 	
 	var that = this;
 	var showFuncs;
@@ -813,7 +820,7 @@ function AppController(div) {
 		});
 		
 		// navigate to first page
-		navigate(window.location.hash, function() {
+		navigate(hash ? hash : window.location.hash, function() {
 			
 			// load notice dependencies and start polling
 			LOADER.load(AppUtils.getNoticeDependencies(), function(err) {
@@ -1188,7 +1195,7 @@ function FaqController(div) {
 						answerDiv.append("<p>In order of importance:</p>");
 						var recommendationsList = $("<ol>").appendTo(answerDiv);
 						recommendationsList.append("<li><a href='#faq_download_verify'>Download and verify</a> then run the source code offline, not from the cryptostorage.com domain.</li>");
-						recommendationsList.append("<li>Run this tool on a device that is disconnected from the internet.  For maximum security, the device should never connect to the internet again after generating high-value storage.</li>");
+						recommendationsList.append("<li>Run this tool on a device that is disconnected from the internet.  For maximum security, the device should not connect to the internet after generating cryptocurrency storage.</li>");
 						recommendationsList.append("<li>Run this tool in an open source browser like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
 						recommendationsList.append("<li>Run this tool on an open source operating system like " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 						return answerDiv;
@@ -1202,7 +1209,7 @@ function FaqController(div) {
 						generateList.append("<li><a href='#faq_download_verify'>Download and verify cryptostorage.com-<i>[version]</i>.zip</a>.</li>");
 						var generateTransfer = $("<li><p>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure computer using a flash drive.</p></li>").appendTo(generateList);
 						var generateTransferList = $("<ul>").appendTo(generateTransfer);
-						generateTransferList.append("<li>The computer should be disconnected from the internet.  For maximum security, the device should never connect to the internet again after generating cryptocurrency storage.</li>");
+						generateTransferList.append("<li>The computer should be disconnected from the internet.  For maximum security, the device should not connect to the internet after generating cryptocurrency storage.</li>");
 						generateTransferList.append("<li>An open source operating system is recommended like " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
 						generateList.append("<li>Unzip cryptostorage.com-<i>[version]</i>.zip</li>");
 						var generateBrowser = $("<li><p>Open index.html in the unzipped folder in a browser.</p></li>").appendTo(generateList);
@@ -2162,7 +2169,7 @@ function ImportTextController(div, plugins, printErrors) {
 		
 		// text area
 		textArea = $("<textarea class='import_textarea'>").appendTo(textInputDiv);
-		textArea.attr("placeholder", "Enter private keys, a divided part, csv, or json");
+		textArea.attr("placeholder", "Enter private keys, a divided part, CSV, JSON, or TXT");
 		
 		// submit button
 		var submit = $("<div class='import_button flex_horizontal flex_align_center flex_justify_center user_select_none'>").appendTo(textInputDiv);
@@ -4596,8 +4603,8 @@ function EditorSaveController(div, pieces) {
 		var checkboxesDiv = $("<div class='editor_export_checkboxes flex_horizontal flex_justify_center'>").appendTo(body);
 		includePublicCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save public addresses").render();
 		includePrivateCheckbox = new CheckboxController($("<div class='editor_export_input'>").appendTo(checkboxesDiv), "Save private keys").render();
-		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
-		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
+		includePublicCheckbox.setChecked(AppUtils.hasPublicAddresses(pieces));
+		includePrivateCheckbox.setChecked(AppUtils.hasPrivateKeys(pieces));
 		
 		// cancel and save buttons
 		var buttonsDiv = $("<div class='flex_horizontal flex_align_center'>").appendTo(body);
@@ -4634,8 +4641,8 @@ function EditorSaveController(div, pieces) {
 	function update(onDone) {
 		
 		// set checkboxes visibility and enabled
-		includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
-		includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
+		includePrivateCheckbox.setEnabled(AppUtils.hasPublicAddresses(pieces) && AppUtils.hasPrivateKeys(pieces) && includePublicCheckbox.isChecked());
+		includePublicCheckbox.setEnabled(AppUtils.hasPublicAddresses(pieces) && AppUtils.hasPrivateKeys(pieces) && includePrivateCheckbox.isChecked());
 		if (!includePublicCheckbox.isEnabled() && !includePrivateCheckbox.isEnabled()) {
       includePublicCheckbox.setVisible(false);
 		  includePrivateCheckbox.setVisible(false);
@@ -4781,9 +4788,9 @@ function EditorPrintController(div, pieces) {
 		previewLoadDiv.append("<img src='img/loading.gif' class='loading'>");
 		
 		// initial state
-		includePublicCheckbox.setChecked(pieces[0].hasPublicAddresses());
-		includePrivateCheckbox.setChecked(pieces[0].hasPrivateKeys());
-		if (pieces[0].hasPrivateKeys()) includePrivateRadio.setChecked(true);
+		includePublicCheckbox.setChecked(AppUtils.hasPublicAddresses(pieces));
+		includePrivateCheckbox.setChecked(AppUtils.hasPrivateKeys(pieces));
+		if (AppUtils.hasPrivateKeys(pieces)) includePrivateRadio.setChecked(true);
 		else includePublicRadio.setChecked(true);
 		includeLogosCheckbox.setChecked(true);
 		includeQrsCheckbox.setChecked(true);
@@ -4839,10 +4846,11 @@ function EditorPrintController(div, pieces) {
 	function update(onDone) {
 	  
 	   // enable/disable checkboxes and radios
-    includePrivateCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePublicCheckbox.isChecked());
-    includePublicCheckbox.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys() && includePrivateCheckbox.isChecked());
-    includePrivateRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
-    includePublicRadio.setEnabled(pieces[0].hasPublicAddresses() && pieces[0].hasPrivateKeys());
+	  var hasPublicAndPrivate = AppUtils.hasPublicAddresses(pieces) && AppUtils.hasPrivateKeys(pieces);
+    includePrivateCheckbox.setEnabled(hasPublicAndPrivate && includePublicCheckbox.isChecked());
+    includePublicCheckbox.setEnabled(hasPublicAndPrivate && includePrivateCheckbox.isChecked());
+    includePrivateRadio.setEnabled(hasPublicAndPrivate);
+    includePublicRadio.setEnabled(hasPublicAndPrivate);
 		
 		// configure per layout
 		var pieceRendererClass;
@@ -6461,12 +6469,12 @@ function TextPieceRenderer(div, piece, config) {
     // build text with break points
     var txt = "";
     for (var i = 0; i < piece.getKeypairs().length; i++) {
-      txt += toTextKeypair(piece.getKeypairs()[i], i);
+      txt += toTextKeypair(piece.getKeypairs()[i], i, config);
       if (i < piece.getKeypairs().length - 1) txt += " | ";
     }
     
     // add text
-    var txtDiv = $("<div class='text_piece word_break_all'>").appendTo(div);
+    var txtDiv = $("<div class='text_piece_text word_break_all'>").appendTo(div);
     txtDiv.append(txt);
 
     // done
@@ -6501,15 +6509,15 @@ function TextPieceRenderer(div, piece, config) {
     return 1;
   }
   
-  function toTextKeypair(keypair, index) {
+  function toTextKeypair(keypair, index, config) {
     var txt = "";
     if (isDefined(index)) txt += getNoWrapSpan("#" + (keypair.getPartNum() ? keypair.getPartNum() + "." : "") + (index + 1) + ",") + " ";
     txt += getNoWrapSpan(keypair.getPlugin().getTicker() + ",");
-    if (isInitialized(keypair.getPublicAddress())) {
-      txt += " " + getNoWrapSpan("public:") + " " + keypair.getPublicAddress();
-      if (isInitialized(keypair.getPrivateWif())) txt += ",";
+    if (isDefined(keypair.getPublicAddress()) && config.showPublic) {
+      txt += " " + getNoWrapSpan("public:") + " " + (keypair.isPublicApplicable() ? keypair.getPublicAddress() : getNoWrapSpan("Not") + " " + getNoWrapSpan("applicable"));
+      if (isDefined(keypair.getPrivateWif())) txt += ",";
     }
-    if (isInitialized(keypair.getPrivateWif())) {
+    if (isDefined(keypair.getPrivateWif()) && config.showPrivate) {
       txt += " " + getNoWrapSpan("private:") + " " + getPrivateTxt(keypair);
       txt += keypair.getPartNum() ? ", " + getNoWrapSpan("divided") : (keypair.isEncrypted() ? ", " + getNoWrapSpan("encrypted") : "");
     }

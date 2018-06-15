@@ -478,6 +478,7 @@ function Tests() {
 		if (piece.isDivided() === false) testPieceDivide(piece);
 		testPieceInit(piece);
 		testPieceRemoval(piece);
+		testNotApplicableAddressExports(piece);
 	}
 	
 	function testPieceDivide(undividedPiece) {
@@ -732,8 +733,14 @@ function Tests() {
 		piece2 = new CryptoPiece({json: piece.toJson()});
 		if (!piece.hasPublicAddresses()) piece2.removePublicAddresses();
 		if (!piece.equals(piece2)) {
-		  console.log(piece.toJson());
-		  console.log(piece2.toJson());
+		  console.log(piece.getInternalState());
+		  console.log(piece2.getInternalState());
+		  for (var i = 0; i < piece.getKeypairs().length; i++) {
+		    if (!piece.getKeypairs()[i].equals(piece2.getKeypairs()[i])) {
+		      console.log(piece.getKeypairs()[i]._state);
+		      console.log(piece2.getKeypairs()[i]._state);
+		    }
+		  }
 		}
 		assertTrue(piece.equals(piece2));
 		
@@ -798,6 +805,39 @@ function Tests() {
 		}
 		if (anyPublicsApply) testPieceWithoutEncryption(modified);
 	}
+	 
+  function testNotApplicableAddressExports(piece) {
+    
+    // ensure piece contains keypair whose address is not applicable
+    var naIdx = -1;
+    for (var i = 0; i < piece.getKeypairs().length; i++) {
+      if (!piece.getKeypairs()[i].isPublicApplicable()) {
+        naIdx = i;
+        break;
+      }
+    }
+    if (naIdx < 0) return;
+    
+    // test json
+    var json = piece.toJson();
+    assertEquals(undefined, json.keypairs[naIdx].publicAddress);
+    
+    // test csv
+    var csv = piece.toCsv();
+    if (piece.hasPublicAddresses()) {
+      assertTrue(csv.indexOf("Not applicable") >= 0);
+    } else {
+      assertFalse(csv.indexOf("Not applicable") >= 0);
+    }
+    
+    // test txt
+    var txt = piece.toTxt();
+    if (piece.hasPublicAddresses()) {
+      assertTrue(txt.indexOf("Not applicable") >= 0);
+    } else {
+      assertFalse(txt.indexOf("Not applicable") >= 0);
+    }
+  }
 	
 	function testGeneratePieces(plugins, onDone) {
 		console.log("Testing generate pieces from config");
@@ -1515,7 +1555,7 @@ function Tests() {
 		piece1 = new CryptoPiece({csv: csv});
 		piece2 = new CryptoPiece({keypairs: [new CryptoKeypair({plugin: "BIP39", privateKey: "tomato domain essence fat velvet robot bring index slab daughter artist cover book image disease divert used paddle hire put index spare busy clap"})]});
 		assertTrue(piece1.equals(piece2));
-    assertTrue(piece1.toCsv().indexOf("Not applicable") > -1);
+    assertTrue(piece1.toCsv().indexOf("Not applicable") < 0);
 		
 		// done testing compatibility
 		onDone();

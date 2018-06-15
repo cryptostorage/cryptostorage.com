@@ -5,7 +5,7 @@
 		<meta name="Description" content="Generate cryptocurrency keypairs in your browser.  100% open source and free to use.  Save and print keypairs for long term storage.  Passphrase-protect and divide keypairs for maximum security.">
 		<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
 		<meta name="viewport" content="user-scalable=no"/>
-		<meta property="og:title" content="CryptoStorage Offline Wallet Generator for Major Cryptocurrencies">
+		<meta property="og:title" content="CryptoStorage Offline Wallet Generator">
 		<meta property="og:description" content="Generate cryptocurrency keypairs in your browser.  100% open source and free to use.  Save and print keypairs for long term storage.  Passphrase-protect and divide keypairs for maximum security.">
 		<meta property="og:image" content="https://cryptostorage.com/img/cryptostorage_social.png">
 		<meta property="og:url" content="https://cryptostorage.com">
@@ -20,9 +20,13 @@
 		<script src="js/DivControllers.js"></script>
 		<script src="js/AppUtils.js"></script>
 		<script src="js/CryptoPlugins.js"></script>
-		<script src="js/Init.js"></script>
 	</head>
+	<script type="text/javascript">
+	$(document).ready(function() {
+	  AppUtils.startApplication();
+	});
+	</script>
 	<body class='app_body flex_vertical flex_align_center'>
-		<!-- Application content -->
+		<!-- Dynamic application content -->
 	</body>
 </html>

@@ -111,6 +111,68 @@ var AppUtils = {
 		"Contiki", "DragonFly", "Joli", "Mageia", "MeeGo", "Minix", "NetBSD", "Plan9" 
 	].concat(OperatingSystems.OSX).concat(OperatingSystems.IOS).concat(OperatingSystems.WINDOWS),
 	
+	/**
+	 * Starts the application.
+	 * 
+	 * @param hash is an initial window hash (e.g. #faq)
+	 */
+	startApplication: function(hash) {
+	  
+	  // welcome :)
+	  console.log("Hey there!  Find an issue?  Let us know!  Submit an issue at https://github.com/cryptostorage/cryptostorage.com/issues");
+	  
+	  // make application aware of uncaught errors
+	  window.onerror = function(message, source, lineno, colno, error) {
+	    AppUtils.setRuntimeError(error ? error : message);
+	  };
+
+	  // assign window.crypto (supports IE11)
+	  window.crypto = window.crypto || window.msCrypto;
+	  
+	  // override Math.random() to use a cryptographically secure RNG
+	  if (window.crypto) {
+	    Math.random = function() {
+	      var randArray = new Uint32Array(1);
+	      window.crypto.getRandomValues(randArray);
+	      return randArray[0] / Math.pow(2, 32);
+	    }
+	  }
+	    
+	  // delete window.crypto for testing
+	  if (AppUtils.DELETE_WINDOW_CRYPTO) delete window.crypto;
+	  
+	  // render application to html body
+	  new AppController($("body"), hash).render(function() {
+	    
+	    // run tests
+	    if (AppUtils.RUN_MIN_TESTS || AppUtils.RUN_FULL_TESTS) {
+	      
+	      // load dependencies
+	      LOADER.load(AppUtils.getImportExportDependencies(), function(err) {
+	        if (err) throw err;
+	        var tester = new Tests();
+	        
+	        // run minimum tests
+	        if (AppUtils.RUN_MIN_TESTS) {
+	          tester.runMinimumTests(function(err) {
+	            if (err) throw err;
+	            console.log("Minimum tests pass");
+	          });
+	        }
+	        
+	        // run full tests
+	        if (AppUtils.RUN_FULL_TESTS) {
+	          console.log("Running test suite...")
+	          tester.runTestSuite(function(err) {
+	            if (err) throw err;
+	            console.log("Test suite passes");
+	          });
+	        }
+	      });
+	    }
+	  });
+	},
+	
 	// ------------------------- APPLICATION DEPENDENCIES -----------------------
 	
 	// returns inital homepage dependencies
@@ -985,5 +1047,19 @@ var AppUtils = {
 				}
 			}
 		}
+	},
+	
+	hasPublicAddresses: function(pieces) {
+	  for (var i = 0; i < pieces.length; i++) {
+	    if (pieces[i].hasPublicAddresses()) return true;
+	  }
+	  return false;
+	},
+	
+	hasPrivateKeys: function(pieces) {
+	  for (var i = 0; i < pieces.length; i++) {
+	    if (pieces[i].hasPrivateKeys()) return true;
+	  }
+	  return false;
 	}
 }

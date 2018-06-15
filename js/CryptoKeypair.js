@@ -287,6 +287,7 @@ CryptoKeypair.prototype.divide = function(numParts, minParts) {
 			publicAddress: this.getPublicAddress(),
 			partNum: i + 1
 		});
+		if (!this.hasPublicAddress()) keypair.removePublicAddress();
 		dividedKeypairs.push(keypair);
 	}
 	return dividedKeypairs;
@@ -329,15 +330,15 @@ CryptoKeypair.prototype.toJson = function() {
 	assertFalse(this._isDestroyed, "Keypair is destroyed");
 	function isExcluded(field) { return arrayContains(CryptoKeypair.getExcludedFields(), field); }
 	var json = {};
-	if (!isExcluded(CryptoKeypair.Field.TICKER)) json.ticker = this.getExportValue(CryptoKeypair.Field.TICKER);
-	if (!isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS)) json.publicAddress = this.getExportValue(CryptoKeypair.Field.PUBLIC_ADDRESS);
-	if (!isExcluded(CryptoKeypair.Field.PRIVATE_WIF)) json.privateWif = this.getExportValue(CryptoKeypair.Field.PRIVATE_WIF);
-	if (!isExcluded(CryptoKeypair.Field.PRIVATE_HEX)) json.privateHex = this.getExportValue(CryptoKeypair.Field.PRIVATE_HEX);
+	if (!isExcluded(CryptoKeypair.Field.TICKER)) json.ticker = this.getPlugin().getTicker();
+	if (!isExcluded(CryptoKeypair.Field.PUBLIC_ADDRESS) && this.isPublicApplicable()) json.publicAddress = this.getPublicAddress();
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_WIF)) json.privateWif = this.getPrivateWif();
+	if (!isExcluded(CryptoKeypair.Field.PRIVATE_HEX)) json.privateHex = this.getPrivateHex();
 	if (!isExcluded(CryptoKeypair.Field.PRIVATE_STATE) && this.hasPrivateKey()) json.privateState = this.getExportValue(CryptoKeypair.Field.PRIVATE_STATE);
-	if (!isExcluded(CryptoKeypair.Field.ENCRYPTION) && this.isEncrypted()) json.encryption = this.getExportValue(CryptoKeypair.Field.ENCRYPTION);
-	if (!isExcluded(CryptoKeypair.Field.IS_DIVIDED)) json.isDivided = this.getExportValue(CryptoKeypair.Field.IS_DIVIDED);
-	if (!isExcluded(CryptoKeypair.Field.MIN_PARTS) && this.isDivided()) json.minParts = this.getExportValue(CryptoKeypair.Field.MIN_PARTS);
-	if (!isExcluded(CryptoKeypair.Field.PART_NUM) && this.isDivided()) json.partNum = this.getExportValue(CryptoKeypair.Field.PART_NUM);
+	if (!isExcluded(CryptoKeypair.Field.ENCRYPTION) && this.isEncrypted()) json.encryption = this.getEncryptionScheme();
+	if (!isExcluded(CryptoKeypair.Field.IS_DIVIDED)) json.isDivided = this.isDivided();
+	if (!isExcluded(CryptoKeypair.Field.MIN_PARTS) && this.isDivided()) json.minParts = this.getMinParts();
+	if (!isExcluded(CryptoKeypair.Field.PART_NUM) && this.isDivided()) json.partNum = this.getPartNum();
 	return json;
 }
 
@@ -457,6 +458,8 @@ CryptoKeypair.prototype._validateState = function() {
 	if (this.getPlugin().isPublicApplicable()) {
 		if (isUndefined(this._state.publicAddress)) assertTrue(this.hasPrivateKey());
 		if (!this.hasPrivateKey()) assertInitialized(this._state.publicAddress);
+	} else {
+	  assertEquals(null, this._state.publicAddress);
 	}
 			
 	// private key known
@@ -561,7 +564,8 @@ CryptoKeypair.prototype._fromJson = function(json) {
 	this._state.minParts = json.minParts;
 	if (isDefined(this._state.privateWif)) this._setPrivateKey(this._state.privateWif);
 	else if (isDefined(this._state.privateHex)) this._setPrivateKey(this._state.privateHex);
-	if (isDefined(json.publicAddress)) this._setPublicAddress(json.publicAddress === AppUtils.NA ? null : json.publicAddress);
+	if (!this.isPublicApplicable()) this._setPublicAddress(null);
+	else if (isDefined(json.publicAddress)) this._setPublicAddress(json.publicAddress);
 	if (json.encryption === null) assertUninitialized(json.partNum);
 	if (isDefined(json.partNum)) this.setPartNum(json.partNum);
 }
@@ -574,7 +578,7 @@ CryptoKeypair.prototype._combine = function(dividedKeypairs) {
 		if (!this._state.plugin) this._state.plugin = dividedKeypairs[i].getPlugin();
 		else if (this._state.plugin !== dividedKeypairs[i].getPlugin()) throw new Error("dividedKeypairs[" + i + "] has inconsistent plugin");
 		if (!publicAddress) publicAddress = dividedKeypairs[i].getPublicAddress();
-		else if (publicAddress !== dividedKeypairs[i].getPublicAddress()) throw new Error("dividedKeypairs[" + i + "] has inconsistent public address");
+		else if (isDefined(publicAddress) && isDefined(dividedKeypairs[i].getPublicAddress()) && publicAddress !== dividedKeypairs[i].getPublicAddress()) throw new Error("dividedKeypairs[" + i + "] has inconsistent public address");
 	}
 	
 	// collect decoded hex parts and verify consistent min parts

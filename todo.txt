@@ -1,13 +1,16 @@
 v0.3.0
+use anchor text and alt text in internal site links
+every page unique title and links back to homepage
 encryption and division method outlined in faq
 slider points cleanup
 address sensitivity of printer and flash drive after use
-put homepage text in index.html and dynamically hide for seo
-upate readme.md
 browser testing
 release
 
 v0.3.1
+editor divide into parts opacity on disabled
+bip39 appears vertically too high on standard keypair
+quotes from news articles
 brave error opening editor in homepage even though tab opens
 brave print document goes to /undefined and causes error in editor tab
 faq.html, import.html, etc each with static html and sitemap to encourage SEO sitelinks
@@ -21,7 +24,6 @@ better cryptocash design
 dynamic editor with horizontal groupings (designer todo)
 qr scanner
 could show print preview right away then print button is progress bar
-bip39 appears vertically too high on standard keypair
 test encryption with full piece instead of piece per plugin
 what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
@@ -50,6 +52,7 @@ within bitaddress, why is encrypted bip38 not recreated from encrypting unencryp
 why are bip38s generated from ian and i's not importable into other dogecoin tools, why is output of bpw not importable in CS but is for others?
 InputLabelController.onChecked() only fires if changed
 custom error message for qrs not loading
+evidence of keypair render scratch pad when importing consecutive txts containing only public addresses on linux
 
 low priority:
 view balance qr code on cryptocash

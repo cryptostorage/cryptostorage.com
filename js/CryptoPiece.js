@@ -281,12 +281,13 @@ function CryptoPiece(config) {
 		for (prop in CryptoKeypair.Field) {
 		  if (!CryptoKeypair.Field.hasOwnProperty(prop)) continue;
 		  var header = CryptoKeypair.Field[prop.toString()];
-		  if (arrayContains(CryptoKeypair.getExcludedFields(), header)) continue;               // skip field if excluded
-		  if (header === CryptoKeypair.Field.PART_NUM && !this.isDivided()) continue;           // skip part num if not divided
-		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue;       // skip encryption if not encrypted
-		  if (header === CryptoKeypair.Field.PRIVATE_WIF && !this.hasPrivateKeys()) continue;   // skip private wif if no private keys
-      if (header === CryptoKeypair.Field.PRIVATE_HEX && !this.hasPrivateKeys()) continue;   // skip private hex if no private keys
-      if (header === CryptoKeypair.Field.PRIVATE_STATE && !this.hasPrivateKeys()) continue; // skip private state if no private keys
+		  if (arrayContains(CryptoKeypair.getExcludedFields(), header)) continue;               			// skip field if excluded
+		  if (header === CryptoKeypair.Field.PART_NUM && !this.isDivided()) continue;           			// skip part num if not divided
+		  if (header === CryptoKeypair.Field.ENCRYPTION && !this.isEncrypted()) continue;       			// skip encryption if not encrypted
+		  if (header === CryptoKeypair.Field.PRIVATE_WIF && !this.hasPrivateKeys()) continue;   			// skip private wif if no private keys
+      if (header === CryptoKeypair.Field.PRIVATE_HEX && !this.hasPrivateKeys()) continue;  				// skip private hex if no private keys
+      if (header === CryptoKeypair.Field.PRIVATE_STATE && !this.hasPrivateKeys()) continue; 			// skip private state if no private keys
+      if (header === CryptoKeypair.Field.PUBLIC_ADDRESS && !this.hasPublicAddresses()) continue;  // skip public address if no public addresses
 			headers.push(header);
 		}
 		
@@ -296,8 +297,6 @@ function CryptoPiece(config) {
 			var keypairValues = [];
 			for (var j = 0; j < headers.length; j++) {
 				var value = state.keypairs[i].getExportValue(headers[j]);
-				if (value === null) value = "null";
-				if (value === undefined) value = "";
 				keypairValues.push(value);
 			}
 			csvArr.push(keypairValues);
@@ -313,7 +312,7 @@ function CryptoPiece(config) {
 		for (var i = 0; i < state.keypairs.length; i++) {
 			txt += "===== #" + (i + 1) + " " + state.keypairs[i].getPlugin().getName() + " =====\r\n\r\n";
 			var publicAddress = state.keypairs[i].getPublicAddress();
-			if (isInitialized(publicAddress)) txt += "Public Address:\r\n" + publicAddress + "\r\n\r\n";
+			if (isDefined(publicAddress) && this.hasPublicAddresses()) txt += "Public Address:\r\n" + state.keypairs[i].getExportValue(CryptoKeypair.Field.PUBLIC_ADDRESS) + "\r\n\r\n";
  			if (isDefined(state.keypairs[i].getPrivateWif())) txt += state.keypairs[i].getPlugin().getPrivateLabel() + " " + (that.getPartNum() ? "(divided)" : (state.keypairs[i].isEncrypted() ? "(encrypted)" : "(unencrypted)")) + ":\r\n" + state.keypairs[i].getPrivateWif() + "\r\n\r\n";
 		}
 		return txt.trim();
@@ -464,9 +463,7 @@ function CryptoPiece(config) {
 			var keypairConfig = {};
 			for (var col = 0; col < csvArr[0].length; col++) {
 				var value = csvArr[row][col];
-				if (value === "") value = undefined;
-				if (value === "null") value = null;
-				if (value === AppUtils.NA) value = null;
+				if (value === "" || value === "null" || value === AppUtils.NA) value = null;
 				switch (csvArr[0][col].toLowerCase()) {
 					case CryptoKeypair.Field.TICKER.toLowerCase():
 						keypairConfig.plugin = AppUtils.getCryptoPlugin(value);

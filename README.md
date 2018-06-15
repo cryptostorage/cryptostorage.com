@@ -1,42 +1,41 @@
 # Introduction
-CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies.  This tool generates [key pairs](https://cryptostorage.com/#faq_keypair) in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be easily printed and saved to digital files for long-term storage.
+CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies.  This tool generates [keypairs](https://cryptostorage.com/#faq_keypair) in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be easily printed and saved to digital files for long-term storage.
 
 This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and [divided into parts](https://cryptostorage.com/#faq_split_keys) which can be geographically separated so funds are not accessible at any one location.  Recommendations are automatically provided to improve the security of the tool's environment.
 
 # Main Features
 - Generate offline storage for multiple cryptocurrencies.
-- Keys are generated only in your device's browser so funds are never entrusted to a third party.
 - 100% open source, client-side, and free to use.  No account necessary.
+- Keypairs are generated only in your browser so funds are never untrusted to a third party.
 - Private keys can be passphrase-protected using [CryptoJS](https://github.com/brix/crypto-js).  Also supports [BIP38](https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki) for Bitcoin and Bitcoin Cash.
 - Storage can be divided into parts which can be geographically separated so funds are not accessible at any one location.
-- Print or save to digital files (json, csv, and txt) for long-term storage.
-- Print and cut out "crypto-cash" to easily tip people in real life.
+- Import and export as JSON, CSV, and TXT.
+- Print to different layouts (Standard, Grid, Text, and CryptoCash to tip people in real life).
 - Recommendations are automatically provided to improve the security of the tool's environment:
 	- Checks if the internet connection is active
 	- Checks if the tool is downloaded and running locally
 	- Checks if the browser is open source
 	- Checks if the operating system is open source
 	
-# Supported Storage
+# Supported Tokens
 - Bitcoin
 - Bitcoin Cash
 - Ethereum
 - Monero
 - Litecoin
+- Dogecoin
 - Neo
 - Dash
+- Zcoin
 - Zcash
 - Waves
 - Stellar
 - Ripple
 - Ethereum Classic
-- Basic Attention Token
 - OmiseGo
-- Ubiq
+- Basic Attention token
 - BIP39
-
-# ⚠ Beta Release
-This software is in beta.  It should not be used with signficant amounts until it is reviewed by the community.
+- Ubiq
 
 # Using this Tool as Securely as Possible
 
@@ -105,14 +104,16 @@ For bug reports and feature requests, please submit an issue to https://github.c
 
 For community discussion, please join the conversation on Reddit at https://reddit.com/r/cryptostorage.
 
-For email support, please email [support@cryptostorage.com](mailto:support@cryptostorage.com).  Email is answered on a best-effort basis only.
+For email support, please email [support@cryptostorage.com](mailto:support@cryptostorage.com).
 
 *No one can recover lost keys or passwords for you. Do not lose these or your funds will be lost.*
 
 # Contribute
-All contributions are welcome to make this project better.
+All contributions to make this project better are welcome.
 
-Please note cryptostorage.com will retain ownership of donation addresses for supported coins.
+Supported tokens need to meet criteria which generally indicates active development and use.
+
+The domain cryptostorage.com will retain ownership of donation addresses for supported coins.
 
 # License
 This project is [MIT](https://github.com/cryptostorage/cryptostorage.com/blob/master/LICENSE.txt) licensed.
