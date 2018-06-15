@@ -1,17 +1,15 @@
 v0.3.0
-editor divide into parts opacity on disabled
 use anchor text and alt text in internal site links
 every page unique title and links back to homepage
-
-bip39 appears vertically too high on standard keypair
 encryption and division method outlined in faq
 slider points cleanup
 address sensitivity of printer and flash drive after use
-upate readme.md
 browser testing
 release
 
 v0.3.1
+editor divide into parts opacity on disabled
+bip39 appears vertically too high on standard keypair
 quotes from news articles
 brave error opening editor in homepage even though tab opens
 brave print document goes to /undefined and causes error in editor tab
