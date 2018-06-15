@@ -1,4 +1,5 @@
 v0.3.0
+remove bitpay credit if their code not used
 use anchor text and alt text in internal site links
 every page unique title and links back to homepage
 encryption and division method outlined in faq
