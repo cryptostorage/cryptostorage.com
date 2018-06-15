@@ -8,6 +8,7 @@ This tool is security-focused.  Funds are never entrusted to a third party.  Pri
 - 100% open source, client-side, and free to use.  No account necessary.
 - Keypairs are generated only in your browser so funds are never untrusted to a third party.
 - Private keys can be passphrase-protected using [CryptoJS](https://github.com/brix/crypto-js).  Also supports [BIP38](https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki) for Bitcoin and Bitcoin Cash.
+- Import existing keys (e.g. BIP39 hardware wallet seeds) and re-export with passphrase encryption and division
 - Storage can be divided into parts which can be geographically separated so funds are not accessible at any one location.
 - Import and export as JSON, CSV, and TXT.
 - Print to different layouts (Standard, Grid, Text, and CryptoCash to tip people in real life).
