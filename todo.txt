@@ -2,13 +2,12 @@ v0.3.0
 make header links real links instead of click
 use anchor text and alt text in internal site links
 every page unique title and links back to homepage
-encryption and division method outlined in faq
-slider points cleanup
 address sensitivity of printer and flash drive after use
 browser testing
 release
 
 v0.3.1
+slider points cleanup
 different print layouts on homepage
 editor divide into parts opacity on disabled
 bip39 appears vertically too high on standard keypair
@@ -31,7 +30,7 @@ what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
 TypeError: event.dataTransfer is null drag and drop DivController2084.js: event.dataTransfer.dropEffect = 'copy';
 print export height down then up when selecting dropdown
-text encryption, divisionn, and import
+text encryption, divisionn, and import                                                  
 "download and verify" notice description with hyperlink to verify faq
 less vertical height on generate progress
 keypairs to generate with info box which hyperlinks to keypairs

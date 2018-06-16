@@ -43,7 +43,8 @@ var UiUtils = {
 	 */
   getDivideDescription: function(faqNewTab) {
     return "<p>This tool uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to divide <a " + (faqNewTab ? "target='_blank'" : "") + "href='index.html#faq_keypair'>private keys</a> into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
-    "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted family member.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>"
+    "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted family member.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>" +
+    "<p>Each divided private key is Base58 encoded with a future version for extensibility, the minimum number of parts necessary to recover the private key, and the output of applying Shamir's Secret Sharing to the hexadecimal private key.</p>";
 	},
 	
 	/**
@@ -1169,7 +1170,7 @@ function FaqController(div) {
 					id: "faq_what_is_cryptostorage",
 					getQuestion: function() { return "What is CryptoStorage?"; },
 					getAnswer: function() { return "<p>CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies.  This tool generates <a href='#faq_keypair'>keypairs</a> in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated keypairs can be easily printed and saved to digital files for long-term storage.</p>" +
-						"<p>This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and <a href='#faq_divide_keys'>divided into parts</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
+						"<p>This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and <a href='#faq_divide'>divided into parts</a> which can be geographically separated so funds are not accessible at any one location.  <a href='#faq_recommendations'>Recommendations</a> are automatically provided to improve the security of the tool's environment.</p>";
 					}
 				}, {
 					id: "faq_keypair",
@@ -1278,7 +1279,17 @@ function FaqController(div) {
 					getQuestion: function() { return "Are my funds ever entrusted to a third party?"; },
 					getAnswer: function() { return "<p>No.  The public/private keypairs are generated only in your devices browser so they are never shared with a third party by design.</p>"; }
 				}, {
-          id: "faq_encryption",
+          id: "faq_interoperable",
+          getQuestion: function() { return "Does CryptoStorage work with other wallet software?"; },
+          getAnswer: function() {
+            var answerDiv = $("<div>");
+            answerDiv.append("<p>All unencrypted keys generated with CryptoStorage will work with other wallet software and vice versa.</p>" +
+                "<p>However, there is currently no standardized way of encrypting and dividing cryptocurrency keypairs across all networks.  As a result, this tool applies its own configurations to <a href='#faq_encrypt'>encrypt</a> and <a href='#faq_divide'>divide</a> keypairs which will not work with other tools unless they use same configurations.<br><br>" +
+                "<b>A copy of this tool should be saved to recover keys in the future if encrypting or dividing keypairs.</b></p>");
+            return answerDiv;
+          }
+        }, {
+          id: "faq_encrypt",
           getQuestion: function() { return "How are keypairs encrypted?"; },
           getAnswer: function() {
             var answerDiv = $("<div>");
@@ -1286,19 +1297,9 @@ function FaqController(div) {
             return answerDiv;
           }
         }, {
-					id: "faq_divide_keys",
-					getQuestion: function() { return "What does it mean to divide private keys?"; },
-					getAnswer: function() { return UiUtils.getDivideDescription(false); }
-				}, {
-          id: "faq_interoperable",
-          getQuestion: function() { return "Does CryptoStorage work with other wallet software?"; },
-          getAnswer: function() {
-            var answerDiv = $("<div>");
-            answerDiv.append("<p>All unencrypted keys generated with CryptoStorage will work with other wallet software and vice versa.</p>" +
-                "<p>However, there is currently no standardized way of encrypting cryptocurrency keypairs with a passphrase except for <a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a>.  When BIP38 is not supported, CryptoStorage uses a specific encryption configuration (<a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> with PBDKF2, 10000 iterations, SHA512, and an embedded verison for future extensibility) which will not work with other tools unless they use the same configuration.<br><br>" +
-                "<b>A copy of this tool should be saved to recover keys in the future if using passphrase encryption.</b></p>");
-            return answerDiv;
-          }
+          id: "faq_divide",
+          getQuestion: function() { return "How are keypairs divided?"; },
+          getAnswer: function() { return UiUtils.getDivideDescription(false); }
         }, {
 					id: "faq_online_to_recover",
 					getQuestion: function() { return "Do I need to be online to recover private keys?"; },
@@ -3439,7 +3440,7 @@ function EditorPassphraseController(div, editorController) {
 		// passphrase checkbox
 		var passphraseTooltipTxt = "<p>Encrypts generated <a target='_blank' href='index.html#faq_keypair'>keypairs</a> with a passphrase.  The passphrase is required in order to decrypt private keys and access funds.</p>" +
 															 "<p>The passphrase must be at least 7 characters.</p>" +
-															 "<p><a target='_blank' href='index.html#faq_encryption'>How are keypairs encrypted?</a></p>";
+															 "<p><a target='_blank' href='index.html#faq_encrypt'>How are keypairs encrypted?</a></p>";
 		passphraseCheckbox = new CheckboxController($("<div>").appendTo(div), "Use Passphrase?", passphraseTooltipTxt);
 		passphraseCheckbox.render();
 		
