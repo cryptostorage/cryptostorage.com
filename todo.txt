@@ -1,7 +1,4 @@
 v0.3.0
-make header links real links instead of click
-use anchor text and alt text in internal site links
-every page unique title and links back to homepage
 browser testing
 release
 

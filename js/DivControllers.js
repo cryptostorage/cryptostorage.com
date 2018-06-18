@@ -2783,7 +2783,7 @@ function EditorController(div, config) {
 		paginatorController.render();
 		paginatorController.onClick(function(index, label) { setVisiblePiece(label); });
 		
-		// load body controller
+		// load content controller
 		contentController = new EditorContentController($("<div>").appendTo(div), that, config);
 		new LoadController(contentController).render(function() {
 			
@@ -3184,7 +3184,7 @@ function EditorContentController(div, editorController, config) {
 				
 				// cryptostorage logo
 				logoHeader = $("<div class='flex_horizontal flex_align_center flex_justify_center'>").appendTo(bodyDiv);
-				$("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>").appendTo(logoHeader);
+				$("<a target='_blank' href='index.html#home' title='Go Home'><img class='piece_page_header_logo' src='img/cryptostorage_export.png' alt='CryptoStorage logo'></a>").appendTo(logoHeader);
 				
 				// progress bar
 				progressDiv = $("<div class='editor_progress_div flex_vertical flex_align_center'>").appendTo(bodyDiv);
@@ -5476,7 +5476,7 @@ function StandardPieceRenderer(div, piece, config) {
 				if (piece.getPartNum() || (!config.cryptoCash && config.showLogos)) {
 					var headerDiv = $("<div class='piece_page_header_div flex_horizontal flex_align_center flex_justify_center'>").appendTo(pageDiv);
 					headerDiv.append($("<div class='piece_page_header_left'>"));
-					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<img class='piece_page_header_logo' src='img/cryptostorage_export.png'>"));
+					if (!config.cryptoCash && config.showLogos) headerDiv.append($("<a target='_blank' href='index.html#home' title='Go Home'><img class='piece_page_header_logo' src='img/cryptostorage_export.png'></a>"));
 					var partNumDiv = $("<div class='piece_page_header_right'>").appendTo(headerDiv);
 					if (piece.getPartNum()) partNumDiv.append("Part " + piece.getPartNum());
 				}
