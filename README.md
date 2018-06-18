@@ -1,7 +1,7 @@
 # Introduction
 CryptoStorage is an open source tool to generate offline storage for multiple cryptocurrencies.  This tool generates [keypairs](https://cryptostorage.com/#faq_keypair) in your device's browser which can store cryptocurrency without exposing private keys to an internet-connected device.  Generated key pairs can be easily printed and saved to digital files for long-term storage.
 
-This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and [divided into parts](https://cryptostorage.com/#faq_split_keys) which can be geographically separated so funds are not accessible at any one location.  Recommendations are automatically provided to improve the security of the tool's environment.
+This tool is security-focused.  Funds are never entrusted to a third party.  Private keys can be passphrase-protected and [divided into parts](https://cryptostorage.com/#faq_divide_meaning) which can be geographically separated so funds are not accessible at any one location.  Recommendations are automatically provided to improve the security of the tool's environment.
 
 # Main Features
 - Generate offline storage for multiple cryptocurrencies.
@@ -54,7 +54,7 @@ Security is a spectrum.  The following procedure is recommended to use this tool
     2. The notice bar at the top should indicate that all security checks pass.
 6. Fill out the form and click the Generate button.
     - Protecting your keys with a passphrase is *highly recommended*.  Otherwise anyone in possession of the unencrypted keys can access the funds.
-    - Optionally split your keys for maximum security.
+    - Optionally divide your keys for maximum security.
 7. Save the generated keypairs to flash drives and/or print to paper. Geographic redundancy is highly recommended so there are backup copies at other locations if one location is lost due to fire, theft, etc.
 8. The keypairs can be imported at any time by relaunching this tool in a secure environment.
  
