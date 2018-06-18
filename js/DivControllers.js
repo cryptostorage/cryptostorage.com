@@ -767,28 +767,18 @@ function AppController(div, hash) {
 		
 		// header logo
 		var headerTopDiv = $("<div class='app_header_top'>").appendTo(headerDiv);
-		var logo = $("<img class='app_header_logo_img' src='img/cryptostorage_white.png'>").appendTo(headerTopDiv);
-		logo.click(function() { navigate("#home"); });
+		var logo = $("<a href='#home' title='Go Home'><img class='app_header_logo_img' src='img/cryptostorage_white.png' alt='CryptoStorage logo white'></a>").appendTo(headerTopDiv);
 		
 		// header links
 		var linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
-		var homeLink = getLinkDiv("Home");
-		var gitHubLink = $("<a target='_blank' class='link_div' href='https://github.com/cryptostorage/cryptostorage.com'>GitHub</a>");
-		var faqLink = getLinkDiv("FAQ");
-		var donateLink = getLinkDiv("Donate");
+		var homeLink = $("<a class='link_div' href='#home' title='Go Home'>Home</a>");
+		var gitHubLink = $("<a target='_blank' class='link_div' href='https://github.com/cryptostorage/cryptostorage.com' title='View source code'>GitHub</a>");
+		var faqLink = $("<a class='link_div' href='#faq' title='Go to FAQ'>FAQ</a>");
+		var donateLink = $("<a class='link_div' href='#donate' title='Go to Donate'>Donate</a>");
 		linksDiv.append(homeLink);
 		linksDiv.append(gitHubLink);
 		linksDiv.append(faqLink);
 		linksDiv.append(donateLink);
-		homeLink.click(function() { navigate("#home"); });
-		faqLink.click(function() { navigate("#faq"); });
-		donateLink.click(function() { navigate("#donate"); });
-		
-		function getLinkDiv(label) {
-			var div = $("<div class='link_div'>");
-			div.html(label);
-			return div;
-		}
 		
 		// validate version
 		AppUtils.getVersionNumbers(AppUtils.VERSION);
@@ -914,6 +904,7 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 		
 		// load mix img
 		var mixImg = new Image();
+		mixImg.alt='Cryptocurrency';
 		mixImg.onload = function() {
 			
 			// div setup
@@ -923,11 +914,11 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			// intro slider
 			sliderDiv = $("<div class='slider_div'>").appendTo(div);
 			getSlide($(mixImg), "Generate offline wallets for major cryptocurrencies.").appendTo(sliderDiv);
-			getSlide($("<img src='img/printer.png'>"), "Print paper wallets or save keys to a file for long-term storage.").appendTo(sliderDiv);
-			getSlide($("<img src='img/security.png'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-			getSlide($("<img src='img/microscope.png'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
-			getSlide($("<img src='img/keys.png'>"), "Passphrase-protect and divide private keys for maximum security.").appendTo(sliderDiv);
-			getSlide($("<img src='img/checklist.png'>"), "Generate keys securely with automatic environment checks.").appendTo(sliderDiv);
+			getSlide($("<img src='img/printer.png' alt='Printer'>"), "Print paper wallets or save keys to a file for long-term storage.").appendTo(sliderDiv);
+			getSlide($("<img src='img/security.png' alt='Security'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
+			getSlide($("<img src='img/microscope.png' alt='Microscope'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
+			getSlide($("<img src='img/keys.png' alt='Keys'>"), "Passphrase-protect and divide private keys for maximum security.").appendTo(sliderDiv);
+			getSlide($("<img src='img/checklist.png' alt='Checklist'>"), "Generate keys securely with automatic environment checks.").appendTo(sliderDiv);
 			
 			function getSlide(img, text) {
 				var slide = $("<div class='slide'>");
@@ -1027,13 +1018,13 @@ function HomeController(div) {
 			pageDiv.append("<div style='height: 10px'>");
 			pageDiv.append("<div class='home_label'>Encrypt and divide private keys for maximum security</div>");
 			pageDiv.append("<div class='home_description'>Encrypt private keys with a passphrase or divide them into parts so funds are not accessible at any one location.  Set how many parts are needed to recover the keys.  Store one in your safe, one in a bank vault, or one with a trusted family member.</div>")
-			pageDiv.append("<img style='width:625px; margin-top:5px;' src='img/passphrase_divide.png'>");
+			pageDiv.append("<img style='width:625px; margin-top:5px;' src='img/passphrase_divide.png' alt='Encrypt and divide keypairs'>");
 			
 			// check environment section
 			pageDiv.append("<div style='height: 70px'>");
 			pageDiv.append("<div class='home_label'>Generate keys securely with automatic environment checks</div>");
 			pageDiv.append("<div class='home_description'>Following a few simple recommendations can improve the security of your cryptocurrency.  Automatic environment checks encourage keys to be generated in a secure environment.</div>")
-			pageDiv.append($("<img width=785px src='img/notice_bars.png'>"));
+			pageDiv.append($("<img width=785px src='img/notice_bars.png' alt='Security checks'>"));
 			
 			// cryptography section
 			pageDiv.append("<div style='height:70px'>");
