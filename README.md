@@ -113,7 +113,7 @@ For email support, please email [support@cryptostorage.com](mailto:support@crypt
 # Contribute
 All contributions to make this project better are welcome.
 
-Supported tokens need to meet criteria which generally indicates active development and use.
+Supported tokens need to meet criteria which generally indicate active development and use.
 
 The domain cryptostorage.com will retain ownership of donation addresses for supported coins.
 
