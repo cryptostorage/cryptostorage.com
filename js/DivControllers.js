@@ -500,16 +500,16 @@ function InputLabelController(div, type, label, tooltip, name) {
 		if (bool === that.isEnabled()) return;
 		if (bool) {
 			input.removeAttr("disabled");
-			if (infoImg) {
-				infoImg.removeClass("info_tooltip_img_disabled");
-				infoImg.get(0)._tippy.enable();
-			}
+//			if (infoImg) {
+//				infoImg.removeClass("info_tooltip_img_disabled");
+//				infoImg.get(0)._tippy.enable();
+//			}
 		} else {
 			input.attr("disabled", "disabled");
-			if (infoImg) {
-				infoImg.addClass("info_tooltip_img_disabled");
-				infoImg.get(0)._tippy.disable();
-			}
+//			if (infoImg) {
+//				infoImg.addClass("info_tooltip_img_disabled");
+//				infoImg.get(0)._tippy.disable();
+//			}
 		}
 		invoke(enabledListeners);
 	}
@@ -3669,8 +3669,12 @@ function EditorDivideController(div, editorController) {
 	var divideCheckbox;
 	var divideInput;
 	var numPartsInput;
+	var numPartsLabelTop;
+	var numPartsLabelBottom;
+  var numPartsVal;
 	var minPartsInput;
-	var numPartsVal;
+	var minPartsLabelTop;
+	var minPartsLabelBottom;
 	var minPartsVal;
 	var hasError;
 	var inputChangeListeners;
@@ -3692,18 +3696,18 @@ function EditorDivideController(div, editorController) {
 		var divideQr = $("<img class='divide_qr' src='img/qr_code.png'>").appendTo(div);
 		var divideLines3 = $("<img class='divide_lines_3' src='img/divide_lines_3.png'>").appendTo(div);
 		var divideNumDiv = $("<div class='divided_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
-		var divideNumLabelTop = $("<div class='divide_config_label divide_config_label_top'>").appendTo(divideNumDiv);
-		divideNumLabelTop.html("Divide Into");
+		numPartsLabelTop = $("<div class='divide_config_label divide_config_label_top'>").appendTo(divideNumDiv);
+		numPartsLabelTop.html("Divide Into");
 		numPartsInput = $("<input class='divide_input' type='tel' min='2'>").appendTo(divideNumDiv);
-		var divideNumLabelBottom = $("<div class='divide_config_label divide_config_label_bottom'>").appendTo(divideNumDiv);
-		divideNumLabelBottom.html("Parts");
+		numPartsLabelBottom = $("<div class='divide_config_label divide_config_label_bottom'>").appendTo(divideNumDiv);
+		numPartsLabelBottom.html("Parts");
 		var divideLines2 = $("<img class='divide_lines_2' src='img/divide_lines_2.png'>").appendTo(div);
 		var divideMinDiv = $("<div class='divided_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
-		var divideMinLabelTop = $("<div class='divide_config_label divide_config_label_top'>").appendTo(divideMinDiv);
-		divideMinLabelTop.html("Require");
+		minPartsLabelTop = $("<div class='divide_config_label divide_config_label_top'>").appendTo(divideMinDiv);
+		minPartsLabelTop.html("Require");
 		minPartsInput = $("<input class='divide_input' type='tel' min='2'>").appendTo(divideMinDiv);
-		var divideMinLabelBottom = $("<div class='divide_config_label divide_config_label_bottom'>").appendTo(divideMinDiv);
-		divideMinLabelBottom.html("To Recover");		
+		minPartsLabelBottom = $("<div class='divide_config_label divide_config_label_bottom'>").appendTo(divideMinDiv);
+		minPartsLabelBottom.html("To Recover");		
 		
 		// register inputs
 		divideCheckbox.onChecked(function(event, isChecked) {
@@ -3804,10 +3808,18 @@ function EditorDivideController(div, editorController) {
 		divideCheckbox.setEnabled(bool);
 		if (!bool || !that.getUseDivided()) {
 			numPartsInput.attr("disabled", "disabled");
+	    numPartsLabelTop.addClass("disabled");
+	    numPartsLabelBottom.addClass("disabled");
 			minPartsInput.attr("disabled", "disabled");
+			minPartsLabelTop.addClass("disabled");
+      minPartsLabelBottom.addClass("disabled");
 		} else {
 			numPartsInput.removeAttr("disabled");
+			numPartsLabelTop.removeClass("disabled");
+      numPartsLabelBottom.removeClass("disabled");
 			minPartsInput.removeAttr("disabled");
+			minPartsLabelTop.removeClass("disabled");
+      minPartsLabelBottom.removeClass("disabled");
 		}
 	}
 	
