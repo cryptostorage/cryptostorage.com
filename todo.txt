@@ -3,32 +3,29 @@ browser testing
 release
 
 v0.3.1
-slider points cleanup
 different print layouts on homepage
-editor divide into parts opacity on disabled
 bip39 appears vertically too high on standard keypair
+divide part checksum instead of min part encoding (adopt standard)
+copied tooltip is not centered for some private keys because div goes under QR
+show print preview right away then print button is progress bar
+2500ms copied tooltip timeout stays active even if tooltip re-clicked so it hides quickly
+when offline, editor notice starts orange then flips to light green
 quotes from news articles
+slider points cleanup
+better cryptocash design
+text encryption, division, and import
+why are bip38s generated from ian and i's not importable into other dogecoin tools, why is output of bpw not importable in CS but is for others?                                          
+
 brave error opening editor in homepage even though tab opens
 brave print document goes to /undefined and causes error in editor tab
 faq.html, import.html, etc each with static html and sitemap to encourage SEO sitelinks
-show print preview when ready then print button becomes progress bar until ready
-divide part checksum instead of min part encoding
-copied tooltip is not centered for some private keys because div goes under QR
-disabled info boxes should still be active
-2500ms copied tooltip timeout stays active even if tooltip re-clicked so it hides quickly
-when offline, editor notice starts orange then flips to light green
-better cryptocash design
 dynamic editor with horizontal groupings (designer todo)
 qr scanner
-could show print preview right away then print button is progress bar
 test encryption with full piece instead of piece per plugin
 what takes the most time within testPieceWithoutEncryption() with large test set
 error on import causes error to flash when re-export screen loaded
 TypeError: event.dataTransfer is null drag and drop DivController2084.js: event.dataTransfer.dropEffect = 'copy';
-print export height down then up when selecting dropdown
-text encryption, divisionn, and import                                                  
 "download and verify" notice description with hyperlink to verify faq
-less vertical height on generate progress
 keypairs to generate with info box which hyperlinks to keypairs
 remove open-source from home notice graphic
 remove selected item from dropdown selection so no duplicate
@@ -43,10 +40,8 @@ text import says please select currency on unrecognized text import
 mobile safari background scrolls while popups open
 dynamic sample angle
 fail gracefully if import dependencies fail to load
-show preview then render print in background with progress indicator in print button
 document cold storage setup options in faq
 within bitaddress, why is encrypted bip38 not recreated from encrypting unencrypted wif? not my tool
-why are bip38s generated from ian and i's not importable into other dogecoin tools, why is output of bpw not importable in CS but is for others?
 InputLabelController.onChecked() only fires if changed
 custom error message for qrs not loading
 evidence of keypair render scratch pad when importing consecutive txts containing only public addresses on linux
