@@ -8,7 +8,7 @@ This tool is security-focused.  Funds are never entrusted to a third party.  Pri
 - 100% open source, client-side, and free to use.  No account necessary.
 - Keypairs are generated only in your browser so funds are never untrusted to a third party.
 - Private keys can be passphrase-protected using [CryptoJS](https://github.com/brix/crypto-js).  Also supports [BIP38](https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki) for Bitcoin and Bitcoin Cash.
-- Import existing keys (e.g. BIP39 hardware wallet seeds) and re-export with passphrase encryption and division
+- Import existing keys (e.g. BIP39 hardware wallet seeds) and re-export with passphrase encryption and division.
 - Storage can be divided into parts which can be geographically separated so funds are not accessible at any one location.
 - Import and export as JSON, CSV, and TXT.
 - Print to different layouts (Standard, Grid, Text, and CryptoCash to tip people in real life).
@@ -52,7 +52,7 @@ Security is a spectrum.  The following procedure is recommended to use this tool
 5. Confirm that all environment checks pass.
     1. Go to Generate New Keys from the homepage.
     2. The notice bar at the top should indicate that all security checks pass.
-6. Fill out the form and click Generate Keys.
+6. Fill out the form and click the Generate button.
     - Protecting your keys with a passphrase is *highly recommended*.  Otherwise anyone in possession of the unencrypted keys can access the funds.
     - Optionally split your keys for maximum security.
 7. Save the generated keypairs to flash drives and/or print to paper. Geographic redundancy is highly recommended so there are backup copies at other locations if one location is lost due to fire, theft, etc.
