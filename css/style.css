@@ -517,6 +517,13 @@ input[type='text'][disabled], input[type='password'][disabled], input[type='tel'
 	cursor: pointer;
 }
 
+.faq_caution_img {
+	width: 25px;
+	height: 25px;
+	margin-right: 10px;
+	margin-left: -5px;
+}
+
 .question {
 	font-size: 22px;
 	color: blue;

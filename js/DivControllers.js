@@ -44,7 +44,7 @@ var UiUtils = {
   getDivideDescription: function(faqNewTab) {
     return "<p>This tool uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to divide <a " + (faqNewTab ? "target='_blank'" : "") + "href='index.html#faq_keypair'>private keys</a> into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
     "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted family member.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>" +
-    "<p>Each divided private key is Base58 encoded with a future version for extensibility, the minimum number of parts necessary to recover the private key, and the output of applying Shamir's Secret Sharing to the hexadecimal private key.</p>";
+    "<p>Each divided private key is Base58 encoded with a future version for extensibility, the minimum number of parts necessary to recover the private key, and the output of Shamir's Secret Sharing.</p>";
 	},
 	
 	/**
@@ -1203,7 +1203,7 @@ function FaqController(div) {
 					}
 				}, {
 					id: "faq_generate_keys",
-					getQuestion: function() { return "How can I generate keys as securely as possible using CryptoStorage?"; },
+					getQuestion: function() { return "How can I generate keypairs as securely as possible using CryptoStorage?"; },
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						var generateList = $("<ol>").appendTo(answerDiv);
@@ -1221,13 +1221,14 @@ function FaqController(div) {
 						generateChecksList.append("<li><p>Go to Generate New Keys from the homepage.</p></li>");
 						generateChecksList.append("<li><p>The notice bar at the top should indicate that all security checks pass:</p>" +
 								"<img style='width:100%;' src='img/notice_bar_pass.png'></img></li>");
-						var generateKeys = $("<li><p>Fill out the form and click Generate Keys.</p></li>").appendTo(generateList);
+						var generateKeys = $("<li><p>Fill out the form and click the Generate button.</p></li>").appendTo(generateList);
 						var generateKeysList = $("<ul>").appendTo(generateKeys);
-						generateKeysList.append("<li><p>Protecting your keys with a passphrase is <i>highly recommended</i>.  Otherwise anyone in possession of the unencrypted keys can access the funds.</p>");
-						generateKeysList.append("<li><p>Optionally divide your keys for maximum security.</p></li>");
-						generateList.append("<li><p>Save the generated keys to a flash drive or printed paper for safe keeping.  Geographic redundancy is <i>highly recommended</i> so if one location is lost due to fire, flood, theft, etc, there are backup copies at other locations.</p>" +
-							"<p>The keys can be imported at any time by relaunching this tool in a secure environment.</p>" +
-							"<p><span style='color:red'>Do not lose the generated keys or the password or all funds will be lost.</span></p></li>");
+						generateKeysList.append("<li><p>Protecting your keypairs with a passphrase is <i>highly recommended</i>.  Otherwise anyone in possession of the unencrypted private keys can access the funds.</p>");
+						generateKeysList.append("<li><p>Optionally divide your keypairs for maximum security.</p></li>");
+						generateList.append("<li><p>Save the generated keypairs to flash drives and/or print to paper.  Geographic redundancy is <i>highly recommended</i> so there are backup copies at other locations if one location is lost due to fire, theft, etc.</p></li>");
+            generateList.append("<li><p>The keypairs can be imported at any time by relaunching this tool in a secure environment.</p></li>");
+            answerDiv.append("<p><br><div class='flex_horizontal flex_align_start'><img class='faq_caution_img' src='img/caution_solid.png'><span style='color:red'>Do not lose the generated keypairs or the passphrase or all funds will be lost.</span></div></p>");
+            answerDiv.append("<p><div class='flex_horizontal flex_align_start'><img class='faq_caution_img' src='img/caution_solid.png'>Many printers retain a copy of printed documents which cannot be deleted easily but can be accessed with the proper tools.  For maximum security, the printer or other hardware which may retain your sensitive data should be destroyed.</div></p>");
 						return answerDiv;
 					}
 				},{
