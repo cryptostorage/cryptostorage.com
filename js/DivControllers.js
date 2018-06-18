@@ -33,6 +33,7 @@ var UiUtils = {
 	TAILS_LINK: "<a target='_blank' href='https://tails.boum.org'>Tails</a>",
 	DEBIAN_LINK: " <a target='_blank' href='https://www.debian.org/'>Debian</a>",
 	RASPBIAN_LINK: "<a target='_blank' href='https://www.raspberrypi.org'>Raspbian for the Raspberry Pi</a>",
+	SHAMIR_LINK: "<a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a>",
 	INFO_TOOLTIP_MAX_WIDTH: "700px",
 	NOTICE_TOOLTIP_MAX_WIDTH: "700px",
   
@@ -42,9 +43,8 @@ var UiUtils = {
 	 * @param faqNewTab whether or not to open faq hyperlink in new tab
 	 */
   getDivideDescription: function(faqNewTab) {
-    return "<p>This tool uses <a target='_blank' href='https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing'>Shamir's Secret Sharing</a> to divide <a " + (faqNewTab ? "target='_blank'" : "") + "href='index.html#faq_keypair'>private keys</a> into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
-    "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted family member.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>" +
-    "<p>Each divided private key is Base58 encoded with a future version for extensibility, the minimum number of parts necessary to recover the private key, and the output of Shamir's Secret Sharing.</p>";
+    return "<p>This tool uses " + UiUtils.SHAMIR_LINK + " to divide <a " + (faqNewTab ? "target='_blank'" : "") + "href='index.html#faq_keypair'>private keys</a> into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
+    "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted family member.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>";
 	},
 	
 	/**
@@ -1176,10 +1176,14 @@ function FaqController(div) {
 					getQuestion: function() { return "How does CryptoStorage help keep my cryptocurrency safe and secure?"; },
 					getAnswer: function() { return "<p>First, this tool generates keys only in your device's browser.  Keys can be generated offline and are never shared with a third party by design.</p>" + 
 						"<p>Second, private keys can be protected with a passphrase.  The passphrase is required to decrypt the private keys in order to access funds.</p>" + 
-						"<p>Third, private keys can be divided into parts which must be combined to access funds.  For example, a Bitcoin keypair can be divided into 3 parts where 2 parts must be combined to recover the private key.  These parts can be geographically separated to prevent access at any one location.</p>" +
+						"<p>Third, private keys can be <a href='#faq_divide_meaning'>divided into parts</a> which must be combined to access funds.  For example, a Bitcoin keypair can be divided into 3 parts where 2 parts must be combined to recover the private key.  These parts can be geographically separated to prevent access at any one location.</p>" +
 						"<p>Fourth, keys can printed and saved to digital files for long-term storage.</p>" +
 						"<p>Finally, this tool <a href='#faq_recommendations'>automatically detects and recommends</a> ways to improve the security of its environment.</p>"; }
 				}, {
+          id: "faq_divide_meaning",
+          getQuestion: function() { return "What does it mean to divide private keys?"; },
+          getAnswer: function() { return UiUtils.getDivideDescription(false); }
+        }, {
 					id: "faq_recommendations",
 					getQuestion: function() { return "What security recommendations does CryptoStorage make?"; },
 					getAnswer: function() {
@@ -1285,13 +1289,13 @@ function FaqController(div) {
           getQuestion: function() { return "How are keypairs encrypted?"; },
           getAnswer: function() {
             var answerDiv = $("<div>");
-            answerDiv.append("<p>Keypairs are encrypted using <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> with PBKDF2, 10000 iterations, SHA512, and an embedded version for future extensibility unless <a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is supported and enabled.</p>");
+            answerDiv.append("<p>Keypairs are encrypted using <a target='_blank' href='https://github.com/brix/crypto-js'>CryptoJS</a> with PBKDF2, 10000 iterations, SHA512, and a version number for future extensibility unless <a target='_blank' href='https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki'>BIP38</a> is supported and enabled.</p>");
             return answerDiv;
           }
         }, {
           id: "faq_divide",
           getQuestion: function() { return "How are keypairs divided?"; },
-          getAnswer: function() { return UiUtils.getDivideDescription(false); }
+          getAnswer: function() { return "<p>Each private key within a <a href='#faq_keypair'>keypair</a> is divided using " + UiUtils.SHAMIR_LINK + " then base58 encoded with the minimum number of parts to recover the original private key and a version number for future extensibility.</p>"; }
         }, {
 					id: "faq_online_to_recover",
 					getQuestion: function() { return "Do I need to be online to recover private keys?"; },
@@ -3683,7 +3687,7 @@ function EditorDivideController(div, editorController) {
 		formErrorChangeListeners = [];
 		
 		// divide input
-		divideCheckbox = new CheckboxController($("<div>").appendTo(div), "Divide Keypairs?", UiUtils.getDivideDescription(true)).render();
+		divideCheckbox = new CheckboxController($("<div>").appendTo(div), "Divide Keypairs?", UiUtils.getDivideDescription(true) + "<p><a target='_blank' href='index.html#faq_divide'>How are keypairs divided?</a></p>").render();
 		var divideQr = $("<img class='divide_qr' src='img/qr_code.png'>").appendTo(div);
 		var divideLines3 = $("<img class='divide_lines_3' src='img/divide_lines_3.png'>").appendTo(div);
 		var divideNumDiv = $("<div class='divided_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
