@@ -43,8 +43,9 @@ var UiUtils = {
 	 * @param faqNewTab whether or not to open faq hyperlink in new tab
 	 */
   getDivideDescription: function(faqNewTab) {
-    return "<p>This tool uses " + UiUtils.SHAMIR_LINK + " to divide <a " + (faqNewTab ? "target='_blank'" : "") + "href='index.html#faq_keypair'>private keys</a> into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
-    "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted family member.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>";
+    return "<p>This tool uses " + UiUtils.SHAMIR_LINK + " to divide <a " + (faqNewTab ? "target='_blank' " : "") + "href='index.html#faq_keypair'>private keys</a> into parts that can be stored at different physical locations such as a safe, a lockbox, or with a trusted friend or family member.  The private keys cannot be accessed from the parts until a sufficient number of parts are combined.</p>" +
+    "<p>For example, Alice wants to save Bitcoin Cash for her 6 grandchildren.  She generates 6 keypairs, one for each grandchild, and divides the 6 keypairs into 3 parts where 2 parts are required to recover the private keys.  She keeps one part, puts one in a bank, and gives one to a trusted family member.  Funds may not be accessed from the 6 keypairs until 2 of the 3 parts are combined.</p>" +
+    "<p><a " + (faqNewTab ? "target='_blank' " : "") + "href='index.html#faq_divide'>How are keypairs divided?</a></p>";
 	},
 	
 	/**
@@ -3687,7 +3688,7 @@ function EditorDivideController(div, editorController) {
 		formErrorChangeListeners = [];
 		
 		// divide input
-		divideCheckbox = new CheckboxController($("<div>").appendTo(div), "Divide Keypairs?", UiUtils.getDivideDescription(true) + "<p><a target='_blank' href='index.html#faq_divide'>How are keypairs divided?</a></p>").render();
+		divideCheckbox = new CheckboxController($("<div>").appendTo(div), "Divide Keypairs?", UiUtils.getDivideDescription(true)).render();
 		var divideQr = $("<img class='divide_qr' src='img/qr_code.png'>").appendTo(div);
 		var divideLines3 = $("<img class='divide_lines_3' src='img/divide_lines_3.png'>").appendTo(div);
 		var divideNumDiv = $("<div class='divided_input_div flex_vertical flex_align_center flex_justify_start'>").appendTo(div);
