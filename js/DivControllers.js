@@ -2244,7 +2244,7 @@ function ImportTextController(div, plugins, printErrors) {
 		
 		// check if valid piece input
 		if (!piece) {
-			setWarning("Input text is not a private key or piece");
+			setWarning("Input text is not a private key or part");
 			return;
 		}
 		

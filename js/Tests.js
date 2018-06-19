@@ -32,7 +32,7 @@ function Tests() {
 	var PASSPHRASE = "MySuperSecretPassphraseAbcTesting123";
 	var REPEAT_KEYS = 1;             // number of keys to test per plugin without encryption throughout tests
 	var REPEAT_KEYS_ENCRYPTION = 1;  // number of keys to test per plugin with encryption throughout tests
-	var TEST_MAX_PARTS = false;			 // computationally intensive
+	var TEST_MAX_PARTS = true;			 // computationally intensive
 	var NUM_PARTS = 5;
 	var MIN_PARTS = 3;
 	
@@ -1232,6 +1232,7 @@ function Tests() {
 			funcs.push(testJsonNoPrivateKeys());
 			funcs.push(testListOfPrivateKeys());
 			funcs.push(testDividedParts());
+			funcs.push(testPublicAddress());
 			
 			// run tests async
 			async.series(funcs, function(err, results) {
@@ -1288,6 +1289,17 @@ function Tests() {
 				onDone();
 			}
 		}
+		
+    function testPublicAddress() {
+      return function(onDone) {
+        textImporter.startOver();
+        textImporter.setSelectedCurrency("BTC");
+        textImporter.addText("14EPDSsGsipnjTmsd8S2s3df69q8wpg3Ex");
+        assertEquals("Input text is not a private key or part", textImporter.getWarning());
+        assertEquals(0, textImporter.getImportedPieces().length);
+        onDone();
+      }
+    }
 	}
 	
 	function testDestroyPiece(piece, onDone) {
