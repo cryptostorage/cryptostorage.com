@@ -286,6 +286,7 @@ body {
 
 .btn_import {
 	color: white;
+	text-decoration: none;
 }
 
 .btn_import:hover {

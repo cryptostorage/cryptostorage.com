@@ -781,26 +781,13 @@ function AppController(div, hash) {
 		linksDiv.append(faqLink);
 		linksDiv.append(donateLink);
 		
-		// IE ignores hash changes
-		if (getIEVersion() && getIEVersion() < 12) {
-			logo.click(function() { pushAndNavigate("#home"); });
-	    homeLink.click(function() { pushAndNavigate("#home"); });
-	    faqLink.click(function() { pushAndNavigate("#faq"); });
-	    donateLink.click(function() { pushAndNavigate("#donate"); });
-	    function pushAndNavigate(hash) {
-	      if (history.pushState) history.pushState(null, null, hash);
-        else window.location.hash = hash;
-	      navigate(hash);
-	    }
-		}
-		
 		// validate version
 		AppUtils.getVersionNumbers(AppUtils.VERSION);
 		
 		// slider has to be attached to the DOM and shown to work, so it's a special case and not part of HomeController
 		introDiv = $("<div class='intro_div'>").hide();
 		introDiv.appendTo(headerDiv);
-		introController = new IntroController(introDiv, onSelectGenerate, onSelectImport);
+		introController = new IntroController(introDiv);
 		
 		// main content
 		contentDiv = $("<div class='app_content'>").appendTo(div);
@@ -820,9 +807,15 @@ function AppController(div, hash) {
 		}
 		
 		// navigate on browser navigation
-		$(window).on('popstate', function(e) {
-			navigate(window.location.hash);
-		});
+		if (getIEVersion()) {
+	    $(window).on("hashchange", function(e) {
+	      navigate(window.location.hash);
+	    });
+		} else {
+	    $(window).on('popstate', function(e) {
+	      navigate(window.location.hash);
+	    });
+		}
 		
 		// navigate to first page
 		navigate(hash ? hash : window.location.hash, function() {
@@ -896,21 +889,13 @@ function AppController(div, hash) {
 		contentDiv.prepend(div);
 		while (contentDiv.children().length > 1) contentDiv.children().last().detach();
 	}
-	
-	function onSelectGenerate() {
-		UiUtils.openEditorStatic();
-	}
-	
-	function onSelectImport() {
-		navigate("#import");
-	}
 }
 inheritsFrom(AppController, DivController);
 
 /**
  * Intro with slider and call to action.
  */
-function IntroController(div, onSelectGenerate, onSelectImport) {
+function IntroController(div) {
 	DivController.call(this, div);
 	var that = this;
 	this.render = function(onDone) {
@@ -951,14 +936,12 @@ function IntroController(div, onSelectGenerate, onSelectImport) {
 			var ctaDiv = $("<div class='cta_div'>").appendTo(div);
 			
 			// button to generate keys
-			var btnGenerate = $("<div class='light_green_btn'>").appendTo(ctaDiv);
+			var btnGenerate = $("<a class='light_green_btn' target='_blank' href='generate.html'>").appendTo(ctaDiv);
 			btnGenerate.append("Generate New Keys");
-			btnGenerate.click(function() { onSelectGenerate(); });
 			
 			// button to import keys
-			var btnImport = $("<div class='btn_import'>").appendTo(ctaDiv);
+			var btnImport = $("<a class='btn_import' href='index.html#import'>").appendTo(ctaDiv);
 			btnImport.append("or Import Existing Keys");
-			btnImport.click(function() { onSelectImport(); });
 			
 			// initialize slider
 			sliderDiv.on("init", function() { if (onDone) onDone(); });
