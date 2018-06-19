@@ -6,6 +6,7 @@ copied tooltip is not centered for some private keys because div goes under QR
 show print preview right away then print button is progress bar
 2500ms copied tooltip timeout stays active even if tooltip re-clicked so it hides quickly
 when offline, editor notice starts orange then flips to light green
+update donation addresses
 quotes from news articles
 slider points cleanup
 better cryptocash design
