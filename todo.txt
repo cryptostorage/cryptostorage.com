@@ -47,6 +47,7 @@ custom error message for qrs not loading
 evidence of keypair render scratch pad when importing consecutive txts containing only public addresses on linux
 
 low priority:
+IE10 footer not formatted correctly
 view balance qr code on cryptocash
 different print layouts
 blue link against red notice is hard to read
