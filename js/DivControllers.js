@@ -2838,7 +2838,7 @@ function EditorController(div, config) {
 		return passphraseController;
 	}
 	
-	this.getDividedController = function() {
+	this.getDivideController = function() {
 		return divideController;
 	}
 	
@@ -3219,7 +3219,7 @@ function EditorContentController(div, editorController, config) {
 					actionsController.onGenerate(validate);
 					actionsController.onReset(reset);
 					editorController.getPassphraseController().onUsePassphraseChange(updateInteroperableDisclaimer);
-					editorController.getDividedController().onUseDividedChange(updateInteroperableDisclaimer);
+					editorController.getDivideController().onUseDividedChange(updateInteroperableDisclaimer);
 				});
 				
 				// handle pre-existing pieces
@@ -3311,7 +3311,7 @@ function EditorContentController(div, editorController, config) {
 	
 	function updateInteroperableDisclaimer() {
 	  if (interoperableDisclaimerDismissed) return;
-	  if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided()) {
+	  if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDivideController().getUseDivided()) {
 	    interoperableDisclaimerDiv.show();
 	  } else {
 	    interoperableDisclaimerDiv.hide();
@@ -3470,6 +3470,7 @@ function EditorPassphraseController(div, editorController) {
 		
 		// register callbacks
 		passphraseInput.on("input", function(e) {
+		  if (!$(document.activeElement).is('input')) return;	// fix IE infinite loop caused by setting placeholder in update() which triggers input event
 		  setFormError(false);
 		  invoke(inputChangeListeners);
 		});
@@ -4440,7 +4441,7 @@ function EditorActionsController(div, editorController) {
 		});
 		editorController.onFormErrorChange(update);
     editorController.getPassphraseController().onInputChange(update);
-		editorController.getDividedController().onInputChange(update);
+		editorController.getDivideController().onInputChange(update);
 		if (editorController.getContentController().getCurrenciesController()) editorController.getContentController().getCurrenciesController().onInputChange(update);
 		editorController.onGenerate(function(isQuick) {
 			if (isQuick) return;
@@ -4525,7 +4526,7 @@ function EditorActionsController(div, editorController) {
 			btnGenerate.hide();
 			
 			// apply shown iff passphrase or divided checked
-			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDividedController().getUseDivided()) {
+			if (editorController.getPassphraseController().getUsePassphrase() || editorController.getDivideController().getUseDivided()) {
 				btnApply.show()
 				btnApply.unbind("click");
 				btnApply.removeClass("editor_btn_green_pulse");
