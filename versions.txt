@@ -92,7 +92,7 @@ cryptostorage-v0.3.0
 - Added support for Dogecoin and Zcoin
 - Changed terminology from "split into pieces" to "divide into parts"
 - Search engine optimization (robots.txt, anchors with href and text, image alt, etc)
-- Refactored codebase to be more object-oriented
+- Refactored code base to be more object-oriented
 - Replaced individual dependencies with BitcoinJS for extensible network configurations
 - Improved thoroughness of test suite
 - Many other bug fixes and improvements
