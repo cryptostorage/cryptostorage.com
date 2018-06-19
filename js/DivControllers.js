@@ -772,14 +772,27 @@ function AppController(div, hash) {
 		
 		// header links
 		var linksDiv = $("<div class='app_header_links_div'>").appendTo(headerTopDiv);
-		var homeLink = $("<a class='link_div' href='#home' title='Go Home'>Home</a>");
+		var homeLink = $("<a class='link_div' href='index.html#home' title='Go Home'>Home</a>");
 		var gitHubLink = $("<a target='_blank' class='link_div' href='https://github.com/cryptostorage/cryptostorage.com' title='View source code'>GitHub</a>");
-		var faqLink = $("<a class='link_div' href='#faq' title='Go to FAQ'>FAQ</a>");
-		var donateLink = $("<a class='link_div' href='#donate' title='Go to Donate'>Donate</a>");
+		var faqLink = $("<a class='link_div' href='index.html#faq' title='Go to FAQ'>FAQ</a>");
+		var donateLink = $("<a class='link_div' href='index.html#donate' title='Go to Donate'>Donate</a>");
 		linksDiv.append(homeLink);
 		linksDiv.append(gitHubLink);
 		linksDiv.append(faqLink);
 		linksDiv.append(donateLink);
+		
+		// IE ignores hash changes
+		if (getIEVersion() && getIEVersion() < 12) {
+			logo.click(function() { pushAndNavigate("#home"); });
+	    homeLink.click(function() { pushAndNavigate("#home"); });
+	    faqLink.click(function() { pushAndNavigate("#faq"); });
+	    donateLink.click(function() { pushAndNavigate("#donate"); });
+	    function pushAndNavigate(hash) {
+	      if (history.pushState) history.pushState(null, null, hash);
+        else window.location.hash = hash;
+	      navigate(hash);
+	    }
+		}
 		
 		// validate version
 		AppUtils.getVersionNumbers(AppUtils.VERSION);
