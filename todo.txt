@@ -1,4 +1,5 @@
 v0.3.1
+cryptostorage.com-[version].zip drop the .com
 different print layouts on homepage
 bip39 appears vertically too high on standard keypair
 divide part checksum instead of min part encoding (adopt standard)
