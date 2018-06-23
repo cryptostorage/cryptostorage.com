@@ -6556,7 +6556,7 @@ TextPieceRenderer.getRenderWeight = function(config) {
 
 /**
  * Renders a preview of what TextPieceRenderer will render.
-
+ *
  * @param div is the div to render to
  * @param piece is the piece to render
  * @param config specifies render configuration
