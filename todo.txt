@@ -13,6 +13,7 @@ slider points cleanup
 better cryptocash design
 text encryption, division, and import
 why are bip38s generated from ian and i's not importable into other dogecoin tools, why is output of bpw not importable in CS but is for others?
+faq "unless they use same configurations." and use different word than networks
 linux standard keypair renderer private vertical height off                                        
 
 brave error opening editor in homepage even though tab opens
