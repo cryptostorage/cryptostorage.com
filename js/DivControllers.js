@@ -913,9 +913,9 @@ function IntroController(div) {
 			// intro slider
 			sliderDiv = $("<div class='slider_div'>").appendTo(div);
 			getSlide($(mixImg), "Generate offline wallets for major cryptocurrencies.").appendTo(sliderDiv);
+	    getSlide($("<img src='img/microscope.png' alt='Microscope'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
+	    getSlide($("<img src='img/security.png' alt='Security'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
 			getSlide($("<img src='img/printer.png' alt='Printer'>"), "Print paper wallets or save keys to a file for long-term storage.").appendTo(sliderDiv);
-			getSlide($("<img src='img/security.png' alt='Security'>"), "Runs only in your browser so funds are never entrusted to a third party.").appendTo(sliderDiv);
-			getSlide($("<img src='img/microscope.png' alt='Microscope'>"), "100% open source and free to use.  No account necessary.").appendTo(sliderDiv);
 			getSlide($("<img src='img/keys.png' alt='Keys'>"), "Passphrase-protect and divide private keys for maximum security.").appendTo(sliderDiv);
 			getSlide($("<img src='img/checklist.png' alt='Checklist'>"), "Generate keys securely with automatic environment checks.").appendTo(sliderDiv);
 			
