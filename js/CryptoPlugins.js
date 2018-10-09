@@ -640,7 +640,7 @@ BitcoinJsPlugin.COMPRESSED_KEYPAIRS = true;
  */
 var BitcoinJsPlugins = {
 		"BTC": {
-			name: "Bitcoin",
+			name: "Bitcoin-BTC",
 			logoPath: "img/bitcoin.png",
 			donationAddress: "1ArmuyQfgM1Sd3tN1A242FzPhbePfCjbmE",
 			bitcoinjsNetwork: "bitcoin",
@@ -684,7 +684,7 @@ var BitcoinJsPlugins = {
 function BitcoinCashPlugin() {
 	BitcoinJsPlugin.call(this, "BTC");
 	var bitcoinPlugin = new BitcoinJsPlugin("BTC");
-	this.getName = function() { return "Bitcoin Cash"; }
+	this.getName = function() { return "Bitcoin-BCH"; }
 	this.getTicker = function() { return "BCH" };
 	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
 	this.getDependencies = function() { return ["lib/bchaddrjs-0.1.4.js"]; }
