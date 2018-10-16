@@ -1277,7 +1277,7 @@ function FaqController(div) {
           getAnswer: function() {
             var answerDiv = $("<div>");
             answerDiv.append("<p>All unencrypted keys generated with CryptoStorage will work with other wallet software and vice versa.</p>" +
-                "<p>However, there is currently no standardized way of encrypting and dividing cryptocurrency keypairs across all networks.  As a result, this tool applies its own configurations to <a href='#faq_encrypt'>encrypt</a> and <a href='#faq_divide'>divide</a> keypairs which will not work with other tools unless they use same configurations.<br><br>" +
+                "<p>However, there is currently no standardized way of encrypting and dividing cryptocurrency keypairs across all networks.  As a result, this tool applies its own configurations to <a href='#faq_encrypt'>encrypt</a> and <a href='#faq_divide'>divide</a> keypairs which will not work with other tools unless they use the same configurations.<br><br>" +
                 "<b>A copy of this tool should be saved to recover keys in the future if encrypting or dividing keypairs.</b></p>");
             return answerDiv;
           }
