@@ -96,3 +96,10 @@ cryptostorage-v0.3.0
 - Replaced individual dependencies with BitcoinJS for extensible network configurations
 - Improved thoroughness of test suite
 - Many other bug fixes and improvements
+
+10/16/2018
+cryptostorage-v0.3.1
+- Re-order currencies to keep things fresh
+- Re-order slider points to emphasize open source
+- Update donation addresses
+- Fix minor grammar errors
