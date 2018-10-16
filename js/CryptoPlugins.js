@@ -135,7 +135,7 @@ function EthereumPlugin() {
 	this.getTicker = function() { return "ETH" };
 	this.getLogoPath = function() { return "img/ethereum.png"; }
 	this.getDependencies = function() { return ["lib/keythereum.js", "lib/ethereumjs-util.js"]; }
-	this.getDonationAddress = function() { return "0x8074da70E22a58A9E4a5DCeCf968Ea499D60e470"; }
+	this.getDonationAddress = function() { return "0x0791eB42B3864d7A56337Ea48126467982e3181C"; }
 	
 	this.randomPrivateKey = function() {
 		return keythereum.create().privateKey.toString("hex");
@@ -173,7 +173,7 @@ function EthereumClassicPlugin() {
 	this.getName = function() { return "Ethereum Classic"; }
 	this.getTicker = function() { return "ETC" };
 	this.getLogoPath = function() { return "img/ethereum_classic.png"; }
-	this.getDonationAddress = function() { return "0xa3cbe053aebfee6860e82c3ad1415279d8c51503"; }
+	this.getDonationAddress = function() { return "0xD11d6DF296279a816f302d89A736d9ad8c9cD22c"; }
 }
 inheritsFrom(EthereumClassicPlugin, EthereumPlugin);
 
@@ -185,7 +185,7 @@ function OmiseGoPlugin() {
 	this.getName = function() { return "OmiseGo"; }
 	this.getTicker = function() { return "OMG" };
 	this.getLogoPath = function() { return "img/omisego.png"; }
-	this.getDonationAddress = function() { return "0x8b0391215e691c0bee419511e6ec77b1416e8593"; }
+	this.getDonationAddress = function() { return "0xA4a8D19B0a53A38825180D20fF1928D163A57D28"; }
 }
 inheritsFrom(OmiseGoPlugin, EthereumPlugin);
 
@@ -197,7 +197,7 @@ function BasicAttentionTokenPlugin() {
 	this.getName = function() { return "Basic Attention Token"; }
 	this.getTicker = function() { return "BAT" };
 	this.getLogoPath = function() { return "img/bat.png"; }
-	this.getDonationAddress = function() { return "0xf4537a85814e014e0fe31001ae5c5ed68082dbe1"; }
+	this.getDonationAddress = function() { return "0xF9B2C53b16eF43216345CED86667Dd79848FbFD4"; }
 }
 inheritsFrom(BasicAttentionTokenPlugin, EthereumPlugin);
 
@@ -209,7 +209,7 @@ function UbiqPlugin() {
 	this.getName = function() { return "Ubiq"; }
 	this.getTicker = function() { return "UBQ" };
 	this.getLogoPath = function() { return "img/ubiq.png"; }
-	this.getDonationAddress = function() { return "0x0B55537E61B15b5f7601DcBf3Dd26e29a0AeD835"; }
+	this.getDonationAddress = function() { return "0xBE881cc77962f9e856cf22b205e4976590D798D8"; }
 }
 inheritsFrom(UbiqPlugin, EthereumPlugin);
 
@@ -222,7 +222,7 @@ function MoneroPlugin() {
 	this.getPrivateLabel = function() { return "Mnemonic"; }
 	this.getLogoPath = function() { return "img/monero.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/moneroaddress.js"]; }
-	this.getDonationAddress = function() { return "42fuBvVfgPUWphR6C5XgsXDGfx2KVhbv4cjhJDm9Y87oU1ixpDnzF82RAWCbt8p81f26kx3kstGJCat1YEohwS1e1o27zWE"; }
+	this.getDonationAddress = function() { return "47N8VuBwAgxdy67YKrJtPcj5eM2Mh4ApQ39NippUKLsd7FLdkQFXjghKkAGqFqezH4YEHEWqxL7jjHd3JnNH5zYaKggqY7N"; }
 	
 	this.randomPrivateKey = function() {
 		return cnUtil.sc_reduce32(cnUtil.rand_32());
@@ -278,7 +278,7 @@ function RipplePlugin() {
 	this.getTicker = function() { return "XRP" };
 	this.getLogoPath = function() { return "img/ripple.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/ripple-key-pairs.js"]; }
-	this.getDonationAddress = function() { return "r9AWMe2aSjTaj9aWpGrXQAHruodTDnHfaK"; }
+	this.getDonationAddress = function() { return "rh8RvVwP117NhkVVVGMvQ6rx83L6WAZ5pa"; }
 	this.getMinHexLength = function() { return 44; }
 	this.getMaxHexLength = function() { return 44; }
 	
@@ -327,7 +327,7 @@ function StellarPlugin() {
 	this.getTicker = function() { return "XLM" };
 	this.getLogoPath = function() { return "img/stellar.png"; }
 	this.getDependencies = function() { return ["lib/bitaddress.js", "lib/stellar-base.js"]; }
-	this.getDonationAddress = function() { return "GBZBQUK27UKX76JMIURN5ESMJ3EEIAWQONM7HKCIUIRG66ZKLPVKT5Y6"; }
+	this.getDonationAddress = function() { return "GD3PABBSRLIZEOL6HKEHDLIFPG3X5PENS3FEWDDIRLBZPJV3QVZT4FSN"; }
 	
 	this.randomPrivateKey = function() {
 		return StellarBase.Keypair.random().secret();
@@ -438,7 +438,7 @@ function WavesPlugin() {
 	this.getPrivateLabel = function() { return "Mnemonic"; }
 	this.getLogoPath = function() { return "img/waves.png"; }
 	this.getDependencies = function() { return ["lib/bip39.js", "lib/polyfill.js", "lib/waves-api.js"]; }
-	this.getDonationAddress = function() { return "3P2xXtsfe4FUnQmu2iuKwXLshYYc2CjnXQH"; }
+	this.getDonationAddress = function() { return "3PEXKKMfn8MssQie4UAngidff53eznYi5iW"; }
 	this.getMinHexLength = function() { return 42; }
 	this.getMaxHexLength = function() { return 42; }
 	
@@ -500,7 +500,7 @@ function NeoPlugin() {
 	this.getTicker = function() { return "NEO" };
 	this.getLogoPath = function() { return "img/neo.png"; }
 	this.getDependencies = function() { return ["lib/neon.js"]; }
-	this.getDonationAddress = function() { return "AXi7Y5cKG6BWXwUcA5hbCmrExxwbA2yK32"; }
+	this.getDonationAddress = function() { return "AJQpHPQZQamguoRWNvycXpEkrNkasz5YZi"; }
 	
 	this.randomPrivateKey = function() {
 		return Neon.wallet.generatePrivateKey();
@@ -642,38 +642,38 @@ var BitcoinJsPlugins = {
 		"BTC": {
 			name: "Bitcoin-BTC",
 			logoPath: "img/bitcoin.png",
-			donationAddress: "1ArmuyQfgM1Sd3tN1A242FzPhbePfCjbmE",
+			donationAddress: "1MbUDLYixvjifi4kbbK56HS86PpBEoibs6",
 			bitcoinjsNetwork: "bitcoin",
 			encryptionSchemes: [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]
 		},
 		"LTC": {
 			name: "Litecoin",
 			logoPath: "img/litecoin.png",
-			donationAddress: "LSRx2UwU5rjKGcmUXx8KDNTNXMBV1PudHB",
+			donationAddress: "LhHSM8foAxQbHF6hauckXG3XhxMR4By7fu",
 			bitcoinjsNetwork: "litecoin",
 		},
 		"DASH": {
 			name: "Dash",
 			logoPath: "img/dash.png",
-			donationAddress: "XoK6AmEGxAh2WKMh2hkVycnkEdmi8zDaQR",
+			donationAddress: "Xdfrd2fqG672EP4unvr3Ft3dDemv1pyvAB",
 			bitcoinjsNetwork: "dash",
 		},
 		"ZEC": {
 			name: "Zcash",
 			logoPath: "img/zcash.png",
-			donationAddress: "t1g1AQ8Q8yWbkBntunJaKADJ38YjxsDuJ3H",
+			donationAddress: "t1Y9Pz37u4A4uJyznj4DaJ9EVPU3b23k1gN",
 			bitcoinjsNetwork: "zcash",
 		},
 		"DOGE": {
 			name: "Dogecoin",
 			logoPath: "img/dogecoin.png",
-			donationAddress: "D782E2y8gseyBxyuTGumSN8fry2eqFNBdE",
+			donationAddress: "D8jdrFpGNgb5FBdSCShDZXgSEphTiG7akp",
 			bitcoinjsNetwork: "dogecoin",
 		},
 		"XZC": {
 			name: "Zcoin",
 			logoPath: "img/zcoin.png",
-			donationAddress: "YAW9C6VxPhjT8P2sfuEKV2ZZjhG8FXSwHX785EBWhFb9M1u9RtZc",
+			donationAddress: "aNJQsvAVX7LPqvuCyGRNseuFvDr6wNjxFF",
 			bitcoinjsNetwork: "zcoin",
 		}
 };
@@ -688,7 +688,7 @@ function BitcoinCashPlugin() {
 	this.getTicker = function() { return "BCH" };
 	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
 	this.getDependencies = function() { return ["lib/bchaddrjs-0.1.4.js"]; }
-	this.getDonationAddress = function() { return "qqcsh20ltcnxxw2wqd3m7j8j8qeh46qwuv5s93987x"; }
+	this.getDonationAddress = function() { return "qpvuy08ccfn60w89najyt23r43dmskqe6549nygf7p"; }
 	
 	this.randomPrivateKey = function() {
 		return bitcoinPlugin.randomPrivateKey();
