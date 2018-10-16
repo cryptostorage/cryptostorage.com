@@ -345,8 +345,8 @@ var AppUtils = {
       AppUtils.plugins.push(new BitcoinJsPlugin("DOGE"));
       AppUtils.plugins.push(new BitcoinJsPlugin("ZEC"));
       AppUtils.plugins.push(new BitcoinJsPlugin("XZC"));
+      AppUtils.plugins.push(new StellarPlugin());
 	    AppUtils.plugins.push(new BIP39Plugin());
-	    AppUtils.plugins.push(new StellarPlugin());
  			AppUtils.plugins.push(new WavesPlugin());
 			AppUtils.plugins.push(new NeoPlugin());
 			AppUtils.plugins.push(new RipplePlugin());
