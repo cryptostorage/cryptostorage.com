@@ -1199,12 +1199,12 @@ function FaqController(div) {
 					getAnswer: function() {
 						var answerDiv = $("<div>");
 						var generateList = $("<ol>").appendTo(answerDiv);
-						generateList.append("<li><a href='#faq_download_verify'>Download and verify cryptostorage.com-<i>[version]</i>.zip</a>.</li>");
-						var generateTransfer = $("<li><p>Transfer cryptostorage.com-<i>[version]</i>.zip to a secure computer using a flash drive.</p></li>").appendTo(generateList);
+						generateList.append("<li><a href='#faq_download_verify'>Download and verify cryptostorage-<i>[version]</i>.zip</a>.</li>");
+						var generateTransfer = $("<li><p>Transfer cryptostorage-<i>[version]</i>.zip to a secure computer using a flash drive.</p></li>").appendTo(generateList);
 						var generateTransferList = $("<ul>").appendTo(generateTransfer);
 						generateTransferList.append("<li>The computer should be disconnected from the internet.  For maximum security, the device should not connect to the internet after generating cryptocurrency storage.</li>");
 						generateTransferList.append("<li>An open source operating system is recommended like " + UiUtils.TAILS_LINK + ", " + UiUtils.DEBIAN_LINK + ", or " + UiUtils.RASPBIAN_LINK + ".</li>");
-						generateList.append("<li>Unzip cryptostorage.com-<i>[version]</i>.zip</li>");
+						generateList.append("<li>Unzip cryptostorage-<i>[version]</i>.zip</li>");
 						var generateBrowser = $("<li><p>Open index.html in the unzipped folder in a browser.</p></li>").appendTo(generateList);
 						var generateBrowserList = $("<ul>").appendTo(generateBrowser);
 						generateBrowserList.append("<li>An open source browser is recommended like " + UiUtils.FIREFOX_LINK + " or " + UiUtils.CHROMIUM_LINK + ".</li>");
