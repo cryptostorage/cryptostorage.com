@@ -1,5 +1,5 @@
-v0.3.1
-cryptostorage.com-[version].zip drop the .com
+v0.3.2
+csv first column is keypair number
 different print layouts on homepage
 bip39 appears vertically too high on standard keypair
 divide part checksum instead of min part encoding (adopt standard)
@@ -7,15 +7,13 @@ copied tooltip is not centered for some private keys because div goes under QR
 show print preview right away then print button is progress bar
 2500ms copied tooltip timeout stays active even if tooltip re-clicked so it hides quickly
 when offline, editor notice starts orange then flips to light green
-update donation addresses
 quotes from news articles
 slider points cleanup
 better cryptocash design
 text encryption, division, and import
 why are bip38s generated from ian and i's not importable into other dogecoin tools, why is output of bpw not importable in CS but is for others?
-faq "unless they use same configurations." and use different word than networks
 linux standard keypair renderer private vertical height off
-slow to load                                       
+slow to load                                  
 
 brave error opening editor in homepage even though tab opens
 brave print document goes to /undefined and causes error in editor tab
