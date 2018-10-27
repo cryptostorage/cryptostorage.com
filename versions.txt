@@ -103,3 +103,8 @@ cryptostorage-v0.3.1
 - Re-order slider points to emphasize open source
 - Update donation addresses
 - Fix minor grammar errors
+
+10/27/2018
+cryptostorage-v0.3.2
+- Added <h1> for SEO
+- Minor wording changes
