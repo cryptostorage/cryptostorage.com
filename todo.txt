@@ -1,4 +1,5 @@
 v0.3.3
+focus index.html static content for seo: cryptocurrency cold storage paper wallets open source, etc
 "Supports these cryptocurrencies" instead of tokens
 in FAQ link to the code which does encryption and decryption
 http generate.html should redirect to https
