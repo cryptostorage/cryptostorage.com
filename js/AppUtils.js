@@ -335,18 +335,19 @@ var AppUtils = {
 	 */
 	getCryptoPlugins: function() {
 		if (!AppUtils.plugins) {
+			
 			AppUtils.plugins = [];
-			AppUtils.plugins.push(new BitcoinCashPlugin());
-	    AppUtils.plugins.push(new MoneroPlugin());
-			AppUtils.plugins.push(new EthereumPlugin());
 			AppUtils.plugins.push(new BitcoinJsPlugin("BTC"));
-	    AppUtils.plugins.push(new BitcoinJsPlugin("LTC"));
-	    AppUtils.plugins.push(new BitcoinJsPlugin("DASH"));
-      AppUtils.plugins.push(new BitcoinJsPlugin("DOGE"));
-      AppUtils.plugins.push(new BitcoinJsPlugin("ZEC"));
-      AppUtils.plugins.push(new BitcoinJsPlugin("XZC"));
-      AppUtils.plugins.push(new StellarPlugin());
-	    AppUtils.plugins.push(new BIP39Plugin());
+	    	AppUtils.plugins.push(new MoneroPlugin());
+			AppUtils.plugins.push(new EthereumPlugin());
+			AppUtils.plugins.push(new BitcoinCashPlugin());
+	    	AppUtils.plugins.push(new BitcoinJsPlugin("LTC"));
+	    	AppUtils.plugins.push(new BitcoinJsPlugin("DASH"));
+      		AppUtils.plugins.push(new BitcoinJsPlugin("DOGE"));
+      		AppUtils.plugins.push(new BitcoinJsPlugin("ZEC"));
+      		AppUtils.plugins.push(new BitcoinJsPlugin("XZC"));
+      		AppUtils.plugins.push(new StellarPlugin());
+	    	AppUtils.plugins.push(new BIP39Plugin());
  			AppUtils.plugins.push(new WavesPlugin());
 			AppUtils.plugins.push(new NeoPlugin());
 			AppUtils.plugins.push(new RipplePlugin());
