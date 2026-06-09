@@ -628,17 +628,29 @@ CryptoPiece.parseTextPiece = function(txt) {
 	assertString(txt);
 	
 	// annotate text
-	var annotatedText = new AnnotatedText(txt.toLowerCase());			// going to be annotating text with metadata
-	annotateCryptos(annotatedText, AppUtils.getCryptoPlugins());	// identify all crypo instances by name
-	annotatedText.removeSubsumedAnnotations();										// remove any that are covered by a larger annotation
-	annotatePublicPrivateLabels(annotatedText);										// identify all labels for public/private values
-	annotatePublicPrivateValues(annotatedText);										// identify all private values
-	annotatedText.removeSubsumedAnnotations();										// remove any that are covered by a larger annotation
-	return annotatedTextToPiece(annotatedText);										// convert the annotated text to a crypo piece
+	var annotatedText = new AnnotatedText(txt.toLowerCase());		// going to be annotating text with metadata
+	annotateCryptos(annotatedText, AppUtils.getCryptoPlugins());	// identify all crypto instances by name
+	annotatedText.removeSubsumedAnnotations();						// remove any that are covered by a larger annotation
+	annotatePublicPrivateLabels(annotatedText);						// identify all labels for public/private values
+	annotatePublicPrivateValues(annotatedText);						// identify all private values
+	annotatedText.removeSubsumedAnnotations();						// remove any that are covered by a larger annotation
+	return annotatedTextToPiece(annotatedText);						// convert the annotated text to a crypto piece
 	
 	function annotateCryptos(annotatedText, plugins) {
 		for (var i = 0; i < plugins.length; i++) {
-			annotateInstances(annotatedText, plugins[i].getName().toLowerCase(), null, null, {plugin: plugins[i]}, true);
+
+			// gather all names to search for
+			var names = [plugins[i].getName()];
+			if (typeof plugins[i].getHistoricalNames === 'function') {
+				names = names.concat(plugins[i].getHistoricalNames() || []);
+			}
+
+			// annotate names in text
+			for (var j = 0; j < names.length; j++) {
+				var name = names[j];
+				if (!name) continue;
+				annotateInstances(annotatedText, name.toLowerCase(), null, null, {plugin: plugins[i]}, true);
+			}
 		}
 	}
 	

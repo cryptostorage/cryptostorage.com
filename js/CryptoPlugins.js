@@ -558,6 +558,7 @@ function BitcoinJsPlugin(ticker) {
 	this.getLogoPath = function() { return BitcoinJsPlugins[ticker].logoPath; }
 	this.getDependencies = function() { return ["lib/bitcoinjs-3.3.2.js"]; }
 	this.getDonationAddress = function() { return BitcoinJsPlugins[ticker].donationAddress }
+	this.getHistoricalNames = function() { return BitcoinJsPlugins[ticker].historicalNames || []; }
 	
 	// initialize encryption schemes
 	if (BitcoinJsPlugins[ticker].encryptionSchemes) {
@@ -640,11 +641,12 @@ BitcoinJsPlugin.COMPRESSED_KEYPAIRS = true;
  */
 var BitcoinJsPlugins = {
 		"BTC": {
-			name: "Bitcoin-BTC",
+			name: "Bitcoin",
 			logoPath: "img/bitcoin.png",
 			donationAddress: "1MbUDLYixvjifi4kbbK56HS86PpBEoibs6",
 			bitcoinjsNetwork: "bitcoin",
-			encryptionSchemes: [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS]
+			encryptionSchemes: [AppUtils.EncryptionScheme.V1_CRYPTOJS, AppUtils.EncryptionScheme.BIP38, AppUtils.EncryptionScheme.V0_CRYPTOJS],
+			historicalNames: ["Bitcoin-BTC"]
 		},
 		"LTC": {
 			name: "Litecoin",
@@ -684,11 +686,12 @@ var BitcoinJsPlugins = {
 function BitcoinCashPlugin() {
 	BitcoinJsPlugin.call(this, "BTC");
 	var bitcoinPlugin = new BitcoinJsPlugin("BTC");
-	this.getName = function() { return "Bitcoin-BCH"; }
+	this.getName = function() { return "Bitcoin Cash"; }
 	this.getTicker = function() { return "BCH" };
 	this.getLogoPath = function() { return "img/bitcoin_cash.png"; }
 	this.getDependencies = function() { return ["lib/bchaddrjs-0.1.4.js"]; }
 	this.getDonationAddress = function() { return "qpvuy08ccfn60w89najyt23r43dmskqe6549nygf7p"; }
+	this.getHistoricalNames = function() { return ["Bitcoin-BCH"]; }
 	
 	this.randomPrivateKey = function() {
 		return bitcoinPlugin.randomPrivateKey();
