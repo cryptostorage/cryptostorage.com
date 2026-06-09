@@ -1039,14 +1039,14 @@ CryptoKeypair.getDecryptWeight = function(schemes) {
 
 // enumerates keypair fields and maps to human readable strings
 CryptoKeypair.Field = {
-		TICKER: "Ticker",
+	TICKER: "Ticker",
     PUBLIC_ADDRESS: "Public Address",
-		PRIVATE_HEX: "Private Hex",
-		PRIVATE_WIF: "Private WIF",
+	PRIVATE_HEX: "Private Hex",
+	PRIVATE_WIF: "Private WIF",
     PRIVATE_STATE: "Private State",
-		ENCRYPTION: "Encryption",
-		IS_DIVIDED: "Is Divided",
-		MIN_PARTS: "Minimum Parts",
+	ENCRYPTION: "Encryption",
+	IS_DIVIDED: "Is Divided",
+	MIN_PARTS: "Minimum Parts",
     PART_NUM: "Part Number"
 }
 
